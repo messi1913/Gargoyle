@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.cell.TreeItemPropertyValueFactory?>
+
+<fx:root prefHeight="378.0" prefWidth="959.0" type="BorderPane"
+	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+	<left>
+		<VBox spacing="5.0" BorderPane.alignment="CENTER">
+			<children>
+				<Button defaultButton="true" mnemonicParsing="false"
+					prefWidth="75.0" text="추가" />
+				<Button defaultButton="true" mnemonicParsing="false"
+					prefWidth="75.0" text="제거" />
+				<Button defaultButton="true" mnemonicParsing="false"
+					prefWidth="75.0" text="청소" />
+				<Button defaultButton="true" mnemonicParsing="false"
+					prefWidth="75.0" text="위로" />
+				<Button defaultButton="true" mnemonicParsing="false"
+					prefWidth="75.0" text="아래로" />
+			</children>
+			<padding>
+				<Insets left="5.0" right="5.0" top="5.0" />
+			</padding>
+		</VBox>
+	</left>
+	<center>
+		<TreeTableView fx:id="treeIndex" prefHeight="200.0"
+			prefWidth="200.0" BorderPane.alignment="CENTER" showRoot="false">
+			<columns>
+				<TreeTableColumn fx:id="tcName" prefWidth="683.0"
+					text="이름">
+					<!-- <cellValueFactory> -->
+					<!-- <TreeItemPropertyValueFactory -->
+					<!-- property="name"> -->
+					<!-- </TreeItemPropertyValueFactory> -->
+					<!-- </cellValueFactory> -->
+				</TreeTableColumn>
+				<TreeTableColumn fx:id="tcType" prefWidth="156.0"
+					text="유형/길이">
+					<!-- <cellValueFactory> -->
+					<!-- <TreeItemPropertyValueFactory -->
+					<!-- property="type"> -->
+					<!-- </TreeItemPropertyValueFactory> -->
+					<!-- </cellValueFactory> -->
+				</TreeTableColumn>
+			</columns>
+		</TreeTableView>
+	</center>
+</fx:root>

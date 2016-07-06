@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.cell.MapValueFactory?>
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="507.0" prefWidth="500.0" tabClosingPolicy="UNAVAILABLE" type="TabPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+	<tabs>
+		<Tab closable="false" text="General">
+			<content>
+				<AnchorPane>
+					<children>
+						<TableView fx:id="tbFileProperties" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+							<columns>
+								<TableColumn fx:id="tcKey" minWidth="171.0" prefWidth="171.0" text="key">
+									<cellValueFactory>
+										<MapValueFactory key="key" />
+									</cellValueFactory>
+								</TableColumn>
+								<TableColumn fx:id="tcValue" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="-1.0" text="Value">
+									<cellValueFactory>
+										<MapValueFactory key="value" />
+									</cellValueFactory>
+								</TableColumn>
+							</columns>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+						</TableView>
+					</children>
+				</AnchorPane>
+			</content>
+		</Tab>
+	</tabs>
+</fx:root>

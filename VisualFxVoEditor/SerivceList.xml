@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<services>
+    <person>
+        <appName>com.samsung.sds.sos.server.fx.sys.au.app.SysAuA00MApp</appName>
+        <colReqJson>{"authSingleInDVO":{}}</colReqJson>
+        <concreateName>com.samsung.sds.sos.context.fx.sys.au.AuthSingleSVO</concreateName>
+        <methodName>listRoles</methodName>
+    </person>
+</services>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.web.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="756.0" prefWidth="856.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.component.HtmlBaseDiffAppController">
+	<center>
+		<BorderPane fx:id="borMain" prefHeight="636.0" prefWidth="782.0" BorderPane.alignment="CENTER">
+			<center>
+				<StackPane BorderPane.alignment="CENTER">
+					<children>
+						<SplitPane dividerPositions="0.4707259953161593" prefHeight="160.0" prefWidth="200.0">
+							<items>
+								<VBox>
+									<children>
+										<Label text="Reviced" />
+										<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <WebView layoutX="46.0" layoutY="50.0" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children>
+										</AnchorPane>
+									</children>
+								</VBox>
+								<VBox>
+									<children>
+										<Label text="Origin" />
+										<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <WebView minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children>
+										</AnchorPane>
+									</children>
+								</VBox>
+							</items>
+						</SplitPane>
+					</children>
+				</StackPane>
+			</center>
+			<top>
+				<BorderPane fx:id="borControls" BorderPane.alignment="CENTER">
+					<left>
+						<GridPane fx:id="gpSnap" prefHeight="150.0" BorderPane.alignment="CENTER">
+							<columnConstraints>
+								<ColumnConstraints hgrow="NEVER" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" />
+								<ColumnConstraints hgrow="NEVER" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" />
+							</columnConstraints>
+							<rowConstraints>
+								<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+							</rowConstraints>
+						</GridPane>
+					</left>
+					<center>
+						<VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+							<children>
+								<VBox VBox.vgrow="ALWAYS">
+									<children>
+										<Label text="Revice Text" />
+										<TextArea fx:id="txtRevice" prefHeight="200.0" prefWidth="200.0" />
+									</children>
+								</VBox>
+								<VBox VBox.vgrow="ALWAYS">
+									<children>
+										<Label text="Origin Text" />
+										<TextArea fx:id="txtOrigin" prefHeight="200.0" prefWidth="200.0" />
+									</children>
+								</VBox>
+							</children>
+						</VBox>
+					</center>
+					<right>
+						<Button fx:id="btnCompare" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Compare" BorderPane.alignment="CENTER" />
+					</right>
+				</BorderPane>
+			</top>
+		</BorderPane>
+	</center>
+	<bottom>
+		<TableView fx:id="tvChgHis" prefHeight="202.0" prefWidth="782.0" BorderPane.alignment="CENTER">
+			<columns>
+				<TableColumn fx:id="colStatus" prefWidth="75.0" text="Status" />
+				<TableColumn fx:id="colPosition" prefWidth="75.0" text="Position" />
+				<TableColumn prefWidth="153.0" text="Chg Contents">
+					<columns>
+						<TableColumn fx:id="colRevice" prefWidth="153.0" text="Revice" />
+						<TableColumn fx:id="colOrigin" prefWidth="153.0" text="Origin" />
+					</columns>
+				</TableColumn>
+			</columns>
+		</TableView>
+	</bottom>
+</BorderPane>

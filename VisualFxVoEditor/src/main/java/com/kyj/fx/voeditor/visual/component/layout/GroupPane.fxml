@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.*?>
+<?import javafx.embed.swing.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity"
+	minHeight="-Infinity" minWidth="-Infinity" prefHeight="515.0"
+	prefWidth="612.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8"
+	xmlns:fx="http://javafx.com/fxml/1">
+	<children>
+		<StackPane prefHeight="150.0" prefWidth="200.0">
+			<children>
+				<AnchorPane prefHeight="200.0" prefWidth="200.0"
+					style="-fx-background-color: white; -fx-border-color: black;">
+					<StackPane.margin>
+						<Insets bottom="5.0" left="5.0" right="5.0" top="15.0" />
+					</StackPane.margin>
+				</AnchorPane>
+			</children>
+		</StackPane>
+		<Label alignment="CENTER" style="-fx-background-color: white;"
+			text="GroupName" StackPane.alignment="TOP_LEFT">
+			<StackPane.margin>
+				<Insets left="7.0" top="7.0" />
+			</StackPane.margin>
+			<padding>
+				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+			</padding>
+		</Label>
+	</children>
+</StackPane>

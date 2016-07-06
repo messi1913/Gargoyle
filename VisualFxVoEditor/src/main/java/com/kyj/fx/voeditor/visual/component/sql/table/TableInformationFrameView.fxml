@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<fx:root prefHeight="785.0" prefWidth="1227.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<SplitPane fx:id="splitMainContent" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+			<items>
+				<TabPane fx:id="tabInformations" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+				</TabPane>
+				<BorderPane fx:id="borTableColumnInformation" />
+			</items>
+		</SplitPane>
+	</center>
+	<bottom>
+		<HBox spacing="5.0" BorderPane.alignment="CENTER">
+			<children>
+				<Button defaultButton="true" mnemonicParsing="false" prefWidth="90.0" text="도움말" />
+				<Button fx:id="btnReload" defaultButton="true" mnemonicParsing="false" onMouseClicked="#btnReloadOnMouseClick" prefWidth="90.0" text="다시불러오기" />
+				<Button defaultButton="true" mnemonicParsing="false" prefWidth="90.0" text="저장" />
+			</children>
+			<padding>
+				<Insets bottom="5.0" left="5.0" top="5.0" />
+			</padding>
+		</HBox>
+	</bottom>
+</fx:root>

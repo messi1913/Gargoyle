@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.cell.MapValueFactory?>
+<?import javafx.scene.control.cell.TextFieldTableCell?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<fx:root prefHeight="400.0" prefWidth="385.0" type="BorderPane"
+	xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<TableView fx:id="gvMappingItems" editable="true"
+			prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+			<columns>
+				<TableColumn fx:id="colVarName" editable="true" text="Name">
+				</TableColumn>
+				<TableColumn fx:id="colVarType" editable="true" text="Type">
+				</TableColumn>
+				<TableColumn fx:id="colVarValue" editable="true" text="Value">
+				</TableColumn>
+			</columns>
+		</TableView>
+	</center>
+	<top>
+		<HBox alignment="CENTER_RIGHT" spacing="5.0"
+			BorderPane.alignment="CENTER">
+			<children>
+				<Button fx:id="btnAddItem" mnemonicParsing="false"
+					onMouseClicked="#btnAddItemOnMouseClick" prefWidth="60.0" text="추가" />
+				<Button fx:id="btnRemoveItem" mnemonicParsing="false"
+					onMouseClicked="#btnRemoveItemOnMouseClick" prefWidth="60.0" text="삭제" />
+			</children>
+			<padding>
+				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+			</padding>
+		</HBox>
+	</top>
+</fx:root>

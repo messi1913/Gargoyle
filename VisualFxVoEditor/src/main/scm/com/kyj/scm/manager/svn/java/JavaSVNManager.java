@@ -1,0 +1,215 @@
+/********************************
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : kyj.Fx.scm.manager.core
+ *	작성일   : 2016. 3. 22.
+ *	작성자   : KYJ
+ *******************************/
+package com.kyj.scm.manager.svn.java;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.List;
+import java.util.Properties;
+import java.util.function.Consumer;
+
+import org.tmatesoft.svn.core.SVNDirEntry;
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.wc.SVNRevision;
+
+import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
+import com.kyj.scm.manager.core.commons.SVNKeywords;
+
+/**
+ * SVN명령어를 모아놓은 매니저클래스
+ *
+ * @author KYJ
+ *
+ */
+public class JavaSVNManager implements SVNKeywords {
+
+	private SVNCat catCommand;
+
+	private SVNList listCommand;
+
+	private SVNLog logCommand;
+
+	private SVNCheckout checkoutCommand;
+
+	private SVNDiff diffCommand;
+
+	private Properties properties;
+
+	public JavaSVNManager(Properties properties) {
+		init(properties);
+	}
+
+	/**
+	 * 초기화 처리
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 4. 2.
+	 * @param properties
+	 */
+	void init(Properties properties) {
+		this.properties = properties;
+		this.checkoutCommand = new SVNCheckout(properties);
+		this.catCommand = new SVNCat(properties);
+		this.listCommand = new SVNList(properties);
+		this.logCommand = new SVNLog(properties);
+		this.diffCommand = new SVNDiff(properties);
+	}
+
+	/**
+	 * URL정보가 존재하는지 체크함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 4. 4.
+	 * @return
+	 */
+	public boolean isContainsURL() {
+		return this.properties.containsKey(SVN_URL) && this.properties.containsValue(SVN_URL);
+	}
+
+	/**
+	 * USER ID정보가 존재하는지 체크함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 4. 4.
+	 * @return
+	 */
+	public boolean isContainsUserId() {
+		return this.properties.containsKey(SVN_USER_ID) && this.properties.containsValue(SVN_USER_ID);
+	}
+
+	/**
+	 * SVN Connection URL RETURN.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 4. 2.
+	 * @return
+	 */
+	public String getUrl() {
+		Object objURL = this.properties.get(SVN_URL);
+		if (objURL == null)
+			throw new GagoyleParamEmptyException("SVN URL IS EMPTY.");
+		return objURL.toString();
+	}
+
+	public String getUserId() {
+		Object objUserId = this.properties.get(SVN_USER_ID);
+		if (objUserId == null)
+			throw new GagoyleParamEmptyException("SVN URL IS EMPTY.");
+		return objUserId.toString();
+	}
+
+	/**
+	 * svn cat명령어
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 3. 23.
+	 * @param param
+	 * @return
+	 */
+	public String cat(String param) {
+		return catCommand.cat(param);
+	}
+
+	/**
+	 * svn cat명령어
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 3. 23.
+	 * @param revision
+	 * @param path
+	 * @return
+	 */
+	public String cat(String path, String revision) {
+		return catCommand.cat(path, revision);
+	}
+
+	/**
+	 * svn cat명령어
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 3. 23.
+	 * @param param
+	 * @return
+	 */
+	public List<String> list(String path) {
+		return listCommand.list(path);
+	}
+
+	public List<SVNDirEntry> listEntry(String path) {
+		return listCommand.listEntry(path, "-1", false, null);
+	}
+
+	/**
+	 * svn 리비젼 정보 조회
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 3. 24.
+	 * @param param
+	 * @return
+	 */
+	public List<SVNLogEntry> log(String path) {
+		return logCommand.log(path);
+	}
+
+	/**
+	 * svn 리비젼 정보 조회
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 6. 13.
+	 * @param path
+	 * @param revision
+	 * @param exceptionHandler
+	 * @return
+	 */
+	public List<SVNLogEntry> log(String path, String revision, Consumer<Exception> exceptionHandler) {
+		return logCommand.log(path, revision, exceptionHandler);
+	}
+
+	/**
+	 * 코드 체크아웃
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 3. 24.
+	 * @param param
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public Long checkout(String param, File outDir) throws FileNotFoundException {
+		return checkoutCommand.checkout(param, outDir);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 5. 5. 작성자 : KYJ
+	 *
+	 * 차이점 비교
+	 *
+	 * @param path1
+	 * @param path2
+	 * @return
+	 * @throws SVNException
+	 ********************************/
+	public String diff(String path1, String path2) throws SVNException {
+		return diffCommand.diff(path1, path2);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 5. 5. 작성자 : KYJ
+	 *
+	 *
+	 * @param path1
+	 * @param rivision1
+	 * @param path2
+	 * @param rivision2
+	 * @return
+	 * @throws SVNException
+	 ********************************/
+	public String diff(String path1, SVNRevision rivision1, String path2, SVNRevision rivision2) throws SVNException {
+		return diffCommand.diff(path1, rivision1, path2, rivision2);
+	}
+
+}

@@ -1,0 +1,30 @@
+.root
+{
+	-fx-background-color:  #212021
+}
+
+TilePane
+{
+	-fx-border-color: #CEE7E7;
+	-fx-border-image-width: 0.1px ;
+	-fx-padding: 5.0px ;
+    -fx-background-insets: -1.4, 0, 1, 2;
+	-fx-border-style: solid  ;
+}
+
+TilePane .label
+{
+	-fx-text-fill:  #CEE7E7;
+	-fx-font-size: 15.0;
+	-fx-border-color: #CEE7E7;
+	-fx-border-style: dotted   ;
+	-fx-border-image-width: 0.1px ;
+}
+
+.label:hover
+{
+	-fx-font-weight: 5;
+	-fx-font-size: 19.0;
+	-fx-background-color: #4B494B;
+	-fx-cursor: hand ;
+}

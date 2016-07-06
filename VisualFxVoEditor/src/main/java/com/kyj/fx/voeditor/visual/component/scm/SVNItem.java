@@ -1,0 +1,134 @@
+/********************************
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.component.scm
+ *	작성일   : 2016. 4. 2.
+ *	작성자   : KYJ
+ *******************************/
+package com.kyj.fx.voeditor.visual.component.scm;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.tmatesoft.svn.core.SVNDirEntry;
+import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNURL;
+
+import com.kyj.scm.manager.svn.java.JavaSVNManager;
+
+/**
+ * SCMITEM 정의
+ *
+ * @author KYJ
+ *
+ */
+public class SVNItem implements SCMItem<SVNItem> {
+
+	private static Logger LOGGER = LoggerFactory.getLogger(SVNItem.class);
+	public String path;
+
+	public String simpleName;
+
+	public boolean isDir;
+
+	private JavaSVNManager manager;
+
+	/**
+	 * @param manager
+	 */
+	public SVNItem(JavaSVNManager manager) {
+		this.manager = manager;
+	}
+
+	/**
+	 * @param path
+	 * @param manager
+	 */
+	public SVNItem(String path, JavaSVNManager manager) {
+		this.manager = manager;
+		this.path = path;
+	}
+
+	/**
+	 * @param path
+	 * @param simpleName
+	 * @param manager
+	 */
+	public SVNItem(String path, String simpleName, JavaSVNManager manager) {
+		this.manager = manager;
+		this.path = path;
+		this.simpleName = simpleName;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public boolean isDir() {
+		return isDir;
+	}
+
+	public void setDir(boolean isDir) {
+		this.isDir = isDir;
+	}
+
+	public String getSimpleName() {
+		return simpleName;
+	}
+
+	public void setSimpleName(String simpleName) {
+		this.simpleName = simpleName;
+	}
+
+	/**
+	 * @return the manager
+	 */
+	public final JavaSVNManager getManager() {
+		return manager;
+	}
+
+	/*
+	 * @inheritDoc
+	 */
+	@Override
+	public List<SVNItem> getChildrens() {
+		String svnUrl = manager.getUrl();
+		String _path = path;
+
+		List<SVNDirEntry> list = manager.listEntry(_path);
+		List<SVNItem> collect = list.stream().map(p -> {
+			String svnPath = p.getURL().getPath();
+			String url = p.getURL().toString();
+			svnPath = url.replaceFirst(svnUrl, "");
+
+			String name = p.getName();
+			SVNItem svnItem = null;
+
+			// scm에서 디렉토리인경우 /로 끝남.
+			SVNNodeKind kind = p.getKind();
+			if (kind == SVNNodeKind.DIR) {
+				svnItem = new SVNDirItem(svnPath, name, manager);
+				svnItem.setDir(true);
+				LOGGER.info("{} .... Dir {}", name, true);
+			} else {
+				svnItem = new SVNFileItem(svnPath, name, manager);
+				svnItem.setDir(false);
+				LOGGER.info("{} .... File {}", name, true);
+			}
+
+			return svnItem;
+		}).collect(Collectors.toList());
+		return collect;
+	}
+
+	@Override
+	public String toString() {
+		return simpleName;
+	}
+
+}

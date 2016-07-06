@@ -1,0 +1,254 @@
+/********************************
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.util
+ *	작성일   : 2015. 10. 15.
+ *	프로젝트 : VisualFxVoEditor
+ *	작성자   : KYJ
+ *******************************/
+package com.kyj.fx.voeditor.visual.momory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
+
+import org.apache.commons.collections.map.HashedMap;
+
+import com.kyj.scm.manager.core.commons.SVNKeywords;
+
+import kyj.Fx.dao.wizard.memory.IFileBaseConfiguration;
+
+/**
+ * 사용자 정의 속성들 Writable속성
+ *
+ * @author KYJ
+ *
+ */
+public class ResourceLoader implements IFileBaseConfiguration {
+
+	/* SVN 키 */
+	public static final String SVN_USER_ID = SVNKeywords.SVN_USER_ID;
+	public static final String SVN_USER_PASS = SVNKeywords.SVN_USER_PASS;
+	public static final String SVN_PATH = SVNKeywords.SVN_PATH;
+	/**
+	 * @최초생성일 2016. 4. 3.
+	 */
+	public static final String SVN_REPOSITORIES = SVNKeywords.SVN_REPOSITORIES;
+
+	public static final String BASE_KEY_JDBC_DRIVER = "jdbc.driver";
+	public static final String BASE_KEY_JDBC_URL = "jdbc.url";
+	public static final String BASE_KEY_JDBC_ID = "jdbc.id";
+	public static final String BASE_KEY_JDBC_PASS = "jdbc.pass";
+	public static final String BASE_KEY_JDBC_INFO = "database.info";
+	/**
+	 * 프로그램 기본 시작 정보를 반환한다. KYJ
+	 */
+	public static final String BASE_DIR = "base.dir";
+
+	/* 프록시 정보를 세팅한다. */
+	public static final String HTTP_PROXY_HOST = "http.proxyHost";
+	public static final String HTTP_PROXY_PORT = "http.proxyPort";
+	public static final String HTTPS_PROXY_HOST = "https.proxyHost";
+	public static final String HTTPS_PROXY_PORT = "https.proxyPort";
+	public static final String DBMS_SUPPORT = "dbms.support";
+
+	/* Supported Databases */
+	public static final String DBMS_SUPPORT_ORACLE = "Oracle";
+	public static final String DBMS_SUPPORT_POSTGRE = "Postgre";
+	public static final String DBMS_SUPPORT_MY_SQL = "Mysql";
+	public static final String DBMS_SUPPORT_H2 = "H2";
+	public static final String DBMS_SUPPORT_Sqlite = "Sqlite";
+
+	/* Database Driver */
+	public static final String ORG_MARIADB_JDBC_DRIVER = "org.mariadb.jdbc.Driver";
+	public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
+	public static final String ORACLE_JDBC_DRIVER_ORACLEDRIVER = "oracle.jdbc.driver.OracleDriver";
+	public static final String ORG_H2_DRIVER = "org.h2.Driver";
+	public static final String ORG_SQLITE_JDBC = "org.sqlite.JDBC";
+
+
+	public static final String START_URL = "start.url";
+
+	/**
+	 * 씬빌더 위치정보
+	 * @최초생성일 2016. 6. 19.
+	 */
+	public static final String SCENEBUILDER_LOCATION= "scenebuilder.location";
+
+	/**
+	 * 사용자가 파일트리에서 선택한 경로 정보
+	 *
+	 * @최초생성일 2015. 10. 15.
+	 */
+	public static final String USER_SELECT_LOCATION_PATH = "user.select.location.path";
+
+	private static Properties properties;
+	private static ResourceLoader loader;
+
+	private static final String FILE_NAME = "UserConf.properties";
+	public static final String DATABASE_COLUMN_ORDER = "database.column.order";
+	public static final Object DBMS = "dbms";
+
+	/**
+	 * 컬럼 크기가 큰 경우 데이터 맵핑을 생략할건지 유무
+	 *
+	 * @최초생성일 2016. 2. 11.
+	 */
+	public static final String SKIP_BIG_DATA_COLUMN = "skip.big.data.column";
+	/**
+	 * 쿼리결과에 대해 MAX로우 처리를 할지
+	 *
+	 * @최초생성일 2016. 2. 11.
+	 */
+	public static final String APPLY_MAX_ROW_COUNT = "apply.max.row.count";
+
+	private String[] baseKeys = { BASE_KEY_JDBC_INFO, BASE_KEY_JDBC_DRIVER, BASE_KEY_JDBC_URL, BASE_KEY_JDBC_ID, BASE_KEY_JDBC_PASS,
+			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES };
+
+	public static ResourceLoader getInstance() {
+		if (loader == null) {
+			loader = new ResourceLoader();
+			loader.initialize();
+		}
+		return loader;
+	}
+
+	private ResourceLoader() {
+		initialize();
+	}
+
+	private void initialize() {
+		properties = new Properties();
+
+		FileInputStream inStream = null;
+		try {
+			File file = new File(FILE_NAME);
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			inStream = new FileInputStream(FILE_NAME);
+			properties.load(inStream);
+			baseKeyLoad(properties);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (inStream != null)
+					inStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 기본키값이 존재하지않으면 로드
+	 *
+	 * @Date 2015. 10. 15.
+	 * @param properties
+	 * @User KYJ
+	 */
+	private void baseKeyLoad(Properties properties) {
+		for (String key : baseKeys) {
+			if (properties.containsKey(key))
+				continue;
+			if (APPLY_MAX_ROW_COUNT.equals(key) || SKIP_BIG_DATA_COLUMN.equals(key)) {
+				properties.put(key, "true");
+			}
+			properties.put(key, "");
+		}
+
+		for (String key : properties.keySet().toArray(new String[0])) {
+			if (key.startsWith("database.info.") && !properties.containsKey(key)) {
+				properties.put(key, "");
+			}
+		}
+	}
+
+	public void initDataBaseInfo() {
+		for (String key : properties.keySet().toArray(new String[0])) {
+			if (key.startsWith("database.info.")) {
+				properties.remove(key);
+			}
+		}
+	}
+
+	public synchronized void putAll(Map<String, Object> bufMap) {
+		properties.putAll(bufMap);
+		store();
+	}
+
+	public synchronized void putAll(Properties prop) {
+		prop.entrySet().stream().forEach(e -> {
+			properties.put(e.getKey(), e.getValue());
+		});
+
+		store();
+	}
+
+	public synchronized void put(String key, String value) {
+		properties.put(key, value);
+		store();
+	}
+
+	/**
+	 * 파일에 적용처리
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 11. 4.
+	 */
+	private void store() {
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(FILE_NAME);
+			properties.store(out, "User Conf...");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (out != null)
+					out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public String get(String key) {
+		String property = properties.getProperty(key);
+		if (property == null || property.isEmpty())
+			return ConfigResourceLoader.getInstance().get(key);
+		return property;
+	}
+
+	String get(String key, int roopCount) {
+		roopCount++;
+		String property = properties.getProperty(key);
+		if (property == null || property.isEmpty())
+			return ConfigResourceLoader.getInstance().get(key, roopCount);
+		return property;
+	}
+
+	public Enumeration<Object> keySet() {
+		return properties.keys();
+	}
+
+	public Set<Entry<Object, Object>> getEntry() {
+		return properties.entrySet();
+	}
+
+	public Map<String, Object> toMap() {
+		return new HashedMap(properties);
+	}
+
+	@Override
+	public String getFileName() {
+		return FILE_NAME;
+	}
+
+}

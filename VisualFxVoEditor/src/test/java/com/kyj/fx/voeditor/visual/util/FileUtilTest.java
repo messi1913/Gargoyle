@@ -1,0 +1,100 @@
+/********************************
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.util
+ *	작성일   : 2016. 3. 31.
+ *	작성자   : KYJ
+ *******************************/
+package com.kyj.fx.voeditor.visual.util;
+
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import javafx.beans.binding.BooleanExpression;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
+/**
+ * TODO 클래스 역할
+ *
+ * @author KYJ
+ *
+ */
+public class FileUtilTest {
+
+	/**
+	 * 루트 경로를 기준으로 someDir의 상대경로를 구한다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 3. 31.
+	 */
+	@Test
+	public void relativizeTest() {
+		File rootDir = new File("C:\\");
+		File someDir = new File("C:\\NVIDIA\\DisplayDriver");
+
+		{
+			Path relativize = rootDir.toPath().relativize(someDir.toPath());
+
+			System.out.println(relativize.toString());
+			Assert.assertEquals("NVIDIA\\DisplayDriver", relativize.toString());
+		}
+
+		{
+			Path relativize = someDir.toPath().relativize(rootDir.toPath());
+			System.out.println(relativize.toString());
+			Assert.assertEquals("..\\..", relativize.toString());
+		}
+
+	}
+
+	@Test
+	public void watchTest() throws IOException {
+		File file = new File("c:\\someDir");
+		file.mkdirs();
+
+		WatchService newWatchService = FileSystems.getDefault().newWatchService();
+		file.toPath().register(newWatchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+
+		System.out.println("Watch Service Registered ..");
+
+		while (true) {
+			try {
+				System.out.println("start");
+				WatchKey key = newWatchService.take();
+				for (WatchEvent<?> event : key.pollEvents()) {
+					WatchEvent.Kind<?> kind = event.kind();
+					@SuppressWarnings("unchecked")
+					WatchEvent<Path> ev = (WatchEvent<Path>) event;
+					Path fileName = ev.context();
+
+					System.out.println(kind.name() + ": " + fileName);
+
+					if (key == ENTRY_MODIFY && fileName.toString().equals("DirectoryWatchDemo.java")) {
+						System.out.println("My source file has changed!!!");
+					}
+				}
+				boolean valid = key.reset();
+				if (!valid) {
+					break;
+				}
+			} catch (InterruptedException e) {
+				break;
+			}
+		}
+
+		System.out.println("end ");
+	}
+
+}

@@ -1,0 +1,73 @@
+-- --------------------------------------------------------
+-- 호스트:                          127.0.0.1
+-- 서버 버전:                        10.0.17-MariaDB - mariadb.org binary distribution
+-- 서버 OS:                        Win64
+-- HeidiSQL 버전:                  9.1.0.4867
+-- 등록일자 :  2016.1.26
+-- 등록자 : 김영준
+-- --------------------------------------------------------
+
+
+-- meerkat 의 데이터베이스 구조 덤핑
+CREATE DATABASE IF NOT EXISTS `meerkat` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `meerkat`;
+
+
+-- 테이블 meerkat의 구조를 덤프합니다. tbm_sys_dao
+CREATE TABLE IF NOT EXISTS `tbm_sys_dao` (
+  `PACKAGE_NAME` varchar(200) NOT NULL,
+  `CLASS_NAME` varchar(50) NOT NULL,
+  `LOCATION` varchar(255) DEFAULT NULL,
+  `CLASS_DESC` mediumtext,
+  `TABLE_NAME` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`PACKAGE_NAME`,`CLASS_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `tbp_sys_dao_columns` (
+  `PACKAGE_NAME` varchar(200) NOT NULL,
+  `CLASS_NAME` varchar(50) NOT NULL,
+  `METHOD_NAME` varchar(50) NOT NULL,
+  `COLUMN_NAME` varchar(50) NOT NULL,
+  `COLUMN_TYPE` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`PACKAGE_NAME`,`CLASS_NAME`,`METHOD_NAME`,`COLUMN_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `tbp_sys_dao_fields` (
+  `PACKAGE_NAME` varchar(200) NOT NULL,
+  `CLASS_NAME` varchar(50) NOT NULL,
+  `METHOD_NAME` varchar(50) NOT NULL,
+  `FIELD_NAME` varchar(50) NOT NULL,
+  `TEST_VALUE` varchar(50) DEFAULT NULL,
+  `TYPE` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`PACKAGE_NAME`,`CLASS_NAME`,`METHOD_NAME`,`FIELD_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `tbp_sys_dao_methods` (
+  `PACKAGE_NAME` varchar(200) NOT NULL,
+  `CLASS_NAME` varchar(50) NOT NULL,
+  `METHOD_NAME` varchar(50) NOT NULL,
+  `RESULT_VO_CLASS` varchar(100) DEFAULT NULL,
+  `SQL_BODY` mediumtext,
+  `METHOD_DESC` mediumtext,
+  PRIMARY KEY (`PACKAGE_NAME`,`CLASS_NAME`,`METHOD_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE IF NOT EXISTS `tbp_sys_dao_methods_h` (
+	`HIST_TSP` VARCHAR(33) NOT NULL,
+	`PACKAGE_NAME` VARCHAR(200) NOT NULL,
+	`CLASS_NAME` VARCHAR(50) NOT NULL,
+	`METHOD_NAME` VARCHAR(50) NOT NULL,
+	`RESULT_VO_CLASS` VARCHAR(100) NULL DEFAULT NULL,
+	`SQL_BODY` MEDIUMTEXT NULL,
+	`METHOD_DESC` MEDIUMTEXT NULL,
+	`DML_TYPE` CHAR(1) NOT NULL,
+	`FST_REG_DT` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (`HIST_TSP`, `PACKAGE_NAME`, `CLASS_NAME`, `METHOD_NAME`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;

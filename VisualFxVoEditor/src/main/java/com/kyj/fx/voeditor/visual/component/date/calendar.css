@@ -1,0 +1,91 @@
+.date-chooser {
+    -fx-skin: "com.kyj.fx.voeditor.visual.component.date.DateChooserSkin";
+}
+
+.label
+{
+	-fx-font: 10.0pt "Tahoma Bold";
+}
+
+.lbl-month-year{
+	-fx-font: 13.0pt "Tahoma Bold";
+}
+
+.hbox-month-menus{
+	-fx-padding: 5.0 5.0 5.0 5.0;
+}
+
+.weekday-cell {
+	-fx-alignment: center ;
+    -fx-background-color: #C6D9FF;
+    /*-fx-background-radius: 5.0 5.0 5.0 5.0;*/
+    /*-fx-background-insets: 2.0 2.0 2.0 2.0 ;*/
+
+}
+.weekday-cell .label
+{
+	-fx-alignment: center ;
+	-fx-text-alignment: center ;
+	-fx-text-fill: #2225B8;
+    -fx-font: 12.0pt "Tahoma Bold";
+}
+
+.week-of-year-cell {
+    -fx-background-color: #C6D9FF;
+    /*-fx-background-radius: 5.0 5.0 5.0 5.0;*/
+    /*-fx-background-insets: 2.0 2.0 2.0 2.0 ;*/
+    -fx-text-fill: white;
+    -fx-text-alignment: left;
+
+}
+
+.week-of-year-cell .label
+{
+	-fx-alignment: top-center  ;
+	-fx-font: 12.0pt "Tahoma Bold";
+	-fx-text-fill: #2225B8;
+}
+
+.calendar-cell {
+    -fx-background-color: derive(skyblue, 75.0%);
+    /*-fx-background-radius: 5.0 5.0 5.0 5.0;*/
+    /*-fx-background-insets: 2.0 2.0 2.0 2.0 ;*/
+    -fx-text-fill: skyblue;
+    -fx-text-alignment: left;
+    -fx-font: 12.0pt "Tahoma Bold";
+}
+
+.calendar-cell:hover {
+    -fx-background-color: skyblue;
+}
+.calendar-cell:hover .label{
+	  -fx-text-fill: white ;
+}
+.calendar-cell:pressed {
+    -fx-background-color: darkblue;
+}
+
+.calendar-cell:pressed .label{
+	 -fx-text-fill: green;
+}
+
+.calendar-cell-selected {
+    -fx-background-color: darkblue;
+}
+
+.calendar-cell-selected .label{
+	  -fx-text-fill: white ;
+}
+
+.calendar-cell-inactive {
+    -fx-background-color: derive(lightgray, 75.0%);
+}
+
+.calendar-cell-today {
+    -fx-background-color: yellow;
+}
+
+.calendar-cell-today .label{
+	 -fx-text-fill: black ;
+}
+

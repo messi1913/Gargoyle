@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="borRoot" prefHeight="272.0" prefWidth="614.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.component.scm.CheckoutController">
+	<center>
+		<GridPane BorderPane.alignment="CENTER">
+			<columnConstraints>
+				<ColumnConstraints hgrow="SOMETIMES" maxWidth="302.0" minWidth="10.0" prefWidth="122.0" />
+				<ColumnConstraints hgrow="SOMETIMES" maxWidth="549.0" minWidth="10.0" prefWidth="492.0" />
+			</columnConstraints>
+			<rowConstraints>
+				<RowConstraints maxHeight="57.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
+				<RowConstraints maxHeight="74.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
+				<RowConstraints maxHeight="110.0" minHeight="10.0" prefHeight="76.0" vgrow="SOMETIMES" />
+			</rowConstraints>
+			<children>
+				<Label text="Project Name" />
+				<TextField fx:id="txtProjectName" GridPane.columnIndex="1" />
+				<Label fx:id="lblLocation" text="Location" GridPane.rowIndex="1" />
+				<VBox spacing="10.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+					<children>
+						<HBox>
+							<children>
+								<CheckBox fx:id="chkIsDefaultLocation" mnemonicParsing="false" onAction="#chkIsDefaultLocationOnAction" selected="true" text="Use Default workspace location" />
+							</children>
+						</HBox>
+						<HBox alignment="CENTER" spacing="5.0">
+							<children>
+								<TextField fx:id="txtCheckoutLocation" disable="true" HBox.hgrow="ALWAYS" />
+								<Button fx:id="btnBrowse" disable="true" mnemonicParsing="false" onAction="#btnBrowseOnAction" text="Browse.." />
+							</children>
+						</HBox>
+					</children>
+				</VBox>
+			</children>
+			<padding>
+				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+			</padding>
+		</GridPane>
+	</center>
+	<top>
+		<HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="614.0" style="-fx-font-size: 20;" BorderPane.alignment="CENTER">
+			<children>
+				<Label text="Check Out As" />
+			</children>
+			<padding>
+				<Insets left="5.0" />
+			</padding>
+		</HBox>
+	</top>
+	<bottom>
+		<HBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
+			<children>
+				<Button fx:id="btnFinish" disable="true" mnemonicParsing="false" onAction="#btnFinishOnAction" text="Finish" />
+				<Button fx:id="btnCancel" mnemonicParsing="false" onAction="#btnCancelOnAction" text="Cancel" />
+			</children>
+			<padding>
+				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+			</padding>
+		</HBox>
+	</bottom>
+</BorderPane>

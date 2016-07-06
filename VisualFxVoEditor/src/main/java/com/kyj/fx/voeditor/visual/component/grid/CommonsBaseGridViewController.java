@@ -1,0 +1,25 @@
+/********************************
+ *	프로젝트 : FxTemplate
+ *	패키지   : com.samsung.sds.sos.client.component.grid
+ *	작성일   : 2015. 10. 9.
+ *	작성자   : KYJ
+ *******************************/
+package com.kyj.fx.voeditor.visual.component.grid;
+
+import java.io.IOException;
+
+import javafx.fxml.FXMLLoader;
+
+/**
+ * @author KYJ
+ *
+ */
+public class CommonsBaseGridViewController extends CommonsBaseGridView {
+	public CommonsBaseGridViewController() throws IOException {
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(getClass().getResource("CommonsBaseGridView.fxml"));
+		loader.setRoot(this);
+		loader.setController(this);
+		loader.load();
+	}
+}

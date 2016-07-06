@@ -1,0 +1,144 @@
+/********************************
+ *	프로젝트 : FxTemplate
+ *	패키지   : com.samsung.sds.sos.client.component.grid
+ *	작성일   : 2015. 10. 9.
+ *	작성자   : KYJ
+ *******************************/
+package com.kyj.fx.voeditor.visual.component.grid;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+
+/**
+ * 어노테이션기반 텍스트헤더를 처리함.
+ * 
+ * @COLUMN("텍스트")
+ * @author KYJ
+ *
+ */
+public class AnnotationOptions<T> extends BaseOptions {
+
+	private Class<T> clazz;
+
+	public AnnotationOptions(Class<T> clazz) {
+		this.clazz = clazz;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.kyj.tmp.application.template.grid.commons.IColumnNaming#convert(java
+	 * .lang.String) KYJ
+	 */
+	@Override
+	public String convert(String columnName) {
+		return getColumnHeader(columnName);
+	}
+
+	/**
+	 * 테이블 헤더를 어노테이션기반 텍스트 형태로 사용한다. 우선순위는 먼저 어노테이션 텍스트존재하면 먼저 맵핑하고 어노테이션이 없는경우
+	 * columnName을 반환한다.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 10. 21.
+	 * @param classType
+	 * @param columnName
+	 * @param options
+	 * @return
+	 */
+	private String getColumnHeader(String columnName) {
+
+		String headerText = "";
+
+		ColumnName annotationsByType = getAnnotationClass(ColumnName.class, columnName);
+		if (annotationsByType != null) {
+			headerText = annotationsByType.value();
+		} else {
+			headerText = columnName;
+		}
+
+		if (headerText == null || headerText.isEmpty())
+			headerText = columnName;
+
+		return headerText;
+	}
+
+	/**
+	 * 어노테이션 클래스를 반환, 없으면 null 리턴
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 10. 21.
+	 * @param annotationClass
+	 * @param fieldName
+	 * @return
+	 */
+	@SuppressWarnings("hiding")
+	private <T extends Annotation> T getAnnotationClass(Class<T> annotationClass, String fieldName) {
+		try {
+			Field declaredField = this.clazz.getDeclaredField(fieldName);
+			declaredField.setAccessible(true);
+			return declaredField.getDeclaredAnnotation(annotationClass);
+		} catch (Exception e) {
+		}
+		return null;
+	}
+
+	/**
+	 * 어노테이션 존재여부를 확인한다.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 10. 21.
+	 * @param annotationClass
+	 * @param fieldName
+	 * @return
+	 */
+	@SuppressWarnings("hiding")
+	private <T extends Annotation> boolean containsAnotation(Class<T> annotationClass, String fieldName) {
+		try {
+			Field declaredField = this.clazz.getDeclaredField(fieldName);
+			declaredField.setAccessible(true);
+			return declaredField.getDeclaredAnnotation(annotationClass) == null ? false : true;
+		} catch (Exception e) {
+		}
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.kyj.tmp.application.template.grid.commons.IOptions#editable(java.
+	 * lang.String)
+	 */
+	@Override
+	public boolean editable(String columnName) {
+
+		if (containsAnotation(NonEditable.class, columnName)) {
+			return false;
+		}
+		return super.editable(columnName);
+	}
+
+	@Override
+	public boolean useCommonCheckBox() {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.samsung.sds.sos.client.component.grid.IOptions#columnSize(java.lang
+	 * .String)
+	 */
+	@Override
+	public int columnSize(String columnName) {
+
+		if (CommonConst.COMMONS_FILEDS_COMMONS_CLICKED.equals(columnName)) {
+			return 30;
+		}
+		return super.columnSize(columnName);
+	}
+
+}

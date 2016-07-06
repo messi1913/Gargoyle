@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8.0.40"
+	xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<VBox BorderPane.alignment="CENTER">
+			<children>
+				<HBox spacing="5.0">
+					<children>
+						<Label prefWidth="100.0" text="열 :" />
+						<Button defaultButton="true" mnemonicParsing="false"
+							prefWidth="55.0" text="추가" />
+						<Button defaultButton="true" mnemonicParsing="false"
+							prefWidth="55.0" text="제거" />
+						<Button defaultButton="true" mnemonicParsing="false"
+							prefWidth="55.0" text="위로" />
+						<Button defaultButton="true" mnemonicParsing="false"
+							prefWidth="55.0" text="아래로" />
+					</children>
+					<padding>
+						<Insets bottom="5.0" top="5.0" />
+					</padding>
+				</HBox>
+				<TableView fx:id="tbColumns">
+					<columns>
+						<TableColumn fx:id="colNumber" prefWidth="72.0" text="#">
+						</TableColumn>
+						<TableColumn fx:id="colKeyType" prefWidth="30" text="">
+						</TableColumn>
+
+						<TableColumn fx:id="colName" prefWidth="182.0" text="이름">
+							<cellValueFactory>
+								<PropertyValueFactory property="columnName" />
+							</cellValueFactory>
+						</TableColumn>
+						<TableColumn fx:id="colType" prefWidth="75.0" text="데이터 유형" >
+						<cellValueFactory>
+								<PropertyValueFactory property="dataType" />
+							</cellValueFactory>
+						</TableColumn>
+						<TableColumn fx:id="colLength" prefWidth="114.0" text="길이/설정">
+							<cellValueFactory>
+								<PropertyValueFactory property="dataLength" />
+							</cellValueFactory>
+						</TableColumn>
+						<TableColumn fx:id="colSign" prefWidth="76.0" text="부호없음" />
+						<TableColumn fx:id="colNullable" prefWidth="69.0"
+							text="NULL 허용">
+							<cellValueFactory>
+								<PropertyValueFactory property="isNullable" />
+							</cellValueFactory>
+						</TableColumn>
+						<TableColumn fx:id="colZero" prefWidth="85.0" text="0으로 채움" />
+						<TableColumn fx:id="colDefault" prefWidth="134.0"
+							text="기본값" />
+						<TableColumn fx:id="colComment" prefWidth="201.0"
+							text="코멘트" />
+					</columns>
+					<padding>
+						<Insets bottom="5.0" left="5.0" right="5.0" />
+					</padding>
+				</TableView>
+			</children>
+		</VBox>
+	</center>
+</fx:root>

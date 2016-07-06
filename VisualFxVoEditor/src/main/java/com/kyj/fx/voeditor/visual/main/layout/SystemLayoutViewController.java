@@ -1,0 +1,1441 @@
+/**
+ * KYJ
+ * 2015. 10. 12.
+ */
+package com.kyj.fx.voeditor.visual.main.layout;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.kyj.fx.voeditor.visual.component.FileWrapper;
+import com.kyj.fx.voeditor.visual.component.ImageFileTreeItemCreator;
+import com.kyj.fx.voeditor.visual.component.ImageViewPane;
+import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
+import com.kyj.fx.voeditor.visual.component.ResultDialog;
+import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
+import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
+import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
+import com.kyj.fx.voeditor.visual.component.file.FilePropertiesComposite;
+import com.kyj.fx.voeditor.visual.component.popup.BigTextView;
+import com.kyj.fx.voeditor.visual.component.popup.FXMLTextView;
+import com.kyj.fx.voeditor.visual.component.popup.GagoyleWorkspaceOpenResourceView;
+import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
+import com.kyj.fx.voeditor.visual.component.popup.SelectWorkspaceView;
+import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
+import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
+import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
+import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
+import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
+import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
+import com.kyj.fx.voeditor.visual.framework.GagoyleParentOnLoaded;
+import com.kyj.fx.voeditor.visual.loder.JarWrapper;
+import com.kyj.fx.voeditor.visual.loder.PluginLoader;
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.momory.SkinManager;
+import com.kyj.fx.voeditor.visual.util.DateUtil;
+import com.kyj.fx.voeditor.visual.util.DbExecListener;
+import com.kyj.fx.voeditor.visual.util.DbUtil;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.NullExpresion;
+import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.util.ProgramSpecUtil;
+
+import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.web.WebView;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
+import javafx.util.Pair;
+
+/**
+ * @author KYJ
+ *
+ */
+
+public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoadable {
+
+	private static Logger LOGGER = LoggerFactory.getLogger(SystemLayoutViewController.class);
+
+	public static final String TAB_TITLE_SPREAD_SHEET = "SpreadSheet";
+
+	private static final String HOME_URL = ResourceLoader.getInstance().get(ResourceLoader.START_URL);
+
+	/**
+	 * 쿼리 모니터링화면에 대한 정보
+	 *
+	 * @최초생성일 2016. 2. 4.
+	 */
+	private ObjectProperty<ReadOnlyConsole> dbConsoleProperty = new SimpleObjectProperty<>();
+
+	/**
+	 * 시스템 콘솔에 대한 정보. 한개의 화면만 띄우기 위한 작업처리이다.
+	 *
+	 * @최초생성일 2016. 3. 31.
+	 */
+	private ObjectProperty<ReadOnlyConsole> systemConsoleProperty = new SimpleObjectProperty<>();
+
+	/**
+	 * Tab에 Item이 추가된경우 발생하는 이벤트.
+	 *
+	 * @최초생성일 2016. 6. 16.
+	 */
+	private ObservableList<GagoyleParentOnLoaded> onParentloaded = FXCollections.observableArrayList();
+
+	/**
+	 * Tabdp Item
+	 *
+	 * @최초생성일 2016. 6. 16.
+	 */
+	private GagoyleParentBeforeLoad beforeParentLoad = null;
+	/**
+	 * 마스터 path
+	 */
+	@FXML
+	private BorderPane borderPaneMain;
+
+	/**
+	 * 브라우져
+	 */
+	@FXML
+	private WebView webvWelcome;
+
+	/**
+	 * URL 텍스트필드
+	 */
+	@FXML
+	private TextField txtUrl;
+
+	@FXML
+	private Button btnUrlSearch;
+
+	@FXML
+	private MenuItem menuImportProject;
+
+	/**
+	 * 파일트리 마스터 노드
+	 */
+	@FXML
+	private TreeView<FileWrapper> treeProjectFile;
+
+	@FXML
+	private TabPane tabPanWorkspace;
+
+	@FXML
+	private VBox accordionItems;
+
+	private File selectDirFile;
+	private FileWrapper tmpSelectFileWrapper = null;
+
+	/**
+	 * 플러그인 메뉴가 등록되는 최상위 메뉴
+	 *
+	 * @최초생성일 2015. 12. 18.
+	 */
+	@FXML
+	private Menu menuPlugins;
+
+	private ContextMenu fileTreeContextMenu;
+
+	@FXML
+	public void initialize() {
+
+		// 쿼리 리스너를 등록
+
+		DbUtil.registQuertyListener(this);
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(SystemLayoutViewController.class.getResource("DAOLoaderView.fxml"));
+			TitledPane titledPane = loader.load();
+			VBox.setVgrow(titledPane, Priority.ALWAYS);
+			accordionItems.getChildren().add(titledPane);
+			DAOLoaderController controller = loader.getController();
+			controller.setSystemLayoutViewController(this);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		SharedMemory.setSystemLayoutView(this);
+		SharedMemory.setWorkspaceTab(tabPanWorkspace);
+
+		// tab key에 대한 이벤트 처리 등록....
+		SharedMemory.getPrimaryStage().addEventHandler(KeyEvent.ANY, event -> {
+			boolean isCloseALLtabKeyCode = event.isControlDown() && event.isShiftDown() && KeyCode.W == event.getCode();
+
+			boolean isTabMoveCode = event.isControlDown() && isNumberCode(event.getCode());
+			ObservableList<Tab> tabs = tabPanWorkspace.getTabs();
+
+			// tab 전부 닫기
+			if (isCloseALLtabKeyCode) {
+				LOGGER.debug("CLOSE ALL TABS...");
+
+				for (int i = tabs.size() - 1; i > 0; i--) {
+					tabs.remove(i);
+				}
+			}
+			// 특정 탭으로 이동하기
+			else if (isTabMoveCode) {
+
+				int tabIndex = Integer.parseInt(event.getCode().getName());
+				if (tabIndex > 0 && tabs.size() < tabIndex)
+					return;
+
+				LOGGER.debug("MOVE TAB" + event.getCode().getName());
+				tabPanWorkspace.getSelectionModel().select(tabIndex - 1);
+			}
+		});
+
+		String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
+		selectDirFile = new File(baseDir);
+
+		createNewTreeViewMenuItems();
+		webvWelcome.getEngine().setJavaScriptEnabled(true);
+
+		webvWelcome.getEngine().load(HOME_URL);
+		txtUrl.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+			if (KeyCode.ENTER == event.getCode()) {
+				webvWelcome.getEngine().load(txtUrl.getText());
+			}
+		});
+		btnUrlSearch.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+			if (event.getClickCount() >= 1) {
+				webvWelcome.getEngine().load(txtUrl.getText());
+			}
+		});
+
+		treeProjectFile.setRoot(createNewTree(selectDirFile));
+		treeProjectFile.setShowRoot(false);
+
+		// 트리 컨테스트 요청 이벤트
+		treeProjectFile.setOnContextMenuRequested(this::treeProjectFileOnContextMenuRequested);
+		// 트리 마우스 이벤트
+		treeProjectFile.setOnMouseClicked(this::treeProjectFileOnMouseClick);
+		// 트리 키 이벤트
+		treeProjectFile.addEventHandler(KeyEvent.KEY_PRESSED, this::treeProjectFileOnKeyPressed);
+
+		/** 플러그인들을 로드함. **/
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+
+				List<JarWrapper> load = PluginLoader.getInstance().load();
+				load.stream().forEach(jarWrapper -> {
+					try {
+
+						String displayMenuName = jarWrapper.getDisplayMenuName();
+						MenuItem pluginMenu = new MenuItem(displayMenuName);
+						pluginMenu.setUserData(jarWrapper);
+						pluginMenu.setOnAction(event -> {
+							JarWrapper jar = (JarWrapper) pluginMenu.getUserData();
+
+							try {
+								Parent newInstance = (Parent) jar.getNodeClass().newInstance();
+								loadNewSystemTab(jar.getDisplayMenuName(), newInstance);
+							} catch (Exception e) {
+								LOGGER.error("regist fail plugin.");
+								LOGGER.error(ValueUtil.toString(e));
+							}
+						});
+
+						try {
+							Class<GagoyleParentBeforeLoad> setBeforeParentLoadListenerClass = jarWrapper
+									.getSetOnParentBeforeLoadedListenerClass();
+							if (setBeforeParentLoadListenerClass != null)
+								setOnbeforeParentLoad(setBeforeParentLoadListenerClass.newInstance());
+						} catch (Exception e) {
+							LOGGER.error("regist fail 'GagoyleParentBeforeLoad' listener.");
+						}
+
+						try {
+							Class<GagoyleParentOnLoaded> addOnParentLoadedListenerClass = jarWrapper.getAddOnParentLoadedListenerClass();
+							if (addOnParentLoadedListenerClass != null)
+								addOnParentLoadedListener(addOnParentLoadedListenerClass.newInstance());
+						} catch (Exception e) {
+							LOGGER.error("regist fail 'GagoyleParentOnLoaded' listener.");
+						}
+
+						menuPlugins.getItems().add(pluginMenu);
+
+					} catch (Exception e) {
+						LOGGER.debug(ValueUtil.toString(e));
+					}
+				});
+
+			}
+
+		});
+
+	}
+
+	/**
+	 * 파일을 연다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 2. 22.
+	 * @param file
+	 * @param tabs
+	 */
+	private void openFile(File file) {
+		try {
+			if (FileUtil.isJavaFile(file)) {
+				openJava(file);
+			} else if (FileUtil.isImageFile(file)) {
+				openImage(file);
+			} else if (FileUtil.isPdfFile(file)) {
+				openPdf(file);
+			} else if (FileUtil.isFXML(file))
+				openFXML(file);
+			else {
+				openBigText(file);
+			}
+			/* 예외에 걸린경우 텍스트방식으로 read */
+		} catch (Exception e) {
+			DialogUtil.showMessageDialog("파일열기에 실패하여 텍스트 형식으로 읽어옵니다.");
+			openBigText(file);
+		}
+
+	}
+
+	/**
+	 * 이미지를 연다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 2. 22.
+	 * @param file
+	 * @throws Exception
+	 */
+	private void openImage(File file) throws Exception {
+		try {
+			loadNewSystemTab(file.getName(), new ImageViewPane(new FileInputStream(file)));
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+			throw e;
+		}
+	}
+
+	/**
+	 * 텍스트기반 파일 형식을 연다.
+	 *
+	 * 무거운 텍스트를 열때... 멈추는 현상이 있음..
+	 *
+	 * 무거운 텍스트를 열경우 openBigText(File) 함수를 호출하도록 한다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 2. 22.
+	 * @param file
+	 * @param tabs
+	 */
+	@SuppressWarnings("unused")
+	@Deprecated
+	private void openText(File file) {
+		try {
+			String content2 = FileUtils.readFileToString(file);
+			SimpleTextView simpleTextView = new SimpleTextView(content2, false);
+			simpleTextView.setEditable(false);
+			loadNewSystemTab(file.getName(), simpleTextView);
+		} catch (IOException e2) {
+			LOGGER.debug(ValueUtil.toString(e2));
+			DialogUtil.showExceptionDailog(e2);
+		}
+	}
+
+	/**
+	 * 사이즈가 큰 텍스트파일을 페이징방식으로 로드한다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 2. 22.
+	 * @param file
+	 */
+	private void openBigText(File file) {
+
+		CloseableParent<BigTextView> closeableParent = new CloseableParent<BigTextView>(new BigTextView(file)) {
+
+			@Override
+			public void close() throws IOException {
+				getParent().close();
+				LOGGER.debug("Closed BigText...");
+			}
+		};
+
+		loadNewSystemTab(file.getName(), closeableParent);
+	}
+
+	/**
+	 * PDF파일을 연다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 2. 22.
+	 * @param file
+	 * @throws Exception
+	 */
+	private void openPdf(File file) throws Exception {
+		try {
+
+			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(new PDFImageBasePane(file)) {
+
+				@Override
+				public void close() throws IOException {
+					getParent().close();
+					LOGGER.debug("Closed doc...");
+				}
+			};
+			loadNewSystemTab(file.getName(), pdfPane);
+
+		} catch (Exception e) {
+			LOGGER.debug(ValueUtil.toString(e));
+			throw e;
+		}
+	}
+
+	/**
+	 * FXML 파일을 연다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 6. 16.
+	 * @param file
+	 * @throws IOException
+	 */
+	private void openFXML(File file) throws IOException {
+
+		try {
+
+			FXMLTextView fxmlTextView = new FXMLTextView(file, false);
+			// fxmlTextView.setEditable(tr);
+			loadNewSystemTab(file.getName(), fxmlTextView);
+		} catch (IOException e1) {
+			LOGGER.debug(ValueUtil.toString(e1));
+			throw e1;
+		}
+
+	}
+
+	/**
+	 * 자바파일을 연다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 2. 22.
+	 * @param file
+	 * @throws IOException
+	 */
+	private void openJava(File file) throws IOException {
+		try {
+			String content1 = FileUtils.readFileToString(file, "UTF-8");
+			JavaTextView javaTextView = new JavaTextView(content1, false);
+			javaTextView.setEditable(false);
+			loadNewSystemTab(file.getName(), javaTextView);
+		} catch (IOException e1) {
+			LOGGER.debug(ValueUtil.toString(e1));
+			throw e1;
+		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 4. 26. 작성자 : KYJ
+	 *
+	 * 입력된 코드가 숫자인지 아닌리 리턴한다.
+	 *
+	 * [단추키 기능으로 사용하기 위해 사용]
+	 *
+	 * @param code
+	 * @return
+	 ********************************/
+	private boolean isNumberCode(KeyCode code) {
+		return code.isDigitKey();
+	}
+
+	/********************************
+	 * 작성일 : 2016. 4. 26. 작성자 : KYJ
+	 *
+	 * TODO 파일로부터 DAO WIZARD 로드 처리
+	 *
+	 * @param e
+	 ********************************/
+	private void daoWizardMenuItemOnActionEvent(ActionEvent e) {
+		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		if (selectedItem == null)
+			return;
+
+		FileWrapper value = selectedItem.getValue();
+		File file = value.getFile();
+		if (file.isFile()) {
+			String fileName = file.getName();
+			String absoluteFile = file.getAbsolutePath();
+			String uLocationPath = ResourceLoader.getInstance().get(ResourceLoader.USER_SELECT_LOCATION_PATH);
+
+			if (uLocationPath.indexOf(absoluteFile) > 0) {
+
+			}
+
+		}
+	}
+
+	/**
+	 * 트리뷰의 메뉴컨텍스트를 새로 생성ㅎ한다.
+	 *
+	 * @Date 2015. 10. 17.
+	 * @User KYJ
+	 */
+	private void createNewTreeViewMenuItems() {
+		fileTreeContextMenu = new ContextMenu();
+		MenuItem openFileMenuItem = new MenuItem("Open");
+
+		Menu menuOpenWidth = new Menu("Open With ");
+
+		/***********************************************************************************/
+		// 조건에 따라 보여주는 아이템. [start]
+		/***********************************************************************************/
+		// FXML선택한경우에만 보여주는 조건처리.
+		final MenuItem menuItemOpenWithSceneBuilder = new MenuItem("SceneBuilder");
+		menuItemOpenWithSceneBuilder.setOnAction(this::menuItemOpenWithSceneBuilderOnAction);
+		menuOpenWidth.setOnShowing(event -> {
+			String sceneBuilderLocation = ResourceLoader.getInstance().get(ResourceLoader.SCENEBUILDER_LOCATION);
+			TreeItem<FileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
+			boolean isRemoveItem = true;
+
+			if (selectedTreeItem != null) {
+				File selectedTree = selectedTreeItem.getValue().getFile();
+				if (FileUtil.isFXML(selectedTree)) {
+					if (ValueUtil.isNotEmpty(sceneBuilderLocation)) {
+						File file = new File(sceneBuilderLocation);
+						if (file.exists()) {
+
+							if (!menuOpenWidth.getItems().contains(menuItemOpenWithSceneBuilder)) {
+								menuOpenWidth.getItems().add(menuItemOpenWithSceneBuilder);
+							}
+							isRemoveItem = false;
+						}
+					}
+				}
+			}
+
+			if (isRemoveItem)
+				menuOpenWidth.getItems().remove(menuItemOpenWithSceneBuilder);
+		});
+		/***********************************************************************************/
+		// 조건에 따라 보여주는 아이템. [end]
+		/***********************************************************************************/
+
+		{
+			MenuItem openSystemExplorerMenuItem = new MenuItem("Open Sys. Explorer");
+			openSystemExplorerMenuItem.setOnAction(this::openSystemExplorerMenuItemOnAction);
+			menuOpenWidth.getItems().add(openSystemExplorerMenuItem);
+		}
+
+		MenuItem newFileMenuItem = new MenuItem("New");
+		MenuItem deleteFileMenuItem = new MenuItem("Delete");
+		// 선택한 파일아이템을 VoEditor에서 조회시 사용
+		// MenuItem voEditorMenuItem = new MenuItem("Show VO Editor");
+		// //선택한 파일아이템을 DaoWizard에서 조회시 사용
+		// MenuItem daoWizardMenuItem = new MenuItem("Show DAO Wizard");
+		// 선택한 파일경로를 Vo Editor Location에 바인딩함.
+//		MenuItem setVoEditorMenuItem = new MenuItem("SET Vo Editor Directory");
+
+		// 선택한 파일경로를 Vo Editor Location에 바인딩함.
+		MenuItem voEditorMenuItem = new MenuItem("Vo Editor");
+
+		// 선택한 파일경로를 DaoWizard Location에 바인딩함.
+		MenuItem setDaoWizardMenuItem = new MenuItem("SET DAO Wizard Directory");
+		// 경로 리프레쉬
+		MenuItem refleshMenuItem = new MenuItem("Reflesh");
+
+		// 코드분석
+		MenuItem chodeAnalysisMenuItem = new MenuItem("자바 코드 분석");
+		// 사양서 생성
+		MenuItem makeProgramSpecMenuItem = new MenuItem("Gen. Program Spec.");
+
+		// 파일 속성 조회
+		MenuItem menuProperties = new MenuItem("Properties");
+
+		menuProperties.setOnAction(this::menuPropertiesOnAction);
+		chodeAnalysisMenuItem.setOnAction(this::chodeAnalysisMenuItemOnAction);
+
+		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem,
+				deleteFileMenuItem, /* voEditorMenuItem, daoWizardMenuItem, */
+				voEditorMenuItem, /*setVoEditorMenuItem,*/ setDaoWizardMenuItem, refleshMenuItem, chodeAnalysisMenuItem,
+				makeProgramSpecMenuItem, new SeparatorMenuItem(), menuProperties);
+
+		// daoWizardMenuItem.addEventHandler(ActionEvent.ACTION,
+		// this::daoWizardMenuItemOnActionEvent);
+
+		// Vo Editor
+//		setVoEditorMenuItem.addEventHandler(ActionEvent.ACTION, event -> {
+//			Node lookup = borderPaneMain.lookup("#txtLocation");
+//			if (lookup != null && tmpSelectFileWrapper != null) {
+//				TextField txtLocation = (TextField) lookup;
+//				File file = tmpSelectFileWrapper.getFile();
+//				if (file.isDirectory()) {
+//					String absolutePath = file.getAbsolutePath();
+//					ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH, absolutePath);
+//					txtLocation.setText(absolutePath);
+//				} else {
+//					DialogUtil.showMessageDialog("Only Directory.");
+//				}
+//			}
+//			tmpSelectFileWrapper = null;
+//		});
+
+		voEditorMenuItem.addEventHandler(ActionEvent.ACTION, this::voEditorMenuItemOnAction);
+
+		// Dao Wizard
+		setDaoWizardMenuItem.addEventHandler(ActionEvent.ACTION, event -> {
+			Node lookup = borderPaneMain.lookup("#txtDaoLocation");
+			if (lookup != null && tmpSelectFileWrapper != null) {
+				TextField txtLocation = (TextField) lookup;
+				File file = tmpSelectFileWrapper.getFile();
+				if (file.isDirectory()) {
+					String absolutePath = file.getAbsolutePath();
+					ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH, absolutePath);
+					txtLocation.setText(absolutePath);
+				} else {
+					DialogUtil.showMessageDialog("Only Directory.");
+				}
+			}
+			tmpSelectFileWrapper = null;
+		});
+
+		refleshMenuItem.setOnAction(event -> {
+			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			selectedItem.getChildren().clear();
+			selectedItem.getChildren().addAll(createNewTree(selectedItem.getValue().getFile()).getChildren());
+		});
+
+		deleteFileMenuItem.setOnAction(event -> {
+			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			if (selectedItem != null) {
+				File file = selectedItem.getValue().getFile();
+				if (file != null && file.exists()) {
+					Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("파일삭제.",
+							file.getName() + " 정말 삭제하시겠습니까? \n[휴지통에 보관되지않음.]");
+					showYesOrNoDialog.ifPresent(pair -> {
+						if ("Y".equals(pair.getValue())) {
+							TreeItem<FileWrapper> root = treeProjectFile.getRoot();
+							root.getChildren().remove(selectedItem);
+							file.delete();
+						}
+					});
+				}
+			}
+		});
+
+		makeProgramSpecMenuItem.setOnAction(event -> {
+
+			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			if (selectedItem != null) {
+				File sourceFile = selectedItem.getValue().getFile();
+				if (sourceFile != null && sourceFile.exists()) {
+					try {
+						if (FileUtil.isJavaFile(sourceFile)) {
+
+							// 파일을 생성하고, 생성하고 나면 오픈.
+							File targetFile = DialogUtil.showFileSaveCheckDialog(SharedMemory.getPrimaryStage(), chooser -> {
+
+								chooser.setInitialFileName(DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSS));
+								chooser.getExtensionFilters().add(new ExtensionFilter("Doc files (*.docx)", "*.docx"));
+								chooser.setTitle("Save Program Spec. Doc");
+								chooser.setInitialDirectory(new File(SystemUtils.USER_HOME));
+
+							});
+
+							if (targetFile != null) {
+								boolean createDefault = ProgramSpecUtil.createDefault(sourceFile, targetFile);
+								if (createDefault)
+									FileUtil.openFile(targetFile);
+							}
+
+						} else {
+							DialogUtil.showMessageDialog("사양서 작성 가능한 유형이 아닙니다.");
+						}
+					} catch (Exception e) {
+						DialogUtil.showExceptionDailog(e);
+					}
+				}
+			}
+
+		});
+
+	}
+
+	/**
+	 * 디렉토리 기준으로 파일트리를 새로 생성한다.
+	 *
+	 * @Date 2015. 10. 17.
+	 * @param dir
+	 * @return
+	 * @User KYJ
+	 */
+	private TreeItem<FileWrapper> createNewTree(File dir) {
+		ImageFileTreeItemCreator value = new ImageFileTreeItemCreator();
+		return value.createNode(dir);
+	}
+
+	@FXML
+	public void menuOpenOnAction() {
+		File showFileDialog = DialogUtil.showFileDialog(SharedMemory.getPrimaryStage());
+		if (showFileDialog != null) {
+			openFile(showFileDialog);
+		}
+	}
+
+	@FXML
+	public void menuSwitchWorkspaceOnAction(ActionEvent e) throws IOException {
+		SelectWorkspaceView view = new SelectWorkspaceView();
+		ResultDialog<Object> show = view.show();
+		if (show != null && ResultDialog.OK == show.getStatus()) {
+			String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
+			selectDirFile = new File(baseDir);
+			treeProjectFile.setRoot(createNewTree(selectDirFile));
+			treeProjectFile.setShowRoot(false);
+		}
+	}
+
+	/**
+	 * 탭 닫기 메뉴
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 10. 8.
+	 * @return
+	 */
+	private ContextMenu closeContextMenu() {
+
+		MenuItem closeMenuItem = new MenuItem("Close");
+		closeMenuItem.setOnAction(hander -> {
+			Tab tab = tabPanWorkspace.getSelectionModel().getSelectedItem();
+			closeTab(tab);
+		});
+		MenuItem closeAllMenuItem = new MenuItem("Close All");
+		closeAllMenuItem.setOnAction(handler -> {
+			for (int i = tabPanWorkspace.getTabs().size() - 1; i >= 1; i--) {
+				Tab tab = tabPanWorkspace.getTabs().get(i);
+				closeTab(tab);
+			}
+		});
+
+		MenuItem closeOtherMenuItem = new MenuItem("Close Others");
+		closeOtherMenuItem.setOnAction(hander -> {
+			Tab tab = tabPanWorkspace.getSelectionModel().getSelectedItem();
+
+			for (int i = tabPanWorkspace.getTabs().size() - 1; i >= 1; i--) {
+				Tab otherTab = tabPanWorkspace.getTabs().get(i);
+				if (tab != otherTab)
+					closeTab(otherTab);
+			}
+
+		});
+
+		ContextMenu contextMenu = new ContextMenu(closeMenuItem, closeOtherMenuItem, closeAllMenuItem);
+
+		return contextMenu;
+	}
+
+	/**
+	 * 탭닫기 (공통 이벤트 호출 포함.)
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 10. 8.
+	 * @param tab
+	 */
+	public void closeTab(Tab tab) {
+		if (tab != null) {
+
+			// 만들어진 closeRequest 이벤트 호출
+			EventHandler<Event> onCloseRequest = tab.getOnCloseRequest();
+			if (onCloseRequest != null)
+				onCloseRequest.handle(new ActionEvent());
+
+			// main tab close
+			tabPanWorkspace.getTabs().remove(tab);
+
+		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 5. 29. 작성자 : KYJ
+	 *
+	 * OS 시스템에 의존되는 형식으로 파일을 오픈함.
+	 *
+	 * @param e
+	 ********************************/
+	public void openSystemExplorerMenuItemOnAction(ActionEvent e) {
+		TreeItem<FileWrapper> selectedItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
+		NullExpresion.ifNotNullDo(selectedItem, item -> {
+			FileWrapper fw = item.getValue();
+			File file = fw.getFile();
+			if (file != null && file.exists()) {
+				FileUtil.openFile(file);
+			}
+		});
+		//
+	}
+
+	/********************************
+	 * 작성일 : 2016. 5. 29. 작성자 : KYJ
+	 *
+	 * TODO 자바 코드 분석기 테스트단계.
+	 *
+	 * @param e
+	 ********************************/
+	public void chodeAnalysisMenuItemOnAction(ActionEvent e) {
+		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			File sourceFile = selectedItem.getValue().getFile();
+			if (sourceFile != null && sourceFile.exists()) {
+				try {
+					if (FileUtil.isJavaFile(sourceFile)) {
+						loadNewSystemTab(sourceFile.getName(), new CodeAnalysisJavaTextArea(sourceFile));
+					} else {
+						DialogUtil.showMessageDialog("자바 파일이 아닙니다.");
+					}
+				} catch (Exception ex) {
+					DialogUtil.showExceptionDailog(ex);
+				}
+			}
+		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 3. 작성자 : KYJ
+	 *
+	 * 파일로부터 VO Editor를 오픈함.
+	 *
+	 * @param e
+	 ********************************/
+	public void voEditorMenuItemOnAction(ActionEvent e) {
+
+		TreeItem<FileWrapper> selectedItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			FileWrapper value = selectedItem.getValue();
+			File file = value.getFile();
+
+			try {
+				Parent parent = FxUtil.load(VoEditorController.class, null, null, c -> {
+					c.setFromFile(file);
+				});
+
+				loadNewSystemTab("VoEditor", parent);
+
+			} catch (NullPointerException | GagoyleException | IOException e1) {
+				LOGGER.error(ValueUtil.toString(e1));
+			}
+
+		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 6. 11. 작성자 : KYJ
+	 *
+	 * 트리 컨텍스트 요청 이벤트
+	 *
+	 * @param event
+	 ********************************/
+	public void treeProjectFileOnContextMenuRequested(ContextMenuEvent event) {
+
+		if (event.getSource() == treeProjectFile) {
+			fileTreeContextMenu.hide();
+			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			if (selectedItem == null)
+				return;
+
+			tmpSelectFileWrapper = selectedItem.getValue();
+			fileTreeContextMenu.show(treeProjectFile, event.getScreenX(), event.getScreenY());
+		} else {
+			fileTreeContextMenu.hide();
+		}
+
+	}
+
+	/********************************
+	 * 작성일 : 2016. 6. 11. 작성자 : KYJ
+	 *
+	 * 트리 키 클릭 이벤트
+	 *
+	 * @param event
+	 ********************************/
+	public void treeProjectFileOnKeyPressed(KeyEvent event) {
+		if (event.getCode() == KeyCode.R && event.isControlDown() && event.isShiftDown()) {
+			try {
+				GagoyleWorkspaceOpenResourceView resourceView = new GagoyleWorkspaceOpenResourceView();
+				ResultDialog<File> show = resourceView.show();
+				File data = show.getData();
+				if (data != null && data.exists()) {
+					TreeItem<FileWrapper> search = search(data);
+
+					treeProjectFile.getSelectionModel().select(search);
+					treeProjectFile.getFocusModel().focus(treeProjectFile.getSelectionModel().getSelectedIndex());
+					treeProjectFile.scrollTo(treeProjectFile.getSelectionModel().getSelectedIndex());
+				}
+
+			} catch (Exception e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+		}
+	}
+
+	public TreeItem<FileWrapper> search(File f) {
+		TreeItem<FileWrapper> root = treeProjectFile.getRoot();
+
+		Path p = FileUtil.toRelativizeForGagoyle(f);
+		String[] split = StringUtils.split(p.toString(), File.separator);
+
+		boolean isFound = false;
+		ObservableList<TreeItem<FileWrapper>> children = root.getChildren();
+		int sliding = 0;
+		TreeItem<FileWrapper> treeItem = null;
+		for (int i = 0; i < split.length; i++) {
+			isFound = false;
+
+			for (TreeItem<FileWrapper> w : children) {
+				treeItem = w;
+				String name = treeItem.getValue().getFile().getName();
+
+				if (split[sliding].equals(name)) {
+					isFound = true;
+
+					break;
+				}
+
+			}
+			if (isFound) {
+				children = treeItem.getChildren();
+				sliding++;
+			} else {
+				// 아예못찾은경우는 종료.
+				break;
+			}
+		}
+
+		return treeItem;
+	}
+
+	/********************************
+	 * 작성일 : 2016. 6. 11. 작성자 : KYJ
+	 *
+	 * 프로젝트 트리 마우스 클릭 이벤트
+	 *
+	 * @param event
+	 ********************************/
+	public void treeProjectFileOnMouseClick(MouseEvent event) {
+
+		fileTreeContextMenu.hide();
+
+		/* 탭 추가 기능. */
+		if (event.getClickCount() == 2) {
+			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			if (selectedItem == null)
+				return;
+
+			FileWrapper value = selectedItem.getValue();
+			if (value != null) {
+				File file = value.getFile();
+				LOGGER.debug(String.format(" file : %s ", file.toPath()));
+				if (file.exists() && file.isFile()) {
+					try {
+						boolean javaFile = FileUtil.isJavaFile(file);
+						LOGGER.debug("is javafile ? " + javaFile);
+						openFile(file);
+					} catch (Exception e) {
+						LOGGER.error(ValueUtil.toString(e));
+					}
+				}
+
+			}
+
+		}
+
+	}
+
+	/********************************
+	 * 작성일 : 2016. 5. 12. 작성자 : KYJ
+	 *
+	 * 속성을 조회하는 팝업을 로드한다.
+	 *
+	 * @param e
+	 ********************************/
+	public void menuPropertiesOnAction(ActionEvent e) {
+
+		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		NullExpresion.ifNotNullDo(selectedItem, item -> {
+			File file = item.getValue().getFile();
+			if (file.exists()) {
+
+				FilePropertiesComposite composite = new FilePropertiesComposite(file);
+				FxUtil.createStageAndShow(composite, stage -> {
+					stage.initOwner(SharedMemory.getPrimaryStage());
+					stage.show();
+				});
+			}
+
+		});
+
+	}
+
+	/**
+	 * 탭항목 추가.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 11. 2.
+	 * @param tab
+	 */
+	public void addTabItem(Tab tab) {
+		tabPanWorkspace.getTabs().add(tab);
+		tab.setContextMenu(closeContextMenu());
+	}
+
+	/**
+	 * 탭에 대해 로드함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 11. 4.
+	 * @param tabName
+	 * @param fxmlName
+	 */
+	@Override
+	public void loadNewSystemTab(String tabName, String fxmlName) {
+		Platform.runLater(() -> {
+			try {
+				FXMLLoader loader = new FXMLLoader();
+				loader.setLocation(getClass().getResource(fxmlName));
+				Parent parent = loader.load();
+
+				if (beforeParentLoad != null && beforeParentLoad.filter(parent)) {
+					beforeParentLoad.beforeLoad(parent);
+
+					if (beforeParentLoad.isUnloadParent()) {
+						return;
+					}
+
+				}
+
+				Tab tab = new Tab(tabName, parent);
+				addTabItem(tab);
+				tab.getTabPane().getSelectionModel().select(tab);
+
+				// 리스너 호출.
+				onParentloaded.forEach(v -> {
+					v.onLoad(parent);
+				});
+
+			} catch (IOException e1) {
+				DialogUtil.showExceptionDailog(e1);
+			}
+		});
+	}
+
+	/**
+	 * 탭에 대해 로드함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 11. 4.
+	 * @param tableName
+	 * @param fxmlName
+	 */
+	@Override
+	public void loadNewSystemTab(String tableName, Parent parent) {
+		Platform.runLater(() -> {
+			try {
+				if (beforeParentLoad != null && beforeParentLoad.filter(parent)) {
+					beforeParentLoad.beforeLoad(parent);
+
+					if (beforeParentLoad.isUnloadParent()) {
+						return;
+					}
+				}
+
+				Tab tab = new Tab(tableName, parent);
+				addTabItem(tab);
+				tabPanWorkspace.getSelectionModel().select(tab);
+
+				// 리스너 호출.
+				onParentloaded.forEach(v -> v.onLoad(parent));
+				// _parent.getStylesheets().clear();
+			} catch (Exception e1) {
+				DialogUtil.showExceptionDailog(e1);
+			}
+		});
+	}
+
+	/********************************
+	 * 작성일 : 2016. 4. 26. 작성자 : KYJ
+	 *
+	 * 새로운 탭을 로드한다.
+	 *
+	 * @param tableName
+	 * @param parent
+	 ********************************/
+	public void loadNewSystemTab(String tableName, CloseableParent<?> parent) {
+		Platform.runLater(() -> {
+			try {
+
+				Parent _parent = parent.getParent();
+
+				if (beforeParentLoad != null && beforeParentLoad.filter(_parent)) {
+					beforeParentLoad.beforeLoad(_parent);
+
+					if (beforeParentLoad.isUnloadParent()) {
+						return;
+					}
+				}
+
+				Tab tab = new Tab(tableName, _parent);
+				addTabItem(tab);
+				tabPanWorkspace.getSelectionModel().select(tab);
+				tab.setOnClosed(event -> {
+					try {
+						parent.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
+
+				// 리스너 호출.
+				onParentloaded.forEach(v -> v.onLoad(parent.getParent()));
+				// tab.getTabPane().getSelectionModel().select(tab);
+				// _parent.getScene().getStylesheets().clear();
+
+			} catch (Exception e1) {
+				DialogUtil.showExceptionDailog(e1);
+			}
+		});
+	}
+
+	@FXML
+	public void lblDaoWizardOnMouseClick(MouseEvent e) {
+		loadNewSystemTab("DaoWizard", "DaoWizardView.fxml");
+	}
+
+	@FXML
+	public void lblDaoWizardOnAction(ActionEvent e) {
+		lblDaoWizardOnMouseClick(null);
+	}
+
+	/**
+	 * 설정 화면을 로드한다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 11. 4.
+	 * @param e
+	 */
+	@FXML
+	public void lblConfigonMouseClick(MouseEvent e) {
+		loadNewSystemTab("Configuration", "ConfigurationView.fxml");
+	}
+
+	@FXML
+	public void lblConfigonOnAction(ActionEvent e) {
+		lblConfigonMouseClick(null);
+	}
+
+	@FXML
+	public void lblSVNOnAction(ActionEvent e) {
+		try {
+			Stage stage = new Stage();
+			Scene scene = new Scene(new BorderPane(new SVNViewer()), 1100, 900);
+			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+			stage.setScene(scene);
+			stage.initOwner(SharedMemory.getPrimaryStage());
+
+			stage.setTitle("SVN");
+			stage.setAlwaysOnTop(false);
+			stage.centerOnScreen();
+			// stage.initModality(Modality.APPLICATION_MODAL);
+			stage.show();
+		} catch (Exception ex) {
+			LOGGER.error(ValueUtil.toString(ex));
+			DialogUtil.showExceptionDailog(ex);
+		}
+
+	}
+
+	/**
+	 * Vo Editor 로드
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 11. 4.
+	 * @param e
+	 */
+	@FXML
+	public void lblVoEditorOnMouseClick(MouseEvent e) {
+		loadNewSystemTab("VoEditor", "VoEditorView.fxml");
+	}
+
+	@FXML
+	public void lblVoEditorOnAction(ActionEvent e) {
+		lblVoEditorOnMouseClick(null);
+	}
+
+	@FXML
+	public void lblDatabaseMouseClick(MouseEvent e) {
+
+		try {
+			CommonsSqllPan sqlPane = CommonsSqllPan.getSqlPane();
+
+			Stage stage = new Stage();
+			sqlPane.setStage(stage);
+			Scene scene = new Scene(new BorderPane(sqlPane), 1100, 900);
+			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+			stage.setScene(scene);
+			// stage.setAlwaysOnTop(true);
+			// stage.initModality(Modality.APPLICATION_MODAL);
+			// stage.initOwner(SharedMemory.getPrimaryStage());
+
+			// stage.initOwner(SharedMemory.getPrimaryStage());
+			double x = SharedMemory.getPrimaryStage().getX();
+			double y = SharedMemory.getPrimaryStage().getY();
+			stage.setTitle("Database");
+			stage.setX(x);
+			stage.setY(y);
+			stage.setAlwaysOnTop(false);
+			stage.centerOnScreen();
+			stage.show();
+			// stage.showAndWait();
+
+			// 다른 레이아웃에 끼어넣을경우 도킹이 제대로 작동하지않아 처리하지않음
+			// loadNewSystemTab("Database", new BorderPane(new
+			// PostgreSqlPane("sample")));
+		} catch (Exception ex) {
+			LOGGER.error(ValueUtil.toString(ex));
+			DialogUtil.showExceptionDailog(ex);
+		}
+
+	}
+
+	@FXML
+	public void lblDatabaseOnAction(ActionEvent e) {
+		lblDatabaseMouseClick(null);
+	}
+
+	@FXML
+	public void lblSpreadSheetOnMouseClick(MouseEvent e) {
+		loadNewSystemTab(TAB_TITLE_SPREAD_SHEET, new SchoolMgrerSpreadSheetView());
+	}
+
+	@FXML
+	public void lblSpreadSheetOnAction(ActionEvent e) {
+		lblSpreadSheetOnMouseClick(null);
+	}
+
+	@FXML
+	public void lblDBConsoleOnAction(ActionEvent e) {
+		lblDBConsoleOnMouseClick(null);
+	}
+
+	@FXML
+	public void lblDBConsoleOnMouseClick(MouseEvent e) {
+		if (dbConsoleProperty.get() != null)
+			return;
+		try {
+			ReadOnlyConsole console = ReadOnlySingletonConsole.getInstance();
+			dbConsoleProperty.set(console);
+			Stage stage = new Stage();
+			BorderPane root = new BorderPane(console);
+			root.getStylesheets().add(SkinManager.getInstance().getSkin());
+			Scene scene = new Scene(root, 700, 300);
+			stage.setScene(scene);
+			double x = SharedMemory.getPrimaryStage().getX();
+			double y = SharedMemory.getPrimaryStage().getY();
+			stage.setTitle("Database Console");
+			stage.setX(x);
+			stage.setY(y);
+			stage.setAlwaysOnTop(false);
+			stage.initOwner(SharedMemory.getPrimaryStage());
+			stage.centerOnScreen();
+			stage.showAndWait();
+			dbConsoleProperty.set(null);
+		} catch (Exception ex) {
+			DialogUtil.showExceptionDailog(ex);
+			LOGGER.error(ValueUtil.toString(ex));
+		}
+	}
+
+	@FXML
+	public void lblSystemConsoleOnAction(ActionEvent e) {
+		lblSystemConsoleOnMouseClick(null);
+	}
+
+	@FXML
+	public void lblSystemConsoleOnMouseClick(MouseEvent e) {
+
+		if (systemConsoleProperty.get() != null)
+			return;
+		try {
+			ReadOnlyConsole console = SystemConsole.getInstance();
+			systemConsoleProperty.set(console);
+			Stage stage = new Stage();
+			BorderPane root = new BorderPane(console);
+			root.getStylesheets().add(SkinManager.getInstance().getSkin());
+			Scene scene = new Scene(root, 700, 300);
+			stage.setScene(scene);
+			double x = SharedMemory.getPrimaryStage().getX();
+			double y = SharedMemory.getPrimaryStage().getY();
+			stage.setTitle("System Console");
+			stage.setX(x);
+			stage.setY(y);
+			stage.setAlwaysOnTop(false);
+			stage.initOwner(SharedMemory.getPrimaryStage());
+			stage.centerOnScreen();
+
+			stage.setOnCloseRequest(ev -> {
+				// 스트림 복구.
+				SystemConsole.reset();
+			});
+			stage.showAndWait();
+			systemConsoleProperty.set(null);
+		} catch (Exception ex) {
+			DialogUtil.showExceptionDailog(ex);
+			LOGGER.error(ValueUtil.toString(ex));
+		}
+
+	}
+
+	/**
+	 * 어플리케이션 종료처리
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 11. 6.
+	 */
+	@FXML
+	public void menuExitOnAction() {
+		Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("종료", "Exit ?");
+		showYesOrNoDialog.ifPresent(str -> {
+
+			if ("RESULT".equals(str.getKey()) && "Y".equals(str.getValue())) {
+				Platform.exit();
+			}
+		});
+
+	}
+
+	/********************************
+	 * 작성일 : 2016. 6. 19. 작성자 : KYJ
+	 *
+	 * 씬빌더 open하기 위한 이벤트.
+	 *
+	 * SceneBuilderOpenEvent로 넘겨받은 항목만 호출됨.
+	 *
+	 * @param e
+	 ********************************/
+	public void menuItemOpenWithSceneBuilderOnAction(ActionEvent event) {
+		TreeItem<FileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
+
+		if (selectedTreeItem != null) {
+			File selectedTree = selectedTreeItem.getValue().getFile();
+			if (FileUtil.isFXML(selectedTree)) {
+
+				String sceneLocation = ResourceLoader.getInstance().get(ResourceLoader.SCENEBUILDER_LOCATION);
+
+				if (ValueUtil.isEmpty(sceneLocation) || !(new File(sceneLocation).exists())) {
+					DialogUtil.showMessageDialog("You have to set up SceneBuilder Location.");
+					lblConfigonMouseClick(null);
+					return;
+				}
+				List<String> args = Arrays.asList(sceneLocation, selectedTree.getAbsolutePath());
+				try {
+					RuntimeClassUtil.simpleExec(args);
+				} catch (Exception e) {
+					LOGGER.error(ValueUtil.toString(e));
+				}
+
+			}
+		}
+
+	}
+
+	/********************************
+	 * 작성일 : 2016. 6. 30. 작성자 : KYJ
+	 *
+	 * 현재 선택된 탭을 출력.
+	 *
+	 ********************************/
+	@FXML
+	public void menuPrintOnAction() {
+		Tab selectedItem = this.tabPanWorkspace.getSelectionModel().getSelectedItem();
+		if (selectedItem != null)
+			FxUtil.printJob(SharedMemory.getPrimaryStage(), selectedItem.getContent());
+	}
+
+	/*
+	 * 쿼리 리스너 구현체.
+	 *
+	 * 쿼리가 처리될때마다 콘솔에 출력하기 위한 처리를 한다.
+	 *
+	 * @inheritDoc
+	 */
+	@Override
+	public void onQuerying(String query) {
+		ReadOnlyConsole readOnlyConsole = dbConsoleProperty.get();
+		if (readOnlyConsole != null)
+			readOnlyConsole.appendText(query);
+
+	}
+
+	/**
+	 * 메인에서 Parent Tab이 추가될때 처리할 리스너를 넣음.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 6. 16.
+	 * @param onload
+	 */
+	public boolean addOnParentLoadedListener(GagoyleParentOnLoaded onload) {
+		if (onload != null)
+			return onParentloaded.add(onload);
+		return false;
+	}
+
+	/**
+	 * 메인에서 Parent Tab 리스너 삭제
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 6. 16.
+	 * @param onload
+	 */
+	public boolean removeOnParentLoadedListener(GagoyleParentOnLoaded onload) {
+		if (onload != null)
+			return onParentloaded.remove(onload);
+		return false;
+	}
+
+	private void setOnbeforeParentLoad(GagoyleParentBeforeLoad beforeLoad) {
+		this.beforeParentLoad = beforeLoad;
+	}
+}

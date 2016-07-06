@@ -1,0 +1,129 @@
+/********************************
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.main.layout
+ *	작성일   : 2015. 10. 15.
+ *	작성자   : KYJ
+ *******************************/
+package com.kyj.fx.voeditor.visual.component.popup;
+
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.kyj.fx.voeditor.visual.component.ExceptionHandler;
+import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
+/**
+ * 단순한 텍스트를 보여주는 용도로만 사용되됨.
+ *
+ * @author KYJ
+ *
+ */
+public class JavaTextView extends BorderPane {
+	private static Logger LOGGER = LoggerFactory.getLogger(JavaTextView.class);
+	private JavaTextArea javaTextArea;
+//	private String content;
+	private boolean showButtons;
+	/**
+	 * 버튼박스
+	 */
+	@FXML
+	private HBox hboxButtons;
+
+	@FXML
+	private Button btnClose;
+
+	// private StringProperty textProperty;
+	private Stage stage = new Stage();
+
+	public JavaTextView(String content) {
+		this(content, true, null);
+	}
+
+	public JavaTextView(String content, boolean showButtons) {
+		this(content, showButtons, null);
+	}
+
+	public JavaTextView(String content, boolean showButtons, ExceptionHandler handler) {
+		LOGGER.debug("JavaTextView Constructor called");
+//		this.content = content;
+		this.showButtons = showButtons;
+		javaTextArea = new JavaTextArea();
+		javaTextArea.setEditable(false);
+		javaTextArea.setContent(content);
+
+		LOGGER.debug("FxmlLoader");
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(JavaTextView.class.getResource("SimpleTextView.fxml"));
+		loader.setRoot(this);
+		loader.setController(this);
+		try {
+
+			loader.load();
+			LOGGER.debug("SimpleTextView.fxml load complete...");
+		} catch (Exception e) {
+			if (handler == null) {
+				e.printStackTrace();
+			} else {
+				handler.handle(e);
+			}
+
+		}
+
+	}
+
+	@FXML
+	public void initialize() {
+		hboxButtons.setVisible(showButtons);
+		setCenter(javaTextArea);
+//		javaTextArea.setContent(content);
+	}
+
+	public void setContent(String content) {
+		javaTextArea.setContent(content);
+	}
+
+	public void setEditable(boolean editable) {
+		javaTextArea.setEditable(false);
+	}
+
+	public void show(double width, double height) throws IOException {
+
+		btnClose.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				close();
+			}
+		});
+
+		Scene scene = new Scene(this, width, height);
+		stage.setScene(scene);
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.initOwner(SharedMemory.getPrimaryStage());
+		stage.show();
+
+	}
+
+	public void show() throws IOException {
+		show(1100, 700);
+	}
+
+	private void close() {
+		stage.close();
+	}
+
+}

@@ -1,0 +1,335 @@
+/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+
+
+
+/*
+ * 2016.2.1 최초작성 by kyj
+ * Black Style
+ *
+ * */
+
+ .table-row-cell:empty {
+    -fx-background-color: #1d1d1d;
+}
+
+.background {
+    -fx-background-color: #1d1d1d;
+}
+
+.label {
+    -fx-text-fill: white;
+    -fx-opacity: 0.6;
+}
+
+/*[start]text-area */
+.text-area {
+    -fx-background-color: #263440;
+    -fx-text-fill:white;
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.text-area .scroll-pane .viewport{
+    -fx-background-color: transparent;
+}
+
+.text-area .scroll-pane .content{
+    -fx-background-color: transparent;
+}
+/*[end]text-area */
+
+CodeArea {
+    -fx-background-color: #E3DEDE;
+    -fx-text-fill:white;
+}
+
+CodeArea .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+CodeArea .scroll-pane .viewport{
+    -fx-background-color: transparent;
+}
+
+CodeArea .scroll-pane .content{
+    -fx-background-color: transparent;
+}
+CodeArea .label{
+    -fx-text-fill: black;
+}
+
+AnchorPane
+{
+	-fx-background-color: #1d1d1d;
+	-fx-border-color: white, white;
+    -fx-border-width: 0.3, 0.3;
+    -fx-border-style: solid, segments(1.0, 1.0);
+    -fx-border-radius: 0.0, 0.0;
+    -fx-border-insets: 1.0 1.0 1.0 1.0, 0.0;
+}
+
+GridPane
+{
+	-fx-background-color: #1d1d1d;
+}
+
+tab-pane .tab-header-area .tab-header-background {
+    -fx-opacity: 0.0;
+}
+
+.tab-pane
+{
+    -fx-tab-min-width:90.0px;
+}
+
+.tab{
+    -fx-background-insets: 0.0 1.0 0.0 1.0,0.0,0.0;
+}
+.tab-pane .tab
+{
+    -fx-background-color: #e6e6e6;
+
+}
+
+.tab-pane .tab:selected
+{
+    -fx-background-color: #3c3c3c;
+}
+
+.tab .tab-label {
+    -fx-alignment: CENTER;
+    -fx-text-fill: #828282;
+    -fx-font-size: 12.0px;
+    -fx-font-weight: bold;
+}
+
+.tab:selected .tab-label {
+    -fx-alignment: CENTER;
+    -fx-text-fill: #96b946;
+}
+
+.label-bright {
+    -fx-text-fill: white;
+    -fx-opacity: 1.0;
+}
+
+.label-header {
+    -fx-text-fill: white;
+    -fx-opacity: 1.0;
+}
+
+/*table view */
+.table-view {
+    -fx-base: #1d1d1d;
+    -fx-control-inner-background: #1d1d1d;
+    -fx-background-color: #1d1d1d;
+    -fx-table-cell-border-color: transparent;
+    -fx-table-header-border-color: transparent;
+    -fx-padding: 5.0;
+
+}
+
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-border-width: 0.0 0.0 1.0 0.0;
+    -fx-background-color: transparent;
+    -fx-border-color:
+        transparent
+        transparent
+        derive(-fx-base, 80.0%)
+        transparent;
+    -fx-border-insets: 0.0 10.0 1.0 0.0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-alignment: center-left;
+    -fx-opacity: 1.0;
+}
+
+.table-view:focused .table-row-cell:filled:focused:selected {
+    -fx-background-color: -fx-focus-color;
+}
+/*table view */
+
+/*list view */
+.list-view {
+    -fx-base: #1d1d1d;
+    -fx-control-inner-background: #1d1d1d;
+    -fx-background-color: #1d1d1d;
+    -fx-table-cell-border-color: transparent;
+    -fx-table-header-border-color: transparent;
+    -fx-padding: 5.0;
+
+}
+
+.list-view .column-header-background {
+    -fx-background-color: transparent;
+}
+
+.list-view .column-header, .table-view .filler {
+    -fx-border-width: 0.0 0.0 1.0 0.0;
+    -fx-background-color: transparent;
+    -fx-border-color:
+        transparent
+        transparent
+        derive(-fx-base, 80.0%)
+        transparent;
+    -fx-border-insets: 0.0 10.0 1.0 0.0;
+}
+
+.list-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-alignment: center-left;
+    -fx-opacity: 1.0;
+}
+
+.list-view:focused .table-row-cell:filled:focused:selected {
+    -fx-background-color: -fx-focus-color;
+}
+/*list view */
+
+.split-pane:horizontal > .split-pane-divider {
+    -fx-border-color: transparent #1d1d1d transparent #1d1d1d;
+    -fx-background-color: transparent, derive(#1d1d1d,20.0%);
+}
+
+.split-pane {
+    -fx-padding: 1.0 0.0 0.0 0.0;
+}
+
+.menu-bar {
+    -fx-background-color: derive(#1d1d1d,20.0%);
+}
+
+.context-menu {
+    -fx-background-color: derive(#1d1d1d,50.0%);
+}
+
+
+.menu-bar .label {
+    -fx-text-fill: white;
+    -fx-opacity: 0.9;
+}
+
+.menu .left-container {
+	-fx-background-color: black;
+}
+
+.text-field {
+	-fx-opacity: 1.0;
+}
+
+/*
+ * Metro style Push Button
+ * Author: Pedro Duque Vieira
+ * http://pixelduke.wordpress.com/2012/10/23/jmetro-windows-8-controls-on-java/
+ */
+.button {
+    -fx-border-color: #e2e2e2;
+    -fx-border-width: 2.0;
+    -fx-background-radius: 0.0;
+    -fx-background-color: #1d1d1d;
+    -fx-text-fill: #d8d8d8;
+    -fx-background-insets: 0.0 0.0 0.0 0.0, 0.0, 1.0, 2.0;
+
+}
+
+.button:hover {
+    -fx-background-color: #3a3a3a;
+}
+
+.button:pressed, .button:default:hover:pressed {
+  -fx-background-color: white;
+  -fx-text-fill: #1d1d1d;
+}
+
+.button:focused {
+    -fx-border-color: white, white;
+    -fx-border-width: 1.0, 1.0;
+    -fx-border-style: solid, segments(1.0, 1.0);
+    -fx-border-radius: 0.0, 0.0;
+    -fx-border-insets: 1.0 1.0 1.0 1.0, 0.0;
+}
+
+.button:disabled, .button:default:disabled {
+    -fx-opacity: 0.4;
+    -fx-background-color: #1d1d1d;
+    -fx-text-fill: white;
+}
+
+.button:default {
+    -fx-background-color: -fx-focus-color;
+    -fx-text-fill: #ffffff;
+}
+
+.button:default:hover {
+    -fx-background-color: derive(-fx-focus-color,30.0%);
+}
+
+HBox
+{
+	-fx-background-color:black;
+	-fx-background-color: #1d1d1d;
+	-fx-border-color: white, white;
+	-fx-border-width: 0.15, 0.15;
+	-fx-border-style: solid, segments(1.0, 1.0);
+	-fx-border-radius: 0.0, 0.0;
+	-fx-border-insets: 1.0 1.0 1.0 1.0, 0.0;
+}
+
+TitlePane
+{
+	-fx-background-color:black;
+}
+
+HBox .label
+{
+	-fx-text-fill: white ;
+	-fx-opacity: 0.9;
+}
+.vbox
+{
+	-fx-background-color: transparent  ;
+}
+.vbox .label
+{
+	-fx-text-fill: black ;
+}
+
+/*트리의 배경색 및 텍스트색상 */
+.tree-cell
+{
+	-fx-background-color: #1d1d1d  ;
+
+	-fx-text-fill: #C2C2C2;
+}
+/* 선택된 트리의 배경색 및 텍스트색상 */
+.tree-cell:focused
+{
+	-fx-background-color: #777676 ;
+	-fx-text-fill: #96b946 ;
+}
+/* 하위트리 존재여부를 포여줌 */
+.tree-cell StackPane StackPane
+{
+	-fx-background-color: white  ;
+}
+
+.drawPane
+{
+	 -fx-background-color: white ;
+}
+
+.drawText
+{
+    -fx-text-fill: black;
+    -fx-opacity: 0.6;
+    -fx-background-color: red ;
+}
+

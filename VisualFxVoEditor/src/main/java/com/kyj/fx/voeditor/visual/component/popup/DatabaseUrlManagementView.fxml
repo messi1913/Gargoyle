@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.cell.*?>
+
+<fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane"
+	xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<TableView fx:id="tbDatabase" editable="true"
+			onMouseClicked="#tbDatabaseMouseClick" prefHeight="200.0" prefWidth="200.0"
+			BorderPane.alignment="CENTER">
+			<columns>
+				<TableColumn fx:id="colKey" editable="false" text="Key"
+					visible="false" />
+				<TableColumn fx:id="colUrl" text="Url" />
+				<TableColumn fx:id="colAlias" text="Alias" />
+				<TableColumn fx:id="colUserName" text="User Name" />
+				<TableColumn fx:id="colUserPassword" text="User Password" />
+<!-- 				<TableColumn fx:id="colPing" text="Ping" /> -->
+			</columns>
+		</TableView>
+	</center>
+	<bottom>
+		<HBox alignment="CENTER_RIGHT" spacing="5.0"
+			BorderPane.alignment="CENTER">
+			<children>
+				<ColorPicker />
+				<Button fx:id="btnDelete" mnemonicParsing="false"
+					onMouseClicked="#btnDeleteOnMouseClick" text="Delete" />
+				<Button fx:id="btnAdd" mnemonicParsing="false"
+					onMouseClicked="#btnAddOnMouseClick" text="Add" />
+				<Button fx:id="btnSave" mnemonicParsing="false"
+					onMouseClicked="#btnSaveOnMouseClick" text="Save" />
+			</children>
+			<padding>
+				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+			</padding>
+		</HBox>
+	</bottom>
+</fx:root>

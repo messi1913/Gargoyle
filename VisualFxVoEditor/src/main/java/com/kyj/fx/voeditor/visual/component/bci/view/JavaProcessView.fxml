@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<BorderPane prefHeight="417.0" prefWidth="937.0"
+	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="com.kyj.fx.voeditor.visual.component.bci.view.JavaProcessViewController">
+	<top>
+		<Label text="Java Process on your PC" BorderPane.alignment="CENTER" />
+	</top>
+	<center>
+		<TableView fx:id="tbJavaApplication" prefHeight="344.0"
+			prefWidth="401.0" BorderPane.alignment="CENTER">
+			<columns>
+				<TableColumn fx:id="colProcessId" prefWidth="100.0"
+					text="Java Process ID">
+					<cellValueFactory>
+						<PropertyValueFactory property="processId" />
+					</cellValueFactory>
+				</TableColumn>
+				<TableColumn fx:id="colApplicationName" prefWidth="250.0"
+					text="Application Name">
+					<cellValueFactory>
+						<PropertyValueFactory property="applicationName" />
+					</cellValueFactory>
+				</TableColumn>
+				<TableColumn fx:id="colApplicationArgu" prefWidth="514.0"
+					text="Argument">
+					<cellValueFactory>
+						<PropertyValueFactory property="argument" />
+					</cellValueFactory>
+				</TableColumn>
+				<TableColumn fx:id="colVmArgu" prefWidth="514.0" text="jvmArgu">
+					<cellValueFactory>
+						<PropertyValueFactory property="jvmArgs" />
+					</cellValueFactory>
+				</TableColumn>
+			</columns>
+		</TableView>
+	</center>
+</BorderPane>

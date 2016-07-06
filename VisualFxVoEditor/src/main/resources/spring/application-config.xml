@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<context:property-placeholder location="classpath:spring/*.properties" />
+	<!-- <tx:annotation-driven /> -->
+
+	<!-- <bean id="templateMessage" class="org.springframework.mail.SimpleMailMessage"> -->
+	<!-- <property name="from" value="${mail.from.address}" /> -->
+	<!-- <property name="subject" value="{mail.title}" /> -->
+	<!-- </bean> -->
+
+	<bean id="mailer" class="com.kyj.fx.voeditor.visual.framework.mail.Mailer"
+		scope="prototype">
+		<property name="mailSender" ref="naverMailSender" />
+		<property name="velocityEngine" ref="velocityEngine" />
+		<property name="mailFrom" value="${mail.from.address}"></property>
+		<property name="mailTitle" value="{mail.title}"></property>
+		<property name="mailTemplate" value="${mail.template}"></property>
+		<property name="encoding" value="${mail.default.encoding}"></property>
+		<property name="mailUseYn" value="${mail.useYn}"></property>
+	</bean>
+
+	<!-- -->
+	<bean id="mailSenderInfo"
+		class="com.kyj.fx.voeditor.visual.framework.mail.SenderMailInfo">
+		<property name="sendUserId" value="${mail.from.address}" />
+		<property name="sendUserPassword" value="${mail.from.password}" />
+	</bean>
+
+	<bean id="naverMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mail.naver.host}" /><!-- smtp.naver.com -->
+		<property name="port" value="${mail.naver.port}" /><!-- 587 -->
+
+		<!-- 기본값 -->
+		<property name="username" value="${mail.from.address}" />
+		<property name="password" value="${mail.from.password}" />
+
+		<property name="defaultEncoding" value="${mail.default.encoding}"></property>
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.debug">true</prop>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+				<prop key="mail.mime.charset">UTF-8</prop>
+				<prop key="mail.transport.protocol">${mail.naver.protocol}</prop>
+				<prop key="SSL">true</prop>
+				<prop key="mail.smtps.ssl.checkserveridentity">true</prop>
+				<prop key="mail.smtps.ssl.trust">*</prop>
+				<!-- <prop key="proxySet">true</prop> -->
+				<!-- <prop key="socksProxyHost">168.219.61.252</prop> -->
+				<!-- <prop key="socksProxyPort">8080</prop> -->
+
+			</props>
+		</property>
+	</bean>
+
+
+
+	<bean id="velocityEngine"
+		class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="velocityProperties">
+			<props>
+				<prop key="resource.loader">class</prop>
+				<prop key="class.resource.loader.class">
+					org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+				</prop>
+			</props>
+		</property>
+	</bean>
+</beans>

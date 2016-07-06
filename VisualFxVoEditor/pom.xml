@@ -1,0 +1,622 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>kyj.Fx.visual</groupId>
+	<artifactId>VisualFxVoEditor</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+
+
+
+	<properties>
+
+		<!-- HTTP -->
+		<apache-http-client.version>4.3.6</apache-http-client.version>
+
+		<!-- Spring -->
+		<spring-framework.security.version>3.0.5.RELEASE</spring-framework.security.version>
+
+		<!-- Generic properties -->
+		<java.version>1.8</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<!-- Spring -->
+		<spring-framework.version>3.2.3.RELEASE</spring-framework.version>
+
+		<!-- Logging -->
+		<logback.version>1.1.2</logback.version>
+		<slf4j.version>1.7.20</slf4j.version>
+
+		<!-- Test -->
+		<junit.version>4.11</junit.version>
+
+		<!-- JSON -->
+		<jason.version>20141113</jason.version>
+
+		<!-- Jackson -->
+		<jackson.version>2.4.2</jackson.version>
+
+		<poi.word.version>3.10.1</poi.word.version>
+
+		<vo.editor.jar.path.name>${user.home}/.m2/repository/kyj/FxVoEditor/kyj.FxVoEditor/0.0.1-SNAPSHOT/kyj.FxVoEditor-0.0.1-SNAPSHOT.jar</vo.editor.jar.path.name>
+		<dao.wizard.jar.path.name>${user.home}/.m2/repository/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/0.0.1-SNAPSHOT/kyj.fx.dao.wizard-0.0.1-SNAPSHOT.jar</dao.wizard.jar.path.name>
+		<maven.plugin.url>http://repo.maven.apache.org/maven2</maven.plugin.url>
+
+		<openoffice.lib>4.1.2</openoffice.lib>
+	</properties>
+
+	<build>
+		<!-- <sourceDirectory>src/main/java</sourceDirectory> <testSourceDirectory>src/main/test</testSourceDirectory> -->
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+
+			<!-- h2 db 접속컨트롤러 실행방법 mvn exec:java 참조사이트 : https://github.com/benelog/web-db-console -->
+			<!-- <plugin> -->
+			<!-- <groupId>org.codehaus.mojo</groupId> -->
+			<!-- <artifactId>exec-maven-plugin</artifactId> -->
+			<!-- <version>1.1</version> -->
+			<!-- <configuration> -->
+			<!-- <mainClass>org.h2.tools.Console</mainClass> -->
+			<!-- <arguments> -->
+			<!-- <argument>-browser</argument> -->
+			<!-- </arguments> -->
+			<!-- </configuration> -->
+			<!-- </plugin> -->
+
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<!-- Logging with SLF4J & LogBack -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.slf4j</groupId> -->
+		<!-- <artifactId>slf4j-log4j12</artifactId> -->
+		<!-- <version>${slf4j.version}</version> -->
+		<!-- <exclusions> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>log4j</artifactId> -->
+		<!-- <groupId>log4j</groupId> -->
+		<!-- </exclusion> -->
+		<!-- </exclusions> -->
+		<!-- </dependency> -->
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- SLF4J가 지원하는 로깅을 대신 구현해주는 이름들입니다. 결과적으로 자신이 고칠수 없는 소스를 그대로 두고 SLF4J를 
+			사용하는것처럼 바꿀수 있는 방법입니다. 쉽게 말해 각각 로깅 구현체를 SLF4J가 package이름으로 구현을 해놓은 것입니다. 참고로 
+			jcl은 jarkarta commons logging의 약자이고, jul은 java util logging의 약자입니다. -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+
+		<!-- <dependency> -->
+		<!-- <groupId>org.slf4j</groupId> -->
+		<!-- <artifactId>slf4j-jdk14</artifactId> -->
+		<!-- <version>${slf4j.version}</version> -->
+		<!-- <scope>runtime</scope> -->
+		<!-- </dependency> -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>org.slf4j</groupId> -->
+		<!-- <artifactId>slf4j-log4j12</artifactId> -->
+		<!-- <version>${slf4j.version}</version> -->
+		<!-- <scope>runtime</scope> -->
+		<!-- </dependency> -->
+
+
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+
+		<!-- SystemUtil -->
+
+		<!-- JAVAFX ANIMATION LIB -->
+		<dependency>
+			<groupId>com.jidesoft</groupId>
+			<artifactId>jidefx-common</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+
+		<!-- ControlsFx i found SpreadSheet bug .. 8.40.10 version -->
+		<dependency>
+			<groupId>org.controlsfx</groupId>
+			<artifactId>controlsfx</artifactId>
+			<version>8.40.10</version>
+		</dependency>
+
+
+		<!-- <dependency> -->
+		<!-- <groupId>org.controlsfx</groupId> -->
+		<!-- <artifactId>controlsfx-samples</artifactId> -->
+		<!-- <version>8.40.10</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
+
+		<!-- Spring -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.springframework</groupId> -->
+		<!-- <artifactId>spring-context</artifactId> -->
+		<!-- <version>${spring-framework.version}</version> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring-framework.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${spring-framework.version}</version>
+		</dependency>
+
+		<!-- <dependency> -->
+		<!-- <groupId>org.springframework</groupId> -->
+		<!-- <artifactId>spring-test</artifactId> -->
+		<!-- <version>${spring-framework.version}</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
+
+		<!-- Jdbc -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring-framework.version}</version>
+		</dependency>
+
+		<!-- dbcp -->
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.4</version>
+		</dependency>
+
+		<!-- Tomcat -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>8.0.9</version>
+		</dependency>
+
+
+
+		<!-- PostgreSQL -->
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.1-901-1.jdbc4</version>
+		</dependency>
+
+		<!-- h2 db -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.181</version>
+		</dependency>
+
+		<!-- sqlite -->
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.8.11.2</version>
+		</dependency>
+
+
+		<!-- apache JCI -->
+		<!-- JCI 제거. 1.8이후버젼부터는 지원안함. -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.commons</groupId> -->
+		<!-- <artifactId>commons-jci-core</artifactId> -->
+		<!-- <version>1.1</version> -->
+		<!-- <exclusions> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>commons-logging</artifactId> -->
+		<!-- <groupId>commons-logging</groupId> -->
+		<!-- </exclusion> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>commons-io</artifactId> -->
+		<!-- <groupId>commons-io</groupId> -->
+		<!-- </exclusion> -->
+		<!-- </exclusions> -->
+		<!-- </dependency> -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.commons</groupId> -->
+		<!-- <artifactId>commons-jci-eclipse</artifactId> -->
+		<!-- <version>1.1</version> -->
+		<!-- </dependency> -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.commons</groupId> -->
+		<!-- <artifactId>commons-jci-fam</artifactId> -->
+		<!-- <version>1.1</version> -->
+		<!-- <exclusions> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>commons-logging</artifactId> -->
+		<!-- <groupId>commons-logging</groupId> -->
+		<!-- </exclusion> -->
+		<!-- </exclusions> -->
+		<!-- </dependency> -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.commons</groupId> -->
+		<!-- <artifactId>commons-jci-examples</artifactId> -->
+		<!-- <version>1.0</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
+
+		<!-- apache commons-io -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fxmisc.richtext</groupId>
+			<artifactId>richtextfx</artifactId>
+			<version>0.6.10</version>
+		</dependency>
+
+
+		<!-- JSON -->
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${jason.version}</version>
+		</dependency>
+
+
+
+
+		<!-- di만사용하는경우 -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.gluonhq</groupId> -->
+		<!-- <artifactId>ignite-guice</artifactId> -->
+		<!-- <version>1.0.0</version> -->
+		<!-- </dependency> -->
+
+		<!-- apache poi lib -->
+		<!-- WORD & EXCEL -->
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-scratchpad</artifactId>
+			<version>${poi.word.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-codec</artifactId>
+					<groupId>commons-codec</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi.word.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml-schemas</artifactId>
+			<version>${poi.word.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>ooxml-schemas</artifactId>
+			<version>1.3</version>
+		</dependency>
+		<!-- docx -> html convert docx의 경우는 poi라이브러리만으론 해결불가능. -->
+		<!-- <dependency> -->
+		<!-- <groupId>fr.opensagres.xdocreport</groupId> -->
+		<!-- <artifactId>fr.opensagres.xdocreport.document.docx</artifactId> -->
+		<!-- <version>1.0.5</version> -->
+		<!-- </dependency> -->
+
+
+
+		<!-- Converter -->
+		<dependency>
+			<groupId>com.artofsolving</groupId>
+			<artifactId>jodconverter</artifactId>
+			<version>2.2.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-io</artifactId>
+					<groupId>commons-io</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- [start] jodconverter dependencies -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.openoffice</groupId> -->
+		<!-- <artifactId>unoil</artifactId> -->
+		<!-- <version>${openoffice.lib}</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.openoffice</groupId> -->
+		<!-- <artifactId>juh</artifactId> -->
+		<!-- <version>${openoffice.lib}</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.openoffice</groupId> -->
+		<!-- <artifactId>ridl</artifactId> -->
+		<!-- <version>${openoffice.lib}</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.openoffice</groupId> -->
+		<!-- <artifactId>jurt</artifactId> -->
+		<!-- <version>${openoffice.lib}</version> -->
+		<!-- </dependency> -->
+
+
+
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<!-- <version>${spring-framework.security.version}</version> -->
+			<version>${spring-framework.version}</version>
+		</dependency>
+
+		<!-- Http -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${apache-http-client.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-codec</artifactId>
+					<groupId>commons-codec</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>${apache-http-client.version}</version>
+		</dependency>
+
+		<!-- java diff -->
+		<dependency>
+			<groupId>com.googlecode.java-diff-utils</groupId>
+			<artifactId>diffutils</artifactId>
+			<version>1.2.1</version>
+		</dependency>
+
+		<!-- [start] org Reflections project :: http://github.com/ronmamo/reflections -->
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.9-RC1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>11.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.16.1-GA</version>
+		</dependency>
+		<!-- [end] org Reflections project :: http://github.com/ronmamo/reflections -->
+
+
+		<!-- pdf reader -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.0</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox-tools</artifactId>
+			<version>2.0.0</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>pdfbox-debugger</artifactId>
+					<groupId>org.apache.pdfbox</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- org.bouncycastle.jce.provider.BouncyCastleProvider pdf박스에서 에러발생되는 
+			부분을 해결해보기위해 추가함. 클래스 NotFoundException 발생. -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+			<version>1.46</version>
+		</dependency>
+
+		<!-- svn kit -->
+		<dependency>
+			<groupId>org.tmatesoft.svnkit</groupId>
+			<artifactId>svnkit</artifactId>
+			<version>1.8.12</version>
+		</dependency>
+
+		<!-- mail lib -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-email -->
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-email</artifactId>
+		    <version>1.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.javaparser</groupId>
+			<artifactId>javaparser-core</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>btrace-agent</groupId>
+			<artifactId>btrace-agent</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/btrace/build/btrace-agent.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>btrace-boot</groupId>
+			<artifactId>btrace-boot</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/btrace/build/btrace-boot.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>btrace-client</groupId>
+			<artifactId>btrace-client</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/btrace/build/btrace-client.jar</systemPath>
+		</dependency>
+
+
+		<!-- <dependency> -->
+		<!-- <groupId>com.aquafx-project</groupId> -->
+		<!-- <artifactId>aquafx</artifactId> -->
+		<!-- <version>0.2</version> -->
+		<!-- </dependency> -->
+
+		<dependency>
+			<groupId>kyj.FxVoEditor</groupId>
+			<artifactId>kyj.FxVoEditor</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<systemPath>${vo.editor.jar.path.name}</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>kyj.Fx.dao.wizard</groupId>
+			<artifactId>kyj.Fx.dao.wizard</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<systemPath>${dao.wizard.jar.path.name}</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>ojdbc14</groupId>
+			<artifactId>ojdbc14</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/db/oracle/ojdbc14.jar</systemPath>
+		</dependency>
+
+
+		<dependency>
+			<groupId>tools</groupId>
+			<artifactId>tools</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/tools/tools.jar</systemPath>
+		</dependency>
+
+
+	</dependencies>
+
+
+
+
+	<repositories>
+		<repository>
+			<id>My-Project</id>
+			<name>My-Project Custom Jars</name>
+			<url>file://${project.basedir}/lib/</url>
+		</repository>
+		<!-- <repository> -->
+		<!-- <id>gagoyle.plugins</id> -->
+		<!-- <name>gagoyle.plugins</name> -->
+		<!-- <url>file://${project.basedir}/plugins/</url> -->
+		<!-- </repository> -->
+	</repositories>
+
+</project>

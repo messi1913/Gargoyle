@@ -1,0 +1,16 @@
+GridPane
+{
+	-fx-background-color: #CFD9E7
+}
+
+
+.table-view
+{
+	-fx-background-color: #CFD9E0
+}
+
+
+.button *.text
+{
+	-fx-font-weight: bold;
+}
