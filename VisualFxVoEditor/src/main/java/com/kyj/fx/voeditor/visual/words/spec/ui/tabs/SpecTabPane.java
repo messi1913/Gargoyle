@@ -10,11 +10,29 @@ import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ProgramSpecSVO;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
+/***************************
+ * 
+ * 프로그램 사양서 처리를 위한 tabPane
+ * 
+ * @author KYJ
+ *
+ ***************************/
 public class SpecTabPane extends TabPane {
 
 	private ObjectProperty<ProgramSpecSVO> svoProperty = new SimpleObjectProperty<>();
+
+	/**
+	 * 기본기능외 추가적인 tab을 더함.
+	 * 
+	 * @param tabs
+	 */
+	public SpecTabPane(Tab... tabs) {
+		this();
+		getTabs().addAll(tabs);
+	}
 
 	public SpecTabPane() {
 		getTabs().add(new BaseInfoTab(this));

@@ -54,6 +54,7 @@ import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.util.ProgramSpecUtil;
+import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.SpecTabPane;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -570,7 +571,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		// //선택한 파일아이템을 DaoWizard에서 조회시 사용
 		// MenuItem daoWizardMenuItem = new MenuItem("Show DAO Wizard");
 		// 선택한 파일경로를 Vo Editor Location에 바인딩함.
-//		MenuItem setVoEditorMenuItem = new MenuItem("SET Vo Editor Directory");
+		//		MenuItem setVoEditorMenuItem = new MenuItem("SET Vo Editor Directory");
 
 		// 선택한 파일경로를 Vo Editor Location에 바인딩함.
 		MenuItem voEditorMenuItem = new MenuItem("Vo Editor");
@@ -600,21 +601,21 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		// this::daoWizardMenuItemOnActionEvent);
 
 		// Vo Editor
-//		setVoEditorMenuItem.addEventHandler(ActionEvent.ACTION, event -> {
-//			Node lookup = borderPaneMain.lookup("#txtLocation");
-//			if (lookup != null && tmpSelectFileWrapper != null) {
-//				TextField txtLocation = (TextField) lookup;
-//				File file = tmpSelectFileWrapper.getFile();
-//				if (file.isDirectory()) {
-//					String absolutePath = file.getAbsolutePath();
-//					ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH, absolutePath);
-//					txtLocation.setText(absolutePath);
-//				} else {
-//					DialogUtil.showMessageDialog("Only Directory.");
-//				}
-//			}
-//			tmpSelectFileWrapper = null;
-//		});
+		//		setVoEditorMenuItem.addEventHandler(ActionEvent.ACTION, event -> {
+		//			Node lookup = borderPaneMain.lookup("#txtLocation");
+		//			if (lookup != null && tmpSelectFileWrapper != null) {
+		//				TextField txtLocation = (TextField) lookup;
+		//				File file = tmpSelectFileWrapper.getFile();
+		//				if (file.isDirectory()) {
+		//					String absolutePath = file.getAbsolutePath();
+		//					ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH, absolutePath);
+		//					txtLocation.setText(absolutePath);
+		//				} else {
+		//					DialogUtil.showMessageDialog("Only Directory.");
+		//				}
+		//			}
+		//			tmpSelectFileWrapper = null;
+		//		});
 
 		voEditorMenuItem.addEventHandler(ActionEvent.ACTION, this::voEditorMenuItemOnAction);
 
@@ -823,7 +824,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			if (sourceFile != null && sourceFile.exists()) {
 				try {
 					if (FileUtil.isJavaFile(sourceFile)) {
-						loadNewSystemTab(sourceFile.getName(), new CodeAnalysisJavaTextArea(sourceFile));
+
+						Tab tab = new Tab(sourceFile.getName(), new CodeAnalysisJavaTextArea(sourceFile));
+						loadNewSystemTab(sourceFile.getName(), new SpecTabPane(tab));
 					} else {
 						DialogUtil.showMessageDialog("자바 파일이 아닙니다.");
 					}

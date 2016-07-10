@@ -45,7 +45,8 @@ public class CodeAnalysisJavaTextArea extends BorderPane {
 		FxUtil.loadRoot(CodeAnalysisJavaTextArea.class, this, ex -> {
 			LOGGER.error(ValueUtil.toString(ex));
 		});
-
+		//bug fix.
+		this.setCenter(txtJavaTextArea);
 	}
 
 	@FXML
