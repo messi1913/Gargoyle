@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -676,7 +677,7 @@ public class FxUtil {
 	 * @return
 	 * @User KYJ
 	 */
-	public static ImageView createImageView(File file) {
+	public static ImageView createImageIconView(File file) {
 		Image fxImage = null;
 		if (file.exists()) {
 			FileSystemView fileSystemView = FileSystemView.getFileSystemView();
@@ -690,7 +691,24 @@ public class FxUtil {
 		}
 
 		return new ImageView(fxImage);
+	}
 
+	/**
+	 * 파일로부터 이미지를 그리기 위한 뷰를 반환한다.
+	 *
+	 * @Date 2015. 10. 14.
+	 * @param file
+	 * @return
+	 * @User KYJ
+	 */
+	public static ImageView createImageView(InputStream inputStream) {
+		Image fxImage = null;
+		if (inputStream != null) {
+			fxImage = new Image(inputStream);
+		} else {
+			return new ImageView();
+		}
+		return new ImageView(fxImage);
 	}
 
 }

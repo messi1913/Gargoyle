@@ -41,6 +41,7 @@ import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentOnLoaded;
 import com.kyj.fx.voeditor.visual.loder.JarWrapper;
 import com.kyj.fx.voeditor.visual.loder.PluginLoader;
+import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
@@ -319,22 +320,32 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param tabs
 	 */
 	private void openFile(File file) {
-		try {
-			if (FileUtil.isJavaFile(file)) {
-				openJava(file);
-			} else if (FileUtil.isImageFile(file)) {
-				openImage(file);
-			} else if (FileUtil.isPdfFile(file)) {
-				openPdf(file);
-			} else if (FileUtil.isFXML(file))
-				openFXML(file);
-			else {
+
+		List<String> exts = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILE_OPEN_NOT_INPROCESSING_EXTENSION, ",");
+		String EXTENSION = file.getName().substring(file.getName().indexOf('.'));
+		Optional<String> findFirst = exts.stream().filter(ext -> EXTENSION.equals(ext) || EXTENSION.isEmpty()).findFirst();
+		if (findFirst.isPresent()) {
+			/*open OS Denpendency.*/
+			FileUtil.openFile(file);
+		} else {
+
+			try {
+				if (FileUtil.isJavaFile(file)) {
+					openJava(file);
+				} else if (FileUtil.isImageFile(file)) {
+					openImage(file);
+				} else if (FileUtil.isPdfFile(file)) {
+					openPdf(file);
+				} else if (FileUtil.isFXML(file))
+					openFXML(file);
+				else {
+					openBigText(file);
+				}
+				/* 예외에 걸린경우 텍스트방식으로 read */
+			} catch (Exception e) {
+				DialogUtil.showMessageDialog("파일열기에 실패하여 텍스트 형식으로 읽어옵니다.");
 				openBigText(file);
 			}
-			/* 예외에 걸린경우 텍스트방식으로 read */
-		} catch (Exception e) {
-			DialogUtil.showMessageDialog("파일열기에 실패하여 텍스트 형식으로 읽어옵니다.");
-			openBigText(file);
 		}
 
 	}

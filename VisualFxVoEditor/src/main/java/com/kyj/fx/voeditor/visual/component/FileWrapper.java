@@ -14,10 +14,6 @@ import java.io.File;
  */
 public class FileWrapper {
 	/**
-	 * @최초생성일 2016. 3. 15.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
 	 * 파일
 	 *
 	 * @최초생성일 2015. 10. 21.
@@ -29,6 +25,19 @@ public class FileWrapper {
 	 * @최초생성일 2015. 10. 21.
 	 */
 	private boolean showHiddenFile;
+
+	/**
+	 * 자바 프로젝트인지 유무
+	 * 
+	 * @최초생성일 2016. 7. 10.
+	 */
+	private boolean isJavaProjectFile;
+	/**
+	 * svn 연결이 되었는지 유무
+	 * 
+	 * @최초생성일 2016. 7. 10.
+	 */
+	private boolean isSVNConnected;
 
 	public FileWrapper(File file) {
 		super();
@@ -47,9 +56,12 @@ public class FileWrapper {
 		return this.file.isFile();
 	}
 
+
 	@Override
 	public String toString() {
-		return file.getName();
+		/*2016.07.10 set empty toString*/
+		return "";
+//		return file.getName();
 	}
 
 	/**
@@ -76,6 +88,22 @@ public class FileWrapper {
 			return true;
 		});
 
+	}
+
+	public boolean isJavaProjectFile() {
+		return isJavaProjectFile;
+	}
+
+	public void setJavaProjectFile(boolean isJavaProjectFile) {
+		this.isJavaProjectFile = isJavaProjectFile;
+	}
+
+	public boolean isSVNConnected() {
+		return isSVNConnected;
+	}
+
+	public void setSVNConnected(boolean isSVNConnected) {
+		this.isSVNConnected = isSVNConnected;
 	}
 
 }

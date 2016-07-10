@@ -132,7 +132,7 @@ public class ImageFileTreeItemCreator {
 				if (f == null) {
 					return FXCollections.emptyObservableList();
 				}
-				treeItem.setGraphic(FxUtil.createImageView(f.getFile()));
+//				treeItem.setGraphic(FxUtil.createImageView(f.getFile()));
 
 				if (f.isFile()) {
 					return FXCollections.emptyObservableList();
@@ -168,7 +168,7 @@ public class ImageFileTreeItemCreator {
 			treeItem.setExpanded(true);
 		}
 
-		treeItem.setGraphic(FxUtil.createImageView(f.getFile()));
+//		treeItem.setGraphic(FxUtil.createImageView(f.getFile()));
 		return treeItem;
 	}
 

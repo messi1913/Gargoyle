@@ -144,7 +144,9 @@ public final class ConfigResourceLoader implements IFileBaseConfiguration {
 
 	public static final String FILE_ENCODING = "file.encoding";
 	public static final String SUN_JNU_ENCODING = "sun.jnu.encoding";
-
+	
+	public static final String FILE_OPEN_NOT_INPROCESSING_EXTENSION = "file.open.inprocessing.extensions";
+	
 	/**
 	 * SVN 기본 설정 항목들이 기록된 키
 	 *
