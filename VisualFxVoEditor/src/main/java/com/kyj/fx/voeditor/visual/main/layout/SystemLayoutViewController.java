@@ -542,6 +542,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		final MenuItem menuItemOpenWithSceneBuilder = new MenuItem("SceneBuilder");
 		menuItemOpenWithSceneBuilder.setOnAction(this::menuItemOpenWithSceneBuilderOnAction);
 		menuOpenWidth.setOnShowing(event -> {
+
 			String sceneBuilderLocation = ResourceLoader.getInstance().get(ResourceLoader.SCENEBUILDER_LOCATION);
 			TreeItem<FileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
 			boolean isRemoveItem = true;
@@ -549,21 +550,25 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			if (selectedTreeItem != null) {
 				File selectedTree = selectedTreeItem.getValue().getFile();
 				if (FileUtil.isFXML(selectedTree)) {
-					if (ValueUtil.isNotEmpty(sceneBuilderLocation)) {
-						File file = new File(sceneBuilderLocation);
-						if (file.exists()) {
 
-							if (!menuOpenWidth.getItems().contains(menuItemOpenWithSceneBuilder)) {
-								menuOpenWidth.getItems().add(menuItemOpenWithSceneBuilder);
-							}
-							isRemoveItem = false;
-						}
+					if (!menuOpenWidth.getItems().contains(menuItemOpenWithSceneBuilder)) {
+						menuOpenWidth.getItems().add(menuItemOpenWithSceneBuilder);
+					}
+					isRemoveItem = false;
+
+					File file = new File(sceneBuilderLocation);
+					/*씬빌더 존재 유무에 따라 활성화 여부를 지정.*/
+					if (file.exists()) {
+						menuItemOpenWithSceneBuilder.setDisable(false);
+					} else {
+						menuItemOpenWithSceneBuilder.setDisable(true);
 					}
 				}
 			}
 
 			if (isRemoveItem)
 				menuOpenWidth.getItems().remove(menuItemOpenWithSceneBuilder);
+
 		});
 		/***********************************************************************************/
 		// 조건에 따라 보여주는 아이템. [end]
