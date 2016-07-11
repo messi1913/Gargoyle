@@ -71,9 +71,11 @@ public class SceneBuilderLocationComposite extends BorderPane {
 	@FXML
 	public void btnSaveOnMouseClick() {
 		File sceneBuilderLocation = new File(txtLocation.getText());
+		String value = "";
 		if (sceneBuilderLocation != null && sceneBuilderLocation.exists()) {
-			ResourceLoader.getInstance().put(ResourceLoader.SCENEBUILDER_LOCATION, sceneBuilderLocation.getAbsolutePath());
+			value = sceneBuilderLocation.getAbsolutePath();
 		}
+		ResourceLoader.getInstance().put(ResourceLoader.SCENEBUILDER_LOCATION, value);
 	}
 
 	/***********************************************************************************/
