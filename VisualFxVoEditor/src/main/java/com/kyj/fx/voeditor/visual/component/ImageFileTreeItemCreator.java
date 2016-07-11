@@ -7,6 +7,7 @@ package com.kyj.fx.voeditor.visual.component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,7 +17,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -40,6 +40,11 @@ public class ImageFileTreeItemCreator {
 	 * @최초생성일 2016. 3. 16.
 	 */
 	private static Set<File> cacheExpaned;
+
+	private static final FilenameFilter SVN_WC_DB_FILTER = (FilenameFilter) (dir1, name1) -> "wc.db".equals(name1);
+	private static final FilenameFilter IS_CONTAINS_SVN_FILE_FILTER = (FilenameFilter) (dir, name) -> ".svn".equals(name)
+			&& isContainsWcDB(dir);
+	private static final FilenameFilter IS_JAVA_PROJECT_FILTER = (FilenameFilter) (dir, name) -> ".classpath".equals(name);
 
 	static {
 		if (!load()) {
@@ -90,19 +95,11 @@ public class ImageFileTreeItemCreator {
 	 * @return
 	 ********************************/
 	public TreeItem<FileWrapper> createNode(final File f) {
-		return createNode(createFileWrapper(f));
+		return createDefaultNode(createFileWrapper(f));
 	}
 
-	/**
-	 * 파일 트리를 생성하기 위한 노드를 반환한다.
-	 *
-	 * @Date 2015. 10. 14.
-	 * @param f
-	 * @return
-	 * @User KYJ
-	 */
-	public TreeItem<FileWrapper> createNode(final FileWrapper f) {
-		TreeItem<FileWrapper> treeItem = new FileTreeItem(f) {
+	public TreeItem<FileWrapper> createJavaProjectNode(final FileWrapper f) {
+		return new JavaProjectFileTreeItem(f) {
 			private boolean isLeaf;
 			private boolean isFirstTimeChildren = true;
 			private boolean isFirstTimeLeaf = true;
@@ -111,7 +108,61 @@ public class ImageFileTreeItemCreator {
 			public ObservableList<TreeItem<FileWrapper>> getChildren() {
 				if (isFirstTimeChildren) {
 					isFirstTimeChildren = false;
-					super.getChildren().setAll(buildChildren(this));
+					super.getChildren().setAll(buildChildren(this, FILE_TREE_TYPE.JAVA_PROJECT));
+				}
+				return super.getChildren();
+			}
+
+			@Override
+			public boolean isLeaf() {
+				if (isFirstTimeLeaf) {
+					isFirstTimeLeaf = false;
+					FileWrapper f = (FileWrapper) getValue();
+					isLeaf = f.isFile();
+				}
+				return isLeaf;
+			}
+		};
+	}
+
+	public TreeItem<FileWrapper> createJavaProjectMemberNode(final FileWrapper f) {
+		return new JavaProjectMemberFileTreeItem(f) {
+			private boolean isLeaf;
+			private boolean isFirstTimeChildren = true;
+			private boolean isFirstTimeLeaf = true;
+
+			@Override
+			public ObservableList<TreeItem<FileWrapper>> getChildren() {
+				if (isFirstTimeChildren) {
+					isFirstTimeChildren = false;
+					super.getChildren().setAll(buildChildren(this, FILE_TREE_TYPE.JAVA_PROJECT_MEMBER));
+				}
+				return super.getChildren();
+			}
+
+			@Override
+			public boolean isLeaf() {
+				if (isFirstTimeLeaf) {
+					isFirstTimeLeaf = false;
+					FileWrapper f = (FileWrapper) getValue();
+					isLeaf = f.isFile();
+				}
+				return isLeaf;
+			}
+		};
+	}
+
+	public TreeItem<FileWrapper> createFileNode(final FileWrapper f) {
+		return new FileTreeItem(f) {
+			private boolean isLeaf;
+			private boolean isFirstTimeChildren = true;
+			private boolean isFirstTimeLeaf = true;
+
+			@Override
+			public ObservableList<TreeItem<FileWrapper>> getChildren() {
+				if (isFirstTimeChildren) {
+					isFirstTimeChildren = false;
+					super.getChildren().setAll(buildChildren(this, FILE_TREE_TYPE.NOMAL));
 				}
 				return super.getChildren();
 			}
@@ -126,34 +177,28 @@ public class ImageFileTreeItemCreator {
 				return isLeaf;
 			}
 
-			private ObservableList<TreeItem<FileWrapper>> buildChildren(TreeItem<FileWrapper> treeItem) {
-
-				FileWrapper f = treeItem.getValue();
-				if (f == null) {
-					return FXCollections.emptyObservableList();
-				}
-//				treeItem.setGraphic(FxUtil.createImageView(f.getFile()));
-
-				if (f.isFile()) {
-					return FXCollections.emptyObservableList();
-				}
-
-				File[] files = f.listFiles();
-				if (files != null) {
-					ObservableList<TreeItem<FileWrapper>> children = FXCollections.observableArrayList();
-					for (File childFile : files) {
-						children.add(createNode(createFileWrapper(childFile)));
-					}
-					return children;
-				}
-				return FXCollections.emptyObservableList();
-			}
-
 		};
+	}
+
+	/**
+	 * 파일 트리를 생성하기 위한 노드를 반환한다.
+	 *
+	 * @Date 2015. 10. 14.
+	 * @param f
+	 * @return
+	 * @User KYJ
+	 */
+	public TreeItem<FileWrapper> createDefaultNode(final FileWrapper f) {
+		TreeItem<FileWrapper> treeItem = null;
+
+		if (f.isJavaProjectFile()) {
+			treeItem = createJavaProjectNode(f);
+		} else {
+			treeItem = createFileNode(f);
+		}
 
 		treeItem.expandedProperty().addListener((oba, oldval, newval) -> {
-
-			FileWrapper value = treeItem.getValue();
+			FileWrapper value = f;
 			File file = value.getFile();
 
 			if (newval) {
@@ -168,8 +213,56 @@ public class ImageFileTreeItemCreator {
 			treeItem.setExpanded(true);
 		}
 
-//		treeItem.setGraphic(FxUtil.createImageView(f.getFile()));
 		return treeItem;
+	}
+
+	enum FILE_TREE_TYPE {
+		NOMAL, JAVA_PROJECT, JAVA_PROJECT_MEMBER
+	}
+
+	private ObservableList<TreeItem<FileWrapper>> buildChildren(TreeItem<FileWrapper> treeItem, FILE_TREE_TYPE type) {
+
+		FileWrapper f = treeItem.getValue();
+		if (f == null) {
+			return FXCollections.emptyObservableList();
+		}
+
+		if (f.isFile()) {
+			return FXCollections.emptyObservableList();
+		}
+
+		File[] files = f.listFiles();
+		if (files != null) {
+			ObservableList<TreeItem<FileWrapper>> children = FXCollections.observableArrayList();
+
+			switch (type) {
+			case NOMAL:
+				for (File childFile : files) {
+					TreeItem<FileWrapper> createNode = createDefaultNode(createFileWrapper(childFile));
+					children.add(createNode);
+				}
+				break;
+
+			case JAVA_PROJECT:
+
+				for (File childFile : files) {
+					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile));
+					children.add(createNode);
+				}
+				break;
+
+			case JAVA_PROJECT_MEMBER:
+
+				for (File childFile : files) {
+					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile));
+					children.add(createNode);
+				}
+				break;
+			}
+
+			return children;
+		}
+		return FXCollections.emptyObservableList();
 	}
 
 	/********************************
@@ -179,7 +272,60 @@ public class ImageFileTreeItemCreator {
 	 * @param childFile
 	 * @return
 	 ********************************/
-	protected FileWrapper createFileWrapper(File childFile) {
-		return new FileWrapper(childFile);
+	//	private FileWrapper createFileWrapper(File childFile) {
+	//		return createFileWrapper(childFile, false);
+	//	}
+
+	private FileWrapper createFileWrapper(File childFile) {
+		FileWrapper fileWrapper = new FileWrapper(childFile);
+		operate(fileWrapper);
+		return fileWrapper;
 	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 10. 작성자 : KYJ
+	 *
+	 * .svn파일안에는 wc.db라는 파일이 존재함.
+	 * 
+	 * @param dir
+	 * @return
+	 ********************************/
+	private static boolean isContainsWcDB(File dir) {
+		File[] listFiles = dir.listFiles(SVN_WC_DB_FILTER);
+		return (listFiles != null && listFiles.length == 1);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 10. 작성자 : KYJ
+	 *
+	 * 자바 프로젝트 메타정보를 처리함.
+	 * 
+	 * @param fileWrapper
+	 ********************************/
+	private void operate(FileWrapper fileWrapper) {
+		File check = fileWrapper.getFile();
+		if (check != null && check.isDirectory()) {
+			File[] listFiles = check.listFiles();
+			for (File file : listFiles) {
+
+				boolean isJavaProject = !fileWrapper.isJavaProjectFile();
+				boolean isSVNConnected = fileWrapper.isSVNConnected();
+				if (isJavaProject) {
+					if (IS_JAVA_PROJECT_FILTER.accept(file, file.getName())) {
+						fileWrapper.setJavaProjectFile(true);
+					}
+				}
+
+				if (!isSVNConnected) {
+					if (IS_CONTAINS_SVN_FILE_FILTER.accept(file, file.getName())) {
+						fileWrapper.setSVNConnected(true);
+					}
+				}
+
+				if (isJavaProject && isSVNConnected)
+					return;
+			}
+		}
+	}
+
 }

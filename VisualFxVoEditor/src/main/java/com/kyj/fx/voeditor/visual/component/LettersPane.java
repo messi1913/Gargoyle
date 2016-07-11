@@ -7,13 +7,11 @@
 package com.kyj.fx.voeditor.visual.component;
 
 import java.util.Random;
-import java.util.Scanner;
 
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
@@ -25,8 +23,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-import jidefx.animation.AnimationType;
-import jidefx.animation.AnimationUtils;
 
 /**
  * @author KYJ
@@ -132,26 +128,26 @@ public class LettersPane extends Region {
 		return timeline;
 	}
 
-//	private Timeline createCurveTimeLine(Node node) {
-//		// over 3 seconds move letter to random position and fade it out
-//		final Timeline timeline = new Timeline();
-//		timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(3), new EventHandler<ActionEvent>() {
-//			@Override
-//			public void handle(ActionEvent event) {
-//				// we are done remove us from scene
-//				getChildren().remove(node);
-//			}
-//		}, new KeyValue(node.translateXProperty(), node.translateXProperty().get(), INTERPOLATOR),
-//			new KeyValue(node.translateYProperty(), 100f, INTERPOLATOR), new KeyValue(node.opacityProperty(), 0f)));
-//
-//		new KeyFrame(Duration.millis(0.5), new KeyFrame(time, values))
-//
-//
-//
-//		return timeline;
-//
-//
-//	}
+	//	private Timeline createCurveTimeLine(Node node) {
+	//		// over 3 seconds move letter to random position and fade it out
+	//		final Timeline timeline = new Timeline();
+	//		timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(3), new EventHandler<ActionEvent>() {
+	//			@Override
+	//			public void handle(ActionEvent event) {
+	//				// we are done remove us from scene
+	//				getChildren().remove(node);
+	//			}
+	//		}, new KeyValue(node.translateXProperty(), node.translateXProperty().get(), INTERPOLATOR),
+	//			new KeyValue(node.translateYProperty(), 100f, INTERPOLATOR), new KeyValue(node.opacityProperty(), 0f)));
+	//
+	//		new KeyFrame(Duration.millis(0.5), new KeyFrame(time, values))
+	//
+	//
+	//
+	//		return timeline;
+	//
+	//
+	//	}
 
 	private Timeline createUpperTimeLine(Node node) {
 		// over 3 seconds move letter to random position and fade it out

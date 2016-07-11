@@ -56,12 +56,11 @@ public class FileWrapper {
 		return this.file.isFile();
 	}
 
-
 	@Override
 	public String toString() {
 		/*2016.07.10 set empty toString*/
 		return "";
-//		return file.getName();
+		//		return file.getName();
 	}
 
 	/**
