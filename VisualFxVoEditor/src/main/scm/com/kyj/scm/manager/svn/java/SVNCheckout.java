@@ -33,10 +33,11 @@ class SVNCheckout extends AbstractSVN implements ICheckoutCommand<String, Long> 
 	private static Logger LOGGER = LoggerFactory.getLogger(SVNCheckout.class);
 
 	/**
+	 * @param javaSVNManager
 	 * @param properties
 	 */
-	public SVNCheckout(Properties properties) {
-		super(properties);
+	public SVNCheckout(JavaSVNManager javaSVNManager, Properties properties) {
+		super(javaSVNManager, properties);
 	}
 
 	/*

@@ -39,8 +39,8 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 	/**
 	 * @param properties
 	 */
-	public SVNCat(Properties properties) {
-		super(properties);
+	public SVNCat(JavaSVNManager javaSVNManager, Properties properties) {
+		super(javaSVNManager, properties);
 	}
 
 	/**
@@ -95,7 +95,7 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 			 * is located at a path in a revision. -1 means the latest revision.
 			 */
 
- 			SVNRepository repository = getRepository();
+			SVNRepository repository = getRepository();
 			SVNNodeKind nodeKind = repository.checkPath(path, -1);
 
 			if (nodeKind == SVNNodeKind.NONE) {
@@ -151,8 +151,7 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 			 * Displays the file contents in the console if the file is a text.
 			 */
 			if (isTextType) {
-				try(StringOutputStream out = new StringOutputStream())
-				{
+				try (StringOutputStream out = new StringOutputStream()) {
 					baos.writeTo(out);
 					result = baos.toString(encoding); // out.getString();
 				}

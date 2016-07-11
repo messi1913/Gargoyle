@@ -30,14 +30,15 @@ import com.kyj.scm.manager.core.commons.ILogCommand;
  */
 class SVNLog extends AbstractSVN implements ILogCommand<String, List<SVNLogEntry>> {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(SVNLog.class);
-
 	/**
+	 * @param javaSVNManager
 	 * @param properties
 	 */
-	public SVNLog(Properties properties) {
-		super(properties);
+	public SVNLog(JavaSVNManager javaSVNManager, Properties properties) {
+		super(javaSVNManager, properties);
 	}
+
+	private static Logger LOGGER = LoggerFactory.getLogger(SVNLog.class);
 
 	/*
 	 * @inheritDoc

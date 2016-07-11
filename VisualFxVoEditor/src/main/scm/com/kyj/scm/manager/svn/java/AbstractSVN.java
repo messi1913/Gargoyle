@@ -38,8 +38,10 @@ abstract class AbstractSVN implements SCMCommonable, SVNKeywords {
 	private SVNRepository repository;
 	private ISVNAuthenticationManager authManager;
 	private SVNClientManager svnManager;
+	private final JavaSVNManager javaSVNManager;
 
-	public AbstractSVN(Properties properties) {
+	public AbstractSVN(JavaSVNManager javaSVNManager, Properties properties) {
+		this.javaSVNManager = javaSVNManager;
 		init(properties);
 	}
 
@@ -89,9 +91,8 @@ abstract class AbstractSVN implements SCMCommonable, SVNKeywords {
 			DefaultSVNOptions options = new DefaultSVNOptions();
 			svnManager = SVNClientManager.newInstance(options, authManager);
 
-
-//			svnManager.dispose();
-//			repository.closeSession();
+			//			svnManager.dispose();
+			//			repository.closeSession();
 		} catch (SVNException e) {
 			throw new RuntimeException(e);
 		}
@@ -149,6 +150,13 @@ abstract class AbstractSVN implements SCMCommonable, SVNKeywords {
 
 	public SVNClientManager getSvnManager() {
 		return svnManager;
+	}
+
+	/**
+	 * @return the javaSVNManager
+	 */
+	public final JavaSVNManager getJavaSVNManager() {
+		return javaSVNManager;
 	}
 
 }

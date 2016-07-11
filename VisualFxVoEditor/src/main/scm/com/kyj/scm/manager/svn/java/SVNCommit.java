@@ -1,6 +1,6 @@
 /********************************
- *	프로젝트 : VisualFxVoEditor
- *	패키지   : kyj.Fx.scm.manager.core.common
+ *	프로젝트 : sos-server
+ *	패키지   : com.samsung.sds.sos.server.core.svn.concreate
  *	작성일   : 2016. 7. 6.
  *	작성자   : KYJ
  *******************************/
@@ -23,7 +23,7 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
 import com.kyj.scm.manager.core.commons.ISVNCommit;
 
 /**
- * SVN Commit Operation 처리.
+ *  SVN Commit Operation 처리.
  *
  * @author KYJ
  *
@@ -31,10 +31,11 @@ import com.kyj.scm.manager.core.commons.ISVNCommit;
 class SVNCommit extends AbstractSVN implements ISVNCommit {
 
 	/**
+	 * @param javaSVNManager
 	 * @param properties
 	 */
-	public SVNCommit(Properties properties) {
-		super(properties);
+	public SVNCommit(JavaSVNManager javaSVNManager, Properties properties) {
+		super(javaSVNManager, properties);
 	}
 
 	/**
@@ -64,7 +65,7 @@ class SVNCommit extends AbstractSVN implements ISVNCommit {
 			Copies each source in sources to dst.
 		*/
 		SVNCopyClient copyClient = getSvnManager().getCopyClient();
-		copyClient.doCopy(convert, targetURL, false, false, false, "copy", new SVNProperties());
+		copyClient.doCopy(convert, targetURL, false, false, false, "copy by O-PERA", new SVNProperties());
 	}
 
 	private SVNCopySource[] convert(SVNURL[] urls) {

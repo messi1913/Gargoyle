@@ -15,7 +15,9 @@ import java.util.function.Consumer;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tmatesoft.svn.core.wc2.SvnImport;
 
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
 import com.kyj.scm.manager.core.commons.SVNKeywords;
@@ -38,6 +40,8 @@ public class JavaSVNManager implements SVNKeywords {
 
 	private SVNDiff diffCommand;
 
+	private SVNImport svnImport;
+
 	private Properties properties;
 
 	public JavaSVNManager(Properties properties) {
@@ -53,11 +57,12 @@ public class JavaSVNManager implements SVNKeywords {
 	 */
 	void init(Properties properties) {
 		this.properties = properties;
-		this.checkoutCommand = new SVNCheckout(properties);
-		this.catCommand = new SVNCat(properties);
-		this.listCommand = new SVNList(properties);
-		this.logCommand = new SVNLog(properties);
-		this.diffCommand = new SVNDiff(properties);
+		this.checkoutCommand = new SVNCheckout(this, properties);
+		this.catCommand = new SVNCat(this, properties);
+		this.listCommand = new SVNList(this, properties);
+		this.logCommand = new SVNLog(this, properties);
+		this.diffCommand = new SVNDiff(this, properties);
+		this.svnImport = new SVNImport(this, properties);
 	}
 
 	/**
@@ -212,4 +217,15 @@ public class JavaSVNManager implements SVNKeywords {
 		return diffCommand.diff(path1, rivision1, path2, rivision2);
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 11.
+	 * @param from
+	 * @param to
+	 * @throws SVNException
+	 * @throws FileNotFoundException
+	 */
+	public void doImport(String from, SVNURL to) throws SVNException, FileNotFoundException {
+		svnImport.importProject(from, to);
+	}
 }
