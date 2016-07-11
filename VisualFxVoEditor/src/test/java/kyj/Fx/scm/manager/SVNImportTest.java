@@ -1,15 +1,21 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : kyj.Fx.scm.manager.core.common
+ *	패키지   : kyj.Fx.scm.manager
  *	작성일   : 2016. 7. 11.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.scm.manager.core.commons;
+package kyj.Fx.scm.manager;
+
+import org.junit.Test;
 
 /**
  * @author KYJ
  *
  */
-public interface ISVNCommit extends SCMCommonable {
+public class SVNImportTest {
 
+	@Test
+	public void doImport(){
+		
+	}
 }

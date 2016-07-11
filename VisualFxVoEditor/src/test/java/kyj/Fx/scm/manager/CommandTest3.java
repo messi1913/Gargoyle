@@ -50,6 +50,11 @@ public class CommandTest3 {
 		manager = new JavaSVNManager(properties);
 	}
 
+	@Test
+	public void importTest() throws Exception {
+		manager.doImport("/sos/deprecated_pass-batch-core", SVNURL.fromFile(new File("c:\\logs\\tmp")));
+	}
+
 	/********************************
 	 * 작성일 : 2016. 5. 5. 작성자 : KYJ
 	 *

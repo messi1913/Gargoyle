@@ -26,8 +26,12 @@ import com.kyj.scm.manager.stream.StringOutputStream;
  ***************************/
 public class SVNDiff extends AbstractSVN implements IDiffCommand<String, String, String> {
 
-	public SVNDiff(Properties properties) {
-		super(properties);
+	/**
+	 * @param javaSVNManager
+	 * @param properties
+	 */
+	public SVNDiff(JavaSVNManager javaSVNManager, Properties properties) {
+		super(javaSVNManager, properties);
 	}
 
 	/*
