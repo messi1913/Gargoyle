@@ -222,10 +222,9 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @작성일 : 2016. 7. 11.
 	 * @param from
 	 * @param to
-	 * @throws SVNException
-	 * @throws FileNotFoundException
+	 * @throws Exception
 	 */
-	public void doImport(String from, SVNURL to) throws SVNException, FileNotFoundException {
+	public void doImport(String from, SVNURL to) throws Exception {
 		svnImport.importProject(from, to);
 	}
 }

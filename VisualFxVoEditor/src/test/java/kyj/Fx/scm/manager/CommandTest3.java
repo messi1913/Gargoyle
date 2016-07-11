@@ -51,7 +51,7 @@ public class CommandTest3 {
 	}
 
 	@Test
-	public void importTest() throws FileNotFoundException, SVNException {
+	public void importTest() throws Exception {
 		manager.doImport("/sos/deprecated_pass-batch-core", SVNURL.fromFile(new File("c:\\logs\\tmp")));
 	}
 
