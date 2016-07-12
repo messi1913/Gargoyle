@@ -45,7 +45,7 @@ Download Site :: http://downloads-kyj.cloudsc.kr/
 
 ### Hisotry
 
-#### 1. Working SVN Google Gource 2015.10 ~ 2016.6
+#### 1. Working SVN [Naver SVN]-> 2015.10 ~ 2016.6
 
 [![Gargoyle](http://downloads-kyj.cloudsc.kr/images/Gargoyle/Gargoyle_Gource.png)](https://youtu.be/iaYnZt66nSU " Watch")
 
