@@ -116,7 +116,7 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 			TreeItem<SVNItem> selectedItem = this.getSelectionModel().getSelectedItem();
 			if (selectedItem != null) {
 				SVNItem value = selectedItem.getValue();
-				if(svnTreeViewOnAction!=null)
+				if (svnTreeViewOnAction != null)
 					svnTreeViewOnAction.onAction(value);
 			}
 		}
@@ -223,9 +223,11 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 
 			Properties result = controller.getResult();
 
-			SVNItem newSVNItem = new SVNRepository(new JavaSVNManager(result));
-			TreeItem<SVNItem> createNode = scmTreeMaker.createNode(newSVNItem);
-			getRoot().getChildren().add(createNode);
+			if (result != null) {
+				SVNItem newSVNItem = new SVNRepository(new JavaSVNManager(result));
+				TreeItem<SVNItem> createNode = scmTreeMaker.createNode(newSVNItem);
+				getRoot().getChildren().add(createNode);
+			}
 
 		} catch (IOException e1) {
 			LOGGER.error(ValueUtil.toString(e1));
