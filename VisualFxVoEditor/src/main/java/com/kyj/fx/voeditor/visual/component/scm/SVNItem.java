@@ -15,6 +15,7 @@ import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNURL;
 
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
 /**
@@ -100,7 +101,7 @@ public class SVNItem implements SCMItem<SVNItem> {
 		String svnUrl = manager.getUrl();
 		String _path = path;
 
-		List<SVNDirEntry> list = manager.listEntry(_path);
+		List<SVNDirEntry> list = manager.listEntry(_path, ex -> DialogUtil.showExceptionDailog(ex, "SVN Connection Fail"));
 		List<SVNItem> collect = list.stream().map(p -> {
 			String svnPath = p.getURL().getPath();
 			String url = p.getURL().toString();

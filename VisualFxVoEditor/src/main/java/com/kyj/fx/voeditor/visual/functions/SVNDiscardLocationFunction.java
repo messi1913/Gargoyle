@@ -49,10 +49,10 @@ public class SVNDiscardLocationFunction implements Function<SVNRepository, Boole
 			return resultFlag;
 		}
 
-		String simpleName = repo.getSimpleName();
+//		String simpleName = repo.getSimpleName();
 		/* URL정보와 USERID가 정보가 합쳐져 키값으로 구성됨. */
 		String savedUrl = repo.getURL();
-		String savedUserId = repo.getUserId();
+//		Object savedUserId = repo.getUserId();
 
 		boolean isFound = false;
 		Iterator<Object> it = parse.iterator();
@@ -66,9 +66,9 @@ public class SVNDiscardLocationFunction implements Function<SVNRepository, Boole
 				continue;
 
 			String url = objURL.toString();
-			String id = objUserId.toString();
+			
 
-			if (savedUrl.equals(url) && savedUserId.equals(id)) {
+			if (savedUrl.equals(url)) {
 				isFound = true;
 				break;
 			}

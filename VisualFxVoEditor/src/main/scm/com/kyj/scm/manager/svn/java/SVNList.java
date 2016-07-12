@@ -97,8 +97,8 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 	 * @param exceptionHandler
 	 * @return
 	 ********************************/
-	public List<SVNDirEntry> listEntry(String path, String revision, boolean isRecursive, Consumer<Exception> exceptionHandler) {
 
+	public List<SVNDirEntry> listEntry(String path, String revision, boolean isRecursive, Consumer<Exception> exceptionHandler) {
 		List<SVNDirEntry> resultList = new ArrayList<>();
 		try {
 			SVNProperties fileProperties = new SVNProperties();

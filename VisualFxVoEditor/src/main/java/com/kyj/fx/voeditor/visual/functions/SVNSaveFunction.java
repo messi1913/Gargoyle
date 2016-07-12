@@ -31,6 +31,30 @@ public class SVNSaveFunction implements Function<Properties, Boolean>, SVNKeywor
 
 	private static Logger LOGGER = LoggerFactory.getLogger(SVNSaveFunction.class);
 
+	public boolean isValide(Properties t) {
+
+		String url = t.getProperty(SVN_URL);
+		JSONArray parse = null;
+		try {
+			String string = ResourceLoader.getInstance().get(SVN_REPOSITORIES);
+			parse = (JSONArray) new JSONParser().parse(string);
+		} catch (ParseException e) {
+			LOGGER.error(ValueUtil.toString(e));
+			return false;
+		}
+
+		if (parse != null) {
+			Iterator<JSONObject> iterator = parse.iterator();
+			while (iterator.hasNext()) {
+				if (iterator.next().containsValue(url))
+					return false;
+			}
+		}
+
+		return true;
+
+	}
+
 	/**
 	 * @inheritDoc
 	 */

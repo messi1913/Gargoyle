@@ -107,11 +107,11 @@ public class JavaSVNManager implements SVNKeywords {
 		return objURL.toString();
 	}
 
-	public String getUserId() {
-		Object objUserId = this.properties.get(SVN_USER_ID);
-		if (objUserId == null)
-			throw new GagoyleParamEmptyException("SVN URL IS EMPTY.");
-		return objUserId.toString();
+	public Object getUserId() {
+		return this.properties.get(SVN_USER_ID);
+		//		if (objUserId == null)
+		//			throw new GagoyleParamEmptyException("SVN ID IS EMPTY.");
+		//		return objUserId.toString();
 	}
 
 	/**
@@ -153,6 +153,10 @@ public class JavaSVNManager implements SVNKeywords {
 
 	public List<SVNDirEntry> listEntry(String path) {
 		return listCommand.listEntry(path, "-1", false, null);
+	}
+
+	public List<SVNDirEntry> listEntry(String path, Consumer<Exception> exceptionHandler) {
+		return listCommand.listEntry(path, "-1", false, exceptionHandler);
 	}
 
 	/**

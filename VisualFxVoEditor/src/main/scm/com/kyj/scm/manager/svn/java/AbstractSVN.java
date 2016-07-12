@@ -60,14 +60,14 @@ abstract class AbstractSVN implements SCMCommonable, SVNKeywords {
 		if (url == null || url.toString().trim().isEmpty())
 			throw new RuntimeException("does not exist url");
 
-		Object userId = this.properties.get(SCMCommonable.SVN_USER_ID);
-		if (userId == null || userId.toString().trim().isEmpty())
-			throw new RuntimeException("does not exist userId");
-
-		Object userPass = this.properties.get(SCMCommonable.SVN_USER_PASS);
-		if (userPass == null || userPass.toString().trim().isEmpty()) {
-			throw new RuntimeException("does not exist userPassword");
-		}
+		//		Object userId = this.properties.get(SCMCommonable.SVN_USER_ID);
+		//		if (userId == null || userId.toString().trim().isEmpty())
+		//			throw new RuntimeException("does not exist userId");
+		//
+		//		Object userPass = this.properties.get(SCMCommonable.SVN_USER_PASS);
+		//		if (userPass == null || userPass.toString().trim().isEmpty()) {
+		//			throw new RuntimeException("does not exist userPassword");
+		//		}
 
 	}
 
@@ -85,7 +85,13 @@ abstract class AbstractSVN implements SCMCommonable, SVNKeywords {
 		try {
 			svnURL = SVNURL.parseURIEncoded(getUrl());
 			repository = SVNRepositoryFactory.create(svnURL);
-			authManager = SVNWCUtil.createDefaultAuthenticationManager(getUserId(), getUserPassword().toCharArray());
+
+			if ((getUserId() == null && getUserPassword() == null) || (getUserId().isEmpty() && getUserPassword().isEmpty())) {
+				authManager = SVNWCUtil.createDefaultAuthenticationManager(SVNWCUtil.getDefaultConfigurationDirectory());
+			} else {
+				authManager = SVNWCUtil.createDefaultAuthenticationManager(getUserId(), getUserPassword().toCharArray());
+			}
+
 			repository.setAuthenticationManager(authManager);
 
 			DefaultSVNOptions options = new DefaultSVNOptions();
