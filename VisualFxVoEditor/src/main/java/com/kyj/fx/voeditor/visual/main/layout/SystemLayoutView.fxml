@@ -21,35 +21,22 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-<BorderPane fx:id="borderPaneMain" prefHeight="762.0"
-	prefWidth="1019.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController">
+<BorderPane fx:id="borderPaneMain" prefHeight="762.0" prefWidth="1019.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController">
 	<center>
-		<BorderPane prefHeight="200.0" prefWidth="200.0"
-			BorderPane.alignment="CENTER">
+		<BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<center>
-				<SplitPane dividerPositions="0.2143559488692232"
-					prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+				<SplitPane dividerPositions="0.2143559488692232" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 					<items>
-						<BorderPane prefHeight="639.0" prefWidth="216.0"
-							AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-							AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="0.0">
+						<BorderPane prefHeight="639.0" prefWidth="216.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="0.0">
 							<center>
-								<SplitPane dividerPositions="0.45368916797488223"
-									orientation="VERTICAL" prefHeight="639.0" prefWidth="208.0"
-									BorderPane.alignment="CENTER">
+								<SplitPane dividerPositions="0.45368916797488223" orientation="VERTICAL" prefHeight="639.0" prefWidth="208.0" BorderPane.alignment="CENTER">
 									<items>
-										<AnchorPane minHeight="0.0" minWidth="0.0"
-											prefHeight="171.0" prefWidth="213.0">
+										<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="171.0" prefWidth="213.0">
 											<children>
-												<TreeView fx:id="treeProjectFile" prefHeight="200.0"
-													prefWidth="200.0" AnchorPane.bottomAnchor="1.0"
-													AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0"
-													AnchorPane.topAnchor="1.0" />
+												<TreeView fx:id="treeProjectFile" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0" />
 											</children>
 										</AnchorPane>
-										<VBox fx:id="accordionItems" prefHeight="273.0"
-											prefWidth="213.0">
+										<VBox fx:id="accordionItems" prefHeight="273.0" prefWidth="213.0">
 											<children>
 												<!-- <TitledPane fx:id="tpDaoView" text="DAO"> -->
 												<!-- <fx:include source="DAOLoaderView.fxml"></fx:include> -->
@@ -72,13 +59,9 @@
 								</SplitPane>
 							</center>
 						</BorderPane>
-						<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0"
-							prefWidth="100.0">
+						<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
 							<children>
-								<TabPane fx:id="tabPanWorkspace" prefHeight="559.0"
-									prefWidth="783.0" tabClosingPolicy="ALL_TABS"
-									AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-									AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+								<TabPane fx:id="tabPanWorkspace" prefHeight="559.0" prefWidth="783.0" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 									<tabs>
 										<Tab closable="false" text="WelCome">
 											<content>
@@ -87,15 +70,12 @@
 														<HBox spacing="10.0" BorderPane.alignment="CENTER">
 															<children>
 																<Label prefHeight="22.0" prefWidth="62.0" text="URL" />
-																<TextField fx:id="txtUrl" prefHeight="23.0"
-																	prefWidth="579.0" HBox.hgrow="ALWAYS">
+																<TextField fx:id="txtUrl" prefHeight="23.0" prefWidth="579.0" HBox.hgrow="ALWAYS">
 																	<HBox.margin>
 																		<Insets />
 																	</HBox.margin>
 																</TextField>
-																<Button fx:id="btnUrlSearch" mnemonicParsing="false"
-																	prefHeight="12.0" prefWidth="71.0" text="Search"
-																	HBox.hgrow="NEVER">
+																<Button fx:id="btnUrlSearch" mnemonicParsing="false" prefHeight="12.0" prefWidth="71.0" text="Search" HBox.hgrow="NEVER">
 																	<HBox.margin>
 																		<Insets />
 																	</HBox.margin>
@@ -107,8 +87,7 @@
 														</HBox>
 													</top>
 													<center>
-														<WebView fx:id="webvWelcome" prefHeight="200.0"
-															prefWidth="200.0" BorderPane.alignment="CENTER">
+														<WebView fx:id="webvWelcome" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 															<BorderPane.margin>
 																<Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
 															</BorderPane.margin>
@@ -134,20 +113,16 @@
 					<menus>
 						<Menu mnemonicParsing="false" text="File">
 							<items>
-								<MenuItem mnemonicParsing="false" onAction="#menuOpenOnAction"
-									text="Open" />
-								<MenuItem mnemonicParsing="false"
-									onAction="#menuSwitchWorkspaceOnAction" text="Switch Workspace" />
+								<MenuItem mnemonicParsing="false" onAction="#menuOpenOnAction" text="Open" />
+								<MenuItem mnemonicParsing="false" onAction="#menuSwitchWorkspaceOnAction" text="Switch Workspace" />
 								<SeparatorMenuItem mnemonicParsing="false" />
-								<MenuItem mnemonicParsing="false" text="Print" fx:id="menuPrint" onAction="#menuPrintOnAction">
+								<MenuItem fx:id="menuPrint" mnemonicParsing="false" onAction="#menuPrintOnAction" text="Print">
 									<accelerator>
-										<KeyCodeCombination alt="UP" code="P"
-											control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+										<KeyCodeCombination alt="UP" code="P" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
 									</accelerator>
 								</MenuItem>
 								<SeparatorMenuItem mnemonicParsing="false" />
-								<MenuItem fx:id="menuExit" mnemonicParsing="false"
-									onAction="#menuExitOnAction" text="Close" />
+								<MenuItem fx:id="menuExit" mnemonicParsing="false" onAction="#menuExitOnAction" text="Close" />
 							</items>
 						</Menu>
 						<Menu fx:id="menuEdit" mnemonicParsing="false" text="Edit">
@@ -157,52 +132,41 @@
 						</Menu>
 						<Menu mnemonicParsing="false" text="Window">
 							<items>
-								<MenuItem mnemonicParsing="false" onAction="#lblVoEditorOnAction"
-									text="VoEditor">
+								<MenuItem mnemonicParsing="false" onAction="#lblVoEditorOnAction" text="VoEditor">
 									<accelerator>
-										<KeyCodeCombination alt="UP" code="V"
-											control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+										<KeyCodeCombination alt="UP" code="V" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
 									</accelerator>
 								</MenuItem>
-								<MenuItem mnemonicParsing="false" onAction="#lblDaoWizardOnAction"
-									text="DaoWizard">
+								<MenuItem mnemonicParsing="false" onAction="#lblDaoWizardOnAction" text="DaoWizard">
 									<accelerator>
-										<KeyCodeCombination alt="UP" code="O"
-											control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+										<KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
 									</accelerator>
 								</MenuItem>
 								<Menu mnemonicParsing="false" text="Database">
 									<items>
-										<MenuItem mnemonicParsing="false" onAction="#lblDatabaseOnAction"
-											text="Database">
+										<MenuItem mnemonicParsing="false" onAction="#lblDatabaseOnAction" text="Database">
 											<accelerator>
-												<KeyCodeCombination alt="UP" code="D"
-													control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+												<KeyCodeCombination alt="UP" code="D" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
 											</accelerator>
 										</MenuItem>
 
-										<MenuItem mnemonicParsing="false" onAction="#lblDBConsoleOnAction"
-											text="DB Console" />
+										<MenuItem mnemonicParsing="false" onAction="#lblDBConsoleOnAction" text="DB Console" />
 									</items>
 								</Menu>
 								<Menu mnemonicParsing="false" text="SpreadSheet">
 									<items>
-										<MenuItem mnemonicParsing="false" onAction="#lblSpreadSheetOnAction"
-											text="SpreadSheet">
+										<MenuItem mnemonicParsing="false" onAction="#lblSpreadSheetOnAction" text="SpreadSheet">
 											<accelerator>
-												<KeyCodeCombination alt="UP" code="S"
-													control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+												<KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
 											</accelerator>
 										</MenuItem>
 									</items>
 								</Menu>
 								<Menu mnemonicParsing="false" text="Configuration">
 									<items>
-										<MenuItem mnemonicParsing="false" onAction="#lblConfigonOnAction"
-											text="Configuration">
+										<MenuItem mnemonicParsing="false" onAction="#lblConfigonOnAction" text="Configuration">
 											<accelerator>
-												<KeyCodeCombination alt="UP" code="C"
-													control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+												<KeyCodeCombination alt="UP" code="C" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
 											</accelerator>
 										</MenuItem>
 									</items>
@@ -210,8 +174,7 @@
 
 								<Menu mnemonicParsing="false" text="SVN">
 									<items>
-										<MenuItem mnemonicParsing="false" onAction="#lblSVNOnAction"
-											text="SVN">
+										<MenuItem mnemonicParsing="false" onAction="#lblSVNOnAction" text="SVN">
 										</MenuItem>
 									</items>
 								</Menu>
@@ -221,7 +184,7 @@
 						<Menu fx:id="menuPlugins" mnemonicParsing="false" text="Plugins" />
 						<Menu mnemonicParsing="false" text="Help">
 							<items>
-								<MenuItem mnemonicParsing="false" text="About" />
+								<MenuItem fx:id="miAbout" mnemonicParsing="false" onAction="#miAboutOnAction" text="About" />
 							</items>
 						</Menu>
 					</menus>
@@ -232,8 +195,7 @@
 					<children>
 						<HBox>
 							<children>
-								<Label fx:id="lblVoEditor" onMouseClicked="#lblVoEditorOnMouseClick"
-									text="VoEditor">
+								<Label fx:id="lblVoEditor" onMouseClicked="#lblVoEditorOnMouseClick" text="VoEditor">
 									<font>
 										<Font size="18.0" />
 									</font>
@@ -244,8 +206,7 @@
 										<Cursor fx:constant="HAND" />
 									</cursor>
 								</Label>
-								<Label fx:id="lblDaoWizard" onMouseClicked="#lblDaoWizardOnMouseClick"
-									text="DaoWizard">
+								<Label fx:id="lblDaoWizard" onMouseClicked="#lblDaoWizardOnMouseClick" text="DaoWizard">
 									<cursor>
 										<Cursor fx:constant="HAND" />
 									</cursor>
@@ -256,8 +217,7 @@
 										<Insets bottom="5.0" left="20.0" right="10.0" top="5.0" />
 									</padding>
 								</Label>
-								<Label fx:id="lblConfig" onMouseClicked="#lblConfigonMouseClick"
-									text="Configuration">
+								<Label fx:id="lblConfig" onMouseClicked="#lblConfigonMouseClick" text="Configuration">
 									<font>
 										<Font size="18.0" />
 									</font>
@@ -268,8 +228,7 @@
 										<Cursor fx:constant="HAND" />
 									</cursor>
 								</Label>
-								<Label fx:id="lblDatabase" onMouseClicked="#lblDatabaseMouseClick"
-									text="Database">
+								<Label fx:id="lblDatabase" onMouseClicked="#lblDatabaseMouseClick" text="Database">
 									<font>
 										<Font size="18.0" />
 									</font>
@@ -280,8 +239,7 @@
 										<Cursor fx:constant="HAND" />
 									</cursor>
 								</Label>
-								<Label fx:id="lblSpreadSheet" onMouseClicked="#lblSpreadSheetOnMouseClick"
-									text="SpreadSheet">
+								<Label fx:id="lblSpreadSheet" onMouseClicked="#lblSpreadSheetOnMouseClick" text="SpreadSheet">
 									<font>
 										<Font size="18.0" />
 									</font>
@@ -303,8 +261,7 @@
 										<Insets bottom="5.0" right="10.0" top="5.0" />
 									</padding>
 								</Label>
-								<Label onMouseClicked="#lblSystemConsoleOnMouseClick"
-									text="System Console">
+								<Label onMouseClicked="#lblSystemConsoleOnMouseClick" text="System Console">
 									<cursor>
 										<Cursor fx:constant="HAND" />
 									</cursor>

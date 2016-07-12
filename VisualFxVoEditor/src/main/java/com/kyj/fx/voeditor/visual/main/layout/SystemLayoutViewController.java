@@ -748,6 +748,17 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	}
 
 	/**
+	 * Help >  About Click Event.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @param e
+	 */
+	@FXML
+	public void miAboutOnAction(ActionEvent e){
+		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
+		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s", url));
+	}
+	/**
 	 * 탭 닫기 메뉴
 	 *
 	 * @작성자 : KYJ
