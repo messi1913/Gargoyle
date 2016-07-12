@@ -129,7 +129,7 @@ public final class ConfigResourceLoader implements IFileBaseConfiguration {
 	public static final String DBMS_H2 = "dbms.H2";
 
 	public static final String DBMS_SQLITE = "dbms.Sqlite";
-	
+
 	public static final String START_ROW = "startRow";
 
 	public static final String MAX_ROW = "maxRow";
@@ -144,15 +144,17 @@ public final class ConfigResourceLoader implements IFileBaseConfiguration {
 
 	public static final String FILE_ENCODING = "file.encoding";
 	public static final String SUN_JNU_ENCODING = "sun.jnu.encoding";
-	
+
 	public static final String FILE_OPEN_NOT_INPROCESSING_EXTENSION = "file.open.inprocessing.extensions";
-	
+
 	/**
 	 * SVN 기본 설정 항목들이 기록된 키
 	 *
 	 * @최초생성일 2016. 4. 2.
 	 */
 	public static final String SVN_BASE_KEYS = "svn.base.keys";
+
+	public static final String ABOUT_PAGE_URL= "about.page.url";
 
 	public static ConfigResourceLoader getInstance() {
 		if (loader == null) {
