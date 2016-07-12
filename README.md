@@ -2,9 +2,7 @@
 Gargoyle
 
 
-Languate : JavaFx , JDK1.8
-
-
+Application Language : JavaFx , JDK1.8
 
 
 
@@ -12,7 +10,7 @@ Download Site :: http://downloads-kyj.cloudsc.kr/
 
 
 
-Functions.
+### Functions.
 
 [ Select Workspace ]
 ![alt tag](http://downloads-kyj.cloudsc.kr/images/Gargoyle/Select Workspace.png)
