@@ -720,7 +720,19 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			if (value instanceof TableItemTree) {
 				TreeItem<DatabaseItemTree<String>> schemaTree = selectedItem.getParent();
 				String schemaName = schemaTree.getValue().getName();
-				String tableName = schemaName.concat(".").concat(value.getName());
+				//				if(value.isValideSchemaName(schemaName))
+
+				String tableName = "";
+				/*
+				 * 2016-07-12 SQLite에서는 스키마라는 개념이 존재하지않는다.
+				 * Schema Name을 100개의로우를 보여주는 SQL에 적용할지 여부를 결정한다.
+				 */
+				if (value.isApplySchemaName(schemaName)) {
+					tableName = schemaName.concat(".").concat(value.getName());
+				} else {
+					tableName = value.getName();
+				}
+
 				String sql = ValueUtil.getVelocityToText(wrapperedSQL, "usersql", "select * from ".concat(tableName));
 				execute(sql);
 			}

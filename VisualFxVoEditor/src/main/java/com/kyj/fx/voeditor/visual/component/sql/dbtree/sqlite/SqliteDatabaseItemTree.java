@@ -18,8 +18,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
 /**
- * 데이터베이스 세션정보 출력
+ * 데이터베이스 스키마조회 처리.
  *
+ * 
  * @author KYJ
  *
  */
