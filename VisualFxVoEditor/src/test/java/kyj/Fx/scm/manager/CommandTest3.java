@@ -7,7 +7,10 @@
 package kyj.Fx.scm.manager;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -15,6 +18,7 @@ import java.util.Properties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -23,6 +27,7 @@ import org.tmatesoft.svn.core.internal.util.SVNURLUtil;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
+import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
@@ -52,7 +57,99 @@ public class CommandTest3 {
 
 	@Test
 	public void importTest() throws Exception {
-		manager.doImport("/sos/deprecated_pass-batch-core", SVNURL.fromFile(new File("c:\\logs\\tmp")));
+		manager.doImport("/sos/deprecated_pass-batch-core", SVNURL.parseURIEncoded("svn://localhost/svn/sos/trunk/"));
+	}
+
+	/**
+	 * SVN Commit Test.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @throws SVNException
+	 * @throws IOException
+	 */
+	@Test
+	public void commitTest() throws SVNException, IOException {
+
+		Properties properties = new Properties();
+		properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/sos/trunk/");
+		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
+		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
+
+		JavaSVNManager thirdPartManager = new JavaSVNManager(properties);
+
+		File[] commitTestFiles = getCommitTestFiles();
+		FileInputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(commitTestFiles[0]);
+//			thirdPartManager.commit_new("/sql", commitTestFiles[0].getName(), inputStream, "test commit.");
+
+			SVNCommitInfo commit_modify = thirdPartManager.commit_modify("/sql", commitTestFiles[0].getName(), inputStream, "test commit.");
+
+			System.out.println(commit_modify.getAuthor());
+			System.out.println(commit_modify.getNewRevision());
+
+		} finally {
+			if (inputStream != null)
+				inputStream.close();
+		}
+
+	}
+
+	/**
+	 * Test File writtend Date
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @param files
+	 * @throws IOException
+	 */
+	private void modifyFileContent(File[] files) throws IOException {
+		for (File f : files) {
+			try (FileWriter fileWriter = new FileWriter(f, true)) {
+				fileWriter.append(DateUtil.getCurrentDateString());
+				fileWriter.append(System.lineSeparator());
+				fileWriter.flush();
+			}
+		}
+	}
+
+	/**
+	 * Create New Test Files.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @param files
+	 * @throws IOException
+	 */
+	private void createTestFiles(File[] files) throws IOException {
+		for (File f : files) {
+			if (!f.exists()) {
+				f.getParentFile().mkdirs();
+				f.createNewFile();
+			}
+		}
+	}
+
+	/**
+	 * get Default Test Files.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @return
+	 * @throws IOException
+	 */
+	private File[] getCommitTestFiles() throws IOException {
+
+		File[] files = new File[] { new File("C:\\logs\\test\\deprecated_pass-batch-core\\sql\\text.txt"),
+				new File("C:\\logs\\test\\deprecated_pass-batch-core\\sql\\text2.txt"),
+				new File("C:\\logs\\test\\deprecated_pass-batch-core\\sql\\text3.txt") };
+
+		createTestFiles(files);
+
+		modifyFileContent(files);
+
+		return files;
 	}
 
 	/********************************

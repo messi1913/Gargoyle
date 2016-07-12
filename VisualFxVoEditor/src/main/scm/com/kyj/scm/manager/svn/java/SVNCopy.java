@@ -16,7 +16,7 @@ import org.tmatesoft.svn.core.wc.SVNCopyClient;
 import org.tmatesoft.svn.core.wc.SVNCopySource;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
-import com.kyj.scm.manager.core.commons.ISVNCommit;
+import com.kyj.scm.manager.core.commons.ISCMCommit;
 
 /**
  *
@@ -27,7 +27,7 @@ import com.kyj.scm.manager.core.commons.ISVNCommit;
  * @author KYJ
  *
  */
-public class SVNCopy extends AbstractSVN implements ISVNCommit {
+public class SVNCopy extends AbstractSVN implements ISCMCommit {
 
 	/**
 	 * @param javaSVNManager

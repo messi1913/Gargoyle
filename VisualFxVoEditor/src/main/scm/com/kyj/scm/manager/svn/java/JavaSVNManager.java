@@ -6,18 +6,21 @@
  *******************************/
 package com.kyj.scm.manager.svn.java;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
 
+import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc2.SvnImport;
 
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
 import com.kyj.scm.manager.core.commons.SVNKeywords;
@@ -42,6 +45,8 @@ public class JavaSVNManager implements SVNKeywords {
 
 	private SVNImport svnImport;
 
+	private SVNCommit svnCommit;
+
 	private Properties properties;
 
 	public JavaSVNManager(Properties properties) {
@@ -63,6 +68,7 @@ public class JavaSVNManager implements SVNKeywords {
 		this.logCommand = new SVNLog(this, properties);
 		this.diffCommand = new SVNDiff(this, properties);
 		this.svnImport = new SVNImport(this, properties);
+		this.svnCommit = new SVNCommit(this, properties);
 	}
 
 	/**
@@ -226,5 +232,54 @@ public class JavaSVNManager implements SVNKeywords {
 	 */
 	public void doImport(String from, SVNURL to) throws Exception {
 		svnImport.importProject(from, to);
+	}
+
+	/**
+	 * Commit Operator.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @param dirPath
+	 * @param filePath
+	 * @param data
+	 * @param commitMessage
+	 * @return
+	 * @throws SVNException
+	 */
+	public SVNCommitInfo commit_new(String dirPath, String fileName, byte[] data, String commitMessage) throws SVNException {
+		return svnCommit.addDirCommit(dirPath, fileName, data, commitMessage);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @param dirPath
+	 * @param filePath
+	 * @param inputStream
+	 * @param commitMessage
+	 * @return
+	 * @throws SVNException
+	 */
+	public SVNCommitInfo commit_new(String dirPath, String fileName, InputStream inputStream, String commitMessage) throws SVNException {
+		return svnCommit.addDirCommit(dirPath, fileName, inputStream, commitMessage);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @param dirPath
+	 * @param fileName
+	 * @param oldData
+	 * @param newData
+	 * @param commitMessage
+	 * @return
+	 * @throws SVNException
+	 * @throws UnsupportedEncodingException
+	 */
+	public SVNCommitInfo commit_modify(String dirPath, String fileName, InputStream newData, String commitMessage)
+			throws SVNException, UnsupportedEncodingException {
+		String headerRevisionContent = this.catCommand.cat(dirPath.concat("/").concat(fileName));
+		return svnCommit.modifyFileCommit(dirPath, fileName, new ByteArrayInputStream(headerRevisionContent.getBytes("UTF-8")), newData,
+				commitMessage);
 	}
 }

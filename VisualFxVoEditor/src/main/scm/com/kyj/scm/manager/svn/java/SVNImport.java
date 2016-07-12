@@ -20,7 +20,7 @@ import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNCommitClient;
 
 import com.kyj.fx.voeditor.visual.util.FileUtil;
-import com.kyj.scm.manager.core.commons.ISVNCommit;
+import com.kyj.scm.manager.core.commons.ISCMCommit;
 
 /**
  * 최초 프로젝트 import
@@ -28,7 +28,7 @@ import com.kyj.scm.manager.core.commons.ISVNCommit;
  * @author KYJ
  *
  */
-class SVNImport extends AbstractSVN implements ISVNCommit {
+class SVNImport extends AbstractSVN implements ISCMCommit {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SVNImport.class);
 
@@ -46,6 +46,7 @@ class SVNImport extends AbstractSVN implements ISVNCommit {
 
 	/**
 	 *
+	 *  최초 한번 SVN에 저장된 한 프로젝트를 다른 서버로 이관시키는 경우 사용한다.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 11.

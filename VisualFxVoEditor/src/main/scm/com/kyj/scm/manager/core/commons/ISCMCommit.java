@@ -10,6 +10,6 @@ package com.kyj.scm.manager.core.commons;
  * @author KYJ
  *
  */
-public interface ISVNCommit extends SCMCommonable {
+public interface ISCMCommit extends SCMCommonable {
 
 }
