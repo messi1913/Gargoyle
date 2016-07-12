@@ -6,6 +6,9 @@ Application Language : JavaFx , JDK1.8
 
 
 
+Memo. [2016-07-12] Too many Bugs.. exists.
+
+
 Download Site :: http://downloads-kyj.cloudsc.kr/
 
 
