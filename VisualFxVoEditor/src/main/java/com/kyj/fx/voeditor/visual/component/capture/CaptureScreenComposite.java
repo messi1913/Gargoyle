@@ -50,7 +50,7 @@ public class CaptureScreenComposite {
 
 				if (isWriteSuccess) {
 					try {
-						c.getIvPicture().getTransforms().add(new Scale(1.5, 1.5));
+						c.getIvPicture().getTransforms().add(new Scale(1.3, 1.3));
 						c.getIvPicture().setImage(new Image(new FileInputStream(file)));
 					} catch (FileNotFoundException e) {
 						errorHandler.accept(e);
@@ -67,7 +67,7 @@ public class CaptureScreenComposite {
 	public void show() {
 
 		FxUtil.createStageAndShow(root, stage -> {
-
+			stage.setTitle("Captured Image Editor[Experiment]");
 			//			double width = targetNode.getBoundsInParent().getWidth();
 			//			double height = targetNode.getBoundsInParent().getHeight();
 			//			stage.setMaxWidth(width);

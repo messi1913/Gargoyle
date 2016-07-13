@@ -179,6 +179,13 @@
 									</items>
 								</Menu>
 
+								<Menu mnemonicParsing="false" text="Capture[Experiment]">
+									<items>
+										<MenuItem mnemonicParsing="false" onAction="#lblCaptureOnAction" text="Capture[Experiment]">
+										</MenuItem>
+									</items>
+								</Menu>
+							
 							</items>
 						</Menu>
 						<Menu fx:id="menuPlugins" mnemonicParsing="false" text="Plugins" />

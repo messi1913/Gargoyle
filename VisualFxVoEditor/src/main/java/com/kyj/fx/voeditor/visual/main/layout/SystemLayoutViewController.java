@@ -23,6 +23,7 @@ import com.kyj.fx.voeditor.visual.component.ImageFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ImageViewPane;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
+import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenComposite;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
 import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
@@ -748,16 +749,18 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	}
 
 	/**
-	 * Help >  About Click Event.
+	 * Help > About Click Event.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
 	 * @param e
 	 */
 	@FXML
-	public void miAboutOnAction(ActionEvent e){
+	public void miAboutOnAction(ActionEvent e) {
 		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
 		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s", url));
 	}
+
 	/**
 	 * 탭 닫기 메뉴
 	 *
@@ -1420,8 +1423,24 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	@FXML
 	public void menuPrintOnAction() {
 		Tab selectedItem = this.tabPanWorkspace.getSelectionModel().getSelectedItem();
-		if (selectedItem != null)
+		if (selectedItem != null) {
 			FxUtil.printJob(SharedMemory.getPrimaryStage(), selectedItem.getContent());
+		}
+	}
+
+	/********************************
+	 * 작성일 :  2016. 7. 13. 작성자 : KYJ
+	 *
+	 * 캡쳐후 이미지 핸들링 
+	 * TODO Expertiment.
+	 ********************************/
+	@FXML
+	public void lblCaptureOnAction() {
+		Tab selectedItem = this.tabPanWorkspace.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			new CaptureScreenComposite(selectedItem.getContent(), System.err::println).show();
+		}
+
 	}
 
 	/*
