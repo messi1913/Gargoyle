@@ -288,7 +288,20 @@ public class FileUtil {
 	 */
 	public static File getTempFileSystem() {
 		return new File(System.getProperty("java.io.tmpdir"));
+	}
 
+	/********************************
+	 * 작성일 : 2016. 7. 13. 작성자 : KYJ
+	 *
+	 * SnapShot 임시 디렉토리 리턴.
+	 *
+	 * @return
+	 ********************************/
+	public static File getSnapShotDir() {
+		File file = new File("SnapShot");
+		if (!file.exists())
+			file.mkdir();
+		return file;
 	}
 
 	/**
