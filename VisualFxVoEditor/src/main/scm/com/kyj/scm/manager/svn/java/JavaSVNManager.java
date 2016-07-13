@@ -188,6 +188,7 @@ public class JavaSVNManager implements SVNKeywords {
 
 	/**
 	 * svn 리비젼 정보 조회
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 13.
 	 * @param path
@@ -201,6 +202,7 @@ public class JavaSVNManager implements SVNKeywords {
 
 	/**
 	 * svn 리비젼 정보 조회
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 13.
 	 * @param path
@@ -211,6 +213,21 @@ public class JavaSVNManager implements SVNKeywords {
 	 */
 	public List<SVNLogEntry> log(String path, long startRevision, Date endDate, Consumer<Exception> exceptionHandler) {
 		return logCommand.log(path, startRevision, endDate, exceptionHandler);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 13. 작성자 : KYJ
+	 *
+	 * FileSystem Base Log.
+	 * 
+	 * @param path
+	 * @param startRevision
+	 * @param endDate
+	 * @param exceptionHandler
+	 * @return
+	 ********************************/
+	public List<SVNLogEntry> logFileSystem(File path, Date endDate, Consumer<Exception> exceptionHandler) {
+		return logCommand.logFileSystem( /*only one target supported.*/new File[] { path }, 0, endDate, exceptionHandler);
 	}
 
 	/**
@@ -270,6 +287,7 @@ public class JavaSVNManager implements SVNKeywords {
 	 * Commit Operator.
 	 *
 	 * 추가되는 코드가 신규파일인경우 사용. (형상으로 관리되지않던 신규파일인경우에만 사용.)
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
 	 * @param dirPath
@@ -278,7 +296,7 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @param commitMessage
 	 * @return
 	 * @throws SVNException
-	 *  신규파일이 아닌 , 존재하는 파일 경우 에러발생.
+	 *             신규파일이 아닌 , 존재하는 파일 경우 에러발생.
 	 */
 	public SVNCommitInfo commit_new(String dirPath, String fileName, byte[] data, String commitMessage) throws SVNException {
 		return svnCommit.addFileCommit(dirPath, fileName, data, commitMessage);
@@ -286,7 +304,7 @@ public class JavaSVNManager implements SVNKeywords {
 
 	/**
 	 *
-	 *  추가되는 코드가 신규파일인경우 사용. (형상으로 관리되지않던 신규파일인경우에만 사용.)
+	 * 추가되는 코드가 신규파일인경우 사용. (형상으로 관리되지않던 신규파일인경우에만 사용.)
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
@@ -296,7 +314,7 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @param commitMessage
 	 * @return
 	 * @throws SVNException
-	 *   신규파일이 아닌 , 존재하는 파일 경우 에러발생.
+	 *             신규파일이 아닌 , 존재하는 파일 경우 에러발생.
 	 */
 	public SVNCommitInfo commit_new(String dirPath, String fileName, InputStream inputStream, String commitMessage) throws SVNException {
 		return svnCommit.addFileCommit(dirPath, fileName, inputStream, commitMessage);
@@ -389,9 +407,7 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @throws SVNException
 	 * @throws IOException
 	 *
-	 * @deprecated  서버간의 API연계에서 사용되면 안됨.
-	 *  		해당 API가 사용되는 때는 FileSystem으로 버젼관리가 되는 상황에서만 사용되야함.
-	 *         (( 로컬시스템으로 svn파일이 관리되는 경우에만 사용. ))
+	 * @deprecated 서버간의 API연계에서 사용되면 안됨. 해당 API가 사용되는 때는 FileSystem으로 버젼관리가 되는 상황에서만 사용되야함. (( 로컬시스템으로 svn파일이 관리되는 경우에만 사용. ))
 	 */
 	@Deprecated
 	public SVNCommitInfo commitClient(File[] paths, String commitMessage) throws SVNException, IOException {

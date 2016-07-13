@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -62,7 +63,7 @@ public class CommandTest3 {
 	}
 
 	@Test
-	public void addFileTest(){
+	public void addFileTest() {
 
 		Properties properties = new Properties();
 		properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/sos/trunk/");
@@ -71,12 +72,11 @@ public class CommandTest3 {
 
 		JavaSVNManager thirdPartManager = new JavaSVNManager(properties);
 
-
-//		try {
-//			thirdPartManager.commit_new(dirPath, fileName, data, commitMessage)
-//		} finally {
-//
-//		}
+		//		try {
+		//			thirdPartManager.commit_new(dirPath, fileName, data, commitMessage)
+		//		} finally {
+		//
+		//		}
 	}
 
 	/**
@@ -279,6 +279,7 @@ public class CommandTest3 {
 	 * 작성일 : 2016. 5. 5. 작성자 : KYJ
 	 *
 	 * 이력정보 테스트
+	 * 
 	 * @throws ParseException
 	 *
 	 ********************************/
@@ -293,9 +294,16 @@ public class CommandTest3 {
 		JavaSVNManager thirdPartManager = new JavaSVNManager(properties);
 
 		// https://dev.naver.com/svn/javafxvoeditor/additional/batch-core/pom.xml
-		thirdPartManager.log("/sql");
 
+		/*Server log*/
+		thirdPartManager.log("/sql");
 		thirdPartManager.log("/sql/text.txt", DateUtil.toDate("20160606", "YYYYMMDD"), System.err::println);
+
+		/*File System log*/
+
+		System.out.println("################# FileSystem Log ###################");
+		thirdPartManager.logFileSystem(new File("C:\\Users\\KYJ\\eclipse-jee-neon\\workspace\\AnimationRecorder"), new Date(),
+				System.err::println);
 
 	}
 
