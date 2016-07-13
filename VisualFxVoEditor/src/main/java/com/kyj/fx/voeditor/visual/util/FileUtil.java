@@ -297,7 +297,7 @@ public class FileUtil {
 	 *
 	 * @return
 	 ********************************/
-	public static File getSnapShotDir() {
+	public static File getTempSnapShotDir() {
 		File file = new File("SnapShot");
 		if (!file.exists())
 			file.mkdir();
