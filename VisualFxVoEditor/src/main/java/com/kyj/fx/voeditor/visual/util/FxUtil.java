@@ -591,6 +591,10 @@ public class FxUtil {
 	 * @param errorCallback
 	 ********************************/
 	public static void snapShot(Node target, OutputStream out, Consumer<Exception> errorCallback) {
+		snapShot(target, out, -1, -1, errorCallback);
+	}
+
+	public static void snapShot(Node target, OutputStream out, int requestWidth, int requestHeight, Consumer<Exception> errorCallback) {
 
 		if (target == null)
 			throw new NullPointerException("target Node is empty.");
@@ -602,15 +606,18 @@ public class FxUtil {
 		params.setDepthBuffer(true);
 		//		params.setFill(Color.CORNSILK);
 
-		target.snapshot(param -> {
-			WritableImage image = param.getImage();
-			try {
-				snapShot(out, image);
-			} catch (IOException e) {
-				errorCallback.accept(e);
-			}
-			return null;
-		}, params, null);
+		WritableImage wi = null;
+		if (requestWidth >= 0 || requestHeight >= 0) {
+			wi = new WritableImage(requestWidth, requestHeight);
+		}
+
+		WritableImage snapshot = target.snapshot(params, wi);
+		try {
+			boolean isSuccess = snapShot(out, snapshot);
+			LOGGER.debug("Write Image result {}", isSuccess);
+		} catch (IOException e) {
+			errorCallback.accept(e);
+		}
 	}
 
 	/********************************
@@ -620,13 +627,13 @@ public class FxUtil {
 	 * 
 	 * @param out
 	 * @param image
+	 * @return
 	 * @throws IOException
 	 ********************************/
-	private static void snapShot(OutputStream out, WritableImage image) throws IOException {
-		ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", out);
-
-		if (out != null)
-			out.close();
+	private static boolean snapShot(OutputStream out, WritableImage image) throws IOException {
+		return ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", out);
+		//		if (out != null)
+		//			out.close();
 	}
 
 	/********************************
