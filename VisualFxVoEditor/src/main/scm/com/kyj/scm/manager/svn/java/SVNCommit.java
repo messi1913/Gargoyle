@@ -1,6 +1,6 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : kyj.Fx.scm.manager.command.svn
+ *	패키지   : com.kyj.scm.manager.svn.java
  *	작성일   : 2016. 7. 12.
  *	작성자   : KYJ
  *******************************/

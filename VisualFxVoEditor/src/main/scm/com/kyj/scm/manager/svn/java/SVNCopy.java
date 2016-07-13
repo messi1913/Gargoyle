@@ -1,6 +1,6 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : com.samsung.sds.sos.server.core.svn.concreate
+ *	패키지   : com.kyj.scm.manager.svn.java
  *	작성일   : 2016. 7. 11.
  *	작성자   : KYJ
  *******************************/
