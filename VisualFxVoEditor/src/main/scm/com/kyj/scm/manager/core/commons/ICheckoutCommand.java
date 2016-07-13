@@ -3,7 +3,6 @@
  *	패키지   : com.kyj.scm.manager.core.commons
  *	작성일   : 2016. 3. 22.
  *	작성자   : KYJ
- * 라이센스 : BSD 라이센스
  *******************************/
 package com.kyj.scm.manager.core.commons;
 

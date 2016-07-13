@@ -304,6 +304,21 @@ public class JavaSVNManager implements SVNKeywords {
 
 	/**
 	 *
+	 * 디렉토리 추가.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 13.
+	 * @param dirPath
+	 * @param commitMessage
+	 * @return
+	 * @throws SVNException
+	 */
+	public SVNCommitInfo commit_new(String dirPath, String commitMessage) throws SVNException {
+		return svnCommit.addDirCommit(dirPath, commitMessage);
+	}
+
+	/**
+	 *
 	 * 코드 수정후 서버 반영
 	 *
 	 * @작성자 : KYJ

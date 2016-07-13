@@ -61,6 +61,24 @@ public class CommandTest3 {
 		manager.doImport("/sos/deprecated_pass-batch-core", SVNURL.parseURIEncoded("svn://localhost/svn/sos/trunk/"));
 	}
 
+	@Test
+	public void addFileTest(){
+
+		Properties properties = new Properties();
+		properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/sos/trunk/");
+		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
+		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
+
+		JavaSVNManager thirdPartManager = new JavaSVNManager(properties);
+
+
+//		try {
+//			thirdPartManager.commit_new(dirPath, fileName, data, commitMessage)
+//		} finally {
+//
+//		}
+	}
+
 	/**
 	 * SVN Commit Test.
 	 *

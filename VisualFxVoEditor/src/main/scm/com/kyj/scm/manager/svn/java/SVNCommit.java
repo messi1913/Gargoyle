@@ -138,6 +138,19 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 	}
 
 	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 13.
+	 * @param dirPath
+	 * @param commitMessage
+	 * @return
+	 * @throws SVNException
+	 */
+	public SVNCommitInfo addDirCommit(String dirPath, String commitMessage) throws SVNException {
+		ISVNEditor editor = getDefaultSVNEditor(commitMessage);
+		return addDir(editor, dirPath);
+	}
+
+	/**
 	 * 신규파일이 추가되는 경우 사용.
 	 *  SVN Commit Operator
 	 *
@@ -180,7 +193,8 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 		revisionProperties.put("exec.ip.addr", getIpAddr());
 		revisionProperties.put("exec.client.date", getCurrentDateTime());
 		revisionProperties.put("exec.user", getUserId());
-		return getRepository().getCommitEditor(convertCommitMessage, null /*locks*/ , true /*keepLocks*/ , revisionProperties, null /*mediator*/ );
+		return getRepository().getCommitEditor(convertCommitMessage, null /*locks*/ , true /*keepLocks*/ , revisionProperties,
+				null /*mediator*/ );
 	}
 
 	/**
@@ -280,6 +294,23 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 		return editor.closeEdit();
 	}
 
+	private static SVNCommitInfo addDir(ISVNEditor editor, String dirPath) throws SVNException {
+
+		//Open Root
+		editor.openRoot(-1);
+
+		//Create Dir
+		editor.addDir(dirPath, null, -1);
+
+		//Close Dir
+		editor.closeDir();
+
+		//Close Root
+		editor.closeDir();
+
+		return editor.closeEdit();
+	}
+
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
@@ -293,16 +324,19 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 	 * @throws SVNException
 	 */
 	private static SVNCommitInfo addFile(ISVNEditor editor, String dirPath, String fileName, InputStream dataStream) throws SVNException {
+		//Open Root
 		editor.openRoot(-1);
+		//Open Dir
 		editor.openDir(dirPath, -1);
-		//		editor.addDir("", null, -1);;
+
+		//Add file
 		editor.addFile(fileName, null, -1);
 
 		editor.applyTextDelta(fileName, null);
-
 		SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
 		String checksum = deltaGenerator.sendDelta(fileName, dataStream, editor, true);
 
+		//Close File
 		editor.closeFile(fileName, checksum);
 
 		//Closes dirPath.
