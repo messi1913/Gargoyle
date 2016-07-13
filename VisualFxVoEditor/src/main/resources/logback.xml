@@ -67,7 +67,7 @@
 	<!-- 이 아래에 있는 애들 다 log로 찍겠다. -->
 <!-- 	<logger name="org.springframework" level="DEBUG" /> -->
 	<root level="DEBUG">
-		<appender-ref ref="console" />
+<!-- 		<appender-ref ref="console" /> -->
 		<appender-ref ref="fileForLoginInterceptor" />
 	</root>
 
