@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -82,9 +83,39 @@ public class CommandTest3 {
 		FileInputStream inputStream = null;
 		try {
 			inputStream = new FileInputStream(commitTestFiles[0]);
-//			thirdPartManager.commit_new("/sql", commitTestFiles[0].getName(), inputStream, "test commit.");
+			//			thirdPartManager.commit_new("/sql", commitTestFiles[0].getName(), inputStream, "test commit.");
 
-			SVNCommitInfo commit_modify = thirdPartManager.commit_modify("/sql", commitTestFiles[0].getName(), inputStream, "test commit.");
+			//			commitTestFiles = new File[] { new File("C:\\logs\\test\\deprecated_pass-batch-core\\sql\\text.txt") };
+			SVNCommitInfo commit_modify = thirdPartManager.commit_modify("sql", "text.txt", inputStream, "test commit.");
+
+			System.out.println(commit_modify.getAuthor());
+			System.out.println(commit_modify.getNewRevision());
+
+		} finally {
+			if (inputStream != null)
+				inputStream.close();
+		}
+
+	}
+
+	@Test
+	public void commitReverseTest() throws SVNException, IOException {
+
+		Properties properties = new Properties();
+		properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/sos/trunk/");
+		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
+		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
+
+		JavaSVNManager thirdPartManager = new JavaSVNManager(properties);
+
+		File[] commitTestFiles = getCommitTestFiles();
+		FileInputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(commitTestFiles[0]);
+			//			thirdPartManager.commit_new("/sql", commitTestFiles[0].getName(), inputStream, "test commit.");
+
+			//			commitTestFiles = new File[] { new File("C:\\logs\\test\\deprecated_pass-batch-core\\sql\\text.txt") };
+			SVNCommitInfo commit_modify = thirdPartManager.commit_modify_reverse("sql", "text.txt", 42);
 
 			System.out.println(commit_modify.getAuthor());
 			System.out.println(commit_modify.getNewRevision());
@@ -230,13 +261,24 @@ public class CommandTest3 {
 	 * 작성일 : 2016. 5. 5. 작성자 : KYJ
 	 *
 	 * 이력정보 테스트
+	 * @throws ParseException
 	 *
 	 ********************************/
 	@Test
-	public void logTest() {
+	public void logTest() throws ParseException {
+
+		Properties properties = new Properties();
+		properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/sos/trunk/");
+		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
+		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
+
+		JavaSVNManager thirdPartManager = new JavaSVNManager(properties);
+
 		// https://dev.naver.com/svn/javafxvoeditor/additional/batch-core/pom.xml
-		manager.log("/additional/DockFX/pom.xml");
-		manager.log("/additional/batch-core/pom.xml");
+		thirdPartManager.log("/sql");
+
+		thirdPartManager.log("/sql/text.txt", DateUtil.toDate("20160606", "YYYYMMDD"), System.err::println);
+
 	}
 
 	/********************************

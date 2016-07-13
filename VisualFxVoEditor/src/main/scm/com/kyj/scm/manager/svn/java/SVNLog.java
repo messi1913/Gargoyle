@@ -7,6 +7,7 @@
 package com.kyj.scm.manager.svn.java;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -66,15 +67,50 @@ class SVNLog extends AbstractSVN implements ILogCommand<String, List<SVNLogEntry
 		List<SVNLogEntry> result = new ArrayList<>();
 		try {
 			ISVNLogEntryHandler handler = logEntry -> {
-				LOGGER.debug("rivision :: " + logEntry.getRevision());
-				LOGGER.debug("date :: " + logEntry.getDate());
-				LOGGER.debug("author :: " + logEntry.getAuthor());
-				LOGGER.debug("message :: " + logEntry.getMessage());
-				LOGGER.debug("properties :: " + logEntry.getRevisionProperties());
+
+				//				System.out.println(logEntry.getChangedPaths());
+				LOGGER.debug("rivision :: {} date :: {} author :: {} message :: {} ", logEntry.getRevision(), logEntry.getDate(),
+						logEntry.getAuthor(), logEntry.getMessage());
+
+				//				LOGGER.debug("rivision :: " + logEntry.getRevision());
+				//				LOGGER.debug("date :: " + logEntry.getDate());
+				//				LOGGER.debug("author :: " + logEntry.getAuthor());
+				//				LOGGER.debug("message :: " + logEntry.getMessage());
+				//				LOGGER.debug("properties :: " + logEntry.getRevisionProperties());
 				result.add(logEntry);
 			};
 			logClient.doLog(getSvnURL(), new String[] { path }, SVNRevision.create(-1), SVNRevision.create(0), SVNRevision.HEAD, true,
 					false, 10L, handler);
+
+		} catch (SVNException e) {
+			LOGGER.error(ValueUtil.toString(e));
+			if (exceptionHandler != null)
+				exceptionHandler.accept(e);
+		}
+
+		return result;
+	}
+
+	public List<SVNLogEntry> log(String path, long startRevision, Date endDate, Consumer<Exception> exceptionHandler) {
+		SVNLogClient logClient = getSvnManager().getLogClient();
+		List<SVNLogEntry> result = new ArrayList<>();
+		try {
+			ISVNLogEntryHandler handler = logEntry -> {
+
+				//				System.out.println(logEntry.getChangedPaths());
+				LOGGER.debug("path :: {}  rivision :: {} date :: {} author :: {} message :: {} ", path, logEntry.getRevision(),
+						logEntry.getDate(), logEntry.getAuthor(), logEntry.getMessage());
+
+				//				LOGGER.debug("rivision :: " + logEntry.getRevision());
+				//				LOGGER.debug("date :: " + logEntry.getDate());
+				//				LOGGER.debug("author :: " + logEntry.getAuthor());
+				//				LOGGER.debug("message :: " + logEntry.getMessage());
+				//				LOGGER.debug("properties :: " + logEntry.getRevisionProperties());
+				result.add(logEntry);
+			};
+
+			logClient.doLog(getSvnURL(), new String[] { path }, SVNRevision.create(startRevision), SVNRevision.create(endDate),
+					SVNRevision.HEAD, true, false, 1000L, handler);
 
 		} catch (SVNException e) {
 			LOGGER.error(ValueUtil.toString(e));

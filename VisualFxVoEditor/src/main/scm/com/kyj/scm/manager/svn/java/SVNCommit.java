@@ -7,26 +7,25 @@
 package com.kyj.scm.manager.svn.java;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.SVNCommitInfo;
+import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNProperties;
+import org.tmatesoft.svn.core.internal.wc.SVNCommitUtil;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
-import org.tmatesoft.svn.core.wc.ISVNCommitHandler;
-import org.tmatesoft.svn.core.wc.ISVNEventHandler;
-import org.tmatesoft.svn.core.wc.SVNCommitItem;
-import org.tmatesoft.svn.core.wc.SVNEvent;
-import org.tmatesoft.svn.core.wc.SVNEventAction;
 
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.NetworkUtil;
+import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.scm.manager.core.commons.ISCMCommit;
 
 /**
@@ -50,34 +49,16 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 
 		//		getSvnManager().getCommitClient().setCommitHandler(new ISVNCommitHandler() {
 		//
-
-		//
 		//			@Override
 		//			public SVNProperties getRevisionProperties(String message, SVNCommitItem[] commitables, SVNProperties revisionProperties)
 		//					throws SVNException {
-		//
 		//				return revisionProperties == null ? new SVNProperties() : revisionProperties;
 		//			}
 		//
 		//			@Override
 		//			public String getCommitMessage(String message, SVNCommitItem[] commitables) throws SVNException {
-		//				int commitCount = commitables == null ? 0 : commitables.length;
-		//				String systemMessage = String.format(DEFAULT_COMMIT_FORMAT, getCurrentTime(), getIpAddr(), commitCount);
-		//				return message == null ? systemMessage : systemMessage.concat("\n").concat(message);
+		//				return SVNCommit.getCommitMessage(message);
 		//			}
-		//
-		//			String getCurrentTime() {
-		//				return DateUtil.getCurrentDateString();
-		//			}
-		//
-		//			String getIpAddr() {
-		//				try {
-		//					return NetworkUtil.getRealAddress();
-		//				} catch (SocketException e) {
-		//					return "ip error";
-		//				}
-		//			}
-		//
 		//		});
 		//
 		//		getSvnManager().getCommitClient().setEventHandler(new ISVNEventHandler() {
@@ -110,7 +91,7 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 	 * @throws SVNException
 	 */
 	private static String getCommitMessage(String message) throws SVNException {
-		String systemMessage = String.format(DEFAULT_COMMIT_FORMAT, getCurrentTime(), getIpAddr());
+		String systemMessage = String.format(DEFAULT_COMMIT_FORMAT, getCurrentDateTime(), getIpAddr());
 		return message == null ? systemMessage : systemMessage.concat("\n").concat(message);
 	}
 
@@ -121,7 +102,7 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 	 * @작성일 : 2016. 7. 12.
 	 * @return
 	 */
-	static String getCurrentTime() {
+	private static String getCurrentDateTime() {
 		return DateUtil.getCurrentDateString();
 	}
 
@@ -133,7 +114,7 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 	 * @작성일 : 2016. 7. 12.
 	 * @return
 	 */
-	static String getIpAddr() {
+	private static String getIpAddr() {
 		try {
 			return NetworkUtil.getRealAddress();
 		} catch (SocketException e) {
@@ -142,6 +123,7 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 	}
 
 	/**
+	 *  신규파일이 추가되는 경우 사용.
 	 *  SVN Commit Operator
 	 *
 	 * @작성자 : KYJ
@@ -151,23 +133,31 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 	 * @return
 	 * @throws SVNException
 	 */
-	public SVNCommitInfo addDirCommit(String dirPath, String filePath, byte[] data, String commitMessage) throws SVNException {
-		return addDirCommit(dirPath, filePath, new ByteArrayInputStream(data), commitMessage);
+	public SVNCommitInfo addFileCommit(String dirPath, String filePath, byte[] data, String commitMessage) throws SVNException {
+		return addFileCommit(dirPath, filePath, new ByteArrayInputStream(data), commitMessage);
 	}
 
-	public SVNCommitInfo addDirCommit(String dirPath, String fileName, InputStream uploadStream, String commitMessage) throws SVNException {
-
+	/**
+	 * 신규파일이 추가되는 경우 사용.
+	 *  SVN Commit Operator
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 13.
+	 * @param dirPath
+	 *    remote server relative path.
+	 * @param fileName
+	 *    only SimpleFileName
+	 * @param uploadStream
+	 *   코드 Stream
+	 * @param commitMessage
+	 *   Commit Message
+	 * @return
+	 * @throws SVNException
+	 */
+	public SVNCommitInfo addFileCommit(String dirPath, String fileName, InputStream uploadStream, String commitMessage)
+			throws SVNException {
 		ISVNEditor editor = getDefaultSVNEditor(commitMessage);
-		/*
-		 * 일반적인 API로는 여러 상황에대한 대처가 불가능함.
-		 * 예를들면 디렉토리 생성후 파일추가. 파일삭제후 다른파일추가등에 대한 처리가 안됨.
-		 *특히 신규파일생성같은경우 doCommit명령어 에러.
-		 *doCommit명령어는 리비젼이 관리되는 상황에서 기존의 파일을 수정하는 처리를 일컬는것같음.
-		 */
-		//		return commitClient.doCommit(commitLocalFile, false, commitMessage, new SVNProperties(), null, false, true, SVNDepth.INFINITY);
-
-		//		String fullPath = getSvnURL().appendPath(dirPath, false).toString();
-		return addDir(editor, dirPath /*fullPath*/ , dirPath.concat("/").concat(fileName), uploadStream);
+		return addFile(editor, dirPath /*fullPath*/ , dirPath.concat("/").concat(fileName), uploadStream);
 	}
 
 	/**
@@ -178,28 +168,82 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
 	 * @param commitMessage
+	 *   Commit Message
 	 * @return
 	 * @throws SVNException
 	 */
 	private ISVNEditor getDefaultSVNEditor(String commitMessage) throws SVNException {
-		return getRepository().getCommitEditor(getCommitMessage(commitMessage), null /*locks*/ , true /*keepLocks*/ , null /*mediator*/ );
+		String convertCommitMessage = getCommitMessage(commitMessage);
+
+		convertCommitMessage = SVNCommitUtil.validateCommitMessage(convertCommitMessage);
+		SVNProperties revisionProperties = new SVNProperties();
+		revisionProperties.put("exec.ip.addr", getIpAddr());
+		revisionProperties.put("exec.client.date", getCurrentDateTime());
+		revisionProperties.put("exec.user", getUserId());
+		return getRepository().getCommitEditor(convertCommitMessage, null /*locks*/ , true /*keepLocks*/ , revisionProperties, null /*mediator*/ );
 	}
 
 	/**
+	 *
+	 * 수정된 코드를 서버 반영시 사용.
+	 *
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
 	 * @param dirPath
+	 *    remote server relative path.
 	 * @param fileName
+	 *     only SimpleFileName
 	 * @param oldData
 	 * @param newData
 	 * @param commitMessage
 	 * @return
 	 * @throws SVNException
+	 * @throws IOException
 	 */
 	public SVNCommitInfo modifyFileCommit(String dirPath, String fileName, InputStream oldData, InputStream newData, String commitMessage)
-			throws SVNException {
+			throws SVNException, IOException {
+
 		ISVNEditor editor = getDefaultSVNEditor(commitMessage);
-		return modifyFile(editor, dirPath, dirPath.concat("/").concat(fileName), oldData, newData);
+		SVNCommitInfo modifyFile = SVNCommitInfo.NULL;
+
+		try {
+			modifyFile = modifyFile(editor, dirPath, dirPath.concat("/").concat(fileName), oldData, newData);
+		} finally {
+			close(oldData);
+			close(newData);
+		}
+
+		return modifyFile;
+
+	}
+
+	/**
+	 *
+	 * FileSystem Base Commit Operation.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 13.
+	 * @param paths
+	 * @param commitMessage
+	 * @return
+	 * @throws SVNException
+	 */
+	public SVNCommitInfo commitClient(File[] paths, String commitMessage) throws SVNException {
+
+		/*
+		 * Parameters:
+		 * paths 				:: paths to commit
+		 * keepLocks 			:: whether to unlock or not files in the repository
+		 * commitMessage 	:: commit log message
+		 * revisionProperties :: custom revision properties
+		 * changelists 			:: changelist names array
+		 * keepChangelist 	:: whether to remove changelists or not
+		 * force 					:: true to force a non-recursive commit; if depth is SVNDepth.INFINITY the force flag is ignored
+		 * depth 				:: tree depth to processReturns: information about the new committed revision
+		 */
+
+		return getSvnManager().getCommitClient().doCommit(paths, false, commitMessage, null, null, false, true, SVNDepth.INFINITY);
 
 	}
 
@@ -209,24 +253,26 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 	 * @작성일 : 2016. 7. 12.
 	 * @param editor
 	 * @param dirPath
-	 * @param filePath
+	 *   remote server relative path.
+	 * @param fileName
+	 *   only SimpleFileName
 	 * @param oldData
 	 * @param newData
 	 * @return
 	 * @throws SVNException
 	 */
-	private static SVNCommitInfo modifyFile(ISVNEditor editor, String dirPath, String filePath, InputStream oldData, InputStream newData)
+	private static SVNCommitInfo modifyFile(ISVNEditor editor, String dirPath, String fileName, InputStream oldData, InputStream newData)
 			throws SVNException {
 		editor.openRoot(-1);
 		editor.openDir(dirPath, -1);
-		editor.openFile(filePath, -1);
-		editor.applyTextDelta(filePath, null);
-		
+		editor.openFile(fileName, -1);
+		editor.applyTextDelta(fileName, null);
+
 		SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-		String checksum = deltaGenerator.sendDelta(filePath, oldData, 0, newData, editor, true);
+		String checksum = deltaGenerator.sendDelta(fileName, oldData, 0, newData, editor, true);
 
 		//Closes filePath.
-		editor.closeFile(filePath, checksum);
+		editor.closeFile(fileName, checksum);
 		// Closes dirPath.
 		editor.closeDir();
 		//Closes the root directory.
@@ -239,23 +285,25 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 	 * @작성일 : 2016. 7. 12.
 	 * @param editor
 	 * @param dirPath
-	 * @param filePath
+	 *    remote server relative path.
+	 * @param fileName
+	 *     only SimpleFileName
 	 * @param dataStream
 	 * @return
 	 * @throws SVNException
 	 */
-	private static SVNCommitInfo addDir(ISVNEditor editor, String dirPath, String filePath, InputStream dataStream) throws SVNException {
+	private static SVNCommitInfo addFile(ISVNEditor editor, String dirPath, String fileName, InputStream dataStream) throws SVNException {
 		editor.openRoot(-1);
 		editor.openDir(dirPath, -1);
 		//		editor.addDir("", null, -1);;
-		editor.addFile(filePath, null, -1);
+		editor.addFile(fileName, null, -1);
 
-		editor.applyTextDelta(filePath, null);
+		editor.applyTextDelta(fileName, null);
 
 		SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-		String checksum = deltaGenerator.sendDelta(filePath, dataStream, editor, true);
+		String checksum = deltaGenerator.sendDelta(fileName, dataStream, editor, true);
 
-		editor.closeFile(filePath, checksum);
+		editor.closeFile(fileName, checksum);
 
 		//Closes dirPath.
 		editor.closeDir();
@@ -277,8 +325,24 @@ class SVNCommit extends AbstractSVN implements ISCMCommit {
 	 * @return
 	 * @throws SVNException
 	 */
-	private static SVNCommitInfo addDir(ISVNEditor editor, String dirPath, String filePath, byte[] data) throws SVNException {
-		return addDir(editor, dirPath, filePath, new ByteArrayInputStream(data));
+	//	private static SVNCommitInfo addDir(ISVNEditor editor, String dirPath, String filePath, byte[] data) throws SVNException {
+	//		return addDir(editor, dirPath, filePath, new ByteArrayInputStream(data));
+	//	}
+
+	/**
+	 * Resource clear.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 13.
+	 * @param is
+	 */
+	static void close(InputStream is) {
+		NullExpresion.ifNotNullDo(is, r -> {
+			try {
+				r.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 }

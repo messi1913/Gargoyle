@@ -9,8 +9,9 @@ package com.kyj.scm.manager.svn.java;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -186,6 +187,33 @@ public class JavaSVNManager implements SVNKeywords {
 	}
 
 	/**
+	 * svn 리비젼 정보 조회
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 13.
+	 * @param path
+	 * @param endDate
+	 * @param exceptionHandler
+	 * @return
+	 */
+	public List<SVNLogEntry> log(String path, Date endDate, Consumer<Exception> exceptionHandler) {
+		return logCommand.log(path, -1, endDate, exceptionHandler);
+	}
+
+	/**
+	 * svn 리비젼 정보 조회
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 13.
+	 * @param path
+	 * @param startRevision
+	 * @param endDate
+	 * @param exceptionHandler
+	 * @return
+	 */
+	public List<SVNLogEntry> log(String path, long startRevision, Date endDate, Consumer<Exception> exceptionHandler) {
+		return logCommand.log(path, startRevision, endDate, exceptionHandler);
+	}
+
+	/**
 	 * 코드 체크아웃
 	 *
 	 * @작성자 : KYJ
@@ -241,6 +269,7 @@ public class JavaSVNManager implements SVNKeywords {
 	/**
 	 * Commit Operator.
 	 *
+	 * 추가되는 코드가 신규파일인경우 사용. (형상으로 관리되지않던 신규파일인경우에만 사용.)
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
 	 * @param dirPath
@@ -249,12 +278,16 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @param commitMessage
 	 * @return
 	 * @throws SVNException
+	 *  신규파일이 아닌 , 존재하는 파일 경우 에러발생.
 	 */
 	public SVNCommitInfo commit_new(String dirPath, String fileName, byte[] data, String commitMessage) throws SVNException {
-		return svnCommit.addDirCommit(dirPath, fileName, data, commitMessage);
+		return svnCommit.addFileCommit(dirPath, fileName, data, commitMessage);
 	}
 
 	/**
+	 *
+	 *  추가되는 코드가 신규파일인경우 사용. (형상으로 관리되지않던 신규파일인경우에만 사용.)
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
 	 * @param dirPath
@@ -263,14 +296,18 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @param commitMessage
 	 * @return
 	 * @throws SVNException
+	 *   신규파일이 아닌 , 존재하는 파일 경우 에러발생.
 	 */
 	public SVNCommitInfo commit_new(String dirPath, String fileName, InputStream inputStream, String commitMessage) throws SVNException {
-		return svnCommit.addDirCommit(dirPath, fileName, inputStream, commitMessage);
+		return svnCommit.addFileCommit(dirPath, fileName, inputStream, commitMessage);
 	}
 
 	/**
+	 *
+	 * 코드 수정후 서버 반영
+	 *
 	 * @작성자 : KYJ
-	 * @작성일 : 2016. 7. 12.
+	 * @작성일 : 2016. 7. 13.
 	 * @param dirPath
 	 * @param fileName
 	 * @param oldData
@@ -278,12 +315,72 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @param commitMessage
 	 * @return
 	 * @throws SVNException
-	 * @throws UnsupportedEncodingException
+	 * @throws IOException
+	 */
+	public SVNCommitInfo commit_modify(String dirPath, String fileName, InputStream oldData, InputStream newData, String commitMessage)
+			throws SVNException, IOException {
+		return svnCommit.modifyFileCommit(dirPath, fileName, oldData, newData, commitMessage);
+	}
+
+	/**
+	 * 코드 수정후 서버 반영
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 13.
+	 * @param dirPath
+	 * @param fileName
+	 * @param newData
+	 * @param commitMessage
+	 * @return
+	 * @throws SVNException
+	 * @throws IOException
 	 */
 	public SVNCommitInfo commit_modify(String dirPath, String fileName, InputStream newData, String commitMessage)
-			throws SVNException, UnsupportedEncodingException {
+			throws SVNException, IOException {
 		String headerRevisionContent = this.catCommand.cat(dirPath.concat("/").concat(fileName));
 		return svnCommit.modifyFileCommit(dirPath, fileName, new ByteArrayInputStream(headerRevisionContent.getBytes("UTF-8")), newData,
 				commitMessage);
 	}
+
+	/**
+	 * revision 기준으로 코드를 되돌린다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 13.
+	 * @param dirPath
+	 * @param fileName
+	 * @param revision
+	 * @param commitMessage
+	 * @return
+	 * @throws SVNException
+	 * @throws IOException
+	 */
+	public SVNCommitInfo commit_modify_reverse(String dirPath, String fileName, long revision) throws SVNException, IOException {
+
+		String currentContent = this.catCommand.cat(dirPath.concat("/").concat(fileName));
+		String revertContent = this.catCommand.cat(dirPath.concat("/").concat(fileName), String.valueOf(revision));
+
+		return svnCommit.modifyFileCommit(dirPath, fileName, new ByteArrayInputStream(currentContent.getBytes("UTF-8")),
+				new ByteArrayInputStream(revertContent.getBytes("UTF-8")), "Revert");
+
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 13.
+	 * @param paths
+	 * @param commitMessage
+	 * @return
+	 * @throws SVNException
+	 * @throws IOException
+	 *
+	 * @deprecated  서버간의 API연계에서 사용되면 안됨.
+	 *  		해당 API가 사용되는 때는 FileSystem으로 버젼관리가 되는 상황에서만 사용되야함.
+	 *         (( 로컬시스템으로 svn파일이 관리되는 경우에만 사용. ))
+	 */
+	@Deprecated
+	public SVNCommitInfo commitClient(File[] paths, String commitMessage) throws SVNException, IOException {
+		return svnCommit.commitClient(paths, commitMessage);
+	}
+
 }
