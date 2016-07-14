@@ -7,14 +7,10 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -170,6 +166,14 @@ public class DateUtilTest {
 			});
 		}
 
+		{
+			GagoyleDate first = DateUtil.getFirstDateByWeek(2016, 2);
+			System.out.printf("First Day of Week %s\n" , first.toDateString());
+			GagoyleDate last = DateUtil.getLastDateByWeek(2016, 2);
+			System.out.printf("Last Day of Week %s\n" , last.toDateString());
+		
+		}
+		
 	}
 
 }
