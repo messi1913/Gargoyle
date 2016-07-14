@@ -6,7 +6,11 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.framework.model;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
+
+import com.kyj.fx.voeditor.visual.util.DateUtil;
 
 /**
  * @author KYJ
@@ -105,6 +109,38 @@ public class GagoyleDate {
 
 	public String getDayString() {
 		return String.valueOf(day);
+	}
+
+	/**
+	 * Convert Date Class.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 14.
+	 * @return
+	 */
+	public Date toDate() {
+		Calendar instance = Calendar.getInstance();
+		instance.set(year, month, day);
+		return instance.getTime();
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 14.
+	 * @return
+	 */
+	public String toDateString() {
+		return toDateString(DateUtil.SYSTEM_DATEFORMAT_YYYY_MM_DD);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 14.
+	 * @param pattern
+	 * @return
+	 */
+	public String toDateString(String pattern) {
+		return DateUtil.getDateAsStr(toDate(), pattern);
 	}
 
 	/*
