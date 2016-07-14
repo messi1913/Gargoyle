@@ -18,11 +18,15 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.base.Objects;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
+import com.kyj.fx.voeditor.visual.framework.FileCheckConverter;
 import com.kyj.fx.voeditor.visual.framework.model.proj.ProjectDescription;
+import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 
 /**
@@ -381,6 +385,64 @@ public class FileUtil {
 		try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), charset)) {
 			writer.write(str);
 			writer.flush();
+		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
+	 *
+	 * File로부터 packageName을 리턴.
+	 * 
+	 * @param javaFile
+	 * @param converter
+	 * @param errorHandler
+	 * @return
+	 ********************************/
+	public static Optional<String> getPackageName(File javaFile, FileCheckConverter<String> converter, Consumer<Exception> errorHandler) {
+
+		try {
+			if (javaFile == null) {
+				return Optional.of(converter.ifNull());
+			}
+
+			if (!javaFile.exists()) {
+				return Optional.of(converter.notExists());
+			}
+
+			if (converter.isMatch(javaFile)) {
+				String packageName = GargoyleJavaParser.getPackageName(javaFile, converter);
+				return Optional.of(packageName);
+
+			} else {
+
+				return Optional.of(converter.notMatchThan());
+			}
+
+		} catch (Exception e) {
+			errorHandler.accept(e);
+		}
+
+		return Optional.empty();
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
+	 *
+	 * JavaParser
+	 * 
+	 * @param javaFile
+	 * @param converter
+	 * @param errorHandler
+	 ********************************/
+	public static void consumeJavaParser(File javaFile, Consumer<CompilationUnit> converter, Consumer<Exception> errorHandler) {
+
+		try {
+			if (javaFile != null && javaFile.exists()) {
+				CompilationUnit cu = GargoyleJavaParser.getCompileUnit(javaFile);
+				converter.accept(cu);
+			}
+		} catch (Exception e) {
+			errorHandler.accept(e);
 		}
 	}
 

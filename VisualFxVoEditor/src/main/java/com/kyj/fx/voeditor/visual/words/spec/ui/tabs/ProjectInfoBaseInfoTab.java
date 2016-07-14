@@ -8,16 +8,16 @@ package com.kyj.fx.voeditor.visual.words.spec.ui.tabs;
 
 import java.io.IOException;
 
+import com.kyj.fx.voeditor.visual.component.grid.AnnotateBizOptions;
 import com.kyj.fx.voeditor.visual.component.grid.CrudBaseGridView;
+import com.kyj.fx.voeditor.visual.component.grid.IOptions;
 import com.kyj.fx.voeditor.visual.framework.SupplySkin;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
 import com.kyj.fx.voeditor.visual.words.spec.ui.skin.BaseInfoController;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -28,14 +28,10 @@ import javafx.scene.layout.Priority;
  * @author KYJ
  *
  */
-public class BaseInfoTab extends Tab implements SupplySkin<BorderPane> {
+class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<BorderPane> {
 
-	private SpecTabPane specTabPane;
-
-	public BaseInfoTab(SpecTabPane specTabPane) {
-		this.specTabPane = specTabPane;
-		setText("사양서 기본 정보");
-		setContent(supplyNode());
+	public ProjectInfoBaseInfoTab(String title, SpecTabPane specTabPane) {
+		super(title, specTabPane);
 	}
 
 	@Override
@@ -49,6 +45,7 @@ public class BaseInfoTab extends Tab implements SupplySkin<BorderPane> {
 			loader.setLocation(BaseInfoController.class.getResource("BaseInfoApp.fxml"));
 			BorderPane supplyNode = loader.load();
 			supplyNode.setPrefWidth(BorderPane.USE_COMPUTED_SIZE);
+			BaseInfoController baseInfoController = loader.getController();
 
 			/* 버튼박스 */
 			HBox hboxButton = new HBox(5);
@@ -59,13 +56,32 @@ public class BaseInfoTab extends Tab implements SupplySkin<BorderPane> {
 			hboxButton.getChildren().add(btnGenerate);
 
 			/* TableInfo */
-			CrudBaseGridView<MethodDVO> gv = new CrudBaseGridView<MethodDVO>(MethodDVO.class);
+			CrudBaseGridView<MethodDVO> gv = new CrudBaseGridView<MethodDVO>(MethodDVO.class,
+					new AnnotateBizOptions<MethodDVO>(MethodDVO.class) {
+
+						@Override
+						public boolean isCreateColumn(String columnName) {
+							if ("methodMetaDVO".equals(columnName))
+								return false;
+							return super.isCreateColumn(columnName);
+						}
+
+						@Override
+						public boolean visible(String columnName) {
+							if ("methodMetaDVO".equals(columnName))
+								return false;
+
+							return super.visible(columnName);
+						}
+
+					});
+			gv.getItems().addAll(baseInfoController.getMethodData());
 
 			supplyNode.setBottom(hboxButton);
 			root.setTop(supplyNode);
 			root.setCenter(gv);
 
-		} catch (IOException e) {
+		} catch (IOException | NullPointerException e) {
 			e.printStackTrace();
 		}
 
@@ -74,4 +90,5 @@ public class BaseInfoTab extends Tab implements SupplySkin<BorderPane> {
 		root.setPadding(new Insets(5, 5, 5, 5));
 		return root;
 	}
+
 }

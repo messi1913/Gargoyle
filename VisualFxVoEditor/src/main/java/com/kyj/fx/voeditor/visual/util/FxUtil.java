@@ -68,6 +68,11 @@ import javafx.util.Callback;
  * @author KYJ
  *
  */
+/***************************
+ * 
+ * @author KYJ
+ *
+ ***************************/
 public class FxUtil {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FxUtil.class);
 
@@ -524,11 +529,6 @@ public class FxUtil {
 				stage.setAlwaysOnTop(true);
 				stage.initModality(Modality.APPLICATION_MODAL);
 				stage.initOwner(stage);
-				stage.show();
-			};
-		} else {
-			option = stage -> {
-				stage.show();
 			};
 		}
 
@@ -540,12 +540,37 @@ public class FxUtil {
 	 * @작성일 : 2016. 6. 23.
 	 */
 	public static void createStageAndShow(Scene scene, Consumer<Stage> option) {
+		Stage stage = craeteStage(scene, option);
+		stage.show();
+	}
+
+	/********************************
+	 * 작성일 :  2016. 7. 14. 작성자 : KYJ
+	 *
+	 *
+	 * @param scene
+	 * @return
+	 ********************************/
+	public static Stage craeteStage(Scene scene) {
 		Stage stage = new Stage();
 		stage.setScene(scene);
+		return stage;
+	}
 
+	/********************************
+	 * 작성일 :  2016. 7. 14. 작성자 : KYJ
+	 *
+	 *
+	 * @param scene
+	 * @param option
+	 * @return
+	 ********************************/
+	public static Stage craeteStage(Scene scene, Consumer<Stage> option) {
+		Stage stage = new Stage();
+		stage.setScene(scene);
 		if (option != null)
 			option.accept(stage);
-
+		return stage;
 	}
 
 	/********************************

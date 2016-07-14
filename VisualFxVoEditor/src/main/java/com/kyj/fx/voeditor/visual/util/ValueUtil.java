@@ -811,8 +811,7 @@ public class ValueUtil {
 	 * 단 객체가 테이블명 규칙에 준해야한다.
 	 *
 	 *
-	 * ex) TbmUser ::: TBM_USER 테이블을 찾는다. TbpSx ::: Tbp_Sx 테이블을 찾는다. ex)
-	 * TbmMsMdDVO ::: TBM_MS_MD 테이블을 찾는다.
+	 * ex) TbmUser ::: TBM_USER 테이블을 찾는다. TbpSx ::: Tbp_Sx 테이블을 찾는다. ex) TbmMsMdDVO ::: TBM_MS_MD 테이블을 찾는다.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 3. 29.
@@ -875,4 +874,5 @@ public class ValueUtil {
 		}
 		return insertStatement.toString();
 	}
+
 }

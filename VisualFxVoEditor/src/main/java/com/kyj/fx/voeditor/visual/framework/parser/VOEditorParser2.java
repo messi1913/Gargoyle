@@ -13,6 +13,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
@@ -39,8 +42,11 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
  * @author KYJ
  *
  ***************************/
+@Deprecated
 public class VOEditorParser2 {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(VOEditorParser.class);
+	
 	public static void main(String[] args) throws ParseException, IOException {
 		String fileName = "C:\\Users\\KYJ\\JAVA_FX\\gagoyleWorkspace\\VisualFxVoEditor\\src\\main\\java\\com\\kyj\\fx\\voeditor\\visual\\main\\model\\vo\\ClassPathEntry.java";
 		FileInputStream in = new FileInputStream(fileName);

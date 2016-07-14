@@ -35,8 +35,8 @@ public class SpecTabPane extends TabPane {
 	}
 
 	public SpecTabPane() {
-		getTabs().add(new BaseInfoTab(this));
-		getTabs().add(new TableInfoTab(this));
+		getTabs().add(new ProjectInfoBaseInfoTab("사양서 기본 정보", this));
+		getTabs().add(new TableInfoTab("테이블 정의", this));
 	}
 
 	public SpecTabPane(ProgramSpecSVO svo) {

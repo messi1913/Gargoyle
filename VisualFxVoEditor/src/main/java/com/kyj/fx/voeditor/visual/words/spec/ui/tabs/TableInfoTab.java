@@ -9,25 +9,21 @@ package com.kyj.fx.voeditor.visual.words.spec.ui.tabs;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseTableView;
 import com.kyj.fx.voeditor.visual.framework.SupplySkin;
 
-import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 
 /**
  * @author KYJ
  *
  */
-public class TableInfoTab extends Tab implements SupplySkin<BorderPane> {
+class TableInfoTab extends AbstractSpecTab implements SupplySkin<BorderPane> {
 
-	private SpecTabPane specTabPane;
-
-	public TableInfoTab(SpecTabPane specTabPane) {
-		this.specTabPane = specTabPane;
-		this.setText("테이블 정의");
-		this.setContent(supplyNode());
+	public TableInfoTab(String title, SpecTabPane specTabPane) {
+		super(title, specTabPane);
 	}
 
 	@Override
 	public BorderPane supplyNode() {
 		return new DatabaseTableView();
 	}
+
 }
