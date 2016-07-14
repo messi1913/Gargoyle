@@ -10,7 +10,7 @@ package com.kyj.fx.voeditor.visual.exceptions;
  * @author KYJ
  *
  */
-public class GagoyleException extends Exception {
+public class GagoyleException extends Exception implements IGargoyleExceptionCode {
 
 	/**
 	 * 
@@ -18,9 +18,17 @@ public class GagoyleException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * 에러 코드
+	 * 
+	 * @최초생성일 2016. 7. 14.
+	 */
+	private ERROR_CODE errorCode = ERROR_CODE.EMPTY;
+
+	/**
 	 * 
 	 */
 	public GagoyleException() {
+
 	}
 
 	/**
@@ -53,6 +61,15 @@ public class GagoyleException extends Exception {
 	 */
 	public GagoyleException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
+	}
+
+	@Override
+	public ERROR_CODE getErrorCode() {
+		return errorCode;
+	}
+
+	public void setErrorCode(ERROR_CODE errorCode) {
+		this.errorCode = errorCode;
 	}
 
 }
