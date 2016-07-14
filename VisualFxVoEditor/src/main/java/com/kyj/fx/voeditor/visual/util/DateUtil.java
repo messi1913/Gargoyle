@@ -80,6 +80,34 @@ public class DateUtil {
 		return dateList;
 	}
 
+	/**
+	 * 주차에 해당하는 일자수 리턴.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 14.
+	 * @param year
+	 * @param week
+	 * @return
+	 */
+	public static List<GagoyleDate> getPeriodDaysByWeek(int year, int week) {
+
+		Calendar instance = GregorianCalendar.getInstance();
+
+		instance.setWeekDate(year, week, Calendar.SUNDAY);
+
+		int minimum = instance.getActualMinimum(GregorianCalendar.DAY_OF_WEEK);
+		int maximum = instance.getActualMaximum(GregorianCalendar.DAY_OF_WEEK);
+
+		TimeZone timeZone = instance.getTimeZone();
+		List<GagoyleDate> dateList = new ArrayList<>();
+
+		for (int i = minimum; i <= maximum; i++)
+
+			dateList.add(new GagoyleDate(timeZone, instance.get(GregorianCalendar.YEAR), instance.get(GregorianCalendar.MONTH),
+					instance.get(GregorianCalendar.DAY_OF_MONTH) + i));
+
+		return dateList;
+	}
+
 	public static String getCurrentDateString(String format) {
 		Date time = GregorianCalendar.getInstance().getTime();
 		SimpleDateFormat sdf = new SimpleDateFormat(format);

@@ -7,7 +7,10 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -144,6 +147,29 @@ public class DateUtilTest {
 			System.out.println(DateUtil.displayTimeZone(TimeZone.getTimeZone(id)));
 		}
 		System.out.println("\nTotal TimeZone ID " + ids.length);
+	}
+
+	@Test
+	public void printWeek() {
+
+		{
+			List<GagoyleDate> periodDaysByWeek = DateUtil.getPeriodDaysByWeek(2016, 1);
+
+			System.out.println("##### Date 2016 .1 #####");
+			periodDaysByWeek.forEach(v -> {
+				System.out.println(v.toDateString());
+			});
+		}
+
+		{
+			List<GagoyleDate> periodDaysByWeek = DateUtil.getPeriodDaysByWeek(2016, 2);
+
+			System.out.println("##### Date 2016 .2 #####");
+			periodDaysByWeek.forEach(v -> {
+				System.out.println(v.toDateString());
+			});
+		}
+
 	}
 
 }
