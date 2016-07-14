@@ -41,42 +41,60 @@ import com.kyj.scm.manager.svn.java.JavaSVNManager;
  */
 public class CommandTest3 {
 
-	JavaSVNManager manager;
+	JavaSVNManager testServerManager;
+	JavaSVNManager localServerManager;
 
 	@Before
 	public void setting() throws Exception {
-		Properties properties = new Properties();
-		properties.put(JavaSVNManager.SVN_URL, "svn://10.40.41.49/");
-
-		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
-		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
-
 		new ProxyInitializable().initialize();
-		// properties.put(SVNManager.URL,
-		// "https://dev.naver.com/svn/javafxvoeditor");
-		manager = new JavaSVNManager(properties);
+
+		{
+			Properties properties = new Properties();
+			properties.put(JavaSVNManager.SVN_URL, "svn://10.40.41.49/");
+			properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
+			properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
+			testServerManager = new JavaSVNManager(properties);
+		}
+
+		{
+			Properties properties = new Properties();
+			properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/sos/trunk/");
+			properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
+			properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
+
+			localServerManager = new JavaSVNManager(properties);
+		}
+
 	}
 
 	@Test
 	public void importTest() throws Exception {
-		manager.doImport("/sos/deprecated_pass-batch-core", SVNURL.parseURIEncoded("svn://localhost/svn/sos/trunk/"));
+		testServerManager.doImport("/sos/deprecated_pass-batch-core", SVNURL.parseURIEncoded("svn://localhost/svn/sos/trunk/"));
 	}
 
 	@Test
-	public void addFileTest() {
+	public void addFileTest() throws SVNException {
+		if (!localServerManager.isExistsPath("test")) {
+			System.out.println("존재하지않음.. 새로 생성함.");
+		}
 
-		Properties properties = new Properties();
-		properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/sos/trunk/");
-		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
-		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
+		String newFile = "test_" + System.currentTimeMillis() + ".txt";
+		String content = "New File Add Test FileName ::: " + newFile;
+		SVNCommitInfo commit_new = localServerManager.commit_new("test", newFile, content.getBytes(), content);
 
-		JavaSVNManager thirdPartManager = new JavaSVNManager(properties);
+		System.out.printf("New File Revision : %d author : %s \n", commit_new.getNewRevision(), commit_new.getAuthor());
+	}
 
-		//		try {
-		//			thirdPartManager.commit_new(dirPath, fileName, data, commitMessage)
-		//		} finally {
-		//
-		//		}
+	@Test
+	public void addDirTest() throws SVNException {
+
+		if (!localServerManager.isExistsPath("test")) {
+			System.out.println("존재하지않음.. 새로 생성함.");
+			localServerManager.commit_new("test", "Dir Commit Test");
+		} else {
+			System.out.println("이미 존재하므로 디렉토리 생성하지않음.");
+		}
+
 	}
 
 	/**
@@ -90,13 +108,6 @@ public class CommandTest3 {
 	@Test
 	public void commitTest() throws SVNException, IOException {
 
-		Properties properties = new Properties();
-		properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/sos/trunk/");
-		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
-		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
-
-		JavaSVNManager thirdPartManager = new JavaSVNManager(properties);
-
 		File[] commitTestFiles = getCommitTestFiles();
 		FileInputStream inputStream = null;
 		try {
@@ -104,7 +115,7 @@ public class CommandTest3 {
 			//			thirdPartManager.commit_new("/sql", commitTestFiles[0].getName(), inputStream, "test commit.");
 
 			//			commitTestFiles = new File[] { new File("C:\\logs\\test\\deprecated_pass-batch-core\\sql\\text.txt") };
-			SVNCommitInfo commit_modify = thirdPartManager.commit_modify("sql", "text.txt", inputStream, "test commit.");
+			SVNCommitInfo commit_modify = localServerManager.commit_modify("sql", "text.txt", inputStream, "test commit.");
 
 			System.out.println(commit_modify.getAuthor());
 			System.out.println(commit_modify.getNewRevision());
@@ -119,13 +130,6 @@ public class CommandTest3 {
 	@Test
 	public void commitReverseTest() throws SVNException, IOException {
 
-		Properties properties = new Properties();
-		properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/sos/trunk/");
-		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
-		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
-
-		JavaSVNManager thirdPartManager = new JavaSVNManager(properties);
-
 		File[] commitTestFiles = getCommitTestFiles();
 		FileInputStream inputStream = null;
 		try {
@@ -133,7 +137,7 @@ public class CommandTest3 {
 			//			thirdPartManager.commit_new("/sql", commitTestFiles[0].getName(), inputStream, "test commit.");
 
 			//			commitTestFiles = new File[] { new File("C:\\logs\\test\\deprecated_pass-batch-core\\sql\\text.txt") };
-			SVNCommitInfo commit_modify = thirdPartManager.commit_modify_reverse("sql", "text.txt", 42);
+			SVNCommitInfo commit_modify = localServerManager.commit_modify_reverse("sql", "text.txt", 42);
 
 			System.out.println(commit_modify.getAuthor());
 			System.out.println(commit_modify.getNewRevision());
@@ -209,7 +213,7 @@ public class CommandTest3 {
 	 ********************************/
 	@Test
 	public void catTest() {
-		System.out.println(manager.cat("/additional/DockFX/.project"));
+		System.out.println(testServerManager.cat("/additional/DockFX/.project"));
 		// System.out.println(manager.cat("r679",
 		// "https://dev.naver.com/svn/javafxvoeditor/trunk/ScmManager/pom.xml"));
 
@@ -257,7 +261,7 @@ public class CommandTest3 {
 	 ********************************/
 	@Test
 	public void listTest() {
-		List<String> list = manager.list("/sos/pass-batch-core");
+		List<String> list = testServerManager.list("/sos/pass-batch-core");
 		// list = manager.list("//additional/DockFX/src/");
 		// list = manager.list("//additional/DockFX/src/main");
 		System.out.println(list);
@@ -271,7 +275,7 @@ public class CommandTest3 {
 	 */
 	@Test
 	public void listEntryTest() {
-		List<SVNDirEntry> list = manager.listEntry("/sos/pass-batch-core");
+		List<SVNDirEntry> list = testServerManager.listEntry("/sos/pass-batch-core");
 		list.forEach(System.out::println);
 	}
 
@@ -279,31 +283,22 @@ public class CommandTest3 {
 	 * 작성일 : 2016. 5. 5. 작성자 : KYJ
 	 *
 	 * 이력정보 테스트
-	 * 
+	 *
 	 * @throws ParseException
 	 *
 	 ********************************/
 	@Test
 	public void logTest() throws ParseException {
 
-		Properties properties = new Properties();
-		properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/sos/trunk/");
-		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
-		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
-
-		JavaSVNManager thirdPartManager = new JavaSVNManager(properties);
-
-		// https://dev.naver.com/svn/javafxvoeditor/additional/batch-core/pom.xml
-
 		/*Server log*/
-		thirdPartManager.log("/sql");
-		thirdPartManager.log("/sql/text.txt", DateUtil.toDate("20160606", "YYYYMMDD"), System.err::println);
+		localServerManager.log("/sql");
+		localServerManager.log("/sql/text.txt", DateUtil.toDate("20160606", "YYYYMMDD"), System.err::println);
 
 		/*File System log*/
-
 		System.out.println("################# FileSystem Log ###################");
-		thirdPartManager.logFileSystem(new File("C:\\Users\\KYJ\\eclipse-jee-neon\\workspace\\AnimationRecorder"), new Date(),
-				System.err::println);
+		File path = new File("C:\\Users\\KYJ\\JAVA_FX\\gagoyleWorkspace\\fileexplorer");
+
+		localServerManager.logFileSystem(path, new Date(), System.err::println);
 
 	}
 
@@ -321,7 +316,7 @@ public class CommandTest3 {
 		File outDir = new File(property + "\\home\\20160504_svn_test\\DockFx");
 		outDir.mkdirs();
 		Assert.assertTrue(true);
-		Long checoutResult = manager.checkout("/branches/batch/", outDir);
+		Long checoutResult = testServerManager.checkout("/branches/batch/", outDir);
 		System.out.println(checoutResult);
 
 		if (outDir.exists()) {
@@ -345,7 +340,7 @@ public class CommandTest3 {
 	 ********************************/
 	@Test
 	public void diff() throws FileNotFoundException, SVNException {
-		String diff = manager.diff("/additional/batch-core/pom.xml", SVNRevision.parse("725"), "/additional/batch-core/pom.xml",
+		String diff = testServerManager.diff("/additional/batch-core/pom.xml", SVNRevision.parse("725"), "/additional/batch-core/pom.xml",
 				SVNRevision.parse("784"));
 		System.out.println(diff);
 	}
@@ -364,7 +359,7 @@ public class CommandTest3 {
 	@Test
 	public void scenarioTest() {
 
-		List<SVNDirEntry> list = manager.listEntry("/sos/pass-batch-core");
+		List<SVNDirEntry> list = testServerManager.listEntry("/sos/pass-batch-core");
 
 		Optional<String> findFirst = list.stream().filter(e -> {
 			SVNNodeKind kind = e.getKind();
@@ -382,7 +377,7 @@ public class CommandTest3 {
 			}
 			return "error";
 		}).peek(e -> {
-			System.out.println(manager.cat(e));
+			System.out.println(testServerManager.cat(e));
 		}).findFirst();
 
 		// 첫번째 데이터를 찾은후...
@@ -394,7 +389,7 @@ public class CommandTest3 {
 
 				System.out.println("checout dir ::: " + outDir.getAbsolutePath());
 				System.out.println("checout url ::: " + url);
-				Long checkout = manager.checkout(url, outDir);
+				Long checkout = testServerManager.checkout(url, outDir);
 
 				System.out.println("result ::: " + checkout);
 			} catch (Exception e1) {

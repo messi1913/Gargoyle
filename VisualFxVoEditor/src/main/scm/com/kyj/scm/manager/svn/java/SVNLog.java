@@ -8,6 +8,7 @@ package com.kyj.scm.manager.svn.java;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.wc.SVNLogClient;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
@@ -201,6 +203,14 @@ class SVNLog extends AbstractSVN implements ILogCommand<String, List<SVNLogEntry
 		 */
 		logClient.doLog(path, SVNRevision.HEAD, SVNRevision.create(startRevision), SVNRevision.create(endDate), true, false, 1000L,
 				handler);
+	}
+
+	public Collection<SVNLogEntry> getAllLogs(String relativePath, long startRevision, long endRevision) throws SVNException {
+
+		SVNRepository repository = getRepository();
+		@SuppressWarnings("unchecked")
+		Collection<SVNLogEntry> logEntries = repository.log(new String[] { relativePath }, null, startRevision, endRevision, true, true);
+		return logEntries;
 	}
 
 }

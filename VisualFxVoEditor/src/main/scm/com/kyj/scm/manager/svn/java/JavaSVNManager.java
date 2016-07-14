@@ -1,7 +1,8 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
  *	패키지   : kyj.Fx.scm.manager.core
- *	작성일   : 2016. 3. 22.
+ *	작성일   : 2016. 3. 22.   최초작성
+ *              2016.7          API 추가. Commit , Log등
  *	작성자   : KYJ
  *******************************/
 package com.kyj.scm.manager.svn.java;
@@ -11,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -20,6 +22,7 @@ import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
@@ -32,8 +35,8 @@ import com.kyj.scm.manager.core.commons.SVNKeywords;
  * @author KYJ
  *
  */
-public class JavaSVNManager implements SVNKeywords {
 
+public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	private SVNCat catCommand;
 
 	private SVNList listCommand;
@@ -47,6 +50,8 @@ public class JavaSVNManager implements SVNKeywords {
 	private SVNImport svnImport;
 
 	private SVNCommit svnCommit;
+
+	private SVNResource svnResource;
 
 	private Properties properties;
 
@@ -70,6 +75,7 @@ public class JavaSVNManager implements SVNKeywords {
 		this.diffCommand = new SVNDiff(this, properties);
 		this.svnImport = new SVNImport(this, properties);
 		this.svnCommit = new SVNCommit(this, properties);
+		this.svnResource = new SVNResource(this, properties);
 	}
 
 	/**
@@ -188,7 +194,7 @@ public class JavaSVNManager implements SVNKeywords {
 
 	/**
 	 * svn 리비젼 정보 조회
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 13.
 	 * @param path
@@ -202,7 +208,7 @@ public class JavaSVNManager implements SVNKeywords {
 
 	/**
 	 * svn 리비젼 정보 조회
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 13.
 	 * @param path
@@ -219,7 +225,7 @@ public class JavaSVNManager implements SVNKeywords {
 	 * 작성일 : 2016. 7. 13. 작성자 : KYJ
 	 *
 	 * FileSystem Base Log.
-	 * 
+	 *
 	 * @param path
 	 * @param startRevision
 	 * @param endDate
@@ -287,10 +293,10 @@ public class JavaSVNManager implements SVNKeywords {
 	 * Commit Operator.
 	 *
 	 * 추가되는 코드가 신규파일인경우 사용. (형상으로 관리되지않던 신규파일인경우에만 사용.)
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
-	 * @param dirPath
+	 * @param relativePath
 	 * @param filePath
 	 * @param data
 	 * @param commitMessage
@@ -298,8 +304,8 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @throws SVNException
 	 *             신규파일이 아닌 , 존재하는 파일 경우 에러발생.
 	 */
-	public SVNCommitInfo commit_new(String dirPath, String fileName, byte[] data, String commitMessage) throws SVNException {
-		return svnCommit.addFileCommit(dirPath, fileName, data, commitMessage);
+	public SVNCommitInfo commit_new(String relativePath, String fileName, byte[] data, String commitMessage) throws SVNException {
+		return svnCommit.addFileCommit(relativePath, fileName, data, commitMessage);
 	}
 
 	/**
@@ -308,7 +314,7 @@ public class JavaSVNManager implements SVNKeywords {
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
-	 * @param dirPath
+	 * @param relativePath
 	 * @param filePath
 	 * @param inputStream
 	 * @param commitMessage
@@ -316,8 +322,9 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @throws SVNException
 	 *             신규파일이 아닌 , 존재하는 파일 경우 에러발생.
 	 */
-	public SVNCommitInfo commit_new(String dirPath, String fileName, InputStream inputStream, String commitMessage) throws SVNException {
-		return svnCommit.addFileCommit(dirPath, fileName, inputStream, commitMessage);
+	public SVNCommitInfo commit_new(String relativePath, String fileName, InputStream inputStream, String commitMessage)
+			throws SVNException {
+		return svnCommit.addFileCommit(relativePath, fileName, inputStream, commitMessage);
 	}
 
 	/**
@@ -326,13 +333,13 @@ public class JavaSVNManager implements SVNKeywords {
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 13.
-	 * @param dirPath
+	 * @param relativePath
 	 * @param commitMessage
 	 * @return
 	 * @throws SVNException
 	 */
-	public SVNCommitInfo commit_new(String dirPath, String commitMessage) throws SVNException {
-		return svnCommit.addDirCommit(dirPath, commitMessage);
+	public SVNCommitInfo commit_new(String relativePath, String commitMessage) throws SVNException {
+		return svnCommit.addDirCommit(relativePath, commitMessage);
 	}
 
 	/**
@@ -341,7 +348,7 @@ public class JavaSVNManager implements SVNKeywords {
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 13.
-	 * @param dirPath
+	 * @param relativePath
 	 * @param fileName
 	 * @param oldData
 	 * @param newData
@@ -350,9 +357,9 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @throws SVNException
 	 * @throws IOException
 	 */
-	public SVNCommitInfo commit_modify(String dirPath, String fileName, InputStream oldData, InputStream newData, String commitMessage)
+	public SVNCommitInfo commit_modify(String relativePath, String fileName, InputStream oldData, InputStream newData, String commitMessage)
 			throws SVNException, IOException {
-		return svnCommit.modifyFileCommit(dirPath, fileName, oldData, newData, commitMessage);
+		return svnCommit.modifyFileCommit(relativePath, fileName, oldData, newData, commitMessage);
 	}
 
 	/**
@@ -360,7 +367,7 @@ public class JavaSVNManager implements SVNKeywords {
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 13.
-	 * @param dirPath
+	 * @param relativePath
 	 * @param fileName
 	 * @param newData
 	 * @param commitMessage
@@ -368,11 +375,11 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @throws SVNException
 	 * @throws IOException
 	 */
-	public SVNCommitInfo commit_modify(String dirPath, String fileName, InputStream newData, String commitMessage)
+	public SVNCommitInfo commit_modify(String relativePath, String fileName, InputStream newData, String commitMessage)
 			throws SVNException, IOException {
-		String headerRevisionContent = this.catCommand.cat(dirPath.concat("/").concat(fileName));
-		return svnCommit.modifyFileCommit(dirPath, fileName, new ByteArrayInputStream(headerRevisionContent.getBytes("UTF-8")), newData,
-				commitMessage);
+		String headerRevisionContent = this.catCommand.cat(relativePath.concat("/").concat(fileName));
+		return svnCommit.modifyFileCommit(relativePath, fileName, new ByteArrayInputStream(headerRevisionContent.getBytes("UTF-8")),
+				newData, commitMessage);
 	}
 
 	/**
@@ -380,7 +387,7 @@ public class JavaSVNManager implements SVNKeywords {
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 13.
-	 * @param dirPath
+	 * @param relativePath
 	 * @param fileName
 	 * @param revision
 	 * @param commitMessage
@@ -388,12 +395,12 @@ public class JavaSVNManager implements SVNKeywords {
 	 * @throws SVNException
 	 * @throws IOException
 	 */
-	public SVNCommitInfo commit_modify_reverse(String dirPath, String fileName, long revision) throws SVNException, IOException {
+	public SVNCommitInfo commit_modify_reverse(String relativePath, String fileName, long revision) throws SVNException, IOException {
 
-		String currentContent = this.catCommand.cat(dirPath.concat("/").concat(fileName));
-		String revertContent = this.catCommand.cat(dirPath.concat("/").concat(fileName), String.valueOf(revision));
+		String currentContent = this.catCommand.cat(relativePath.concat("/").concat(fileName));
+		String revertContent = this.catCommand.cat(relativePath.concat("/").concat(fileName), String.valueOf(revision));
 
-		return svnCommit.modifyFileCommit(dirPath, fileName, new ByteArrayInputStream(currentContent.getBytes("UTF-8")),
+		return svnCommit.modifyFileCommit(relativePath, fileName, new ByteArrayInputStream(currentContent.getBytes("UTF-8")),
 				new ByteArrayInputStream(revertContent.getBytes("UTF-8")), "Revert");
 
 	}
@@ -412,6 +419,65 @@ public class JavaSVNManager implements SVNKeywords {
 	@Deprecated
 	public SVNCommitInfo commitClient(File[] paths, String commitMessage) throws SVNException, IOException {
 		return svnCommit.commitClient(paths, commitMessage);
+	}
+
+	/**
+	 * Resource가 서버에 존재하는지 여부를 체크함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 14.
+	 * @param relativePath
+	 * @return
+	 * @throws SVNException
+	 */
+	public boolean isExistsPath(String relativePath) throws SVNException {
+
+		SVNNodeKind exists = this.svnResource.isExists(relativePath);
+		if (exists == SVNNodeKind.FILE || exists == SVNNodeKind.DIR)
+			return true;
+
+		return false;
+	}
+
+	public Collection<SVNLogEntry> getAllLogs(String relativePath) throws SVNException {
+		return getAllLogs(relativePath, 0);
+	}
+
+	public Collection<SVNLogEntry> getAllLogs(long startRevision, long endRevision) throws SVNException {
+		return getAllLogs("", startRevision, endRevision);
+	}
+
+	public Collection<SVNLogEntry> getAllLogs(String relativePath, long startRevision) throws SVNException {
+		long latestRevision = this.svnResource.getLatestRevision();
+		return getAllLogs(relativePath, startRevision, latestRevision);
+	}
+
+	public Collection<SVNLogEntry> getAllLogs(String relativePath, long startRevision, long endRevision) throws SVNException {
+		return this.logCommand.getAllLogs(relativePath, startRevision, endRevision);
+	}
+
+	/**
+	 * 가장 최신 리비젼 번호를 구함.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 14.
+	 * @return
+	 * @throws SVNException
+	 */
+	public long getLatestRevision() throws SVNException {
+		return this.svnResource.getLatestRevision();
+	}
+
+	/**
+	 * 날짜에 매치되는 리비젼 번호를 구함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 14.
+	 * @param date
+	 * @return
+	 * @throws SVNException
+	 */
+	public long getRevision(Date date) throws SVNException {
+		return this.svnResource.getRevision(date);
 	}
 
 }

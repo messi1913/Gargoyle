@@ -20,4 +20,5 @@ public interface SVNKeywords {
 	public static final String SVN_PATH = "svn.path";
 	public static final String SVN_PATH_WINDOW = "svn.path.window";
 	public static final String SVN_REPOSITORIES = "svn.repositores";
+
 }
