@@ -41,6 +41,13 @@ public class DateUtil {
 	public static final String SYSTEM_DATEFORMAT_YY_MM_DD_HH_MM_SS = "yy-MM-dd HH:mm:ss";
 	public static final String ORACLE_DATEFORMAT_YYYYMMDDHH24MISS = "YYYYMMDDHH24MISS";
 
+
+	private static final SimpleDateFormat DEFAULT_SYSTEM_DATE_FORMAT = new SimpleDateFormat(SYSTEM_DATEFORMAT_YYYY_MM_DD_HH_MM_SS_SSS);
+
+	public static enum DATE_TYPE {
+		YEAR, MONTH, WEEK
+	}
+
 	public synchronized static String getCurrentDateString() {
 		SimpleDateFormat format = new SimpleDateFormat(SYSTEM_DATEFORMAT_YYYY_MM_DD_HH_MM_SS);
 		Date time = GregorianCalendar.getInstance().getTime();
@@ -55,10 +62,6 @@ public class DateUtil {
 			SimpleDateFormat sdf = new SimpleDateFormat(format);
 			return sdf.format(time);
 		}
-	}
-
-	public static enum DATE_TYPE {
-		YEAR, MONTH, WEEK
 	}
 
 	/**
@@ -81,6 +84,19 @@ public class DateUtil {
 	}
 
 	/**
+	 * 현재 주차에 해당하는 일자수 리턴.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 14.
+	 * @return
+	 */
+	public static List<GagoyleDate> getPeriodDaysByWeek() {
+		Calendar instance = Calendar.getInstance();
+		int year = instance.get(Calendar.YEAR);
+		int week = instance.get(Calendar.WEEK_OF_YEAR);
+		return getPeriodDaysByWeek(year, week);
+	}
+
+	/**
 	 * 주차에 해당하는 일자수 리턴.
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.
@@ -94,13 +110,13 @@ public class DateUtil {
 
 		instance.setWeekDate(year, week, Calendar.SUNDAY);
 
-		int minimum = instance.getActualMinimum(GregorianCalendar.DAY_OF_WEEK);
-		int maximum = instance.getActualMaximum(GregorianCalendar.DAY_OF_WEEK);
+		//		int minimum = instance.getActualMinimum(GregorianCalendar.DAY_OF_WEEK);
+		//		int maximum = instance.getActualMaximum(GregorianCalendar.DAY_OF_WEEK);
 
 		TimeZone timeZone = instance.getTimeZone();
 		List<GagoyleDate> dateList = new ArrayList<>();
 
-		for (int i = minimum; i <= maximum; i++)
+		for (int i = 0 /*minimum*/; i <= 6/*maximum*/; i++)
 
 			dateList.add(new GagoyleDate(timeZone, instance.get(GregorianCalendar.YEAR), instance.get(GregorianCalendar.MONTH),
 					instance.get(GregorianCalendar.DAY_OF_MONTH) + i));
@@ -108,16 +124,44 @@ public class DateUtil {
 		return dateList;
 	}
 
+	/**
+	 * 첫번째 주차 날짜정보 리턴.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 14.
+	 * @param year
+	 * @param week
+	 * @return
+	 */
+	public static GagoyleDate getFirstDateByWeek(int year, int week) {
+		Calendar instance = GregorianCalendar.getInstance();
+		instance.setWeekDate(year, week, Calendar.SUNDAY);
+		TimeZone timeZone = instance.getTimeZone();
+		return new GagoyleDate(timeZone, instance.get(GregorianCalendar.YEAR), instance.get(GregorianCalendar.MONTH),
+				instance.get(GregorianCalendar.DAY_OF_MONTH));
+	}
+
+	public static GagoyleDate getLastDateByWeek(int year, int week) {
+		Calendar instance = GregorianCalendar.getInstance();
+		instance.setWeekDate(year, week, Calendar.SUNDAY);
+		TimeZone timeZone = instance.getTimeZone();
+		return new GagoyleDate(timeZone, instance.get(GregorianCalendar.YEAR), instance.get(GregorianCalendar.MONTH),
+				instance.get(GregorianCalendar.DAY_OF_MONTH) + 6);
+	}
+
 	public static String getCurrentDateString(String format) {
 		Date time = GregorianCalendar.getInstance().getTime();
-		SimpleDateFormat sdf = new SimpleDateFormat(format);
-		return sdf.format(time);
+		return new SimpleDateFormat(format).format(time);
+	}
+
+
+
+	public static String getDateString(Date date) {
+		return DEFAULT_SYSTEM_DATE_FORMAT.format(date);
 	}
 
 	public static String getDateString(long dateTime) {
-		Date time = new Date(dateTime);
-		SimpleDateFormat format = new SimpleDateFormat(SYSTEM_DATEFORMAT_YYYY_MM_DD_HH_MM_SS_SSS);
-		return format.format(time);
+		return getDateString(new Date(dateTime));
 	}
 
 	public static String getDateAsStr(Date date, String format) {
