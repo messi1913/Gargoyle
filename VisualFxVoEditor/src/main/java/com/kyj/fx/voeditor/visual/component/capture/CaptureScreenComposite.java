@@ -74,8 +74,6 @@ public class CaptureScreenComposite {
 			//			stage.setMaxHeight(height);
 			//			stage.setWidth(width);
 			//			stage.setHeight(height);
-
-			stage.show();
 		});
 
 	}
