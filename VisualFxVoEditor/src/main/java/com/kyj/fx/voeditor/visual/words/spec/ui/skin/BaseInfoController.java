@@ -25,6 +25,8 @@ import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TextField;
@@ -58,6 +60,11 @@ public class BaseInfoController {
 			String projectFileName = projectFile.getName();
 			File targetFile = selectedItem.getValue().getFile();
 
+			lblProjectName.setText(projectFileName);
+			lblRealPath.setText(targetFile.getAbsolutePath());
+			lblFileName.setText(targetFile.getName());
+			lblUserName.setText(SystemUtils.USER_NAME);
+
 			FileUtil.consumeJavaParser(targetFile, cu -> {
 
 				NameExpr name = cu.getPackage().getName();
@@ -65,17 +72,26 @@ public class BaseInfoController {
 				String importStatement = cu.getImports().stream().map(im -> im.getName().toString()).collect(Collectors.joining(","));
 				lblImports.setText(importStatement);
 
-				new MethodVisitor(v -> {
-					methodData.add(v);
-				}).visit(cu, null);
+				Service<Void> service = new Service<Void>() {
+					@Override
+					protected Task<Void> createTask() {
+
+						return new Task<Void>() {
+
+							@Override
+							protected Void call() throws Exception {
+								new MethodVisitor(v -> {
+									methodData.add(v);
+								}).visit(cu, null);
+								return null;
+							}
+						};
+					}
+				};
+				service.start();
 
 			}, System.err::println);
 
-			lblProjectName.setText(projectFileName);
-			lblRealPath.setText(targetFile.getAbsolutePath());
-			lblFileName.setText(targetFile.getName());
-
-			lblUserName.setText(SystemUtils.USER_NAME);
 		}
 	}
 

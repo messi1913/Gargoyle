@@ -75,6 +75,16 @@ class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<Borde
 						}
 
 					});
+			
+//			baseInfoController.getMethodData().addListener(new ListChangeListener<MethodDVO>() {
+//				@Override
+//				public void onChanged(javafx.collections.ListChangeListener.Change<? extends MethodDVO> c) {
+//					if (c.next()) {
+//						gv.getItems().addAll(c.getAddedSubList());
+//					}
+//				}
+//			});
+			
 			gv.getItems().addAll(baseInfoController.getMethodData());
 
 			supplyNode.setBottom(hboxButton);
