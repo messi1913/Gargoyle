@@ -8,10 +8,14 @@ package com.kyj.fx.voeditor.visual.words.spec.ui.tabs;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.kyj.fx.voeditor.visual.component.grid.AnnotateBizOptions;
 import com.kyj.fx.voeditor.visual.component.grid.CrudBaseGridView;
 import com.kyj.fx.voeditor.visual.component.grid.IOptions;
 import com.kyj.fx.voeditor.visual.framework.SupplySkin;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
 import com.kyj.fx.voeditor.visual.words.spec.ui.skin.BaseInfoController;
 
@@ -30,6 +34,8 @@ import javafx.scene.layout.Priority;
  */
 class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<BorderPane> {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectInfoBaseInfoTab.class);
+	
 	public ProjectInfoBaseInfoTab(String title, SpecTabPane specTabPane) {
 		super(title, specTabPane);
 	}
@@ -92,7 +98,7 @@ class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<Borde
 			root.setCenter(gv);
 
 		} catch (IOException | NullPointerException e) {
-			e.printStackTrace();
+			LOGGER.error(ValueUtil.toString(e));
 		}
 
 		root.setPrefSize(BorderPane.USE_COMPUTED_SIZE, BorderPane.USE_COMPUTED_SIZE);

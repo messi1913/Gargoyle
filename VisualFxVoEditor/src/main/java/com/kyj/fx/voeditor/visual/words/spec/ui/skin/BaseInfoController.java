@@ -36,7 +36,7 @@ import javafx.scene.control.TreeItem;
  * @author KYJ
  *
  */
-@FXMLController(value = "BaseInfoApp.fxml")
+@FXMLController("BaseInfoApp.fxml")
 public class BaseInfoController {
 
 	@FXML
@@ -135,7 +135,7 @@ public class BaseInfoController {
 
 			MethodDVO methodDVO = new MethodDVO();
 			methodDVO.setMethodName(n.getName());
-			methodDVO.setVisivility(GargoyleJavaParser.getVisibility(n.getModifiers()));
+			methodDVO.setVisivility(GargoyleJavaParser.toStringVisibility(n.getModifiers()));
 			methodDVO.setDescription(n.getComment() != null ? n.getComment().toString() : "");
 
 			onMethodDVOVisite.accept(methodDVO);

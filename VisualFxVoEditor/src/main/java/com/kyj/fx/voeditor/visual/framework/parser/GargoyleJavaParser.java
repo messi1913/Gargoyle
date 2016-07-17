@@ -90,7 +90,11 @@ public class GargoyleJavaParser {
 		return cu;
 	}
 
-	public static String getVisibility(int modifier) {
+//	public static String toStringVisibility(int modifier) {
+//		return Modifier.toString(modifier);
+//	}
+	
+	public static String toStringVisibility(int modifier) {
 
 		// 접근지정자 추출.
 		String accessModifiers = "";
