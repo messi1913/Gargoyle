@@ -56,6 +56,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.scene.transform.Scale;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -69,7 +70,7 @@ import javafx.util.Callback;
  *
  */
 /***************************
- * 
+ *
  * @author KYJ
  *
  ***************************/
@@ -78,7 +79,7 @@ public class FxUtil {
 
 	/**
 	 * 에러 콜백.
-	 * 
+	 *
 	 * @최초생성일 2016. 6. 29.
 	 */
 	private static final Consumer<Exception> DEFAULT_ERROR_CALLBACK = error -> {
@@ -577,7 +578,7 @@ public class FxUtil {
 	 * 작성일 : 2016. 6. 29. 작성자 : KYJ
 	 *
 	 * 캡쳐
-	 * 
+	 *
 	 * @param target
 	 * @param saveFile
 	 ********************************/
@@ -589,7 +590,7 @@ public class FxUtil {
 	 * 작성일 : 2016. 6. 29. 작성자 : KYJ
 	 *
 	 * 캡쳐
-	 * 
+	 *
 	 * @param target
 	 * @param saveFile
 	 * @param errorCallback
@@ -608,9 +609,9 @@ public class FxUtil {
 	 * 작성일 : 2016. 6. 29. 작성자 : KYJ
 	 *
 	 * 캡쳐
-	 * 
+	 *
 	 * out처리가 완료되면 stream은 자동 close처리됨.
-	 * 
+	 *
 	 * @param target
 	 * @param out
 	 * @param errorCallback
@@ -649,7 +650,7 @@ public class FxUtil {
 	 * 작성일 : 2016. 6. 29. 작성자 : KYJ
 	 *
 	 * 캡쳐 후 stream close처리.
-	 * 
+	 *
 	 * @param out
 	 * @param image
 	 * @return
@@ -665,14 +666,14 @@ public class FxUtil {
 	 * 작성일 : 2016. 6. 29. 작성자 : KYJ
 	 *
 	 * print 처리.
-	 * 
+	 *
 	 * @param window
 	 * @param target
 	 ********************************/
 	public static void printJob(Window window, Node target) {
 		Printer printer = Printer.getDefaultPrinter();
 		//		PrinterAttributes printerAttributes = printer.getPrinterAttributes();
-		//		
+		//
 		Paper a4 = Paper.A4;
 
 		//		Paper a4 = PrintHelper.createPaper("Rotate A4", Paper.A4.getHeight(), Paper.A4.getWidth(), Units.MM);
@@ -741,6 +742,19 @@ public class FxUtil {
 			return new ImageView();
 		}
 		return new ImageView(fxImage);
+	}
+
+	/**
+	 * RGB 색상 리턴.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 19.
+	 * @param color
+	 * @return
+	 */
+	public static String toRGBCode(Color color) {
+		if (color == null)
+			return "BLACK";
+		return String.format("#%02X%02X%02X", (int) (color.getRed() * 255), (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
 	}
 
 }
