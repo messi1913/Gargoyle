@@ -173,7 +173,14 @@ public class TextBaseDiffAppController {
 			int position = cw.getPosition();
 			switch (type) {
 			case DELETE: {
-				wrapperedReviced.add(position + deltaPos, new ChunkWrapper());
+				if (wrapperedReviced.size() < position + deltaPos) {
+					for (int i = wrapperedReviced.size(); i < position + deltaPos; i++) {
+						wrapperedReviced.add(i, new ChunkWrapper());
+					}
+				} else {
+					wrapperedReviced.add(position + deltaPos, new ChunkWrapper());
+				}
+
 				deltaPos++;
 				break;
 			}
@@ -284,12 +291,15 @@ public class TextBaseDiffAppController {
 			if (event.getClickCount() == 2) {
 				int movePosition = -1;
 				ChunkWrapper selectedItem = lvOrinal.getSelectionModel().getSelectedItem();
-				Delta delta = selectedItem.getDelta();
-				if (delta != null && delta.getRevised() != null) {
-					movePosition = delta.getRevised().getPosition();
-					lvRevice.scrollTo(movePosition - 1);
-					lvRevice.getSelectionModel().select(movePosition);
+				if (selectedItem != null) {
+					Delta delta = selectedItem.getDelta();
+					if (delta != null && delta.getRevised() != null) {
+						movePosition = delta.getRevised().getPosition();
+						lvRevice.scrollTo(movePosition - 1);
+						lvRevice.getSelectionModel().select(movePosition);
+					}
 				}
+
 			}
 
 		});
@@ -370,7 +380,7 @@ public class TextBaseDiffAppController {
 			WritableImage image = param.getImage();
 			ivOrigin.setImage(image);
 			return null;
-		}, new SnapshotParameters(), null));
+		} , new SnapshotParameters(), null));
 	}
 
 	void snappReviceShot() {
@@ -378,7 +388,7 @@ public class TextBaseDiffAppController {
 			WritableImage image = param.getImage();
 			ivReviced.setImage(image);
 			return null;
-		}, new SnapshotParameters(), null));
+		} , new SnapshotParameters(), null));
 	}
 
 	// public enum TYPE {
@@ -444,7 +454,7 @@ public class TextBaseDiffAppController {
 				newChunk.add(chunkWrapper);
 			}
 			return newChunk;
-		}, (collection, item) -> {
+		} , (collection, item) -> {
 			int position = item.getPosition();
 			List<String> lines = item.getLines();
 			TYPE type = item.getType();
@@ -459,7 +469,7 @@ public class TextBaseDiffAppController {
 				chunkWrapper.setDelta(item.getDelta());
 				collection.set(tmpPosition++, chunkWrapper);
 			}
-		}, (collection1, collection2) -> collection1.addAll(collection2));
+		} , (collection1, collection2) -> collection1.addAll(collection2));
 
 		return collect;
 	}

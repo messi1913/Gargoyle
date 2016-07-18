@@ -82,6 +82,7 @@ public class SVNViewer extends BorderPane {
 	@FXML
 	private BorderPane borSource;
 	private JavaTextArea javaTextAre;
+	private LineChart<String, String> lineHist;
 
 	public SVNViewer() throws NullPointerException, GagoyleException, IOException {
 		FxUtil.loadRoot(SVNViewer.class, this);
@@ -106,9 +107,10 @@ public class SVNViewer extends BorderPane {
 		javaTextAre = new JavaTextArea();
 
 		borSource.setCenter(javaTextAre);
-		LineChart<String, String> lineHist = new LineChart<>(new CategoryAxis(), new CategoryAxis());
+		lineHist = new LineChart<>(new CategoryAxis(), new CategoryAxis());
 		borChart.setCenter(lineHist);
 
+		tbRevision.getSelectionModel().setCellSelectionEnabled(true);
 		tbRevision.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 		MenuItem menuDiff = new MenuItem("Diff");
@@ -137,6 +139,8 @@ public class SVNViewer extends BorderPane {
 
 			SVNLogEntry svnLogEntry = selectedItems.get(0);
 			SVNLogEntry svnLogEntry2 = selectedItems.get(1);
+			if(svnLogEntry == null || svnLogEntry2 == null)
+				return;
 
 			long revision = svnLogEntry.getRevision();
 			long revision2 = svnLogEntry2.getRevision();
@@ -147,12 +151,20 @@ public class SVNViewer extends BorderPane {
 
 			try {
 
-				FXMLLoader loader = new FXMLLoader();
-				loader.setLocation(TextBaseDiffAppController.class.getResource("TextBaseDiffApp.fxml"));
-				Parent parent = loader.load();
 
-				TextBaseDiffAppController controller = loader.getController();
-				controller.setDiff(cat, cat2);
+//				FXMLLoader loader = new FXMLLoader();
+//				loader.setLocation(TextBaseDiffAppController.class.getResource("TextBaseDiffApp.fxml"));
+//				Parent parent = loader.load();
+//				TextBaseDiffAppController controller = loader.getController();
+//				controller.setDiff(cat, cat2);
+				Parent parent = FxUtil.loadAndControllerAction(TextBaseDiffAppController.class, controller->{
+					try {
+						controller.setDiff(cat, cat2);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				});
+
 
 				Stage stage = new Stage();
 				stage.setScene(new Scene(parent));
