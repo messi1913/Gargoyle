@@ -12,6 +12,7 @@ package com.kyj.scm.manager.core.commons;
  * @author KYJ
  *
  */
+@Deprecated
 public interface SCMListener {
 
 	/********************************
