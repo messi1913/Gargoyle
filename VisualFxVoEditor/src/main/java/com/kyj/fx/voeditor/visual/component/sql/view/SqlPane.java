@@ -503,8 +503,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	public void initialize(Map<String, Object> map) {
 		try {
 			this.url = map.get(ResourceLoader.BASE_KEY_JDBC_URL).toString();
-			this.username = map.get(ResourceLoader.BASE_KEY_JDBC_ID).toString();
-			this.password = EncrypUtil.decryp(map.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString());
+			this.username = map.get(ResourceLoader.BASE_KEY_JDBC_ID) == null ? "" :map.get(ResourceLoader.BASE_KEY_JDBC_ID) .toString();
+			this.password = map.get(ResourceLoader.BASE_KEY_JDBC_PASS) == null ? "" : EncrypUtil.decryp(map.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString());
 			this.driver = map.get("driver").toString();
 
 			this.userColor = map.get("color") == null ? null : Color.web(map.get("color").toString());
