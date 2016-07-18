@@ -22,6 +22,12 @@ public interface IGargoyleExceptionCode {
 	enum ERROR_CODE {
 
 		EMPTY(""),
+		
+		/**
+		 * 값이 NULL인경우.
+		 * @최초생성일 2016. 7. 18.
+		 */
+		NULL("NULL"),
 		/**
 		 * File 타입이 일치하지않는경우 .
 		 * 
@@ -30,11 +36,18 @@ public interface IGargoyleExceptionCode {
 		FILE_DOES_NOT_MATCH("FILE_DOES_NOT_MATCH"),
 
 		/**
+		 * 파일이 존재하지않음.
+		 * @최초생성일 2016. 7. 18.
+		 */
+		FILE_NOT_FOUND("FILE_NOT_FOUND"),
+		/**
 		 * 파라미터 값이 빔.
 		 * 
 		 * @최초생성일 2016. 7. 14.
 		 */
 		PARAMETER_EMPTY("PARAMETER_EMPTY");
+		
+		
 
 		String code;
 
