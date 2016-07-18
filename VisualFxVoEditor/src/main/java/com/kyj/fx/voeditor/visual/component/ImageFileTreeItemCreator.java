@@ -32,6 +32,10 @@ import javafx.scene.control.TreeItem;
  */
 public class ImageFileTreeItemCreator {
 
+	/**
+	 * 열어본 파일 트리(Workspace)에 대한 정보가 Serialize되는 파일 .
+	 * @최초생성일 2016. 7. 18.
+	 */
 	private static final String OPEND_HISTORY_FILE_NAME = "opendInfo.dat";
 	private static Logger LOGGER = LoggerFactory.getLogger(ImageFileTreeItemCreator.class);
 	/**
@@ -41,7 +45,12 @@ public class ImageFileTreeItemCreator {
 	 */
 	private static Set<File> cacheExpaned;
 
-	private static final FilenameFilter SVN_WC_DB_FILTER = (FilenameFilter) (dir1, name1) -> "wc.db".equals(name1);
+	/**
+	 * SQLite DbFile. SVN에 대한 메타정보가 담긴 파일.
+	 * @최초생성일 2016. 7. 18.
+	 */
+	private static final String WCDB_FILE_NAME = "wc.db";
+	private static final FilenameFilter SVN_WC_DB_FILTER = (FilenameFilter) (dir1, name1) -> WCDB_FILE_NAME.equals(name1);
 	private static final FilenameFilter IS_CONTAINS_SVN_FILE_FILTER = (FilenameFilter) (dir, name) -> ".svn".equals(name)
 			&& isContainsWcDB(dir);
 	private static final FilenameFilter IS_JAVA_PROJECT_FILTER = (FilenameFilter) (dir, name) -> ".classpath".equals(name);
@@ -237,6 +246,7 @@ public class ImageFileTreeItemCreator {
 
 			switch (type) {
 			case NOMAL:
+				
 				for (File childFile : files) {
 					TreeItem<FileWrapper> createNode = createDefaultNode(createFileWrapper(childFile));
 					children.add(createNode);
@@ -244,7 +254,7 @@ public class ImageFileTreeItemCreator {
 				break;
 
 			case JAVA_PROJECT:
-
+				System.err.println(f.isSVNConnected());
 				for (File childFile : files) {
 					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile));
 					children.add(createNode);
@@ -253,6 +263,7 @@ public class ImageFileTreeItemCreator {
 
 			case JAVA_PROJECT_MEMBER:
 
+				
 				for (File childFile : files) {
 					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile));
 					children.add(createNode);
@@ -319,6 +330,7 @@ public class ImageFileTreeItemCreator {
 				if (!isSVNConnected) {
 					if (IS_CONTAINS_SVN_FILE_FILTER.accept(file, file.getName())) {
 						fileWrapper.setSVNConnected(true);
+						fileWrapper.setWcDbFile(new File(new File(file, ".svn"), WCDB_FILE_NAME));
 					}
 				}
 
