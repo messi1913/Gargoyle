@@ -39,6 +39,7 @@ public class DateUtil {
 	public static final String SYSTEM_DATEFORMAT_YYYY_MM = "yyyyMM";
 	public static final String SYSTEM_DATEFORMAT_YYYY = "yyyy";
 	public static final String SYSTEM_DATEFORMAT_YY_MM_DD_HH_MM_SS = "yy-MM-dd HH:mm:ss";
+	public static final String SYSTEM_DATEFORMAT_EEE = "EEE";/*요일패턴.*/
 	public static final String ORACLE_DATEFORMAT_YYYYMMDDHH24MISS = "YYYYMMDDHH24MISS";
 
 
