@@ -41,6 +41,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TreeItem;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -88,6 +91,7 @@ public class SVNViewer extends BorderPane {
 	public void initialize() {
 		element = new SVNTreeView();
 		element.setOnAction(this::svnTreeViewOnAction);
+		element.setOnKeyPressed(this::svnTreeVoewOnKeyPressed);
 		anTreePane.getChildren().set(0, element);
 		AnchorPane.setLeftAnchor(element, 0.0);
 		AnchorPane.setRightAnchor(element, 0.0);
@@ -203,6 +207,16 @@ public class SVNViewer extends BorderPane {
 
 		}
 
+	}
+
+	public void svnTreeVoewOnKeyPressed(KeyEvent e) {
+		if (e.getCode() == KeyCode.DELETE) {
+
+			TreeItem<SVNItem> selectedItem = element.getSelectionModel().getSelectedItem();
+			if (selectedItem != null) {
+				element.menuDiscardLocationOnAction(new ActionEvent());
+			}
+		}
 	}
 
 	/**

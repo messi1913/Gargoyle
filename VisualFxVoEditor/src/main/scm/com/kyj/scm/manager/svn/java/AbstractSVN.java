@@ -8,6 +8,8 @@ package com.kyj.scm.manager.svn.java;
 
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
@@ -20,6 +22,8 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
 import com.kyj.scm.manager.core.commons.SCMCommonable;
 import com.kyj.scm.manager.core.commons.SVNKeywords;
 
+import kyj.Fx.dao.wizard.core.util.ValueUtil;
+
 /**
  * SVN에 접속하기 위한 메타정보를 처리한다.
  *
@@ -27,6 +31,8 @@ import com.kyj.scm.manager.core.commons.SVNKeywords;
  *
  */
 abstract class AbstractSVN implements SCMCommonable, SVNKeywords {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSVN.class);
 
 	/** [시작] 일반상수 정의 */
 	public static final String SVN_REVISION_HISTORY_ROW_COUNT = "15";
@@ -100,7 +106,8 @@ abstract class AbstractSVN implements SCMCommonable, SVNKeywords {
 			//			svnManager.dispose();
 			//			repository.closeSession();
 		} catch (SVNException e) {
-			throw new RuntimeException(e);
+			LOGGER.error(ValueUtil.toString(e));
+//			throw new RuntimeException(e);
 		}
 
 	}

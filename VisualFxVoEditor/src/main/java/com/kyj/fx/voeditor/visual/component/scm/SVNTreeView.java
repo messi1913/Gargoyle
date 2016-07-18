@@ -143,16 +143,20 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 				Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Discard Repository",
 						String.format("Do you want Discard Repository %s ???", url));
 				showYesOrNoDialog.ifPresent(v -> {
-					Boolean apply = discardFunction.apply(repo);
-					if (apply == true) {
-						TreeItem<SVNItem> result = children.remove(selectedIndex);
-						if (result != null)
-							DialogUtil.showMessageDialog("Discard Success!");
-						else
+
+					if ("Y".equals(v.getValue())) {
+						Boolean apply = discardFunction.apply(repo);
+						if (apply == true) {
+							TreeItem<SVNItem> result = children.remove(selectedIndex);
+							if (result != null)
+								DialogUtil.showMessageDialog("Discard Success!");
+							else
+								DialogUtil.showMessageDialog("Discard Fail...");
+						} else {
 							DialogUtil.showMessageDialog("Discard Fail...");
-					} else {
-						DialogUtil.showMessageDialog("Discard Fail...");
+						}
 					}
+
 				});
 
 			}
