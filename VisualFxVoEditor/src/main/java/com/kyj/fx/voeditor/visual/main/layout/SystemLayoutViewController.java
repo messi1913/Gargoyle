@@ -61,8 +61,6 @@ import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.SpecTabPane;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -544,21 +542,25 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		/***********************************************************************************/
 		// FXML선택한경우에만 보여주는 조건처리.
 		final MenuItem menuItemOpenWithSceneBuilder = new MenuItem("SceneBuilder");
+		final MenuItem menuItemSCMGraphs = new MenuItem("SCM Graphs");
+		menuItemSCMGraphs.setDisable(true);
 		menuItemOpenWithSceneBuilder.setOnAction(this::menuItemOpenWithSceneBuilderOnAction);
 		menuOpenWidth.setOnShowing(event -> {
 
 			String sceneBuilderLocation = ResourceLoader.getInstance().get(ResourceLoader.SCENEBUILDER_LOCATION);
 			TreeItem<FileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
-			boolean isRemoveItem = true;
+			boolean isRemoveOpenWidthSceneBuilderMenuItem = true;
+			boolean isDisableSCMGraphsMenuItem = true;
 
 			if (selectedTreeItem != null) {
-				File selectedTree = selectedTreeItem.getValue().getFile();
+				FileWrapper fileWrapper = selectedTreeItem.getValue();
+				File selectedTree = fileWrapper.getFile();
 				if (FileUtil.isFXML(selectedTree)) {
 
 					if (!menuOpenWidth.getItems().contains(menuItemOpenWithSceneBuilder)) {
 						menuOpenWidth.getItems().add(menuItemOpenWithSceneBuilder);
 					}
-					isRemoveItem = false;
+					isRemoveOpenWidthSceneBuilderMenuItem = false;
 
 					File file = new File(sceneBuilderLocation);
 					/*씬빌더 존재 유무에 따라 활성화 여부를 지정.*/
@@ -567,11 +569,16 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					} else {
 						menuItemOpenWithSceneBuilder.setDisable(true);
 					}
-				}
+				} //else if (selectedTreeItem instanceof JavaProjectFileTreeItem) {
+					if (fileWrapper.isSVNConnected())
+						isDisableSCMGraphsMenuItem = false;
+//				}
 			}
 
-			if (isRemoveItem)
+			if (isRemoveOpenWidthSceneBuilderMenuItem)
 				menuOpenWidth.getItems().remove(menuItemOpenWithSceneBuilder);
+
+			menuItemSCMGraphs.setDisable(isDisableSCMGraphsMenuItem);
 
 		});
 		/***********************************************************************************/
@@ -615,7 +622,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem,
 				deleteFileMenuItem, /* voEditorMenuItem, daoWizardMenuItem, */
 				voEditorMenuItem, /*setVoEditorMenuItem,*/ setDaoWizardMenuItem, refleshMenuItem, chodeAnalysisMenuItem,
-				makeProgramSpecMenuItem, new SeparatorMenuItem(), menuProperties);
+				makeProgramSpecMenuItem, menuItemSCMGraphs, new SeparatorMenuItem(), menuProperties);
 
 		// daoWizardMenuItem.addEventHandler(ActionEvent.ACTION,
 		// this::daoWizardMenuItemOnActionEvent);

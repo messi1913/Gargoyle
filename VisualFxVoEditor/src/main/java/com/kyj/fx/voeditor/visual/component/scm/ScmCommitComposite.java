@@ -36,6 +36,9 @@ import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 
 /**
+ * 
+ * SCM 커밋 이력정보를 차트화화여 분석.
+ * 
  * @author KYJ
  *
  */
@@ -151,10 +154,10 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 			return new XYChart.Data<>(key, value);
 		}).collect(() -> FXCollections.observableArrayList(), (a, b) -> {
 
-			int g = a.size() / 7;
-			b.setXValue("[" + g + "]    ".concat(b.getXValue()));
+			//			int g = a.size() / 7;
+			//			b.setXValue("[" + g + "]    ".concat(b.getXValue()));
 			a.add(b);
-		} , (a, b) -> a.addAll(b));
+		}, (a, b) -> a.addAll(b));
 
 	}
 

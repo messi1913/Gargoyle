@@ -44,6 +44,10 @@ public class FileWrapper implements Serializable{
 	 */
 	private boolean isSVNConnected;
 
+	/**
+	 * SVN 연결시 연계되는 SQLIte DB 파일.
+	 * @최초생성일 2016. 7. 18.
+	 */
 	private File wcDbFile;
 
 	public FileWrapper(File file) {
