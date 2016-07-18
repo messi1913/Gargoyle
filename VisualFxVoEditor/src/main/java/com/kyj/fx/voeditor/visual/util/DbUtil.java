@@ -29,7 +29,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
@@ -149,6 +148,11 @@ public class DbUtil extends ConnectionManager {
 	 */
 	public static List<Map<String, Object>> select(final Connection con, final String sql, int fetchCount) throws Exception {
 		return select(con, sql, fetchCount, -1, new ResultSetToMapConverter());
+	}
+
+	public static Map<String, Object> findOne(final Connection con, final String sql) throws Exception {
+		List<Map<String, Object>> select = select(con, sql, 1, 1, new ResultSetToMapConverter());
+		return select.isEmpty() ? Collections.emptyMap() : select.get(0);
 	}
 
 	public static List<Map<String, Object>> select(final Connection con, final String sql, int fetchCount, int limitedSize,
@@ -457,7 +461,6 @@ public class DbUtil extends ConnectionManager {
 			Statement createStatement = con.createStatement();
 
 			List<String> apply = sqlConverter.apply(userObj);
-
 
 			for (String sql : apply) {
 
