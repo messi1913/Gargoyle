@@ -168,12 +168,30 @@ public class DateUtilTest {
 
 		{
 			GagoyleDate first = DateUtil.getFirstDateByWeek(2016, 2);
-			System.out.printf("First Day of Week %s\n" , first.toDateString());
+			System.out.printf("First Day of Week %s\n", first.toDateString());
 			GagoyleDate last = DateUtil.getLastDateByWeek(2016, 2);
-			System.out.printf("Last Day of Week %s\n" , last.toDateString());
-		
+			System.out.printf("Last Day of Week %s\n", last.toDateString());
+
 		}
-		
+
+	}
+
+	@Test
+	public void gap() {
+		int gap = -1;
+		Calendar current = Calendar.getInstance();
+		int currentYear = current.get(Calendar.YEAR);
+		int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
+
+		Calendar past = Calendar.getInstance();
+		past.set(Calendar.WEEK_OF_MONTH, gap);
+		int pastYear = past.get(Calendar.YEAR);
+		int pastWeek = past.get(Calendar.WEEK_OF_YEAR);
+
+		System.out.println(currentYear);
+		System.out.println(currentWeek);
+		System.out.println(pastYear);
+		System.out.println(pastWeek);
 	}
 
 }

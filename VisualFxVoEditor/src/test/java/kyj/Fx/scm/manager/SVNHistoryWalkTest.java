@@ -7,10 +7,13 @@
 package kyj.Fx.scm.manager;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.function.Function;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -119,6 +122,37 @@ public class SVNHistoryWalkTest {
 		System.out.println("startRevision " + startRevision + " endRevision : " + endRevision);
 		Collection<SVNLogEntry> allLogs = localServerManager2.getAllLogs(startRevision, endRevision);
 		allLogs.stream().map(localServerManager2.fromPrettySVNLogConverter()).forEach(System.out::println);
+
+	}
+
+	@Test
+	public void historyWalkAnalysisGroupingTest() throws SVNException {
+
+		List<GagoyleDate> periodDaysByWeek = DateUtil.getPeriodDaysByWeek();
+
+		GagoyleDate start = periodDaysByWeek.get(0);
+		GagoyleDate end = periodDaysByWeek.get(periodDaysByWeek.size() - 1);
+
+		Calendar instance = Calendar.getInstance();
+		instance.set(2016, 6, 1);
+		Date time = instance.getTime();
+
+		long startRevision = localServerManager2.getRevision(/*start.toDate()*/time);
+		long endRevision = localServerManager2.getRevision(end.toDate());
+
+		System.out.println("start " + start.toDateString() + " end : " + end.toDateString());
+		System.out.println("startRevision " + startRevision + " endRevision : " + endRevision);
+		Collection<SVNLogEntry> allLogs = localServerManager2.getAllLogs(startRevision, endRevision);
+		//		allLogs.
+
+		SimpleDateFormat format = new SimpleDateFormat(DateUtil.SYSTEM_DATEFORMAT_YYYY_MM_DD);
+
+		TreeMap<String, Long> collect = allLogs.stream().collect(Collectors.groupingBy(v -> format.format(v.getDate()), TreeMap::new, Collectors.mapping(v -> 1, Collectors.counting())));
+
+		//		Map<String, Long> collect = allLogs.stream()
+		//				.collect(Collectors.groupingBy(v -> format.format(v.getDate()), Collectors.mapping(v -> 1, Collectors.counting())));
+
+		System.out.println(collect);
 
 	}
 

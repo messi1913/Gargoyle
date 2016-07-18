@@ -42,7 +42,6 @@ public class DateUtil {
 	public static final String SYSTEM_DATEFORMAT_EEE = "EEE";/*요일패턴.*/
 	public static final String ORACLE_DATEFORMAT_YYYYMMDDHH24MISS = "YYYYMMDDHH24MISS";
 
-
 	private static final SimpleDateFormat DEFAULT_SYSTEM_DATE_FORMAT = new SimpleDateFormat(SYSTEM_DATEFORMAT_YYYY_MM_DD_HH_MM_SS_SSS);
 
 	public static enum DATE_TYPE {
@@ -95,6 +94,37 @@ public class DateUtil {
 		int year = instance.get(Calendar.YEAR);
 		int week = instance.get(Calendar.WEEK_OF_YEAR);
 		return getPeriodDaysByWeek(year, week);
+	}
+
+	/**
+	 * 현재 주에서 gap주차를 뺀값부터 나열.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 18.
+	 * @param gap
+	 * @return
+	 */
+	public static List<GagoyleDate> getPeriodDaysByWeek(int gap) {
+		Calendar current = Calendar.getInstance();
+		int currentYear = current.get(Calendar.YEAR);
+		int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
+
+		Calendar past = Calendar.getInstance();
+		past.set(Calendar.WEEK_OF_MONTH, (-gap));
+		int pastYear = past.get(Calendar.YEAR);
+		int pastWeek = past.get(Calendar.WEEK_OF_YEAR);
+
+		return getPeriodDaysByWeek(pastYear, pastWeek, currentYear, currentWeek);
+	}
+
+	public static List<GagoyleDate> getPeriodDaysByWeek(int startYear, int startWeek, int endYear, int endWeek) {
+
+		List<GagoyleDate> periodDaysByWeek1 = getPeriodDaysByWeek(startYear, startWeek);
+		List<GagoyleDate> periodDaysByWeek2 = getPeriodDaysByWeek(endYear, endWeek);
+
+		ArrayList<GagoyleDate> arrayList = new ArrayList<>(periodDaysByWeek1.size() + periodDaysByWeek2.size());
+		arrayList.addAll(periodDaysByWeek1);
+		arrayList.addAll(periodDaysByWeek2);
+		return arrayList;
 	}
 
 	/**
@@ -154,8 +184,6 @@ public class DateUtil {
 		Date time = GregorianCalendar.getInstance().getTime();
 		return new SimpleDateFormat(format).format(time);
 	}
-
-
 
 	public static String getDateString(Date date) {
 		return DEFAULT_SYSTEM_DATE_FORMAT.format(date);
