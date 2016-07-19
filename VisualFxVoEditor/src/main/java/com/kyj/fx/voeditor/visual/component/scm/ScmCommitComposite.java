@@ -6,19 +6,15 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.scm;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNException;
@@ -97,7 +93,7 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 				}
 				barChartDayOfMonth.setStyle(
 						".chart-legend-item-syCmbol chart-bar series0 bar-legend-symbol default-color0{- fx-background-color:green;}");
-						/*end Desing css.*/
+				/*end Desing css.*/
 
 				/*start Popover*/
 				//무조건 1개의 시리즈만 처리하므로 인덱스에서 바로 가져옴.
@@ -110,6 +106,8 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 					});
 
 				}
+				barChartDayOfMonth.setMinWidth(BarChart.USE_COMPUTED_SIZE);
+				barChartDayOfMonth.requestLayout();
 
 				/*end Popover*/
 			}
@@ -142,22 +140,21 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 	private void createPopOver(Data<String, Long> data) {
 		String xValue = data.getXValue();
 
-//			Date parse = FxSVNHistoryDataSupplier.YYYYMMDD_EEE_PATTERN.parse(xValue);
+		//			Date parse = FxSVNHistoryDataSupplier.YYYYMMDD_EEE_PATTERN.parse(xValue);
 
-			Collection<SVNLogEntry> list = supplier.getAllLogs();//supplier.list(parse);
-//			Stream<GargoyleSVNLogEntryPath> createStream = supplier.createStream(list);
+		Collection<SVNLogEntry> list = supplier.getAllLogs();//supplier.list(parse);
+		//			Stream<GargoyleSVNLogEntryPath> createStream = supplier.createStream(list);
 
-			ObservableList<SVNLogEntry> collect = list.stream().filter(v ->{
-				return xValue.equals(FxSVNHistoryDataSupplier.YYYYMMDD_EEE_PATTERN.format(v.getDate()));
-			}).distinct().collect(() -> FXCollections.observableArrayList(),
-					(a, b) -> a.add(b), (a, b) -> a.addAll(b));
-			ListView<SVNLogEntry> createHistoryListView = supplier.createEntryListView(collect);
+		ObservableList<SVNLogEntry> collect = list.stream().filter(v -> {
+			return xValue.equals(FxSVNHistoryDataSupplier.YYYYMMDD_EEE_PATTERN.format(v.getDate()));
+		}).distinct().collect(() -> FXCollections.observableArrayList(), (a, b) -> a.add(b), (a, b) -> a.addAll(b));
+		ListView<SVNLogEntry> createHistoryListView = supplier.createEntryListView(collect);
 
-			BorderPane borderPane = new BorderPane(createHistoryListView);
-			borderPane.setTop(new Label(xValue));
-			borderPane.setBottom(new Label(String.valueOf(collect.size())));
-			PopOver popOver = new PopOver(borderPane);
-			popOver.show(data.getNode());
+		BorderPane borderPane = new BorderPane(createHistoryListView);
+		borderPane.setTop(new Label(xValue));
+		borderPane.setBottom(new Label(String.valueOf(collect.size())));
+
+		FxUtil.showPopOver(data.getNode(), borderPane);
 
 	}
 
@@ -165,7 +162,7 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 		List<GagoyleDate> periodDaysByWeek = DateUtil.getPeriodDaysByWeek(supplier.getWeekSize());
 
 		Collection<SVNLogEntry> allLogs = supplier.getAllLogs();
-//		supplier.createStream(allLogs);
+		//		supplier.createStream(allLogs);
 
 		TreeMap<String, Long> dayOfMonths = allLogs.stream().collect(Collectors.groupingBy(
 				v -> FxSVNHistoryDataSupplier.YYYYMMDD_EEE_PATTERN.format(v.getDate()), () -> new TreeMap<>(), Collectors.counting()));
@@ -229,7 +226,7 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 			//			int g = a.size() / 7;
 			//			b.setXValue("[" + g + "]    ".concat(b.getXValue()));
 			a.add(b);
-		} , (a, b) -> a.addAll(b));
+		}, (a, b) -> a.addAll(b));
 
 	}
 

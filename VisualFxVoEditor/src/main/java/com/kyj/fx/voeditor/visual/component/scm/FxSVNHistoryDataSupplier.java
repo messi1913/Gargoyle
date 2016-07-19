@@ -6,22 +6,30 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.scm;
 
-import java.util.Date;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
-import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNLogEntryPath;
 
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
 /**
@@ -39,7 +47,7 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 	}
 
 	public FxSVNHistoryDataSupplier(JavaSVNManager manager) throws SVNException {
-		this(manager, 5, 25);
+		this(manager, 4, 25);
 	}
 
 	ListView<GargoyleSVNLogEntryPath> createHistoryListView(ObservableList<GargoyleSVNLogEntryPath> list) {
@@ -95,16 +103,45 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 				GargoyleSVNLogEntryPath selectedItem = listView.getSelectionModel().getSelectedItem();
 				if (selectedItem != null) {
 					String path = selectedItem.getPath();
+
 					long copyRevision = selectedItem.getCopyRevision();
 					String rootUrl = getRootUrl();
 					LOGGER.debug("{}", rootUrl);
 					LOGGER.debug("Cat Command, Path : {} Revision {}", path, copyRevision);
 
-					String content = cat(path, String.valueOf(copyRevision));
+					try {
+						String content = "";
+						VBox vBox = new VBox(5);
+						if (isExists(path)) {
+							content = cat(path, String.valueOf(copyRevision));
 
-					PopOver popOver = new PopOver(createJavaTextArea(content));
-					popOver.show(ev.getPickResult().getIntersectedNode());
+							List<SVNLogEntry> log = log(path, String.valueOf(copyRevision), ex -> {
+								LOGGER.error(ValueUtil.toString(ex));
+							});
+
+							if (ValueUtil.isNotEmpty(log)) {
+								SVNLogEntry svnLogEntry = log.get(0);
+								String apply = getManager().fromPrettySVNLogConverter().apply(svnLogEntry);
+								Label e = new Label(apply);
+								e.setStyle("-fx-text-fill:black");
+								vBox.getChildren().add(e);
+							}
+							vBox.getChildren().add(createJavaTextArea(content));
+
+						} else {
+							content = "Does not exists. Repository. [Removed]";
+							Label e = new Label(content);
+							e.setStyle("-fx-text-fill:black");
+							vBox.getChildren().add(e);
+						}
+
+						FxUtil.showPopOver(ev.getPickResult().getIntersectedNode(), vBox);
+					} catch (SVNException e) {
+						LOGGER.error(ValueUtil.toString(e));
+					}
+
 				}
+				ev.consume();
 			}
 		});
 
@@ -133,8 +170,7 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 							String author = item.getAuthor();
 							String dateString = YYYY_MM_DD_HH_MM_SS_PATTERN.format(item.getDate());
 							String message = item.getMessage();
-							setText(String.format("Resivion :%d author %s date :%s message :%s ", item.getRevision(), author, dateString,
-									message));
+							setText(String.format("Resivion :%d author %s date :%s message :%s ", revision, author, dateString, message));
 						}
 
 					}
@@ -144,26 +180,34 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 				return listCell;
 			}
 		});
-		listView.setPrefSize(600, ListView.USE_COMPUTED_SIZE);
+		//		listView.setPrefSize(600, ListView.USE_COMPUTED_SIZE);
 
-//		listView.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
-//
-//			if (ev.getClickCount() == 2 && ev.getButton() == MouseButton.PRIMARY) {
-//				SVNLogEntry selectedItem = listView.getSelectionModel().getSelectedItem();
-//				if (selectedItem != null) {
-//					String path = selectedItem.getPath();
-//					long copyRevision = selectedItem.getCopyRevision();
-//					String rootUrl = getRootUrl();
-//					LOGGER.debug("{}", rootUrl);
-//					LOGGER.debug("Cat Command, Path : {} Revision {}", path, copyRevision);
-//
-//					String content = cat(path, String.valueOf(copyRevision));
-//
-//					PopOver popOver = new PopOver(createJavaTextArea(content));
-//					popOver.show(ev.getPickResult().getIntersectedNode());
-//				}
-//			}
-//		});
+		listView.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
+
+			if (ev.getClickCount() == 2 && ev.getButton() == MouseButton.PRIMARY) {
+				SVNLogEntry selectedItem = listView.getSelectionModel().getSelectedItem();
+				if (selectedItem != null) {
+
+					Map<String, SVNLogEntryPath> changedPaths = selectedItem.getChangedPaths();
+					if (ValueUtil.isNotEmpty(changedPaths)) {
+
+						ObservableList<GargoyleSVNLogEntryPath> collect = createStream(Arrays.asList(selectedItem))
+								.collect(() -> FXCollections.observableArrayList(), (a, b) -> a.add(b), (a, b) -> a.addAll(b));
+
+						Node showing = null;
+						if (collect.isEmpty()) {
+							showing = new Label("Empty.");
+							showing.setStyle("-fx-text-fill:black");
+						} else {
+							showing = createHistoryListView(collect);
+						}
+
+						FxUtil.showPopOver(ev.getPickResult().getIntersectedNode(), showing);
+					}
+
+				}
+			}
+		});
 
 		return listView;
 	}

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,6 +34,7 @@ import com.kyj.scm.manager.svn.java.JavaSVNManager;
 /**
  *
  * SVN과 연계된 API 제공.
+ * 
  * @author KYJ
  *
  */
@@ -45,7 +47,7 @@ class SimpleSVNHistoryDataSupplier extends AbstracrtSVNHistoryDataSupplier {
 	public static final SimpleDateFormat EEE_PATTERN = new SimpleDateFormat(DateUtil.SYSTEM_DATEFORMAT_EEE);
 
 	private Collection<SVNLogEntry> allLogs;
-
+	private Map<String, List<GargoyleSVNLogEntryPath>> collectedTable;
 	private GagoyleDate start;
 
 	private GagoyleDate end;
@@ -71,7 +73,7 @@ class SimpleSVNHistoryDataSupplier extends AbstracrtSVNHistoryDataSupplier {
 
 		LOGGER.debug("start Revision: {} end Resivion: {}", startRevision, endRevision);
 		allLogs = getManager().getAllLogs(startRevision, endRevision);
-
+		collectedTable = createStream(allLogs).collect(Collectors.groupingBy(v -> v.getPath()));
 	}
 
 	/**
@@ -88,6 +90,7 @@ class SimpleSVNHistoryDataSupplier extends AbstracrtSVNHistoryDataSupplier {
 
 	/**
 	 * 데이터 조회.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 19.
 	 * @param path
@@ -96,6 +99,31 @@ class SimpleSVNHistoryDataSupplier extends AbstracrtSVNHistoryDataSupplier {
 	 */
 	public String cat(String path, String revision) {
 		return getManager().cat(path, revision);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 19. 작성자 : KYJ
+	 *
+	 *
+	 * @param path
+	 * @return
+	 * @throws SVNException
+	 ********************************/
+	public boolean isExists(String path) throws SVNException {
+		return getManager().isExistsPath(path);
+	}
+
+	/********************************
+	 * 작성일 :  2016. 7. 19. 작성자 : KYJ
+	 *
+	 * 이력에 대한 정보 get
+	 * @param path
+	 * @param revision
+	 * @param errorHandler
+	 * @return
+	 ********************************/
+	public List<SVNLogEntry> log(String path, String revision, Consumer<Exception> errorHandler) {
+		return getManager().log(path, revision, errorHandler);
 	}
 
 	/**
@@ -121,6 +149,10 @@ class SimpleSVNHistoryDataSupplier extends AbstracrtSVNHistoryDataSupplier {
 
 	public String getRootUrl() {
 		return getManager().getUrl();
+	}
+
+	public Map<String, List<GargoyleSVNLogEntryPath>> getCollectedTable() {
+		return collectedTable;
 	}
 
 	/**

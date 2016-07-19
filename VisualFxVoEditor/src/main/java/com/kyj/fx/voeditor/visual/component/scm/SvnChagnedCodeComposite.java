@@ -7,32 +7,21 @@
 package com.kyj.fx.voeditor.visual.component.scm;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.SVNLogEntryPath;
-import org.tmatesoft.svn.core.SVNNodeKind;
 
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
-import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -61,7 +50,6 @@ public class SvnChagnedCodeComposite extends BorderPane {
 	private PieChart piChartChagendCode;
 
 	private List<Data> dataList;
-	private Map<String, List<GargoyleSVNLogEntryPath>> collectedTable;
 
 	public SvnChagnedCodeComposite(FxSVNHistoryDataSupplier supplier)
 			throws SVNException, NullPointerException, GagoyleException, IOException {
@@ -81,7 +69,7 @@ public class SvnChagnedCodeComposite extends BorderPane {
 		piChartChagendCode
 				.setTitle(String.format("Chaned Code Count ( Rank %d )\n%s ~ %s", supplier.getRankSize(), dateString, dateString2));
 
-		collectedTable = supplier.createStream(allLogs).collect(Collectors.groupingBy(v -> v.getPath()));
+		//		collectedTable = supplier.createStream(allLogs).collect(Collectors.groupingBy(v -> v.getPath()));
 		Map<String, Long> collect = supplier.createStream(allLogs)
 				.collect(Collectors.groupingBy(v -> v.getPath(), LinkedHashMap::new, Collectors.counting()));
 
@@ -106,7 +94,7 @@ public class SvnChagnedCodeComposite extends BorderPane {
 		lookupAll.stream().map(v -> (Text) v).forEach(v -> {
 
 			String text = v.getText();
-			int count = collectedTable.get(text).size();
+			int count = supplier.getCollectedTable().get(text).size();
 			int textLength = text.length();
 			if (textLength > 15) {
 				int lastIndexOf = text.lastIndexOf("/");
@@ -118,32 +106,23 @@ public class SvnChagnedCodeComposite extends BorderPane {
 		});
 	}
 
-
-
 	public void dataOnMouseClick(MouseEvent e, Data d) {
 
 		if (e.getClickCount() == 1 && e.getButton() == MouseButton.PRIMARY) {
 
 			//			Long long1 = collectedTable.get(d.getName());
 
-			ObservableList<GargoyleSVNLogEntryPath> list = FXCollections.observableArrayList(collectedTable.get(d.getName()));
+			ObservableList<GargoyleSVNLogEntryPath> list = FXCollections.observableArrayList(supplier.getCollectedTable().get(d.getName()));
 			if (!list.isEmpty()) {
+				GargoyleSVNLogEntryPath gargoyleSVNLogEntryPath = list.get(0);
 
 				BorderPane borderPane = new BorderPane();
-				borderPane.setTop(new Label(list.get(0).getPath()));
+				borderPane.setTop(new Label(gargoyleSVNLogEntryPath.getPath()));
 				borderPane.setCenter(supplier.createHistoryListView(list));
-				PopOver popOver = new PopOver(borderPane);
-				popOver.show(d.getNode());
+				FxUtil.showPopOver(d.getNode(), borderPane);
 			}
 
 		}
 	}
-
-	//	JavaTextArea createJavaTextArea(String content) {
-	//		JavaTextArea javaTextArea = new JavaTextArea();
-	//		javaTextArea.setPrefSize(1200, 800);
-	//		javaTextArea.setContent(content);
-	//		return javaTextArea;
-	//	}
 
 }

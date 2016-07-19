@@ -26,6 +26,7 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 
+import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -546,7 +547,7 @@ public class FxUtil {
 	}
 
 	/********************************
-	 * 작성일 :  2016. 7. 14. 작성자 : KYJ
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
 	 *
 	 *
 	 * @param scene
@@ -559,7 +560,7 @@ public class FxUtil {
 	}
 
 	/********************************
-	 * 작성일 :  2016. 7. 14. 작성자 : KYJ
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
 	 *
 	 *
 	 * @param scene
@@ -746,6 +747,7 @@ public class FxUtil {
 
 	/**
 	 * RGB 색상 리턴.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 19.
 	 * @param color
@@ -755,6 +757,22 @@ public class FxUtil {
 		if (color == null)
 			return "BLACK";
 		return String.format("#%02X%02X%02X", (int) (color.getRed() * 255), (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 19. 작성자 : KYJ
+	 *
+	 * Show PopOver
+	 * 
+	 * @param root 
+	 * @param showingNode
+	 ********************************/
+	public static void showPopOver(Node root, Node showingNode) {
+		if (root == showingNode)
+			return;
+
+		PopOver popOver = new PopOver(showingNode);
+		popOver.show(root);
 	}
 
 }
