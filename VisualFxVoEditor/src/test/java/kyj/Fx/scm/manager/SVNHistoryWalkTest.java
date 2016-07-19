@@ -101,6 +101,13 @@ public class SVNHistoryWalkTest {
 		System.out.println(localServerManager.getAllLogs(""));
 	}
 
+	@Test
+	public void historyWalkTest3() throws SVNException {
+		Calendar instance = Calendar.getInstance();
+		instance.set(2016, 6, 8);
+		System.out.println(localServerManager2.getAllLogs(instance.getTime()));
+	}
+
 	/**
 	 * 현재 일자에 최신 커밋내역을 조회.
 	 * @작성자 : KYJ
@@ -147,7 +154,8 @@ public class SVNHistoryWalkTest {
 
 		SimpleDateFormat format = new SimpleDateFormat(DateUtil.SYSTEM_DATEFORMAT_YYYY_MM_DD);
 
-		TreeMap<String, Long> collect = allLogs.stream().collect(Collectors.groupingBy(v -> format.format(v.getDate()), TreeMap::new, Collectors.mapping(v -> 1, Collectors.counting())));
+		TreeMap<String, Long> collect = allLogs.stream().collect(
+				Collectors.groupingBy(v -> format.format(v.getDate()), TreeMap::new, Collectors.mapping(v -> 1, Collectors.counting())));
 
 		//		Map<String, Long> collect = allLogs.stream()
 		//				.collect(Collectors.groupingBy(v -> format.format(v.getDate()), Collectors.mapping(v -> 1, Collectors.counting())));

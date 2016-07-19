@@ -8,11 +8,15 @@ package com.kyj.fx.voeditor.visual.example;
 
 import java.util.Properties;
 
+import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
 import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
+import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 
 /**
@@ -37,11 +41,17 @@ public class ScmCommitCompositeExam extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		Properties properties = new Properties();
-		properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn");
+		properties.put(JavaSVNManager.SVN_URL, "svn://10.40.41.49/");
 		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
 		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
 
-		primaryStage.setScene(new Scene(new ScmCommitComposite(properties)));
+		FxSVNHistoryDataSupplier svnDataSupplier = new FxSVNHistoryDataSupplier(new JavaSVNManager(properties));
+
+		SvnChagnedCodeComposite svnChagnedCodeComposite = new SvnChagnedCodeComposite(svnDataSupplier);
+		ScmCommitComposite scmCommitComposite = new ScmCommitComposite(svnDataSupplier);
+		TabPane tabPane = new TabPane();
+		tabPane.getTabs().addAll(new Tab("Chagned Codes.", svnChagnedCodeComposite), new Tab("Commit Hist.", scmCommitComposite));
+		primaryStage.setScene(new Scene(tabPane));
 		primaryStage.show();
 	}
 

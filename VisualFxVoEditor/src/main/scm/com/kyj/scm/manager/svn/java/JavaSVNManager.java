@@ -457,6 +457,19 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	}
 
 	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 19.
+	 * @param date
+	 * @return
+	 * @throws SVNException
+	 */
+	public Collection<SVNLogEntry> getAllLogs(Date date) throws SVNException {
+		long startRevision = getRevision(date);
+		long endRevision = getRevision(date);
+		return getAllLogs(startRevision, endRevision);
+	}
+
+	/**
 	 * 가장 최신 리비젼 번호를 구함.
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.

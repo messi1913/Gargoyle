@@ -26,6 +26,15 @@ public class GagoyleDate {
 
 	private int day;
 
+	public GagoyleDate(Date date) {
+		Calendar instance = Calendar.getInstance();
+		instance.setTime(date);
+
+		this.year = instance.get(Calendar.YEAR);
+		this.month = instance.get(Calendar.MONTH);
+		this.day = instance.get(Calendar.DATE);
+	}
+
 	public GagoyleDate(int year, int month, int day) {
 		this.year = year;
 		this.month = month;

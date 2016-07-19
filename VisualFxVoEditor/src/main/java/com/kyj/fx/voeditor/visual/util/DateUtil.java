@@ -119,12 +119,27 @@ public class DateUtil {
 
 	public static List<GagoyleDate> getPeriodDaysByWeek(int startYear, int startWeek, int endYear, int endWeek) {
 
-		List<GagoyleDate> periodDaysByWeek1 = getPeriodDaysByWeek(startYear, startWeek);
-		List<GagoyleDate> periodDaysByWeek2 = getPeriodDaysByWeek(endYear, endWeek);
+		Calendar firstCalendar = GregorianCalendar.getInstance();
+		firstCalendar.setWeekDate(startYear, startWeek, Calendar.SUNDAY);
+//		Date firstDate = firstCalendar.getTime();
 
-		ArrayList<GagoyleDate> arrayList = new ArrayList<>(periodDaysByWeek1.size() + periodDaysByWeek2.size());
-		arrayList.addAll(periodDaysByWeek1);
-		arrayList.addAll(periodDaysByWeek2);
+		Calendar lastCalendar = GregorianCalendar.getInstance();
+		lastCalendar.setWeekDate(endYear, endWeek, Calendar.SUNDAY);
+//		Date lastDate = lastCalendar.getTime();
+
+		ArrayList<GagoyleDate> arrayList = new ArrayList<>();
+		while (firstCalendar.before(lastCalendar)) {
+			firstCalendar.add(Calendar.DATE, 1);
+			arrayList.add(new GagoyleDate(firstCalendar.getTime()));
+		}
+
+//		List<GagoyleDate> periodDaysByWeek1 = getPeriodDaysByWeek(startYear, startWeek);
+//		List<GagoyleDate> periodDaysByWeek2 = getPeriodDaysByWeek(endYear, endWeek);
+//
+//		ArrayList<GagoyleDate> arrayList = new ArrayList<>(periodDaysByWeek1.size() + periodDaysByWeek2.size());
+//		arrayList.addAll(periodDaysByWeek1);
+//		arrayList.addAll(periodDaysByWeek2);
+
 		return arrayList;
 	}
 

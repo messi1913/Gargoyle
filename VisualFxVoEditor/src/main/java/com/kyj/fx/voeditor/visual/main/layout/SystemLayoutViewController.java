@@ -760,7 +760,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	/**
 	 * Help > About Click Event.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
 	 * @param e
@@ -1501,7 +1501,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
 	 *
 	 * 트리에 선택된 모델 리턴.
-	 * 
+	 *
 	 * @return
 	 ********************************/
 	public final MultipleSelectionModel<TreeItem<FileWrapper>> getTreeProjectFileSelectionModel() {
