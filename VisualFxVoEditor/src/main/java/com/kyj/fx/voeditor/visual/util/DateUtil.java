@@ -36,6 +36,7 @@ public class DateUtil {
 	public static final String SYSTEM_DATEFORMAT_SSS = "SSS";
 	public static final String SYSTEM_DATEFORMAT_YYYYMMDD = "yyyyMMdd";
 	public static final String SYSTEM_DATEFORMAT_YYYY_MM_DD = "yyyy-MM-dd";
+	public static final String SYSTEM_DATEFORMAT_YYYY_MM_DD_EEE = "yyyy-MM-dd EEE";
 	public static final String SYSTEM_DATEFORMAT_YYYY_MM = "yyyyMM";
 	public static final String SYSTEM_DATEFORMAT_YYYY = "yyyy";
 	public static final String SYSTEM_DATEFORMAT_YY_MM_DD_HH_MM_SS = "yy-MM-dd HH:mm:ss";
