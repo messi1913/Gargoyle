@@ -117,7 +117,8 @@ public class ExcelUtil {
 		} else if (str == null) {
 			createCell.setCellValue("");
 		} else {
-			throw new Exception("뭘 입력하신겁니까?");
+			createCell.setCellValue(str.toString());
+//			throw new Exception("뭘 입력하신겁니까?");
 		}
 
 		return createCell;
