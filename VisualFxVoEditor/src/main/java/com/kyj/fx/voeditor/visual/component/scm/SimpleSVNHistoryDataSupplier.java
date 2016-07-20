@@ -34,7 +34,7 @@ import com.kyj.scm.manager.svn.java.JavaSVNManager;
 /**
  *
  * SVN과 연계된 API 제공.
- * 
+ *
  * @author KYJ
  *
  */
@@ -90,7 +90,7 @@ class SimpleSVNHistoryDataSupplier extends AbstracrtSVNHistoryDataSupplier {
 
 	/**
 	 * 데이터 조회.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 19.
 	 * @param path
@@ -99,6 +99,10 @@ class SimpleSVNHistoryDataSupplier extends AbstracrtSVNHistoryDataSupplier {
 	 */
 	public String cat(String path, String revision) {
 		return getManager().cat(path, revision);
+	}
+
+	public String cat(String path, long revision) {
+		return getManager().cat(path, String.valueOf(revision));
 	}
 
 	/********************************

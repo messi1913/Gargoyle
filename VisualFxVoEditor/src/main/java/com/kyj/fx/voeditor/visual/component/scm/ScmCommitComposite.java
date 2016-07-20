@@ -23,9 +23,9 @@ import org.tmatesoft.svn.core.SVNLogEntry;
 import com.kyj.fx.voeditor.visual.component.MasterSlaveChartComposite;
 import com.kyj.fx.voeditor.visual.framework.model.GagoyleDate;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
+import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
@@ -93,7 +93,7 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 				}
 				barChartDayOfMonth.setStyle(
 						".chart-legend-item-syCmbol chart-bar series0 bar-legend-symbol default-color0{- fx-background-color:green;}");
-				/*end Desing css.*/
+						/*end Desing css.*/
 
 				/*start Popover*/
 				//무조건 1개의 시리즈만 처리하므로 인덱스에서 바로 가져옴.
@@ -147,7 +147,8 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 
 		ObservableList<SVNLogEntry> collect = list.stream().filter(v -> {
 			return xValue.equals(FxSVNHistoryDataSupplier.YYYYMMDD_EEE_PATTERN.format(v.getDate()));
-		}).distinct().collect(() -> FXCollections.observableArrayList(), (a, b) -> a.add(b), (a, b) -> a.addAll(b));
+		}).distinct().collect(FxCollectors.toObservableList());
+
 		ListView<SVNLogEntry> createHistoryListView = supplier.createEntryListView(collect);
 
 		BorderPane borderPane = new BorderPane(createHistoryListView);
@@ -169,7 +170,7 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 
 		Map<String, Long> dayOfWeeks = new LinkedHashMap<>();
 
-		//초기값 세팅.
+		//초기값 세팅. [중요한건 정렬순서를 유지해아하므로. 초기값을 넣어준것.]
 		for (GagoyleDate d : DateUtil.getPeriodDaysByWeek()) {
 			String eee = FxSVNHistoryDataSupplier.EEE_PATTERN.format(d.toDate());
 			dayOfWeeks.put(eee, new Long(0));
@@ -177,9 +178,6 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 		//실제값 add
 		dayOfWeeks.putAll(allLogs.stream()
 				.collect(Collectors.groupingBy(v -> FxSVNHistoryDataSupplier.EEE_PATTERN.format(v.getDate()), Collectors.counting())));
-
-		//		getBarChartDayOfMonthCategory().getCategories().addAll(dayOfMonths.keySet());
-		//		getLineChartDayOfWeekCategory().getCategories().addAll(dayOfWeeks.keySet());
 
 		{
 			BarChart<String, Long> barChartDayOfMonth = getBarChartDayOfMonth();
@@ -189,7 +187,6 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 			Series<String, Long> series = new Series<>(SERIES_LABEL, convert);
 			barChartDayOfMonth.getData().add(series);
 
-			//			series.getData().addAll(convert);
 		}
 
 		{
@@ -199,7 +196,6 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 			Series<String, Long> series = new Series<>(SERIES_LABEL, convert);
 			lineChartDayOfWeek.getData().add(series);
 
-			//			series.getData().addAll(convert);
 		}
 
 	}
@@ -221,12 +217,7 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 			String key = ent.getKey();
 			Long value = ent.getValue();
 			return new XYChart.Data<>(key, value);
-		}).collect(() -> FXCollections.observableArrayList(), (a, b) -> {
-
-			//			int g = a.size() / 7;
-			//			b.setXValue("[" + g + "]    ".concat(b.getXValue()));
-			a.add(b);
-		}, (a, b) -> a.addAll(b));
+		}).collect(FxCollectors.toObservableList());
 
 	}
 
