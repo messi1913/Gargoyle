@@ -334,12 +334,10 @@ public class CommandTest3 {
 	 * 작성일 : 2016. 5. 5. 작성자 : KYJ
 	 *
 	 * 차이점 비교 테스트
-	 *
-	 * @throws FileNotFoundException
-	 * @throws SVNException
+	 * @throws Exception
 	 ********************************/
 	@Test
-	public void diff() throws FileNotFoundException, SVNException {
+	public void diff() throws Exception {
 		String diff = testServerManager.diff("/additional/batch-core/pom.xml", SVNRevision.parse("725"), "/additional/batch-core/pom.xml",
 				SVNRevision.parse("784"));
 		System.out.println(diff);

@@ -747,7 +747,7 @@ public class FxUtil {
 
 	/**
 	 * RGB 색상 리턴.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 19.
 	 * @param color
@@ -763,13 +763,14 @@ public class FxUtil {
 	 * 작성일 : 2016. 7. 19. 작성자 : KYJ
 	 *
 	 * Show PopOver
-	 * 
-	 * @param root 
+	 *
+	 * @param root
 	 * @param showingNode
 	 ********************************/
 	public static void showPopOver(Node root, Node showingNode) {
 		if (root == showingNode)
 			return;
+
 
 		PopOver popOver = new PopOver(showingNode);
 		popOver.show(root);

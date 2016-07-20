@@ -15,8 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
+import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
+import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
@@ -24,9 +26,13 @@ import com.kyj.scm.manager.svn.java.JavaSVNManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -34,6 +40,10 @@ import javafx.util.Callback;
 
 /**
  * JAVA FX와 연계된 API를 제공.
+ *
+ * SVN에서 가져온 데이터에 대한 공유변수 역할 처리함.
+ *
+ * 스레드에 안정적이지 않으므로 싱글톤 사용은 금지.
  *
  * @author KYJ
  *
@@ -47,10 +57,18 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 	}
 
 	public FxSVNHistoryDataSupplier(JavaSVNManager manager) throws SVNException {
-		this(manager, 4, 25);
+		this(manager, 3, 25);
 	}
 
-	ListView<GargoyleSVNLogEntryPath> createHistoryListView(ObservableList<GargoyleSVNLogEntryPath> list) {
+	public ListView<GargoyleSVNLogEntryPath> createHistoryListView(String relativePath) {
+
+		List<GargoyleSVNLogEntryPath> list = getCollectedTable().get(relativePath);
+		ListView<GargoyleSVNLogEntryPath> createHistoryListView = createHistoryListView(FXCollections.observableArrayList(list));
+		createHistoryListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		return createHistoryListView;
+	}
+
+	public ListView<GargoyleSVNLogEntryPath> createHistoryListView(ObservableList<GargoyleSVNLogEntryPath> list) {
 		ListView<GargoyleSVNLogEntryPath> listView = new ListView<GargoyleSVNLogEntryPath>(list);
 		listView.setCellFactory(new Callback<ListView<GargoyleSVNLogEntryPath>, ListCell<GargoyleSVNLogEntryPath>>() {
 
@@ -99,8 +117,16 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 
 		listView.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
 
+			ContextMenu contextMenu = null;
+
+			ObservableList<GargoyleSVNLogEntryPath> selectedItems = listView.getSelectionModel().getSelectedItems();
+			GargoyleSVNLogEntryPath selectedItem = null;
+			if (selectedItems != null && !selectedItems.isEmpty()) {
+				selectedItem = selectedItems.get(0);
+			}
+
 			if (ev.getClickCount() == 2 && ev.getButton() == MouseButton.PRIMARY) {
-				GargoyleSVNLogEntryPath selectedItem = listView.getSelectionModel().getSelectedItem();
+
 				if (selectedItem != null) {
 					String path = selectedItem.getPath();
 
@@ -142,11 +168,67 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 
 				}
 				ev.consume();
+
+			} else if (ev.getClickCount() == 1 && ev.getButton() == MouseButton.SECONDARY) {
+
+				ObservableList<MenuItem> menus = FXCollections.observableArrayList();
+
+				MenuItem miHist = new MenuItem("History");
+				miHist.setUserData(selectedItem);
+				MenuItem miDiff = new MenuItem("Diff");
+				miDiff.setDisable(true);
+				menus.add(miHist);
+				menus.add(miDiff);
+
+				if (selectedItems.size() == 2) {
+					miDiff.setUserData(selectedItems);
+					miDiff.setDisable(false);
+				}
+
+				miHist.setOnAction(event -> {
+					GargoyleSVNLogEntryPath userData = (GargoyleSVNLogEntryPath) miHist.getUserData();
+					if (userData == null)
+						return;
+
+					FxUtil.showPopOver(ev.getPickResult().getIntersectedNode(), createHistoryListView(userData.getPath()));
+				});
+
+				miDiff.setOnAction(event -> {
+
+					List<GargoyleSVNLogEntryPath> userData = (List<GargoyleSVNLogEntryPath>) miDiff.getUserData();
+					if (userData == null && userData.size() != 2)
+						return;
+
+					GargoyleSVNLogEntryPath gargoyleSVNLogEntryPath1 = userData.get(0);
+					GargoyleSVNLogEntryPath gargoyleSVNLogEntryPath2 = userData.get(1);
+
+					try {
+						String diff = diff(gargoyleSVNLogEntryPath1.getPath(), gargoyleSVNLogEntryPath1.getCopyRevision(),
+								gargoyleSVNLogEntryPath2.getCopyRevision());
+
+						TextArea showingNode = new TextArea(diff);
+						showingNode.setPrefSize(600d, 800d);
+
+						FxUtil.showPopOver(ev.getPickResult().getIntersectedNode(), showingNode);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+				});
+
+				contextMenu = new ContextMenu(menus.stream().toArray(MenuItem[]::new));
+
+				contextMenu.show(ev.getPickResult().getIntersectedNode(), ev.getScreenX(), ev.getScreenY());
 			}
+
 		});
 
 		return listView;
 	}
+
+//	MenuItem createDiffMenu(){
+//
+//	}
 
 	ListView<SVNLogEntry> createEntryListView(ObservableList<SVNLogEntry> list) {
 		ListView<SVNLogEntry> listView = new ListView<SVNLogEntry>(list);
@@ -180,7 +262,7 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 				return listCell;
 			}
 		});
-		//		listView.setPrefSize(600, ListView.USE_COMPUTED_SIZE);
+		listView.setPrefSize(600, ListView.USE_COMPUTED_SIZE);
 
 		listView.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
 
@@ -192,7 +274,7 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 					if (ValueUtil.isNotEmpty(changedPaths)) {
 
 						ObservableList<GargoyleSVNLogEntryPath> collect = createStream(Arrays.asList(selectedItem))
-								.collect(() -> FXCollections.observableArrayList(), (a, b) -> a.add(b), (a, b) -> a.addAll(b));
+								.collect(FxCollectors.toObservableList());
 
 						Node showing = null;
 						if (collect.isEmpty()) {
@@ -217,6 +299,10 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 		javaTextArea.setPrefSize(1200, 800);
 		javaTextArea.setContent(content);
 		return javaTextArea;
+	}
+
+	public String diff(String path, long revision1, long revision2) throws Exception {
+		return getManager().diff(path, SVNRevision.create(revision1), path, SVNRevision.create(revision2));
 	}
 
 }

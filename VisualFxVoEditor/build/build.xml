@@ -74,8 +74,8 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi-ooxml\3.10.1">
-				<filename name="poi-ooxml-3.10.1.jar" />
+			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi-ooxml\3.14">
+				<filename name="poi-ooxml-3.14.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
@@ -199,8 +199,8 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi-ooxml-schemas\3.10.1">
-				<filename name="poi-ooxml-schemas-3.10.1.jar" />
+			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi-ooxml-schemas\3.14">
+				<filename name="poi-ooxml-schemas-3.14.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
@@ -244,8 +244,8 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi\3.10.1">
-				<filename name="poi-3.10.1.jar" />
+			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi\3.14">
+				<filename name="poi-3.14.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
@@ -474,8 +474,8 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi-scratchpad\3.10.1">
-				<filename name="poi-scratchpad-3.10.1.jar" />
+			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi-scratchpad\3.14">
+				<filename name="poi-scratchpad-3.14.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
@@ -488,7 +488,7 @@
 				<filename name="javaparser-core-2.4.0.jar" />
 			</fileset>
 		</copy>
-		
+
 
 		<mkdir dir="project" />
 		<copy todir="project">
@@ -547,8 +547,8 @@
 				<include name="jsch.agentproxy.sshagent-0.0.7.jar" />
 				<include name="jsch.agentproxy.pageant-0.0.7.jar" />
 				<include name="spring-core-3.2.3.RELEASE.jar" />
-				<include name="poi-ooxml-3.10.1.jar" />
-				<include name="poi-scratchpad-3.10.1.jar" />
+				<include name="poi-ooxml-3.14.jar" />
+				<include name="poi-scratchpad-3.14.jar" />
 				<include name="btrace-agent.jar" />
 				<include name="logback-core-1.1.2.jar" />
 				<include name="svnkit-1.8.12.jar" />
@@ -601,7 +601,7 @@
 				<include name="hamcrest-core-1.3.jar" />
 				<include name="reflections-0.9.9-RC1.jar" />
 				<include name="httpmime-4.3.6.jar" />
-				<include name="poi-ooxml-schemas-3.10.1.jar" />
+				<include name="poi-ooxml-schemas-3.14.jar" />
 				<include name="spring-tx-3.2.3.RELEASE.jar" />
 				<include name="gson-2.4.jar" />
 				<include name="platform-3.4.0.jar" />
@@ -623,7 +623,7 @@
 				<include name="postgresql-9.1-901-1.jdbc4.jar" />
 				<include name="ridl-2.3.0.jar" />
 				<include name="jurt-2.3.0.jar" />
-				<include name="poi-3.10.1.jar" />
+				<include name="poi-3.14.jar" />
 				<include name="sqljet-1.1.10.jar" />
 				<include name="jsch.agentproxy.core-0.0.7.jar" />
 				<include name="spring-context-3.2.3.RELEASE.jar" />
@@ -637,15 +637,15 @@
 				<include name="jackson-annotations-2.4.2.jar" />
 				<include name="sqlite-jdbc-3.8.11.2.jar" />
 				<include name="javaparser-core-2.4.0.jar" />
-				
-					
+
+
 			</fileset>
 		</copy>
 
 		<!-- Copy project references -->
 
 		<!-- Copy project sources itself -->
-		
+
 		<!--
 		<copy todir="build/src">
 			<fileset dir="project/src/test/java">
@@ -657,7 +657,7 @@
 				<include name="**/*" />
 			</fileset>
 		</copy>
-		
+
 		<copy todir="build/src">
 			<fileset dir="project/src/test/resources">
 				<include name="**/*" />
@@ -670,7 +670,7 @@
 				<include name="**/*" />
 			</fileset>
 		</copy>
-		
+
 		<copy todir="build/src">
 			<fileset dir="project/src/main/compiler">
 				<include name="**/*" />
@@ -702,7 +702,7 @@
 
 		<!-- Copy over none Java-Files -->
 		<copy todir="build/classes">
-			
+
 			<fileset dir="project/src/test/java">
 				<exclude name="**/*" />
 			</fileset>
@@ -712,7 +712,7 @@
 			<fileset dir="project/src/test/resources">
 				<exclude name="**/*" />
 			</fileset>
-				
+
 			<fileset dir="project/src/main/projmagt">
 				<exclude name="**/*.java" />
 			</fileset>

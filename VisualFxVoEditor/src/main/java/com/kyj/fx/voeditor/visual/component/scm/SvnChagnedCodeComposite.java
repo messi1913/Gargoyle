@@ -23,17 +23,25 @@ import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.PieChart.Data;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 
 /**
@@ -51,6 +59,8 @@ public class SvnChagnedCodeComposite extends BorderPane {
 
 	private List<Data> dataList;
 
+	private ContextMenu contextMenu;
+
 	public SvnChagnedCodeComposite(FxSVNHistoryDataSupplier supplier)
 			throws SVNException, NullPointerException, GagoyleException, IOException {
 		this.supplier = supplier;
@@ -60,6 +70,7 @@ public class SvnChagnedCodeComposite extends BorderPane {
 
 	@FXML
 	public void initialize() {
+		createContextMenu();
 
 		Collection<SVNLogEntry> allLogs = supplier.getAllLogs();
 		LOGGER.debug("Log Count : {}", allLogs.size());
@@ -82,11 +93,25 @@ public class SvnChagnedCodeComposite extends BorderPane {
 		Set<Node> lookupAll = piChartChagendCode.lookupAll(".chart-pie-label");
 
 		for (Data d : piChartChagendCode.getData()) {
-			Tooltip.install(d.getNode(),
-					new Tooltip(String.format("Source Code : %s\nModify Count:%d", d.getName(), (int) d.getPieValue())));
+			Node node = d.getNode();
+			Tooltip.install(node, new Tooltip(String.format("Source Code : %s\nModify Count:%d", d.getName(), (int) d.getPieValue())));
 
-			d.getNode().setOnMouseClicked(e -> {
+			node.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 				dataOnMouseClick(e, d);
+				e.consume();
+			});
+
+			/*animation effect. */
+			node.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, ev -> {
+
+				Platform.runLater(() -> node.setStyle("-fx-background-color:derive(-fx-color,-5%);"));
+
+			});
+			/*animation effect. */
+			node.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, ev -> {
+
+				Platform.runLater(() -> node.setStyle(null));
+
 			});
 
 		}
@@ -104,24 +129,89 @@ public class SvnChagnedCodeComposite extends BorderPane {
 			text = text.concat("   [").concat(String.valueOf(count)).concat("]");
 			v.setText(text);
 		});
+
+		Platform.runLater(() -> {
+			this.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::sceneOnKeyPressed);
+		});
+
+	}
+
+	/**
+	 * 차트 위치를 복구하는 기능을 처리.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 20.
+	 * @param e
+	 */
+	public void sceneOnKeyPressed(KeyEvent e) {
+		if (e.getCode() == KeyCode.ESCAPE) {
+
+			setRight(null);
+			e.consume();
+		}
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 20.
+	 */
+	private void createContextMenu() {
+
+		MenuItem miViewHistory = new MenuItem("View History");
+		miViewHistory.setOnAction(ev -> {
+
+			//			Object source = ev.getSource();
+			//			System.out.println(source);
+
+			Node ownerNode = contextMenu.getOwnerNode();
+			System.out.println(ownerNode);
+			Node center = getCenter();
+			if ((ownerNode != null && ownerNode instanceof Region) && (center != null && center == piChartChagendCode)) {
+
+				Data userData = (Data) contextMenu.getUserData();
+
+				//				Node[] nodes = {};
+				//				GridPane gridPane = new GridPane();
+				//
+				if (userData != null) {
+					String relativePath = userData.getName();
+
+					ListView<GargoyleSVNLogEntryPath> createHistoryListView = supplier.createHistoryListView(relativePath);
+//					createHistoryListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+					FxUtil.showPopOver(ownerNode, createHistoryListView);
+				}
+
+			}
+
+		});
+
+		contextMenu = new ContextMenu(miViewHistory);
+
 	}
 
 	public void dataOnMouseClick(MouseEvent e, Data d) {
 
 		if (e.getClickCount() == 1 && e.getButton() == MouseButton.PRIMARY) {
-
+			contextMenu.hide();
 			//			Long long1 = collectedTable.get(d.getName());
 
 			ObservableList<GargoyleSVNLogEntryPath> list = FXCollections.observableArrayList(supplier.getCollectedTable().get(d.getName()));
 			if (!list.isEmpty()) {
 				GargoyleSVNLogEntryPath gargoyleSVNLogEntryPath = list.get(0);
-
 				BorderPane borderPane = new BorderPane();
 				borderPane.setTop(new Label(gargoyleSVNLogEntryPath.getPath()));
 				borderPane.setCenter(supplier.createHistoryListView(list));
+				borderPane.setBottom(new Label(String.valueOf(list.size()) + " ea"));
 				FxUtil.showPopOver(d.getNode(), borderPane);
 			}
 
+		} else if (e.getClickCount() == 1 && e.getButton() == MouseButton.SECONDARY) {
+			Node owner = d.getNode();
+			if (!contextMenu.isShowing()) {
+				contextMenu.setUserData(d);
+				contextMenu.show(owner, e.getScreenX(), e.getScreenY());
+			}
 		}
 	}
 

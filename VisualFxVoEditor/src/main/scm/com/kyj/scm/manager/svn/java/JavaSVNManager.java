@@ -257,9 +257,9 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	 * @param path1
 	 * @param path2
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 ********************************/
-	public String diff(String path1, String path2) throws SVNException {
+	public String diff(String path1, String path2) throws Exception {
 		return diffCommand.diff(path1, path2);
 	}
 
@@ -272,9 +272,9 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	 * @param path2
 	 * @param rivision2
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 ********************************/
-	public String diff(String path1, SVNRevision rivision1, String path2, SVNRevision rivision2) throws SVNException {
+	public String diff(String path1, SVNRevision rivision1, String path2, SVNRevision rivision2) throws Exception {
 		return diffCommand.diff(path1, rivision1, path2, rivision2);
 	}
 

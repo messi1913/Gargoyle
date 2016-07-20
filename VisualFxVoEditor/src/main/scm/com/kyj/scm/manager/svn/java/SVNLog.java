@@ -82,8 +82,9 @@ class SVNLog extends AbstractSVN implements ILogCommand<String, List<SVNLogEntry
 				//				LOGGER.debug("properties :: " + logEntry.getRevisionProperties());
 				result.add(logEntry);
 			};
-			logClient.doLog(getSvnURL(), new String[] { path }, SVNRevision.create(Long.parseLong(revision)), SVNRevision.create(Long.parseLong(revision)), SVNRevision.HEAD, true,
-					false, 10L, handler);
+			logClient.doLog(getSvnURL(), new String[] { path }, SVNRevision.create(Long.parseLong(revision)),
+					SVNRevision.create(Long.parseLong(revision) == -1 ? 0 : Long.parseLong(revision)), SVNRevision.HEAD, true, false, 10L,
+					handler);
 
 		} catch (SVNException e) {
 			LOGGER.error(ValueUtil.toString(e));
