@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -34,7 +35,10 @@ import com.kyj.fx.voeditor.visual.component.popup.GagoyleWorkspaceOpenResourceVi
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.popup.SelectWorkspaceView;
 import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
+import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
+import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
+import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
@@ -57,6 +61,8 @@ import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.util.ProgramSpecUtil;
 import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.SpecTabPane;
+import com.kyj.scm.manager.svn.java.JavaSVNManager;
+import com.kyj.scm.manager.svn.java.SVNWcDbClient;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -544,6 +550,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		final MenuItem menuItemOpenWithSceneBuilder = new MenuItem("SceneBuilder");
 		final MenuItem menuItemSCMGraphs = new MenuItem("SCM Graphs");
 		menuItemSCMGraphs.setDisable(true);
+		menuItemSCMGraphs.setOnAction(this::menuItemSCMGraphsOnAction);
 		menuItemOpenWithSceneBuilder.setOnAction(this::menuItemOpenWithSceneBuilderOnAction);
 		menuOpenWidth.setOnShowing(event -> {
 
@@ -570,9 +577,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						menuItemOpenWithSceneBuilder.setDisable(true);
 					}
 				} //else if (selectedTreeItem instanceof JavaProjectFileTreeItem) {
-					if (fileWrapper.isSVNConnected())
-						isDisableSCMGraphsMenuItem = false;
-//				}
+				if (fileWrapper.isSVNConnected())
+					isDisableSCMGraphsMenuItem = false;
+				//				}
 			}
 
 			if (isRemoveOpenWidthSceneBuilderMenuItem)
@@ -1422,6 +1429,39 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			}
 		}
 
+	}
+
+	public void menuItemSCMGraphsOnAction(ActionEvent event) {
+		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			FileWrapper value = selectedItem.getValue();
+			if (value.isSVNConnected()) {
+				File wcDbFile = value.getWcDbFile();
+				if (wcDbFile.exists()) {
+					try {
+						SVNWcDbClient client = new SVNWcDbClient(wcDbFile);
+						String rootUrl = client.getUrl();
+
+						Properties properties = new Properties();
+						properties.put(JavaSVNManager.SVN_URL, rootUrl);
+
+						FxSVNHistoryDataSupplier svnDataSupplier = new FxSVNHistoryDataSupplier(new JavaSVNManager(properties));
+
+						SvnChagnedCodeComposite svnChagnedCodeComposite = new SvnChagnedCodeComposite(svnDataSupplier);
+						ScmCommitComposite scmCommitComposite = new ScmCommitComposite(svnDataSupplier);
+						TabPane tabPane = new TabPane();
+						tabPane.getTabs().addAll(new Tab("Chagned Codes.", svnChagnedCodeComposite), new Tab("Commit Hist.", scmCommitComposite));
+
+						loadNewSystemTab("Scm Graph", tabPane);
+//						primaryStage.setScene(new Scene(tabPane));
+//						primaryStage.show();
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 
 	/********************************
