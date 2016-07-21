@@ -493,4 +493,18 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 		return this.svnResource.getRevision(date);
 	}
 
+	/**
+	 * SVN Root Url
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @return
+	 */
+	public String getRootUrl() {
+		SVNURL location = this.svnResource.getRepository().getLocation();
+		String decodedString = location.toDecodedString();
+		String uriEncodedPath = location.getURIEncodedPath();
+		String rootUrl = decodedString.replaceAll(uriEncodedPath, "");
+		return rootUrl;
+	}
+
 }

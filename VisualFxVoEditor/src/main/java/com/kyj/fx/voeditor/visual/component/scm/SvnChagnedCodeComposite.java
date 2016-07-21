@@ -36,8 +36,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -130,9 +128,9 @@ public class SvnChagnedCodeComposite extends BorderPane {
 			v.setText(text);
 		});
 
-		Platform.runLater(() -> {
-			this.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::sceneOnKeyPressed);
-		});
+//		Platform.runLater(() -> {
+//			this.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::sceneOnKeyPressed);
+//		});
 
 	}
 
@@ -143,13 +141,13 @@ public class SvnChagnedCodeComposite extends BorderPane {
 	 * @작성일 : 2016. 7. 20.
 	 * @param e
 	 */
-	public void sceneOnKeyPressed(KeyEvent e) {
-		if (e.getCode() == KeyCode.ESCAPE) {
-
-			setRight(null);
-			e.consume();
-		}
-	}
+//	public void sceneOnKeyPressed(KeyEvent e) {
+//		if (e.getCode() == KeyCode.ESCAPE) {
+//
+//			setRight(null);
+//			e.consume();
+//		}
+//	}
 
 	/**
 	 * @작성자 : KYJ
@@ -201,7 +199,8 @@ public class SvnChagnedCodeComposite extends BorderPane {
 				GargoyleSVNLogEntryPath gargoyleSVNLogEntryPath = list.get(0);
 				BorderPane borderPane = new BorderPane();
 				borderPane.setTop(new Label(gargoyleSVNLogEntryPath.getPath()));
-				borderPane.setCenter(supplier.createHistoryListView(list));
+				ListView<GargoyleSVNLogEntryPath> createHistoryListView = supplier.createHistoryListView(list);
+				borderPane.setCenter(createHistoryListView);
 				borderPane.setBottom(new Label(String.valueOf(list.size()) + " ea"));
 				FxUtil.showPopOver(d.getNode(), borderPane);
 			}

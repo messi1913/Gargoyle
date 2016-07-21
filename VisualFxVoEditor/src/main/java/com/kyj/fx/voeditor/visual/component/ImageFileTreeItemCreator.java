@@ -246,7 +246,7 @@ public class ImageFileTreeItemCreator {
 
 			switch (type) {
 			case NOMAL:
-				
+
 				for (File childFile : files) {
 					TreeItem<FileWrapper> createNode = createDefaultNode(createFileWrapper(childFile));
 					children.add(createNode);
@@ -263,7 +263,7 @@ public class ImageFileTreeItemCreator {
 
 			case JAVA_PROJECT_MEMBER:
 
-				
+
 				for (File childFile : files) {
 					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile));
 					children.add(createNode);
@@ -297,7 +297,7 @@ public class ImageFileTreeItemCreator {
 	 * 작성일 : 2016. 7. 10. 작성자 : KYJ
 	 *
 	 * .svn파일안에는 wc.db라는 파일이 존재함.
-	 * 
+	 *
 	 * @param dir
 	 * @return
 	 ********************************/
@@ -310,7 +310,7 @@ public class ImageFileTreeItemCreator {
 	 * 작성일 : 2016. 7. 10. 작성자 : KYJ
 	 *
 	 * 자바 프로젝트 메타정보를 처리함.
-	 * 
+	 *
 	 * @param fileWrapper
 	 ********************************/
 	private void operate(FileWrapper fileWrapper) {
@@ -330,7 +330,7 @@ public class ImageFileTreeItemCreator {
 				if (!isSVNConnected) {
 					if (IS_CONTAINS_SVN_FILE_FILTER.accept(file, file.getName())) {
 						fileWrapper.setSVNConnected(true);
-						fileWrapper.setWcDbFile(new File(new File(file, ".svn"), WCDB_FILE_NAME));
+						fileWrapper.setWcDbFile(new File(file, WCDB_FILE_NAME));
 					}
 				}
 

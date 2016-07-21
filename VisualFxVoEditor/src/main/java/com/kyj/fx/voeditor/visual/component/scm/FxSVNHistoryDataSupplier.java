@@ -114,6 +114,7 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 			}
 		});
 		listView.setPrefSize(600, ListView.USE_COMPUTED_SIZE);
+		listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 		listView.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
 

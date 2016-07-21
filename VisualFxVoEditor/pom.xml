@@ -39,8 +39,8 @@
 
 		<poi.word.version>3.14</poi.word.version>
 
-		<vo.editor.jar.path.name>${user.home}/.m2/repository/kyj/FxVoEditor/kyj.FxVoEditor/0.0.1-SNAPSHOT/kyj.FxVoEditor-0.0.1-SNAPSHOT.jar</vo.editor.jar.path.name>
-		<dao.wizard.jar.path.name>${user.home}/.m2/repository/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/0.0.1-SNAPSHOT/kyj.fx.dao.wizard-0.0.1-SNAPSHOT.jar</dao.wizard.jar.path.name>
+		<vo.editor.jar.path.name>C:\Users\KYJ\STUDY_WEB_APP\m2/kyj/FxVoEditor/kyj.FxVoEditor/0.0.1-SNAPSHOT/kyj.FxVoEditor-0.0.1-SNAPSHOT.jar</vo.editor.jar.path.name>
+		<dao.wizard.jar.path.name>C:\Users\KYJ\STUDY_WEB_APP\m2/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/0.0.1-SNAPSHOT/kyj.fx.dao.wizard-0.0.1-SNAPSHOT.jar</dao.wizard.jar.path.name>
 		<maven.plugin.url>http://repo.maven.apache.org/maven2</maven.plugin.url>
 
 		<openoffice.lib>4.1.2</openoffice.lib>
@@ -582,6 +582,7 @@
 			<scope>system</scope>
 			<systemPath>${dao.wizard.jar.path.name}</systemPath>
 		</dependency>
+
 
 		<dependency>
 			<groupId>ojdbc14</groupId>

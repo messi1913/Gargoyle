@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -29,12 +30,18 @@ import javax.swing.filechooser.FileSystemView;
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tmatesoft.svn.core.SVNException;
 
+import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
+import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
+import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
 import com.kyj.fx.voeditor.visual.framework.InstanceTypes;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
+import com.kyj.scm.manager.svn.java.JavaSVNManager;
+import com.kyj.scm.manager.svn.java.SVNWcDbClient;
 
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -51,6 +58,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.SnapshotResult;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -771,9 +780,52 @@ public class FxUtil {
 		if (root == showingNode)
 			return;
 
-
 		PopOver popOver = new PopOver(showingNode);
 		popOver.show(root);
+	}
+
+	/**
+	 * SVNGraph 노드생성후 리턴.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @param url
+	 * @return
+	 * @throws Exception
+	 */
+	public static TabPane createSVNGraph(String url) throws Exception {
+		Properties properties = new Properties();
+		properties.put(JavaSVNManager.SVN_URL, url);
+		return createSVNGraph(properties);
+	}
+
+	/**
+	 * SVNGraph 노드생성후 리턴.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @param properties
+	 * @return
+	 * @throws Exception
+	 */
+	public static TabPane createSVNGraph(Properties properties) throws Exception {
+		return createSVNGraph(new JavaSVNManager(properties));
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @param manager
+	 * @throws Exception
+	 */
+	public static TabPane createSVNGraph(JavaSVNManager manager) throws Exception {
+		FxSVNHistoryDataSupplier svnDataSupplier = new FxSVNHistoryDataSupplier(manager);
+		SvnChagnedCodeComposite svnChagnedCodeComposite = new SvnChagnedCodeComposite(svnDataSupplier);
+		ScmCommitComposite scmCommitComposite = new ScmCommitComposite(svnDataSupplier);
+		TabPane tabPane = new TabPane();
+		tabPane.getTabs().addAll(new Tab("Chagned Codes.", svnChagnedCodeComposite), new Tab("Commit Hist.", scmCommitComposite));
+		return tabPane;
+
 	}
 
 }

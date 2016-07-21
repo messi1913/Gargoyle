@@ -19,9 +19,13 @@ import com.kyj.fx.voeditor.visual.functions.SVNDiscardLocationFunction;
 import com.kyj.fx.voeditor.visual.loder.SVNInitLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.scm.manager.core.commons.SVNKeywords;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -31,6 +35,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTreeCell;
@@ -60,9 +65,17 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 	private ContextMenu contextMenu;
 	private Menu menuNew;
 	private MenuItem menuAddNewLocation;
+	private MenuItem menuSvnGraph;
 	private MenuItem menuDiscardLocation;
 	private MenuItem menuReflesh;
 	private MenuItem menuCheckout;
+
+	/**
+	 * SVN분석 Graph객체를 보관함.
+	 *
+	 * @최초생성일 2016. 7. 21.
+	 */
+	private ObjectProperty<TabPane> svnGraphProperty = new SimpleObjectProperty<>();
 
 	/**
 	 * repository를 삭제하는 기능을 구현.
@@ -137,31 +150,55 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 		TreeItem<SVNItem> selectedItem = children.get(selectedIndex);
 		if (selectedItem != null) {
 			SVNItem value = selectedItem.getValue();
+
+			getSVNUrl(selectedItem);
 			if (value != null && value instanceof SVNRepository) {
 				SVNRepository repo = (SVNRepository) value;
-				String url = repo.getURL();
-				Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Discard Repository",
-						String.format("Do you want Discard Repository %s ???", url));
-				showYesOrNoDialog.ifPresent(v -> {
+				String url = getSVNUrl(repo);
 
-					if ("Y".equals(v.getValue())) {
-						Boolean apply = discardFunction.apply(repo);
-						if (apply == true) {
-							TreeItem<SVNItem> result = children.remove(selectedIndex);
-							if (result != null)
-								DialogUtil.showMessageDialog("Discard Success!");
-							else
+				NullExpresion.ifNotNullDo(url, svnUrl -> {
+
+					Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Discard Repository",
+							String.format("Do you want Discard Repository %s ???", url));
+
+					showYesOrNoDialog.ifPresent(v -> {
+
+						if ("Y".equals(v.getValue())) {
+							Boolean apply = discardFunction.apply(repo);
+							if (apply == true) {
+								TreeItem<SVNItem> result = children.remove(selectedIndex);
+								if (result != null)
+									DialogUtil.showMessageDialog("Discard Success!");
+								else
+									DialogUtil.showMessageDialog("Discard Fail...");
+							} else {
 								DialogUtil.showMessageDialog("Discard Fail...");
-						} else {
-							DialogUtil.showMessageDialog("Discard Fail...");
+							}
 						}
-					}
+
+					});
 
 				});
 
 			}
 		}
 
+	}
+
+	private static String getSVNUrl(TreeItem<SVNItem> selectedItem) {
+		SVNItem value = selectedItem.getValue();
+		if (value != null && value instanceof SVNRepository) {
+			SVNRepository repo = (SVNRepository) value;
+			if (repo != null)
+				return getSVNUrl(repo);
+		}
+		return null;
+	}
+
+	private static String getSVNUrl(SVNRepository repo) {
+		if (repo != null)
+			return repo.getURL();
+		return null;
 	}
 
 	/**
@@ -197,6 +234,38 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 		} catch (IOException e1) {
 			LOGGER.error(ValueUtil.toString(e1));
 		}
+	}
+
+	/**
+	 * SVN Graph
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @param e
+	 * @throws Exception
+	 */
+	public void menuSVNGraphOnAction(ActionEvent e) {
+
+		final int selectedIndex = getSelectionModel().getSelectedIndex();
+		ObservableList<TreeItem<SVNItem>> children = getRoot().getChildren();
+		TreeItem<SVNItem> selectedItem = children.get(selectedIndex);
+		if (selectedItem != null) {
+			SVNItem value = selectedItem.getValue();
+			if (value != null && value instanceof SVNRepository) {
+				SVNRepository repo = (SVNRepository) value;
+				TabPane createSVNGraph = null;
+				try {
+					createSVNGraph = FxUtil.createSVNGraph(repo.getManager());
+				} catch (Exception e1) {
+					LOGGER.error(ValueUtil.toString(e1));
+				}
+
+				if (createSVNGraph != null) {
+					setSvnGraphProperty(createSVNGraph);
+				}
+			}
+		}
+
 	}
 
 	/**
@@ -247,8 +316,10 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 		TreeItem<SVNItem> selectedItem = getSelectionModel().getSelectedItem();
 		if (selectedItem != null && selectedItem.getValue() instanceof SVNRepository) {
 			menuDiscardLocation.setVisible(true);
+			menuSvnGraph.setVisible(true);
 		} else {
 			menuDiscardLocation.setVisible(false);
+			menuSvnGraph.setVisible(false);
 		}
 	};
 
@@ -269,14 +340,17 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 		menuDiscardLocation = new MenuItem("Discard Location");
 		menuReflesh = new MenuItem("Reflesh");
 		menuCheckout = new MenuItem("Checkout");
+		menuSvnGraph = new MenuItem("SVN Graph");
 
 		menuNew.getItems().add(menuAddNewLocation);
 
 		menuAddNewLocation.setOnAction(this::menuAddNewLocationOnAction);
 		menuDiscardLocation.setOnAction(this::menuDiscardLocationOnAction);
 		menuCheckout.setOnAction(this::menuCheckoutOnAction);
-		contextMenu = new ContextMenu(menuNew, new SeparatorMenuItem(), menuCheckout, new SeparatorMenuItem(), menuDiscardLocation,
-				menuReflesh);
+		menuSvnGraph.setOnAction(this::menuSVNGraphOnAction);
+
+		contextMenu = new ContextMenu(menuNew, new SeparatorMenuItem(), menuCheckout, new SeparatorMenuItem(), menuSvnGraph,
+				new SeparatorMenuItem(), menuDiscardLocation, menuReflesh);
 		// setContextMenu(contextMenu);
 
 		setCellFactory(treeItem -> {
@@ -300,5 +374,19 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 		List<SVNItem> load = loader.load();
 		return load.stream().map(v -> scmTreeMaker.createNode(v)).collect(Collectors.toList());
 	}
+
 	/***********************************************************************************/
+
+	public final ObjectProperty<TabPane> svnGraphPropertyProperty() {
+		return this.svnGraphProperty;
+	}
+
+	public final javafx.scene.control.TabPane getSvnGraphProperty() {
+		return this.svnGraphPropertyProperty().get();
+	}
+
+	public final void setSvnGraphProperty(final javafx.scene.control.TabPane svnGraphProperty) {
+		this.svnGraphPropertyProperty().set(svnGraphProperty);
+	}
+
 }

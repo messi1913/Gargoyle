@@ -42,8 +42,8 @@ public class ScmCommitCompositeExam extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		Properties properties = new Properties();
 		properties.put(JavaSVNManager.SVN_URL, "svn://10.40.41.49");
-		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
-		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
+//		properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
+//		properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
 
 		FxSVNHistoryDataSupplier svnDataSupplier = new FxSVNHistoryDataSupplier(new JavaSVNManager(properties));
 
