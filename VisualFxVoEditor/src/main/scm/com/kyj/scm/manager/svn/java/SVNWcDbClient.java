@@ -21,9 +21,9 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.ISCMUrl;
 
 /***************************
- * 
+ *
  * SVN WcDB파일을 연결하여 메타정보를 가져옴.
- * 
+ *
  * @author KYJ
  *
  ***************************/
@@ -41,11 +41,11 @@ public class SVNWcDbClient implements ISCMUrl {
 
 	/**
 	 * SVN에 관한 메타정보를 파일로부터 얻어오기위한 처리.
-	 * 
+	 *
 	 * 특히 이 클래스는 파일로부터 SVN 서버와 관련된 메타처리.
-	 * 
+	 *
 	 * 더부어 SVN에 연결된 로컬 파일시스템에 대한 메타정보도 얻어 올 수 있음.
-	 * 
+	 *
 	 * @param wcdbFile
 	 * @throws Exception
 	 *             에러가 발생하는경우 SVN과 관련된 충분한 데이터가 없음.
@@ -77,12 +77,14 @@ public class SVNWcDbClient implements ISCMUrl {
 
 		//데이터베이스로부터 SVN URL 정보를 리턴받음.
 		try (Connection con = this.connectionSupplier.get()) {
-			Map<String, Object> findOne = DbUtil.findOne(con, "select id, root from repository limit 1");
-			Object svnUrl = findOne.get("root");
+			Map<String, Object> findOne = DbUtil.findOne(con, "select id, a.root || '/' || b.repos_path as root from repository a inner join nodes_base b on id = b.wc_id limit 1");
 
+
+			Object svnUrl = findOne.get("root");
 			if (ValueUtil.isNotEmpty(svnUrl)) {
 				this.svnUrl = svnUrl.toString();
 			}
+
 
 			Object repositoryId = findOne.get("id");
 			if (ValueUtil.isNotEmpty(svnUrl)) {
