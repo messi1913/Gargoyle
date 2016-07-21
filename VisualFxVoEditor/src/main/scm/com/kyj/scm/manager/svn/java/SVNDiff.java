@@ -61,8 +61,18 @@ public class SVNDiff extends AbstractSVN implements IDiffCommand<String, String,
 		SVNDiffClient diffClient = getSvnManager().getDiffClient();
 		//		StringOutputStream result = new StringOutputStream();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		SVNURL svnUrl1 = SVNURL.parseURIEncoded(getUrl() + "/" + path1);
-		SVNURL svnUrl2 = SVNURL.parseURIEncoded(getUrl() + "/" + path2);
+
+		//		SVNURL svnURL = getSvnURL();
+		//		String repositoryPath = getRepository().getRepositoryPath(path1);
+		SVNURL location = getRepository().getLocation();
+		String decodedString = location.toDecodedString();
+
+		String uriEncodedPath = location.getURIEncodedPath();
+
+		String rootUrl = decodedString.replaceAll(uriEncodedPath, "");
+
+		SVNURL svnUrl1 = SVNURL.parseURIEncoded(rootUrl + "/" + path1/*getRepository().getRepositoryPath(path1)*/);
+		SVNURL svnUrl2 = SVNURL.parseURIEncoded(rootUrl + "/" + path2/*getRepository().getRepositoryPath(path2)*/);
 
 		diffClient.doDiff(svnUrl1, rivision1, svnUrl2, rivision2, SVNDepth.UNKNOWN, true, out);
 		return out.toString("UTF-8");

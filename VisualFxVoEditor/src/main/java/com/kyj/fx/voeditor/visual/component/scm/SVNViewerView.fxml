@@ -61,7 +61,7 @@
 						</BorderPane>
 					</items>
 				</SplitPane>
-				<TabPane>
+				<TabPane fx:id="tabPaneSVN">
 					<tabs>
 						<Tab closable="false" text="Hist Chart">
 							<content>
@@ -74,6 +74,7 @@
 								<BorderPane fx:id="borSource" />
 							</content>
 						</Tab>
+
 					</tabs>
 				</TabPane>
 			</items>

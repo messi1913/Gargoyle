@@ -29,7 +29,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
@@ -39,6 +38,8 @@ import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
@@ -61,6 +62,10 @@ import javafx.stage.Stage;
 @FXMLController(value = "SVNViewerView.fxml", isSelfController = true)
 public class SVNViewer extends BorderPane {
 
+	/**
+	 * @최초생성일 2016. 7. 21.
+	 */
+	private static final int TAB_INDEX_SVN_GRAPH = 2;
 	@FXML
 	private AnchorPane anTreePane;
 	@FXML
@@ -74,10 +79,17 @@ public class SVNViewer extends BorderPane {
 	@FXML
 	private TableColumn<SVNLogEntry, String> colDate;
 
-	private SVNTreeView element;
+	private SVNTreeView tvSvnView;
 
 	@FXML
 	private BorderPane borChart;
+
+	/**
+	 * TabPane.
+	 * @최초생성일 2016. 7. 21.
+	 */
+	@FXML
+	private TabPane tabPaneSVN;
 
 	@FXML
 	private BorderPane borSource;
@@ -90,14 +102,14 @@ public class SVNViewer extends BorderPane {
 
 	@FXML
 	public void initialize() {
-		element = new SVNTreeView();
-		element.setOnAction(this::svnTreeViewOnAction);
-		element.setOnKeyPressed(this::svnTreeVoewOnKeyPressed);
-		anTreePane.getChildren().set(0, element);
-		AnchorPane.setLeftAnchor(element, 0.0);
-		AnchorPane.setRightAnchor(element, 0.0);
-		AnchorPane.setBottomAnchor(element, 0.0);
-		AnchorPane.setTopAnchor(element, 0.0);
+		tvSvnView = new SVNTreeView();
+		tvSvnView.setOnAction(this::svnTreeViewOnAction);
+		tvSvnView.setOnKeyPressed(this::svnTreeVoewOnKeyPressed);
+		anTreePane.getChildren().set(0, tvSvnView);
+		AnchorPane.setLeftAnchor(tvSvnView, 0.0);
+		AnchorPane.setRightAnchor(tvSvnView, 0.0);
+		AnchorPane.setBottomAnchor(tvSvnView, 0.0);
+		AnchorPane.setTopAnchor(tvSvnView, 0.0);
 
 		colRevision.setCellValueFactory(v -> new SimpleObjectProperty<Long>(v.getValue().getRevision()));
 		colUser.setCellValueFactory(v -> new SimpleStringProperty(v.getValue().getAuthor()));
@@ -116,6 +128,18 @@ public class SVNViewer extends BorderPane {
 		MenuItem menuDiff = new MenuItem("Diff");
 		menuDiff.setOnAction(this::menuDiffOnAction);
 		tbRevision.setContextMenu(new ContextMenu(menuDiff));
+
+		tvSvnView.svnGraphPropertyProperty().addListener((oba, oldView, newView) -> {
+
+			if (newView != null) {
+				Tab tabSvnGraph = new Tab("SVN Graph", newView);
+				if (tabPaneSVN.getTabs().size() <= TAB_INDEX_SVN_GRAPH) {
+					tabPaneSVN.getTabs().add(tabSvnGraph);
+				} else {
+					tabPaneSVN.getTabs().add(TAB_INDEX_SVN_GRAPH, tabSvnGraph);
+				}
+			}
+		});
 	}
 
 	/**********************************************************************************************/
@@ -139,7 +163,7 @@ public class SVNViewer extends BorderPane {
 
 			SVNLogEntry svnLogEntry = selectedItems.get(0);
 			SVNLogEntry svnLogEntry2 = selectedItems.get(1);
-			if(svnLogEntry == null || svnLogEntry2 == null)
+			if (svnLogEntry == null || svnLogEntry2 == null)
 				return;
 
 			long revision = svnLogEntry.getRevision();
@@ -151,20 +175,18 @@ public class SVNViewer extends BorderPane {
 
 			try {
 
-
-//				FXMLLoader loader = new FXMLLoader();
-//				loader.setLocation(TextBaseDiffAppController.class.getResource("TextBaseDiffApp.fxml"));
-//				Parent parent = loader.load();
-//				TextBaseDiffAppController controller = loader.getController();
-//				controller.setDiff(cat, cat2);
-				Parent parent = FxUtil.loadAndControllerAction(TextBaseDiffAppController.class, controller->{
+				//				FXMLLoader loader = new FXMLLoader();
+				//				loader.setLocation(TextBaseDiffAppController.class.getResource("TextBaseDiffApp.fxml"));
+				//				Parent parent = loader.load();
+				//				TextBaseDiffAppController controller = loader.getController();
+				//				controller.setDiff(cat, cat2);
+				Parent parent = FxUtil.loadAndControllerAction(TextBaseDiffAppController.class, controller -> {
 					try {
 						controller.setDiff(cat, cat2);
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
 				});
-
 
 				Stage stage = new Stage();
 				stage.setScene(new Scene(parent));
@@ -224,9 +246,9 @@ public class SVNViewer extends BorderPane {
 	public void svnTreeVoewOnKeyPressed(KeyEvent e) {
 		if (e.getCode() == KeyCode.DELETE) {
 
-			TreeItem<SVNItem> selectedItem = element.getSelectionModel().getSelectedItem();
+			TreeItem<SVNItem> selectedItem = tvSvnView.getSelectionModel().getSelectedItem();
 			if (selectedItem != null) {
-				element.menuDiscardLocationOnAction(new ActionEvent());
+				tvSvnView.menuDiscardLocationOnAction(new ActionEvent());
 			}
 		}
 	}

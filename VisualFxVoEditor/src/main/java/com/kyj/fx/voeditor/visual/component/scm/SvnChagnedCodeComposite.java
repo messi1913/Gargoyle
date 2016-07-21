@@ -34,6 +34,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -198,7 +199,8 @@ public class SvnChagnedCodeComposite extends BorderPane {
 				GargoyleSVNLogEntryPath gargoyleSVNLogEntryPath = list.get(0);
 				BorderPane borderPane = new BorderPane();
 				borderPane.setTop(new Label(gargoyleSVNLogEntryPath.getPath()));
-				borderPane.setCenter(supplier.createHistoryListView(list));
+				ListView<GargoyleSVNLogEntryPath> createHistoryListView = supplier.createHistoryListView(list);
+				borderPane.setCenter(createHistoryListView);
 				borderPane.setBottom(new Label(String.valueOf(list.size()) + " ea"));
 				FxUtil.showPopOver(d.getNode(), borderPane);
 			}

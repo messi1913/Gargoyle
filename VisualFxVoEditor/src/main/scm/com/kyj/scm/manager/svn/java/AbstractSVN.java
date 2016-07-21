@@ -99,6 +99,7 @@ abstract class AbstractSVN implements SCMCommonable, SVNKeywords {
 			}
 
 			repository.setAuthenticationManager(authManager);
+			
 
 			DefaultSVNOptions options = new DefaultSVNOptions();
 			svnManager = SVNClientManager.newInstance(options, authManager);

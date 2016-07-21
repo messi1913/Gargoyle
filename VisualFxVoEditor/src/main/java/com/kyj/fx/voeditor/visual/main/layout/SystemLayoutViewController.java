@@ -1431,6 +1431,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	}
 
+	/**
+	 * SCM Graph분석 화면을 생성후 보여주는 처리를 함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @param event
+	 */
 	public void menuItemSCMGraphsOnAction(ActionEvent event) {
 		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
@@ -1445,19 +1452,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						Properties properties = new Properties();
 						properties.put(JavaSVNManager.SVN_URL, rootUrl);
 
-						FxSVNHistoryDataSupplier svnDataSupplier = new FxSVNHistoryDataSupplier(new JavaSVNManager(properties));
-
-						SvnChagnedCodeComposite svnChagnedCodeComposite = new SvnChagnedCodeComposite(svnDataSupplier);
-						ScmCommitComposite scmCommitComposite = new ScmCommitComposite(svnDataSupplier);
-						TabPane tabPane = new TabPane();
-						tabPane.getTabs().addAll(new Tab("Chagned Codes.", svnChagnedCodeComposite), new Tab("Commit Hist.", scmCommitComposite));
-
-						loadNewSystemTab("Scm Graph", tabPane);
-//						primaryStage.setScene(new Scene(tabPane));
-//						primaryStage.show();
+						loadNewSystemTab("Scm Graph", FxUtil.createSVNGraph(properties));
 
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.error(ValueUtil.toString(e));
 					}
 				}
 			}

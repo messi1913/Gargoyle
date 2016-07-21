@@ -29,6 +29,11 @@ import com.kyj.scm.manager.core.commons.ISCMUrl;
  ***************************/
 public class SVNWcDbClient implements ISCMUrl {
 
+	/**
+	 * sqlite sql. SVN저장소의 URL위치를 찾아 리턴.
+	 * @최초생성일 2016. 7. 21.
+	 */
+	private static final String QUERY_SVN_REPOSITORY_LOCATION = "select id, a.root || '/' || b.repos_path as root from repository a inner join nodes_base b on id = b.wc_id limit 1";
 	private File wcdbFile;
 	private String driver = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.DBMS_SQLITE);
 	private String dbUrl;
@@ -77,7 +82,7 @@ public class SVNWcDbClient implements ISCMUrl {
 
 		//데이터베이스로부터 SVN URL 정보를 리턴받음.
 		try (Connection con = this.connectionSupplier.get()) {
-			Map<String, Object> findOne = DbUtil.findOne(con, "select id, a.root || '/' || b.repos_path as root from repository a inner join nodes_base b on id = b.wc_id limit 1");
+			Map<String, Object> findOne = DbUtil.findOne(con, QUERY_SVN_REPOSITORY_LOCATION);
 
 
 			Object svnUrl = findOne.get("root");
