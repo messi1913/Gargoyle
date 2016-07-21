@@ -91,10 +91,10 @@ public class VOEditorParser2 {
 
 			String name = n.getName();
 
-			if (name.startsWith("set") || name.startsWith("get")) {
-				String fieldName = ValueUtil.getIndexLowercase(name.substring(3, name.length()), 0);
-				System.err.println(fieldName);
-			}
+//			if (name.startsWith("set") || name.startsWith("get")) {
+//				String fieldName = ValueUtil.getIndexLowercase(name.substring(3, name.length()), 0);
+//				
+//			}
 
 			super.visit(n, arg);
 		}

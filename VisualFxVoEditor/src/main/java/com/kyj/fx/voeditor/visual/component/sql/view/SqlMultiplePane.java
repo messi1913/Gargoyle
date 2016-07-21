@@ -313,7 +313,7 @@ public abstract class SqlMultiplePane<T, K> extends DockPane implements ISchemaT
 
 			@Override
 			public ReadType fromString(String string) {
-				System.err.println(string);
+				LOGGER.error(string);
 				return null;
 			}
 

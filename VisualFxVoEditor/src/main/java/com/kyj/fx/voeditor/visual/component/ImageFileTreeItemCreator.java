@@ -254,7 +254,7 @@ public class ImageFileTreeItemCreator {
 				break;
 
 			case JAVA_PROJECT:
-				System.err.println(f.isSVNConnected());
+				
 				for (File childFile : files) {
 					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile));
 					children.add(createNode);

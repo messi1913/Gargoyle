@@ -245,7 +245,7 @@ class SvnCommand {
 			p.exitValue();
 
 		} catch (IOException e) {
-			System.err.println(e.getMessage().toString());
+			
 			if (br != null) {
 				try {
 					br.close();
