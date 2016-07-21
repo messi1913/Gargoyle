@@ -6,7 +6,7 @@
  */
 package com.kyj.fx.voeditor.visual.exceptions;
 
-public class ProgramSpecFileNotSurpportException extends GagoyleException {
+public class ProgramSpecFileNotSurpportException extends GargoyleException {
 
 	/**
 	 * 

@@ -23,7 +23,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 
 /**
  * TODO 클래스 역할
@@ -47,11 +47,11 @@ public class SAXPasrerUtil {
 	 * @param file
 	 * @param job
 	 * @throws JAXBException
-	 * @throws GagoyleException
+	 * @throws GargoyleException
 	 */
-	public static <T> void saveXml(File file, T job) throws JAXBException, GagoyleException {
+	public static <T> void saveXml(File file, T job) throws JAXBException, GargoyleException {
 		if (job.getClass().getAnnotation(XmlRootElement.class) == null)
-			throw new GagoyleException("this object is not contains XmlRootElement annotation");
+			throw new GargoyleException("this object is not contains XmlRootElement annotation");
 
 		JAXBContext context = JAXBContext.newInstance(job.getClass());
 		Marshaller m = context.createMarshaller();

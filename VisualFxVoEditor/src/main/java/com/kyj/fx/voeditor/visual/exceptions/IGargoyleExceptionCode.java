@@ -19,12 +19,18 @@ public interface IGargoyleExceptionCode {
 	 * @author KYJ
 	 *
 	 ***************************/
+	/***************************
+	 * 
+	 * @author KYJ
+	 *
+	 ***************************/
 	enum ERROR_CODE {
 
 		EMPTY(""),
-		
+
 		/**
 		 * 값이 NULL인경우.
+		 * 
 		 * @최초생성일 2016. 7. 18.
 		 */
 		NULL("NULL"),
@@ -37,23 +43,42 @@ public interface IGargoyleExceptionCode {
 
 		/**
 		 * 파일이 존재하지않음.
+		 * 
 		 * @최초생성일 2016. 7. 18.
 		 */
 		FILE_NOT_FOUND("FILE_NOT_FOUND"),
+
+		/**
+		 * 파일이 이미 존재함.
+		 * 
+		 * @최초생성일 2016. 7. 18.
+		 */
+		FILE_ALREADY_EXISTS("FILE_ALREADY_EXISTS"),
+
 		/**
 		 * 파라미터 값이 빔.
 		 * 
 		 * @최초생성일 2016. 7. 14.
 		 */
-		PARAMETER_EMPTY("PARAMETER_EMPTY");
-		
-		
+		PARAMETER_EMPTY("PARAMETER_EMPTY"),
+
+		/**
+		 * 접속불가 상태.
+		 * 
+		 * @최초생성일 2016. 7. 21.
+		 */
+		CONNECTION_FAIL("CONNECTION_FAIL");
 
 		String code;
 
 		ERROR_CODE(String code) {
 			this.code = code;
 		}
+
+		public String getCodeMessage() {
+			return code;
+		}
+
 	}
 
 	/********************************
@@ -66,12 +91,12 @@ public interface IGargoyleExceptionCode {
 	public ERROR_CODE getErrorCode();
 
 	/********************************
-	 * 작성일 :  2016. 7. 14. 작성자 : KYJ
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
 	 *
 	 *
 	 * @return
 	 ********************************/
 	public default String getCodeMessage() {
-		return getErrorCode().code;
+		return getErrorCode().getCodeMessage();
 	}
 }

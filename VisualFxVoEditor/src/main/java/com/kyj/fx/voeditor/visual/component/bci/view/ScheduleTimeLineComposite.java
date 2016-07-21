@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.kyj.bci.monitor.ApplicationModel;
 import com.kyj.bci.monitor.MonitorListener;
 import com.kyj.bci.monitor.Monitors;
-import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.main.Main;
@@ -64,7 +64,7 @@ public class ScheduleTimeLineComposite extends BorderPane implements MonitorList
 	// private AtomicInteger allProcessCounting = new AtomicInteger(0);
 	Service<Void> monitorService;
 
-	public ScheduleTimeLineComposite() throws IOException, NullPointerException, GagoyleException {
+	public ScheduleTimeLineComposite() throws IOException, NullPointerException, GargoyleException {
 		FxUtil.loadRoot(ScheduleTimeLineComposite.class, this);
 	}
 

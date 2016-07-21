@@ -10,7 +10,7 @@ package com.kyj.fx.voeditor.visual.exceptions;
  * @author KYJ
  *
  */
-public class GagoyleException extends Exception implements IGargoyleExceptionCode {
+public class GargoyleException extends Exception implements IGargoyleExceptionCode {
 
 	/**
 	 * 
@@ -27,21 +27,37 @@ public class GagoyleException extends Exception implements IGargoyleExceptionCod
 	/**
 	 * 
 	 */
-	public GagoyleException() {
+	public GargoyleException() {
 
 	}
+	
+	/**
+	 * 
+	 */
+	public GargoyleException(ERROR_CODE errorCode) {
+		this.errorCode = errorCode;
+	}
+	
+	/**
+	 * 
+	 */
+	public GargoyleException(ERROR_CODE errorCode,String message) {
+		super(message);
+		this.errorCode = errorCode;
+	}
+	
 
 	/**
 	 * @param message
 	 */
-	public GagoyleException(String message) {
+	public GargoyleException(String message) {
 		super(message);
 	}
 
 	/**
 	 * @param cause
 	 */
-	public GagoyleException(Throwable cause) {
+	public GargoyleException(Throwable cause) {
 		super(cause);
 	}
 
@@ -49,7 +65,7 @@ public class GagoyleException extends Exception implements IGargoyleExceptionCod
 	 * @param message
 	 * @param cause
 	 */
-	public GagoyleException(String message, Throwable cause) {
+	public GargoyleException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
@@ -59,7 +75,7 @@ public class GagoyleException extends Exception implements IGargoyleExceptionCod
 	 * @param enableSuppression
 	 * @param writableStackTrace
 	 */
-	public GagoyleException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+	public GargoyleException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 

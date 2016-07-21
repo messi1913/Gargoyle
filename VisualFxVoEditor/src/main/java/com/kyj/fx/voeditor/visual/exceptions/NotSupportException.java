@@ -12,7 +12,7 @@ package com.kyj.fx.voeditor.visual.exceptions;
  * @author KYJ
  *
  */
-public class NotSupportException extends GagoyleException {
+public class NotSupportException extends GargoyleException {
 
 	/**
 	 *

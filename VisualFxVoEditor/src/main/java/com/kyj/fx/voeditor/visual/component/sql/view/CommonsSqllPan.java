@@ -35,7 +35,7 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationFrameView;
 import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationUserMetadataVO;
-import com.kyj.fx.voeditor.visual.exceptions.ConnectionFailException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
 import com.kyj.fx.voeditor.visual.exceptions.NotYetSupportException;
 import com.kyj.fx.voeditor.visual.functions.ResultSetToMapConverter;
@@ -260,7 +260,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 				childrens.forEach(item -> item.setGraphic(DatabaseTreeNode.getGraphics(item.getValue())));
 
 				selectedItem.getChildren().addAll(childrens);
-			} catch (ConnectionFailException ex) {
+			} catch (GargoyleConnectionFailException ex) {
 				DialogUtil.showExceptionDailog(ex);
 			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
@@ -356,7 +356,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 
 				if (newChildres != null && !newChildres.isEmpty())
 					selectedItem.getChildren().addAll(newChildres);
-			} catch (ConnectionFailException ex) {
+			} catch (GargoyleConnectionFailException ex) {
 				DialogUtil.showExceptionDailog(ex);
 			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
@@ -372,13 +372,13 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	 *
 	 * @return
 	 * @throws NotYetSupportException
-	 * @throws ConnectionFailException
+	 * @throws GargoyleConnectionFailException
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
 	public static CommonsSqllPan getSqlPane()
-			throws NotYetSupportException, ConnectionFailException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+			throws NotYetSupportException, GargoyleConnectionFailException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 		CommonsSqllPan postgreSqlPane = null;
 
 		String driver = ResourceLoader.getInstance().get(ResourceLoader.BASE_KEY_JDBC_DRIVER);

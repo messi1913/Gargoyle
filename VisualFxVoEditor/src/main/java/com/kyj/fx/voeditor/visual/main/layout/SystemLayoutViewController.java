@@ -35,13 +35,10 @@ import com.kyj.fx.voeditor.visual.component.popup.GagoyleWorkspaceOpenResourceVi
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.popup.SelectWorkspaceView;
 import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
-import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
-import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
-import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
-import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentOnLoaded;
 import com.kyj.fx.voeditor.visual.loder.JarWrapper;
@@ -905,7 +902,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				loadNewSystemTab("VoEditor", parent);
 
-			} catch (NullPointerException | GagoyleException | IOException e1) {
+			} catch (NullPointerException | GargoyleException | IOException e1) {
 				LOGGER.error(ValueUtil.toString(e1));
 			}
 
@@ -1448,14 +1445,17 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					try {
 						SVNWcDbClient client = new SVNWcDbClient(wcDbFile);
 						String rootUrl = client.getUrl();
-
+						LOGGER.debug("root URL : {}" , rootUrl);
 						Properties properties = new Properties();
 						properties.put(JavaSVNManager.SVN_URL, rootUrl);
 
 						loadNewSystemTab("Scm Graph", FxUtil.createSVNGraph(properties));
 
-					} catch (Exception e) {
+					} catch (GargoyleException e) {
 						LOGGER.error(ValueUtil.toString(e));
+						DialogUtil.showExceptionDailog(e, e.getErrorCode().getCodeMessage());
+					} catch (Exception e) {
+
 					}
 				}
 			}

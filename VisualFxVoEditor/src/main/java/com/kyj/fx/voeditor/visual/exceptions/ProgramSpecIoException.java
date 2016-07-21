@@ -11,7 +11,7 @@ package com.kyj.fx.voeditor.visual.exceptions;
  * @author KYJ
  *
  */
-public class ProgramSpecIoException extends GagoyleException {
+public class ProgramSpecIoException extends GargoyleException {
 
 	/**
 	 * 

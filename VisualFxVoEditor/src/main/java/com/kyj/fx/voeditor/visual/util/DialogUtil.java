@@ -222,7 +222,7 @@ public class DialogUtil {
 
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
-
+		alert.initOwner(SharedMemory.getPrimaryStage());
 		alert.showAndWait();
 	}
 

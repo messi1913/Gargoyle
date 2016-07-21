@@ -1,7 +1,7 @@
 package com.kyj.fx.voeditor.visual.example;
 
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
-import com.kyj.fx.voeditor.visual.exceptions.ConnectionFailException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.exceptions.NotYetSupportException;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 
@@ -23,7 +23,7 @@ public class SqlTabPanExample extends Application {
 	}
 
 	@Override
-	public void start(Stage primaryStage) throws NotYetSupportException, ConnectionFailException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+	public void start(Stage primaryStage) throws NotYetSupportException, GargoyleConnectionFailException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 		primaryStage.setTitle("Database Exam");
 
 		CommonsSqllPan sqlPane = CommonsSqllPan.getSqlPane();

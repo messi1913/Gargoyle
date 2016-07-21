@@ -15,7 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
-import com.kyj.fx.voeditor.visual.exceptions.ConnectionFailException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
 /**
@@ -69,7 +69,7 @@ public abstract class TableItemTree<T> extends SchemaItemTree<T> {
 
 		Connection connection = getConnection();
 		if (connection == null)
-			throw new ConnectionFailException("connect fail...");
+			throw new GargoyleConnectionFailException("connect fail...");
 
 		try {
 			if (childrenSQL != null && !childrenSQL.isEmpty()) {

@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 
-import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
@@ -60,7 +60,7 @@ public class SvnChagnedCodeComposite extends BorderPane {
 	private ContextMenu contextMenu;
 
 	public SvnChagnedCodeComposite(FxSVNHistoryDataSupplier supplier)
-			throws SVNException, NullPointerException, GagoyleException, IOException {
+			throws SVNException, NullPointerException, GargoyleException, IOException {
 		this.supplier = supplier;
 		FxUtil.loadRoot(SvnChagnedCodeComposite.class, this);
 

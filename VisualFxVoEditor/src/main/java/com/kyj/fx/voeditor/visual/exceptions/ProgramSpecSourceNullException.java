@@ -6,7 +6,7 @@
  */
 package com.kyj.fx.voeditor.visual.exceptions;
 
-public class ProgramSpecSourceNullException extends GagoyleException {
+public class ProgramSpecSourceNullException extends GargoyleException {
 	/**
 	 * 
 	 */

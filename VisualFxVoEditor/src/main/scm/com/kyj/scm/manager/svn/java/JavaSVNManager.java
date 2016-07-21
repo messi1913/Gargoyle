@@ -471,6 +471,7 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 
 	/**
 	 * 가장 최신 리비젼 번호를 구함.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.
 	 * @return
@@ -495,6 +496,7 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 
 	/**
 	 * SVN Root Url
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 21.
 	 * @return
@@ -505,6 +507,10 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 		String uriEncodedPath = location.getURIEncodedPath();
 		String rootUrl = decodedString.replaceAll(uriEncodedPath, "");
 		return rootUrl;
+	}
+
+	public void ping() throws SVNException {
+		this.svnResource.ping();
 	}
 
 }

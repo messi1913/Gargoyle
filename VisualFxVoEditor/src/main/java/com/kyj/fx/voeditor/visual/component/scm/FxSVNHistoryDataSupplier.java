@@ -52,11 +52,11 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(FxSVNHistoryDataSupplier.class);
 
-	public FxSVNHistoryDataSupplier(JavaSVNManager manager, int weekSize, int rankSize) throws SVNException {
+	public FxSVNHistoryDataSupplier(JavaSVNManager manager, int weekSize, int rankSize) throws Exception {
 		super(manager, weekSize, rankSize);
 	}
 
-	public FxSVNHistoryDataSupplier(JavaSVNManager manager) throws SVNException {
+	public FxSVNHistoryDataSupplier(JavaSVNManager manager) throws Exception {
 		this(manager, 3, 25);
 	}
 

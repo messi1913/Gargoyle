@@ -70,4 +70,14 @@ public class SVNResource extends AbstractSVN {
 		return getRepository().getDatedRevision(date);
 	}
 
+	/********************************
+	 * 작성일 :  2016. 7. 21. 작성자 : KYJ
+	 *
+	 *
+	 * @throws SVNException
+	 ********************************/
+	public void ping() throws SVNException {
+		getRepository().testConnection();
+	}
+
 }

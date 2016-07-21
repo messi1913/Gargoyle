@@ -16,7 +16,7 @@ import org.tmatesoft.svn.core.SVNLogEntry;
 
 import com.kyj.fx.voeditor.visual.component.TextBaseDiffAppController;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
-import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -96,7 +96,7 @@ public class SVNViewer extends BorderPane {
 	private JavaTextArea javaTextAre;
 	private LineChart<String, String> lineHist;
 
-	public SVNViewer() throws NullPointerException, GagoyleException, IOException {
+	public SVNViewer() throws NullPointerException, GargoyleException, IOException {
 		FxUtil.loadRoot(SVNViewer.class, this);
 	}
 

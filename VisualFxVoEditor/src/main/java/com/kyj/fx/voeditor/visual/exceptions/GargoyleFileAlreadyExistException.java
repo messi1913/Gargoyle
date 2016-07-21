@@ -10,7 +10,7 @@ package com.kyj.fx.voeditor.visual.exceptions;
  * @author KYJ
  *
  */
-public class FileAlreadyExistException extends GagoyleException {
+public class GargoyleFileAlreadyExistException extends GargoyleResourceException{
 
 	/**
 	 * 
@@ -20,20 +20,27 @@ public class FileAlreadyExistException extends GagoyleException {
 	/**
 	 * 
 	 */
-	public FileAlreadyExistException() {
+	public GargoyleFileAlreadyExistException() {
+		super(ERROR_CODE.FILE_ALREADY_EXISTS);
 	}
+
+	
+	public GargoyleFileAlreadyExistException(ERROR_CODE errorCode) {
+		super(errorCode);
+	}
+
 
 	/**
 	 * @param message
 	 */
-	public FileAlreadyExistException(String message) {
+	public GargoyleFileAlreadyExistException(String message) {
 		super(message);
 	}
 
 	/**
 	 * @param cause
 	 */
-	public FileAlreadyExistException(Throwable cause) {
+	public GargoyleFileAlreadyExistException(Throwable cause) {
 		super(cause);
 	}
 
@@ -41,7 +48,7 @@ public class FileAlreadyExistException extends GagoyleException {
 	 * @param message
 	 * @param cause
 	 */
-	public FileAlreadyExistException(String message, Throwable cause) {
+	public GargoyleFileAlreadyExistException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
@@ -51,7 +58,7 @@ public class FileAlreadyExistException extends GagoyleException {
 	 * @param enableSuppression
 	 * @param writableStackTrace
 	 */
-	public FileAlreadyExistException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+	public GargoyleFileAlreadyExistException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 

@@ -52,11 +52,11 @@ class SimpleSVNHistoryDataSupplier extends AbstracrtSVNHistoryDataSupplier {
 
 	private GagoyleDate end;
 
-	public SimpleSVNHistoryDataSupplier(JavaSVNManager manager, int weekSize, int rankSize) throws SVNException {
+	public SimpleSVNHistoryDataSupplier(JavaSVNManager manager, int weekSize, int rankSize) throws Exception {
 		super(manager, weekSize, rankSize);
 	}
 
-	public SimpleSVNHistoryDataSupplier(JavaSVNManager manager) throws SVNException {
+	public SimpleSVNHistoryDataSupplier(JavaSVNManager manager) throws Exception {
 		this(manager, 5, 25);
 	}
 
