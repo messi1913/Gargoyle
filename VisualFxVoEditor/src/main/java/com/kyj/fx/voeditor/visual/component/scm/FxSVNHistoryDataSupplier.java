@@ -296,10 +296,7 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 	}
 
 	public JavaTextArea createJavaTextArea(String content) {
-		JavaTextArea javaTextArea = new JavaTextArea();
-		javaTextArea.setPrefSize(1200, 800);
-		javaTextArea.setContent(content);
-		return javaTextArea;
+		return FxUtil.createJavaTextArea(content);
 	}
 
 	public String diff(String path, long revision1, long revision2) throws Exception {

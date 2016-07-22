@@ -35,6 +35,7 @@ import org.tmatesoft.svn.core.SVNException;
 import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
 import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
 import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
+import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.InstanceTypes;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
@@ -828,4 +829,32 @@ public class FxUtil {
 
 	}
 
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 22.
+	 * @param content
+	 */
+	public static JavaTextArea createJavaTextArea(String title, String content, double width, double height) {
+		JavaTextArea javaTextArea = new JavaTextArea();
+		javaTextArea.setPrefSize(width, height);
+		javaTextArea.setContent(content);
+		return javaTextArea;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 22.
+	 * @param content
+	 */
+	public static JavaTextArea createJavaTextArea(String content, double width, double height) {
+		JavaTextArea javaTextArea = new JavaTextArea();
+		javaTextArea.setPrefSize(width, height);
+		javaTextArea.setContent(content);
+		return javaTextArea;
+	}
+
+	public static JavaTextArea createJavaTextArea(String content) {
+		return createJavaTextArea(content,1200,800);
+	}
 }

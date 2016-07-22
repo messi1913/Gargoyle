@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
 
 <fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65"
 	xmlns:fx="http://javafx.com/fxml/1">
@@ -63,15 +64,23 @@
 				</SplitPane>
 				<TabPane fx:id="tabPaneSVN">
 					<tabs>
-						<Tab closable="false" text="Hist Chart">
+						<Tab fx:id="tabHistChart" closable="false" text="Hist Chart">
 							<content>
-								<BorderPane fx:id="borChart" />
+								<BorderPane fx:id="borChart" >
+								<top>
+									<Label fx:id="lblRevisionChartTitle" text="Revision Graph" style=" -fx-font-size:15px;"></Label>
+								</top>
+								</BorderPane>
 							</content>
 						</Tab>
 
-						<Tab closable="false" text="Source">
+						<Tab fx:id="tabSource" closable="false" text="Source">
 							<content>
-								<BorderPane fx:id="borSource" />
+								<BorderPane fx:id="borSource" >
+								<top>
+									<Label fx:id="lblSourceTitle" text="Source" style=" -fx-font-size:15px;"></Label>
+								</top>
+								</BorderPane>
 							</content>
 						</Tab>
 
