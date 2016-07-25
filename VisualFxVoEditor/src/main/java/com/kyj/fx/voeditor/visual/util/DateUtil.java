@@ -124,7 +124,8 @@ public class DateUtil {
 //		Date firstDate = firstCalendar.getTime();
 
 		Calendar lastCalendar = GregorianCalendar.getInstance();
-		lastCalendar.setWeekDate(endYear, endWeek, Calendar.SUNDAY);
+
+		lastCalendar.setWeekDate(endYear, endWeek, /*Calendar.SUNDAY*/ 	lastCalendar.get(Calendar.DAY_OF_WEEK));
 //		Date lastDate = lastCalendar.getTime();
 
 		ArrayList<GagoyleDate> arrayList = new ArrayList<>();
