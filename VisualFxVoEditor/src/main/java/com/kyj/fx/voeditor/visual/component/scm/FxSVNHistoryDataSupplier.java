@@ -17,7 +17,6 @@ import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
-import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -295,8 +294,12 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 		return listView;
 	}
 
-	public JavaTextArea createJavaTextArea(String content) {
-		return FxUtil.createJavaTextArea(content);
+	public TextArea createJavaTextArea(String content) {
+
+		return new TextArea(content);
+//		return FxUtil.createJavaTextArea(content);
+
+
 	}
 
 	public String diff(String path, long revision1, long revision2) throws Exception {

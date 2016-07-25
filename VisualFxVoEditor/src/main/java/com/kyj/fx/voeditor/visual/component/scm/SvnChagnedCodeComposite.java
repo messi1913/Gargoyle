@@ -34,7 +34,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -117,15 +116,20 @@ public class SvnChagnedCodeComposite extends BorderPane {
 		lookupAll.stream().map(v -> (Text) v).forEach(v -> {
 
 			String text = v.getText();
-			int count = supplier.getCollectedTable().get(text).size();
-			int textLength = text.length();
+			String displayText = text;
+			int count = supplier.getCollectedTable().get(displayText).size();
+			int textLength = displayText.length();
+
 			if (textLength > 15) {
-				int lastIndexOf = text.lastIndexOf("/");
-				text = text.substring(lastIndexOf, textLength);
+				displayText = "... "+ displayText.substring(textLength-15);
+
+				Tooltip.install(v, new Tooltip(text));
+
+//				text = text.substring(lastIndexOf, textLength);
 			}
 
-			text = text.concat("   [").concat(String.valueOf(count)).concat("]");
-			v.setText(text);
+			displayText = displayText.concat("   [").concat(String.valueOf(count)).concat("]");
+			v.setText(displayText);
 		});
 
 //		Platform.runLater(() -> {
