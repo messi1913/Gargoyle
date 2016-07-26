@@ -125,7 +125,7 @@ public class SqlTab extends Tab {
 							}
 
 						} else if (isControlDown && keyE.getCode() == KeyCode.O) {
-							File showFileDialog = DialogUtil.showFileDialog(SharedMemory.getPrimaryStage(), choser -> {
+							File showFileDialog = DialogUtil.showFileDialog(/*SharedMemory.getPrimaryStage()*/ null , choser -> {
 								String dir = System.getProperty("user.home");
 								choser.setInitialDirectory(new File(dir));
 								choser.getExtensionFilters().add(new ExtensionFilter("SQL files (*.sql)", "*.sql"));
