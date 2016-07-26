@@ -4,13 +4,15 @@
  *	date      : 2015. 12. 24.
  *	user      : KYJ
  */
-package com.kyj.fx.voeditor.visual.component.sql.functions;
+package com.kyj.fx.voeditor.visual.functions;
 
+import java.io.File;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * 파일을 로드할시에 처리할 옵션.
- * 
+ *
  * @author KYJ
  *
  */
@@ -35,6 +37,12 @@ public class LoadFileOptionHandler {
 	 * 확장자 필터
 	 */
 	private List<String> fileNameLikeFilter;
+
+	/**
+	 * File이 존재하지않는경우 치환할 내용을 기술. 기본값은 null 리턴.
+	 * @최초생성일 2016. 7. 26.
+	 */
+	private Function<File, String> fileNotFoundThan = file -> null;
 
 	public String getEncoding() {
 		return encoding;
@@ -69,6 +77,20 @@ public class LoadFileOptionHandler {
 
 	public void setFileNameLikeFilter(List<String> fileNameLikeFilter) {
 		this.fileNameLikeFilter = fileNameLikeFilter;
+	}
+
+	/**
+	 * @return the fileNotFoundThan
+	 */
+	public final Function<File, String> getFileNotFoundThan() {
+		return fileNotFoundThan;
+	}
+
+	/**
+	 * @param fileNotFoundThan the fileNotFoundThan to set
+	 */
+	public final void setFileNotFoundThan(Function<File, String> fileNotFoundThan) {
+		this.fileNotFoundThan = fileNotFoundThan;
 	}
 
 }

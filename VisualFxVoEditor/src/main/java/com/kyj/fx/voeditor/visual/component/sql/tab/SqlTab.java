@@ -12,14 +12,16 @@ import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 
-import com.kyj.fx.voeditor.visual.component.sql.functions.LoadFileOptionHandler;
 import com.kyj.fx.voeditor.visual.component.sql.functions.LoadSQLFileFunction;
 import com.kyj.fx.voeditor.visual.component.sql.functions.LoadSQLFunction;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SaveSQLFileFunction;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SaveSQLFunction;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
+import com.kyj.fx.voeditor.visual.functions.LoadFileOptionHandler;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -47,11 +49,11 @@ public class SqlTab extends Tab {
 	private ObjectProperty<SqlKeywords> txtSql;
 
 	private SaveSQLFunction<File> saveFileFunction;
-	private LoadSQLFunction<File> loadFileFunction;
+//	private LoadSQLFunction<File> loadFileFunction;
 
 	public SqlTab() {
 		saveFileFunction = new SaveSQLFileFunction();
-		loadFileFunction = new LoadSQLFileFunction();
+//		loadFileFunction = new LoadSQLFileFunction();
 	}
 
 	/**
@@ -63,7 +65,7 @@ public class SqlTab extends Tab {
 		SqlKeywords content = new SqlKeywords();
 		txtSql = new SimpleObjectProperty<>(content);
 		setContent(content);
-//		content.setOnKeyPressed(excutable);
+		//		content.setOnKeyPressed(excutable);
 		content.addEventHandler(KeyEvent.KEY_RELEASED, excutable);
 
 		EventDispatcher eventDispatcher = content.getEventDispatcher();
@@ -71,7 +73,7 @@ public class SqlTab extends Tab {
 		content.setEventDispatcher((event, tail) -> {
 
 			if (event.getEventType() == KeyEvent.KEY_RELEASED) {
-//				System.out.println("sqlTab");
+				//				System.out.println("sqlTab");
 				tail.append(new EventDispatcher() {
 
 					@Override
@@ -128,8 +130,17 @@ public class SqlTab extends Tab {
 								choser.setInitialDirectory(new File(dir));
 								choser.getExtensionFilters().add(new ExtensionFilter("SQL files (*.sql)", "*.sql"));
 							});
-							String fileContent = loadFileFunction.apply(showFileDialog, new LoadFileOptionHandler());
-							setTxtSql(fileContent);
+
+							//선택한 파일이 정상적으로 선택된 경우는 null이 아님.
+							if(showFileDialog!=null)
+							{
+
+								String fileContent = FileUtil.readFile(showFileDialog, new LoadFileOptionHandler());
+								if (fileContent !=null /*공백여부는 체크안함. 파일 내용에 실제 공백이 포함될 수 있으므로...*/) {
+									setTxtSql(fileContent);
+								}
+							}
+
 							event.consume();
 						} else {
 							// if (keyE.isAltDown() || isControlDown ||
