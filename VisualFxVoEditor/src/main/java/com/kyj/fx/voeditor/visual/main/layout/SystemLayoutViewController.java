@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.FileWrapper;
-import com.kyj.fx.voeditor.visual.component.ImageFileTreeItemCreator;
+import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ImageViewPane;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
@@ -738,7 +738,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @User KYJ
 	 */
 	private TreeItem<FileWrapper> createNewTree(File dir) {
-		ImageFileTreeItemCreator value = new ImageFileTreeItemCreator();
+		ProjectFileTreeItemCreator value = new ProjectFileTreeItemCreator();
 		return value.createNode(dir);
 	}
 

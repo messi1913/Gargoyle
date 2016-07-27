@@ -23,4 +23,11 @@ public class JavaProjectMemberFileTreeItem extends FileTreeItem {
 		return "";
 	}
 
+//	@Override
+//	protected List<Node> createAttachNodes() {
+//		return Arrays.asList(new Label("Connected"));
+//	}
+	
+	
+
 }
