@@ -509,8 +509,26 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 		return rootUrl;
 	}
 
+	/********************************
+	 * 작성일 :  2016. 7. 31. 작성자 : KYJ
+	 *
+	 * SVN 서버 접속 여부를 확인
+	 * @throws SVNException
+	 ********************************/
 	public void ping() throws SVNException {
 		this.svnResource.ping();
+	}
+
+	/********************************
+	 * 작성일 :  2016. 7. 31. 작성자 : KYJ
+	 *
+	 * SVN 서버 RepositoryUUID를 리턴.
+	 * 
+	 * @return
+	 * @throws SVNException
+	 ********************************/
+	public String getRepositoryUUID() throws SVNException {
+		return this.svnResource.getRepositoryUUID();
 	}
 
 }

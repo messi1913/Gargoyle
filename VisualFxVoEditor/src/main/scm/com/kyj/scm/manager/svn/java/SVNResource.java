@@ -11,9 +11,6 @@ import java.util.Properties;
 
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
-import org.tmatesoft.svn.core.SVNProperties;
-import org.tmatesoft.svn.core.io.ISVNEditor;
-import org.tmatesoft.svn.core.io.ISVNReplayHandler;
 
 /**
  *
@@ -73,11 +70,24 @@ public class SVNResource extends AbstractSVN {
 	/********************************
 	 * 작성일 :  2016. 7. 21. 작성자 : KYJ
 	 *
-	 *
+	 * SVN 서버 접속 여부 확인
+	 * 
 	 * @throws SVNException
 	 ********************************/
 	public void ping() throws SVNException {
 		getRepository().testConnection();
 	}
 
+	
+	/********************************
+	 * 작성일 :  2016. 7. 31. 작성자 : KYJ
+	 *
+	 *  SVN 서버 RepositoryUUID를 리턴.
+	 *  
+	 * @return
+	 * @throws SVNException
+	 ********************************/
+	public String getRepositoryUUID() throws SVNException{
+		return getRepository().getRepositoryUUID(false);
+	}
 }
