@@ -27,7 +27,7 @@ import com.kyj.scm.manager.svn.java.JavaSVNManager;
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
- * TODO 클래스 역할
+ *
  *
  * @author KYJ
  *

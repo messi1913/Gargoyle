@@ -25,6 +25,7 @@ import com.kyj.scm.manager.svn.java.JavaSVNManager;
  */
 public class SVNItem implements SCMItem<SVNItem> {
 
+
 	private static Logger LOGGER = LoggerFactory.getLogger(SVNItem.class);
 	public String path;
 
