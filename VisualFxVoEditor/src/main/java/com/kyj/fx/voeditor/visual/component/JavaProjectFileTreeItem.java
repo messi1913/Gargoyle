@@ -6,9 +6,11 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component;
 
+import java.io.File;
 import java.io.InputStream;
 
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.scm.manager.svn.java.SVNWcDbClient;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -31,13 +33,23 @@ public class JavaProjectFileTreeItem extends FileTreeItem {
 	protected Node createGraphcis(FileWrapper fileWrapper) {
 		InputStream imageStream = ClassLoader.getSystemClassLoader().getResourceAsStream("META-INF/images/eclipse/project.gif");
 		ImageView createImageView = FxUtil.createImageView(imageStream);
-		String meta = String.format("[%b][%b]", fileWrapper.isJavaProjectFile(), fileWrapper.isSVNConnected());
-		return new HBox(createImageView, new Label(fileWrapper.getFile().getName()), new Label(meta));
+//		String meta = String.format("[%b][%b]", fileWrapper.isJavaProjectFile(), fileWrapper.isSVNConnected());
+		return new HBox(createImageView, new Label(fileWrapper.getFile().getName()), new Label(getMetadata()));
 	}
 
 	@Override
 	protected String getMetadata() {
-		return String.format("[%b][%b]", getValue().isJavaProjectFile(), getValue().isSVNConnected());
+		File wcDbFile = getValue().getWcDbFile();
+		try {
+			SVNWcDbClient client = new SVNWcDbClient(wcDbFile);
+			return String.format(" [%s]", client.getUrl());
+		} catch (Exception e) {
+			//e.printStackTrace();
+		}
+		return "";
+//		return String.format("[%b][%b]", getValue().isJavaProjectFile(), getValue().isSVNConnected());
+		
+		
 	}
 
 }

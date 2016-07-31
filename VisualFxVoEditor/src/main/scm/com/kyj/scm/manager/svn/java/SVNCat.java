@@ -7,6 +7,11 @@
 package com.kyj.scm.manager.svn.java;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -152,10 +157,11 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 			 * Displays the file contents in the console if the file is a text.
 			 */
 			if (isTextType) {
-				try (StringOutputStream out = new StringOutputStream()) {
-					baos.writeTo(out);
+//				try (StringOutputStream out = new StringOutputStream()) {
+//					baos.writeTo(out);
+				
 					result = baos.toString(encoding); // out.getString();
-				}
+//				}
 			} else {
 				LOGGER.debug(
 						"File contents can not be displayed in the console since the mime-type property says that it's not a kind of a text file.");
@@ -168,5 +174,7 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 		}
 		return result;
 	}
+
+	
 
 }

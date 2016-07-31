@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,14 +31,15 @@ import javafx.scene.control.TreeItem;
  * @author KYJ
  *
  */
-public class ImageFileTreeItemCreator {
+public class ProjectFileTreeItemCreator {
 
 	/**
 	 * 열어본 파일 트리(Workspace)에 대한 정보가 Serialize되는 파일 .
+	 * 
 	 * @최초생성일 2016. 7. 18.
 	 */
 	private static final String OPEND_HISTORY_FILE_NAME = "opendInfo.dat";
-	private static Logger LOGGER = LoggerFactory.getLogger(ImageFileTreeItemCreator.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(ProjectFileTreeItemCreator.class);
 	/**
 	 * 파일을 오픈한 대상에 대한 히스토리를 남기고, 프로그램이 종료된후 다시 열었을때, 전의 상태로 되돌리기 위한 변수
 	 *
@@ -47,6 +49,7 @@ public class ImageFileTreeItemCreator {
 
 	/**
 	 * SQLite DbFile. SVN에 대한 메타정보가 담긴 파일.
+	 * 
 	 * @최초생성일 2016. 7. 18.
 	 */
 	private static final String WCDB_FILE_NAME = "wc.db";
@@ -74,7 +77,7 @@ public class ImageFileTreeItemCreator {
 		}));
 	}
 
-	public ImageFileTreeItemCreator() {
+	public ProjectFileTreeItemCreator() {
 
 	}
 
@@ -232,6 +235,8 @@ public class ImageFileTreeItemCreator {
 	private ObservableList<TreeItem<FileWrapper>> buildChildren(TreeItem<FileWrapper> treeItem, FILE_TREE_TYPE type) {
 
 		FileWrapper f = treeItem.getValue();
+		boolean isParentSvnConnected = f.isSVNConnected();
+		File parentWcDbFile = f.getWcDbFile();
 		if (f == null) {
 			return FXCollections.emptyObservableList();
 		}
@@ -254,18 +259,23 @@ public class ImageFileTreeItemCreator {
 				break;
 
 			case JAVA_PROJECT:
-				
+
 				for (File childFile : files) {
-					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile));
+					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile, fw -> {
+						fw.setWcDbFile(parentWcDbFile);
+						fw.setSVNConnected(isParentSvnConnected);
+					}));
 					children.add(createNode);
 				}
 				break;
 
 			case JAVA_PROJECT_MEMBER:
 
-
 				for (File childFile : files) {
-					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile));
+					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile, fw -> {
+						fw.setWcDbFile(parentWcDbFile);
+						fw.setSVNConnected(isParentSvnConnected);
+					}));
 					children.add(createNode);
 				}
 				break;
@@ -286,10 +296,20 @@ public class ImageFileTreeItemCreator {
 	//	private FileWrapper createFileWrapper(File childFile) {
 	//		return createFileWrapper(childFile, false);
 	//	}
-
 	private FileWrapper createFileWrapper(File childFile) {
+		return createFileWrapper(childFile, fileWrapper -> operate(fileWrapper));
+	}
+
+	//	private FileWrapper createFileWrapper(File childFile, UnaryOperator<FileWrapper> andThanOperate) {
+	//		return createFileWrapper(childFile,  andThanOperate);
+	//	}
+
+	private FileWrapper createFileWrapper(File childFile, Consumer<FileWrapper> operator) {
 		FileWrapper fileWrapper = new FileWrapper(childFile);
-		operate(fileWrapper);
+
+		if (operator != null)
+			operator.accept(fileWrapper);
+
 		return fileWrapper;
 	}
 
@@ -310,32 +330,34 @@ public class ImageFileTreeItemCreator {
 	 * 작성일 : 2016. 7. 10. 작성자 : KYJ
 	 *
 	 * 자바 프로젝트 메타정보를 처리함.
+	 * 
+	 * 현재 처리내용은 svn이 Connected되었는지, javaProject파일인지 여부를 확인함.
 	 *
 	 * @param fileWrapper
 	 ********************************/
-	private void operate(FileWrapper fileWrapper) {
+	void operate(FileWrapper fileWrapper) {
 		File check = fileWrapper.getFile();
 		if (check != null && check.isDirectory()) {
 			File[] listFiles = check.listFiles();
 			for (File file : listFiles) {
 
-				boolean isJavaProject = !fileWrapper.isJavaProjectFile();
-				boolean isSVNConnected = fileWrapper.isSVNConnected();
-				if (isJavaProject) {
+				boolean isNotJavaProject = !fileWrapper.isJavaProjectFile();
+				boolean isNotSVNConnected = !fileWrapper.isSVNConnected();
+				if (isNotJavaProject) {
 					if (IS_JAVA_PROJECT_FILTER.accept(file, file.getName())) {
 						fileWrapper.setJavaProjectFile(true);
 					}
 				}
 
-				if (!isSVNConnected) {
+				if (isNotSVNConnected) {
 					if (IS_CONTAINS_SVN_FILE_FILTER.accept(file, file.getName())) {
 						fileWrapper.setSVNConnected(true);
 						fileWrapper.setWcDbFile(new File(file, WCDB_FILE_NAME));
 					}
 				}
 
-				if (isJavaProject && isSVNConnected)
-					return;
+				//				if (isNotJavaProject && isNotSVNConnected)
+				//					return;
 			}
 		}
 	}

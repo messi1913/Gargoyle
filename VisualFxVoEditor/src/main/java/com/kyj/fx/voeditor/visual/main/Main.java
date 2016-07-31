@@ -50,10 +50,25 @@ public class Main extends Application {
 
 	private static List<PrimaryStageCloseable> listeners = new ArrayList<PrimaryStageCloseable>();
 
+	/********************************
+	 * 작성일 :  2016. 7. 26. 작성자 : KYJ
+	 *
+	 * 프로그램 종료시 처리할 내용을 구현할 이벤트를 등록하는 함수.
+	 * @param listener
+	 ********************************/
 	public static void addPrimaryStageCloseListener(PrimaryStageCloseable listener) {
 		listeners.add(listener);
 	}
 
+	/**
+	 * 어플리케이션이 종료될때 처리할 이벤트를 구현한다.
+	 * 
+	 * PrimaryStageCloseable을 구현하고  addPrimaryStageCloseListener(PrimaryStageCloseable) 함수에 리스너를 등록한 
+	 * 함수는 프로그램 종료시 처리할 이벤트가 실행되게 된다.
+	 * 
+	 *  주로 화면에 대한 Resource 해제등의 로직이 대상이됨.
+	 * @최초생성일 2016. 7. 26.
+	 */
 	private static EventHandler<WindowEvent> onPrimaryStageCloseRequest = event -> {
 
 		Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Exit?", "Exit???");
@@ -100,11 +115,6 @@ public class Main extends Application {
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}
-
-		// LOGGER.debug("Resources Info");
-		// Map loadingResourceInfo =
-		// ResourceInfo.getInstance().getLoadingResourceInfo("log4j.xml");
-		// LOGGER.debug(loadingResourceInfo.toString());
 	}
 
 	@Override
@@ -112,9 +122,16 @@ public class Main extends Application {
 
 		// setApplicationUncaughtExceptionHandler();
 
+		//어플리케이션 타이틀 지정
 		primaryStage.setTitle(APPLICATION_TITLE);
+		
+		//화면 중앙 위치.
 		primaryStage.centerOnScreen();
+		
+		//메인 스테이지 클로즈 이벤트 구현.
 		primaryStage.setOnCloseRequest(onPrimaryStageCloseRequest);
+		
+		/*[시작 ]초기 워크스페이스 선택 지정. */
 		String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
 
 		if (baseDir == null || baseDir.isEmpty() || !new File(baseDir).exists()) {
@@ -127,12 +144,20 @@ public class Main extends Application {
 				return;
 			}
 		}
-
+		/*[끝 ]초기 워크스페이스 선택 지정. */
+		
 		try {
+			
+			//예상치 못한 에외에 대한 대비 로직구현. 
 			setApplicationUncaughtExceptionHandler();
+			
+			//클래스 로딩같은 어플리케이션이 메모리에 로딩됨과 동기에 무거운 처리를 비동기로 로딩하는 로직이 구현되있음.
 			SharedMemory.init();
+			
+			//PrimaryStage를 공유변수로 지정하기 위한 로직 처리. 
 			SharedMemory.setPrimaryStage(primaryStage);
 
+			//Main Application을 로드
 			BorderPane mainParent = setNewRootView();
 
 			Scene scene = new Scene(mainParent, 1280, 900);
@@ -143,10 +168,17 @@ public class Main extends Application {
 			primaryStage.show();
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error(ValueUtil.toString(e));
 		}
 	}
 
+	/********************************
+	 * 작성일 :  2016. 7. 26. 작성자 : KYJ
+	 *
+	 * 예측되지 못한 예외처리에 대한 로직처리가 입력된다. 
+	 * 
+	 * ex) 정규식 무한루프등(StackOverflow)
+	 ********************************/
 	private void setApplicationUncaughtExceptionHandler() {
 		if (Thread.getDefaultUncaughtExceptionHandler() == null) {
 			// Register a Default Uncaught Exception Handler for the application
@@ -154,6 +186,12 @@ public class Main extends Application {
 		}
 	}
 
+	/***************************
+	 *
+	 * 예측하지 못한 예외에 대한 실제 로직이 구현됨.
+	 * @author KYJ
+	 *
+	 ***************************/
 	private static class GargoyleUnCaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 		@Override
 		public void uncaughtException(Thread t, Throwable e) {
@@ -165,12 +203,26 @@ public class Main extends Application {
 		}
 	}
 
+	/********************************
+	 * 작성일 :  2016. 7. 26. 작성자 : KYJ
+	 *
+	 * Appplication 메인 로직
+	 * @return
+	 * @throws IOException
+	 ********************************/
 	private BorderPane setNewRootView() throws IOException {
 		BorderPane root = new BorderPane();
 		root.setCenter(loadMainLayout());
 		return root;
 	}
 
+	/********************************
+	 * 작성일 :  2016. 7. 26. 작성자 : KYJ
+	 *
+	 *Appliucation 메인로직.
+	 * @return
+	 * @throws IOException
+	 ********************************/
 	BorderPane loadMainLayout() throws IOException {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(Main.class.getResource("layout/SystemLayoutView.fxml"));
