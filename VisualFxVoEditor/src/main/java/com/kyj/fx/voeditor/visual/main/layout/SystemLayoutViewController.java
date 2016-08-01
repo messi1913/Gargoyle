@@ -35,7 +35,6 @@ import com.kyj.fx.voeditor.visual.component.popup.GagoyleWorkspaceOpenResourceVi
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.popup.SelectWorkspaceView;
 import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
-import com.kyj.fx.voeditor.visual.component.scm.SVNFileHistoryComposite;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
@@ -879,12 +878,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 							client = new SVNWcDbClient(wcDbFile);
 							
 							
-							
-							new SVNFileHistoryComposite( JavaSVNManager.createNewInstance(client.getUrl()) , sourceFile);
+							//TODO 코드 완성시키기.
+//							new SVNFileHistoryComposite( JavaSVNManager.createNewInstance(client.getUrl()) , sourceFile);
 //							new JavaSVNManager(new Properties(defaults))
 						} catch (Exception e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+							LOGGER.error(ValueUtil.toString(e1));
 						}
 					}
 				}
