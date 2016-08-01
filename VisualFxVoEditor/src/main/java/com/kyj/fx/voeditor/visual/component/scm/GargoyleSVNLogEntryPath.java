@@ -8,7 +8,6 @@ package com.kyj.fx.voeditor.visual.component.scm;
 
 import java.util.Date;
 
-import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
 
@@ -25,6 +24,7 @@ public class GargoyleSVNLogEntryPath extends SVNLogEntryPath {
 
 	/**
 	 * Commit Date.
+	 * 
 	 * @최초생성일 2016. 7. 19.
 	 */
 	private Date date;
@@ -45,17 +45,18 @@ public class GargoyleSVNLogEntryPath extends SVNLogEntryPath {
 	}
 
 	/**
-	 * @param date the date to set
+	 * @param date
+	 *            the date to set
 	 */
 	public final void setDate(Date date) {
 		this.date = date;
 	}
 
 	/**
-	* Calculates and returns a hash code for this object.
-	*
-	* @return a hash code
-	*/
+	 * Calculates and returns a hash code for this object.
+	 *
+	 * @return a hash code
+	 */
 	public int hashCode() {
 		final int PRIME = 31;
 		int result = 1;
@@ -67,10 +68,9 @@ public class GargoyleSVNLogEntryPath extends SVNLogEntryPath {
 	/**
 	 * Compares this object with another one.
 	 *
-	 * @param  obj  an object to compare with
-	 * @return      <span class="javakeyword">true</span>
-	 *              if this object is the same as the <code>obj</code>
-	 *              argument
+	 * @param obj
+	 *            an object to compare with
+	 * @return <span class="javakeyword">true</span> if this object is the same as the <code>obj</code> argument
 	 */
 	public boolean equals(Object obj) {
 		if (this == obj) {
