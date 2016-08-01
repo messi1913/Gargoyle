@@ -34,7 +34,7 @@ public class FileTreeItem extends TreeItem<FileWrapper> {
 	 * 작성일 : 2016. 7. 10. 작성자 : KYJ
 	 *
 	 * UI에 보여질 Dispay 처리.
-	 * 
+	 *
 	 * @param fileWrapper
 	 ********************************/
 	private void updateGraphics(FileWrapper fileWrapper) {
@@ -66,7 +66,7 @@ public class FileTreeItem extends TreeItem<FileWrapper> {
 	 * 작성일 :  2016. 7. 27. 작성자 : KYJ
 	 *
 	 * 추가적으로 덧붙일 노드정보가 있으면 오버라이드해서 사용할 수 있도록한다.
-	 * 
+	 *
 	 * @return
 	 ********************************/
 	protected List<Node> createAttachNodes(){
@@ -76,7 +76,7 @@ public class FileTreeItem extends TreeItem<FileWrapper> {
 	 * 작성일 :  2016. 7. 27. 작성자 : KYJ
 	 *
 	 * 파일 이미지 리턴.
-	 * 
+	 *
 	 * @param fileWrapper
 	 * @return
 	 ********************************/
@@ -98,8 +98,8 @@ public class FileTreeItem extends TreeItem<FileWrapper> {
 	/********************************
 	 * 작성일 :  2016. 7. 27. 작성자 : KYJ
 	 *
-	 * UI에 Diplay되는 텍스트를 리턴. 이클립스로 예를들어 svn이 연결되면 뒤에붙는 메타정보를 표현. 
-	 * 
+	 * UI에 Diplay되는 텍스트를 리턴. 이클립스로 예를들어 svn이 연결되면 뒤에붙는 메타정보를 표현.
+	 *
 	 * @return
 	 ********************************/
 	protected String getMetadata() {

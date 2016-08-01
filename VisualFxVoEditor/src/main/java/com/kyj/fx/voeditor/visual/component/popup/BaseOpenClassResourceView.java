@@ -64,7 +64,7 @@ public class BaseOpenClassResourceView extends AbstractOpenClassResourceView<Str
 
 	@Override
 	public boolean isMatch(String value, String check) {
-		return value.indexOf(check) >= 0;
+		return  value.toUpperCase().indexOf(check.toUpperCase()) >=0; //value.indexOf(check) >= 0;
 	}
 
 	@Override
