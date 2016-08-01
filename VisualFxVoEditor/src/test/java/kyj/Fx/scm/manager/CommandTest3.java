@@ -43,6 +43,7 @@ public class CommandTest3 {
 
 	JavaSVNManager testServerManager;
 	JavaSVNManager localServerManager;
+	JavaSVNManager localServerManager2;
 
 	@Before
 	public void setting() throws Exception {
@@ -65,6 +66,16 @@ public class CommandTest3 {
 			localServerManager = new JavaSVNManager(properties);
 		}
 
+		{
+			Properties properties = new Properties();
+			properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/test/");
+			properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
+			properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
+
+			localServerManager2 = new JavaSVNManager(properties);
+		}
+
+
 	}
 
 	@Test
@@ -73,7 +84,7 @@ public class CommandTest3 {
 	}
 
 	@Test
-	public void addFileTest() throws SVNException {
+	public void addFileTest() throws Exception {
 		if (!localServerManager.isExistsPath("test")) {
 			System.out.println("존재하지않음.. 새로 생성함.");
 		}
@@ -86,7 +97,7 @@ public class CommandTest3 {
 	}
 
 	@Test
-	public void addDirTest() throws SVNException {
+	public void addDirTest() throws Exception {
 
 		if (!localServerManager.isExistsPath("test")) {
 			System.out.println("존재하지않음.. 새로 생성함.");
@@ -413,6 +424,13 @@ public class CommandTest3 {
 			e.printStackTrace();
 		}
 		
+	}
+
+	@Test
+	public void getSvnUrlByFileSystemTest() throws Exception {
+		SVNURL svnUrlByFileSystem = localServerManager2
+				.getSvnUrlByFileSystem(new File("C:\\Users\\KYJ\\JAVA_FX\\gagoyleWorkspace\\test\\trunk\\trunk\\test\\Test"));
+		System.out.println(svnUrlByFileSystem);
 	}
 
 }

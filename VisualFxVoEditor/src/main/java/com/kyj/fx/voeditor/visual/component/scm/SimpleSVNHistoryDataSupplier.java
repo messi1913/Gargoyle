@@ -111,10 +111,15 @@ class SimpleSVNHistoryDataSupplier extends AbstracrtSVNHistoryDataSupplier {
 	 *
 	 * @param path
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 ********************************/
-	public boolean isExists(String path) throws SVNException {
-		return getManager().isExistsPath(path);
+	public boolean isExists(String path)  {
+		try {
+			return getManager().isExistsPath(path);
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
+		return false;
 	}
 
 	/********************************

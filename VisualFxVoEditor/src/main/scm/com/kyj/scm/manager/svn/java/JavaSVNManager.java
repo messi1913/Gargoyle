@@ -79,6 +79,18 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	}
 
 	/**
+	 * create new instance
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 1.
+	 * @param url
+	 * @return
+	 */
+	public static final JavaSVNManager createNewInstance(String url){
+		Properties properties = new Properties();
+		properties.put(JavaSVNManager.SVN_URL, url);
+		return new JavaSVNManager(properties);
+	}
+	/**
 	 * URL정보가 존재하는지 체크함.
 	 *
 	 * @작성자 : KYJ
@@ -430,7 +442,7 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	 * @return
 	 * @throws SVNException
 	 */
-	public boolean isExistsPath(String relativePath) throws SVNException {
+	public boolean isExistsPath(String relativePath) throws Exception {
 
 		SVNNodeKind exists = this.svnResource.isExists(relativePath);
 		if (exists == SVNNodeKind.FILE || exists == SVNNodeKind.DIR)
@@ -471,7 +483,7 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 
 	/**
 	 * 가장 최신 리비젼 번호를 구함.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.
 	 * @return
@@ -496,17 +508,13 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 
 	/**
 	 * SVN Root Url
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 21.
 	 * @return
 	 */
 	public String getRootUrl() {
-		SVNURL location = this.svnResource.getRepository().getLocation();
-		String decodedString = location.toDecodedString();
-		String uriEncodedPath = location.getURIEncodedPath();
-		String rootUrl = decodedString.replaceAll(uriEncodedPath, "");
-		return rootUrl;
+		return this.svnResource.getRootUrl();
 	}
 
 	/********************************
@@ -518,6 +526,7 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	public void ping() throws SVNException {
 		this.svnResource.ping();
 	}
+
 
 	/********************************
 	 * 작성일 :  2016. 7. 31. 작성자 : KYJ
@@ -531,4 +540,19 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 		return this.svnResource.getRepositoryUUID();
 	}
 
+
+	/**
+	 * SVN 서버에 연결된 루트 디렉토리에 속하는
+	 * 로컬 파일시스템의 파일에 해당하는 SVN서버 경로를
+	 * 리턴한다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 1.
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	public SVNURL getSvnUrlByFileSystem(File file) throws Exception {
+		return this.svnResource.getSvnUrlByFileSystem(file, SVNRevision.create(-1L));
+	}
 }

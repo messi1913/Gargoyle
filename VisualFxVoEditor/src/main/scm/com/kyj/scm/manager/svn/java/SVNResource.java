@@ -6,11 +6,17 @@
  *******************************/
 package com.kyj.scm.manager.svn.java;
 
+import java.io.File;
 import java.util.Date;
 import java.util.Properties;
 
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.wc.SVNClientManager;
+import org.tmatesoft.svn.core.wc.SVNInfo;
+import org.tmatesoft.svn.core.wc.SVNRevision;
 
 /**
  *
@@ -19,7 +25,7 @@ import org.tmatesoft.svn.core.SVNNodeKind;
  * @author KYJ
  *
  */
-public class SVNResource extends AbstractSVN {
+class SVNResource extends AbstractSVN {
 
 	/**
 	 * @param javaSVNManager
@@ -31,13 +37,14 @@ public class SVNResource extends AbstractSVN {
 
 	/**
 	 * 존재여부 확인
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.
 	 * @param relativePath
 	 * @return
 	 * @throws SVNException
 	 */
-	public SVNNodeKind isExists(String relativePath) throws SVNException {
+	public SVNNodeKind isExists(String relativePath) throws Exception {
 		//		ArrayList<Object> dirEntries = new ArrayList<>();
 		//		getRepository().getDir(relativePath, -1, null, dirEntries);
 		return getRepository().checkPath(relativePath, -1);
@@ -45,6 +52,7 @@ public class SVNResource extends AbstractSVN {
 
 	/**
 	 * 저장소에 저장된 최신 리비젼 리턴.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.
 	 * @return
@@ -68,7 +76,7 @@ public class SVNResource extends AbstractSVN {
 	}
 
 	/********************************
-	 * 작성일 :  2016. 7. 21. 작성자 : KYJ
+	 * 작성일 : 2016. 7. 21. 작성자 : KYJ
 	 *
 	 * SVN 서버 접속 여부 확인
 	 * 
@@ -78,16 +86,45 @@ public class SVNResource extends AbstractSVN {
 		getRepository().testConnection();
 	}
 
-	
 	/********************************
-	 * 작성일 :  2016. 7. 31. 작성자 : KYJ
+	 * 작성일 : 2016. 7. 31. 작성자 : KYJ
 	 *
-	 *  SVN 서버 RepositoryUUID를 리턴.
-	 *  
+	 * SVN 서버 RepositoryUUID를 리턴.
+	 * 
 	 * @return
 	 * @throws SVNException
 	 ********************************/
-	public String getRepositoryUUID() throws SVNException{
+	public String getRepositoryUUID() throws SVNException {
 		return getRepository().getRepositoryUUID(false);
 	}
+
+	/**
+	 * SVN Root Url
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @return
+	 */
+	public String getRootUrl() {
+		SVNURL location = getRepository().getLocation();
+		String decodedString = location.toDecodedString();
+		String uriEncodedPath = location.getURIEncodedPath();
+		String rootUrl = decodedString.replaceAll(uriEncodedPath, "");
+		return rootUrl;
+	}
+
+	/**
+	 * SVN 서버에 연결된 루트 디렉토리에 속하는 로컬 파일시스템의 파일에 해당하는 SVN서버 경로를 리턴한다.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 1.
+	 * @return
+	 * @throws Exception
+	 */
+	public SVNURL getSvnUrlByFileSystem(File file, SVNRevision revision) throws Exception {
+		SVNClientManager svnManager2 = getSvnManager();
+		SVNInfo doInfo = svnManager2.getWCClient().doInfo(file, revision);
+		return doInfo.getURL();
+	}
+
 }

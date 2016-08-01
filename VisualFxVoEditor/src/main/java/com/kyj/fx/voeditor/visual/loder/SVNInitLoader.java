@@ -27,7 +27,7 @@ import com.kyj.scm.manager.svn.java.JavaSVNManager;
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
- * TODO 클래스 역할
+ *
  *
  * @author KYJ
  *
@@ -66,7 +66,7 @@ public class SVNInitLoader implements SCMInitLoader {
 			properties.put(SVNTreeView.SVN_URL, url.toString());
 			if (id != null && !id.toString().isEmpty())
 				properties.put(SVNTreeView.SVN_USER_ID, id.toString());
-			
+
 			if (pass != null && !pass.toString().isEmpty()) {
 				try {
 					properties.put(SVNTreeView.SVN_USER_PASS, EncrypUtil.decryp(pass.toString()));
@@ -78,7 +78,7 @@ public class SVNInitLoader implements SCMInitLoader {
 
 			JavaSVNManager manager = new JavaSVNManager(properties);
 
-			SVNRepository svnRepository = new SVNRepository("/", url.toString(), manager);
+			SVNRepository svnRepository = new SVNRepository("", url.toString(), manager);
 
 			repositorys.add(svnRepository);
 		}
