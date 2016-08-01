@@ -227,12 +227,12 @@ public class TableOpenResourceView {
 				/*
 				 * TODO 추후 아래 메타정보를 이용하여 고칠 수 있게할것.
 				 * REFERENCES.
-				 * 
+				 *
 				 * http://docs.oracle.com/javase/6/docs/api/java/sql/DatabaseMetaData.html#getColumns(java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String)
-				 * 
+				 *
 				 * */
 				//				ResultSet tables = connection.getMetaData().getTables(null, null, "%", new String[]{"TABLE"});
-				//				
+				//
 				//				while(tables.next())
 				//				{
 				//					String TABLE_CAT = tables.getString(1);
@@ -283,7 +283,7 @@ public class TableOpenResourceView {
 		 */
 		@Override
 		public boolean isMatch(Map<String, Object> value, String text) {
-			boolean equals = getTableName(value).indexOf(text) >= 0;
+			boolean equals = getTableName(value).toUpperCase().indexOf(text.toUpperCase()) >= 0;
 			return equals;
 		}
 	}

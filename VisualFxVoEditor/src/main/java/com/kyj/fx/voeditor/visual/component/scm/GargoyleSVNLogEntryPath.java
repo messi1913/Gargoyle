@@ -8,7 +8,6 @@ package com.kyj.fx.voeditor.visual.component.scm;
 
 import java.util.Date;
 
-import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
 
@@ -16,7 +15,7 @@ import org.tmatesoft.svn.core.SVNNodeKind;
  * @author KYJ
  *
  */
-public class GargoyleSVNLogEntryPath extends SVNLogEntryPath {
+public class GargoyleSVNLogEntryPath extends SVNLogEntryPath  implements ISCMLogEntryPath {
 
 	/**
 	 * @최초생성일 2016. 7. 19.

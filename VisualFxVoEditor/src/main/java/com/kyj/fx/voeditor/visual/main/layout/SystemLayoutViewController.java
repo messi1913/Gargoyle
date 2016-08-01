@@ -20,9 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.FileWrapper;
-import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ImageViewPane;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
+import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenComposite;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
@@ -35,6 +35,7 @@ import com.kyj.fx.voeditor.visual.component.popup.GagoyleWorkspaceOpenResourceVi
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.popup.SelectWorkspaceView;
 import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
+import com.kyj.fx.voeditor.visual.component.scm.SVNFileHistoryComposite;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
@@ -621,7 +622,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		MenuItem menuProperties = new MenuItem("Properties");
 
 		menuProperties.setOnAction(this::menuPropertiesOnAction);
-		chodeAnalysisMenuItem.setOnAction(this::chodeAnalysisMenuItemOnAction);
+		chodeAnalysisMenuItem.setOnAction(this::menuItemCodeAnalysisMenuItemOnAction);
 
 		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem,
 				deleteFileMenuItem, /* voEditorMenuItem, daoWizardMenuItem, */
@@ -861,10 +862,34 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 *
 	 * @param e
 	 ********************************/
-	public void chodeAnalysisMenuItemOnAction(ActionEvent e) {
+	public void menuItemCodeAnalysisMenuItemOnAction(ActionEvent e) {
 		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
-			File sourceFile = selectedItem.getValue().getFile();
+			FileWrapper value = selectedItem.getValue();
+			File sourceFile = value.getFile();
+//			if(selectedItem instanceof JavaProjectMemberFileTreeItem)
+			{
+				if(value.isSVNConnected())
+				{
+					File wcDbFile = value.getWcDbFile();
+					if(wcDbFile!=null && wcDbFile.exists())
+					{
+						SVNWcDbClient client;
+						try {
+							client = new SVNWcDbClient(wcDbFile);
+							
+							
+							
+							new SVNFileHistoryComposite( JavaSVNManager.createNewInstance(client.getUrl()) , sourceFile);
+//							new JavaSVNManager(new Properties(defaults))
+						} catch (Exception e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				}
+			}
+
 			if (sourceFile != null && sourceFile.exists()) {
 				try {
 					if (FileUtil.isJavaFile(sourceFile)) {
@@ -1049,7 +1074,6 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				FilePropertiesComposite composite = new FilePropertiesComposite(file);
 				FxUtil.createStageAndShow(composite, stage -> {
 					stage.initOwner(SharedMemory.getPrimaryStage());
-					stage.show();
 				});
 			}
 
@@ -1216,17 +1240,29 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	@FXML
 	public void lblSVNOnAction(ActionEvent e) {
 		try {
-			Stage stage = new Stage();
+
 			Scene scene = new Scene(new BorderPane(new SVNViewer()), 1100, 900);
 			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-			stage.setScene(scene);
-			stage.initOwner(SharedMemory.getPrimaryStage());
+			FxUtil.createStageAndShow(scene, stage->{
+				stage.setTitle("SVN");
+				stage.initOwner(SharedMemory.getPrimaryStage());
+				stage.setAlwaysOnTop(false);
+				stage.centerOnScreen();
+			});
 
-			stage.setTitle("SVN");
-			stage.setAlwaysOnTop(false);
-			stage.centerOnScreen();
-			// stage.initModality(Modality.APPLICATION_MODAL);
-			stage.show();
+
+//			Stage stage = new Stage();
+//			Scene scene = new Scene(new BorderPane(new SVNViewer()), 1100, 900);
+//
+//
+//			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+//			stage.setScene(scene);
+//			stage.initOwner(SharedMemory.getPrimaryStage());
+//
+//			stage.setTitle("SVN");
+//			stage.setAlwaysOnTop(false);
+//			stage.centerOnScreen();
+//			stage.show();
 		} catch (Exception ex) {
 			LOGGER.error(ValueUtil.toString(ex));
 			DialogUtil.showExceptionDailog(ex);

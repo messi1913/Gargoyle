@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.wc.SVNRevision;
@@ -136,36 +135,32 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 					LOGGER.debug("{}", rootUrl);
 					LOGGER.debug("Cat Command, Path : {} Revision {}", path, copyRevision);
 
-					try {
-						String content = "";
-						VBox vBox = new VBox(5);
-						if (isExists(path)) {
-							content = cat(path, String.valueOf(copyRevision));
+					String content = "";
+					VBox vBox = new VBox(5);
+					if (isExists(path)) {
+						content = cat(path, String.valueOf(copyRevision));
 
-							List<SVNLogEntry> log = log(path, String.valueOf(copyRevision), ex -> {
-								LOGGER.error(ValueUtil.toString(ex));
-							});
+						List<SVNLogEntry> log = log(path, String.valueOf(copyRevision), ex -> {
+							LOGGER.error(ValueUtil.toString(ex));
+						});
 
-							if (ValueUtil.isNotEmpty(log)) {
-								SVNLogEntry svnLogEntry = log.get(0);
-								String apply = getManager().fromPrettySVNLogConverter().apply(svnLogEntry);
-								Label e = new Label(apply);
-								e.setStyle("-fx-text-fill:black");
-								vBox.getChildren().add(e);
-							}
-							vBox.getChildren().add(createJavaTextArea(content));
-
-						} else {
-							content = "Does not exists. Repository. [Removed]";
-							Label e = new Label(content);
+						if (ValueUtil.isNotEmpty(log)) {
+							SVNLogEntry svnLogEntry = log.get(0);
+							String apply = getManager().fromPrettySVNLogConverter().apply(svnLogEntry);
+							Label e = new Label(apply);
 							e.setStyle("-fx-text-fill:black");
 							vBox.getChildren().add(e);
 						}
+						vBox.getChildren().add(createJavaTextArea(content));
 
-						FxUtil.showPopOver(ev.getPickResult().getIntersectedNode(), vBox);
-					} catch (SVNException e) {
-						LOGGER.error(ValueUtil.toString(e));
+					} else {
+						content = "Does not exists. Repository. [Removed]";
+						Label e = new Label(content);
+						e.setStyle("-fx-text-fill:black");
+						vBox.getChildren().add(e);
 					}
+
+					FxUtil.showPopOver(ev.getPickResult().getIntersectedNode(), vBox);
 
 				}
 				ev.consume();
