@@ -58,7 +58,7 @@ public class CommandTest3 {
 
 		{
 			Properties properties = new Properties();
-			properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/sos/trunk/");
+			properties.put(JavaSVNManager.SVN_URL, "svn://localhost/svn/AnimationRecorder");
 			properties.put(JavaSVNManager.SVN_USER_ID, "kyjun.kim");
 			properties.put(JavaSVNManager.SVN_USER_PASS, "kyjun.kim");
 
@@ -69,7 +69,7 @@ public class CommandTest3 {
 
 	@Test
 	public void importTest() throws Exception {
-		testServerManager.doImport("/sos/deprecated_pass-batch-core", SVNURL.parseURIEncoded("svn://localhost/svn/sos/trunk/"));
+		testServerManager.doImport("/sos/deprecated_pass-batch-core", SVNURL.parseURIEncoded("svn://localhost/svn/A/trunk/"));
 	}
 
 	@Test
@@ -213,7 +213,7 @@ public class CommandTest3 {
 	 ********************************/
 	@Test
 	public void catTest() {
-		System.out.println(testServerManager.cat("/additional/DockFX/.project"));
+		System.out.println(localServerManager.cat("/pom.xml"));
 		// System.out.println(manager.cat("r679",
 		// "https://dev.naver.com/svn/javafxvoeditor/trunk/ScmManager/pom.xml"));
 
@@ -396,6 +396,23 @@ public class CommandTest3 {
 
 		});
 
+	}
+	
+	@Test
+	public void getRepositoryUUID(){
+		
+		
+		try {
+			localServerManager.ping();
+			
+			String repositoryUUID = localServerManager.getRepositoryUUID();
+			System.out.println(repositoryUUID);
+			
+		} catch (SVNException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 }
