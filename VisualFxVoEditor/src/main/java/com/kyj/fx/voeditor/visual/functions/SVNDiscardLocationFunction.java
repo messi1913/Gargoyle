@@ -60,9 +60,9 @@ public class SVNDiscardLocationFunction implements Function<SVNRepository, Boole
 		while (it.hasNext()) {
 			JSONObject e = (JSONObject) it.next();
 			Object objURL = e.get(SVN_URL);
-			Object objUserId = e.get(SVN_USER_ID);
+//			Object objUserId = e.get(SVN_USER_ID);
 			idx++;
-			if (objURL == null || objUserId == null)
+			if (objURL == null )
 				continue;
 
 			String url = objURL.toString();

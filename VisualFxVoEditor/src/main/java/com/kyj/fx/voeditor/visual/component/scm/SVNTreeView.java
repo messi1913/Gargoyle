@@ -145,9 +145,12 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 	 */
 	public void menuDiscardLocationOnAction(ActionEvent e) {
 
-		final int selectedIndex = getSelectionModel().getSelectedIndex();
-		ObservableList<TreeItem<SVNItem>> children = getRoot().getChildren();
-		TreeItem<SVNItem> selectedItem = children.get(selectedIndex);
+//		final int selectedIndex = getSelectionModel().getSelectedIndex();
+		
+//		ObservableList<TreeItem<SVNItem>> children = getRoot().getChildren();
+		
+		
+		TreeItem<SVNItem> selectedItem = getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
 			SVNItem value = selectedItem.getValue();
 
@@ -166,8 +169,12 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 						if ("Y".equals(v.getValue())) {
 							Boolean apply = discardFunction.apply(repo);
 							if (apply == true) {
-								TreeItem<SVNItem> result = children.remove(selectedIndex);
-								if (result != null)
+								
+								
+								boolean remove = getRoot().getChildren().remove(selectedItem);
+								
+								
+								if (remove)
 									DialogUtil.showMessageDialog("Discard Success!");
 								else
 									DialogUtil.showMessageDialog("Discard Fail...");

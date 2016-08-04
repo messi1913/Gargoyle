@@ -72,7 +72,7 @@ public class SqlTab extends Tab {
 
 		content.setEventDispatcher((event, tail) -> {
 
-			if (event.getEventType() == KeyEvent.KEY_RELEASED) {
+			if (event.getEventType() == KeyEvent.KEY_PRESSED) {
 				//				System.out.println("sqlTab");
 				tail.append(new EventDispatcher() {
 
@@ -88,7 +88,7 @@ public class SqlTab extends Tab {
 							int lastIndexOf = text2.lastIndexOf('*');
 							if (lastIndexOf >= 0) {
 
-								File selectedFile = DialogUtil.showFileSaveDialog(SharedMemory.getPrimaryStage(), choser -> {
+								File selectedFile = DialogUtil.showFileSaveDialog(null, choser -> {
 									String dir = System.getProperty("user.home");
 									choser.setInitialDirectory(new File(dir));
 
