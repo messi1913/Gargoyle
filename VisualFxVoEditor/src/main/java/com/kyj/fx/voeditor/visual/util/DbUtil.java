@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -53,6 +54,11 @@ import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
  *
  */
 public class DbUtil extends ConnectionManager {
+	/**
+	 * @최초생성일 2016. 8. 4.
+	 */
+	private static final int DEFAULT_FETCH_SIZE = 1000;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(DbUtil.class);
 
 	/**
@@ -69,6 +75,24 @@ public class DbUtil extends ConnectionManager {
 		String item = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.DML_KEYWORD);
 		dmlkeyword = item.split(",");
 	}
+
+	static BiFunction<Connection, String, PreparedStatement> DEFAULT_PREPAREDSTATEMENT_CONVERTER = (c, sql) -> {
+		try {
+			return c.prepareStatement(sql);
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+			return null;
+		}
+	};
+
+	static BiFunction<Connection, String, PreparedStatement> READ_ONLY_CURSOR_PREPAREDSTATEMENT_CONVERTER = (c, sql) -> {
+		try {
+			return c.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+			return null;
+		}
+	};
 
 	/**
 	 * 쿼리가 수행되면 메세지를 보낸다.
@@ -127,7 +151,7 @@ public class DbUtil extends ConnectionManager {
 
 	public static List<Map<String, Object>> selectLimit(final String sql) throws Exception {
 		Connection con = getConnection();
-		return selectLimit(con, sql, 10, 1000);
+		return selectLimit(con, sql, 10, DEFAULT_FETCH_SIZE);
 	}
 
 	public static List<Map<String, Object>> selectLimit(final String sql, int limitSize) throws Exception {
@@ -155,7 +179,25 @@ public class DbUtil extends ConnectionManager {
 		return select.isEmpty() ? Collections.emptyMap() : select.get(0);
 	}
 
+	public static List<Map<String, Object>> selectCursor(final Connection con, final String sql, int startRow) throws Exception {
+		return selectCursor(con, sql, startRow, -1);
+	}
+
+	public static List<Map<String, Object>> selectCursor(final Connection con, final String sql, int startRow, int limitRow)
+			throws Exception {
+		Properties properties = new Properties();
+		properties.put(ResultSetToMapConverter.START_ROW, --startRow);
+		return select(con, sql, DEFAULT_FETCH_SIZE, limitRow, READ_ONLY_CURSOR_PREPAREDSTATEMENT_CONVERTER,
+				new ResultSetToMapConverter(properties));
+	}
+
 	public static List<Map<String, Object>> select(final Connection con, final String sql, int fetchCount, int limitedSize,
+			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>> convert) throws Exception {
+		return select(con, sql, fetchCount, limitedSize, DEFAULT_PREPAREDSTATEMENT_CONVERTER, convert);
+	}
+
+	public static List<Map<String, Object>> select(final Connection con, final String sql, int fetchCount, int limitedSize,
+			BiFunction<Connection, String, PreparedStatement> prestatementConvert,
 			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>> convert) throws Exception {
 		List<Map<String, Object>> arrayList = null;
 
@@ -169,7 +211,7 @@ public class DbUtil extends ConnectionManager {
 			/* 쿼리 타임아웃 시간 설정 SEC */
 			// int queryTimeout = getQueryTimeout();
 
-			prepareStatement = con.prepareStatement(sql);
+			prepareStatement = prestatementConvert.apply(con, sql); //con.prepareStatement(sql);
 			// postgre-sql can't
 			// prepareStatement.setQueryTimeout(queryTimeout);
 
