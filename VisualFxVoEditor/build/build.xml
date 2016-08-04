@@ -29,7 +29,7 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor\lib\tools">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor\lib\tools">
 				<filename name="tools.jar" />
 			</fileset>
 		</copy>
@@ -64,7 +64,7 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor\btrace\build">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor\btrace\build">
 				<filename name="btrace-boot.jar" />
 			</fileset>
 		</copy>
@@ -79,7 +79,7 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor\lib\db\maria">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor\lib\db\maria">
 				<filename name="mariadb-java-client-1.2.2.jar" />
 			</fileset>
 		</copy>
@@ -164,7 +164,7 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor\btrace\build">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor\btrace\build">
 				<filename name="btrace-client.jar" />
 			</fileset>
 		</copy>
@@ -179,7 +179,7 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor\btrace\build">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor\btrace\build">
 				<filename name="btrace-agent.jar" />
 			</fileset>
 		</copy>
@@ -349,7 +349,7 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor\lib\db\oracle">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor\lib\db\oracle">
 				<filename name="ojdbc14.jar" />
 			</fileset>
 		</copy>
@@ -409,7 +409,7 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor\lib\richtext">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor\lib\richtext">
 				<filename name="richtextfx-fat-0.6.10.jar" />
 			</fileset>
 		</copy>
@@ -491,46 +491,49 @@
 
 
 		<mkdir dir="project" />
+		<!--
 		<copy todir="project">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
 				<include name="src\test\resources/**" />
 			</fileset>
 		</copy>
+		-->
 		<copy todir="project">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
 				<include name="src\main\scm/**" />
 			</fileset>
 		</copy>
 		<copy todir="project">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
 				<include name="src\main\resources/**" />
 			</fileset>
 		</copy>
+		<!--
 		<copy todir="project">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
 				<include name="src\main\projmagt/**" />
 			</fileset>
 		</copy>
+		-->
+		
 		<copy todir="project">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor">
-				<include name="src\test\compiler/**" />
-			</fileset>
-		</copy>
-		<copy todir="project">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor">
-				<include name="src\main\java/**" />
-			</fileset>
-		</copy>
-		<copy todir="project">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor">
-				<include name="src\test\java/**" />
-			</fileset>
-		</copy>
-		<copy todir="project">
-			<fileset dir="${user.home}\javafx_workspace\VisualFxVoEditor">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
 				<include name="src\main\compiler/**" />
 			</fileset>
 		</copy>
+		
+		<copy todir="project">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
+				<include name="src\main\java/**" />
+			</fileset>
+		</copy>
+		<!--
+		<copy todir="project">
+			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
+				<include name="src\test\java/**" />
+			</fileset>
+		</copy>
+		-->
 
 		<mkdir dir="projectRefs" />
 	</target>
@@ -665,11 +668,7 @@
 		</copy>
 		-->
 
-		<copy todir="build/src">
-			<fileset dir="project/src/main/projmagt">
-				<include name="**/*" />
-			</fileset>
-		</copy>
+		
 
 		<copy todir="build/src">
 			<fileset dir="project/src/main/compiler">
@@ -703,19 +702,6 @@
 		<!-- Copy over none Java-Files -->
 		<copy todir="build/classes">
 
-			<fileset dir="project/src/test/java">
-				<exclude name="**/*" />
-			</fileset>
-			<fileset dir="project/src/test/compiler">
-				<exclude name="**/*" />
-			</fileset>
-			<fileset dir="project/src/test/resources">
-				<exclude name="**/*" />
-			</fileset>
-
-			<fileset dir="project/src/main/projmagt">
-				<exclude name="**/*.java" />
-			</fileset>
 			<fileset dir="project/src/main/compiler">
 				<exclude name="**/*.java" />
 			</fileset>
@@ -783,7 +769,7 @@
 
 		</fx:resources>
 
-		<fx:application id="Gagoyle" name="Gargoyle" mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx" version="1.0.2" />
+		<fx:application id="Gagoyle" name="Gargoyle" mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx" version="1.0.6" />
 
 		<mkdir dir="build/classes/META-INF" />
 
@@ -798,7 +784,7 @@
 			<manifest>
 				<attribute name="Implementation-Vendor" value="kyj.fx.wizard" />
 				<attribute name="Implementation-Title" value="Gargoyle" />
-				<attribute name="Implementation-Version" value="1.0.2" />
+				<attribute name="Implementation-Version" value="1.0.6" />
 				<attribute name="JavaFX-Feature-Proxy" value="None" />
 			</manifest>
 		</fx:jar>
