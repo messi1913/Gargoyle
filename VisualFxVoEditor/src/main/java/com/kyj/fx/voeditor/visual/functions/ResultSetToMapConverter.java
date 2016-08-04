@@ -94,12 +94,14 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 
 					String value = u.getString(c);
 					boolean isEmptyValue = value == null || value.isEmpty();
+//					String tmpColumnLabel = metaData.getColumnLabel(c);
 					String columnLabel = metaData.getColumnLabel(c);
 
 					//2016-08-04 중복되는 컬럼이 씹혀 없어지지않도록 컬럼이름이 중복되면 인덱스를 붙임.
 					int nextNameIdx = 1;
-					while (map.containsKey(columnLabel)) {
-						columnLabel = columnLabel + "_" + nextNameIdx;
+					while (map.containsKey(columnLabel) && /*무한루핑 방지*/nextNameIdx < 1000 ) {
+						columnLabel = String.format("%s_%d", metaData.getColumnLabel(c), nextNameIdx);
+						nextNameIdx ++;
 					}
 
 					if (isBigDataColumnSkip) {
