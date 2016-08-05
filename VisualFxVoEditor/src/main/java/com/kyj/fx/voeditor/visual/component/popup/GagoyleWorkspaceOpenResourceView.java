@@ -33,10 +33,10 @@ public class GagoyleWorkspaceOpenResourceView {
 			@Override
 			public boolean isMatch(File value, String text) {
 
-//				return value.getAbsolutePath().equalsIgnoreCase(text);
+				//				return value.getAbsolutePath().equalsIgnoreCase(text);
 
-				return value.getAbsolutePath().toUpperCase().indexOf(text.toUpperCase()) >=0;
-//				return value.getAbsolutePath().indexOf(text) >= 0;
+				return value.getAbsolutePath().toUpperCase().indexOf(text.toUpperCase()) >= 0;
+				//				return value.getAbsolutePath().indexOf(text) >= 0;
 
 			}
 

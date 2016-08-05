@@ -752,7 +752,6 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		/* CTRL + P (Properties) */
 		// case P:
 		else if ((e.getCode() == KeyCode.P) && e.isControlDown() && !e.isAltDown() && !e.isShiftDown())
-
 		{
 			String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
 			TreeItem<K> selectedItem = schemaTree.getSelectionModel().getSelectedItem();
@@ -912,7 +911,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	}
 
 	/**
-	 * 엑셀 export기능
+	 * Excel Export.
 	 *
 	 * @param e
 	 */
@@ -953,7 +952,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	}
 
 	/**
-	 * JSON형태로 만듬.
+	 * Export JSON Script.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 13.
@@ -991,6 +990,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	}
 
 	/**
+	 * Export Import Script.
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 10.
 	 * @param e

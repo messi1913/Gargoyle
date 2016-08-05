@@ -327,7 +327,16 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	private void openFile(File file) {
 
 		List<String> exts = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILE_OPEN_NOT_INPROCESSING_EXTENSION, ",");
-		String EXTENSION = file.getName().substring(file.getName().indexOf('.'));
+
+		String fileName = file.getName();
+		int dotIndex = fileName.indexOf('.');
+		/*확장자부분이 없는경우 처리. */
+		if (dotIndex == -1) {
+			openBigText(file);
+			return;
+		}
+
+		String EXTENSION = fileName.substring(dotIndex);
 		Optional<String> findFirst = exts.stream().filter(ext -> EXTENSION.equals(ext) || EXTENSION.isEmpty()).findFirst();
 		if (findFirst.isPresent()) {
 			/*open OS Denpendency.*/
@@ -866,21 +875,18 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		if (selectedItem != null) {
 			FileWrapper value = selectedItem.getValue();
 			File sourceFile = value.getFile();
-//			if(selectedItem instanceof JavaProjectMemberFileTreeItem)
+			//			if(selectedItem instanceof JavaProjectMemberFileTreeItem)
 			{
-				if(value.isSVNConnected())
-				{
+				if (value.isSVNConnected()) {
 					File wcDbFile = value.getWcDbFile();
-					if(wcDbFile!=null && wcDbFile.exists())
-					{
+					if (wcDbFile != null && wcDbFile.exists()) {
 						SVNWcDbClient client;
 						try {
 							client = new SVNWcDbClient(wcDbFile);
-							
-							
+
 							//TODO 코드 완성시키기.
-//							new SVNFileHistoryComposite( JavaSVNManager.createNewInstance(client.getUrl()) , sourceFile);
-//							new JavaSVNManager(new Properties(defaults))
+							//							new SVNFileHistoryComposite( JavaSVNManager.createNewInstance(client.getUrl()) , sourceFile);
+							//							new JavaSVNManager(new Properties(defaults))
 						} catch (Exception e1) {
 							LOGGER.error(ValueUtil.toString(e1));
 						}
@@ -1241,26 +1247,25 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 			Scene scene = new Scene(new BorderPane(new SVNViewer()), 1100, 900);
 			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-			FxUtil.createStageAndShow(scene, stage->{
+			FxUtil.createStageAndShow(scene, stage -> {
 				stage.setTitle("SVN");
 				stage.initOwner(SharedMemory.getPrimaryStage());
 				stage.setAlwaysOnTop(false);
 				stage.centerOnScreen();
 			});
 
-
-//			Stage stage = new Stage();
-//			Scene scene = new Scene(new BorderPane(new SVNViewer()), 1100, 900);
-//
-//
-//			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-//			stage.setScene(scene);
-//			stage.initOwner(SharedMemory.getPrimaryStage());
-//
-//			stage.setTitle("SVN");
-//			stage.setAlwaysOnTop(false);
-//			stage.centerOnScreen();
-//			stage.show();
+			//			Stage stage = new Stage();
+			//			Scene scene = new Scene(new BorderPane(new SVNViewer()), 1100, 900);
+			//
+			//
+			//			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+			//			stage.setScene(scene);
+			//			stage.initOwner(SharedMemory.getPrimaryStage());
+			//
+			//			stage.setTitle("SVN");
+			//			stage.setAlwaysOnTop(false);
+			//			stage.centerOnScreen();
+			//			stage.show();
 		} catch (Exception ex) {
 			LOGGER.error(ValueUtil.toString(ex));
 			DialogUtil.showExceptionDailog(ex);
@@ -1479,7 +1484,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					try {
 						SVNWcDbClient client = new SVNWcDbClient(wcDbFile);
 						String rootUrl = client.getUrl();
-						LOGGER.debug("root URL : {}" , rootUrl);
+						LOGGER.debug("root URL : {}", rootUrl);
 						Properties properties = new Properties();
 						properties.put(JavaSVNManager.SVN_URL, rootUrl);
 

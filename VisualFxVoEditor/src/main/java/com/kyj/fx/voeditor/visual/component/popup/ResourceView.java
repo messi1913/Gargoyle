@@ -25,7 +25,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -51,7 +53,7 @@ import javafx.util.StringConverter;
  ***************************/
 public abstract class ResourceView<R> extends BorderPane {
 
-	Logger LOGGER = LoggerFactory.getLogger(ResourceView.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(ResourceView.class);
 
 	@FXML
 	private MenuBar menuOptional;
@@ -170,45 +172,33 @@ public abstract class ResourceView<R> extends BorderPane {
 
 		/* Control + C 기능 적용 */
 
-		lvResources.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
-
-			if (ev.isControlDown() && !ev.isShiftDown() && KeyCode.C == ev.getCode()) {
-				R selectedItem = lvResources.getSelectionModel().getSelectedItem();
-				String string = stringConverter().toString(selectedItem);
-				FxClipboardUtil.putString(string);
-				ev.consume();
-			}
-
-		});
+		lvResources.addEventHandler(KeyEvent.KEY_PRESSED, this::lvResourcesOnKeyPressed);
 
 		// lvResources.getItems().addAll(loadClasses);
 
 		// 자동완성기능 사용시 주석풀것
 		// autoCompletionBinding = getCompletionBinding();
 
-		txtFilter.textProperty().addListener((oba, oldval, newval) -> {
-
-			Platform.runLater(() -> {
-
-				if (newval == null)
-					return;
-
-				lvResources.getItems().clear();
-
-				List<R> collect = resources.stream().filter(r -> {
-					return isMatch(r, newval);
-				}).collect(Collectors.toList());
-
-				lvResources.getItems().addAll(collect);
-			});
-
-		});
+		txtFilter.textProperty().addListener(txtFilterChangeListener);
+		txtFilter.setOnKeyPressed(this::txtFilterOnKeyPressed);
 
 		btnReflesh.setOnMouseClicked(this::btnRefleshOnMouseClick);
+
 		init();
+		Platform.runLater(() -> {
+			onInited();
+		});
 	}
 
 	protected abstract void init();
+
+	protected void onInited() {
+		txtFilter.requestFocus();
+
+		Scene scene = getScene();
+		scene.addEventHandler(KeyEvent.KEY_PRESSED, sceneKeyEvent);
+
+	}
 
 	/**
 	 * 팝업호출
@@ -329,6 +319,101 @@ public abstract class ResourceView<R> extends BorderPane {
 			btnSelectOnMouseClick(event);
 		}
 	}
+
+	/**
+	 * 텍스트 필터 텍스트 변경 리스너
+	 * @최초생성일 2016. 8. 5.
+	 */
+	private ChangeListener<? super String> txtFilterChangeListener = (oba, oldval, newval) -> {
+
+		Platform.runLater(() -> {
+
+			if (newval == null)
+				return;
+
+			lvResources.getItems().clear();
+
+			List<R> collect = resources.stream().filter(r -> {
+				return isMatch(r, newval);
+			}).collect(Collectors.toList());
+
+			lvResources.getItems().addAll(collect);
+		});
+
+	};
+
+	/**
+	 * 텍스트필터 키 클릭 이벤트.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 5.
+	 * @param e
+	 */
+	private void txtFilterOnKeyPressed(KeyEvent e) {
+
+		switch (e.getCode()) {
+		case DOWN: {
+			//			lvResources.getSelectionModel().select(0);
+			lvResources.getSelectionModel().selectFirst();
+			lvResources.requestFocus();
+			e.consume();
+		}
+			break;
+
+		case UP: {
+
+			lvResources.getSelectionModel().selectLast();
+			lvResources.requestFocus();
+			e.consume();
+		}
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	/**
+	 * lvResources 그리드 키 이벤트
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 5.
+	 * @param ev
+	 */
+	public void lvResourcesOnKeyPressed(KeyEvent ev) {
+		if (KeyCode.C == ev.getCode() && !ev.isControlDown() && !ev.isShiftDown() && !ev.isAltDown()) {
+			R selectedItem = lvResources.getSelectionModel().getSelectedItem();
+			String string = stringConverter().toString(selectedItem);
+			FxClipboardUtil.putString(string);
+			ev.consume();
+		} else if (ev.getCode() == KeyCode.UP && !ev.isControlDown() && !ev.isShiftDown() && !ev.isAltDown()) {
+			int selectedIndex = lvResources.getSelectionModel().getSelectedIndex();
+			if (selectedIndex == 0) {
+				txtFilter.requestFocus();
+			}
+		} else if (ev.getCode() == KeyCode.DOWN && !ev.isControlDown() && !ev.isShiftDown() && !ev.isAltDown()) {
+			int idx = lvResources.getSelectionModel().getSelectedIndex();
+			if (idx == (lvResources.getItems().size() - 1)) {
+				txtFilter.requestFocus();
+			}
+		} else if (ev.getCode() == KeyCode.ENTER && !ev.isControlDown() && !ev.isShiftDown() && !ev.isAltDown()) {
+			btnSelectOnMouseClick(null);
+		}
+
+	}
+
+	/**
+	 * 화면에 대한 전역선택 키 이벤트.
+	 * @최초생성일 2016. 8. 5.
+	 */
+	private EventHandler<? super KeyEvent> sceneKeyEvent = ev -> {
+		if (ev.getCode() == KeyCode.ESCAPE && !ev.isControlDown() && !ev.isShiftDown() && !ev.isAltDown()) {
+			Scene scene = getScene();
+			if (scene != null) {
+				Stage window = (Stage) scene.getWindow();
+				if (window != null)
+					window.close();
+			}
+		}
+	};
 
 	/**
 	 * @return the consumer

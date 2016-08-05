@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
@@ -34,6 +37,7 @@ import javafx.util.StringConverter;
  ***************************/
 public class TableOpenResourceView {
 
+	private static Logger LOGGER = LoggerFactory.getLogger(TableOpenResourceView.class);
 	/**
 	 *
 	 * @최초생성일 2016. 6. 14.
