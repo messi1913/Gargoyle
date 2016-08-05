@@ -13,13 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.grid.AnnotateBizOptions;
 import com.kyj.fx.voeditor.visual.component.grid.CrudBaseGridView;
-import com.kyj.fx.voeditor.visual.component.grid.IOptions;
 import com.kyj.fx.voeditor.visual.framework.SupplySkin;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
-import com.kyj.fx.voeditor.visual.words.spec.ui.skin.BaseInfoController;
+import com.kyj.fx.voeditor.visual.words.spec.ui.skin.BaseInfoComposite;
 
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
@@ -35,23 +33,26 @@ import javafx.scene.layout.Priority;
 class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<BorderPane> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectInfoBaseInfoTab.class);
-	
-	public ProjectInfoBaseInfoTab(String title, SpecTabPane specTabPane) {
+
+	public ProjectInfoBaseInfoTab(String title, SpecTabPane specTabPane) throws Exception {
 		super(title, specTabPane);
 	}
 
 	@Override
-	public BorderPane supplyNode() {
+	public BorderPane supplyNode() throws Exception {
 
 		BorderPane root = new BorderPane();
 
 		try {
+
 			/* BaseInfo */
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(BaseInfoController.class.getResource("BaseInfoApp.fxml"));
-			BorderPane supplyNode = loader.load();
-			supplyNode.setPrefWidth(BorderPane.USE_COMPUTED_SIZE);
-			BaseInfoController baseInfoController = loader.getController();
+
+			BaseInfoComposite baseInfoController = new BaseInfoComposite(this);
+//			FXMLLoader loader = new FXMLLoader();
+//			loader.setLocation(BaseInfoComposite.class.getResource("BaseInfoApp.fxml"));
+//			BorderPane supplyNode = loader.load();
+//			supplyNode.setPrefWidth(BorderPane.USE_COMPUTED_SIZE);
+//			BaseInfoComposite baseInfoController = loader.getController();
 
 			/* 버튼박스 */
 			HBox hboxButton = new HBox(5);
@@ -81,7 +82,7 @@ class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<Borde
 						}
 
 					});
-			
+
 //			baseInfoController.getMethodData().addListener(new ListChangeListener<MethodDVO>() {
 //				@Override
 //				public void onChanged(javafx.collections.ListChangeListener.Change<? extends MethodDVO> c) {
@@ -90,11 +91,11 @@ class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<Borde
 //					}
 //				}
 //			});
-			
+
 			gv.getItems().addAll(baseInfoController.getMethodData());
 
-			supplyNode.setBottom(hboxButton);
-			root.setTop(supplyNode);
+			baseInfoController.setBottom(hboxButton);
+			root.setTop(baseInfoController);
 			root.setCenter(gv);
 
 		} catch (IOException | NullPointerException e) {

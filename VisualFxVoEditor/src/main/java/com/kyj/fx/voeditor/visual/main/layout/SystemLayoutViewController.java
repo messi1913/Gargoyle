@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.FileWrapper;
 import com.kyj.fx.voeditor.visual.component.ImageViewPane;
+import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
 import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
@@ -57,6 +58,7 @@ import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.util.ProgramSpecUtil;
+import com.kyj.fx.voeditor.visual.words.spec.resources.SpecResource;
 import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.SpecTabPane;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 import com.kyj.scm.manager.svn.java.SVNWcDbClient;
@@ -898,8 +900,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				try {
 					if (FileUtil.isJavaFile(sourceFile)) {
 
-						Tab tab = new Tab(sourceFile.getName(), new CodeAnalysisJavaTextArea(sourceFile));
-						loadNewSystemTab(sourceFile.getName(), new SpecTabPane(tab));
+						JavaProjectFileTreeItem javaProjectFileTreeItem = FileUtil.toJavaProjectFileTreeItem(selectedItem);
+						if (javaProjectFileTreeItem != null) {
+
+							Tab tab = new Tab(sourceFile.getName(), new CodeAnalysisJavaTextArea(sourceFile));
+							loadNewSystemTab(sourceFile.getName(),
+									new SpecTabPane(new SpecResource(javaProjectFileTreeItem.getValue().getFile(), sourceFile), tab));
+
+						}
+
 					} else {
 						DialogUtil.showMessageDialog("자바 파일이 아닙니다.");
 					}

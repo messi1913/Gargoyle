@@ -29,12 +29,16 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.base.Objects;
+import com.kyj.fx.voeditor.visual.component.FileWrapper;
+import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
 import com.kyj.fx.voeditor.visual.framework.FileCheckConverter;
 import com.kyj.fx.voeditor.visual.framework.model.proj.ProjectDescription;
 import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
 import com.kyj.fx.voeditor.visual.functions.LoadFileOptionHandler;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+
+import javafx.scene.control.TreeItem;
 
 /**
  *
@@ -510,6 +514,24 @@ public class FileUtil {
 		} catch (Exception e) {
 			errorHandler.accept(e);
 		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
+	 *
+	 * JavaProjectTree 반환
+	 *
+	 * @param treeItem
+	 * @return
+	 ********************************/
+	public static JavaProjectFileTreeItem toJavaProjectFileTreeItem(TreeItem<FileWrapper> treeItem) {
+		if (treeItem != null) {
+			if (treeItem instanceof JavaProjectFileTreeItem) {
+				return (JavaProjectFileTreeItem) treeItem;
+			}
+			return toJavaProjectFileTreeItem(treeItem.getParent());
+		}
+		return null;
 	}
 
 }

@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.words.spec.ui.tabs;
 
 import com.kyj.fx.voeditor.visual.framework.SupplySkin;
+import com.kyj.fx.voeditor.visual.words.spec.resources.SpecResource;
 
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
@@ -21,7 +22,7 @@ public abstract class AbstractSpecTab extends Tab implements SupplySkin<BorderPa
 
 	private SpecTabPane specTabPane;
 
-	public AbstractSpecTab(String title, SpecTabPane specTabPane) {
+	public AbstractSpecTab(String title, SpecTabPane specTabPane) throws Exception {
 		this.specTabPane = specTabPane;
 		setContent(supplyNode());
 		setText(title);
@@ -31,6 +32,10 @@ public abstract class AbstractSpecTab extends Tab implements SupplySkin<BorderPa
 
 	public SpecTabPane getSpecTabPane() {
 		return specTabPane;
+	}
+
+	public final SpecResource getSpecResource() {
+		return this.specTabPane.getResource();
 	}
 
 }

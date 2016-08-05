@@ -19,81 +19,96 @@ import com.kyj.fx.voeditor.visual.component.FileWrapper;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
-import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
+import com.kyj.fx.voeditor.visual.words.spec.resources.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.AbstractSpecTab;
+import com.sun.btrace.org.objectweb.asm.MethodVisitor;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
+import javafx.scene.layout.BorderPane;
 
 /**
  * @author KYJ
  *
  */
-@FXMLController("BaseInfoApp.fxml")
-public class BaseInfoController {
+@FXMLController(value = "BaseInfoApp.fxml", isSelfController = true)
+public class BaseInfoComposite extends BorderPane {
 
 	@FXML
 	private TextField lblProjectName, lblRealPath, lblFileName, lblPackage, lblImports, lblUserName;
 
 	private ObservableList<MethodDVO> methodData = FXCollections.observableArrayList();
 
+	private AbstractSpecTab projectInfoBaseInfoTab;
+
+	/**
+	 * Construnctor.
+	 * @param projectInfoBaseInfoTab
+	 *
+	 * @param projectDir
+	 * @param targetFile
+	 * @throws Exception
+	 */
+	public BaseInfoComposite(AbstractSpecTab projectInfoBaseInfoTab) throws Exception {
+		this.projectInfoBaseInfoTab = projectInfoBaseInfoTab;
+		FxUtil.loadRoot(getClass(), this);
+	}
+
 	@FXML
 	public void initialize() {
 
-		MultipleSelectionModel<TreeItem<FileWrapper>> selectionModel = SharedMemory.getSystemLayoutViewController()
-				.getTreeProjectFileSelectionModel();
-		TreeItem<FileWrapper> selectedItem = selectionModel.getSelectedItem();
 
-		if (selectedItem != null) {
-			JavaProjectFileTreeItem javaProjectFileTreeItem = getJavaProjectFileTreeItem(selectedItem);
-			if (javaProjectFileTreeItem == null)
-				return;
 
-			File projectFile = javaProjectFileTreeItem.getValue().getFile();
-			String projectFileName = projectFile.getName();
-			File targetFile = selectedItem.getValue().getFile();
+		SpecResource specResource = projectInfoBaseInfoTab.getSpecResource();
+		//TODO SVO형태로 받은경우는 없을 수 있음 처리해야함.
+		
+		File projectFile = specResource.getProjectFile();
+		File targetFile = specResource.getTargetFile();
 
-			lblProjectName.setText(projectFileName);
-			lblRealPath.setText(targetFile.getAbsolutePath());
-			lblFileName.setText(targetFile.getName());
-			lblUserName.setText(SystemUtils.USER_NAME);
+		String projectFileName = projectFile.getName();
 
-			FileUtil.consumeJavaParser(targetFile, cu -> {
+		lblProjectName.setText(projectFileName);
+		lblRealPath.setText(targetFile.getAbsolutePath());
+		lblFileName.setText(targetFile.getName());
+		lblUserName.setText(SystemUtils.USER_NAME);
 
-				NameExpr name = cu.getPackage().getName();
-				lblPackage.setText(name.toString());
-				String importStatement = cu.getImports().stream().map(im -> im.getName().toString()).collect(Collectors.joining(","));
-				lblImports.setText(importStatement);
+		FileUtil.consumeJavaParser(targetFile, cu -> {
 
-				Service<Void> service = new Service<Void>() {
-					@Override
-					protected Task<Void> createTask() {
+			NameExpr name = cu.getPackage().getName();
+			lblPackage.setText(name.toString());
+			String importStatement = cu.getImports().stream().map(im -> im.getName().toString()).collect(Collectors.joining(","));
+			lblImports.setText(importStatement);
 
-						return new Task<Void>() {
+			Service<Void> service = new Service<Void>() {
+				@Override
+				protected Task<Void> createTask() {
 
-							@Override
-							protected Void call() throws Exception {
-								new MethodVisitor(v -> {
-									methodData.add(v);
-								}).visit(cu, null);
-								return null;
-							}
-						};
-					}
-				};
-				service.start();
+					return new Task<Void>() {
 
-			}, System.err::println);
+						@Override
+						protected Void call() throws Exception {
+							new MethodVisitor(v -> {
+								methodData.add(v);
+							}).visit(cu, null);
+							return null;
+						}
+					};
+				}
+			};
+			service.start();
 
-		}
+		} , System.err::println);
+
 	}
+	//	}
 
 	/********************************
 	 * 작성일 : 2016. 7. 14. 작성자 : KYJ

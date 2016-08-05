@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane prefHeight="180.0" prefWidth="777.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.words.spec.ui.skin.BaseInfoController">
+<fx:root prefHeight="180.0" prefWidth="777.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
 		<GridPane BorderPane.alignment="CENTER">
 			<columnConstraints>
@@ -34,15 +34,15 @@
 				<TextField fx:id="lblRealPath" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 				<TextField fx:id="lblFileName" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 				<TextField fx:id="lblPackage" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <HBox alignment="CENTER" style="fx-background-color: transparent;" GridPane.columnIndex="1" GridPane.rowIndex="4">
-               <children>
-      				<TextField fx:id="lblImports" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                  <Button mnemonicParsing="false" text="Show" />
-               </children>
-            </HBox>
+				<HBox alignment="CENTER" style="fx-background-color: transparent;" GridPane.columnIndex="1" GridPane.rowIndex="4">
+					<children>
+						<TextField fx:id="lblImports" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+						<Button mnemonicParsing="false" text="Show" />
+					</children>
+				</HBox>
 				<TextField fx:id="lblUserName" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 				<Label text="User Name" GridPane.rowIndex="5" />
 			</children>
 		</GridPane>
 	</center>
-</BorderPane>
+</fx:root>

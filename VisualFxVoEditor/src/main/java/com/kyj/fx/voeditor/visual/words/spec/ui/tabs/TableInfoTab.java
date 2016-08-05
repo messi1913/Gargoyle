@@ -26,7 +26,7 @@ class TableInfoTab extends AbstractSpecTab implements SupplySkin<BorderPane> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TableInfoTab.class);
 
-	public TableInfoTab(String title, SpecTabPane specTabPane) {
+	public TableInfoTab(String title, SpecTabPane specTabPane) throws Exception {
 		super(title, specTabPane);
 	}
 
