@@ -25,13 +25,13 @@ public class AnswerTableEditorUtil {
 	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 11. 27.
-	 * @param text
+	 * @param numberText
 	 * @param startingNumber
 	 *            시작번호
 	 * @return
 	 */
-	public static List<List<String>> convertNumbering(String text, int startingNumber) {
-		return convert(text, list -> {
+	public static List<List<String>> convertNumbering(String numberText, int startingNumber) {
+		return convert(numberText, list -> {
 			List<String> arr = new ArrayList<>();
 			for (int i = startingNumber; i < list.size() + startingNumber; i++) {
 				arr.add(String.valueOf(i));
