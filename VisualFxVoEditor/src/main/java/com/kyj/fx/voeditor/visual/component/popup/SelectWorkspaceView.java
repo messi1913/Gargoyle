@@ -122,7 +122,9 @@ public class SelectWorkspaceView extends AnchorPane {
 	@FXML
 	public void btnBrowseOnMouseClick(MouseEvent e) {
 		File selectDirFile = DialogUtil.showDirectoryDialog(SharedMemory.getPrimaryStage());
-		txtWorkspace.setText(selectDirFile.getAbsolutePath());
+		//NullException fix.
+		if(selectDirFile!=null)
+			txtWorkspace.setText(selectDirFile.getAbsolutePath());
 	}
 
 	@FXML
