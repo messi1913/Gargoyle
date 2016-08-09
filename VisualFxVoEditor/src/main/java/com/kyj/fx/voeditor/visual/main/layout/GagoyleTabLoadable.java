@@ -32,4 +32,8 @@ interface GagoyleTabLoadable {
 	 * @param fxmlName
 	 */
 	void loadNewSystemTab(String tabName, String fxmlName);
+	
+	
+	
+	
 }

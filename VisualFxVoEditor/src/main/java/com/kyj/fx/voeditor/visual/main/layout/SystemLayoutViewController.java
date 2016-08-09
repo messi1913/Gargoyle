@@ -298,7 +298,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						}
 
 						try {
-							Class<GagoyleParentOnLoaded> addOnParentLoadedListenerClass = jarWrapper.getAddOnParentLoadedListenerClass();
+							Class<GagoyleParentOnLoaded> addOnParentLoadedListenerClass = jarWrapper
+									.getAddOnParentLoadedListenerClass();
 							if (addOnParentLoadedListenerClass != null)
 								addOnParentLoadedListener(addOnParentLoadedListenerClass.newInstance());
 						} catch (Exception e) {
@@ -328,20 +329,22 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 */
 	private void openFile(File file) {
 
-		List<String> exts = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILE_OPEN_NOT_INPROCESSING_EXTENSION, ",");
+		List<String> exts = ConfigResourceLoader.getInstance()
+				.getValues(ConfigResourceLoader.FILE_OPEN_NOT_INPROCESSING_EXTENSION, ",");
 
 		String fileName = file.getName();
 		int dotIndex = fileName.indexOf('.');
-		/*확장자부분이 없는경우 처리. */
+		/* 확장자부분이 없는경우 처리. */
 		if (dotIndex == -1) {
 			openBigText(file);
 			return;
 		}
 
 		String EXTENSION = fileName.substring(dotIndex);
-		Optional<String> findFirst = exts.stream().filter(ext -> EXTENSION.equals(ext) || EXTENSION.isEmpty()).findFirst();
+		Optional<String> findFirst = exts.stream().filter(ext -> EXTENSION.equals(ext) || EXTENSION.isEmpty())
+				.findFirst();
 		if (findFirst.isPresent()) {
-			/*open OS Denpendency.*/
+			/* open OS Denpendency. */
 			FileUtil.openFile(file);
 		} else {
 
@@ -441,7 +444,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	private void openPdf(File file) throws Exception {
 		try {
 
-			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(new PDFImageBasePane(file)) {
+			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(
+					new PDFImageBasePane(file)) {
 
 				@Override
 				public void close() throws IOException {
@@ -578,16 +582,17 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					isRemoveOpenWidthSceneBuilderMenuItem = false;
 
 					File file = new File(sceneBuilderLocation);
-					/*씬빌더 존재 유무에 따라 활성화 여부를 지정.*/
+					/* 씬빌더 존재 유무에 따라 활성화 여부를 지정. */
 					if (file.exists()) {
 						menuItemOpenWithSceneBuilder.setDisable(false);
 					} else {
 						menuItemOpenWithSceneBuilder.setDisable(true);
 					}
-				} //else if (selectedTreeItem instanceof JavaProjectFileTreeItem) {
+				} // else if (selectedTreeItem instanceof
+					// JavaProjectFileTreeItem) {
 				if (fileWrapper.isSVNConnected())
 					isDisableSCMGraphsMenuItem = false;
-				//				}
+				// }
 			}
 
 			if (isRemoveOpenWidthSceneBuilderMenuItem)
@@ -613,7 +618,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		// //선택한 파일아이템을 DaoWizard에서 조회시 사용
 		// MenuItem daoWizardMenuItem = new MenuItem("Show DAO Wizard");
 		// 선택한 파일경로를 Vo Editor Location에 바인딩함.
-		//		MenuItem setVoEditorMenuItem = new MenuItem("SET Vo Editor Directory");
+		// MenuItem setVoEditorMenuItem = new MenuItem("SET Vo Editor
+		// Directory");
 
 		// 선택한 파일경로를 Vo Editor Location에 바인딩함.
 		MenuItem voEditorMenuItem = new MenuItem("Vo Editor");
@@ -636,28 +642,30 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem,
 				deleteFileMenuItem, /* voEditorMenuItem, daoWizardMenuItem, */
-				voEditorMenuItem, /*setVoEditorMenuItem,*/ setDaoWizardMenuItem, refleshMenuItem, chodeAnalysisMenuItem,
-				makeProgramSpecMenuItem, menuItemSCMGraphs, new SeparatorMenuItem(), menuProperties);
+				voEditorMenuItem, /* setVoEditorMenuItem, */ setDaoWizardMenuItem, refleshMenuItem,
+				chodeAnalysisMenuItem, makeProgramSpecMenuItem, menuItemSCMGraphs, new SeparatorMenuItem(),
+				menuProperties);
 
 		// daoWizardMenuItem.addEventHandler(ActionEvent.ACTION,
 		// this::daoWizardMenuItemOnActionEvent);
 
 		// Vo Editor
-		//		setVoEditorMenuItem.addEventHandler(ActionEvent.ACTION, event -> {
-		//			Node lookup = borderPaneMain.lookup("#txtLocation");
-		//			if (lookup != null && tmpSelectFileWrapper != null) {
-		//				TextField txtLocation = (TextField) lookup;
-		//				File file = tmpSelectFileWrapper.getFile();
-		//				if (file.isDirectory()) {
-		//					String absolutePath = file.getAbsolutePath();
-		//					ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH, absolutePath);
-		//					txtLocation.setText(absolutePath);
-		//				} else {
-		//					DialogUtil.showMessageDialog("Only Directory.");
-		//				}
-		//			}
-		//			tmpSelectFileWrapper = null;
-		//		});
+		// setVoEditorMenuItem.addEventHandler(ActionEvent.ACTION, event -> {
+		// Node lookup = borderPaneMain.lookup("#txtLocation");
+		// if (lookup != null && tmpSelectFileWrapper != null) {
+		// TextField txtLocation = (TextField) lookup;
+		// File file = tmpSelectFileWrapper.getFile();
+		// if (file.isDirectory()) {
+		// String absolutePath = file.getAbsolutePath();
+		// ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH,
+		// absolutePath);
+		// txtLocation.setText(absolutePath);
+		// } else {
+		// DialogUtil.showMessageDialog("Only Directory.");
+		// }
+		// }
+		// tmpSelectFileWrapper = null;
+		// });
 
 		voEditorMenuItem.addEventHandler(ActionEvent.ACTION, this::voEditorMenuItemOnAction);
 
@@ -712,14 +720,17 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						if (FileUtil.isJavaFile(sourceFile)) {
 
 							// 파일을 생성하고, 생성하고 나면 오픈.
-							File targetFile = DialogUtil.showFileSaveCheckDialog(SharedMemory.getPrimaryStage(), chooser -> {
+							File targetFile = DialogUtil.showFileSaveCheckDialog(SharedMemory.getPrimaryStage(),
+									chooser -> {
 
-								chooser.setInitialFileName(DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSS));
-								chooser.getExtensionFilters().add(new ExtensionFilter("Doc files (*.docx)", "*.docx"));
-								chooser.setTitle("Save Program Spec. Doc");
-								chooser.setInitialDirectory(new File(SystemUtils.USER_HOME));
+										chooser.setInitialFileName(DateUtil
+												.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSS));
+										chooser.getExtensionFilters()
+												.add(new ExtensionFilter("Doc files (*.docx)", "*.docx"));
+										chooser.setTitle("Save Program Spec. Doc");
+										chooser.setInitialDirectory(new File(SystemUtils.USER_HOME));
 
-							});
+									});
 
 							if (targetFile != null) {
 								boolean createDefault = ProgramSpecUtil.createDefault(sourceFile, targetFile);
@@ -877,7 +888,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		if (selectedItem != null) {
 			FileWrapper value = selectedItem.getValue();
 			File sourceFile = value.getFile();
-			//			if(selectedItem instanceof JavaProjectMemberFileTreeItem)
+			// if(selectedItem instanceof JavaProjectMemberFileTreeItem)
 			{
 				if (value.isSVNConnected()) {
 					File wcDbFile = value.getWcDbFile();
@@ -886,9 +897,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						try {
 							client = new SVNWcDbClient(wcDbFile);
 
-							//TODO 코드 완성시키기.
-							//							new SVNFileHistoryComposite( JavaSVNManager.createNewInstance(client.getUrl()) , sourceFile);
-							//							new JavaSVNManager(new Properties(defaults))
+							// TODO 코드 완성시키기.
+							// new SVNFileHistoryComposite(
+							// JavaSVNManager.createNewInstance(client.getUrl())
+							// , sourceFile);
+							// new JavaSVNManager(new Properties(defaults))
 						} catch (Exception e1) {
 							LOGGER.error(ValueUtil.toString(e1));
 						}
@@ -900,12 +913,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				try {
 					if (FileUtil.isJavaFile(sourceFile)) {
 
-						JavaProjectFileTreeItem javaProjectFileTreeItem = FileUtil.toJavaProjectFileTreeItem(selectedItem);
+						JavaProjectFileTreeItem javaProjectFileTreeItem = FileUtil
+								.toJavaProjectFileTreeItem(selectedItem);
 						if (javaProjectFileTreeItem != null) {
 
 							Tab tab = new Tab(sourceFile.getName(), new CodeAnalysisJavaTextArea(sourceFile));
-							loadNewSystemTab(sourceFile.getName(),
-									new SpecTabPane(new SpecResource(javaProjectFileTreeItem.getValue().getFile(), sourceFile), tab));
+							loadNewSystemTab(sourceFile.getName(), new SpecTabPane(
+									new SpecResource(javaProjectFileTreeItem.getValue().getFile(), sourceFile), tab));
 
 						}
 
@@ -1263,18 +1277,19 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				stage.centerOnScreen();
 			});
 
-			//			Stage stage = new Stage();
-			//			Scene scene = new Scene(new BorderPane(new SVNViewer()), 1100, 900);
+			// Stage stage = new Stage();
+			// Scene scene = new Scene(new BorderPane(new SVNViewer()), 1100,
+			// 900);
 			//
 			//
-			//			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-			//			stage.setScene(scene);
-			//			stage.initOwner(SharedMemory.getPrimaryStage());
+			// scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+			// stage.setScene(scene);
+			// stage.initOwner(SharedMemory.getPrimaryStage());
 			//
-			//			stage.setTitle("SVN");
-			//			stage.setAlwaysOnTop(false);
-			//			stage.centerOnScreen();
-			//			stage.show();
+			// stage.setTitle("SVN");
+			// stage.setAlwaysOnTop(false);
+			// stage.centerOnScreen();
+			// stage.show();
 		} catch (Exception ex) {
 			LOGGER.error(ValueUtil.toString(ex));
 			DialogUtil.showExceptionDailog(ex);
@@ -1592,5 +1607,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 ********************************/
 	public final MultipleSelectionModel<TreeItem<FileWrapper>> getTreeProjectFileSelectionModel() {
 		return treeProjectFile.getSelectionModel();
+	}
+
+	public void refleshWorkspaceTree() {
+		String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
+		selectDirFile = new File(baseDir);
+		treeProjectFile.setRoot(createNewTree(selectDirFile));
 	}
 }

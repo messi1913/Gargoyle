@@ -35,7 +35,7 @@ import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTabPane;
 import com.kyj.fx.voeditor.visual.framework.BigDataDVO;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
-import com.kyj.fx.voeditor.visual.main.layout.GagoyleTabLoaderProxy;
+import com.kyj.fx.voeditor.visual.main.layout.GagoyleTabProxy;
 import com.kyj.fx.voeditor.visual.main.layout.SchoolMgrerSpreadSheetView;
 import com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
@@ -129,7 +129,7 @@ public abstract class SqlMultiplePane<T, K> extends DockPane implements ISchemaT
 	/**
 	 * 시스템에서 로드할 탭로더 프록시 객체
 	 */
-	private GagoyleTabLoaderProxy tabProxy;
+	private GagoyleTabProxy tabProxy;
 
 	private Stage stage;
 
@@ -906,7 +906,7 @@ public abstract class SqlMultiplePane<T, K> extends DockPane implements ISchemaT
 	public void menuExportSpreadSheetOnAction(ActionEvent e) {
 		// 탭을 로드할 수 있는 프록시 객체를 불러옴
 		if (tabProxy == null) {
-			tabProxy = new GagoyleTabLoaderProxy();
+			tabProxy = GagoyleTabProxy.getInstance();
 		}
 
 		// 그리드 데이터를 copy

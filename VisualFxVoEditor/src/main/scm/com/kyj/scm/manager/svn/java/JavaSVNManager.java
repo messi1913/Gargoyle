@@ -555,4 +555,18 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	public SVNURL getSvnUrlByFileSystem(File file) throws Exception {
 		return this.svnResource.getSvnUrlByFileSystem(file, SVNRevision.create(-1L));
 	}
+	
+	/**
+	 * 현재 객체에 설정된 Properties를 리턴한다.
+	 * 원본 데이터가 변경되자않게하기위해 
+	 * 객체를 새로 생성후 반환한다.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 9.
+	 * @param file
+	 * @return
+	 */
+	public Properties getProperties(){
+		return (Properties) this.properties.clone();
+	}
 }
