@@ -51,9 +51,10 @@ public class Main extends Application {
 	private static List<PrimaryStageCloseable> listeners = new ArrayList<PrimaryStageCloseable>();
 
 	/********************************
-	 * 작성일 :  2016. 7. 26. 작성자 : KYJ
+	 * 작성일 : 2016. 7. 26. 작성자 : KYJ
 	 *
 	 * 프로그램 종료시 처리할 내용을 구현할 이벤트를 등록하는 함수.
+	 * 
 	 * @param listener
 	 ********************************/
 	public static void addPrimaryStageCloseListener(PrimaryStageCloseable listener) {
@@ -63,10 +64,10 @@ public class Main extends Application {
 	/**
 	 * 어플리케이션이 종료될때 처리할 이벤트를 구현한다.
 	 * 
-	 * PrimaryStageCloseable을 구현하고  addPrimaryStageCloseListener(PrimaryStageCloseable) 함수에 리스너를 등록한 
-	 * 함수는 프로그램 종료시 처리할 이벤트가 실행되게 된다.
+	 * PrimaryStageCloseable을 구현하고 addPrimaryStageCloseListener(PrimaryStageCloseable) 함수에 리스너를 등록한 함수는 프로그램 종료시 처리할 이벤트가 실행되게 된다.
 	 * 
-	 *  주로 화면에 대한 Resource 해제등의 로직이 대상이됨.
+	 * 주로 화면에 대한 Resource 해제등의 로직이 대상이됨.
+	 * 
 	 * @최초생성일 2016. 7. 26.
 	 */
 	private static EventHandler<WindowEvent> onPrimaryStageCloseRequest = event -> {
@@ -124,13 +125,13 @@ public class Main extends Application {
 
 		//어플리케이션 타이틀 지정
 		primaryStage.setTitle(APPLICATION_TITLE);
-		
+
 		//화면 중앙 위치.
 		primaryStage.centerOnScreen();
-		
+
 		//메인 스테이지 클로즈 이벤트 구현.
 		primaryStage.setOnCloseRequest(onPrimaryStageCloseRequest);
-		
+
 		/*[시작 ]초기 워크스페이스 선택 지정. */
 		String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
 
@@ -145,15 +146,15 @@ public class Main extends Application {
 			}
 		}
 		/*[끝 ]초기 워크스페이스 선택 지정. */
-		
+
 		try {
-			
+
 			//예상치 못한 에외에 대한 대비 로직구현. 
 			setApplicationUncaughtExceptionHandler();
-			
+
 			//클래스 로딩같은 어플리케이션이 메모리에 로딩됨과 동기에 무거운 처리를 비동기로 로딩하는 로직이 구현되있음.
 			SharedMemory.init();
-			
+
 			//PrimaryStage를 공유변수로 지정하기 위한 로직 처리. 
 			SharedMemory.setPrimaryStage(primaryStage);
 
@@ -173,9 +174,9 @@ public class Main extends Application {
 	}
 
 	/********************************
-	 * 작성일 :  2016. 7. 26. 작성자 : KYJ
+	 * 작성일 : 2016. 7. 26. 작성자 : KYJ
 	 *
-	 * 예측되지 못한 예외처리에 대한 로직처리가 입력된다. 
+	 * 예측되지 못한 예외처리에 대한 로직처리가 입력된다.
 	 * 
 	 * ex) 정규식 무한루프등(StackOverflow)
 	 ********************************/
@@ -189,6 +190,7 @@ public class Main extends Application {
 	/***************************
 	 *
 	 * 예측하지 못한 예외에 대한 실제 로직이 구현됨.
+	 * 
 	 * @author KYJ
 	 *
 	 ***************************/
@@ -200,13 +202,23 @@ public class Main extends Application {
 			LOGGER.error("uncaughtException");
 			LOGGER.error(ValueUtil.toString(e));
 			LOGGER.error("####################");
+
+			StackTraceElement[] sts = t.getStackTrace();
+			if (sts != null) {
+				for (StackTraceElement s : sts) {
+
+					LOGGER.error("className : {} method : {}  line : {} ", s.getClassName(), s.getMethodName(), s.getLineNumber());
+				}
+			}
+
 		}
 	}
 
 	/********************************
-	 * 작성일 :  2016. 7. 26. 작성자 : KYJ
+	 * 작성일 : 2016. 7. 26. 작성자 : KYJ
 	 *
 	 * Appplication 메인 로직
+	 * 
 	 * @return
 	 * @throws IOException
 	 ********************************/
@@ -217,9 +229,10 @@ public class Main extends Application {
 	}
 
 	/********************************
-	 * 작성일 :  2016. 7. 26. 작성자 : KYJ
+	 * 작성일 : 2016. 7. 26. 작성자 : KYJ
 	 *
-	 *Appliucation 메인로직.
+	 * Appliucation 메인로직.
+	 * 
 	 * @return
 	 * @throws IOException
 	 ********************************/

@@ -7,6 +7,8 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +25,7 @@ import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 public class DBUtilTest {
 
 	/**
-	 * Test method for
-	 * {@link com.kyj.fx.voeditor.visual.util.DbUtil#select(java.lang.String)}.
+	 * Test method for {@link com.kyj.fx.voeditor.visual.util.DbUtil#select(java.lang.String)}.
 	 *
 	 * @throws Exception
 	 */
@@ -76,4 +77,33 @@ public class DBUtilTest {
 		}
 	}
 
+	@Test
+	public void pkPrintTest() throws Exception {
+
+		{
+			Connection connection = DbUtil.getConnection();
+			ResultSet rs = connection.getMetaData().getPrimaryKeys(null, null, "tbm_sys_dao");
+
+			while (rs.next()) {
+				System.out.println(rs.getString(4));
+			}
+
+		}
+
+		DbUtil.pks("tbm_sys_dao", rs -> {
+			String string = "";
+			try {
+
+				string = rs.getString(4);
+
+				System.out.println("row : " + rs.getRow() + " : " + string);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			return string;
+
+		});
+	}
 }

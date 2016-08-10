@@ -127,7 +127,10 @@ abstract class ConnectionManager {
 	public static DataSource getDataSource(String driver, String url, String id, String pass) throws Exception {
 		if (dataSource == null) {
 			// 비밀번호는 입력안하는경우도 있기때문에 검증에서 제외
-			if (ValueUtil.isEmpty(driver, url, id)) {
+			/*2016-08-10
+			 * id도 입력안하는 경우가 있음 sqlite. by kyj
+			 * */
+			if (ValueUtil.isEmpty(driver, url)) {
 				throw new GargoyleConnectionFailException("Check 'Datatabse Settings' on the 'Configuration tab' ");
 			}
 

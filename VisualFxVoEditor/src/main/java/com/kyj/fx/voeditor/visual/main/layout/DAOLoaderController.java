@@ -6,10 +6,26 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.main.layout;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.kyj.fx.voeditor.visual.component.DiffAppController;
+import com.kyj.fx.voeditor.visual.component.TextBaseDiffAppController;
+import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
+import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
+import com.kyj.fx.voeditor.visual.diff.TextBaseComparator;
+import com.kyj.fx.voeditor.visual.main.model.vo.TbmSysDaoMethodsHDVO;
+import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.util.DbUtil;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -33,23 +49,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kyj.Fx.dao.wizard.core.model.vo.TbmSysDaoDVO;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.kyj.fx.voeditor.visual.component.DiffAppController;
-import com.kyj.fx.voeditor.visual.component.TextBaseDiffAppController;
-import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
-import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
-import com.kyj.fx.voeditor.visual.diff.TextBaseComparator;
-import com.kyj.fx.voeditor.visual.main.model.vo.TbmSysDaoMethodsHDVO;
-import com.kyj.fx.voeditor.visual.momory.SharedMemory;
-import com.kyj.fx.voeditor.visual.util.DbUtil;
-import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 /**
  * @author KYJ
@@ -200,7 +201,11 @@ public class DAOLoaderController {
 
 	private TbmSysDaoMethodsHDVO getHistorySQL(Map<String, Object> paramMap) throws Exception {
 		StringBuffer sb = new StringBuffer();
-		sb.append("select hist_tsp, sql_body from meerkat.tbp_sys_dao_methods_h ");
+		if (isExistsSchemaDatabase())
+			sb.append("select hist_tsp, sql_body from meerkat.tbp_sys_dao_methods_h ");
+		else
+			sb.append("select hist_tsp, sql_body from tbp_sys_dao_methods_h ");
+		
 		sb.append("where hist_tsp =':histTsp'");
 
 		List<TbmSysDaoMethodsHDVO> select = DbUtil.select(sb.toString(), paramMap, (rs, row) -> {
@@ -216,8 +221,11 @@ public class DAOLoaderController {
 
 	private List<TbmSysDaoMethodsHDVO> listHistoryItems(Map<String, Object> paramMap) throws Exception {
 		StringBuffer sb = new StringBuffer();
-		sb.append(
-				"select b.hist_tsp, b.package_name, b.class_name, b.method_name, b.result_vo_class, b.dml_type, fst_reg_dt from meerkat.tbm_sys_dao a inner join meerkat.tbp_sys_dao_methods_h b\n");
+		sb.append("select b.hist_tsp, b.package_name, b.class_name, b.method_name, b.result_vo_class, b.dml_type, fst_reg_dt from \n");
+		if (isExistsSchemaDatabase())
+			sb.append("meerkat.tbm_sys_dao a inner join meerkat.tbp_sys_dao_methods_h b\n");
+		else
+			sb.append("tbm_sys_dao a inner join tbp_sys_dao_methods_h b\n");
 		sb.append("on a.package_name = b.package_name and a.class_name = b.class_name\n");
 		sb.append("and a.package_name = ':packageName' \n");
 		sb.append("and a.class_name =':className'\n");
@@ -300,6 +308,7 @@ public class DAOLoaderController {
 		if (daoName == null || daoName.isEmpty())
 			return FXCollections.emptyObservableList();
 
+
 		Map<String, Object> param = new HashMap<String, Object>();
 
 		if ("*".equals(daoName)) {
@@ -309,7 +318,11 @@ public class DAOLoaderController {
 		}
 		StringBuffer sb = new StringBuffer();
 		sb.append("\n");
-		sb.append("SELECT PACKAGE_NAME, CLASS_NAME,LOCATION,CLASS_DESC,TABLE_NAME FROM meerkat.tbm_sys_dao \n");
+		if(isExistsSchemaDatabase())
+			sb.append("SELECT PACKAGE_NAME, CLASS_NAME,LOCATION,CLASS_DESC,TABLE_NAME FROM meerkat.tbm_sys_dao \n");
+		else
+			sb.append("SELECT PACKAGE_NAME, CLASS_NAME,LOCATION,CLASS_DESC,TABLE_NAME FROM tbm_sys_dao \n");
+		
 		sb.append("WHERE 1=1 \n");
 		sb.append("#if($tableName) \n");
 		sb.append("AND CLASS_NAME LIKE '%:tableName%'  \n");
@@ -326,6 +339,21 @@ public class DAOLoaderController {
 			return hashMap;
 		});
 
+	}
+
+	
+	private static boolean isExistsSchemaDatabase() {
+		String driver = DbUtil.getDriver().trim();
+		if (driver == null || driver.isEmpty())
+			return true;
+
+		String drivers = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.NOT_EXISTS_SCHEMA_DRIVER_NAMES);
+		if (drivers != null && !driver.isEmpty()) {
+			drivers = drivers.trim();
+			Optional<String> findFirst = Stream.of(drivers.split(",")).filter(v -> v.equals(driver)).findFirst();
+			return !findFirst.isPresent();
+		}
+		return true;
 	}
 
 }

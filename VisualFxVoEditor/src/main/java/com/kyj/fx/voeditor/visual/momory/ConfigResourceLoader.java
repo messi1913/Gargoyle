@@ -147,6 +147,13 @@ public final class ConfigResourceLoader implements IFileBaseConfiguration {
 
 	public static final String FILE_OPEN_NOT_INPROCESSING_EXTENSION = "file.open.inprocessing.extensions";
 
+	
+	/**
+	 * 스키마라는 개념이 없는 DBMS의 Driver들을 나열함.
+	 * 
+	 * @최초생성일 2016. 8. 10.
+	 */
+	public static final String NOT_EXISTS_SCHEMA_DRIVER_NAMES="not.exists.schema.driver.names";
 	/**
 	 * SVN 기본 설정 항목들이 기록된 키
 	 *

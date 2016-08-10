@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.kyj.fx.voeditor.core.VoEditor;
@@ -36,6 +38,8 @@ import kyj.Fx.dao.wizard.core.model.vo.TableModelDVO;
  *
  */
 public class VoWizardUtil {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(VoWizardUtil.class);
 
 	/**
 	 * VO에디터가 생성하는 시트명
@@ -89,31 +93,78 @@ public class VoWizardUtil {
 		String tableName = selectedItem.getTableName();
 		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_COLUMN);
 
-		Map<String, Object> hashMap = new HashMap<String, Object>();
-		hashMap.put("tableName", tableName);
-		return DbUtil.select(sql, hashMap, new RowMapper<TableModelDVO>() {
+		
+		/*
+		 * 2016-08-11 by kyj.
+		 * 
+		 * 설정에 대한 sql항목이 없는경우 순수 jdbc 라이브러리를 이용하는 방안으로 구성.
+		 */
+		if (sql == null || sql.isEmpty()) {
 
-			@Override
-			public TableModelDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
+			List<String> pks = DbUtil.pks(tableName, rs -> {
+
+				try {
+					return rs.getString(4).toLowerCase();
+				} catch (SQLException e) {
+					LOGGER.error(ValueUtil.toString(e));
+				}
+				return "";
+			});
+
+			return DbUtil.columns(tableName, rs -> {
+
 				TableModelDVO dvo = new TableModelDVO();
+				try {
 
-				String columnName = rs.getString(COLUMN_NAME);
-				dvo.setName(ValueUtil.getPrefixLowerTextMyEdit(columnName));
-				dvo.setDatabaseColumnName(columnName);
+					String columnName = rs.getString(4);
+					String dataType = rs.getString(5);
+					String typeName = rs.getString(6);
+					String size = rs.getString(7);
+					String remark = rs.getString(12);
+					dvo.setName(ValueUtil.getPrefixLowerTextMyEdit(columnName));
+					dvo.setDatabaseColumnName(columnName);
+					dvo.setDabaseTypeName(typeName);
 
-				dvo.setDatabaseColumnName(columnName);
-				String typeName = rs.getString(TYPE);
-				dvo.setDabaseTypeName(typeName);
+					dvo.setType(databaseTypeMappingFunction.apply(typeName));
 
-//				rs.getInt(columnLabel)
-//				rs.getMetaData().getColumnTypeName()
-				dvo.setType( databaseTypeMappingFunction.apply(typeName));
-				dvo.setPk(rs.getString(PK));
-				dvo.setDesc(rs.getString(COMMENTS));
-				dvo.setSize(rs.getString(DATA_LENGTH));
+					dvo.setPk(pks.contains(columnName.toLowerCase()) ? "Y" : "N");
+					dvo.setDesc(remark);
+					dvo.setSize(size);
+
+				} catch (Exception e) {
+					LOGGER.error(ValueUtil.toString(e));
+				}
+
 				return dvo;
-			}
-		});
+			});
+
+		} else {
+			Map<String, Object> hashMap = new HashMap<String, Object>();
+			hashMap.put("tableName", tableName);
+			return DbUtil.select(sql, hashMap, new RowMapper<TableModelDVO>() {
+
+				@Override
+				public TableModelDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
+					TableModelDVO dvo = new TableModelDVO();
+
+					String columnName = rs.getString(COLUMN_NAME);
+					dvo.setName(ValueUtil.getPrefixLowerTextMyEdit(columnName));
+					dvo.setDatabaseColumnName(columnName);
+
+					String typeName = rs.getString(TYPE);
+					dvo.setDabaseTypeName(typeName);
+
+					//				rs.getInt(columnLabel)
+					//				rs.getMetaData().getColumnTypeName()
+					dvo.setType(databaseTypeMappingFunction.apply(typeName));
+					dvo.setPk(rs.getString(PK));
+					dvo.setDesc(rs.getString(COMMENTS));
+					dvo.setSize(rs.getString(DATA_LENGTH));
+					return dvo;
+				}
+			});
+		}
+
 	}
 
 	/**

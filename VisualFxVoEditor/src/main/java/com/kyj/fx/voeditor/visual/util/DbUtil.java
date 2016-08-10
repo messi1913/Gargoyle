@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -42,6 +43,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.exceptions.NotSupportException;
 import com.kyj.fx.voeditor.visual.functions.BiTransactionScope;
 import com.kyj.fx.voeditor.visual.functions.ResultSetToMapConverter;
@@ -686,6 +688,111 @@ public class DbUtil extends ConnectionManager {
 
 		onSuccess.accept(result);
 
+	}
+
+	/********************************
+	 * 작성일 : 2016. 8. 11. 작성자 : KYJ
+	 *
+	 *
+	 * @return
+	 * @throws Exception
+	 ********************************/
+	public static List<String> tables(String tableNamePattern) throws Exception {
+		return tables(tableNamePattern, rs -> {
+			try {
+				return rs.getString(3);
+			} catch (SQLException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+			return "";
+		});
+	}
+
+	/********************************
+	 * 작성일 : 2016. 8. 11. 작성자 : KYJ
+	 *
+	 *
+	 * @param converter
+	 * @return
+	 * @throws Exception
+	 ********************************/
+	public static <T> List<T> tables(String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
+		if (converter == null)
+			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
+
+		List<T> tables = new ArrayList<>();
+		try (Connection connection = getConnection()) {
+
+			DatabaseMetaData metaData = connection.getMetaData();
+			ResultSet rs = metaData.getTables(null, null, "%" + tableNamePattern + "%", null);
+
+			while (rs.next()) {
+				tables.add(converter.apply(rs));
+			}
+		}
+
+		return tables;
+	}
+
+	public static List<String> columns(String tableNamePattern) throws Exception {
+		return columns(tableNamePattern, t -> {
+			try {
+				return t.getString(4);
+			} catch (SQLException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+			return "";
+		});
+	}
+
+	public static <T> List<T> columns(String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
+		if (converter == null)
+			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
+
+		List<T> tables = new ArrayList<>();
+		try (Connection connection = getConnection()) {
+
+			DatabaseMetaData metaData = connection.getMetaData();
+			ResultSet rs = metaData.getColumns(null, null, tableNamePattern, null);
+
+			while (rs.next()) {
+				tables.add(converter.apply(rs));
+			}
+		}
+
+		return tables;
+	}
+
+	public static List<String> pks(String tableNamePattern) throws Exception {
+		return pks(tableNamePattern, t -> {
+			try {
+				return t.getString(4);
+			} catch (SQLException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+			return "";
+		});
+	}
+
+	public static <T> List<T> pks(String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
+		if (converter == null)
+			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
+
+		List<T> tables = new ArrayList<>();
+		try (Connection connection = getConnection()) {
+
+			DatabaseMetaData metaData = connection.getMetaData();
+			ResultSet rs = metaData.getPrimaryKeys(null, null, tableNamePattern);
+
+			
+			while (rs.next()) {
+				tables.add(converter.apply(rs));
+			}
+			
+			
+		}
+
+		return tables;
 	}
 
 	// TODO 구현가능한부분인지 확인.
