@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
@@ -21,7 +29,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-<BorderPane fx:id="borderPaneMain" prefHeight="762.0" prefWidth="1019.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController">
+<BorderPane fx:id="borderPaneMain" prefHeight="762.0" prefWidth="1019.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController">
 	<center>
 		<BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<center>
@@ -200,15 +208,12 @@
 			<center>
 				<VBox BorderPane.alignment="CENTER">
 					<children>
-						<HBox>
+						<HBox spacing="20.0">
 							<children>
 								<Label fx:id="lblVoEditor" onMouseClicked="#lblVoEditorOnMouseClick" text="VoEditor">
 									<font>
 										<Font size="18.0" />
 									</font>
-									<padding>
-										<Insets bottom="5.0" left="20.0" right="10.0" top="5.0" />
-									</padding>
 									<cursor>
 										<Cursor fx:constant="HAND" />
 									</cursor>
@@ -220,17 +225,11 @@
 									<font>
 										<Font size="18.0" />
 									</font>
-									<padding>
-										<Insets bottom="5.0" left="20.0" right="10.0" top="5.0" />
-									</padding>
 								</Label>
 								<Label fx:id="lblConfig" onMouseClicked="#lblConfigonMouseClick" text="Configuration">
 									<font>
 										<Font size="18.0" />
 									</font>
-									<padding>
-										<Insets bottom="5.0" right="10.0" top="5.0" />
-									</padding>
 									<cursor>
 										<Cursor fx:constant="HAND" />
 									</cursor>
@@ -239,9 +238,6 @@
 									<font>
 										<Font size="18.0" />
 									</font>
-									<padding>
-										<Insets bottom="5.0" right="10.0" top="5.0" />
-									</padding>
 									<cursor>
 										<Cursor fx:constant="HAND" />
 									</cursor>
@@ -250,9 +246,6 @@
 									<font>
 										<Font size="18.0" />
 									</font>
-									<padding>
-										<Insets bottom="5.0" right="10.0" top="5.0" />
-									</padding>
 									<cursor>
 										<Cursor fx:constant="HAND" />
 									</cursor>
@@ -264,9 +257,6 @@
 									<font>
 										<Font size="18.0" />
 									</font>
-									<padding>
-										<Insets bottom="5.0" right="10.0" top="5.0" />
-									</padding>
 								</Label>
 								<Label onMouseClicked="#lblSystemConsoleOnMouseClick" text="System Console">
 									<cursor>
@@ -275,11 +265,11 @@
 									<font>
 										<Font size="18.0" />
 									</font>
-									<padding>
-										<Insets bottom="5.0" right="10.0" top="5.0" />
-									</padding>
 								</Label>
 							</children>
+                     <padding>
+                        <Insets bottom="3.0" left="5.0" top="3.0" />
+                     </padding>
 						</HBox>
 					</children>
 				</VBox>
