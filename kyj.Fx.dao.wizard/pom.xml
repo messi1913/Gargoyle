@@ -10,6 +10,7 @@
 	<name>kyj.Fx.dao.wizard</name>
 	<url>http://maven.apache.org</url>
 
+<!-- 메이븐 잘 안됨. 오픈소스에 니 이름 넣지 마 -->
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
