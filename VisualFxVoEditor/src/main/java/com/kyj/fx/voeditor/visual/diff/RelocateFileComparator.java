@@ -124,7 +124,7 @@ public class RelocateFileComparator implements DiffComparable<File> {
 			case DELETE:
 				// tmpOriginalFileLines.addAll(position, lines2);
 				// tmpReviceFileLines.addAll(position, lines);
-				System.err.println("DELETE");
+				
 				break;
 			case INSERT: {
 				// tmpOriginalFileLines.addAll(position, lines2);

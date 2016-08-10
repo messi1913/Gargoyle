@@ -26,8 +26,12 @@ public class ConverterSampleTest {
 	 * @throws ConnectException
 	 */
 	public static void main(String[] args) throws ConnectException {
-		File inputFile = new File("제목없음 1.pdf");
-		File outputFile = new File("C:\\Users\\KYJ\\Desktop\\converter\\제목없음 1.odt");
+
+
+
+//
+		File inputFile = new File("C:\\Users\\KYJ\\Desktop\\convert\\memojava.doc");
+		File outputFile = new File("C:\\Users\\KYJ\\Desktop\\convert\\memojav2.html");
 
 		// connect to an OpenOffice.org instance running on port 8100
 		OpenOfficeConnection connection = new SocketOpenOfficeConnection(8100);

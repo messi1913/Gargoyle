@@ -1,15 +1,21 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : com.kyj.fx.voeditor.visual.component.popup
+ *	패키지   : com.kyj.fx.voeditor.visual.component
  *	작성일   : 2016. 07. 04.
  *	작성자   : KYJ
  *******************************/
 package com.kyj.fx.voeditor.visual.component;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.util.Collections;
+import java.util.List;
 
+import com.kyj.fx.voeditor.visual.util.FxUtil;
+
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 
 /**
  * 자바프로젝트 트리Item 처리 기반 Tree
@@ -19,69 +25,84 @@ import javafx.scene.control.TreeItem;
  */
 public class FileTreeItem extends TreeItem<FileWrapper> {
 
-	//	private FileWrapper fileWrapper;
-	private boolean isJavaProjectFile;
-	private boolean isSVNConnected;
-
-	private boolean isLeaf;
-	private boolean isFirstTimeChildren = true;
-	private boolean isFirstTimeLeaf = true;
-
-	private static final FilenameFilter SVN_WC_DB_FILTER = (FilenameFilter) (dir1, name1) -> "wc.db".equals(name1);
-	private static final FilenameFilter IS_CONTAINS_SVN_FILE_FILTER = (FilenameFilter) (dir, name) -> ".svn".equals(name)
-			&& isContainsWcDB(dir);
-
 	public FileTreeItem(FileWrapper fileWrapper) {
 		super(fileWrapper);
-		//		this.fileWrapper = fileWrapper;
-
-		//		isJavaProjectFile = isJavaProjectCondition();
-		//		isSVNConnected = isSVNConnected();
-
-	}
-
-	private static boolean isContainsWcDB(File dir) {
-		File[] listFiles = dir.listFiles(SVN_WC_DB_FILTER);
-		return (listFiles != null && listFiles.length == 1);
-	}
-
-	private boolean isSVNConnected() {
-		File f = getValue().getFile();
-		if (f.isDirectory()) {
-			File[] listFiles = f.listFiles(IS_CONTAINS_SVN_FILE_FILTER);
-			if (listFiles != null && listFiles.length >= 1) {
-				return true;
-			}
-		}
-		return false;
+		updateGraphics(fileWrapper);
 	}
 
 	/********************************
-	 * 작성일 : 2016. 7. 4. 작성자 : KYJ
-	 * 
-	 * 자바 프로젝트가 될 조건을 기술.
-	 * 
-	 * @return
+	 * 작성일 : 2016. 7. 10. 작성자 : KYJ
+	 *
+	 * UI에 보여질 Dispay 처리.
+	 *
+	 * @param fileWrapper
 	 ********************************/
-	protected boolean isJavaProjectCondition() {
-
-		File f = getValue().getFile();
-		if (f.isDirectory()) {
-
-			File[] listFiles = f.listFiles(new FilenameFilter() {
-
-				@Override
-				public boolean accept(File dir, String name) {
-					return ".classPath".equals(name);
-				}
-			});
-
-			if (listFiles != null && listFiles.length >= 1) {
-				isJavaProjectFile = true;
-			}
-
-		}
-		return isJavaProjectFile;
+	private void updateGraphics(FileWrapper fileWrapper) {
+		Node value = createGraphcis(fileWrapper);
+		value.getStyleClass().add(graphicsCssId());
+		setGraphic(value);
 	}
 
+	/********************************
+	 * 작성일 : 2016. 7. 11. 작성자 : KYJ
+	 *
+	 *이 함수에서 리턴되는 노드가 트리를 구성하는 주 Node가 된다.
+	 *
+	 * @param fileWrapper
+	 * @return
+	 ********************************/
+	protected Node createGraphcis(FileWrapper fileWrapper) {
+		String meta = getMetadata();
+		ImageView createImageView = getImage(fileWrapper);
+		HBox value = new HBox(createImageView, new Label(fileWrapper.getFile().getName()), new Label(meta) );
+		List<Node> createAttachLabels = createAttachNodes();
+		if(createAttachLabels !=null && !createAttachLabels.isEmpty())
+			value.getChildren().addAll(createAttachLabels);
+		return value;
+	}
+
+
+	/********************************
+	 * 작성일 :  2016. 7. 27. 작성자 : KYJ
+	 *
+	 * 추가적으로 덧붙일 노드정보가 있으면 오버라이드해서 사용할 수 있도록한다.
+	 *
+	 * @return
+	 ********************************/
+	protected List<Node> createAttachNodes(){
+		return Collections.emptyList();
+	}
+	/********************************
+	 * 작성일 :  2016. 7. 27. 작성자 : KYJ
+	 *
+	 * 파일 이미지 리턴.
+	 *
+	 * @param fileWrapper
+	 * @return
+	 ********************************/
+	protected ImageView getImage(FileWrapper fileWrapper) {
+		ImageView createImageView = FxUtil.createImageIconView(fileWrapper.getFile());
+		return createImageView;
+	}
+
+	/********************************
+	 * 작성일 :  2016. 7. 27. 작성자 : KYJ
+	 *
+	 * 노드의 css명을 리턴
+	 * @return
+	 ********************************/
+	protected String graphicsCssId() {
+		return "fiile-tree-item";
+	}
+
+	/********************************
+	 * 작성일 :  2016. 7. 27. 작성자 : KYJ
+	 *
+	 * UI에 Diplay되는 텍스트를 리턴. 이클립스로 예를들어 svn이 연결되면 뒤에붙는 메타정보를 표현.
+	 *
+	 * @return
+	 ********************************/
+	protected String getMetadata() {
+		return "";
+	}
 }

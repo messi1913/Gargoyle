@@ -41,7 +41,7 @@ public class ClockExam extends Application {
 		primaryStage.show();
 
 
-		System.err.println(clock.getTimeString());
+		
 	}
 
 	/**********************************************************************************************/

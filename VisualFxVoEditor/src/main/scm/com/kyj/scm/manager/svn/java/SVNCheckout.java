@@ -1,6 +1,6 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : kyj.Fx.scm.manager.command.svn
+ *	패키지   : com.kyj.scm.manager.svn.java
  *	작성일   : 2016. 3. 23.
  *	작성자   : KYJ
  *******************************/
@@ -33,10 +33,11 @@ class SVNCheckout extends AbstractSVN implements ICheckoutCommand<String, Long> 
 	private static Logger LOGGER = LoggerFactory.getLogger(SVNCheckout.class);
 
 	/**
+	 * @param javaSVNManager
 	 * @param properties
 	 */
-	public SVNCheckout(Properties properties) {
-		super(properties);
+	public SVNCheckout(JavaSVNManager javaSVNManager, Properties properties) {
+		super(javaSVNManager, properties);
 	}
 
 	/*

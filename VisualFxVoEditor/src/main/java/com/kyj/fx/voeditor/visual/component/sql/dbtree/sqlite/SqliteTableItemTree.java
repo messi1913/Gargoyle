@@ -118,4 +118,14 @@ public class SqliteTableItemTree extends TableItemTree<String> {
 	public ObservableList<TreeItem<DatabaseItemTree<String>>> applyChildren(List<Map<String, Object>> items) throws Exception {
 		return FXCollections.observableArrayList();
 	}
+
+	/**
+	 * SQLite에서는 스키마명을 적용하여 조회하지않는다.
+	 * 
+	 * @inheritDoc
+	 */
+	@Override
+	public boolean isApplySchemaName(String schemaName) {
+		return false;
+	}
 }

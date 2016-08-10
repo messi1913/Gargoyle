@@ -39,7 +39,7 @@ import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTabPane;
 import com.kyj.fx.voeditor.visual.framework.BigDataDVO;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
-import com.kyj.fx.voeditor.visual.main.layout.GagoyleTabLoaderProxy;
+import com.kyj.fx.voeditor.visual.main.layout.GagoyleTabProxy;
 import com.kyj.fx.voeditor.visual.main.layout.SchoolMgrerSpreadSheetView;
 import com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
@@ -135,7 +135,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	/**
 	 * 시스템에서 로드할 탭로더 프록시 객체
 	 */
-	private GagoyleTabLoaderProxy tabProxy;
+	private GagoyleTabProxy tabProxy;
 
 	private Stage stage;
 
@@ -503,8 +503,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	public void initialize(Map<String, Object> map) {
 		try {
 			this.url = map.get(ResourceLoader.BASE_KEY_JDBC_URL).toString();
-			this.username = map.get(ResourceLoader.BASE_KEY_JDBC_ID).toString();
-			this.password = EncrypUtil.decryp(map.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString());
+			this.username = map.get(ResourceLoader.BASE_KEY_JDBC_ID) == null ? "" :map.get(ResourceLoader.BASE_KEY_JDBC_ID) .toString();
+			this.password = map.get(ResourceLoader.BASE_KEY_JDBC_PASS) == null ? "" : EncrypUtil.decryp(map.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString());
 			this.driver = map.get("driver").toString();
 
 			this.userColor = map.get("color") == null ? null : Color.web(map.get("color").toString());
@@ -752,7 +752,6 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		/* CTRL + P (Properties) */
 		// case P:
 		else if ((e.getCode() == KeyCode.P) && e.isControlDown() && !e.isAltDown() && !e.isShiftDown())
-
 		{
 			String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
 			TreeItem<K> selectedItem = schemaTree.getSelectionModel().getSelectedItem();
@@ -912,7 +911,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	}
 
 	/**
-	 * 엑셀 export기능
+	 * Excel Export.
 	 *
 	 * @param e
 	 */
@@ -953,7 +952,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	}
 
 	/**
-	 * JSON형태로 만듬.
+	 * Export JSON Script.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 13.
@@ -991,6 +990,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	}
 
 	/**
+	 * Export Import Script.
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 10.
 	 * @param e
@@ -1073,7 +1073,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	public void menuExportSpreadSheetOnAction(ActionEvent e) {
 		// 탭을 로드할 수 있는 프록시 객체를 불러옴
 		if (tabProxy == null) {
-			tabProxy = new GagoyleTabLoaderProxy();
+			tabProxy = GagoyleTabProxy.getInstance();
 		}
 
 		// 그리드 데이터를 copy

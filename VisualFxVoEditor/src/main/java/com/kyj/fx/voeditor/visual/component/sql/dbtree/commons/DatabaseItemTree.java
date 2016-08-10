@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.kyj.fx.voeditor.visual.exceptions.ConnectionFailException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
 import javafx.collections.FXCollections;
@@ -41,7 +41,7 @@ public abstract class DatabaseItemTree<T> implements IConnectionByChildrens<T> {
 		String childrenSQL = getChildrenSQL("");
 		Connection connection = getConnection();
 		if (connection == null)
-			throw new ConnectionFailException("connect fail...");
+			throw new GargoyleConnectionFailException("connect fail...");
 
 		try {
 			if (childrenSQL != null && !childrenSQL.isEmpty()) {
@@ -49,8 +49,8 @@ public abstract class DatabaseItemTree<T> implements IConnectionByChildrens<T> {
 				childrens.addAll(applyChildren(select));
 			}
 
-//			if (childrens == null)
-//				childrens = FXCollections.observableArrayList();
+			//			if (childrens == null)
+			//				childrens = FXCollections.observableArrayList();
 
 			// SQL로 불가능한 처리는 Connection을 받아 처리하도록한다.
 			ObservableList<TreeItem<DatabaseItemTree<T>>> second = applyChildren(connection);
@@ -81,6 +81,22 @@ public abstract class DatabaseItemTree<T> implements IConnectionByChildrens<T> {
 	}
 
 	public abstract String getChildrenSQL(String... conditions);
+
+	/********************************
+	 * 작성일 : 2016. 7. 12. 작성자 : KYJ
+	 *
+	 * check is Valide Schema Name
+	 *
+	 * if is not, The Method(' show100RowAction() ') in CommonsSqllPan.java
+	 *  
+	 * not apply  schema Name SQL 
+	 * 
+	 * @param schemaName
+	 * @return
+	 ********************************/
+	public boolean isApplySchemaName(String schemaName) {
+		return true;
+	}
 
 	// public abstract TreeItem<DatabaseItemTree<T>> applyChildren(Map<String,
 	// Object> item)

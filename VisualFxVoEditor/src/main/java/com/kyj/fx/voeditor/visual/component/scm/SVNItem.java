@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
-import org.tmatesoft.svn.core.SVNURL;
 
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
 /**
@@ -24,6 +24,7 @@ import com.kyj.scm.manager.svn.java.JavaSVNManager;
  *
  */
 public class SVNItem implements SCMItem<SVNItem> {
+
 
 	private static Logger LOGGER = LoggerFactory.getLogger(SVNItem.class);
 	public String path;
@@ -100,7 +101,22 @@ public class SVNItem implements SCMItem<SVNItem> {
 		String svnUrl = manager.getUrl();
 		String _path = path;
 
-		List<SVNDirEntry> list = manager.listEntry(_path);
+		/*
+		 * fix bug -> SVNInitLoader.java
+		 *
+		 * 버그 수정 SVN주소를 입력해도 루트디렉토리 밑의 요소들이 트리 요소로 화면에 출력되는 버그 수정
+		 *
+		 * as-is ]
+		 * new SVNRepository("/", url.toString(), manager);
+		 *
+		 * to-be]
+		 * new SVNRepository("", url.toString(), manager);
+		 */
+
+//		if(_path.startsWith("/"))
+//			_path = _path.substring(1);
+
+		List<SVNDirEntry> list = manager.listEntry(_path, ex -> DialogUtil.showExceptionDailog(ex, "SVN Connection Fail"));
 		List<SVNItem> collect = list.stream().map(p -> {
 			String svnPath = p.getURL().getPath();
 			String url = p.getURL().toString();

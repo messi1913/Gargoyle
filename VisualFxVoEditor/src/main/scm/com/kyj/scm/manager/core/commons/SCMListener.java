@@ -1,6 +1,6 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : kyj.Fx.scm.manager.core.common
+ *	패키지   : com.kyj.scm.manager.core.commons
  *	작성일   : 2016. 3. 24.
  *	작성자   : KYJ
  *******************************/
@@ -12,6 +12,7 @@ package com.kyj.scm.manager.core.commons;
  * @author KYJ
  *
  */
+@Deprecated
 public interface SCMListener {
 
 	/********************************

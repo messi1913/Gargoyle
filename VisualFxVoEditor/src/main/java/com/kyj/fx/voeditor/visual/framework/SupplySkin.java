@@ -14,5 +14,13 @@ import javafx.scene.Node;
  */
 public interface SupplySkin<N extends Node> {
 
-	public N supplyNode();
+	/**
+	 * JavaFx Node를 리턴.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 5.
+	 * @return
+	 * @throws Exception
+	 */
+	public N supplyNode() throws Exception;
 }

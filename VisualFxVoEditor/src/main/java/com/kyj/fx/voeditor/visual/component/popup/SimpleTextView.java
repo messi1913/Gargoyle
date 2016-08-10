@@ -147,7 +147,12 @@ public class SimpleTextView extends BorderPane {
 	public void initialize() {
 		textArea = new TextArea();
 		hboxButtons.setVisible(showButtons);
-
+		if(!showButtons)
+		{
+			hboxButtons.setMinHeight(0d);
+			hboxButtons.setMaxHeight(0d);
+			hboxButtons.setPrefHeight(0d);
+		}
 		// textProperty = new SimpleStringProperty();
 
 		// txtVoEditor.textProperty().bind(textProperty);

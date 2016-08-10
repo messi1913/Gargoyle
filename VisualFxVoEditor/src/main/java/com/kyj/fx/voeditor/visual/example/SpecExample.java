@@ -9,6 +9,7 @@ package com.kyj.fx.voeditor.visual.example;
 import java.io.File;
 
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.words.spec.resources.SpecResource;
 import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.SpecTabPane;
 
 import javafx.application.Application;
@@ -37,7 +38,12 @@ public class SpecExample extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		SpecTabPane center = new SpecTabPane();
+		String projectDir = System.getProperty("user.dir");
+
+		File file = new File(projectDir, "src/main/java/com/kyj/fx/voeditor/visual/example/SpecExample.java");
+		SpecResource specResource = new SpecResource(new File(projectDir), file);
+
+		SpecTabPane center = new SpecTabPane(specResource);
 		Button btnCapture = new Button("SnapShot");
 		ImageView ivOrigin = new ImageView();
 

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<fx:root prefHeight="769.0" prefWidth="1194.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<SplitPane dividerPositions="0.5" orientation="VERTICAL" BorderPane.alignment="CENTER">
+			<items>
+				<BarChart fx:id="barChartDayOfMonth" legendVisible="false">
+					<xAxis>
+						<CategoryAxis fx:id="barChartDayOfMonthCategory" side="BOTTOM" />
+					</xAxis>
+					<yAxis>
+						<NumberAxis fx:id="barChartDayOfMonthNumber" side="LEFT" />
+					</yAxis>
+				</BarChart>
+				<LineChart fx:id="lineChartDayOfWeek" legendVisible="false">
+					<xAxis>
+						<CategoryAxis fx:id="lineChartDayOfWeekCategory" side="BOTTOM" />
+					</xAxis>
+					<yAxis>
+						<NumberAxis fx:id="lineChartDayOfWeekNumber" side="LEFT" />
+					</yAxis>
+				</LineChart>
+			</items>
+		</SplitPane>
+	</center>
+</fx:root>

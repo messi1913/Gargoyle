@@ -32,6 +32,7 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
  *
  */
 public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>> {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ResultSetToMapConverter.class);
 
 	/**
@@ -41,6 +42,7 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 	 */
 	public static final String SKIP_BIG_DATA_COLUMN = ResourceLoader.SKIP_BIG_DATA_COLUMN;
 
+	public static final String START_ROW = "start.row";
 	/**
 	 * Mapping처리할때 필요한 속성이 정의된다.
 	 *
@@ -49,6 +51,8 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 	private Properties prop;
 
 	private boolean isBigDataColumnSkip;
+
+	private int startRow = -1;
 
 	public ResultSetToMapConverter(Properties prop) {
 		if (prop != null)
@@ -73,6 +77,22 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 			if (value != null)
 				isBigDataColumnSkip = "true".equals(this.prop.get(SKIP_BIG_DATA_COLUMN).toString());
 		}
+
+		if (this.prop.containsKey(START_ROW)) {
+			Object startRow = this.prop.get(START_ROW);
+			if (startRow != null) {
+
+				try {
+					if (startRow instanceof Integer) {
+						this.startRow = (int) startRow;
+					} else {
+						this.startRow = Integer.parseInt(startRow.toString());
+					}
+				} catch (NumberFormatException e) {
+					/*Nothing.*/}
+
+			}
+		}
 	}
 
 	@Override
@@ -80,6 +100,10 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 
 		List<Map<String, Object>> arrayList = Collections.emptyList();
 		try {
+
+			if (startRow != -1)
+				u.absolute(startRow);
+
 			ResultSetMetaData metaData = u.getMetaData();
 			int columnCount = metaData.getColumnCount();
 			arrayList = new ArrayList<Map<String, Object>>();
@@ -94,18 +118,27 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 
 					String value = u.getString(c);
 					boolean isEmptyValue = value == null || value.isEmpty();
+					//					String tmpColumnLabel = metaData.getColumnLabel(c);
+					String columnLabel = metaData.getColumnLabel(c);
+
+					//2016-08-04 중복되는 컬럼이 씹혀 없어지지않도록 컬럼이름이 중복되면 인덱스를 붙임.
+					int nextNameIdx = 1;
+					while (map.containsKey(columnLabel) && /*무한루핑 방지*/nextNameIdx < 1000) {
+						columnLabel = String.format("%s_%d", metaData.getColumnLabel(c), nextNameIdx);
+						nextNameIdx++;
+					}
+
 					if (isBigDataColumnSkip) {
 						switch (columnType) {
 						case Types.BLOB:
 							// map.put(metaData.getColumnLabel(c), new
 							// BigDataDVO("BLOB", value));
-							map.put(metaData.getColumnLabel(c),
-									isEmptyValue ? new BigDataDVO("{data.blob}", "") : new BigDataDVO("{DATA.BLOB}", value));
+							map.put(columnLabel, isEmptyValue ? new BigDataDVO("{data.blob}", "") : new BigDataDVO("{DATA.BLOB}", value));
 							break;
 						case Types.CLOB:
 							// map.put(metaData.getColumnLabel(c), new
 							// BigDataDVO("CLOB", value));
-							map.put(metaData.getColumnLabel(c),
+							map.put(columnLabel,
 									isEmptyValue ? new BigDataDVO("{data.clob}", value) : new BigDataDVO("{DATA.CLOB}", value));
 							break;
 						default:
@@ -114,7 +147,7 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 							if ("text".equals(columnTypeName)) {
 								// map.put(metaData.getColumnLabel(c), new
 								// BigDataDVO("TEXT", value));
-								map.put(metaData.getColumnLabel(c),
+								map.put(columnLabel,
 										isEmptyValue ? new BigDataDVO("{data.text}", value) : new BigDataDVO("{DATA.TEXT}", value));
 								break;
 							}
@@ -122,18 +155,18 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 							else if ("bytea".equals(columnTypeName)) {
 								// map.put(metaData.getColumnLabel(c), new
 								// BigDataDVO("BYTEA", value));
-								map.put(metaData.getColumnLabel(c),
+								map.put(columnLabel,
 										isEmptyValue ? new BigDataDVO("{data.bytea}", value) : new BigDataDVO("{DATA.BYTEA}", value));
 								break;
 							}
-							map.put(metaData.getColumnLabel(c), value);
+							map.put(columnLabel, value);
 							break;
 						}
 						if (firstRow) {
-							LOGGER.debug(String.format("column : %s type %s", metaData.getColumnLabel(c), metaData.getColumnTypeName(c)));
+							LOGGER.debug(String.format("column : %s type %s", columnLabel, metaData.getColumnTypeName(c)));
 						}
 					} else {
-						map.put(metaData.getColumnLabel(c), value);
+						map.put(columnLabel, value);
 					}
 
 				}

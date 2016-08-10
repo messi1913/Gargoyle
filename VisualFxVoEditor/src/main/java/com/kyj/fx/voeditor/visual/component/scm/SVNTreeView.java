@@ -19,9 +19,13 @@ import com.kyj.fx.voeditor.visual.functions.SVNDiscardLocationFunction;
 import com.kyj.fx.voeditor.visual.loder.SVNInitLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.scm.manager.core.commons.SVNKeywords;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -31,6 +35,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTreeCell;
@@ -60,9 +65,17 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 	private ContextMenu contextMenu;
 	private Menu menuNew;
 	private MenuItem menuAddNewLocation;
+	private MenuItem menuSvnGraph;
 	private MenuItem menuDiscardLocation;
 	private MenuItem menuReflesh;
 	private MenuItem menuCheckout;
+	private MenuItem menuProperties;
+	/**
+	 * SVN분석 Graph객체를 보관함.
+	 *
+	 * @최초생성일 2016. 7. 21.
+	 */
+	private ObjectProperty<TabPane> svnGraphProperty = new SimpleObjectProperty<>();
 
 	/**
 	 * repository를 삭제하는 기능을 구현.
@@ -116,7 +129,7 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 			TreeItem<SVNItem> selectedItem = this.getSelectionModel().getSelectedItem();
 			if (selectedItem != null) {
 				SVNItem value = selectedItem.getValue();
-				if(svnTreeViewOnAction!=null)
+				if (svnTreeViewOnAction != null)
 					svnTreeViewOnAction.onAction(value);
 			}
 		}
@@ -132,32 +145,64 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 	 */
 	public void menuDiscardLocationOnAction(ActionEvent e) {
 
-		final int selectedIndex = getSelectionModel().getSelectedIndex();
-		ObservableList<TreeItem<SVNItem>> children = getRoot().getChildren();
-		TreeItem<SVNItem> selectedItem = children.get(selectedIndex);
+		// final int selectedIndex = getSelectionModel().getSelectedIndex();
+
+		// ObservableList<TreeItem<SVNItem>> children = getRoot().getChildren();
+
+		TreeItem<SVNItem> selectedItem = getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
 			SVNItem value = selectedItem.getValue();
+
+			getSVNUrl(selectedItem);
 			if (value != null && value instanceof SVNRepository) {
 				SVNRepository repo = (SVNRepository) value;
-				String url = repo.getURL();
-				Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Discard Repository",
-						String.format("Do you want Discard Repository %s ???", url));
-				showYesOrNoDialog.ifPresent(v -> {
-					Boolean apply = discardFunction.apply(repo);
-					if (apply == true) {
-						TreeItem<SVNItem> result = children.remove(selectedIndex);
-						if (result != null)
-							DialogUtil.showMessageDialog("Discard Success!");
-						else
-							DialogUtil.showMessageDialog("Discard Fail...");
-					} else {
-						DialogUtil.showMessageDialog("Discard Fail...");
-					}
+				String url = getSVNUrl(repo);
+
+				NullExpresion.ifNotNullDo(url, svnUrl -> {
+
+					Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog(
+							"Discard Repository", String.format("Do you want Discard Repository %s ???", url));
+
+					showYesOrNoDialog.ifPresent(v -> {
+
+						if ("Y".equals(v.getValue())) {
+							Boolean apply = discardFunction.apply(repo);
+							if (apply == true) {
+
+								boolean remove = getRoot().getChildren().remove(selectedItem);
+
+								if (remove)
+									DialogUtil.showMessageDialog("Discard Success!");
+								else
+									DialogUtil.showMessageDialog("Discard Fail...");
+							} else {
+								DialogUtil.showMessageDialog("Discard Fail...");
+							}
+						}
+
+					});
+
 				});
 
 			}
 		}
 
+	}
+
+	private static String getSVNUrl(TreeItem<SVNItem> selectedItem) {
+		SVNItem value = selectedItem.getValue();
+		if (value != null && value instanceof SVNRepository) {
+			SVNRepository repo = (SVNRepository) value;
+			if (repo != null)
+				return getSVNUrl(repo);
+		}
+		return null;
+	}
+
+	private static String getSVNUrl(SVNRepository repo) {
+		if (repo != null)
+			return repo.getURL();
+		return null;
 	}
 
 	/**
@@ -196,6 +241,87 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 	}
 
 	/**
+	 * SVN Graph
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @param e
+	 * @throws Exception
+	 */
+	public void menuSVNGraphOnAction(ActionEvent e) {
+
+		final int selectedIndex = getSelectionModel().getSelectedIndex();
+		ObservableList<TreeItem<SVNItem>> children = getRoot().getChildren();
+		TreeItem<SVNItem> selectedItem = children.get(selectedIndex);
+		if (selectedItem != null) {
+			SVNItem value = selectedItem.getValue();
+			if (value != null && value instanceof SVNRepository) {
+				SVNRepository repo = (SVNRepository) value;
+				TabPane createSVNGraph = null;
+				try {
+					createSVNGraph = FxUtil.createSVNGraph(repo.getManager());
+				} catch (Exception e1) {
+					LOGGER.error(ValueUtil.toString(e1));
+				}
+
+				if (createSVNGraph != null) {
+					setSvnGraphProperty(createSVNGraph);
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 8.
+	 * @param e
+	 * @throws IOException
+	 */
+	public void menuPropertiesOnAction(ActionEvent e) {
+		TreeItem<SVNItem> selectedItem = getSelectionModel().getSelectedItem();
+		try {
+			if (selectedItem != null) {
+				SVNItem value = selectedItem.getValue();
+				Properties properties = value.getManager().getProperties();
+
+				FXMLLoader fxmlLoader = new FXMLLoader(SVNTreeView.class.getResource("AddNewSVNRepositoryView.fxml"));
+				BorderPane n = fxmlLoader.load();
+
+				Stage window = (Stage) getParent().getScene().getWindow();
+				Stage parent = (Stage) com.kyj.fx.voeditor.visual.util.ValueUtil.decode(window, window,
+						SharedMemory.getPrimaryStage());
+
+				Stage stage = new Stage();
+				AddNewSVNRepositoryController controller = fxmlLoader.getController();
+				controller.setStage(stage);
+				controller.setProperties(properties);
+
+				stage.setScene(new Scene(n));
+				stage.setResizable(false);
+				stage.initOwner(parent);
+				stage.setTitle("Modify Location.");
+				stage.centerOnScreen();
+				stage.showAndWait();
+
+				Properties result = controller.getResult();
+
+				if (result != null) {
+					
+					SVNItem newSVNItem = new SVNRepository(new JavaSVNManager(result));
+					TreeItem<SVNItem> createNode = scmTreeMaker.createNode(newSVNItem);
+					getRoot().getChildren().remove(selectedItem);
+					getRoot().getChildren().add(createNode);
+				}
+
+			}
+		} catch (Exception ex) {
+			LOGGER.error(ValueUtil.toString(ex));
+		}
+
+	}
+
+	/**
 	 * 새로운 레포지토리를 추가한다.
 	 *
 	 * @작성자 : KYJ
@@ -208,7 +334,8 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 			BorderPane n = fxmlLoader.load();
 
 			Stage window = (Stage) getParent().getScene().getWindow();
-			Stage parent = (Stage) com.kyj.fx.voeditor.visual.util.ValueUtil.decode(window, window, SharedMemory.getPrimaryStage());
+			Stage parent = (Stage) com.kyj.fx.voeditor.visual.util.ValueUtil.decode(window, window,
+					SharedMemory.getPrimaryStage());
 
 			Stage stage = new Stage();
 			AddNewSVNRepositoryController controller = fxmlLoader.getController();
@@ -223,9 +350,11 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 
 			Properties result = controller.getResult();
 
-			SVNItem newSVNItem = new SVNRepository(new JavaSVNManager(result));
-			TreeItem<SVNItem> createNode = scmTreeMaker.createNode(newSVNItem);
-			getRoot().getChildren().add(createNode);
+			if (result != null) {
+				SVNItem newSVNItem = new SVNRepository(new JavaSVNManager(result));
+				TreeItem<SVNItem> createNode = scmTreeMaker.createNode(newSVNItem);
+				getRoot().getChildren().add(createNode);
+			}
 
 		} catch (IOException e1) {
 			LOGGER.error(ValueUtil.toString(e1));
@@ -241,8 +370,10 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 		TreeItem<SVNItem> selectedItem = getSelectionModel().getSelectedItem();
 		if (selectedItem != null && selectedItem.getValue() instanceof SVNRepository) {
 			menuDiscardLocation.setVisible(true);
+			menuSvnGraph.setVisible(true);
 		} else {
 			menuDiscardLocation.setVisible(false);
+			menuSvnGraph.setVisible(false);
 		}
 	};
 
@@ -264,13 +395,20 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 		menuReflesh = new MenuItem("Reflesh");
 		menuCheckout = new MenuItem("Checkout");
 
+		menuSvnGraph = new MenuItem("SVN Graph");
+		menuProperties = new MenuItem("Properties");
+
 		menuNew.getItems().add(menuAddNewLocation);
 
 		menuAddNewLocation.setOnAction(this::menuAddNewLocationOnAction);
 		menuDiscardLocation.setOnAction(this::menuDiscardLocationOnAction);
 		menuCheckout.setOnAction(this::menuCheckoutOnAction);
-		contextMenu = new ContextMenu(menuNew, new SeparatorMenuItem(), menuCheckout, new SeparatorMenuItem(), menuDiscardLocation,
-				menuReflesh);
+		menuSvnGraph.setOnAction(this::menuSVNGraphOnAction);
+		menuProperties.setOnAction(this::menuPropertiesOnAction);
+
+		contextMenu = new ContextMenu(menuNew, new SeparatorMenuItem(), menuCheckout, new SeparatorMenuItem(),
+				menuSvnGraph, new SeparatorMenuItem(), menuDiscardLocation, menuReflesh, new SeparatorMenuItem(),
+				menuProperties);
 		// setContextMenu(contextMenu);
 
 		setCellFactory(treeItem -> {
@@ -294,5 +432,19 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 		List<SVNItem> load = loader.load();
 		return load.stream().map(v -> scmTreeMaker.createNode(v)).collect(Collectors.toList());
 	}
+
 	/***********************************************************************************/
+
+	public final ObjectProperty<TabPane> svnGraphPropertyProperty() {
+		return this.svnGraphProperty;
+	}
+
+	public final javafx.scene.control.TabPane getSvnGraphProperty() {
+		return this.svnGraphPropertyProperty().get();
+	}
+
+	public final void setSvnGraphProperty(final javafx.scene.control.TabPane svnGraphProperty) {
+		this.svnGraphPropertyProperty().set(svnGraphProperty);
+	}
+
 }

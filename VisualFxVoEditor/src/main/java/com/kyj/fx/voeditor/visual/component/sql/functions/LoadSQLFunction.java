@@ -8,6 +8,8 @@ package com.kyj.fx.voeditor.visual.component.sql.functions;
 
 import java.util.function.BiFunction;
 
+import com.kyj.fx.voeditor.visual.functions.LoadFileOptionHandler;
+
 /**
  * SQL문을 로드처리한다.
  *

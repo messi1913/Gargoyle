@@ -22,7 +22,7 @@ import com.kyj.fx.voeditor.core.VoEditor;
 import com.kyj.fx.voeditor.core.model.meta.ClassMeta;
 import com.kyj.fx.voeditor.visual.excels.base.ExcelDataDVO;
 import com.kyj.fx.voeditor.visual.excels.base.ExcelSVO;
-import com.kyj.fx.voeditor.visual.exceptions.FileAlreadyExistException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleFileAlreadyExistException;
 import com.kyj.fx.voeditor.visual.functions.DatabaseTypeMappingFunction;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 
@@ -136,9 +136,9 @@ public class VoWizardUtil {
 	 * @param pathDir
 	 * @param models
 	 * @return 생성된 엑셀파일에 대한 파일 객체
-	 * @throws FileAlreadyExistException
+	 * @throws GargoyleFileAlreadyExistException
 	 */
-	public static File createExcelFile(File pathDir, List<TableModelDVO> models) throws FileAlreadyExistException {
+	public static File createExcelFile(File pathDir, List<TableModelDVO> models) throws GargoyleFileAlreadyExistException {
 		// 고유한 id 생성
 		String fileNameId = IdGenUtil.generate();
 		return createExcelFile(pathDir, fileNameId, models, false);
@@ -151,10 +151,10 @@ public class VoWizardUtil {
 	 * @param _fileName
 	 * @param models
 	 * @return 생성된 엑셀파일에 대한 파일 객체
-	 * @throws FileAlreadyExistException
+	 * @throws GargoyleFileAlreadyExistException
 	 */
 	public static File createExcelFile(File pathDir, String _fileName, List<TableModelDVO> models, boolean isOverWrite)
-			throws FileAlreadyExistException {
+			throws GargoyleFileAlreadyExistException {
 
 		File saveFile = null;
 		if (!pathDir.exists() || !pathDir.isDirectory())
@@ -168,7 +168,7 @@ public class VoWizardUtil {
 		saveFile = new File(createFilePathName);
 
 		if (saveFile.exists() && !isOverWrite) {
-			throw new FileAlreadyExistException("already exists. file");
+			throw new GargoyleFileAlreadyExistException("already exists. file");
 		}
 		// 로우번호 채번링
 		AtomicInteger atomicInteger = new AtomicInteger(2);

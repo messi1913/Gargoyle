@@ -13,7 +13,7 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ColumnItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
-import com.kyj.fx.voeditor.visual.exceptions.ConnectionFailException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -98,7 +98,7 @@ public class DatabaseTreeNode {
 				} else {
 					try {
 						f.read();
-					} catch (ConnectionFailException e) {
+					} catch (GargoyleConnectionFailException e) {
 						LOGGER.error(ValueUtil.toString(e));
 						DialogUtil.showExceptionDailog(e);
 					} catch (Exception e) {

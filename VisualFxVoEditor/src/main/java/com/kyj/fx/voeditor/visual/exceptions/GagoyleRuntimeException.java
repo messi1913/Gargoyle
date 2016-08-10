@@ -12,17 +12,22 @@ package com.kyj.fx.voeditor.visual.exceptions;
  * @author KYJ
  *
  */
-public class GagoyleRuntimeException extends RuntimeException {
+public class GagoyleRuntimeException extends RuntimeException implements IGargoyleExceptionCode {
 
 	/**
 	 * @최초생성일 2016. 3. 31.
 	 */
 	private static final long serialVersionUID = 1L;
+	private ERROR_CODE errorCode = ERROR_CODE.EMPTY;
+
+	public GagoyleRuntimeException() {
+
+	}
 
 	/**
 	 */
-	public GagoyleRuntimeException() {
-		// TODO Auto-generated constructor stub
+	public GagoyleRuntimeException(ERROR_CODE errorCode) {
+		this.errorCode = errorCode;
 	}
 
 	/**
@@ -30,7 +35,6 @@ public class GagoyleRuntimeException extends RuntimeException {
 	 */
 	public GagoyleRuntimeException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -38,7 +42,6 @@ public class GagoyleRuntimeException extends RuntimeException {
 	 */
 	public GagoyleRuntimeException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -47,7 +50,6 @@ public class GagoyleRuntimeException extends RuntimeException {
 	 */
 	public GagoyleRuntimeException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -58,18 +60,18 @@ public class GagoyleRuntimeException extends RuntimeException {
 	 */
 	public GagoyleRuntimeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
 	}
-	/***********************************************************************************/
-	/* 이벤트 구현 */
-
-	// TODO
-
-	/***********************************************************************************/
 
 	/***********************************************************************************/
 	/* 일반API 구현 */
 
-	// TODO
+	public ERROR_CODE getErrorCode() {
+		return errorCode;
+	}
+
+	public void setErrorCode(ERROR_CODE errorCode) {
+		this.errorCode = errorCode;
+	}
+
 	/***********************************************************************************/
 }

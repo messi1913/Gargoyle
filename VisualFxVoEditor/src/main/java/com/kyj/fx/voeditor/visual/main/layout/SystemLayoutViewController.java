@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -19,10 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.FileWrapper;
-import com.kyj.fx.voeditor.visual.component.ImageFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ImageViewPane;
+import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
+import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
+import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenComposite;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
 import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
@@ -36,11 +39,12 @@ import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
-import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentOnLoaded;
 import com.kyj.fx.voeditor.visual.loder.JarWrapper;
 import com.kyj.fx.voeditor.visual.loder.PluginLoader;
+import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
@@ -54,6 +58,10 @@ import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.util.ProgramSpecUtil;
+import com.kyj.fx.voeditor.visual.words.spec.resources.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.SpecTabPane;
+import com.kyj.scm.manager.svn.java.JavaSVNManager;
+import com.kyj.scm.manager.svn.java.SVNWcDbClient;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -72,6 +80,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -289,7 +298,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						}
 
 						try {
-							Class<GagoyleParentOnLoaded> addOnParentLoadedListenerClass = jarWrapper.getAddOnParentLoadedListenerClass();
+							Class<GagoyleParentOnLoaded> addOnParentLoadedListenerClass = jarWrapper
+									.getAddOnParentLoadedListenerClass();
 							if (addOnParentLoadedListenerClass != null)
 								addOnParentLoadedListener(addOnParentLoadedListenerClass.newInstance());
 						} catch (Exception e) {
@@ -318,22 +328,43 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param tabs
 	 */
 	private void openFile(File file) {
-		try {
-			if (FileUtil.isJavaFile(file)) {
-				openJava(file);
-			} else if (FileUtil.isImageFile(file)) {
-				openImage(file);
-			} else if (FileUtil.isPdfFile(file)) {
-				openPdf(file);
-			} else if (FileUtil.isFXML(file))
-				openFXML(file);
-			else {
+
+		List<String> exts = ConfigResourceLoader.getInstance()
+				.getValues(ConfigResourceLoader.FILE_OPEN_NOT_INPROCESSING_EXTENSION, ",");
+
+		String fileName = file.getName();
+		int dotIndex = fileName.indexOf('.');
+		/* 확장자부분이 없는경우 처리. */
+		if (dotIndex == -1) {
+			openBigText(file);
+			return;
+		}
+
+		String EXTENSION = fileName.substring(dotIndex);
+		Optional<String> findFirst = exts.stream().filter(ext -> EXTENSION.equals(ext) || EXTENSION.isEmpty())
+				.findFirst();
+		if (findFirst.isPresent()) {
+			/* open OS Denpendency. */
+			FileUtil.openFile(file);
+		} else {
+
+			try {
+				if (FileUtil.isJavaFile(file)) {
+					openJava(file);
+				} else if (FileUtil.isImageFile(file)) {
+					openImage(file);
+				} else if (FileUtil.isPdfFile(file)) {
+					openPdf(file);
+				} else if (FileUtil.isFXML(file))
+					openFXML(file);
+				else {
+					openBigText(file);
+				}
+				/* 예외에 걸린경우 텍스트방식으로 read */
+			} catch (Exception e) {
+				DialogUtil.showMessageDialog("파일열기에 실패하여 텍스트 형식으로 읽어옵니다.");
 				openBigText(file);
 			}
-			/* 예외에 걸린경우 텍스트방식으로 read */
-		} catch (Exception e) {
-			DialogUtil.showMessageDialog("파일열기에 실패하여 텍스트 형식으로 읽어옵니다.");
-			openBigText(file);
 		}
 
 	}
@@ -413,7 +444,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	private void openPdf(File file) throws Exception {
 		try {
 
-			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(new PDFImageBasePane(file)) {
+			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(
+					new PDFImageBasePane(file)) {
 
 				@Override
 				public void close() throws IOException {
@@ -528,30 +560,46 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		/***********************************************************************************/
 		// FXML선택한경우에만 보여주는 조건처리.
 		final MenuItem menuItemOpenWithSceneBuilder = new MenuItem("SceneBuilder");
+		final MenuItem menuItemSCMGraphs = new MenuItem("SCM Graphs");
+		menuItemSCMGraphs.setDisable(true);
+		menuItemSCMGraphs.setOnAction(this::menuItemSCMGraphsOnAction);
 		menuItemOpenWithSceneBuilder.setOnAction(this::menuItemOpenWithSceneBuilderOnAction);
 		menuOpenWidth.setOnShowing(event -> {
+
 			String sceneBuilderLocation = ResourceLoader.getInstance().get(ResourceLoader.SCENEBUILDER_LOCATION);
 			TreeItem<FileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
-			boolean isRemoveItem = true;
+			boolean isRemoveOpenWidthSceneBuilderMenuItem = true;
+			boolean isDisableSCMGraphsMenuItem = true;
 
 			if (selectedTreeItem != null) {
-				File selectedTree = selectedTreeItem.getValue().getFile();
+				FileWrapper fileWrapper = selectedTreeItem.getValue();
+				File selectedTree = fileWrapper.getFile();
 				if (FileUtil.isFXML(selectedTree)) {
-					if (ValueUtil.isNotEmpty(sceneBuilderLocation)) {
-						File file = new File(sceneBuilderLocation);
-						if (file.exists()) {
 
-							if (!menuOpenWidth.getItems().contains(menuItemOpenWithSceneBuilder)) {
-								menuOpenWidth.getItems().add(menuItemOpenWithSceneBuilder);
-							}
-							isRemoveItem = false;
-						}
+					if (!menuOpenWidth.getItems().contains(menuItemOpenWithSceneBuilder)) {
+						menuOpenWidth.getItems().add(menuItemOpenWithSceneBuilder);
 					}
-				}
+					isRemoveOpenWidthSceneBuilderMenuItem = false;
+
+					File file = new File(sceneBuilderLocation);
+					/* 씬빌더 존재 유무에 따라 활성화 여부를 지정. */
+					if (file.exists()) {
+						menuItemOpenWithSceneBuilder.setDisable(false);
+					} else {
+						menuItemOpenWithSceneBuilder.setDisable(true);
+					}
+				} // else if (selectedTreeItem instanceof
+					// JavaProjectFileTreeItem) {
+				if (fileWrapper.isSVNConnected())
+					isDisableSCMGraphsMenuItem = false;
+				// }
 			}
 
-			if (isRemoveItem)
+			if (isRemoveOpenWidthSceneBuilderMenuItem)
 				menuOpenWidth.getItems().remove(menuItemOpenWithSceneBuilder);
+
+			menuItemSCMGraphs.setDisable(isDisableSCMGraphsMenuItem);
+
 		});
 		/***********************************************************************************/
 		// 조건에 따라 보여주는 아이템. [end]
@@ -570,7 +618,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		// //선택한 파일아이템을 DaoWizard에서 조회시 사용
 		// MenuItem daoWizardMenuItem = new MenuItem("Show DAO Wizard");
 		// 선택한 파일경로를 Vo Editor Location에 바인딩함.
-//		MenuItem setVoEditorMenuItem = new MenuItem("SET Vo Editor Directory");
+		// MenuItem setVoEditorMenuItem = new MenuItem("SET Vo Editor
+		// Directory");
 
 		// 선택한 파일경로를 Vo Editor Location에 바인딩함.
 		MenuItem voEditorMenuItem = new MenuItem("Vo Editor");
@@ -589,32 +638,34 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		MenuItem menuProperties = new MenuItem("Properties");
 
 		menuProperties.setOnAction(this::menuPropertiesOnAction);
-		chodeAnalysisMenuItem.setOnAction(this::chodeAnalysisMenuItemOnAction);
+		chodeAnalysisMenuItem.setOnAction(this::menuItemCodeAnalysisMenuItemOnAction);
 
 		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem,
 				deleteFileMenuItem, /* voEditorMenuItem, daoWizardMenuItem, */
-				voEditorMenuItem, /*setVoEditorMenuItem,*/ setDaoWizardMenuItem, refleshMenuItem, chodeAnalysisMenuItem,
-				makeProgramSpecMenuItem, new SeparatorMenuItem(), menuProperties);
+				voEditorMenuItem, /* setVoEditorMenuItem, */ setDaoWizardMenuItem, refleshMenuItem,
+				chodeAnalysisMenuItem, makeProgramSpecMenuItem, menuItemSCMGraphs, new SeparatorMenuItem(),
+				menuProperties);
 
 		// daoWizardMenuItem.addEventHandler(ActionEvent.ACTION,
 		// this::daoWizardMenuItemOnActionEvent);
 
 		// Vo Editor
-//		setVoEditorMenuItem.addEventHandler(ActionEvent.ACTION, event -> {
-//			Node lookup = borderPaneMain.lookup("#txtLocation");
-//			if (lookup != null && tmpSelectFileWrapper != null) {
-//				TextField txtLocation = (TextField) lookup;
-//				File file = tmpSelectFileWrapper.getFile();
-//				if (file.isDirectory()) {
-//					String absolutePath = file.getAbsolutePath();
-//					ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH, absolutePath);
-//					txtLocation.setText(absolutePath);
-//				} else {
-//					DialogUtil.showMessageDialog("Only Directory.");
-//				}
-//			}
-//			tmpSelectFileWrapper = null;
-//		});
+		// setVoEditorMenuItem.addEventHandler(ActionEvent.ACTION, event -> {
+		// Node lookup = borderPaneMain.lookup("#txtLocation");
+		// if (lookup != null && tmpSelectFileWrapper != null) {
+		// TextField txtLocation = (TextField) lookup;
+		// File file = tmpSelectFileWrapper.getFile();
+		// if (file.isDirectory()) {
+		// String absolutePath = file.getAbsolutePath();
+		// ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH,
+		// absolutePath);
+		// txtLocation.setText(absolutePath);
+		// } else {
+		// DialogUtil.showMessageDialog("Only Directory.");
+		// }
+		// }
+		// tmpSelectFileWrapper = null;
+		// });
 
 		voEditorMenuItem.addEventHandler(ActionEvent.ACTION, this::voEditorMenuItemOnAction);
 
@@ -669,14 +720,17 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						if (FileUtil.isJavaFile(sourceFile)) {
 
 							// 파일을 생성하고, 생성하고 나면 오픈.
-							File targetFile = DialogUtil.showFileSaveCheckDialog(SharedMemory.getPrimaryStage(), chooser -> {
+							File targetFile = DialogUtil.showFileSaveCheckDialog(SharedMemory.getPrimaryStage(),
+									chooser -> {
 
-								chooser.setInitialFileName(DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSS));
-								chooser.getExtensionFilters().add(new ExtensionFilter("Doc files (*.docx)", "*.docx"));
-								chooser.setTitle("Save Program Spec. Doc");
-								chooser.setInitialDirectory(new File(SystemUtils.USER_HOME));
+										chooser.setInitialFileName(DateUtil
+												.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSS));
+										chooser.getExtensionFilters()
+												.add(new ExtensionFilter("Doc files (*.docx)", "*.docx"));
+										chooser.setTitle("Save Program Spec. Doc");
+										chooser.setInitialDirectory(new File(SystemUtils.USER_HOME));
 
-							});
+									});
 
 							if (targetFile != null) {
 								boolean createDefault = ProgramSpecUtil.createDefault(sourceFile, targetFile);
@@ -706,7 +760,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @User KYJ
 	 */
 	private TreeItem<FileWrapper> createNewTree(File dir) {
-		ImageFileTreeItemCreator value = new ImageFileTreeItemCreator();
+		ProjectFileTreeItemCreator value = new ProjectFileTreeItemCreator();
 		return value.createNode(dir);
 	}
 
@@ -728,6 +782,19 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			treeProjectFile.setRoot(createNewTree(selectDirFile));
 			treeProjectFile.setShowRoot(false);
 		}
+	}
+
+	/**
+	 * Help > About Click Event.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @param e
+	 */
+	@FXML
+	public void miAboutOnAction(ActionEvent e) {
+		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
+		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s", url));
 	}
 
 	/**
@@ -816,14 +883,46 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 *
 	 * @param e
 	 ********************************/
-	public void chodeAnalysisMenuItemOnAction(ActionEvent e) {
+	public void menuItemCodeAnalysisMenuItemOnAction(ActionEvent e) {
 		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
-			File sourceFile = selectedItem.getValue().getFile();
+			FileWrapper value = selectedItem.getValue();
+			File sourceFile = value.getFile();
+			// if(selectedItem instanceof JavaProjectMemberFileTreeItem)
+			{
+				if (value.isSVNConnected()) {
+					File wcDbFile = value.getWcDbFile();
+					if (wcDbFile != null && wcDbFile.exists()) {
+						SVNWcDbClient client;
+						try {
+							client = new SVNWcDbClient(wcDbFile);
+
+							// TODO 코드 완성시키기.
+							// new SVNFileHistoryComposite(
+							// JavaSVNManager.createNewInstance(client.getUrl())
+							// , sourceFile);
+							// new JavaSVNManager(new Properties(defaults))
+						} catch (Exception e1) {
+							LOGGER.error(ValueUtil.toString(e1));
+						}
+					}
+				}
+			}
+
 			if (sourceFile != null && sourceFile.exists()) {
 				try {
 					if (FileUtil.isJavaFile(sourceFile)) {
-						loadNewSystemTab(sourceFile.getName(), new CodeAnalysisJavaTextArea(sourceFile));
+
+						JavaProjectFileTreeItem javaProjectFileTreeItem = FileUtil
+								.toJavaProjectFileTreeItem(selectedItem);
+						if (javaProjectFileTreeItem != null) {
+
+							Tab tab = new Tab(sourceFile.getName(), new CodeAnalysisJavaTextArea(sourceFile));
+							loadNewSystemTab(sourceFile.getName(), new SpecTabPane(
+									new SpecResource(javaProjectFileTreeItem.getValue().getFile(), sourceFile), tab));
+
+						}
+
 					} else {
 						DialogUtil.showMessageDialog("자바 파일이 아닙니다.");
 					}
@@ -855,7 +954,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				loadNewSystemTab("VoEditor", parent);
 
-			} catch (NullPointerException | GagoyleException | IOException e1) {
+			} catch (NullPointerException | GargoyleException | IOException e1) {
 				LOGGER.error(ValueUtil.toString(e1));
 			}
 
@@ -1002,7 +1101,6 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				FilePropertiesComposite composite = new FilePropertiesComposite(file);
 				FxUtil.createStageAndShow(composite, stage -> {
 					stage.initOwner(SharedMemory.getPrimaryStage());
-					stage.show();
 				});
 			}
 
@@ -1169,17 +1267,29 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	@FXML
 	public void lblSVNOnAction(ActionEvent e) {
 		try {
-			Stage stage = new Stage();
+
 			Scene scene = new Scene(new BorderPane(new SVNViewer()), 1100, 900);
 			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-			stage.setScene(scene);
-			stage.initOwner(SharedMemory.getPrimaryStage());
+			FxUtil.createStageAndShow(scene, stage -> {
+				stage.setTitle("SVN");
+				stage.initOwner(SharedMemory.getPrimaryStage());
+				stage.setAlwaysOnTop(false);
+				stage.centerOnScreen();
+			});
 
-			stage.setTitle("SVN");
-			stage.setAlwaysOnTop(false);
-			stage.centerOnScreen();
-			// stage.initModality(Modality.APPLICATION_MODAL);
-			stage.show();
+			// Stage stage = new Stage();
+			// Scene scene = new Scene(new BorderPane(new SVNViewer()), 1100,
+			// 900);
+			//
+			//
+			// scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+			// stage.setScene(scene);
+			// stage.initOwner(SharedMemory.getPrimaryStage());
+			//
+			// stage.setTitle("SVN");
+			// stage.setAlwaysOnTop(false);
+			// stage.centerOnScreen();
+			// stage.show();
 		} catch (Exception ex) {
 			LOGGER.error(ValueUtil.toString(ex));
 			DialogUtil.showExceptionDailog(ex);
@@ -1381,6 +1491,40 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	}
 
+	/**
+	 * SCM Graph분석 화면을 생성후 보여주는 처리를 함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @param event
+	 */
+	public void menuItemSCMGraphsOnAction(ActionEvent event) {
+		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			FileWrapper value = selectedItem.getValue();
+			if (value.isSVNConnected()) {
+				File wcDbFile = value.getWcDbFile();
+				if (wcDbFile.exists()) {
+					try {
+						SVNWcDbClient client = new SVNWcDbClient(wcDbFile);
+						String rootUrl = client.getUrl();
+						LOGGER.debug("root URL : {}", rootUrl);
+						Properties properties = new Properties();
+						properties.put(JavaSVNManager.SVN_URL, rootUrl);
+
+						loadNewSystemTab("Scm Graph", FxUtil.createSVNGraph(properties));
+
+					} catch (GargoyleException e) {
+						LOGGER.error(ValueUtil.toString(e));
+						DialogUtil.showExceptionDailog(e, e.getErrorCode().getCodeMessage());
+					} catch (Exception e) {
+
+					}
+				}
+			}
+		}
+	}
+
 	/********************************
 	 * 작성일 : 2016. 6. 30. 작성자 : KYJ
 	 *
@@ -1390,8 +1534,23 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	@FXML
 	public void menuPrintOnAction() {
 		Tab selectedItem = this.tabPanWorkspace.getSelectionModel().getSelectedItem();
-		if (selectedItem != null)
+		if (selectedItem != null) {
 			FxUtil.printJob(SharedMemory.getPrimaryStage(), selectedItem.getContent());
+		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 13. 작성자 : KYJ
+	 *
+	 * 캡쳐후 이미지 핸들링 TODO Expertiment.
+	 ********************************/
+	@FXML
+	public void lblCaptureOnAction() {
+		Tab selectedItem = this.tabPanWorkspace.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			new CaptureScreenComposite(selectedItem.getContent(), System.err::println).show();
+		}
+
 	}
 
 	/*
@@ -1437,5 +1596,22 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	private void setOnbeforeParentLoad(GagoyleParentBeforeLoad beforeLoad) {
 		this.beforeParentLoad = beforeLoad;
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
+	 *
+	 * 트리에 선택된 모델 리턴.
+	 *
+	 * @return
+	 ********************************/
+	public final MultipleSelectionModel<TreeItem<FileWrapper>> getTreeProjectFileSelectionModel() {
+		return treeProjectFile.getSelectionModel();
+	}
+
+	public void refleshWorkspaceTree() {
+		String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
+		selectDirFile = new File(baseDir);
+		treeProjectFile.setRoot(createNewTree(selectDirFile));
 	}
 }

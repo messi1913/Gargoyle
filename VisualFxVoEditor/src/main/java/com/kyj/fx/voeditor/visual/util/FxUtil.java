@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -17,6 +18,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -25,14 +27,22 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 
+import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tmatesoft.svn.core.SVNException;
 
-import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
+import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
+import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
+import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
+import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.InstanceTypes;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
+import com.kyj.scm.manager.svn.java.JavaSVNManager;
+import com.kyj.scm.manager.svn.java.SVNWcDbClient;
 
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -49,12 +59,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.SnapshotResult;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.scene.transform.Scale;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -67,12 +80,17 @@ import javafx.util.Callback;
  * @author KYJ
  *
  */
+/***************************
+ *
+ * @author KYJ
+ *
+ ***************************/
 public class FxUtil {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FxUtil.class);
 
 	/**
 	 * 에러 콜백.
-	 * 
+	 *
 	 * @최초생성일 2016. 6. 29.
 	 */
 	private static final Consumer<Exception> DEFAULT_ERROR_CALLBACK = error -> {
@@ -87,11 +105,11 @@ public class FxUtil {
 	 *
 	 * @param controllerClass
 	 * @return
-	 * @throws GagoyleException
+	 * @throws GargoyleException
 	 * @throws NullPointerException
 	 * @throws IOException
 	 ********************************/
-	public static <T> T load(Class<?> controllerClass) throws GagoyleException, NullPointerException, IOException {
+	public static <T> T load(Class<?> controllerClass) throws GargoyleException, NullPointerException, IOException {
 		return load(controllerClass, null, null, null);
 	}
 
@@ -104,11 +122,11 @@ public class FxUtil {
 	 * @param option
 	 *            FXML을 로드한후 후처리할 내용을 기입한다.
 	 * @return
-	 * @throws GagoyleException
+	 * @throws GargoyleException
 	 * @throws NullPointerException
 	 * @throws IOException
 	 ********************************/
-	public static <T, C> T load(Class<C> controllerClass, Consumer<T> option) throws GagoyleException, NullPointerException, IOException {
+	public static <T, C> T load(Class<C> controllerClass, Consumer<T> option) throws GargoyleException, NullPointerException, IOException {
 		return load(controllerClass, null, option, null);
 	}
 
@@ -121,12 +139,12 @@ public class FxUtil {
 	 * @param controllerClass
 	 * @param controllerAction
 	 * @return
-	 * @throws GagoyleException
+	 * @throws GargoyleException
 	 * @throws NullPointerException
 	 * @throws IOException
 	 */
 	public static <N, C> N loadAndControllerAction(Class<C> controllerClass, Consumer<C> controllerAction)
-			throws GagoyleException, NullPointerException, IOException {
+			throws GargoyleException, NullPointerException, IOException {
 		return load(controllerClass, null, null, controllerAction);
 	}
 
@@ -138,11 +156,11 @@ public class FxUtil {
 	 * @param controllerClass
 	 * @param instance
 	 * @return
-	 * @throws GagoyleException
+	 * @throws GargoyleException
 	 * @throws NullPointerException
 	 * @throws IOException
 	 ********************************/
-	public static <T, C> T loadRoot(Class<C> controllerClass, Object instance) throws GagoyleException, NullPointerException, IOException {
+	public static <T, C> T loadRoot(Class<C> controllerClass, Object instance) throws GargoyleException, NullPointerException, IOException {
 		return load(controllerClass, instance, null, null);
 	}
 
@@ -153,14 +171,14 @@ public class FxUtil {
 	 *
 	 * @param controllerClass
 	 * @return
-	 * @throws GagoyleException
+	 * @throws GargoyleException
 	 * @throws NullPointerException
 	 * @throws IOException
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 ********************************/
 	public static <T, C> T loadRoot(Class<C> controllerClass)
-			throws GagoyleException, NullPointerException, IOException, InstantiationException, IllegalAccessException {
+			throws GargoyleException, NullPointerException, IOException, InstantiationException, IllegalAccessException {
 		return load(controllerClass, controllerClass.newInstance(), null, null);
 	}
 
@@ -216,12 +234,12 @@ public class FxUtil {
 	 * @param controllerClass
 	 * @param option
 	 * @return
-	 * @throws GagoyleException
+	 * @throws GargoyleException
 	 * @throws NullPointerException
 	 * @throws IOException
 	 ********************************/
 	public static <N, C> N load(Class<C> controllerClass, Object rootInstance, Consumer<N> option, Consumer<C> controllerAction)
-			throws GagoyleException, NullPointerException, IOException {
+			throws GargoyleException, NullPointerException, IOException {
 		if (controllerClass == null)
 			throw new NullPointerException("controller is null.");
 
@@ -229,7 +247,7 @@ public class FxUtil {
 
 		FXMLController controller = controllerClass.getAnnotation(FXMLController.class);
 		if (controller == null) {
-			throw new GagoyleException("this is not FXMLController. check @FXMLController");
+			throw new GargoyleException("this is not FXMLController. check @FXMLController");
 		}
 		String fxml = controller.value();
 
@@ -258,7 +276,7 @@ public class FxUtil {
 	}
 
 	private static <T, C> T newInstance(Class<?> controllerClass, Object rootInstance, Consumer<T> option, FXMLController controller,
-			String fxml, Consumer<C> controllerAction) throws GagoyleException, IOException {
+			String fxml, Consumer<C> controllerAction) throws GargoyleException, IOException {
 		URL resource = controllerClass.getResource(fxml);
 
 		FXMLLoader loader = new FXMLLoader(resource);
@@ -268,7 +286,7 @@ public class FxUtil {
 				loader.setRoot(rootInstance);
 				loader.setController(rootInstance);
 			} catch (Exception e) {
-				throw new GagoyleException(e);
+				throw new GargoyleException(e);
 			}
 		}
 
@@ -523,11 +541,6 @@ public class FxUtil {
 				stage.setAlwaysOnTop(true);
 				stage.initModality(Modality.APPLICATION_MODAL);
 				stage.initOwner(stage);
-				stage.show();
-			};
-		} else {
-			option = stage -> {
-				stage.show();
 			};
 		}
 
@@ -539,19 +552,44 @@ public class FxUtil {
 	 * @작성일 : 2016. 6. 23.
 	 */
 	public static void createStageAndShow(Scene scene, Consumer<Stage> option) {
+		Stage stage = craeteStage(scene, option);
+		stage.show();
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
+	 *
+	 *
+	 * @param scene
+	 * @return
+	 ********************************/
+	public static Stage craeteStage(Scene scene) {
 		Stage stage = new Stage();
 		stage.setScene(scene);
+		return stage;
+	}
 
+	/********************************
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
+	 *
+	 *
+	 * @param scene
+	 * @param option
+	 * @return
+	 ********************************/
+	public static Stage craeteStage(Scene scene, Consumer<Stage> option) {
+		Stage stage = new Stage();
+		stage.setScene(scene);
 		if (option != null)
 			option.accept(stage);
-
+		return stage;
 	}
 
 	/********************************
 	 * 작성일 : 2016. 6. 29. 작성자 : KYJ
 	 *
 	 * 캡쳐
-	 * 
+	 *
 	 * @param target
 	 * @param saveFile
 	 ********************************/
@@ -563,7 +601,7 @@ public class FxUtil {
 	 * 작성일 : 2016. 6. 29. 작성자 : KYJ
 	 *
 	 * 캡쳐
-	 * 
+	 *
 	 * @param target
 	 * @param saveFile
 	 * @param errorCallback
@@ -582,14 +620,18 @@ public class FxUtil {
 	 * 작성일 : 2016. 6. 29. 작성자 : KYJ
 	 *
 	 * 캡쳐
-	 * 
+	 *
 	 * out처리가 완료되면 stream은 자동 close처리됨.
-	 * 
+	 *
 	 * @param target
 	 * @param out
 	 * @param errorCallback
 	 ********************************/
 	public static void snapShot(Node target, OutputStream out, Consumer<Exception> errorCallback) {
+		snapShot(target, out, -1, -1, errorCallback);
+	}
+
+	public static void snapShot(Node target, OutputStream out, int requestWidth, int requestHeight, Consumer<Exception> errorCallback) {
 
 		if (target == null)
 			throw new NullPointerException("target Node is empty.");
@@ -601,45 +643,48 @@ public class FxUtil {
 		params.setDepthBuffer(true);
 		//		params.setFill(Color.CORNSILK);
 
-		target.snapshot(param -> {
-			WritableImage image = param.getImage();
-			try {
-				snapShot(out, image);
-			} catch (IOException e) {
-				errorCallback.accept(e);
-			}
-			return null;
-		}, params, null);
+		WritableImage wi = null;
+		if (requestWidth >= 0 || requestHeight >= 0) {
+			wi = new WritableImage(requestWidth, requestHeight);
+		}
+
+		WritableImage snapshot = target.snapshot(params, wi);
+		try {
+			boolean isSuccess = snapShot(out, snapshot);
+			LOGGER.debug("Write Image result {}", isSuccess);
+		} catch (IOException e) {
+			errorCallback.accept(e);
+		}
 	}
 
 	/********************************
 	 * 작성일 : 2016. 6. 29. 작성자 : KYJ
 	 *
 	 * 캡쳐 후 stream close처리.
-	 * 
+	 *
 	 * @param out
 	 * @param image
+	 * @return
 	 * @throws IOException
 	 ********************************/
-	private static void snapShot(OutputStream out, WritableImage image) throws IOException {
-		ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", out);
-
-		if (out != null)
-			out.close();
+	private static boolean snapShot(OutputStream out, WritableImage image) throws IOException {
+		return ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", out);
+		//		if (out != null)
+		//			out.close();
 	}
 
 	/********************************
 	 * 작성일 : 2016. 6. 29. 작성자 : KYJ
 	 *
 	 * print 처리.
-	 * 
+	 *
 	 * @param window
 	 * @param target
 	 ********************************/
 	public static void printJob(Window window, Node target) {
 		Printer printer = Printer.getDefaultPrinter();
 		//		PrinterAttributes printerAttributes = printer.getPrinterAttributes();
-		//		
+		//
 		Paper a4 = Paper.A4;
 
 		//		Paper a4 = PrintHelper.createPaper("Rotate A4", Paper.A4.getHeight(), Paper.A4.getWidth(), Units.MM);
@@ -676,7 +721,7 @@ public class FxUtil {
 	 * @return
 	 * @User KYJ
 	 */
-	public static ImageView createImageView(File file) {
+	public static ImageView createImageIconView(File file) {
 		Image fxImage = null;
 		if (file.exists()) {
 			FileSystemView fileSystemView = FileSystemView.getFileSystemView();
@@ -690,7 +735,126 @@ public class FxUtil {
 		}
 
 		return new ImageView(fxImage);
+	}
+
+	/**
+	 * 파일로부터 이미지를 그리기 위한 뷰를 반환한다.
+	 *
+	 * @Date 2015. 10. 14.
+	 * @param file
+	 * @return
+	 * @User KYJ
+	 */
+	public static ImageView createImageView(InputStream inputStream) {
+		Image fxImage = null;
+		if (inputStream != null) {
+			fxImage = new Image(inputStream);
+		} else {
+			return new ImageView();
+		}
+		return new ImageView(fxImage);
+	}
+
+	/**
+	 * RGB 색상 리턴.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 19.
+	 * @param color
+	 * @return
+	 */
+	public static String toRGBCode(Color color) {
+		if (color == null)
+			return "BLACK";
+		return String.format("#%02X%02X%02X", (int) (color.getRed() * 255), (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 19. 작성자 : KYJ
+	 *
+	 * Show PopOver
+	 *
+	 * @param root
+	 * @param showingNode
+	 ********************************/
+	public static void showPopOver(Node root, Node showingNode) {
+		if (root == showingNode)
+			return;
+
+		PopOver popOver = new PopOver(showingNode);
+		popOver.show(root);
+	}
+
+	/**
+	 * SVNGraph 노드생성후 리턴.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @param url
+	 * @return
+	 * @throws Exception
+	 */
+	public static TabPane createSVNGraph(String url) throws Exception {
+		Properties properties = new Properties();
+		properties.put(JavaSVNManager.SVN_URL, url);
+		return createSVNGraph(properties);
+	}
+
+	/**
+	 * SVNGraph 노드생성후 리턴.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @param properties
+	 * @return
+	 * @throws Exception
+	 */
+	public static TabPane createSVNGraph(Properties properties) throws Exception {
+		return createSVNGraph(new JavaSVNManager(properties));
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 21.
+	 * @param manager
+	 * @throws Exception
+	 */
+	public static TabPane createSVNGraph(JavaSVNManager manager) throws Exception {
+		FxSVNHistoryDataSupplier svnDataSupplier = new FxSVNHistoryDataSupplier(manager);
+		SvnChagnedCodeComposite svnChagnedCodeComposite = new SvnChagnedCodeComposite(svnDataSupplier);
+		ScmCommitComposite scmCommitComposite = new ScmCommitComposite(svnDataSupplier);
+		TabPane tabPane = new TabPane();
+		tabPane.getTabs().addAll(new Tab("Chagned Codes.", svnChagnedCodeComposite), new Tab("Commit Hist.", scmCommitComposite));
+		return tabPane;
 
 	}
 
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 22.
+	 * @param content
+	 */
+	public static JavaTextArea createJavaTextArea(String title, String content, double width, double height) {
+		JavaTextArea javaTextArea = new JavaTextArea();
+		javaTextArea.setPrefSize(width, height);
+		javaTextArea.setContent(content);
+		return javaTextArea;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 22.
+	 * @param content
+	 */
+	public static JavaTextArea createJavaTextArea(String content, double width, double height) {
+		JavaTextArea javaTextArea = new JavaTextArea();
+		javaTextArea.setPrefSize(width, height);
+		javaTextArea.setContent(content);
+		return javaTextArea;
+	}
+
+	public static JavaTextArea createJavaTextArea(String content) {
+		return createJavaTextArea(content,1200,800);
+	}
 }

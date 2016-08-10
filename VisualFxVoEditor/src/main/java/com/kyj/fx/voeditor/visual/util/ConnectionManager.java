@@ -14,7 +14,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.exceptions.ConnectionFailException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 
 /**
@@ -128,7 +128,7 @@ abstract class ConnectionManager {
 		if (dataSource == null) {
 			// 비밀번호는 입력안하는경우도 있기때문에 검증에서 제외
 			if (ValueUtil.isEmpty(driver, url, id)) {
-				throw new ConnectionFailException("Check 'Datatabse Settings' on the 'Configuration tab' ");
+				throw new GargoyleConnectionFailException("Check 'Datatabse Settings' on the 'Configuration tab' ");
 			}
 
 			dataSource = new DataSource();

@@ -50,7 +50,7 @@ import com.kyj.fx.voeditor.visual.component.Menus;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseTableView;
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.events.CommonContextMenuEvent;
-import com.kyj.fx.voeditor.visual.exceptions.FileAlreadyExistException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleFileAlreadyExistException;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.momory.ClassTypeResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
@@ -437,7 +437,7 @@ public class VoEditorController {
 				if (createExcelFile != null && createExcelFile.exists()) {
 					isSuccess = true;
 				}
-			} catch (FileAlreadyExistException e1) {
+			} catch (GargoyleFileAlreadyExistException e1) {
 				ValueUtil.toString(e1);
 				DialogUtil.showExceptionDailog(e1);
 				return;

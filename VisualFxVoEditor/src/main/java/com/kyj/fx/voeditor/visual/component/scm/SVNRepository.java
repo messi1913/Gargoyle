@@ -37,7 +37,7 @@ public class SVNRepository extends SVNItem {
 		return manager.getUrl();
 	}
 
-	public String getUserId() {
+	public Object getUserId() {
 		JavaSVNManager manager = super.getManager();
 		return manager.getUserId();
 	}

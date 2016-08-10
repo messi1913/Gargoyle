@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
+import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -32,10 +34,11 @@ import javafx.stage.Stage;
  * @author KYJ
  *
  */
+@FXMLController(value = "SimpleTextView.fxml", isSelfController = true)
 public class JavaTextView extends BorderPane {
 	private static Logger LOGGER = LoggerFactory.getLogger(JavaTextView.class);
 	private JavaTextArea javaTextArea;
-//	private String content;
+	//	private String content;
 	private boolean showButtons;
 	/**
 	 * 버튼박스
@@ -59,37 +62,29 @@ public class JavaTextView extends BorderPane {
 
 	public JavaTextView(String content, boolean showButtons, ExceptionHandler handler) {
 		LOGGER.debug("JavaTextView Constructor called");
-//		this.content = content;
+		//		this.content = content;
 		this.showButtons = showButtons;
 		javaTextArea = new JavaTextArea();
 		javaTextArea.setEditable(false);
 		javaTextArea.setContent(content);
 
 		LOGGER.debug("FxmlLoader");
+
+		/*
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(JavaTextView.class.getResource("SimpleTextView.fxml"));
 		loader.setRoot(this);
 		loader.setController(this);
-		try {
+		*/
 
-			loader.load();
-			LOGGER.debug("SimpleTextView.fxml load complete...");
-		} catch (Exception e) {
-			if (handler == null) {
-				e.printStackTrace();
-			} else {
-				handler.handle(e);
-			}
-
-		}
-
+		FxUtil.loadRoot(JavaTextView.class, this, ex -> handler.handle(ex));
 	}
 
 	@FXML
 	public void initialize() {
 		hboxButtons.setVisible(showButtons);
 		setCenter(javaTextArea);
-//		javaTextArea.setContent(content);
+		//		javaTextArea.setContent(content);
 	}
 
 	public void setContent(String content) {

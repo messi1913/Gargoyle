@@ -18,11 +18,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.ExceptionHandler;
+import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -50,13 +51,14 @@ import kyj.Fx.dao.wizard.core.util.ValueUtil;
  * @author KYJ
  *
  */
+@FXMLController(value = "SimpleTextView.fxml", isSelfController = true)
 public class BigTextView extends BorderPane implements Closeable {
 	private static Logger LOGGER = LoggerFactory.getLogger(BigTextView.class);
 
 	private File file;
 	private RandomAccessFile randomAccessFile;
 	private boolean showButtons;
-	private TextArea javaTextArea;
+//	private TextArea javaTextArea;
 
 	private Map<String, String> pageBuffer;
 	private static final int SEEK_SIZE = 1024 * 100;
@@ -94,11 +96,16 @@ public class BigTextView extends BorderPane implements Closeable {
 			this.showButtons = showButtons;
 			pageBuffer = new HashMap<>();
 
-			FXMLLoader loader = new FXMLLoader();
+
+			FxUtil.loadRoot(getClass(), this);
+
+			/*FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(BigTextView.class.getResource("SimpleTextView.fxml"));
 			loader.setRoot(this);
 			loader.setController(this);
-			loader.load();
+			loader.load();*/
+
+
 		} catch (Exception e) {
 			if (handler == null) {
 				LOGGER.error(ValueUtil.toString(e));
@@ -108,9 +115,9 @@ public class BigTextView extends BorderPane implements Closeable {
 		}
 	}
 
-	public void setEditable(boolean editable) {
-		javaTextArea.setEditable(false);
-	}
+//	public void setEditable(boolean editable) {
+//		javaTextArea.setEditable(false);
+//	}
 
 	/**
 	 * 세팅했던 파일정보
@@ -141,7 +148,8 @@ public class BigTextView extends BorderPane implements Closeable {
 
 	@FXML
 	public void initialize() {
-		javaTextArea = new TextArea();
+//		javaTextArea = new TextArea();
+//		javaTextArea.setPrefSize(TextArea.USE_COMPUTED_SIZE, Double.MAX_VALUE);
 		hboxButtons.setVisible(showButtons);
 
 		Pagination pagination = new Pagination(TOTAL_PAGE);
@@ -150,9 +158,12 @@ public class BigTextView extends BorderPane implements Closeable {
 			@Override
 			public Node call(Integer param) {
 				String readContent = readPage(param);
-				return new SimpleTextView(readContent, false);
+				SimpleTextView simpleTextView = new SimpleTextView(readContent, false);
+				simpleTextView.setPrefSize(TextArea.USE_COMPUTED_SIZE, Double.MAX_VALUE);
+				return simpleTextView;
 			}
 		});
+		pagination.setPrefSize(Pagination.USE_COMPUTED_SIZE, Pagination.USE_COMPUTED_SIZE);
 		this.setCenter(pagination);
 	}
 

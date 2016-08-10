@@ -1,12 +1,17 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : kyj.Fx.scm.manager.command.svn.concreate
+ *	패키지   : com.kyj.scm.manager.svn.java
  *	작성일   : 2016. 3. 22.
  *	작성자   : KYJ
  *******************************/
 package com.kyj.scm.manager.svn.java;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -24,6 +29,7 @@ import com.sun.star.uno.RuntimeException;
 
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
+
 /**
  * SVN의 CAT명령어를 수행한다.
  *
@@ -39,8 +45,8 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 	/**
 	 * @param properties
 	 */
-	public SVNCat(Properties properties) {
-		super(properties);
+	public SVNCat(JavaSVNManager javaSVNManager, Properties properties) {
+		super(javaSVNManager, properties);
 	}
 
 	/**
@@ -95,7 +101,7 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 			 * is located at a path in a revision. -1 means the latest revision.
 			 */
 
- 			SVNRepository repository = getRepository();
+			SVNRepository repository = getRepository();
 			SVNNodeKind nodeKind = repository.checkPath(path, -1);
 
 			if (nodeKind == SVNNodeKind.NONE) {
@@ -151,11 +157,11 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 			 * Displays the file contents in the console if the file is a text.
 			 */
 			if (isTextType) {
-				try(StringOutputStream out = new StringOutputStream())
-				{
-					baos.writeTo(out);
+//				try (StringOutputStream out = new StringOutputStream()) {
+//					baos.writeTo(out);
+				
 					result = baos.toString(encoding); // out.getString();
-				}
+//				}
 			} else {
 				LOGGER.debug(
 						"File contents can not be displayed in the console since the mime-type property says that it's not a kind of a text file.");
@@ -168,5 +174,7 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 		}
 		return result;
 	}
+
+	
 
 }

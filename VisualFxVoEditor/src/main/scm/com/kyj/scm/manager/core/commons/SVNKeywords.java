@@ -1,6 +1,6 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : kyj.Fx.scm.manager.core.common
+ *	패키지   : com.kyj.scm.manager.core.commons
  *	작성일   : 2016. 3. 23.
  *	작성자   : KYJ
  *******************************/
@@ -20,4 +20,5 @@ public interface SVNKeywords {
 	public static final String SVN_PATH = "svn.path";
 	public static final String SVN_PATH_WINDOW = "svn.path.window";
 	public static final String SVN_REPOSITORIES = "svn.repositores";
+
 }

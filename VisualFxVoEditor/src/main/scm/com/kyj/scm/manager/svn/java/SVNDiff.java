@@ -6,6 +6,8 @@
  *******************************/
 package com.kyj.scm.manager.svn.java;
 
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 import org.tmatesoft.svn.core.SVNDepth;
@@ -15,7 +17,6 @@ import org.tmatesoft.svn.core.wc.SVNDiffClient;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import com.kyj.scm.manager.core.commons.IDiffCommand;
-import com.kyj.scm.manager.stream.StringOutputStream;
 
 /***************************
  *
@@ -26,8 +27,12 @@ import com.kyj.scm.manager.stream.StringOutputStream;
  ***************************/
 public class SVNDiff extends AbstractSVN implements IDiffCommand<String, String, String> {
 
-	public SVNDiff(Properties properties) {
-		super(properties);
+	/**
+	 * @param javaSVNManager
+	 * @param properties
+	 */
+	public SVNDiff(JavaSVNManager javaSVNManager, Properties properties) {
+		super(javaSVNManager, properties);
 	}
 
 	/*
@@ -36,7 +41,7 @@ public class SVNDiff extends AbstractSVN implements IDiffCommand<String, String,
 	 * @inheritDoc
 	 */
 	@Override
-	public String diff(String path1, String path2) throws SVNException {
+	public String diff(String path1, String path2) throws Exception {
 		return diff(path1, SVNRevision.HEAD, path2, SVNRevision.HEAD);
 	}
 
@@ -50,16 +55,27 @@ public class SVNDiff extends AbstractSVN implements IDiffCommand<String, String,
 	 * @param rivision2
 	 * @return
 	 * @throws SVNException
+	 * @throws UnsupportedEncodingException
 	 ********************************/
-	public String diff(String path1, SVNRevision rivision1, String path2, SVNRevision rivision2) throws SVNException {
+	public String diff(String path1, SVNRevision rivision1, String path2, SVNRevision rivision2) throws SVNException, Exception {
 		SVNDiffClient diffClient = getSvnManager().getDiffClient();
-		StringOutputStream result = new StringOutputStream();
+		//		StringOutputStream result = new StringOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-		SVNURL svnUrl1 = SVNURL.parseURIEncoded(getUrl() + "/" + path1);
-		SVNURL svnUrl2 = SVNURL.parseURIEncoded(getUrl() + "/" + path2);
+		//		SVNURL svnURL = getSvnURL();
+		//		String repositoryPath = getRepository().getRepositoryPath(path1);
+		SVNURL location = getRepository().getLocation();
+		String decodedString = location.toDecodedString();
 
-		diffClient.doDiff(svnUrl1, rivision1, svnUrl2, rivision2, SVNDepth.UNKNOWN, true, result);
-		return result.getString();
+		String uriEncodedPath = location.getURIEncodedPath();
+
+		String rootUrl = decodedString.replaceAll(uriEncodedPath, "");
+
+		SVNURL svnUrl1 = SVNURL.parseURIEncoded(rootUrl + "/" + path1/*getRepository().getRepositoryPath(path1)*/);
+		SVNURL svnUrl2 = SVNURL.parseURIEncoded(rootUrl + "/" + path2/*getRepository().getRepositoryPath(path2)*/);
+
+		diffClient.doDiff(svnUrl1, rivision1, svnUrl2, rivision2, SVNDepth.UNKNOWN, true, out);
+		return out.toString("UTF-8");
 	}
 
 }

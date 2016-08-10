@@ -19,11 +19,8 @@ public class GagoyleParamEmptyException extends GagoyleRuntimeException {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 *
-	 */
 	public GagoyleParamEmptyException() {
-
+		setErrorCode(ERROR_CODE.PARAMETER_EMPTY);
 	}
 
 	/**

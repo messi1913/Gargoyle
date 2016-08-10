@@ -9,7 +9,7 @@ package com.kyj.fx.voeditor.visual.exceptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProgramSpecSourceException extends GagoyleException {
+public class ProgramSpecSourceException extends GargoyleException {
 
 	public List<String> getDetailMsgList() {
 		return detailMsgList;

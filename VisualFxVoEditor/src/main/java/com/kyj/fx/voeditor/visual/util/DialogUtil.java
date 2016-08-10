@@ -222,7 +222,7 @@ public class DialogUtil {
 
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
-
+		alert.initOwner(SharedMemory.getPrimaryStage());
 		alert.showAndWait();
 	}
 
@@ -325,14 +325,39 @@ public class DialogUtil {
 		showMessageDialog(SharedMemory.getPrimaryStage(), message);
 	}
 
+	/**
+	 * show info Dialog
+	 * info Dialog
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @param initOwner
+	 * @param message
+	 */
 	public static void showMessageDialog(Stage initOwner, String message) {
+		showMessageDialog(initOwner, "Info", "", message, alert -> {
+			alert.initModality(Modality.APPLICATION_MODAL);
+			alert.initOwner(initOwner);
+			alert.showAndWait();
+		});
+
+	}
+
+	/**
+	 * show info Dialog
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @param initOwner
+	 * @param title
+	 * @param headerText
+	 * @param message
+	 * @param apply
+	 */
+	public static void showMessageDialog(Stage initOwner, String title, String headerText, String message, Consumer<Alert> apply) {
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Information Dialog");
-		alert.setHeaderText(null);
+		alert.setTitle(title);
+		alert.setHeaderText(headerText);
 		alert.setContentText(message);
-		alert.initModality(Modality.APPLICATION_MODAL);
-		alert.initOwner(initOwner);
-		alert.showAndWait();
+		apply.accept(alert);
 	}
 
 	public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message) {

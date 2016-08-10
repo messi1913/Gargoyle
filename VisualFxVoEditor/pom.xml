@@ -5,7 +5,7 @@
 	<artifactId>VisualFxVoEditor</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-
+<!-- changed from github -->
 
 
 	<properties>
@@ -37,7 +37,7 @@
 		<!-- Jackson -->
 		<jackson.version>2.4.2</jackson.version>
 
-		<poi.word.version>3.10.1</poi.word.version>
+		<poi.word.version>3.14</poi.word.version>
 
 		<vo.editor.jar.path.name>${user.home}/.m2/repository/kyj/FxVoEditor/kyj.FxVoEditor/0.0.1-SNAPSHOT/kyj.FxVoEditor-0.0.1-SNAPSHOT.jar</vo.editor.jar.path.name>
 		<dao.wizard.jar.path.name>${user.home}/.m2/repository/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/0.0.1-SNAPSHOT/kyj.fx.dao.wizard-0.0.1-SNAPSHOT.jar</dao.wizard.jar.path.name>
@@ -107,8 +107,8 @@
 			</exclusions>
 		</dependency>
 
-		<!-- SLF4J가 지원하는 로깅을 대신 구현해주는 이름들입니다. 결과적으로 자신이 고칠수 없는 소스를 그대로 두고 SLF4J를 
-			사용하는것처럼 바꿀수 있는 방법입니다. 쉽게 말해 각각 로깅 구현체를 SLF4J가 package이름으로 구현을 해놓은 것입니다. 참고로 
+		<!-- SLF4J가 지원하는 로깅을 대신 구현해주는 이름들입니다. 결과적으로 자신이 고칠수 없는 소스를 그대로 두고 SLF4J를
+			사용하는것처럼 바꿀수 있는 방법입니다. 쉽게 말해 각각 로깅 구현체를 SLF4J가 package이름으로 구현을 해놓은 것입니다. 참고로
 			jcl은 jarkarta commons logging의 약자이고, jul은 java util logging의 약자입니다. -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -502,7 +502,7 @@
 			</exclusions>
 		</dependency>
 
-		<!-- org.bouncycastle.jce.provider.BouncyCastleProvider pdf박스에서 에러발생되는 
+		<!-- org.bouncycastle.jce.provider.BouncyCastleProvider pdf박스에서 에러발생되는
 			부분을 해결해보기위해 추가함. 클래스 NotFoundException 발생. -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -525,9 +525,9 @@
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-email -->
 		<dependency>
-		    <groupId>org.apache.commons</groupId>
-		    <artifactId>commons-email</artifactId>
-		    <version>1.4</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-email</artifactId>
+			<version>1.4</version>
 		</dependency>
 
 		<dependency>
@@ -583,6 +583,7 @@
 			<systemPath>${dao.wizard.jar.path.name}</systemPath>
 		</dependency>
 
+
 		<dependency>
 			<groupId>ojdbc14</groupId>
 			<artifactId>ojdbc14</artifactId>
@@ -605,6 +606,19 @@
 
 
 
+	<pluginRepositories>
+		<pluginRepository>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>Central Repository</name>
+			<url>http://repo.maven.apache.org/maven2</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<repositories>
 		<repository>
@@ -612,11 +626,12 @@
 			<name>My-Project Custom Jars</name>
 			<url>file://${project.basedir}/lib/</url>
 		</repository>
-		<!-- <repository> -->
-		<!-- <id>gagoyle.plugins</id> -->
-		<!-- <name>gagoyle.plugins</name> -->
-		<!-- <url>file://${project.basedir}/plugins/</url> -->
-		<!-- </repository> -->
+
+		<repository>
+			<id>Maven Central</id>
+			<name>Maven Central</name>
+			<url>http://repo.maven.apache.org/maven2</url>
+		</repository>
 	</repositories>
 
 </project>

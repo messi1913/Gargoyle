@@ -35,7 +35,7 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationFrameView;
 import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationUserMetadataVO;
-import com.kyj.fx.voeditor.visual.exceptions.ConnectionFailException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
 import com.kyj.fx.voeditor.visual.exceptions.NotYetSupportException;
 import com.kyj.fx.voeditor.visual.functions.ResultSetToMapConverter;
@@ -260,7 +260,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 				childrens.forEach(item -> item.setGraphic(DatabaseTreeNode.getGraphics(item.getValue())));
 
 				selectedItem.getChildren().addAll(childrens);
-			} catch (ConnectionFailException ex) {
+			} catch (GargoyleConnectionFailException ex) {
 				DialogUtil.showExceptionDailog(ex);
 			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
@@ -356,7 +356,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 
 				if (newChildres != null && !newChildres.isEmpty())
 					selectedItem.getChildren().addAll(newChildres);
-			} catch (ConnectionFailException ex) {
+			} catch (GargoyleConnectionFailException ex) {
 				DialogUtil.showExceptionDailog(ex);
 			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
@@ -372,13 +372,13 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	 *
 	 * @return
 	 * @throws NotYetSupportException
-	 * @throws ConnectionFailException
+	 * @throws GargoyleConnectionFailException
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
 	public static CommonsSqllPan getSqlPane()
-			throws NotYetSupportException, ConnectionFailException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+			throws NotYetSupportException, GargoyleConnectionFailException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 		CommonsSqllPan postgreSqlPane = null;
 
 		String driver = ResourceLoader.getInstance().get(ResourceLoader.BASE_KEY_JDBC_DRIVER);
@@ -720,7 +720,19 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			if (value instanceof TableItemTree) {
 				TreeItem<DatabaseItemTree<String>> schemaTree = selectedItem.getParent();
 				String schemaName = schemaTree.getValue().getName();
-				String tableName = schemaName.concat(".").concat(value.getName());
+				//				if(value.isValideSchemaName(schemaName))
+
+				String tableName = "";
+				/*
+				 * 2016-07-12 SQLite에서는 스키마라는 개념이 존재하지않는다.
+				 * Schema Name을 100개의로우를 보여주는 SQL에 적용할지 여부를 결정한다.
+				 */
+				if (value.isApplySchemaName(schemaName)) {
+					tableName = schemaName.concat(".").concat(value.getName());
+				} else {
+					tableName = value.getName();
+				}
+
 				String sql = ValueUtil.getVelocityToText(wrapperedSQL, "usersql", "select * from ".concat(tableName));
 				execute(sql);
 			}

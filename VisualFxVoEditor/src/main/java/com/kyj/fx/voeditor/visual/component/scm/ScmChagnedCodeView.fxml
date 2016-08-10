@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.layout.BorderPane?>
+
+<fx:root prefHeight="795.0" prefWidth="1117.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<PieChart fx:id="piChartChagendCode" legendVisible="false" title="Chagned Code Count." />
+	</center>
+</fx:root>

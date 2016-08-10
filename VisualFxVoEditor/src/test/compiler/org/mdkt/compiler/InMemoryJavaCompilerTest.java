@@ -23,6 +23,8 @@ import com.kyj.compiler.InMemoryJavaCompiler;
 import com.kyj.compiler.SourceCode;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 
+import javafx.scene.layout.HBox;
+
 /**
  * Created by trung on 5/3/15.
  */
@@ -312,5 +314,39 @@ public class InMemoryJavaCompilerTest {
 
 			System.out.println(m.getName());
 		});
+	}
+
+	@Test
+	public void dummyControllerMaker() throws Exception {
+
+		StringBuffer sb = new StringBuffer();
+
+		sb.append("/********************************\n");
+		sb.append(" *	프로젝트 : auto.intern.for.pass\n");
+		sb.append(" *	패키지   : com.kyj.intern.controller.dummy\n");
+		sb.append(" *	작성일   : 2016. 7. 14.\n");
+		sb.append(" *	작성자   : KYJ\n");
+		sb.append(" *******************************/\n");
+		sb.append("package com.kyj.intern.controller.dummy;\n");
+		sb.append("\n");
+		sb.append("\n");
+		sb.append("/**\n");
+		sb.append(" * @author KYJ\n");
+		sb.append(" *\n");
+		sb.append(" */\n");
+		sb.append("public class HBoxDummyController extends javafx.scene.layout.HBox {\n");
+		sb.append("\n");
+		sb.append("}\n");
+		sb.toString();
+
+		List<SourceCode> asList = new ArrayList<>();
+
+		asList.add(new SourceCode("com.kyj.intern.controller.dummy.HBoxDummyController", sb.toString()));
+		// asList.add(new SourceCode("pak.ExampleRef2", sb3.toString()));
+
+		Class<?> helloClass = InMemoryJavaCompiler.compile(asList, "com.kyj.intern.controller.dummy.HBoxDummyController");
+
+		Assert.assertNotNull(helloClass);
+		Assert.assertNotNull(helloClass.newInstance());
 	}
 }

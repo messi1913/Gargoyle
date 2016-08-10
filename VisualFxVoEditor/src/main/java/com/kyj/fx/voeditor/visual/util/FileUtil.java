@@ -17,13 +17,28 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.base.Objects;
+import com.kyj.fx.voeditor.visual.component.FileWrapper;
+import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
+import com.kyj.fx.voeditor.visual.framework.FileCheckConverter;
 import com.kyj.fx.voeditor.visual.framework.model.proj.ProjectDescription;
+import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
+import com.kyj.fx.voeditor.visual.functions.LoadFileOptionHandler;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+
+import javafx.scene.control.TreeItem;
 
 /**
  *
@@ -34,6 +49,7 @@ import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
  */
 public class FileUtil {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
 	/**
 	 * 이클립스의 경우 프로젝트 디렉토리라는 걸 인식하기 위한 파일 확장자. 이 확장자에는 참조되는 라이브러리에 대한 메타데이터를 정의함.
 	 *
@@ -108,6 +124,64 @@ public class FileUtil {
 			}
 		}
 		return isSuccess;
+	}
+
+	/**
+	 * 파일 읽기 처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 26.
+	 * @param file
+	 * @param options
+	 * @return
+	 */
+	public static String readFile(File file, LoadFileOptionHandler options) {
+		String content = "";
+		try {
+
+			if (file == null) {
+				Function<File, String> fileNotFoundThan = options.getFileNotFoundThan();
+				if (fileNotFoundThan != null) {
+					content = fileNotFoundThan.apply(file);
+					return content;
+				}
+			}
+
+			List<String> fileNameLikeFilter = options.getFileNameLikeFilter();
+			boolean isMatch = false;
+			if (fileNameLikeFilter == null) {
+				isMatch = true;
+			} else {
+				for (String ext : fileNameLikeFilter) {
+					if (file.getName().endsWith(ext)) {
+						isMatch = true;
+						break;
+					}
+				}
+			}
+
+			if (isMatch && file.exists()) {
+
+				//인코딩이 존재하지않는경우 UTF-8로 치환.
+				String encoding = options.getEncoding();
+				if (ValueUtil.isEmpty(encoding))
+					encoding = "UTF-8";
+
+				content = FileUtils.readFileToString(file, encoding);
+			} else {
+
+				//만약 파일이 존재하지않는다면 option파라미터에서 제공되는 처리내용을 반영.
+				Function<File, String> fileNotFoundThan = options.getFileNotFoundThan();
+				if (fileNotFoundThan != null) {
+					content = fileNotFoundThan.apply(file);
+				}
+			}
+
+		} catch (Exception e) {
+			options.setException(e);
+			LOGGER.error(ValueUtil.toString(e));
+		}
+		return content;
+
 	}
 
 	/**
@@ -288,7 +362,20 @@ public class FileUtil {
 	 */
 	public static File getTempFileSystem() {
 		return new File(System.getProperty("java.io.tmpdir"));
+	}
 
+	/********************************
+	 * 작성일 : 2016. 7. 13. 작성자 : KYJ
+	 *
+	 * SnapShot 임시 디렉토리 리턴.
+	 *
+	 * @return
+	 ********************************/
+	public static File getTempSnapShotDir() {
+		File file = new File("SnapShot");
+		if (!file.exists())
+			file.mkdir();
+		return file;
 	}
 
 	/**
@@ -369,6 +456,82 @@ public class FileUtil {
 			writer.write(str);
 			writer.flush();
 		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
+	 *
+	 * File로부터 packageName을 리턴.
+	 *
+	 * @param javaFile
+	 * @param converter
+	 * @param errorHandler
+	 * @return
+	 ********************************/
+	public static Optional<String> getPackageName(File javaFile, FileCheckConverter<String> converter, Consumer<Exception> errorHandler) {
+
+		try {
+			if (javaFile == null) {
+				return Optional.of(converter.ifNull());
+			}
+
+			if (!javaFile.exists()) {
+				return Optional.of(converter.notExists());
+			}
+
+			if (converter.isMatch(javaFile)) {
+				String packageName = GargoyleJavaParser.getPackageName(javaFile, converter);
+				return Optional.of(packageName);
+
+			} else {
+
+				return Optional.of(converter.notMatchThan());
+			}
+
+		} catch (Exception e) {
+			errorHandler.accept(e);
+		}
+
+		return Optional.empty();
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
+	 *
+	 * JavaParser
+	 *
+	 * @param javaFile
+	 * @param converter
+	 * @param errorHandler
+	 ********************************/
+	public static void consumeJavaParser(File javaFile, Consumer<CompilationUnit> converter, Consumer<Exception> errorHandler) {
+
+		try {
+			if (javaFile != null && javaFile.exists()) {
+				CompilationUnit cu = GargoyleJavaParser.getCompileUnit(javaFile);
+				converter.accept(cu);
+			}
+		} catch (Exception e) {
+			errorHandler.accept(e);
+		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 7. 14. 작성자 : KYJ
+	 *
+	 * JavaProjectTree 반환
+	 *
+	 * @param treeItem
+	 * @return
+	 ********************************/
+	public static JavaProjectFileTreeItem toJavaProjectFileTreeItem(TreeItem<FileWrapper> treeItem) {
+		if (treeItem != null) {
+			if (treeItem instanceof JavaProjectFileTreeItem) {
+				return (JavaProjectFileTreeItem) treeItem;
+			}
+			return toJavaProjectFileTreeItem(treeItem.getParent());
+		}
+		return null;
 	}
 
 }

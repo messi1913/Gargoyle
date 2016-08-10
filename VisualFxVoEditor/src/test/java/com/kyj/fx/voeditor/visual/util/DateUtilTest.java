@@ -11,7 +11,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -144,6 +143,55 @@ public class DateUtilTest {
 			System.out.println(DateUtil.displayTimeZone(TimeZone.getTimeZone(id)));
 		}
 		System.out.println("\nTotal TimeZone ID " + ids.length);
+	}
+
+	@Test
+	public void printWeek() {
+
+		{
+			List<GagoyleDate> periodDaysByWeek = DateUtil.getPeriodDaysByWeek(2016, 1);
+
+			System.out.println("##### Date 2016 .1 #####");
+			periodDaysByWeek.forEach(v -> {
+				System.out.println(v.toDateString());
+			});
+		}
+
+		{
+			List<GagoyleDate> periodDaysByWeek = DateUtil.getPeriodDaysByWeek(2016, 2);
+
+			System.out.println("##### Date 2016 .2 #####");
+			periodDaysByWeek.forEach(v -> {
+				System.out.println(v.toDateString());
+			});
+		}
+
+		{
+			GagoyleDate first = DateUtil.getFirstDateByWeek(2016, 2);
+			System.out.printf("First Day of Week %s\n", first.toDateString());
+			GagoyleDate last = DateUtil.getLastDateByWeek(2016, 2);
+			System.out.printf("Last Day of Week %s\n", last.toDateString());
+
+		}
+
+	}
+
+	@Test
+	public void gap() {
+		int gap = -1;
+		Calendar current = Calendar.getInstance();
+		int currentYear = current.get(Calendar.YEAR);
+		int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
+
+		Calendar past = Calendar.getInstance();
+		past.set(Calendar.WEEK_OF_MONTH, gap);
+		int pastYear = past.get(Calendar.YEAR);
+		int pastWeek = past.get(Calendar.WEEK_OF_YEAR);
+
+		System.out.println(currentYear);
+		System.out.println(currentWeek);
+		System.out.println(pastYear);
+		System.out.println(pastWeek);
 	}
 
 }

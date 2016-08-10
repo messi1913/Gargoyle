@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.main.layout.GagoyleTabProxy;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -174,6 +175,10 @@ public class CheckoutController {
 
 			long checkoutCount = svnItem.getManager().checkout(path, outDir);
 			LOGGER.debug("Checkout Result ::: " + checkoutCount);
+			
+			GagoyleTabProxy.getInstance().refleshWorkspaceTree();
+			
+			closeStage();
 		} catch (FileNotFoundException e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}

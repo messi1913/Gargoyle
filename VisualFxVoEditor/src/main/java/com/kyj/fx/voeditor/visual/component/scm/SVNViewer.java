@@ -16,7 +16,7 @@ import org.tmatesoft.svn.core.SVNLogEntry;
 
 import com.kyj.fx.voeditor.visual.component.TextBaseDiffAppController;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
-import com.kyj.fx.voeditor.visual.exceptions.GagoyleException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -29,7 +29,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
+import javafx.geometry.NodeOrientation;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
@@ -37,14 +38,25 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TreeItem;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -58,6 +70,10 @@ import javafx.stage.Stage;
 @FXMLController(value = "SVNViewerView.fxml", isSelfController = true)
 public class SVNViewer extends BorderPane {
 
+	/**
+	 * @최초생성일 2016. 7. 21.
+	 */
+	private static final int TAB_INDEX_SVN_GRAPH = 2;
 	@FXML
 	private AnchorPane anTreePane;
 	@FXML
@@ -71,28 +87,42 @@ public class SVNViewer extends BorderPane {
 	@FXML
 	private TableColumn<SVNLogEntry, String> colDate;
 
-	private SVNTreeView element;
+	private SVNTreeView tvSvnView;
 
 	@FXML
 	private BorderPane borChart;
+	@FXML
+	private Tab tabHistChart;
+	/**
+	 * TabPane.
+	 * @최초생성일 2016. 7. 21.
+	 */
+	@FXML
+	private TabPane tabPaneSVN;
 
 	@FXML
 	private BorderPane borSource;
+	@FXML
+	private Tab tabSource;
+	@FXML
+	private Label lblSourceTitle;
 	private JavaTextArea javaTextAre;
+	private LineChart<String, String> lineHist;
 
-	public SVNViewer() throws NullPointerException, GagoyleException, IOException {
+	public SVNViewer() throws NullPointerException, GargoyleException, IOException {
 		FxUtil.loadRoot(SVNViewer.class, this);
 	}
 
 	@FXML
 	public void initialize() {
-		element = new SVNTreeView();
-		element.setOnAction(this::svnTreeViewOnAction);
-		anTreePane.getChildren().set(0, element);
-		AnchorPane.setLeftAnchor(element, 0.0);
-		AnchorPane.setRightAnchor(element, 0.0);
-		AnchorPane.setBottomAnchor(element, 0.0);
-		AnchorPane.setTopAnchor(element, 0.0);
+		tvSvnView = new SVNTreeView();
+		tvSvnView.setOnAction(this::svnTreeViewOnAction);
+		tvSvnView.setOnKeyPressed(this::svnTreeVoewOnKeyPressed);
+		anTreePane.getChildren().set(0, tvSvnView);
+		AnchorPane.setLeftAnchor(tvSvnView, 0.0);
+		AnchorPane.setRightAnchor(tvSvnView, 0.0);
+		AnchorPane.setBottomAnchor(tvSvnView, 0.0);
+		AnchorPane.setTopAnchor(tvSvnView, 0.0);
 
 		colRevision.setCellValueFactory(v -> new SimpleObjectProperty<Long>(v.getValue().getRevision()));
 		colUser.setCellValueFactory(v -> new SimpleStringProperty(v.getValue().getAuthor()));
@@ -102,14 +132,27 @@ public class SVNViewer extends BorderPane {
 		javaTextAre = new JavaTextArea();
 
 		borSource.setCenter(javaTextAre);
-		LineChart<String, String> lineHist = new LineChart<>(new CategoryAxis(), new CategoryAxis());
+		lineHist = new LineChart<>(new CategoryAxis(), new CategoryAxis());
 		borChart.setCenter(lineHist);
 
+		tbRevision.getSelectionModel().setCellSelectionEnabled(true);
 		tbRevision.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 		MenuItem menuDiff = new MenuItem("Diff");
 		menuDiff.setOnAction(this::menuDiffOnAction);
 		tbRevision.setContextMenu(new ContextMenu(menuDiff));
+
+		tvSvnView.svnGraphPropertyProperty().addListener((oba, oldView, newView) -> {
+
+			if (newView != null) {
+				Tab tabSvnGraph = new Tab("SVN Graph", newView);
+				if (tabPaneSVN.getTabs().size() <= TAB_INDEX_SVN_GRAPH) {
+					tabPaneSVN.getTabs().add(tabSvnGraph);
+				} else {
+					tabPaneSVN.getTabs().add(TAB_INDEX_SVN_GRAPH, tabSvnGraph);
+				}
+			}
+		});
 	}
 
 	/**********************************************************************************************/
@@ -133,6 +176,8 @@ public class SVNViewer extends BorderPane {
 
 			SVNLogEntry svnLogEntry = selectedItems.get(0);
 			SVNLogEntry svnLogEntry2 = selectedItems.get(1);
+			if (svnLogEntry == null || svnLogEntry2 == null)
+				return;
 
 			long revision = svnLogEntry.getRevision();
 			long revision2 = svnLogEntry2.getRevision();
@@ -143,12 +188,18 @@ public class SVNViewer extends BorderPane {
 
 			try {
 
-				FXMLLoader loader = new FXMLLoader();
-				loader.setLocation(TextBaseDiffAppController.class.getResource("TextBaseDiffApp.fxml"));
-				Parent parent = loader.load();
-
-				TextBaseDiffAppController controller = loader.getController();
-				controller.setDiff(cat, cat2);
+				//				FXMLLoader loader = new FXMLLoader();
+				//				loader.setLocation(TextBaseDiffAppController.class.getResource("TextBaseDiffApp.fxml"));
+				//				Parent parent = loader.load();
+				//				TextBaseDiffAppController controller = loader.getController();
+				//				controller.setDiff(cat, cat2);
+				Parent parent = FxUtil.loadAndControllerAction(TextBaseDiffAppController.class, controller -> {
+					try {
+						controller.setDiff(cat, cat2);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				});
 
 				Stage stage = new Stage();
 				stage.setScene(new Scene(parent));
@@ -179,6 +230,11 @@ public class SVNViewer extends BorderPane {
 			lastSelectedSVNItem.set(item);
 			tbRevision.getItems().clear();
 			LineChart<String, String> lineHist = new LineChart<>(new CategoryAxis(), new CategoryAxis());
+			//			lineHist.setRotate(90d);
+			//			lineHist.scaleXProperty().set(0.7);
+			//			lineHist.scaleYProperty().set(0.7);
+			lineHist.autosize();
+			lineHist.setLegendVisible(false);
 			List<SVNLogEntry> logs = item.getManager().log(item.getPath());
 
 			tbRevision.getItems().addAll(logs.stream().sorted(sortUpper).collect(Collectors.toList()));
@@ -186,10 +242,38 @@ public class SVNViewer extends BorderPane {
 			// 시리즈 생성
 
 			ObservableList<Data<String, String>> observableArrayList = FXCollections.observableArrayList();
-			logs.stream().sorted(sortLower).forEach(v -> {
-				Date date = v.getDate();
-				String dateString = DateUtil.getDateString(date.getTime(), "yyyy/MM/dd");
-				observableArrayList.add(new Data<>(dateString, v.getAuthor()));
+			logs.stream().sorted(sortLower).forEach(entry -> {
+				Date date = entry.getDate();
+				String dateString = DateUtil.getDateString(date.getTime(), "yy-MM-dd HH:mm");
+				Data<String, String> data = new Data<>(dateString, entry.getAuthor());
+
+				setDataNode(entry, data);
+
+				data.getNode().setOnMouseClicked(e -> {
+
+					if (e.getClickCount() == 2 && e.getButton() == MouseButton.PRIMARY) {
+						String path = item.path;
+						long revision = entry.getRevision();
+
+						String content = item.getManager().cat(path, String.valueOf(revision));
+
+						BorderPane pane = new BorderPane(FxUtil.createJavaTextArea(content));
+						pane.setTop(new Label(item.getManager().fromPrettySVNLogConverter().apply(entry)));
+						FxUtil.showPopOver(data.getNode(), pane);
+					}
+				});
+
+				data.getNode().setOnMouseEntered(ev -> {
+					data.getNode().setBlendMode(BlendMode.GREEN);
+				});
+
+				data.getNode().setOnMouseExited(ev -> {
+					data.getNode().setBlendMode(null);
+				});
+
+				//				e.setNode(new Label(String.valueOf(v.getRevision())));
+
+				observableArrayList.add(data);
 			});
 
 			Series<String, String> series = new Series<>("Commitors.", observableArrayList);
@@ -198,11 +282,40 @@ public class SVNViewer extends BorderPane {
 			borChart.setCenter(lineHist);
 
 			String cat = item.getManager().cat(item.getPath());
-			String simpleName = item.getSimpleName();
+//			String simpleName = item.getSimpleName();
 			javaTextAre.setContent(cat);
 
+
+			tabPaneSVN.getSelectionModel().select(tabHistChart);
 		}
 
+	}
+
+	private void setDataNode(SVNLogEntry entry, Data<String, String> data) {
+
+		Group group = new Group();
+		group.setManaged(false);
+		Text value = new Text(entry.getRevision() + "");
+		value.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+		value.translateYProperty().set(-15);
+		Circle circle = new Circle(4, Color.WHITE);
+		circle.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+		circle.setStroke(Color.web("#f3622d"));
+		StackPane stackPane = new StackPane(value, circle);
+		stackPane.setPrefSize(30, 60);
+		group.getChildren().add(stackPane);
+		data.setNode(group);
+
+	}
+
+	public void svnTreeVoewOnKeyPressed(KeyEvent e) {
+		if (e.getCode() == KeyCode.DELETE) {
+
+			TreeItem<SVNItem> selectedItem = tvSvnView.getSelectionModel().getSelectedItem();
+			if (selectedItem != null) {
+				tvSvnView.menuDiscardLocationOnAction(new ActionEvent());
+			}
+		}
 	}
 
 	/**
@@ -225,6 +338,7 @@ public class SVNViewer extends BorderPane {
 					String path = svnItem.getPath();
 					String cat = svnItem.getManager().cat(path, String.valueOf(revision));
 					javaTextAre.setContent(cat);
+					tabPaneSVN.getSelectionModel().select(tabHistChart);
 				}
 
 			}

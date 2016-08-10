@@ -98,3 +98,12 @@ DockTitleBar Label
 {
 	-fx-text-fill:black;
 }
+
+.fiile-tree-item{
+	-fx-background-color: transparent ;
+}
+
+.fiile-tree-item Label
+{
+	-fx-text-fill:black;
+}

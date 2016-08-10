@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.kyj.fx.voeditor.visual.exceptions.ConnectionFailException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
 import javafx.collections.FXCollections;
@@ -74,7 +74,7 @@ public abstract class SchemaItemTree<T> extends DatabaseItemTree<T> {
 
 		Connection connection = getConnection();
 		if (connection == null)
-			throw new ConnectionFailException("connect fail...");
+			throw new GargoyleConnectionFailException("connect fail...");
 
 		try {
 			if (childrenSQL != null && !childrenSQL.isEmpty()) {

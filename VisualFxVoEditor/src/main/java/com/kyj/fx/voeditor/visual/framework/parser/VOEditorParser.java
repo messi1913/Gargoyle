@@ -10,6 +10,10 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.junit.experimental.categories.Categories.ExcludeCategory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
@@ -23,8 +27,11 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
  * @author KYJ
  *
  ***************************/
+@Deprecated
 public class VOEditorParser implements Closeable {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(VOEditorParser.class);
+	
 	private InputStream is;
 
 	public VOEditorParser(InputStream is) throws IOException {
@@ -39,11 +46,12 @@ public class VOEditorParser implements Closeable {
 
 		PackageDeclaration package1 = cu.getPackage();
 
-		System.out.println(package1.getName().toString());
-		System.out.println();
-		System.out.println(String.format("package name : %s", package1.getName().getName()));
+		
+		LOGGER.debug(package1.getName().toString());
+		
+		LOGGER.debug(String.format("package name : %s", package1.getName().getName()));
 		// prints the resulting compilation unit to default system output
-		System.out.println(cu.toString());
+		LOGGER.debug(cu.toString());
 
 		new MethodVisitor().visit(cu, null);
 
@@ -62,14 +70,14 @@ public class VOEditorParser implements Closeable {
 
 		@Override
 		public void visit(MethodDeclaration n, Object arg) {
-			System.out.println(n.getName());
+//			LOGGER.debug(n.getName());
 			super.visit(n, arg);
 		}
 
 		@Override
 		public void visit(FieldDeclaration n, Object arg) {
 
-			System.out.println(n.getVariables());
+//			LOGGER.debug(n.getVariables());
 			super.visit(n, arg);
 		}
 

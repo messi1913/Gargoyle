@@ -1,6 +1,6 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : kyj.Fx.scm.manager.command.svn
+ *	패키지   : com.kyj.scm.manager.svn.java
  *	작성일   : 2016. 3. 23.
  *	작성자   : KYJ
  *******************************/
@@ -35,14 +35,15 @@ import com.kyj.scm.manager.core.commons.IListCommand;
  */
 class SVNList extends AbstractSVN implements IListCommand<String, List<String>> {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(SVNList.class);
-
 	/**
+	 * @param javaSVNManager
 	 * @param properties
 	 */
-	public SVNList(Properties properties) {
-		super(properties);
+	public SVNList(JavaSVNManager javaSVNManager, Properties properties) {
+		super(javaSVNManager, properties);
 	}
+
+	private static Logger LOGGER = LoggerFactory.getLogger(SVNList.class);
 
 	/*
 	 * @inheritDoc
@@ -96,8 +97,8 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 	 * @param exceptionHandler
 	 * @return
 	 ********************************/
-	public List<SVNDirEntry> listEntry(String path, String revision, boolean isRecursive, Consumer<Exception> exceptionHandler) {
 
+	public List<SVNDirEntry> listEntry(String path, String revision, boolean isRecursive, Consumer<Exception> exceptionHandler) {
 		List<SVNDirEntry> resultList = new ArrayList<>();
 		try {
 			SVNProperties fileProperties = new SVNProperties();
