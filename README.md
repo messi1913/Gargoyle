@@ -12,6 +12,9 @@ Application Language : JavaFx , JDK1.8
 Download Site :: http://downloads-kyj.cloudsc.kr/
 
 
+설치 가이드(install guide.) :  http://cafe.naver.com/bluegrayfn1yo/1361
+
+
 
 ### Functions.
 
