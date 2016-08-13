@@ -10,6 +10,7 @@ Application Language : JavaFx , JDK1.8
 
 
 Download Site ::  [Download](https://storage.googleapis.com/gargoyle/Gargoyle-1.0.7.exe)
+
 ~~http://downloads-kyj.cloudsc.kr/~~
               
 
