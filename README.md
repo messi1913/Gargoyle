@@ -9,9 +9,10 @@ Application Language : JavaFx , JDK1.8
 ## Ref -> [2016-07-12] Too many Bugs.. exists.
 
 
-Download Site ::  https://storage.googleapis.com/gargoyle/Gargoyle-1.0.7.exe
-   ~~http://downloads-kyj.cloudsc.kr/~~
+Download Site ::  [Download](https://storage.googleapis.com/gargoyle/Gargoyle-1.0.7.exe)
+~~http://downloads-kyj.cloudsc.kr/~~
               
+
 
 환경 설치 가이드(install guide.) :  http://cafe.naver.com/bluegrayfn1yo/1361
 
