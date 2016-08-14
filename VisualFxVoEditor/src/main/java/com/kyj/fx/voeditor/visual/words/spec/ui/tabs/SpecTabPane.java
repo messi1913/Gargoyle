@@ -6,10 +6,9 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.words.spec.ui.tabs;
 
-import com.kyj.fx.voeditor.visual.component.FileWrapper;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleResourceException;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ProgramSpecSVO;
-import com.kyj.fx.voeditor.visual.words.spec.resources.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.ui.model.SpecResource;
 
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;

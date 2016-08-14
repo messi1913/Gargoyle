@@ -7,27 +7,17 @@
 package com.kyj.fx.voeditor.visual.words.spec.auto.msword.util;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecFileNotFoundException;
-import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecSourceException;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.AbstractJavaProgramSpecFile;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.AbstractXframeProgramSpecFile;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.AppFile;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.BizFile;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.DEMFile;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.DQMFile;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.DVOFile;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.IProgramSpecFile;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.SVOFile;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.VOFile;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.XframeJsFile;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ImportsDVO;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ProgramSpecSVO;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.SourceAnalysisDVO;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.UserSourceMetaDVO;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.AppFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.BizFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.DEMFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.DQMFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.DVOFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.IProgramSpecFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.SVOFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.VOFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.XframeJsFile;
 
 /**
  * @author KYJ

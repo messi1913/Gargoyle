@@ -9,7 +9,7 @@ package com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.IProgramSpecFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.IProgramSpecFile;
 
 /**
  * 프로그램 사양서를 작성하기 위해 종합적인 메타정보를 기록하는 데이터셋

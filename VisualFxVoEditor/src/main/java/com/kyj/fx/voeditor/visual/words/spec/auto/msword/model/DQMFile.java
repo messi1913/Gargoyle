@@ -4,7 +4,7 @@
  *	작성일   : 2016. 2. 15.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.model;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,15 +17,15 @@ import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.TableDVO;
  * @author KYJ
  *
  */
-public class AppFile extends BusinessFile {
+public class DQMFile extends DAOFile {
 
-	public AppFile(File f) throws Exception {
+	public DQMFile(File f) throws Exception {
 		super(f);
 	}
 
 	@Override
 	public SOURCE_FILE_TYPE getSourceFileType() {
-		return SOURCE_FILE_TYPE.APP;
+		return SOURCE_FILE_TYPE.DQM;
 	}
 
 	@Override
@@ -43,21 +43,17 @@ public class AppFile extends BusinessFile {
 	public List<TableDVO> getTableList() {
 		//TODO 주석
 //		String fileSimpleName = getFileSimpleName();
-//		String menuId = fileSimpleName.substring(0, fileSimpleName.toUpperCase().lastIndexOf("APP"));
-//
+//		String dqmName = fileSimpleName.substring(0, fileSimpleName.toUpperCase().lastIndexOf("DQM"));
 //		// 결과값 반환 list
 		List<TableDVO> arrayList = new ArrayList<TableDVO>();
 //
 //		StringBuffer sb = new StringBuffer();
-//		sb.append("SELECT A.TAB_NM AS TABLE_NAME, C. COMMENTS \n");
-//		sb.append("FROM  TBD_SM_SCREEN_TAB A,  ALL_TABLES B , ALL_TAB_COMMENTS C\n");
-//		sb.append("WHERE 1=1\n");
-//		sb.append("AND A.SCREEN_ID = '" + menuId + "'\n");
-//		sb.append("AND A.TAB_NM = B.TABLE_NAME\n");
-//		sb.append("AND A.TAB_NM  = C.TABLE_NAME \n");
-//		sb.append("AND C.OWNER = 'GMES20DBA'\n");
-//		sb.append("AND A.DEL_YN = 'N'\n");
-//		sb.append("AND A.USE_YN = 'Y'\n");
+//		sb.append("SELECT A.TABLE_NAME, B.COMMENTS\n");
+//		sb.append("FROM   ALL_TABLES A, ALL_TAB_COMMENTS B  \n");
+//		sb.append(" WHERE  A.TABLE_NAME = B.TABLE_NAME(+)\n");
+//		sb.append("AND  A.TABLE_NAME = '" + DbOracleUtil.getTableName(dqmName) + "'\n");
+//		sb.append("AND B.OWNER = 'GMES20DBA'\n");
+//		sb.append(" \n");
 //		sb.toString();
 //
 //		try {
@@ -82,6 +78,8 @@ public class AppFile extends BusinessFile {
 //		} catch (Exception e) {
 //			e.printStackTrace();
 //		}
+//
 		return arrayList;
 	}
+
 }

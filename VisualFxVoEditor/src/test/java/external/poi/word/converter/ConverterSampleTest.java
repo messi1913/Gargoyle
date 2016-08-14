@@ -13,7 +13,7 @@ import com.artofsolving.jodconverter.DocumentConverter;
 import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
-import com.kyj.fx.voeditor.visual.words.CustomDocFormatRegistry;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.core.CustomDocFormatRegistry;
 
 /**
  * @author KYJ

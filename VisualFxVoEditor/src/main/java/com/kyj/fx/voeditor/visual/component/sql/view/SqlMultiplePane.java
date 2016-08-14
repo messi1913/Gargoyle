@@ -45,6 +45,7 @@ import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
+import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -866,8 +867,8 @@ public abstract class SqlMultiplePane<T, K> extends DockPane implements ISchemaT
 
 		File saveFile = DialogUtil.showFileSaveDialog(SharedMemory.getPrimaryStage().getOwner(), option -> {
 			option.setInitialFileName(DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSS));
-			option.getExtensionFilters().add(new ExtensionFilter("Excel files (*.xlsx)", "*.xlsx"));
-			option.getExtensionFilters().add(new ExtensionFilter("Excel files (*.xls)", "*.xls"));
+			option.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.XLSX_NAME, GargoyleExtensionFilters.XLSX));
+			option.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.XLS_NAME, GargoyleExtensionFilters.XLS));
 			option.getExtensionFilters().add(new ExtensionFilter("All files", "*.*"));
 			option.setTitle("Save Excel");
 			option.setInitialDirectory(new File(SystemUtils.USER_HOME));

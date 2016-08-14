@@ -56,8 +56,7 @@ public class MethodParameterDVO {
 
 	@Override
 	public String toString() {
-		return "MethodParameterDVO [parameter=" + parameter + ", parameterType=" + parameterType + ", type=" + type + ", description="
-				+ description + "]";
+		return parameterType + " " + parameter;
 	}
 
 }

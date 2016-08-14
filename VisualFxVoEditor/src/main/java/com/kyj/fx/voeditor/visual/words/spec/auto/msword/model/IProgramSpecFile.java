@@ -4,7 +4,7 @@
  *	작성일   : 2016. 2. 15.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.model;
 
 import java.util.List;
 

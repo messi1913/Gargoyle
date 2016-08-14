@@ -13,7 +13,7 @@ import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.SourceCodeAnalysis;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel.BizFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.BizFile;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.SourceAnalysisDVO;
 
 import javafx.fxml.FXML;

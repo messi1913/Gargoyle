@@ -214,9 +214,9 @@ public class ProgramSpecWord extends MSWord {
 		{
 			ArrayList<String> arr = new ArrayList<String>();
 			arr.add("a.시스템 명");
-			arr.add(" GMES2.0 ");
+			arr.add(" - ");
 			arr.add("b.시스템");
-			arr.add(" GMES 2.0");
+			arr.add(" - ");
 			arr.add("c.서브시스템");
 			arr.add(getSubSystemName(svo.getUserSourceMetaDVO().getProjectName(), svo.getUserSourceMetaDVO().getPackages()));
 			list.add(arr);
@@ -248,7 +248,7 @@ public class ProgramSpecWord extends MSWord {
 			arr.add("h.개발 유형");
 			arr.add(svo.getFile().getFileType().toString());
 			arr.add("i.프로그램 유형");
-			arr.add("CLS");
+			arr.add(" - ");
 
 			list.add(arr);
 		}
@@ -256,7 +256,7 @@ public class ProgramSpecWord extends MSWord {
 		{
 			ArrayList<String> arr = new ArrayList<String>();
 			arr.add("j. 프로그램 개요");
-			arr.add("작업자가 조회하고자 하는 조건을 설정하여 시생산 계획 내역을 조회하고 시생산 실적 처리하고자 하는 시생산 계획을 선택한다.");
+			arr.add(" - ");
 
 			list.add(arr);
 		}
@@ -460,8 +460,9 @@ public class ProgramSpecWord extends MSWord {
 
 		// 여유 공간이 남는다면 빈공간을 추가한다.
 		int loopCnt = DEFAULT_ROW;
+		int mListSize = mList == null ? 0 : mList.size();
 		if (mList != null) {
-			loopCnt = DEFAULT_ROW - mList.size();
+			loopCnt = DEFAULT_ROW - mListSize;
 		}
 
 		for (int i = 0; i < loopCnt; i++) {
@@ -477,7 +478,7 @@ public class ProgramSpecWord extends MSWord {
 		XWPFTable table = addToTable(methodList);
 		mergeCellHorizon(table, 0, 1, 4);
 		mergeCellHorizon(table, 1, 1, 4);
-		mergeCellsVertically(table, 0, 2, ((loopCnt < 0) ? (mList.size() + 2) : (mList.size() + loopCnt + 2)));
+		mergeCellsVertically(table, 0, 2, ((loopCnt < 0) ? (mListSize + 2) : (mListSize + loopCnt + 2)));
 
 		if (dvo.getFlow() != null) {
 			String[] split = dvo.getFlow().split("\n");

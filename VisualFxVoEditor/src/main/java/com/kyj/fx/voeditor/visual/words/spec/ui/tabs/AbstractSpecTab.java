@@ -7,7 +7,7 @@
 package com.kyj.fx.voeditor.visual.words.spec.ui.tabs;
 
 import com.kyj.fx.voeditor.visual.framework.SupplySkin;
-import com.kyj.fx.voeditor.visual.words.spec.resources.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.ui.model.SpecResource;
 
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;

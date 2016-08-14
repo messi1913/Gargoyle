@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
@@ -79,6 +80,7 @@ public class FileUtilTest {
 					WatchEvent<Path> ev = (WatchEvent<Path>) event;
 					Path fileName = ev.context();
 
+					
 					System.out.println(kind.name() + ": " + fileName);
 
 					if (key == ENTRY_MODIFY && fileName.toString().equals("DirectoryWatchDemo.java")) {
@@ -97,4 +99,15 @@ public class FileUtilTest {
 		System.out.println("end ");
 	}
 
+	@Test
+	public void asynchReadTest() throws IOException, InterruptedException {
+		FileUtil.asynchRead(new File("pom.xml").toPath(), b -> {
+
+			String x = new String(b);
+			System.out.println(x);
+			return x;
+		});
+
+		Thread.sleep(2000);
+	}
 }

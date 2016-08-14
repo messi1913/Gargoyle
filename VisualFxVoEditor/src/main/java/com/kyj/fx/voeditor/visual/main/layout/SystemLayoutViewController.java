@@ -54,11 +54,12 @@ import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.util.ProgramSpecUtil;
-import com.kyj.fx.voeditor.visual.words.spec.resources.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.ui.model.SpecResource;
 import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.SpecTabPane;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 import com.kyj.scm.manager.svn.java.SVNWcDbClient;
@@ -298,8 +299,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						}
 
 						try {
-							Class<GagoyleParentOnLoaded> addOnParentLoadedListenerClass = jarWrapper
-									.getAddOnParentLoadedListenerClass();
+							Class<GagoyleParentOnLoaded> addOnParentLoadedListenerClass = jarWrapper.getAddOnParentLoadedListenerClass();
 							if (addOnParentLoadedListenerClass != null)
 								addOnParentLoadedListener(addOnParentLoadedListenerClass.newInstance());
 						} catch (Exception e) {
@@ -329,8 +329,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 */
 	private void openFile(File file) {
 
-		List<String> exts = ConfigResourceLoader.getInstance()
-				.getValues(ConfigResourceLoader.FILE_OPEN_NOT_INPROCESSING_EXTENSION, ",");
+		List<String> exts = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILE_OPEN_NOT_INPROCESSING_EXTENSION, ",");
 
 		String fileName = file.getName();
 		int dotIndex = fileName.indexOf('.');
@@ -341,8 +340,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		}
 
 		String EXTENSION = fileName.substring(dotIndex);
-		Optional<String> findFirst = exts.stream().filter(ext -> EXTENSION.equals(ext) || EXTENSION.isEmpty())
-				.findFirst();
+		Optional<String> findFirst = exts.stream().filter(ext -> EXTENSION.equals(ext) || EXTENSION.isEmpty()).findFirst();
 		if (findFirst.isPresent()) {
 			/* open OS Denpendency. */
 			FileUtil.openFile(file);
@@ -444,8 +442,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	private void openPdf(File file) throws Exception {
 		try {
 
-			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(
-					new PDFImageBasePane(file)) {
+			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(new PDFImageBasePane(file)) {
 
 				@Override
 				public void close() throws IOException {
@@ -642,9 +639,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem,
 				deleteFileMenuItem, /* voEditorMenuItem, daoWizardMenuItem, */
-				voEditorMenuItem, /* setVoEditorMenuItem, */ setDaoWizardMenuItem, refleshMenuItem,
-				chodeAnalysisMenuItem, makeProgramSpecMenuItem, menuItemSCMGraphs, new SeparatorMenuItem(),
-				menuProperties);
+				voEditorMenuItem, /* setVoEditorMenuItem, */ setDaoWizardMenuItem, refleshMenuItem, chodeAnalysisMenuItem,
+				makeProgramSpecMenuItem, menuItemSCMGraphs, new SeparatorMenuItem(), menuProperties);
 
 		// daoWizardMenuItem.addEventHandler(ActionEvent.ACTION,
 		// this::daoWizardMenuItemOnActionEvent);
@@ -720,17 +716,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						if (FileUtil.isJavaFile(sourceFile)) {
 
 							// 파일을 생성하고, 생성하고 나면 오픈.
-							File targetFile = DialogUtil.showFileSaveCheckDialog(SharedMemory.getPrimaryStage(),
-									chooser -> {
+							File targetFile = DialogUtil.showFileSaveCheckDialog(SharedMemory.getPrimaryStage(), chooser -> {
 
-										chooser.setInitialFileName(DateUtil
-												.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSS));
-										chooser.getExtensionFilters()
-												.add(new ExtensionFilter("Doc files (*.docx)", "*.docx"));
-										chooser.setTitle("Save Program Spec. Doc");
-										chooser.setInitialDirectory(new File(SystemUtils.USER_HOME));
+								chooser.setInitialFileName(DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSS));
+								chooser.getExtensionFilters()
+										.add(new ExtensionFilter(GargoyleExtensionFilters.DOCX_NAME, GargoyleExtensionFilters.DOCX));
+								chooser.setTitle("Save Program Spec. Doc");
+								chooser.setInitialDirectory(new File(SystemUtils.USER_HOME));
 
-									});
+							});
 
 							if (targetFile != null) {
 								boolean createDefault = ProgramSpecUtil.createDefault(sourceFile, targetFile);
@@ -913,13 +907,12 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				try {
 					if (FileUtil.isJavaFile(sourceFile)) {
 
-						JavaProjectFileTreeItem javaProjectFileTreeItem = FileUtil
-								.toJavaProjectFileTreeItem(selectedItem);
+						JavaProjectFileTreeItem javaProjectFileTreeItem = FileUtil.toJavaProjectFileTreeItem(selectedItem);
 						if (javaProjectFileTreeItem != null) {
 
 							Tab tab = new Tab(sourceFile.getName(), new CodeAnalysisJavaTextArea(sourceFile));
-							loadNewSystemTab(sourceFile.getName(), new SpecTabPane(
-									new SpecResource(javaProjectFileTreeItem.getValue().getFile(), sourceFile), tab));
+							loadNewSystemTab(sourceFile.getName(),
+									new SpecTabPane(new SpecResource(javaProjectFileTreeItem.getValue().getFile(), sourceFile), tab));
 
 						}
 

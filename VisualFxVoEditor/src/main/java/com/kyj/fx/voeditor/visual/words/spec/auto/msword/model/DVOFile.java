@@ -4,7 +4,7 @@
  *	작성일   : 2016. 2. 15.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.model;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,50 +13,62 @@ import java.util.List;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.SourceAnalysisDVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.TableDVO;
 
-public abstract class XframeFile extends AbstractXframeProgramSpecFile
-{
+/**
+ * @author KYJ
+ *
+ */
+public class DVOFile extends VOFile {
 
-	public XframeFile(File f) throws Exception
-	{
+	/**
+	 * @param f
+	 * @throws Exception
+	 */
+	public DVOFile(File f) throws Exception {
 		super(f);
-		// TODO Auto-generated constructor stub
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see programspecification.model.file.AbstractProgreamSpecFile#anaysis()
+	 */
 	@Override
-	public FILE_TYPE getFileType()
-	{
-		return FILE_TYPE.JAVASCRIPT;
-	}
-
-	@Override
-	public List<SourceAnalysisDVO> anaysis()
-	{
+	public List<SourceAnalysisDVO> anaysis() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<TableDVO> getTableList()
-	{
+	public SOURCE_FILE_TYPE getSourceFileType() {
+
+		return SOURCE_FILE_TYPE.DVO;
+	}
+
+	@Override
+	public FILE_TYPE getFileType() {
+		return FILE_TYPE.JAVA;
+	}
+
+	@Override
+	public List<TableDVO> getTableList() {
 		// TODO 주석
-		// String menuId = getFileSimpleName();
-		//
+		// String fileSimpleName = getFileSimpleName();
+		// String dvoName = fileSimpleName.substring(0,
+		// fileSimpleName.toUpperCase().lastIndexOf("DVO"));
 		// // 결과값 반환 list
 		List<TableDVO> arrayList = new ArrayList<TableDVO>();
 		//
 		// StringBuffer sb = new StringBuffer();
-		// sb.append("SELECT A.TAB_NM AS TABLE_NAME, C. COMMENTS \n");
-		// sb.append("FROM TBD_SM_SCREEN_TAB A, ALL_TABLES B , ALL_TAB_COMMENTS
-		// C\n");
-		// sb.append("WHERE 1=1\n");
-		// sb.append("AND A.SCREEN_ID = '" + menuId + "'\n");
-		// sb.append("AND A.TAB_NM = B.TABLE_NAME\n");
-		// sb.append("AND A.TAB_NM = C.TABLE_NAME \n");
-		// sb.append("AND C.OWNER = 'GMES20DBA'\n");
-		// sb.append("AND A.DEL_YN = 'N'\n");
-		// sb.append("AND A.USE_YN = 'Y'\n");
+		// sb.append("SELECT A.TABLE_NAME, B.COMMENTS\n");
+		// sb.append("FROM   ALL_TABLES A, ALL_TAB_COMMENTS B  \n");
+		// sb.append(" WHERE  A.TABLE_NAME = B.TABLE_NAME(+)\n");
+		// sb.append("AND  A.TABLE_NAME = '" +
+		// DbOracleUtil.getTableName(dvoName) + "'\n");
+		// sb.append("AND B.OWNER = 'GMES20DBA'\n");
+		// sb.append(" \n");
 		// sb.toString();
 		//
+		// System.out.println(sb.toString());
 		// try {
 		// List<Map<String, Object>> select =
 		// DbOracleUtil.select(sb.toString());
@@ -80,6 +92,7 @@ public abstract class XframeFile extends AbstractXframeProgramSpecFile
 		// } catch (Exception e) {
 		// e.printStackTrace();
 		// }
+
 		return arrayList;
 	}
 

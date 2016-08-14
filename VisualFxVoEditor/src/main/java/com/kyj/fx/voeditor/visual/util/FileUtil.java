@@ -15,8 +15,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.CompletionHandler;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -128,6 +132,7 @@ public class FileUtil {
 
 	/**
 	 * 파일 읽기 처리.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 26.
 	 * @param file
@@ -534,4 +539,62 @@ public class FileUtil {
 		return null;
 	}
 
+	public static <T> void asynchRead(Path path, Function<byte[], T> handler) throws IOException {
+
+		AsynchronousFileChannel open = AsynchronousFileChannel.open(path, StandardOpenOption.READ);
+
+		// ByteBuffer 크기를 8k로 축소
+		ByteBuffer byteBuffer = ByteBuffer.allocate(8 * 1024);
+		long position = 0L;
+		Long attachment = 0L;
+		long fileSize = open.size();
+
+		open.read(byteBuffer, position, attachment, new CompletionHandler<Integer, Long>() {
+
+			@Override
+			public void completed(Integer result, Long attachment) {
+
+				if (result == -1)
+					close();
+
+				//읽기 쓰기 병행시 flip을 호출해줘야함.
+				byteBuffer.flip();
+				byteBuffer.mark();
+				handler.apply(byteBuffer.array());
+				byteBuffer.reset();
+
+				// 읽어들인 바이트수가
+				// 파일사이즈와 같거나(버퍼 크기와 파일 크기가 같은 경우)
+				// 버퍼 사이즈보다 작다면 파일의 끝까지 읽은 것이므로 종료 처리
+				if (result == fileSize || result < byteBuffer.capacity()) {
+
+					//// asyncFileChannel 닫기
+					close();
+
+					return;
+				}
+				// 읽을 내용이 남아있으므로 반복 회수를 증가 시키고 다시 읽는다.
+				attachment++;
+				open.read(byteBuffer, result * attachment, attachment, this);
+
+			}
+
+			@Override
+			public void failed(Throwable exc, Long attachment) {
+				exc.printStackTrace();
+				close();
+
+			}
+
+			public void close() {
+				try {
+					if (open != null)
+						open.close();
+				} catch (IOException e) {
+					throw new RuntimeException(e.getMessage());
+				}
+			}
+		});
+
+	}
 }

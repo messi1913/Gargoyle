@@ -4,7 +4,7 @@
  *	작성일   : 2016. 8. 5.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.resources;
+package com.kyj.fx.voeditor.visual.words.spec.ui.model;
 
 import java.io.File;
 

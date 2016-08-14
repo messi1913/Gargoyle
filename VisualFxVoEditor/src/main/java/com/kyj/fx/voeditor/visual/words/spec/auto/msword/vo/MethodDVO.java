@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.kyj.fx.voeditor.visual.component.grid.AbstractDVO;
@@ -62,6 +63,7 @@ public class MethodDVO extends AbstractDVO{
 		visivility = "public";
 		isNewOrChg = "변경";
 		methodMetaDVO = new MethodMetaDVO();
+		methodParameterDVOList = new ArrayList<>();
 	}
 
 	public MethodMetaDVO getMethodMetaDVO() {

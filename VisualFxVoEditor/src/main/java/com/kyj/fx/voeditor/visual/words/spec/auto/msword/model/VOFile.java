@@ -4,7 +4,7 @@
  *	작성일   : 2016. 2. 15.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.model;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,20 +17,20 @@ import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.TableDVO;
  * @author KYJ
  *
  */
-public class DQMFile extends DAOFile {
+public class VOFile extends AbstractJavaProgramSpecFile {
 
-	public DQMFile(File f) throws Exception {
+	public VOFile(File f) throws Exception {
 		super(f);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public SOURCE_FILE_TYPE getSourceFileType() {
-		return SOURCE_FILE_TYPE.DQM;
+		return SOURCE_FILE_TYPE.DVO;
 	}
 
 	@Override
 	public List<SourceAnalysisDVO> anaysis() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -41,9 +41,9 @@ public class DQMFile extends DAOFile {
 
 	@Override
 	public List<TableDVO> getTableList() {
-		//TODO 주석
+		//주석
 //		String fileSimpleName = getFileSimpleName();
-//		String dqmName = fileSimpleName.substring(0, fileSimpleName.toUpperCase().lastIndexOf("DQM"));
+//		String demName = fileSimpleName.substring(0, fileSimpleName.toUpperCase().lastIndexOf("VO"));
 //		// 결과값 반환 list
 		List<TableDVO> arrayList = new ArrayList<TableDVO>();
 //
@@ -51,7 +51,7 @@ public class DQMFile extends DAOFile {
 //		sb.append("SELECT A.TABLE_NAME, B.COMMENTS\n");
 //		sb.append("FROM   ALL_TABLES A, ALL_TAB_COMMENTS B  \n");
 //		sb.append(" WHERE  A.TABLE_NAME = B.TABLE_NAME(+)\n");
-//		sb.append("AND  A.TABLE_NAME = '" + DbOracleUtil.getTableName(dqmName) + "'\n");
+//		sb.append("AND  A.TABLE_NAME = '" + DbOracleUtil.getTableName(demName) + "'\n");
 //		sb.append("AND B.OWNER = 'GMES20DBA'\n");
 //		sb.append(" \n");
 //		sb.toString();
@@ -76,10 +76,10 @@ public class DQMFile extends DAOFile {
 //				}
 //			}
 //		} catch (Exception e) {
+//
 //			e.printStackTrace();
 //		}
-//
+
 		return arrayList;
 	}
-
 }

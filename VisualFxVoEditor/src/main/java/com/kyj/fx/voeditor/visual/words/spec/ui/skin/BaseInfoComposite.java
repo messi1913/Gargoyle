@@ -7,13 +7,22 @@
 package com.kyj.fx.voeditor.visual.words.spec.ui.skin;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.SystemUtils;
 
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.VariableDeclaratorId;
+import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.kyj.fx.voeditor.visual.component.FileWrapper;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
@@ -22,9 +31,9 @@ import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
-import com.kyj.fx.voeditor.visual.words.spec.resources.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodParameterDVO;
+import com.kyj.fx.voeditor.visual.words.spec.ui.model.SpecResource;
 import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.AbstractSpecTab;
-import com.sun.btrace.org.objectweb.asm.MethodVisitor;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -51,6 +60,7 @@ public class BaseInfoComposite extends BorderPane {
 
 	/**
 	 * Construnctor.
+	 * 
 	 * @param projectInfoBaseInfoTab
 	 *
 	 * @param projectDir
@@ -65,11 +75,9 @@ public class BaseInfoComposite extends BorderPane {
 	@FXML
 	public void initialize() {
 
-
-
 		SpecResource specResource = projectInfoBaseInfoTab.getSpecResource();
 		//TODO SVO형태로 받은경우는 없을 수 있음 처리해야함.
-		
+
 		File projectFile = specResource.getProjectFile();
 		File targetFile = specResource.getTargetFile();
 
@@ -96,7 +104,9 @@ public class BaseInfoComposite extends BorderPane {
 						@Override
 						protected Void call() throws Exception {
 							new MethodVisitor(v -> {
+
 								methodData.add(v);
+
 							}).visit(cu, null);
 							return null;
 						}
@@ -105,7 +115,7 @@ public class BaseInfoComposite extends BorderPane {
 			};
 			service.start();
 
-		} , System.err::println);
+		}, System.err::println);
 
 	}
 	//	}
@@ -152,6 +162,19 @@ public class BaseInfoComposite extends BorderPane {
 			methodDVO.setMethodName(n.getName());
 			methodDVO.setVisivility(GargoyleJavaParser.toStringVisibility(n.getModifiers()));
 			methodDVO.setDescription(n.getComment() != null ? n.getComment().toString() : "");
+			ArrayList<MethodParameterDVO> methodParameterDVOList = new ArrayList<>();
+			methodDVO.setMethodParameterDVOList(methodParameterDVOList);
+			List<Parameter> parameters = n.getParameters();
+			for (Parameter p : parameters) {
+				//				String string2 = p.toString();
+				VariableDeclaratorId id2 = p.getId();
+				String varName = id2.getName();
+				Type type = p.getType();
+				String typeName = type.toString();
+				Comment comment = p.getComment();
+				System.out.println(p);
+				methodParameterDVOList.add(new MethodParameterDVO(varName, typeName, "",  comment == null? "" : comment.toString()));
+			}
 
 			onMethodDVOVisite.accept(methodDVO);
 
@@ -164,4 +187,34 @@ public class BaseInfoComposite extends BorderPane {
 		return methodData;
 	}
 
+	/********************************
+	 * 작성일 : 2016. 8. 14. 작성자 : KYJ
+	 *
+	 * package List 리턴
+	 * 
+	 * @return
+	 ********************************/
+	public List<String> getImports() {
+		return this.getImports(t -> t);
+	}
+
+	public <T> List<T> getImports(Function<String, T> convert) {
+		String text = this.lblImports.getText();
+		if (text != null && !text.isEmpty()) {
+			return Stream.of(text.split(",")).map(convert).collect(Collectors.toList());
+		}
+		return Collections.emptyList();
+	}
+
+	public String getPackage() {
+		return lblPackage.getText();
+	}
+
+	public String getProjectName() {
+		return lblProjectName.getText();
+	}
+
+	public String getUserName() {
+		return lblUserName.getText();
+	}
 }

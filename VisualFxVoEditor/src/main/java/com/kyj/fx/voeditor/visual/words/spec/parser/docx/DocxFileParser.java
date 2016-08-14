@@ -4,7 +4,7 @@
  *	작성일   : 2016. 2. 15.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.read.docx;
+package com.kyj.fx.voeditor.visual.words.spec.parser.docx;
 
 import java.io.File;
 import java.io.FileInputStream;

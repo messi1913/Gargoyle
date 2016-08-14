@@ -12,6 +12,7 @@ import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.fxml.FXML;
@@ -59,7 +60,7 @@ public class SceneBuilderLocationComposite extends BorderPane {
 			chooser.setTitle("Scenebuilder Location");
 			chooser.setInitialFileName("SceneBuilder.exe");
 			chooser.setInitialDirectory(file);
-			chooser.setSelectedExtensionFilter(new ExtensionFilter("exe files (*.exe)", "*.exe"));
+			chooser.setSelectedExtensionFilter(new ExtensionFilter(GargoyleExtensionFilters.EXE_NAME, GargoyleExtensionFilters.EXE));
 		});
 
 		if (selectedFile != null && selectedFile.exists()) {

@@ -4,7 +4,7 @@
  *	작성일   : 2016. 1. 25.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.core;
 
 /**
  * DefaultDocumentFormatRegistry가 오래전에 작성된 프로그램이라서 

@@ -25,6 +25,10 @@ public class ImportsDVO {
 		this.imports = imports;
 	}
 
+	public boolean addImport(String importStatement) {
+		return this.imports.add(importStatement);
+	}
+
 	public String toImportStatement() {
 		if (imports == null || imports.isEmpty())
 			return "";

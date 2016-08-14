@@ -4,7 +4,7 @@
  *	작성일   : 2016. 2. 15.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.model;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,31 +17,21 @@ import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.TableDVO;
  * @author KYJ
  *
  */
-public class SVOFile extends VOFile {
+public class BizFile extends BusinessFile {
 
-	/**
-	 * @param f
-	 * @throws Exception
-	 */
-	public SVOFile(File f) throws Exception {
+	public BizFile(File f) throws Exception {
 		super(f);
-		// TODO Auto-generated constructor stub
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see programspecification.model.file.AbstractProgreamSpecFile#anaysis()
-	 */
-	@Override
-	public List<SourceAnalysisDVO> anaysis() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
 	public SOURCE_FILE_TYPE getSourceFileType() {
-		return SOURCE_FILE_TYPE.SVO;
+		return SOURCE_FILE_TYPE.BIZ;
+	}
+
+	@Override
+	public List<SourceAnalysisDVO> anaysis() {
+
+		return null;
 	}
 
 	@Override
@@ -51,6 +41,7 @@ public class SVOFile extends VOFile {
 
 	@Override
 	public List<TableDVO> getTableList() {
+		// TODO 처리..?
 		return new ArrayList<TableDVO>();
 	}
 

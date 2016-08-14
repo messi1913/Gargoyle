@@ -88,7 +88,7 @@ public class DialogUtil {
 	 */
 	public static File showPropertyFileSelectDialog(final Window ownerWindow) {
 		return showFileDialog(ownerWindow, chooser -> {
-			chooser.getExtensionFilters().add(new ExtensionFilter("Property files (*.properties)", "*.properties"));
+			chooser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.PROPERTIES_NAME, GargoyleExtensionFilters.PROPERTIES));
 		});
 	}
 
@@ -102,7 +102,7 @@ public class DialogUtil {
 	 */
 	public static File showCssFileSelectDialog(final Window ownerWindow) {
 		return showFileDialog(ownerWindow, chooser -> {
-			chooser.getExtensionFilters().add(new ExtensionFilter("CSS files (*.css)", "*.css"));
+			chooser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.FX_CSS_NAME, GargoyleExtensionFilters.FX_CSS));
 		});
 	}
 
@@ -138,9 +138,16 @@ public class DialogUtil {
 	public static File showFileSaveDialog(final Window ownerWindow, Consumer<FileChooser> option) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Resource File");
+
+		installDefaultPath(fileChooser);
+
 		option.accept(fileChooser);
 
-		return fileChooser.showSaveDialog(ownerWindow);
+		File result = fileChooser.showSaveDialog(ownerWindow);
+		if (result != null)
+			applyLastPath(result.getParentFile());
+
+		return result;
 	}
 
 	/**
@@ -326,8 +333,8 @@ public class DialogUtil {
 	}
 
 	/**
-	 * show info Dialog
-	 * info Dialog
+	 * show info Dialog info Dialog
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
 	 * @param initOwner
@@ -344,6 +351,7 @@ public class DialogUtil {
 
 	/**
 	 * show info Dialog
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
 	 * @param initOwner

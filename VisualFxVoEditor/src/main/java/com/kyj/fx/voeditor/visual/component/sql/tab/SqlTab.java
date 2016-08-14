@@ -12,16 +12,13 @@ import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 
-import com.kyj.fx.voeditor.visual.component.sql.functions.LoadSQLFileFunction;
-import com.kyj.fx.voeditor.visual.component.sql.functions.LoadSQLFunction;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SaveSQLFileFunction;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SaveSQLFunction;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.functions.LoadFileOptionHandler;
-import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -103,8 +100,10 @@ public class SqlTab extends Tab {
 						String dir = System.getProperty("user.home");
 						choser.setInitialDirectory(new File(dir));
 
-						choser.getExtensionFilters().add(new ExtensionFilter("SQL files (*.sql)", "*.sql"));
-						choser.getExtensionFilters().add(new ExtensionFilter("All files", "*.*"));
+						choser.getExtensionFilters()
+								.add(new ExtensionFilter(GargoyleExtensionFilters.SQL_NAME, GargoyleExtensionFilters.SQL));
+						choser.getExtensionFilters()
+								.add(new ExtensionFilter(GargoyleExtensionFilters.ALL_NAME, GargoyleExtensionFilters.ALL));
 
 					});
 					if (selectedFile != null) {

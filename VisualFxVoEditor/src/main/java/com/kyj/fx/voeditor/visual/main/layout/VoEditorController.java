@@ -57,6 +57,7 @@ import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ExcelUtil;
+import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.util.VoEditorConverter;
 import com.kyj.fx.voeditor.visual.util.VoWizardUtil;
@@ -425,7 +426,7 @@ public class VoEditorController {
 				File dir = SystemUtils.getUserDir();
 				choser.setInitialFileName(fileName);
 				choser.setInitialDirectory(dir);
-				choser.getExtensionFilters().add(new ExtensionFilter("Excel files (*.xlsx)", "*.xlsx"));
+				choser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.XLSX_NAME, GargoyleExtensionFilters.XLSX));
 			}
 		});
 		boolean isSuccess = false;
@@ -466,10 +467,10 @@ public class VoEditorController {
 			@Override
 			public void accept(FileChooser choser) {
 				String fileName = txtClassName.getText();
-				File dir = SystemUtils.getUserDir();
+//				File dir = SystemUtils.getUserDir();
 				choser.setInitialFileName(fileName);
-				choser.setInitialDirectory(dir);
-				choser.getExtensionFilters().add(new ExtensionFilter("Excel files (*.xlsx)", "*.xlsx"));
+//				choser.setInitialDirectory(dir);
+				choser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.XLSX_NAME, GargoyleExtensionFilters.XLSX, GargoyleExtensionFilters.XLS));
 			}
 		});
 

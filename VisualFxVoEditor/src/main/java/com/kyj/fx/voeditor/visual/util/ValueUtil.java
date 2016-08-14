@@ -44,6 +44,7 @@ import org.springframework.util.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecSourceNullException;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.sun.star.lang.IllegalArgumentException;
 
@@ -875,4 +876,33 @@ public class ValueUtil {
 		return insertStatement.toString();
 	}
 
+	/**
+	 * String 입력값으로부터 테이블명을 찾아본다. 글자내에 소문자가 포함되면 앞에 '_'를 붙인다.
+	 * 
+	 * @param sourceNm
+	 * @return
+	 * @throws ProgramSpecSourceNullException
+	 */
+	public static String getTableName(String sourceNm) {
+		StringBuffer stringBuffer = new StringBuffer();
+		char[] charArray = sourceNm.toCharArray();
+
+		int length = charArray.length;
+		stringBuffer.append(charArray[0]);
+		for (int i = 1; i < length; i++) {
+			stringBuffer.append(charArray[i]);
+			if (i + 1 < length) {
+
+				if (Character.isUpperCase(charArray[i + 1])) {
+					stringBuffer.append('_');
+				}
+			}// end if
+
+		}// end for
+
+		return stringBuffer.toString().toUpperCase();
+	}
+	
+	
+	
 }

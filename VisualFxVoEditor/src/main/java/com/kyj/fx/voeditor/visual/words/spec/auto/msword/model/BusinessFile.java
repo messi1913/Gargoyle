@@ -4,14 +4,14 @@
  *	작성일   : 2016. 2. 15.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.auto.msword.filemodel;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.model;
 
 import java.io.File;
 
-public abstract class DAOFile extends AbstractJavaProgramSpecFile {
+public abstract class BusinessFile extends AbstractJavaProgramSpecFile {
 
-	public DAOFile(File f) throws Exception {
+	public BusinessFile(File f) throws Exception {
 		super(f);
-	}
 
+	}
 }
