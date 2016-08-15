@@ -41,7 +41,6 @@ public class AppFile extends BusinessFile {
 
 	@Override
 	public List<TableDVO> getTableList() {
-		//TODO 주석
 //		String fileSimpleName = getFileSimpleName();
 //		String menuId = fileSimpleName.substring(0, fileSimpleName.toUpperCase().lastIndexOf("APP"));
 //
@@ -73,7 +72,7 @@ public class AppFile extends BusinessFile {
 //						TableDVO tableDVO = new TableDVO();
 //						tableDVO.setTableId(tableName);
 //						tableDVO.setTableName(comment);
-//						// TODO CRUD가 뭐지...ㅋ
+//					
 //						tableDVO.setCrud("");
 //						arrayList.add(tableDVO);
 //					}

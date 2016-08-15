@@ -143,8 +143,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 						LOGGER.debug("search result empty.");
 					}
 
-					// TODO
-					System.out.println(data);
+					
 				}
 			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
@@ -603,6 +602,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 				// sql = ValueUtil.getVelocityToText(dynamicSql, paramMap);
 				limitSize = 1000;
 			}
+			prop.put("pageIndex", 0);
 
 			arrayList = DbUtil.select(sql, 10, limitSize, new ResultSetToMapConverter(prop));
 		}

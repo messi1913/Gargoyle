@@ -6,12 +6,15 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.kyj.fx.voeditor.visual.component.chart.RangeSliderLineChartComposite;
 import com.kyj.fx.voeditor.visual.component.chart.SliderLineChartComposite;
-import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.application.Application;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.SplitPane;
 import javafx.stage.Stage;
 
@@ -28,11 +31,32 @@ public class SliderLineChartExam extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		Parent loadRoot1 = null;
-		Parent loadRoot2 = null;
+		SliderLineChartComposite<Person> loadRoot1 = null;
+		RangeSliderLineChartComposite<Person> loadRoot2 = null;
 		try {
-			loadRoot1 = FxUtil.loadRoot(SliderLineChartComposite.class);
-			loadRoot2 = FxUtil.loadRoot(SliderLineChartComposite.class);
+			List<Person> arrayList = new ArrayList<>();
+			for (int i = 0; i < 30; i++) {
+				arrayList.add(new Person(i + "", i));
+			}
+			loadRoot1 = new SliderLineChartComposite<Person>() {
+
+				@Override
+				public Data<String, Number> converter(Person t) {
+					return new Data<>(t.name, t.age);
+				}
+
+			};
+			loadRoot1.getItems().addAll(arrayList);
+
+			loadRoot2 = new RangeSliderLineChartComposite<Person>() {
+
+				@Override
+				public Data<String, Number> converter(Person t) {
+					return new Data<>(t.name, t.age);
+				}
+
+			};
+			loadRoot2.getItems().addAll(arrayList);
 
 			primaryStage.setScene(new Scene(new SplitPane(loadRoot1, loadRoot2)));
 			primaryStage.show();
@@ -40,7 +64,19 @@ public class SliderLineChartExam extends Application {
 			e.printStackTrace();
 		}
 
-		System.out.println(loadRoot1 == loadRoot2);
+		//		System.out.println(loadRoot1 == loadRoot2);
+
+	}
+
+	static class Person {
+		String name;
+		int age;
+
+		public Person(String name, int age) {
+			super();
+			this.name = name;
+			this.age = age;
+		}
 
 	}
 

@@ -43,6 +43,7 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 	public static final String SKIP_BIG_DATA_COLUMN = ResourceLoader.SKIP_BIG_DATA_COLUMN;
 
 	public static final String START_ROW = "start.row";
+
 	/**
 	 * Mapping처리할때 필요한 속성이 정의된다.
 	 *
@@ -93,6 +94,7 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 
 			}
 		}
+
 	}
 
 	@Override

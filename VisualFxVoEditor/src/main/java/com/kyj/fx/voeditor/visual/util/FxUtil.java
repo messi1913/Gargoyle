@@ -829,7 +829,6 @@ public class FxUtil {
 
 	}
 
-
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 22.
@@ -855,6 +854,6 @@ public class FxUtil {
 	}
 
 	public static JavaTextArea createJavaTextArea(String content) {
-		return createJavaTextArea(content,1200,800);
+		return createJavaTextArea(content, 1200, 800);
 	}
 }
