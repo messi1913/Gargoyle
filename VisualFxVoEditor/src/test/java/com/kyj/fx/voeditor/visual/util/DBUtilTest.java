@@ -106,4 +106,28 @@ public class DBUtilTest {
 
 		});
 	}
+
+	@Test
+	public void selectCursorTest1() throws Exception {
+
+		
+		String sql = "select * from tbm_sm_realtime_search";
+
+		int startRow = 0;
+		int limitRow = 1000;
+		int length = 1000;
+		
+		for (int page = 0; page < 3; page++) {
+
+			startRow = page * length;
+//			limitRow = (page * length) * 2;
+			Connection connection = DbUtil.getConnection();
+			List<Map<String, Object>> selectCursor = DbUtil.selectCursor(connection, sql, startRow, limitRow);
+			for (int i = 0; i < selectCursor.size(); i++) {
+				System.out.printf("%d %s\n", i, selectCursor.get(i));
+			}
+
+		}
+
+	}
 }
