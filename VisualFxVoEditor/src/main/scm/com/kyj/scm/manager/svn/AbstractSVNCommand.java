@@ -47,7 +47,7 @@ public abstract class AbstractSVNCommand implements SCMCommonable, SVNKeywords {
 
 	protected String getSvnPath() {
 
-		// TODO 리눅스에서는 등록되엇다고 가정. 수정가능성 높음.
+
 		if ("Linux".equals(OS_NAME)) {
 			return "svn";
 		}
