@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * TODO 클래스 역할
+ * .classpath 파일 xml parser 클래스
  *
  * @author KYJ
  *
