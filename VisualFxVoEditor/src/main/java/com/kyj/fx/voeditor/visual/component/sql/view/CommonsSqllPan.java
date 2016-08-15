@@ -377,8 +377,8 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
-	public static CommonsSqllPan getSqlPane()
-			throws NotYetSupportException, GargoyleConnectionFailException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+	public static CommonsSqllPan getSqlPane() throws NotYetSupportException, GargoyleConnectionFailException, InstantiationException,
+			IllegalAccessException, ClassNotFoundException {
 		CommonsSqllPan postgreSqlPane = null;
 
 		String driver = ResourceLoader.getInstance().get(ResourceLoader.BASE_KEY_JDBC_DRIVER);
@@ -645,6 +645,8 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 				limitSize = 1000;
 			}
 
+			prop.put("pageIndex", 0);
+
 			arrayList = DbUtil.select(con, sql, 10, limitSize, new ResultSetToMapConverter(prop));
 		}
 		return arrayList;
@@ -899,10 +901,27 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	 */
 	@Override
 	public List<String> getSelectedTreeByPrimaryKey(TreeItem<DatabaseItemTree<String>> selectItem) {
-		List<String> columnList = Collections.emptyList();
-		// TODO 구현
 
-		return columnList;
+		ObservableList<TreeItem<DatabaseItemTree<String>>> children = selectItem.getChildren();
+
+		if (children == null || children.isEmpty())
+			return Collections.emptyList();
+
+		List<String> primaryKeys = new ArrayList<>();
+		for (TreeItem<DatabaseItemTree<String>> item : children) {
+			DatabaseItemTree<String> value = item.getValue();
+			if (value != null) {
+				if (value instanceof ColumnItemTree) {
+					ColumnItemTree<?> columnItemTree = (ColumnItemTree<?>) value;
+					if (columnItemTree.isPrimaryKey()) {
+						primaryKeys.add(columnItemTree.getName());
+					}
+				}
+			}
+
+		}
+
+		return primaryKeys;
 	}
 
 }

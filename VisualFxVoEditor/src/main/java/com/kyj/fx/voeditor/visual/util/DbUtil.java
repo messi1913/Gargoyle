@@ -764,7 +764,18 @@ public class DbUtil extends ConnectionManager {
 	}
 
 	public static List<String> pks(String tableNamePattern) throws Exception {
-		return pks(tableNamePattern, t -> {
+		return pks(getConnection(), tableNamePattern, t -> {
+			try {
+				return t.getString(4);
+			} catch (SQLException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+			return "";
+		});
+	}
+
+	public static List<String> pks(Connection con, String tableNamePattern) throws Exception {
+		return pks(con, tableNamePattern, t -> {
 			try {
 				return t.getString(4);
 			} catch (SQLException e) {
@@ -775,21 +786,24 @@ public class DbUtil extends ConnectionManager {
 	}
 
 	public static <T> List<T> pks(String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
+		List<T> tables = Collections.emptyList();
+		try (Connection connection = getConnection()) {
+			tables = pks(connection, tableNamePattern, converter);
+		}
+		return tables;
+	}
+
+	public static <T> List<T> pks(Connection connection, String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
 		if (converter == null)
 			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
 
 		List<T> tables = new ArrayList<>();
-		try (Connection connection = getConnection()) {
 
-			DatabaseMetaData metaData = connection.getMetaData();
-			ResultSet rs = metaData.getPrimaryKeys(null, null, tableNamePattern);
+		DatabaseMetaData metaData = connection.getMetaData();
+		ResultSet rs = metaData.getPrimaryKeys(null, null, tableNamePattern);
 
-			
-			while (rs.next()) {
-				tables.add(converter.apply(rs));
-			}
-			
-			
+		while (rs.next()) {
+			tables.add(converter.apply(rs));
 		}
 
 		return tables;

@@ -503,8 +503,9 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	public void initialize(Map<String, Object> map) {
 		try {
 			this.url = map.get(ResourceLoader.BASE_KEY_JDBC_URL).toString();
-			this.username = map.get(ResourceLoader.BASE_KEY_JDBC_ID) == null ? "" :map.get(ResourceLoader.BASE_KEY_JDBC_ID) .toString();
-			this.password = map.get(ResourceLoader.BASE_KEY_JDBC_PASS) == null ? "" : EncrypUtil.decryp(map.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString());
+			this.username = map.get(ResourceLoader.BASE_KEY_JDBC_ID) == null ? "" : map.get(ResourceLoader.BASE_KEY_JDBC_ID).toString();
+			this.password = map.get(ResourceLoader.BASE_KEY_JDBC_PASS) == null ? ""
+					: EncrypUtil.decryp(map.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString());
 			this.driver = map.get("driver").toString();
 
 			this.userColor = map.get("color") == null ? null : Color.web(map.get("color").toString());
@@ -606,8 +607,20 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	public void applyDeleteSelectScript(ActionEvent e) {
 		TreeItem<K> selectedItem = schemaTree.getSelectionModel().getSelectedItem();
 		String tableName = this.getSelectedTreeByTableName(selectedItem);
+		List<String> primaryKeys = this.getSelectedTreeByPrimaryKey(selectedItem);
+
 		SqlTab selectedTab = getSelectedSqlTab();
-		selectedTab.appendTextSql(String.format("delete from %s where ", tableName));
+
+		// default is primarykeys...
+		StringBuffer whereStatement = new StringBuffer("1=1 ");
+		if (primaryKeys != null && !primaryKeys.isEmpty()) {
+			for (String col : primaryKeys) {
+				whereStatement.append(String.format("\nand %s = :%s ", col, ValueUtil.toCamelCase(col)));
+			}
+			whereStatement.setLength(whereStatement.length() - 1);
+		}
+
+		selectedTab.appendTextSql(String.format("delete from %s \nwhere %s", tableName, whereStatement.toString()));
 	}
 
 	/**
@@ -619,18 +632,28 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		TreeItem<K> selectedItem = schemaTree.getSelectionModel().getSelectedItem();
 		String tableName = this.getSelectedTreeByTableName(selectedItem);
 		List<String> primaryKeys = this.getSelectedTreeByPrimaryKey(selectedItem);
+		List<String> columns = this.getSelectedTreeByTableColumns(selectedItem);
 		SqlTab selectedTab = getSelectedSqlTab();
 
-		// default is primarykeys...
+		//set statement
+		StringBuffer setStatement = new StringBuffer();
+		if (columns != null && !columns.isEmpty()) {
+			for (String col : columns) {
+				setStatement.append(String.format("\n %s = :%s ,", col, ValueUtil.toCamelCase(col)));
+			}
+			setStatement.setLength(setStatement.length() - 1);
+		}
+
+		//where statement
 		StringBuffer whereStatement = new StringBuffer();
 		if (primaryKeys != null && !primaryKeys.isEmpty()) {
 			for (String col : primaryKeys) {
-				whereStatement.append(String.format("'%s' ,", col));
+				whereStatement.append(String.format("\nand %s = :%s ", col, ValueUtil.toCamelCase(col)));
 			}
 			whereStatement.setLength(whereStatement.length() - 1);
 		}
 
-		selectedTab.appendTextSql(String.format("update %s set  \nwhere  %s", tableName, whereStatement.toString()));
+		selectedTab.appendTextSql(String.format("update %s \nset %s \nwhere  %s", tableName, setStatement.toString(), whereStatement.toString()));
 	}
 
 	/**
@@ -751,8 +774,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		// break;
 		/* CTRL + P (Properties) */
 		// case P:
-		else if ((e.getCode() == KeyCode.P) && e.isControlDown() && !e.isAltDown() && !e.isShiftDown())
-		{
+		else if ((e.getCode() == KeyCode.P) && e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
 			String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
 			TreeItem<K> selectedItem = schemaTree.getSelectionModel().getSelectedItem();
 			String selectedSchemName = getSchemaName(selectedItem);
@@ -991,6 +1013,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 
 	/**
 	 * Export Import Script.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 10.
 	 * @param e
