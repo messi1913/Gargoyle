@@ -12,6 +12,9 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
@@ -26,6 +29,8 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
  *
  */
 public class SqliteSchemaItemTree extends SchemaItemTree<String> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(SqliteSchemaItemTree.class);
 
 	public SqliteSchemaItemTree(DatabaseItemTree<String> parent, String name) throws Exception {
 		super(parent, name);
@@ -42,9 +47,16 @@ public class SqliteSchemaItemTree extends SchemaItemTree<String> {
 		ObservableList<TreeItem<DatabaseItemTree<String>>> observableArrayList = FXCollections.observableArrayList();
 		while (tables.next()) {
 
-			SqliteTableItemTree mysqlSchemaItemTree = new SqliteTableItemTree(this, tables.getString(3));
-			TreeItem<DatabaseItemTree<String>> treeItem = new TreeItem<>(mysqlSchemaItemTree);
-			observableArrayList.add(treeItem);
+			String tableType = tables.getString(4);
+
+			if ("TABLE".equals(tableType)) {
+				LOGGER.debug("TABLE_CAT: {} TABLE_SCHEM:  {}  TABLE_NAME : {} TABLE_TYPE : {} ", tables.getString(1), tables.getString(2),
+						tables.getString(3), tableType);
+				SqliteTableItemTree mysqlSchemaItemTree = new SqliteTableItemTree(this, tables.getString(3));
+				TreeItem<DatabaseItemTree<String>> treeItem = new TreeItem<>(mysqlSchemaItemTree);
+				observableArrayList.add(treeItem);
+			}
+
 		}
 		return observableArrayList;
 	}

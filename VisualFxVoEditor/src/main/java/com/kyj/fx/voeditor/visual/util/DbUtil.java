@@ -727,7 +727,13 @@ public class DbUtil extends ConnectionManager {
 			ResultSet rs = metaData.getTables(null, null, "%" + tableNamePattern + "%", null);
 
 			while (rs.next()) {
-				tables.add(converter.apply(rs));
+
+				//2016-08-18 특정데이터베이스(sqlite)에서는 인덱스 트리거정보도 동시에 출력된다.
+				String tableType = rs.getString(4);
+				if ("TABLE".equals(tableType)) {
+					tables.add(converter.apply(rs));
+				}
+
 			}
 		}
 
