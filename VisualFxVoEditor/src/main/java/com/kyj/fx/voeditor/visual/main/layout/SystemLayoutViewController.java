@@ -36,6 +36,7 @@ import com.kyj.fx.voeditor.visual.component.popup.GagoyleWorkspaceOpenResourceVi
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.popup.SelectWorkspaceView;
 import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
+import com.kyj.fx.voeditor.visual.component.popup.XMLTextView;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
@@ -355,7 +356,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					openPdf(file);
 				} else if (FileUtil.isFXML(file))
 					openFXML(file);
-				else {
+				else if (FileUtil.isXML(file)) {
+					openXML(file);
+				} else {
 					openBigText(file);
 				}
 				/* 예외에 걸린경우 텍스트방식으로 read */
@@ -478,6 +481,25 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			throw e1;
 		}
 
+	}
+
+	/********************************
+	 * 작성일 : 2016. 8. 19. 작성자 : KYJ
+	 *
+	 * XML 파일을 연다.
+	 * 
+	 * @param file
+	 * @throws IOException
+	 ********************************/
+	private void openXML(File file) throws IOException {
+		try {
+			XMLTextView fxmlTextView = new XMLTextView(file, false);
+			// fxmlTextView.setEditable(tr);
+			loadNewSystemTab(file.getName(), fxmlTextView);
+		} catch (IOException e1) {
+			LOGGER.debug(ValueUtil.toString(e1));
+			throw e1;
+		}
 	}
 
 	/**

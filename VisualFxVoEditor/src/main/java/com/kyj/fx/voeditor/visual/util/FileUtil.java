@@ -80,6 +80,13 @@ public class FileUtil {
 	private static final String FXML = ".fxml";
 
 	/**
+	 * XML 파일 확장자
+	 * 
+	 * @최초생성일 2016. 8. 19.
+	 */
+	private static final String XML = ".xml";
+
+	/**
 	 * 이미지 파일 확장자들을 정의
 	 *
 	 * @최초생성일 2016. 5. 5.
@@ -236,6 +243,34 @@ public class FileUtil {
 	 */
 	public static boolean isFXML(String fileName) {
 		return ValueUtil.isEmpty(fileName) ? false : fileName.endsWith(FXML);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 8. 19. 작성자 : KYJ
+	 *
+	 * XML 파일 여부
+	 * 
+	 * @param file
+	 * @return
+	 ********************************/
+	public static boolean isXML(File file) {
+		if (file != null && file.exists()) {
+			return isXML(file.getName());
+		}
+		return false;
+	}
+
+	/********************************
+	 * 작성일 : 2016. 8. 19. 작성자 : KYJ
+	 *
+	 * XML 파일 여부
+	 * 
+	 * @param fileName
+	 * @return
+	 ********************************/
+	public static boolean isXML(String fileName) {
+		return ValueUtil.isEmpty(fileName) ? false : fileName.endsWith(XML);
+
 	}
 
 	/**

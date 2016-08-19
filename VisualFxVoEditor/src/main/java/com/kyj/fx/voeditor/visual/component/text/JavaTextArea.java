@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -17,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -35,7 +33,7 @@ public class JavaTextArea extends BorderPane {
 			"return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try",
 			"void", "volatile", "while" };
 
-	private static String KEYWORD_PATTERN = null;
+	private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
 	private static final String PAREN_PATTERN = "\\(|\\)";
 	private static final String BRACE_PATTERN = "\\{|\\}";
 	private static final String BRACKET_PATTERN = "\\[|\\]";
@@ -43,29 +41,37 @@ public class JavaTextArea extends BorderPane {
 	private static final String STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\"";
 	private static final String COMMENT_PATTERN = "//[^\n]*" + "|" + "/\\*(.|\\R)*?\\*/";
 
-	private static Pattern PATTERN = null;
-
-	private static void buildPattern() {
-		KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
-
-		PATTERN = Pattern.compile("(?<KEYWORD>" + KEYWORD_PATTERN + ")" + "|(?<PAREN>" + PAREN_PATTERN + ")" + "|(?<BRACE>" + BRACE_PATTERN
-				+ ")" + "|(?<BRACKET>" + BRACKET_PATTERN + ")" + "|(?<SEMICOLON>" + SEMICOLON_PATTERN + ")" + "|(?<STRING>" + STRING_PATTERN
-				+ ")" + "|(?<COMMENT>" + COMMENT_PATTERN + ")");
-	}
+	private static final Pattern PATTERN = Pattern.compile("(?<KEYWORD>" + KEYWORD_PATTERN + ")" + "|(?<PAREN>" + PAREN_PATTERN + ")"
+			+ "|(?<BRACE>" + BRACE_PATTERN + ")" + "|(?<BRACKET>" + BRACKET_PATTERN + ")" + "|(?<SEMICOLON>" + SEMICOLON_PATTERN + ")"
+			+ "|(?<STRING>" + STRING_PATTERN + ")" + "|(?<COMMENT>" + COMMENT_PATTERN + ")");
 
 	private CodeArea codeArea;
 	private Label lblLineInfo = new Label();
 
 	public JavaTextArea() {
 
-		buildPattern();
-
 		codeArea = new CodeArea();
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
-		codeArea.richChanges().subscribe(change -> {
-			codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
-		});
+		//		codeArea.richChanges().subscribe(change -> {
+		//			codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
+		//		});
+
+		codeArea.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
+				.subscribe(change -> {
+					codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
+				});
+
+		//		codeArea.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
+		//				.successionEnds(Duration.millis(500)).supplyTask(this::computeHighlightingAsync).awaitLatest(codeArea.richChanges())
+		//				.filterMap(t -> {
+		//					if (t.isSuccess()) {
+		//						return Optional.of(t.get());
+		//					} else {
+		//						t.getFailure().printStackTrace();
+		//						return Optional.empty();
+		//					}
+		//				}).subscribe(this::applyHighlighting);
 
 		codeArea.selectionProperty().addListener((oba, oldval, newval) -> {
 			int start = newval.getStart();
@@ -78,20 +84,21 @@ public class JavaTextArea extends BorderPane {
 			lblLineInfo.setText(format);
 		});
 
-		codeArea.setOnKeyPressed(this::codeAreaKeyClick);
 		lblLineInfo.setPrefHeight(USE_COMPUTED_SIZE);
 		lblLineInfo.setMinHeight(USE_COMPUTED_SIZE);
 		lblLineInfo.setMaxHeight(USE_COMPUTED_SIZE);
+
 		this.setCenter(codeArea);
 		this.setBottom(lblLineInfo);
 		// this.getChildren().add(codeArea);
+
+		//		this.getStylesheets().add(JavaKeywordsAsync.class.getResource("java-keywords.css").toExternalForm());
 		this.getStylesheets().add(JavaTextArea.class.getResource("java-keywords.css").toExternalForm());
 
 	}
 
 	public void setKeywords(String[] keywords) {
 		KEYWORDS = keywords;
-		buildPattern();
 		codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
 	}
 
@@ -143,11 +150,8 @@ public class JavaTextArea extends BorderPane {
 									: matcher.group("BRACKET") != null ? "bracket"
 											: matcher.group("SEMICOLON") != null ? "semicolon"
 													: matcher.group("STRING") != null ? "string"
-															: matcher.group("COMMENT") != null ? "comment" : null; /*
-																													 * never
-																													 * happens
-																													 */
-			assert styleClass != null;
+															: matcher.group("COMMENT") != null ? "comment" : null;
+			/* never happens */ assert styleClass != null;
 			spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
 			spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
 			lastKwEnd = matcher.end();
@@ -156,14 +160,8 @@ public class JavaTextArea extends BorderPane {
 		return spansBuilder.create();
 	}
 
-	/**
-	 * 키클릭 이벤트 처리
-	 *
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 1. 16.
-	 * @param e
-	 */
-	public void codeAreaKeyClick(KeyEvent e) {
+	//	private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
+	//		codeArea.setStyleSpans(0, highlighting);
+	//	}
 
-	}
 }
