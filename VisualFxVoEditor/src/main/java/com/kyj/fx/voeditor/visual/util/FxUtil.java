@@ -30,7 +30,6 @@ import javax.swing.filechooser.FileSystemView;
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tmatesoft.svn.core.SVNException;
 
 import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
 import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
@@ -42,7 +41,6 @@ import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
-import com.kyj.scm.manager.svn.java.SVNWcDbClient;
 
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -109,7 +107,7 @@ public class FxUtil {
 	 * @throws NullPointerException
 	 * @throws IOException
 	 ********************************/
-	public static <T> T load(Class<?> controllerClass) throws GargoyleException, NullPointerException, IOException {
+	public static <T> T load(Class<?> controllerClass) throws Exception {
 		return load(controllerClass, null, null, null);
 	}
 
@@ -126,7 +124,7 @@ public class FxUtil {
 	 * @throws NullPointerException
 	 * @throws IOException
 	 ********************************/
-	public static <T, C> T load(Class<C> controllerClass, Consumer<T> option) throws GargoyleException, NullPointerException, IOException {
+	public static <T, C> T load(Class<C> controllerClass, Consumer<T> option) throws Exception {
 		return load(controllerClass, null, option, null);
 	}
 
@@ -144,7 +142,7 @@ public class FxUtil {
 	 * @throws IOException
 	 */
 	public static <N, C> N loadAndControllerAction(Class<C> controllerClass, Consumer<C> controllerAction)
-			throws GargoyleException, NullPointerException, IOException {
+			throws Exception {
 		return load(controllerClass, null, null, controllerAction);
 	}
 
@@ -160,7 +158,7 @@ public class FxUtil {
 	 * @throws NullPointerException
 	 * @throws IOException
 	 ********************************/
-	public static <T, C> T loadRoot(Class<C> controllerClass, Object instance) throws GargoyleException, NullPointerException, IOException {
+	public static <T, C> T loadRoot(Class<C> controllerClass, Object instance) throws Exception {
 		return load(controllerClass, instance, null, null);
 	}
 
@@ -177,8 +175,7 @@ public class FxUtil {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 ********************************/
-	public static <T, C> T loadRoot(Class<C> controllerClass)
-			throws GargoyleException, NullPointerException, IOException, InstantiationException, IllegalAccessException {
+	public static <T, C> T loadRoot(Class<C> controllerClass) throws Exception {
 		return load(controllerClass, controllerClass.newInstance(), null, null);
 	}
 
@@ -239,7 +236,7 @@ public class FxUtil {
 	 * @throws IOException
 	 ********************************/
 	public static <N, C> N load(Class<C> controllerClass, Object rootInstance, Consumer<N> option, Consumer<C> controllerAction)
-			throws GargoyleException, NullPointerException, IOException {
+			throws Exception {
 		if (controllerClass == null)
 			throw new NullPointerException("controller is null.");
 
@@ -276,7 +273,7 @@ public class FxUtil {
 	}
 
 	private static <T, C> T newInstance(Class<?> controllerClass, Object rootInstance, Consumer<T> option, FXMLController controller,
-			String fxml, Consumer<C> controllerAction) throws GargoyleException, IOException {
+			String fxml, Consumer<C> controllerAction) throws Exception {
 		URL resource = controllerClass.getResource(fxml);
 
 		FXMLLoader loader = new FXMLLoader(resource);

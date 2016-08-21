@@ -9,6 +9,7 @@ package com.kyj.fx.voeditor.visual.words.spec.ui.tabs;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleResourceException;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ProgramSpecSVO;
 import com.kyj.fx.voeditor.visual.words.spec.ui.model.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.ui.skin.EtcDefineTabPane;
 
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -47,6 +48,8 @@ public class SpecTabPane extends TabPane {
 
 		getTabs().add(new ProjectInfoBaseInfoTab("사양서 기본 정보", this));
 		getTabs().add(new TableInfoTab("테이블 정의", this));
+		getTabs().add(new EtcDefineTabPane("기타정의 사항", this));
+		
 	}
 
 	public SpecTabPane(ProgramSpecSVO svo) throws Exception {

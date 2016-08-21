@@ -59,7 +59,7 @@ public class SvnChagnedCodeComposite extends BorderPane {
 	private ContextMenu contextMenu;
 
 	public SvnChagnedCodeComposite(FxSVNHistoryDataSupplier supplier)
-			throws SVNException, NullPointerException, GargoyleException, IOException {
+			throws Exception {
 		this.supplier = supplier;
 		FxUtil.loadRoot(SvnChagnedCodeComposite.class, this);
 

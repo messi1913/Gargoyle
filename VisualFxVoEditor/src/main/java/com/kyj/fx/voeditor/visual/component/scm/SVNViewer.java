@@ -109,7 +109,7 @@ public class SVNViewer extends BorderPane {
 	private JavaTextArea javaTextAre;
 	private LineChart<String, String> lineHist;
 
-	public SVNViewer() throws NullPointerException, GargoyleException, IOException {
+	public SVNViewer() throws Exception {
 		FxUtil.loadRoot(SVNViewer.class, this);
 	}
 

@@ -969,7 +969,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				loadNewSystemTab("VoEditor", parent);
 
-			} catch (NullPointerException | GargoyleException | IOException e1) {
+			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
 			}
 

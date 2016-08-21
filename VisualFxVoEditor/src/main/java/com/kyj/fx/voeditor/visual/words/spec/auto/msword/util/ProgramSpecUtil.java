@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecSourceException;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.InspectorSourceMeta;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.ProgramSpecWord;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.AbstractJavaProgramSpecFile;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.AbstractXframeProgramSpecFile;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.IProgramSpecFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.template.ProgramSpecWordTemplate;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ImportsDVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ProgramSpecSVO;
@@ -65,7 +65,7 @@ public class ProgramSpecUtil {
 			else
 				docFile = targetFile.getAbsolutePath();
 
-			ProgramSpecWord word = new ProgramSpecWord(docFile, svo);
+			ProgramSpecWordTemplate word = new ProgramSpecWordTemplate(docFile, svo);
 			word.write();
 			word.close();
 			LOGGER.debug("사양서 생성 완료.[ " + sourceFile + " ]");
@@ -128,7 +128,7 @@ public class ProgramSpecUtil {
 
 			source.setFile(newInstance);
 
-			ProgramSpecWord word = new ProgramSpecWord(targetFile.getAbsolutePath(), source);
+			ProgramSpecWordTemplate word = new ProgramSpecWordTemplate(targetFile.getAbsolutePath(), source);
 			word.write();
 			word.close();
 

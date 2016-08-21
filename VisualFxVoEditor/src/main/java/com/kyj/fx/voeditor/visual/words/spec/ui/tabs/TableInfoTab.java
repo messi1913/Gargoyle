@@ -19,6 +19,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
 /**
+ * 테이블정의.
+ * 
  * @author KYJ
  *
  */
@@ -37,7 +39,10 @@ class TableInfoTab extends AbstractSpecTab implements SupplySkin<BorderPane> {
 			return FxUtil.loadAndControllerAction(TableInfoController.class, (TableInfoController c) -> {
 
 				c.setBorTableDefine(new DatabaseTableView());
-				c.setBorTableCollect(new TableView<>());
+				TableView<Object> tbDefined = new TableView<>();
+				c.setBorTableCollect(tbDefined);
+
+
 
 			});
 		} catch (Exception e) {

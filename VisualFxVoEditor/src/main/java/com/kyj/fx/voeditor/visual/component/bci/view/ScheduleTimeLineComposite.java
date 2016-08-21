@@ -7,7 +7,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.bci.view;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import com.kyj.bci.monitor.ApplicationModel;
 import com.kyj.bci.monitor.MonitorListener;
 import com.kyj.bci.monitor.Monitors;
-import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.main.Main;
@@ -31,7 +29,6 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
@@ -64,7 +61,7 @@ public class ScheduleTimeLineComposite extends BorderPane implements MonitorList
 	// private AtomicInteger allProcessCounting = new AtomicInteger(0);
 	Service<Void> monitorService;
 
-	public ScheduleTimeLineComposite() throws IOException, NullPointerException, GargoyleException {
+	public ScheduleTimeLineComposite() throws Exception {
 		FxUtil.loadRoot(ScheduleTimeLineComposite.class, this);
 	}
 

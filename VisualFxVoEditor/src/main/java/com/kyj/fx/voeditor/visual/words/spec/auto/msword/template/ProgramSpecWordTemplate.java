@@ -4,7 +4,7 @@
  *	작성일   : 2016. 2. 15.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.template;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -28,12 +28,12 @@ import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.Summarize;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.TableDVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.VocHistoryDVO;
 
-public class ProgramSpecWord extends MSWord {
+public class ProgramSpecWordTemplate extends MSWord {
 
 	private String docPath;
 	private ProgramSpecSVO svo;
 
-	public ProgramSpecWord(String docPath, ProgramSpecSVO svo) {
+	public ProgramSpecWordTemplate(String docPath, ProgramSpecSVO svo) {
 		this.docPath = docPath;
 		this.svo = svo;
 	}
