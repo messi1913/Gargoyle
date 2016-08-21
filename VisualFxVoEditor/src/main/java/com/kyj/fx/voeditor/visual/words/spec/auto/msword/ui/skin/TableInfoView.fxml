@@ -8,7 +8,7 @@
 
 <BorderPane prefHeight="803.0" prefWidth="1180.0"
 	xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="com.kyj.fx.voeditor.visual.words.spec.ui.skin.TableInfoController">
+	fx:controller="com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.skin.TableInfoController">
 	<center>
 		<SplitPane dividerPositions="0.6129837702871411"
 			orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0"

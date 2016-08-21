@@ -14,6 +14,7 @@ import com.kyj.fx.voeditor.visual.framework.SupplySkin;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.skin.TableInfoController;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ProgramSpecSVO;
 
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
@@ -42,14 +43,17 @@ class TableInfoTab extends AbstractSpecTab implements SupplySkin<BorderPane> {
 				TableView<Object> tbDefined = new TableView<>();
 				c.setBorTableCollect(tbDefined);
 
-
-
 			});
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}
 
 		return new DatabaseTableView();
+	}
+
+	@Override
+	public void createDocumentAction(ProgramSpecSVO svo) {
+
 	}
 
 }

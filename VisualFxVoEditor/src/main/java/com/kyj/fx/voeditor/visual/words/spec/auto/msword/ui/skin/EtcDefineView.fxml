@@ -50,7 +50,7 @@
 						<TextArea fx:id="txtRelFct" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
 						<TextArea fx:id="txtModuleEffect" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" />
 						<TextArea fx:id="txtTestCaut" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
-						<TextArea fx:id="txtRelCaut" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" />
+						<TextArea fx:id="txtDeployCaut" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" />
 						<TextArea fx:id="txtEtc" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
 					</children>
 					<padding>

@@ -16,10 +16,10 @@ import com.kyj.fx.voeditor.visual.component.grid.AnnotateBizOptions;
 import com.kyj.fx.voeditor.visual.component.grid.CrudBaseGridView;
 import com.kyj.fx.voeditor.visual.framework.SupplySkin;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.skin.BaseInfoComposite;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.util.ProgramSpecUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ImportsDVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ProgramSpecSVO;
@@ -90,8 +90,8 @@ class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<Borde
 				public boolean isCreateColumn(String columnName) {
 					if ("methodMetaDVO".equals(columnName))
 						return false;
-//					else if("methodParameterDVOList".equals(columnName))
-//						return false;
+					//					else if("methodParameterDVOList".equals(columnName))
+					//						return false;
 					return super.isCreateColumn(columnName);
 				}
 
@@ -140,26 +140,50 @@ class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<Borde
 	public void btnGenerateOnMouseClick(MouseEvent e) {
 
 		File showFileSaveDialog = DialogUtil.showFileSaveDialog(null, chooser -> {
-			chooser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.DOCX_NAME, GargoyleExtensionFilters.DOCX, GargoyleExtensionFilters.DOC));
+			chooser.getExtensionFilters().add(
+					new ExtensionFilter(GargoyleExtensionFilters.DOCX_NAME, GargoyleExtensionFilters.DOCX, GargoyleExtensionFilters.DOC));
 
 		});
 		if (showFileSaveDialog != null) {
-			ProgramSpecSVO svo = new ProgramSpecSVO();
-			UserSourceMetaDVO meta = new UserSourceMetaDVO();
-			meta.setPackages(baseInfoController.getPackage());
-			meta.setProjectName(baseInfoController.getProjectName());
-			meta.setProgramName(baseInfoController.getProjectName());
-			meta.setUserPcName(baseInfoController.getUserName());
-			svo.setUserSourceMetaDVO(meta);
+			//			ProgramSpecSVO svo = new ProgramSpecSVO();
+			//			UserSourceMetaDVO meta = new UserSourceMetaDVO();
+			//			meta.setPackages(baseInfoController.getPackage());
+			//			meta.setProjectName(baseInfoController.getProjectName());
+			//			meta.setProgramName(baseInfoController.getProjectName());
+			//			meta.setUserPcName(baseInfoController.getUserName());
+			//			svo.setUserSourceMetaDVO(meta);
+			//
+			//			ImportsDVO importDvo = new ImportsDVO();
+			//			importDvo.setImports(baseInfoController.getImports());
+			//			svo.setImportsDVO(importDvo);
+			//
+			//			svo.setMethodDVOList(baseInfoController.getMethodData());
 
-			ImportsDVO importDvo = new ImportsDVO();
-			importDvo.setImports(baseInfoController.getImports());
-			svo.setImportsDVO(importDvo);
+			//			ProgramSpecUtil.createDefault(svo, showFileSaveDialog);
 
-			svo.setMethodDVOList(baseInfoController.getMethodData());
+			File result = getSpecTabPane().createDocument(showFileSaveDialog);
+			if (result != null) {
+				FileUtil.openFile(result);
+			}
 
-			ProgramSpecUtil.createDefault(svo, showFileSaveDialog);
 		}
+
+	}
+
+	@Override
+	public void createDocumentAction(ProgramSpecSVO svo) {
+		UserSourceMetaDVO meta = new UserSourceMetaDVO();
+		meta.setPackages(baseInfoController.getPackage());
+		meta.setProjectName(baseInfoController.getProjectName());
+		meta.setProgramName(baseInfoController.getProjectName());
+		meta.setUserPcName(baseInfoController.getUserName());
+		svo.setUserSourceMetaDVO(meta);
+
+		ImportsDVO importDvo = new ImportsDVO();
+		importDvo.setImports(baseInfoController.getImports());
+		svo.setImportsDVO(importDvo);
+
+		svo.setMethodDVOList(baseInfoController.getMethodData());
 
 	}
 
