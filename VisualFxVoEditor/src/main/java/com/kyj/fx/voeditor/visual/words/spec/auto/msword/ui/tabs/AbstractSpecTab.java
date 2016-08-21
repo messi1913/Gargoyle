@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.tabs;
 
 import com.kyj.fx.voeditor.visual.framework.SupplySkin;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.model.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ProgramSpecSVO;
 
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
@@ -26,6 +27,7 @@ public abstract class AbstractSpecTab extends Tab implements SupplySkin<BorderPa
 		this.specTabPane = specTabPane;
 		setContent(supplyNode());
 		setText(title);
+		setClosable(false);
 	}
 
 	//	public abstract String getTitle();
@@ -37,5 +39,14 @@ public abstract class AbstractSpecTab extends Tab implements SupplySkin<BorderPa
 	public final SpecResource getSpecResource() {
 		return this.specTabPane.getResource();
 	}
+
+	/********************************
+	 * 작성일 : 2016. 8. 21. 작성자 : KYJ
+	 *
+	 * 사양서 생성하기 위해 SVO에 필요값을 SET 처리함.
+	 * 
+	 * @param svo
+	 ********************************/
+	public abstract void createDocumentAction(ProgramSpecSVO svo);
 
 }
