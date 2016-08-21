@@ -4,7 +4,7 @@
  *	작성일   : 2016. 8. 5.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.ui.model;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.model;
 
 import java.io.File;
 
@@ -37,7 +37,8 @@ public class SpecResource {
 	}
 
 	/**
-	 * @param svo the svo to set
+	 * @param svo
+	 *            the svo to set
 	 */
 	public final void setSvo(ProgramSpecSVO svo) {
 		this.svo = svo;
@@ -58,14 +59,16 @@ public class SpecResource {
 	}
 
 	/**
-	 * @param projectFile the projectFile to set
+	 * @param projectFile
+	 *            the projectFile to set
 	 */
 	public final void setProjectFile(File projectFile) {
 		this.projectFile = projectFile;
 	}
 
 	/**
-	 * @param targetFile the targetFile to set
+	 * @param targetFile
+	 *            the targetFile to set
 	 */
 	public final void setTargetFile(File targetFile) {
 		this.targetFile = targetFile;

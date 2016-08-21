@@ -9,8 +9,8 @@ package com.kyj.fx.voeditor.visual.example;
 import java.io.File;
 
 import com.kyj.fx.voeditor.visual.util.FxUtil;
-import com.kyj.fx.voeditor.visual.words.spec.ui.model.SpecResource;
-import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.SpecTabPane;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.model.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.tabs.SpecTabPane;
 
 import javafx.application.Application;
 import javafx.scene.Scene;

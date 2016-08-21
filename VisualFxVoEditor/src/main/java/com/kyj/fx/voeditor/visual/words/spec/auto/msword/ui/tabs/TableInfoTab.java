@@ -4,7 +4,7 @@
  *	작성일   : 2016. 2. 18.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.ui.tabs;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.tabs;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import com.kyj.fx.voeditor.visual.component.popup.DatabaseTableView;
 import com.kyj.fx.voeditor.visual.framework.SupplySkin;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.kyj.fx.voeditor.visual.words.spec.ui.skin.TableInfoController;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.skin.TableInfoController;
 
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;

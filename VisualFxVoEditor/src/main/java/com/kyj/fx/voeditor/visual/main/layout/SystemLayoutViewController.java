@@ -59,9 +59,9 @@ import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.model.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.tabs.SpecTabPane;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.util.ProgramSpecUtil;
-import com.kyj.fx.voeditor.visual.words.spec.ui.model.SpecResource;
-import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.SpecTabPane;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 import com.kyj.scm.manager.svn.java.SVNWcDbClient;
 

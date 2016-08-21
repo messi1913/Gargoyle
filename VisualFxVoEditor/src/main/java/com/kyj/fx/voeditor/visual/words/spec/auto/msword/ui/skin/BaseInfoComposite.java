@@ -4,7 +4,7 @@
  *	작성일   : 2016. 2. 18.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.ui.skin;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.skin;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,10 +30,10 @@ import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.model.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.tabs.AbstractSpecTab;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodParameterDVO;
-import com.kyj.fx.voeditor.visual.words.spec.ui.model.SpecResource;
-import com.kyj.fx.voeditor.visual.words.spec.ui.tabs.AbstractSpecTab;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -173,7 +173,7 @@ public class BaseInfoComposite extends BorderPane {
 				String typeName = type.toString();
 				Comment comment = p.getComment();
 				System.out.println(p);
-				methodParameterDVOList.add(new MethodParameterDVO(varName, typeName, "",  comment == null? "" : comment.toString()));
+				methodParameterDVOList.add(new MethodParameterDVO(varName, typeName, "", comment == null ? "" : comment.toString()));
 			}
 
 			onMethodDVOVisite.accept(methodDVO);

@@ -4,10 +4,10 @@
  *	작성일   : 2016. 2. 18.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.words.spec.ui.tabs;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.tabs;
 
 import com.kyj.fx.voeditor.visual.framework.SupplySkin;
-import com.kyj.fx.voeditor.visual.words.spec.ui.model.SpecResource;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.model.SpecResource;
 
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;

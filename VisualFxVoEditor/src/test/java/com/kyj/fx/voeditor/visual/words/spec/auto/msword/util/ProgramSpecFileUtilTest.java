@@ -11,10 +11,10 @@ import org.junit.Test;
 
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.InspectorBiz;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.InspectorSourceMeta;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.ProgramSpecWord;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.AbstractJavaProgramSpecFile;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.AbstractXframeProgramSpecFile;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.IProgramSpecFile;
+import com.kyj.fx.voeditor.visual.words.spec.auto.msword.template.ProgramSpecWordTemplate;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO.MethodMetaDVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ProgramSpecSVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.SourceAnalysisDVO;
@@ -83,7 +83,7 @@ public class ProgramSpecFileUtilTest
 
 		try
 		{
-			ProgramSpecWord word = new ProgramSpecWord(docFile, svo);
+			ProgramSpecWordTemplate word = new ProgramSpecWordTemplate(docFile, svo);
 			word.write();
 			word.close();
 			System.out.println("사양서 생성 완료.[ " + file + " ]");

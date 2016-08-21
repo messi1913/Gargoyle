@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.kyj.fx.voeditor.visual.words.spec.parser.pdf;
+package com.kyj.fx.voeditor.visual.words.spec.auto.msword.parser;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
