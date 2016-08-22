@@ -79,9 +79,9 @@ public class DatabaseTableView extends BorderPane {
 		loader.setRoot(this);
 		loader.setController(this);
 		try {
-			BorderPane load = loader.load();
-			String skin = SkinManager.getInstance().getSkin();
-			load.getStylesheets().add(skin);
+			loader.load();
+//			String skin = SkinManager.getInstance().getSkin();
+//			load.getStylesheets().add(skin);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -97,6 +97,7 @@ public class DatabaseTableView extends BorderPane {
 	 */
 	public TableDVO show() {
 		Scene scene = new Scene(this);
+		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 		stage = new Stage();
 		stage.setTitle(TITLE);
 		stage.setScene(scene);

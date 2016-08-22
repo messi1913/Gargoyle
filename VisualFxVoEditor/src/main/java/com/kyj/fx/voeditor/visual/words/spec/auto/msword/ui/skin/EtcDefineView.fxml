@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<fx:root prefHeight="655.0" prefWidth="867.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="655.0" prefWidth="867.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<top>
 		<HBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
 			<children>
@@ -20,9 +20,9 @@
 	<center>
 		<BorderPane BorderPane.alignment="CENTER">
 			<center>
-				<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+				<GridPane fx:id="gpContent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
 					<columnConstraints>
-						<ColumnConstraints hgrow="NEVER" maxWidth="447.0" minWidth="10.0" prefWidth="170.0" />
+						<ColumnConstraints hgrow="NEVER" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" />
 						<ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
 					</columnConstraints>
 					<rowConstraints>
@@ -44,14 +44,14 @@
 						<Label text="테스트시 주의사항" GridPane.rowIndex="5" />
 						<Label text="운영 이관시, 주의사항" GridPane.rowIndex="6" />
 						<Label text="기타" GridPane.rowIndex="7" />
-						<TextArea fx:id="txtCodeMasterTable" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
-						<TextArea fx:id="txtMessage" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-						<TextArea fx:id="txtAuthChk" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
-						<TextArea fx:id="txtRelFct" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
-						<TextArea fx:id="txtModuleEffect" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" />
-						<TextArea fx:id="txtTestCaut" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
-						<TextArea fx:id="txtDeployCaut" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" />
-						<TextArea fx:id="txtEtc" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
+						<TextArea fx:id="txtMessage" onKeyPressed="#txtOnKeyEvent" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+						<TextArea fx:id="txtCodeMasterTable" onKeyPressed="#txtOnKeyEvent" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+						<TextArea fx:id="txtAuthChk" onKeyPressed="#txtOnKeyEvent" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
+						<TextArea fx:id="txtRelFct" onKeyPressed="#txtOnKeyEvent" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
+						<TextArea fx:id="txtModuleEffect" onKeyPressed="#txtOnKeyEvent" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" />
+						<TextArea fx:id="txtTestCaut" onKeyPressed="#txtOnKeyEvent" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
+						<TextArea fx:id="txtDeployCaut" onKeyPressed="#txtOnKeyEvent" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" />
+						<TextArea fx:id="txtEtc" onKeyPressed="#txtOnKeyEvent" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
 					</children>
 					<padding>
 						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
