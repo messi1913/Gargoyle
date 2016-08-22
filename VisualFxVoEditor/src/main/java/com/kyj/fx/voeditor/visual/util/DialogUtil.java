@@ -38,6 +38,7 @@ import javafx.stage.Window;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Pair;
 
+import com.kyj.fx.voeditor.visual.component.popup.ExceptionDialogComposite;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 
 /**
@@ -259,45 +260,53 @@ public class DialogUtil {
 	 * @param ex
 	 */
 	public static void showExceptionDailog(Window owner, Throwable ex, String message) {
-		Alert alert = new Alert(AlertType.ERROR);
-		alert.setTitle("Exception Dialog");
 
-		alert.setHeaderText(message);
-		alert.setContentText(ex.getMessage());
-
-		// Create expandable Exception.
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		ex.printStackTrace(pw);
-		String exceptionText = sw.toString();
-
-		Label label = new Label(message);
-
-		TextArea textArea = new TextArea(exceptionText);
-		textArea.setEditable(false);
-		textArea.setWrapText(true);
-
-		textArea.setMaxWidth(Double.MAX_VALUE);
-		textArea.setMaxHeight(Double.MAX_VALUE);
-		GridPane.setVgrow(textArea, Priority.ALWAYS);
-		GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-		GridPane expContent = new GridPane();
-		expContent.setMaxWidth(Double.MAX_VALUE);
-		expContent.add(label, 0, 0);
-		expContent.add(textArea, 0, 1);
-
-		// Set expandable Exception into the dialog pane.
-		alert.getDialogPane().setExpandableContent(expContent);
-//		alert.setDialogPane(expContent);
-
+		/*
+		 * 2016-08-23 기존에 사용하던 에러 다이얼로그는 사용되지않음.
+		 *
+		 * 이유는 팝업에 대한 우선순위 핸들링처리가 불가.
+		 *
+		 * ex) A팝업이 화면에 떠있는 상태에서 , 또 다른 B 팝업이 뜬 상태에서 에러 다이얼로그가 보여지는경우
+		 *
+		 *  연관성이 없는 A팝업이 화면 최상단으로 올라오는 버그가 있음.
+		 * by kyj.
+		 *
+		 *
+		 */
+//		Alert alert = new Alert(AlertType.ERROR);
+//		alert.setTitle("Exception Dialog");
+//
+//		alert.setHeaderText(message);
+//		alert.setContentText(ex.getMessage());
+//
+//		// Create expandable Exception.
+//		StringWriter sw = new StringWriter();
+//		PrintWriter pw = new PrintWriter(sw);
+//		ex.printStackTrace(pw);
+//		String exceptionText = sw.toString();
+//
+//		Label label = new Label(message);
+//
+//		TextArea textArea = new TextArea(exceptionText);
+//		textArea.setEditable(false);
+//		textArea.setWrapText(true);
+//
+//		textArea.setMaxWidth(Double.MAX_VALUE);
+//		textArea.setMaxHeight(Double.MAX_VALUE);
+//		GridPane.setVgrow(textArea, Priority.ALWAYS);
+//		GridPane.setHgrow(textArea, Priority.ALWAYS);
+//
+//		GridPane expContent = new GridPane();
+//		expContent.setMaxWidth(Double.MAX_VALUE);
+//		expContent.add(label, 0, 0);
+//		expContent.add(textArea, 0, 1);
+//
+//		alert.getDialogPane().setExpandableContent(expContent);
+//		alert.initOwner(owner);
 //		alert.showAndWait();
-//		Window window = alert.getDialogPane().getScene().getWindow();
 
-		alert.initOwner(owner);
-		alert.showAndWait();
-//		alert.show();
-	}
+		new ExceptionDialogComposite(ex, message).show(owner);
+		}
 
 	/**
 	 * login Dialog 로그인 처리 다이얼로그

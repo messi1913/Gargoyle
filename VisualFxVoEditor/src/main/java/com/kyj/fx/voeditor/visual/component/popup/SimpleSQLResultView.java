@@ -190,14 +190,8 @@ public class SimpleSQLResultView extends BorderPane {
 
 		} catch (Exception e) {
 //			DialogUtil.showConfirmDialog();
-
-			try {
-				new SimpleTextView(ValueUtil.toString(e)).show(false);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-//			DialogUtil.showExceptionDailog(SharedMemory.getPrimaryStage(), e, "User SQL Error");
+			//에러 다이얼로그 수정.
+			DialogUtil.showExceptionDailog(SharedMemory.getPrimaryStage(), e, "User SQL Error");
 		}
 
 		Iterator<String> iterator = param.keySet().iterator();
