@@ -48,6 +48,8 @@ public class SliderLineChartExam extends Application {
 			};
 			loadRoot1.getItems().addAll(arrayList);
 
+
+
 			loadRoot2 = new RangeSliderLineChartComposite<Person>() {
 
 				@Override

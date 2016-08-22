@@ -559,7 +559,7 @@ public abstract class SqlMultiplePane<T, K> extends DockPane implements ISchemaT
 			this.userColor = map.get("color") == null ? null : Color.web(map.get("color").toString());
 			this.setTitle(this.url);
 		} catch (Exception e) {
-			DialogUtil.showExceptionDailog(e, "초기화 실패....");
+			DialogUtil.showExceptionDailog(this, e, "초기화 실패....");
 		}
 
 	}
@@ -813,7 +813,7 @@ public abstract class SqlMultiplePane<T, K> extends DockPane implements ISchemaT
 
 			List<Map<String, Object>> query = query(sql, param, success -> {
 				lblStatus.setText(success.size() + " row");
-			}, (exception, showDialog) -> {
+			} , (exception, showDialog) -> {
 				lblStatus.setText(exception.toString());
 				if (showDialog)
 					DialogUtil.showExceptionDailog(exception);

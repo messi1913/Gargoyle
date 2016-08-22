@@ -88,7 +88,8 @@ public class DialogUtil {
 	 */
 	public static File showPropertyFileSelectDialog(final Window ownerWindow) {
 		return showFileDialog(ownerWindow, chooser -> {
-			chooser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.PROPERTIES_NAME, GargoyleExtensionFilters.PROPERTIES));
+			chooser.getExtensionFilters()
+					.add(new ExtensionFilter(GargoyleExtensionFilters.PROPERTIES_NAME, GargoyleExtensionFilters.PROPERTIES));
 		});
 	}
 
@@ -189,8 +190,67 @@ public class DialogUtil {
 		return showDirectoryDialog(ownerWindow, null);
 	}
 
+	/**
+	 * Exception Dialog 예외가 발생햇을때 표시할 다이얼로그
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 22.
+	 * @param owner
+	 * @param ex
+	 */
+	public static void showExceptionDailog(Node owner, Throwable ex) {
+		showExceptionDailog(getWindow(owner), ex, "The exception stacktrace was:");
+	}
+
 	public static void showExceptionDailog(Throwable ex) {
-		showExceptionDailog(ex, "The exception stacktrace was:");
+		showExceptionDailog((Window) null, ex, "The exception stacktrace was:");
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 22.
+	 * @param e
+	 * @param string
+	 */
+	public static void showExceptionDailog(Exception ex, String string) {
+		showExceptionDailog((Window) null, ex, "The exception stacktrace was:");
+	}
+
+	private static Window getWindow(Node owner) {
+		Window _owner = null;
+		if (owner != null) {
+			Scene scene = owner.getScene();
+			if (scene != null) {
+				_owner = scene.getWindow();
+			}
+		}
+
+		if (_owner == null) {
+			_owner = SharedMemory.getPrimaryStage();
+		}
+		return _owner;
+	}
+
+	/**
+	 * Exception Dialog 예외가 발생햇을때 표시할 다이얼로그
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 22.
+	 * @param owner
+	 * @param ex
+	 */
+	public static void showExceptionDailog(Window owner, Throwable ex) {
+		showExceptionDailog(owner, ex, "The exception stacktrace was:");
+	}
+
+	/**
+	 * Exception Dialog 예외가 발생햇을때 표시할 다이얼로그
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 22.
+	 * @param owner
+	 * @param ex
+	 * @param message
+	 */
+	public static void showExceptionDailog(Node owner, Throwable ex, String message) {
+		showExceptionDailog(getWindow(owner), ex, message);
 	}
 
 	/**
@@ -198,7 +258,7 @@ public class DialogUtil {
 	 *
 	 * @param ex
 	 */
-	public static void showExceptionDailog(Throwable ex, String message) {
+	public static void showExceptionDailog(Window owner, Throwable ex, String message) {
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle("Exception Dialog");
 
@@ -229,7 +289,7 @@ public class DialogUtil {
 
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
-		alert.initOwner(SharedMemory.getPrimaryStage());
+		alert.initOwner(owner);
 		alert.showAndWait();
 	}
 
@@ -334,7 +394,7 @@ public class DialogUtil {
 
 	/**
 	 * show info Dialog info Dialog
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
 	 * @param initOwner
@@ -351,7 +411,7 @@ public class DialogUtil {
 
 	/**
 	 * show info Dialog
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 12.
 	 * @param initOwner
@@ -470,4 +530,5 @@ public class DialogUtil {
 		// stage.setScene(borderPane, 800, 500);
 
 	}
+
 }

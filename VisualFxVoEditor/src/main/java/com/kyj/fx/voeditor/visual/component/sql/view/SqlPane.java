@@ -511,7 +511,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			this.userColor = map.get("color") == null ? null : Color.web(map.get("color").toString());
 			this.setTitle(this.url);
 		} catch (Exception e) {
-			DialogUtil.showExceptionDailog(e, "초기화 실패....");
+			DialogUtil.showExceptionDailog(this, e, "초기화 실패....");
 		}
 
 	}
@@ -653,7 +653,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			whereStatement.setLength(whereStatement.length() - 1);
 		}
 
-		selectedTab.appendTextSql(String.format("update %s \nset %s \nwhere  %s", tableName, setStatement.toString(), whereStatement.toString()));
+		selectedTab.appendTextSql(
+				String.format("update %s \nset %s \nwhere  %s", tableName, setStatement.toString(), whereStatement.toString()));
 	}
 
 	/**
@@ -830,7 +831,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		List<String> asList = Arrays.asList(split);
 		queryAll(asList, cnt -> {
 			DialogUtil.showMessageDialog(String.format("%d 건 success", cnt));
-		}, (e, bool) -> {
+		} , (e, bool) -> {
 			if (bool)
 				DialogUtil.showExceptionDailog(e);
 		});
@@ -893,10 +894,10 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 
 		List<Map<String, Object>> query = query(sql, param, success -> {
 			lblStatus.setText(success.size() + " row");
-		}, (exception, showDialog) -> {
+		} , (exception, showDialog) -> {
 			lblStatus.setText(exception.toString());
 			if (showDialog)
-				DialogUtil.showExceptionDailog(exception);
+				DialogUtil.showExceptionDailog(this, exception);
 		});
 		if (query.isEmpty()) {
 			return;
@@ -1013,7 +1014,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 
 	/**
 	 * Export Import Script.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 10.
 	 * @param e
