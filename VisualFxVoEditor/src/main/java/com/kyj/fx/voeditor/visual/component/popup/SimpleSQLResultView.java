@@ -29,6 +29,7 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
@@ -36,7 +37,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kyj.Fx.dao.wizard.core.model.vo.TableModelDVO;
 
@@ -106,6 +106,10 @@ public class SimpleSQLResultView extends BorderPane {
 	 * @작성일 : 2015. 10. 21.
 	 */
 	public void executeSQL() {
+		executeSQL(null);
+	}
+
+	public void executeSQL(Node root) {
 
 		LOGGER.debug("sql check....");
 		if (this.sql == null || this.sql.isEmpty()) {
@@ -134,16 +138,15 @@ public class SimpleSQLResultView extends BorderPane {
 		columns = new ArrayList<>();
 		try {
 
-
 			//Iterator<Entry<String, Object>> iterator = param.entrySet().iterator();
 			MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource(param);
-//			while (iterator.hasNext()) {
-//				Entry<String, Object> next = iterator.next();
-//				Object value = null;
-//				if (next.getValue() != null)
-//					value = "'".concat(next.getValue().toString()).concat("'");
-//				mapSqlParameterSource.addValue(next.getKey(), value);
-//			}
+			//			while (iterator.hasNext()) {
+			//				Entry<String, Object> next = iterator.next();
+			//				Object value = null;
+			//				if (next.getValue() != null)
+			//					value = "'".concat(next.getValue().toString()).concat("'");
+			//				mapSqlParameterSource.addValue(next.getKey(), value);
+			//			}
 
 			List<Map<String, Object>> select = DbUtil.select(sql, mapSqlParameterSource, (rs, row) -> {
 				Map<String, Object> hashMap = new HashMap<String, Object>();
@@ -186,7 +189,15 @@ public class SimpleSQLResultView extends BorderPane {
 			}
 
 		} catch (Exception e) {
-			DialogUtil.showExceptionDailog(e, "User SQL Error");
+//			DialogUtil.showConfirmDialog();
+
+			try {
+				new SimpleTextView(ValueUtil.toString(e)).show(false);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+//			DialogUtil.showExceptionDailog(SharedMemory.getPrimaryStage(), e, "User SQL Error");
 		}
 
 		Iterator<String> iterator = param.keySet().iterator();
@@ -201,7 +212,9 @@ public class SimpleSQLResultView extends BorderPane {
 				for (Object obj : items) {
 					sb.append("'").append(obj).append("'").append(",");
 				}
-				sb.setLength(sb.length() - 1);
+
+				if (items != null && !items.isEmpty()) //bug fix. sb가 빈 경우 에러발생.
+					sb.setLength(sb.length() - 1);
 				param.put(key, sb.toString());
 			} else
 				param.put(key, "'".concat(value.toString()).concat("'"));
@@ -223,14 +236,14 @@ public class SimpleSQLResultView extends BorderPane {
 
 		LOGGER.debug("SHOW SimpleSQLResult View.....");
 		LOGGER.debug("call executeSQL function....");
-		executeSQL();
+		executeSQL(this);
 		LOGGER.debug("end function");
 		Scene scene = new Scene(this, 1100, 700);
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 		stage.setScene(scene);
-		stage.setAlwaysOnTop(true);
-		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.initOwner(SharedMemory.getPrimaryStage());
+		stage.setAlwaysOnTop(false);
+		//		stage.initModality(Modality.APPLICATION_MODAL);
+		//		stage.initOwner(SharedMemory.getPrimaryStage());
 		stage.showAndWait();
 
 		// 재사용금지 1회성 뷰

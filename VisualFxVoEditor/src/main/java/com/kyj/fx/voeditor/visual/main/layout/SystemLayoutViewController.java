@@ -487,7 +487,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * 작성일 : 2016. 8. 19. 작성자 : KYJ
 	 *
 	 * XML 파일을 연다.
-	 * 
+	 *
 	 * @param file
 	 * @throws IOException
 	 ********************************/
@@ -1345,11 +1345,12 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			// stage.initOwner(SharedMemory.getPrimaryStage());
 
 			// stage.initOwner(SharedMemory.getPrimaryStage());
-			double x = SharedMemory.getPrimaryStage().getX();
-			double y = SharedMemory.getPrimaryStage().getY();
+//			double x = SharedMemory.getPrimaryStage().getX();
+//			double y = SharedMemory.getPrimaryStage().getY();
 			stage.setTitle("Database");
-			stage.setX(x);
-			stage.setY(y);
+//			stage.setX(x);
+//			stage.setY(y);
+//			stage.initOwner(SharedMemory.getPrimaryStage());
 			stage.setAlwaysOnTop(false);
 			stage.centerOnScreen();
 			stage.show();

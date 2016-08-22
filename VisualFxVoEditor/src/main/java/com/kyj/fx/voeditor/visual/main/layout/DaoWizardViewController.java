@@ -210,7 +210,7 @@ public class DaoWizardViewController {
 		 * 2016-04-19 파람의 아이템을 삭제하고 다시 호출했을때 인덱스 순서가 맞지않던 버그 fix
 		 */
 		colParamNo.setCellValueFactory(param -> {
-			return new ReadOnlyObjectWrapper<Integer>(tbParams.getItems().indexOf(param.getValue())+1);
+			return new ReadOnlyObjectWrapper<Integer>(tbParams.getItems().indexOf(param.getValue()) + 1);
 		});
 		// [끝] 넘버링 컬럼
 
@@ -433,28 +433,41 @@ public class DaoWizardViewController {
 			return;
 
 		final List<String> velocityKeys = ValueUtil.getVelocityKeys(velocitySQL);
-
 		ObservableList<TbpSysDaoFieldsDVO> fields = FXCollections.observableArrayList();
 		Set<String> keys = new HashSet<String>(velocityKeys);
+
+		//기존에 존재했던 값이 있으면 먼저 바인드.
+		ObservableList<TbpSysDaoFieldsDVO> oldFieldList = tbParams.getItems();
+		for (TbpSysDaoFieldsDVO vo : oldFieldList) {
+			String fieldName = vo.getFieldName();
+			if (keys.contains(fieldName)) {
+				fields.add(vo);
+				keys.remove(fieldName);
+			}
+		}
+
+		/*구버젼*/
 		Iterator<String> iterator = keys.iterator();
 		while (iterator.hasNext()) {
 			String key = iterator.next();
 
 			/* 2016.4.7 이미 존재하는 데이터는 유지한다. */
-			Optional<TbpSysDaoFieldsDVO> findAny = tbParams.getItems().stream().filter(v -> key.equals(v.getFieldName())).findAny();
-			if (findAny.isPresent()) {
-				continue;
-			}
+//			Optional<TbpSysDaoFieldsDVO> findAny = tbParams.getItems().stream().filter(v -> key.equals(v.getFieldName())).findAny();
+//			if (findAny.isPresent()) {
+//				continue;
+//			}
 
 			TbpSysDaoFieldsDVO dvo = new TbpSysDaoFieldsDVO();
 			dvo.setFieldName(key);
 			fields.add(dvo);
 		}
+		/*구버젼*/
 
 		/* 메소드항목에 생성된 다이나픽 필드변수를 메모리에 저장한다. */
 		TbpSysDaoMethodsDVO tbpSysDaoMethodsDVO = getSelectedMethodItem();
 		if (tbpSysDaoMethodsDVO != null) {
 			tbpSysDaoMethodsDVO.setTbpSysDaoFieldsDVOList(fields);
+			tbParams.getItems().clear();
 			tbParams.getItems().addAll(fields);
 		}
 

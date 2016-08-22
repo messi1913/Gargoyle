@@ -289,8 +289,14 @@ public class DialogUtil {
 
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
+//		alert.setDialogPane(expContent);
+
+//		alert.showAndWait();
+//		Window window = alert.getDialogPane().getScene().getWindow();
+
 		alert.initOwner(owner);
 		alert.showAndWait();
+//		alert.show();
 	}
 
 	/**
