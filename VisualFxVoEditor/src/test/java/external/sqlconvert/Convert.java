@@ -37,7 +37,7 @@ public class Convert {
 		List<String> exe = RuntimeClassUtil.exe(Arrays.asList(options));
 
 		System.out.println("#######################################");
-		System.out.println("Status :::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+		System.out.println("Status ::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 		exe.forEach(System.out::println);
 		System.out.println("#######################################");
 
