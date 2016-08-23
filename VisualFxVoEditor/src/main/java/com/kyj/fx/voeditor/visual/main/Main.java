@@ -38,7 +38,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 
 /**
- * 메인클래스
+ * 메인클래스.
  *
  * @author KYJ
  *
