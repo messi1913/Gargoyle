@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -141,8 +142,7 @@ public class FxUtil {
 	 * @throws NullPointerException
 	 * @throws IOException
 	 */
-	public static <N, C> N loadAndControllerAction(Class<C> controllerClass, Consumer<C> controllerAction)
-			throws Exception {
+	public static <N, C> N loadAndControllerAction(Class<C> controllerClass, Consumer<C> controllerAction) throws Exception {
 		return load(controllerClass, null, null, controllerAction);
 	}
 
@@ -852,5 +852,31 @@ public class FxUtil {
 
 	public static JavaTextArea createJavaTextArea(String content) {
 		return createJavaTextArea(content, 1200, 800);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 8. 23. 작성자 : KYJ
+	 *
+	 * Node의 Window 객체를 리턴함.
+	 * 
+	 * @param node
+	 * @return
+	 ********************************/
+	public static Window getWindow(Node node) {
+		return getWindow(node, () -> null);
+	}
+
+	public static Window getWindow(Node node, Supplier<Window> emptyThan) {
+		if (node != null) {
+			Scene scene = node.getScene();
+			if (scene != null) {
+				return scene.getWindow();
+			}
+		}
+
+		if (emptyThan != null)
+			return emptyThan.get();
+
+		return null;
 	}
 }

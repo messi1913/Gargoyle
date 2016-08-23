@@ -5,10 +5,11 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import com.kyj.fx.voeditor.visual.component.popup.ExceptionDialogComposite;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -23,23 +24,18 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Pair;
-
-import com.kyj.fx.voeditor.visual.component.popup.ExceptionDialogComposite;
-import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 
 /**
  * @author KYJ
@@ -193,6 +189,7 @@ public class DialogUtil {
 
 	/**
 	 * Exception Dialog 예외가 발생햇을때 표시할 다이얼로그
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 22.
 	 * @param owner
@@ -233,6 +230,7 @@ public class DialogUtil {
 
 	/**
 	 * Exception Dialog 예외가 발생햇을때 표시할 다이얼로그
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 22.
 	 * @param owner
@@ -244,6 +242,7 @@ public class DialogUtil {
 
 	/**
 	 * Exception Dialog 예외가 발생햇을때 표시할 다이얼로그
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 22.
 	 * @param owner
@@ -273,40 +272,40 @@ public class DialogUtil {
 		 *
 		 *
 		 */
-//		Alert alert = new Alert(AlertType.ERROR);
-//		alert.setTitle("Exception Dialog");
-//
-//		alert.setHeaderText(message);
-//		alert.setContentText(ex.getMessage());
-//
-//		// Create expandable Exception.
-//		StringWriter sw = new StringWriter();
-//		PrintWriter pw = new PrintWriter(sw);
-//		ex.printStackTrace(pw);
-//		String exceptionText = sw.toString();
-//
-//		Label label = new Label(message);
-//
-//		TextArea textArea = new TextArea(exceptionText);
-//		textArea.setEditable(false);
-//		textArea.setWrapText(true);
-//
-//		textArea.setMaxWidth(Double.MAX_VALUE);
-//		textArea.setMaxHeight(Double.MAX_VALUE);
-//		GridPane.setVgrow(textArea, Priority.ALWAYS);
-//		GridPane.setHgrow(textArea, Priority.ALWAYS);
-//
-//		GridPane expContent = new GridPane();
-//		expContent.setMaxWidth(Double.MAX_VALUE);
-//		expContent.add(label, 0, 0);
-//		expContent.add(textArea, 0, 1);
-//
-//		alert.getDialogPane().setExpandableContent(expContent);
-//		alert.initOwner(owner);
-//		alert.showAndWait();
+		//		Alert alert = new Alert(AlertType.ERROR);
+		//		alert.setTitle("Exception Dialog");
+		//
+		//		alert.setHeaderText(message);
+		//		alert.setContentText(ex.getMessage());
+		//
+		//		// Create expandable Exception.
+		//		StringWriter sw = new StringWriter();
+		//		PrintWriter pw = new PrintWriter(sw);
+		//		ex.printStackTrace(pw);
+		//		String exceptionText = sw.toString();
+		//
+		//		Label label = new Label(message);
+		//
+		//		TextArea textArea = new TextArea(exceptionText);
+		//		textArea.setEditable(false);
+		//		textArea.setWrapText(true);
+		//
+		//		textArea.setMaxWidth(Double.MAX_VALUE);
+		//		textArea.setMaxHeight(Double.MAX_VALUE);
+		//		GridPane.setVgrow(textArea, Priority.ALWAYS);
+		//		GridPane.setHgrow(textArea, Priority.ALWAYS);
+		//
+		//		GridPane expContent = new GridPane();
+		//		expContent.setMaxWidth(Double.MAX_VALUE);
+		//		expContent.add(label, 0, 0);
+		//		expContent.add(textArea, 0, 1);
+		//
+		//		alert.getDialogPane().setExpandableContent(expContent);
+		//		alert.initOwner(owner);
+		//		alert.showAndWait();
 
 		new ExceptionDialogComposite(ex, message).show(owner);
-		}
+	}
 
 	/**
 	 * login Dialog 로그인 처리 다이얼로그
@@ -385,6 +384,7 @@ public class DialogUtil {
 	 * @return
 	 */
 	public static ButtonType showConfirmDialog() {
+
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Confirmation Dialog");
 		alert.setHeaderText("Look, a Confirmation Dialog");
@@ -441,11 +441,17 @@ public class DialogUtil {
 		alert.setHeaderText(headerText);
 		alert.setContentText(message);
 		apply.accept(alert);
+
+		//		Dialog<Pair<String, String>> dialog = new Dialog<>();
+		//		dialog.setTitle(title);
+		//		dialog.setHeaderText(headerText);
+		//		dialog.setContentText(message);
+		//		dialog.initOwner(initOwner);
+		//		apply.accept(dialog);
 	}
 
 	public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message) {
-		return showYesOrNoDialog(title, message, str -> {
-		});
+		return showYesOrNoDialog(title, message, null);
 	}
 
 	public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message,
@@ -471,9 +477,12 @@ public class DialogUtil {
 			return null;
 		});
 
+		dialog.initOwner(SharedMemory.getPrimaryStage());
+
 		Optional<Pair<String, String>> result = dialog.showAndWait();
 
-		result.ifPresent(consumer);
+		if (consumer != null)
+			result.ifPresent(consumer);
 
 		return result;
 

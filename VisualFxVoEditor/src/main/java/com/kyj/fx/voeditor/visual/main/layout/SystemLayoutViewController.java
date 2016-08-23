@@ -1352,7 +1352,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 //			stage.setY(y);
 //			stage.initOwner(SharedMemory.getPrimaryStage());
 			stage.setAlwaysOnTop(false);
-			stage.centerOnScreen();
+//			stage.centerOnScreen();
+//			stage.initOwner(SharedMemory.getPrimaryStage());
 			stage.show();
 			// stage.showAndWait();
 

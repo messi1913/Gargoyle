@@ -101,7 +101,7 @@ public class DatabaseTableView extends BorderPane {
 		stage = new Stage();
 		stage.setTitle(TITLE);
 		stage.setScene(scene);
-		stage.initModality(Modality.APPLICATION_MODAL);
+//		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.initOwner(SharedMemory.getPrimaryStage());
 		stage.showAndWait();
 		return tableDVO;

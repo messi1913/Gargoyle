@@ -432,6 +432,7 @@ public class DatabaseUrlManagementView extends BorderPane {
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 		stage.setScene(scene);
 		stage.setTitle(dbms);
+		
 		stage.show();
 	}
 }

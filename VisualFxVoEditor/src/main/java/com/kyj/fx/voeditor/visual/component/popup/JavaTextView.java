@@ -19,14 +19,13 @@ import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /**
  * 단순한 텍스트를 보여주는 용도로만 사용되됨.
@@ -68,8 +67,6 @@ public class JavaTextView extends BorderPane {
 		javaTextArea.setEditable(false);
 		javaTextArea.setContent(content);
 
-		LOGGER.debug("FxmlLoader");
-
 		/*
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(JavaTextView.class.getResource("SimpleTextView.fxml"));
@@ -96,6 +93,10 @@ public class JavaTextView extends BorderPane {
 	}
 
 	public void show(double width, double height) throws IOException {
+		show(SharedMemory.getPrimaryStage(), width, height);
+	}
+
+	public void show(Window root, double width, double height) throws IOException {
 
 		btnClose.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
@@ -107,8 +108,8 @@ public class JavaTextView extends BorderPane {
 
 		Scene scene = new Scene(this, width, height);
 		stage.setScene(scene);
-		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.initOwner(SharedMemory.getPrimaryStage());
+//		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.initOwner(root);
 		stage.show();
 
 	}
