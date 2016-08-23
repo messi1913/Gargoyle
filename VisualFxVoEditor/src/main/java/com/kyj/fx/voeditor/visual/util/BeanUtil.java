@@ -3,7 +3,7 @@ package com.kyj.fx.voeditor.visual.util;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * 객체 생성관리
+ * 객체 생성관리.
  * 
  * @author KYJ
  *
