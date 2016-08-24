@@ -46,6 +46,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -74,8 +75,10 @@ public class DAOLoaderController {
 	@FXML
 	public void initialize() {
 		txtSrchTable.setText("*");
-		colSrchClassName.setCellValueFactory(param -> new SimpleObjectProperty<Object>(param.getValue().get("CLASS_NAME").toString()));
-		colSrchPackageName.setCellValueFactory(param -> new SimpleObjectProperty<Object>(param.getValue().get("PACKAGE_NAME").toString()));
+		colSrchClassName.setCellValueFactory(
+				param -> new SimpleObjectProperty<Object>(param.getValue().get("CLASS_NAME").toString()));
+		colSrchPackageName.setCellValueFactory(
+				param -> new SimpleObjectProperty<Object>(param.getValue().get("PACKAGE_NAME").toString()));
 
 		MenuItem history = new MenuItem("history");
 		history.setOnAction(this::menuHistoryOnAction);
@@ -105,7 +108,8 @@ public class DAOLoaderController {
 		try {
 			List<TbmSysDaoMethodsHDVO> select = listHistoryItems(paramMap);
 
-			CommonsBaseGridView<TbmSysDaoMethodsHDVO> commonsBaseGridView = new CommonsBaseGridView<>(TbmSysDaoMethodsHDVO.class, select);
+			CommonsBaseGridView<TbmSysDaoMethodsHDVO> commonsBaseGridView = new CommonsBaseGridView<>(
+					TbmSysDaoMethodsHDVO.class, select);
 			TableViewSelectionModel<TbmSysDaoMethodsHDVO> selectionModel = commonsBaseGridView.getSelectionModel();
 			selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
 			BorderPane borderPane = new BorderPane();
@@ -137,7 +141,8 @@ public class DAOLoaderController {
 			compare.setDisable(true);
 			compare.setOnAction(ev -> {
 
-				ObservableList<TbmSysDaoMethodsHDVO> selectedItems = commonsBaseGridView.getSelectionModel().getSelectedItems();
+				ObservableList<TbmSysDaoMethodsHDVO> selectedItems = commonsBaseGridView.getSelectionModel()
+						.getSelectedItems();
 				if (selectedItems.size() == 2) {
 					compare(selectedItems.get(0), selectedItems.get(1));
 				}
@@ -205,7 +210,7 @@ public class DAOLoaderController {
 			sb.append("select hist_tsp, sql_body from meerkat.tbp_sys_dao_methods_h ");
 		else
 			sb.append("select hist_tsp, sql_body from tbp_sys_dao_methods_h ");
-		
+
 		sb.append("where hist_tsp =':histTsp'");
 
 		List<TbmSysDaoMethodsHDVO> select = DbUtil.select(sb.toString(), paramMap, (rs, row) -> {
@@ -221,7 +226,8 @@ public class DAOLoaderController {
 
 	private List<TbmSysDaoMethodsHDVO> listHistoryItems(Map<String, Object> paramMap) throws Exception {
 		StringBuffer sb = new StringBuffer();
-		sb.append("select b.hist_tsp, b.package_name, b.class_name, b.method_name, b.result_vo_class, b.dml_type, fst_reg_dt from \n");
+		sb.append(
+				"select b.hist_tsp, b.package_name, b.class_name, b.method_name, b.result_vo_class, b.dml_type, fst_reg_dt from \n");
 		if (isExistsSchemaDatabase())
 			sb.append("meerkat.tbm_sys_dao a inner join meerkat.tbp_sys_dao_methods_h b\n");
 		else
@@ -291,15 +297,16 @@ public class DAOLoaderController {
 
 	@FXML
 	public void txtSrchTableOnKeyReleased(KeyEvent e) {
-
-		Platform.runLater(() -> {
-			try {
-				List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
-				tbSrchDao.getItems().addAll(listDAO);
-			} catch (Exception e1) {
-				DialogUtil.showExceptionDailog(e1);
-			}
-		});
+		if (KeyCode.ENTER.equals(e.getCode())) {
+			Platform.runLater(() -> {
+				try {
+					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
+					tbSrchDao.getItems().addAll(listDAO);
+				} catch (Exception e1) {
+					DialogUtil.showExceptionDailog(e1);
+				}
+			});
+		}
 
 	}
 
@@ -307,7 +314,6 @@ public class DAOLoaderController {
 		tbSrchDao.getItems().clear();
 		if (daoName == null || daoName.isEmpty())
 			return FXCollections.emptyObservableList();
-
 
 		Map<String, Object> param = new HashMap<String, Object>();
 
@@ -318,11 +324,11 @@ public class DAOLoaderController {
 		}
 		StringBuffer sb = new StringBuffer();
 		sb.append("\n");
-		if(isExistsSchemaDatabase())
+		if (isExistsSchemaDatabase())
 			sb.append("SELECT PACKAGE_NAME, CLASS_NAME,LOCATION,CLASS_DESC,TABLE_NAME FROM meerkat.tbm_sys_dao \n");
 		else
 			sb.append("SELECT PACKAGE_NAME, CLASS_NAME,LOCATION,CLASS_DESC,TABLE_NAME FROM tbm_sys_dao \n");
-		
+
 		sb.append("WHERE 1=1 \n");
 		sb.append("#if($tableName) \n");
 		sb.append("AND CLASS_NAME LIKE '%:tableName%'  \n");
@@ -341,7 +347,6 @@ public class DAOLoaderController {
 
 	}
 
-	
 	private static boolean isExistsSchemaDatabase() {
 		String driver = DbUtil.getDriver().trim();
 		if (driver == null || driver.isEmpty())
