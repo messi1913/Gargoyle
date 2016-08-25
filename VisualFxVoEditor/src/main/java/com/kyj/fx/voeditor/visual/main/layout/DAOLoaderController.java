@@ -306,7 +306,7 @@ public class DAOLoaderController {
 	}
 
 	private List<Map<String, Object>> listDAO(String daoName) throws Exception {
-		String a = "";
+		String a = "a";
 		tbSrchDao.getItems().clear();
 		if (daoName == null || daoName.isEmpty())
 			return FXCollections.emptyObservableList();
