@@ -75,10 +75,8 @@ public class DAOLoaderController {
 	@FXML
 	public void initialize() {
 		txtSrchTable.setText("*");
-		colSrchClassName.setCellValueFactory(
-				param -> new SimpleObjectProperty<Object>(param.getValue().get("CLASS_NAME").toString()));
-		colSrchPackageName.setCellValueFactory(
-				param -> new SimpleObjectProperty<Object>(param.getValue().get("PACKAGE_NAME").toString()));
+		colSrchClassName.setCellValueFactory(param -> new SimpleObjectProperty<Object>(param.getValue().get("CLASS_NAME").toString()));
+		colSrchPackageName.setCellValueFactory(param -> new SimpleObjectProperty<Object>(param.getValue().get("PACKAGE_NAME").toString()));
 
 		MenuItem history = new MenuItem("history");
 		history.setOnAction(this::menuHistoryOnAction);
@@ -108,8 +106,7 @@ public class DAOLoaderController {
 		try {
 			List<TbmSysDaoMethodsHDVO> select = listHistoryItems(paramMap);
 
-			CommonsBaseGridView<TbmSysDaoMethodsHDVO> commonsBaseGridView = new CommonsBaseGridView<>(
-					TbmSysDaoMethodsHDVO.class, select);
+			CommonsBaseGridView<TbmSysDaoMethodsHDVO> commonsBaseGridView = new CommonsBaseGridView<>(TbmSysDaoMethodsHDVO.class, select);
 			TableViewSelectionModel<TbmSysDaoMethodsHDVO> selectionModel = commonsBaseGridView.getSelectionModel();
 			selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
 			BorderPane borderPane = new BorderPane();
@@ -141,8 +138,7 @@ public class DAOLoaderController {
 			compare.setDisable(true);
 			compare.setOnAction(ev -> {
 
-				ObservableList<TbmSysDaoMethodsHDVO> selectedItems = commonsBaseGridView.getSelectionModel()
-						.getSelectedItems();
+				ObservableList<TbmSysDaoMethodsHDVO> selectedItems = commonsBaseGridView.getSelectionModel().getSelectedItems();
 				if (selectedItems.size() == 2) {
 					compare(selectedItems.get(0), selectedItems.get(1));
 				}
@@ -226,8 +222,7 @@ public class DAOLoaderController {
 
 	private List<TbmSysDaoMethodsHDVO> listHistoryItems(Map<String, Object> paramMap) throws Exception {
 		StringBuffer sb = new StringBuffer();
-		sb.append(
-				"select b.hist_tsp, b.package_name, b.class_name, b.method_name, b.result_vo_class, b.dml_type, fst_reg_dt from \n");
+		sb.append("select b.hist_tsp, b.package_name, b.class_name, b.method_name, b.result_vo_class, b.dml_type, fst_reg_dt from \n");
 		if (isExistsSchemaDatabase())
 			sb.append("meerkat.tbm_sys_dao a inner join meerkat.tbp_sys_dao_methods_h b\n");
 		else
@@ -311,6 +306,7 @@ public class DAOLoaderController {
 	}
 
 	private List<Map<String, Object>> listDAO(String daoName) throws Exception {
+		String a = "";
 		tbSrchDao.getItems().clear();
 		if (daoName == null || daoName.isEmpty())
 			return FXCollections.emptyObservableList();
