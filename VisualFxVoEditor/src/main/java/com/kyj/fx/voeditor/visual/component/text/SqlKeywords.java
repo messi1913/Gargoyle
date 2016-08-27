@@ -44,8 +44,9 @@ public class SqlKeywords extends BorderPane {
 	// "select", "from", "group", "by", "where", "join", "and", "update",
 	// "delete", "create", "drop", "set", "not null", "insert into",
 	// "alter", "order" };
-
-	private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", SQLKeywordFactory.getKeywords()) + ")\\b";
+	
+	//2016-08-27 정규식 (?i) 추가옵션을 주는경오 대소문자 구분을 무시한다.
+	private static final String KEYWORD_PATTERN = "(?i)\\b(" + String.join("|", SQLKeywordFactory.getKeywords()) + ")\\b";
 	private static final String PAREN_PATTERN = "\\(|\\)";
 	private static final String BRACE_PATTERN = "\\{|\\}";
 	private static final String BRACKET_PATTERN = "\\[|\\]";
