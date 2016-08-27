@@ -1,0 +1,5 @@
+.table-row-cell:odd{
+	-fx-background-color: #ABB6BA ;
+	-fx-fill: blue;
+	-fx-text-fill: yellow ;
+}

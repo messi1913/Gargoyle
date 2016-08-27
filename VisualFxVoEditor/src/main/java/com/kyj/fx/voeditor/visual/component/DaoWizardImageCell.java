@@ -40,12 +40,11 @@ public class DaoWizardImageCell<S> extends TableCell<S, String> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javafx.scene.control.TableCell#commitEdit(java.lang.Object)
 	 */
 	@Override
 	public void commitEdit(String newValue) {
-		// TODO Auto-generated method stub
 		super.commitEdit(newValue);
 	}
 

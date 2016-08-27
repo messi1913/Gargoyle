@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.component;
 
 import java.lang.reflect.Field;
 
+import javafx.beans.NamedArg;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableCell;
@@ -24,7 +25,7 @@ public class CheckedColumn<T> extends TableColumn<T, Boolean> {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(CheckedColumn.class);
 
-	public CheckedColumn(String columnName) {
+	public CheckedColumn(@NamedArg("columnName") String columnName) {
 		super();
 
 		this.setCellFactory(new Callback<TableColumn<T, Boolean>, TableCell<T, Boolean>>() {

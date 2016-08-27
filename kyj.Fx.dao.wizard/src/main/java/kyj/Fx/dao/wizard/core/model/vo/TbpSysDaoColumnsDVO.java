@@ -7,12 +7,12 @@
  *******************************/
 package kyj.Fx.dao.wizard.core.model.vo;
 
+import javafx.beans.property.SimpleStringProperty;
 /**
  * @author KYJ
  *
  */
 import javafx.beans.property.StringProperty;
-import javafx.beans.property.SimpleStringProperty;
 
 public class TbpSysDaoColumnsDVO {
 	private StringProperty columnName;
@@ -25,9 +25,19 @@ public class TbpSysDaoColumnsDVO {
 	 */
 	private StringProperty columnType;
 
+	/**
+	 * 프로그램 데이터 타입
+	 * @최초생성일 2016. 8. 26.
+	 */
+	private StringProperty programType;
+
+	private StringProperty lockYn;
+
 	public TbpSysDaoColumnsDVO() {
 		this.columnName = new SimpleStringProperty();
 		this.columnType = new SimpleStringProperty();
+		this.programType = new SimpleStringProperty();
+		this.lockYn = new SimpleStringProperty();
 	}
 
 	public void setColumnName(String columnName) {
@@ -58,4 +68,29 @@ public class TbpSysDaoColumnsDVO {
 	public StringProperty columnTypeProperty() {
 		return columnType;
 	}
+
+	public final StringProperty programTypeProperty() {
+		return this.programType;
+	}
+
+	public final java.lang.String getProgramType() {
+		return this.programTypeProperty().get();
+	}
+
+	public final void setProgramType(final java.lang.String programType) {
+		this.programTypeProperty().set(programType);
+	}
+
+	public final StringProperty lockYnProperty() {
+		return this.lockYn;
+	}
+
+	public final java.lang.String getLockYn() {
+		return this.lockYnProperty().get();
+	}
+
+	public final void setLockYn(final java.lang.String lockYn) {
+		this.lockYnProperty().set(lockYn);
+	}
+
 }

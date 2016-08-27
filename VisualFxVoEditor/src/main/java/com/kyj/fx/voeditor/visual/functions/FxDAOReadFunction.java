@@ -57,7 +57,6 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append("AND PACKAGE_NAME = ':packageName'\n");
 		sb.append("AND CLASS_NAME = ':className'\n");
 
-
 		List<TbpSysDaoMethodsDVO> select = DbUtil.select(sb.toString(), map, new RowMapper<TbpSysDaoMethodsDVO>() {
 
 			@Override
@@ -120,7 +119,9 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT \n");
 		sb.append("COLUMN_NAME  , \n");
-		sb.append("COLUMN_TYPE \n");
+		sb.append("COLUMN_TYPE, \n");
+		sb.append("PROGRAM_TYPE, \n");
+		sb.append("LOCK_YN \n");
 		sb.append(" FROM meerkat.tbp_sys_dao_columns \n");
 		sb.append(" WHERE 1=1 \n");
 		sb.append("AND PACKAGE_NAME = ':packageName'\n");
@@ -139,6 +140,8 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 				TbpSysDaoColumnsDVO dvo = new TbpSysDaoColumnsDVO();
 				dvo.setColumnType(rs.getString("COLUMN_TYPE"));
 				dvo.setColumnName(rs.getString("COLUMN_NAME"));
+				dvo.setProgramType(rs.getString("PROGRAM_TYPE"));
+				dvo.setLockYn(rs.getString("LOCK_YN"));
 				return dvo;
 			}
 		});

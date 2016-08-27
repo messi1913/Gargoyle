@@ -12,6 +12,8 @@
 <?import javafx.collections.*?>
 <?import com.kyj.fx.voeditor.visual.component.*?>
 <?import com.kyj.fx.voeditor.visual.component.text.SqlKeywords?>
+<?import com.kyj.fx.voeditor.visual.component.LockImagedYnColumn?>
+
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.control.TextField?>
 
@@ -157,6 +159,7 @@
 											layoutY="53.0" prefHeight="200.0" prefWidth="200.0"
 											AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
 											AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+											
 											<columns>
 												<TableColumn fx:id="colParamNo" editable="false"
 													prefWidth="56.0" text="No.">
@@ -198,18 +201,55 @@
 										<TableView fx:id="tbMappings" layoutX="119.0"
 											layoutY="47.0" prefHeight="200.0" prefWidth="200.0"
 											AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-											AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+											AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+											editable="true">
 											<columns>
-												<TableColumn prefWidth="172.0" text="Column Name">
+												<TableColumn prefWidth="172.0" text="Column Name"
+													editable="false">
 													<cellValueFactory>
 														<PropertyValueFactory property="columnName" />
 													</cellValueFactory>
 												</TableColumn>
-												<TableColumn prefWidth="172.0" text="Column Type">
+												<TableColumn prefWidth="172.0" text="Column Type"
+													editable="false">
 													<cellValueFactory>
 														<PropertyValueFactory property="columnType" />
 													</cellValueFactory>
 												</TableColumn>
+
+												<TableColumn fx:id="colProgramType" text="Program Type"
+													prefWidth="200.0">
+
+													<columns>
+														<TableColumn fx:id="colProgramType" prefWidth="150.0"
+															text="Program Type" editable="true">
+															<cellValueFactory>
+																<PropertyValueFactory property="programType" />
+															</cellValueFactory>
+														</TableColumn>
+
+														<!-- <TableColumn fx:id="colProgramTypeLock" -->
+														<!-- prefWidth="50.0" text="Lock" editable="true"> -->
+														<!-- <cellValueFactory> -->
+														<!-- <PropertyValueFactory property="programTypeLock" /> -->
+														<!-- </cellValueFactory> -->
+														<!-- </TableColumn> -->
+
+														<LockImagedYnColumn fx:id="colProgramTypeLock"
+															prefWidth="50.0" text="Lock" editable="true" style="-fx-alignment:center">
+															<columnName>
+																<String fx:value="lockYn" />
+															</columnName>
+<!-- 															<cellValueFactory> -->
+<!-- 																<PropertyValueFactory property="lockYn" /> -->
+<!-- 															</cellValueFactory> -->
+														</LockImagedYnColumn>
+
+													</columns>
+
+												</TableColumn>
+
+
 											</columns>
 										</TableView>
 									</children>

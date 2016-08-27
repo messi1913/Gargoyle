@@ -32,8 +32,15 @@ interface GagoyleTabLoadable {
 	 * @param fxmlName
 	 */
 	void loadNewSystemTab(String tabName, String fxmlName);
-	
-	
-	
-	
+
+	/********************************
+	 * 작성일 : 2016. 8. 27. 작성자 : KYJ
+	 *
+	 * 새로운 템을 로드함. CloseableParent의 경우는 탭이 닫혔을때 처리할 내용을 기술하는 로직이 추가적으로 들어감.
+	 * 
+	 * @param tableName
+	 * @param parent
+	 ********************************/
+	public void loadNewSystemTab(String tableName, CloseableParent<?> parent);
+
 }

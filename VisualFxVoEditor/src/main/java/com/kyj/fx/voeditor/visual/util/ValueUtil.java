@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,6 +40,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.google.gson.Gson;
@@ -56,6 +59,8 @@ import javafx.collections.ObservableList;
  */
 public class ValueUtil {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ValueUtil.class);
+	
 	public enum IndexCaseTypes {
 		UPPERCASE, LOWERCASE
 	}
@@ -467,7 +472,7 @@ public class ValueUtil {
 	}
 
 	public static <T> Map<String, Object> toMap(final T t, List<String> fields) {
-		Map<String, Object> hashMap = new HashMap<String, Object>();
+		Map<String, Object> hashMap = new LinkedHashMap<String, Object>();
 		try {
 			BeanInfo beanInfo = Introspector.getBeanInfo(t.getClass());
 			// Iterate over all the attributes
@@ -487,7 +492,7 @@ public class ValueUtil {
 
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error(ValueUtil.toString(e));	
 		}
 
 		return hashMap;

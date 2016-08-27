@@ -9,11 +9,12 @@ package com.kyj.fx.voeditor.visual.main.layout;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import com.kyj.fx.voeditor.core.model.meta.ClassMeta;
 import com.kyj.fx.voeditor.core.model.meta.FieldMeta;
 import com.kyj.fx.voeditor.util.EditorUtil;
 import com.kyj.fx.voeditor.visual.component.CommonsContextMenu;
+import com.kyj.fx.voeditor.visual.component.LockImagedYnColumn;
 import com.kyj.fx.voeditor.visual.component.Menus;
 import com.kyj.fx.voeditor.visual.component.NumberingCellValueFactory;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
@@ -51,6 +53,7 @@ import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
+import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -65,6 +68,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -85,12 +89,15 @@ import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoColumnsDVO;
 import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoFieldsDVO;
 import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoMethodsDVO;
 import kyj.Fx.dao.wizard.core.util.QuerygenUtil;
+import kyj.Fx.dao.wizard.memory.DatabaseTypeMappingResourceLoader;
 
 /**
  * @author KYJ
  *
  */
 public class DaoWizardViewController {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DaoWizardViewController.class);
 
 	private static final String MSG_NOMAL = "";
 
@@ -107,20 +114,12 @@ public class DaoWizardViewController {
 	private static final List<String> MESSAGE_CODES = Arrays.asList(MSG_NOMAL, MSG_CLASS_NAME_IS_EMPTY, MSG_USED_RESERVED_KEYWORD,
 			MSG_RESULT_VO_CLASS_IS_EMPTY, MSG_MAPPING_DATA_EMPTY, MSG_NO_WARNNING);
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DaoWizardViewController.class);
-
 	@FXML
 	private Label lblMessage;
 	@FXML
-	private TextField txtClassName;
-	@FXML
 	private TextArea txtAreaDaoDesc;
 	@FXML
-	private TextField txtPackageName;
-	@FXML
-	private TextField txtDaoLocation;
-	@FXML
-	private TextField txtTableName;
+	private TextField txtClassName, txtPackageName, txtDaoLocation, txtTableName;
 	@FXML
 	private SqlKeywords txtSql;
 	@FXML
@@ -143,6 +142,11 @@ public class DaoWizardViewController {
 	private TableColumn<TbpSysDaoFieldsDVO, String> colParamTestValue;
 	@FXML
 	private TableView<TbpSysDaoColumnsDVO> tbMappings;
+	@FXML
+	private TableColumn<TbpSysDaoColumnsDVO, String> colProgramType;
+
+	@FXML
+	private LockImagedYnColumn<TbpSysDaoColumnsDVO> colProgramTypeLock;
 
 	/**
 	 * DAOWizard가 갖고 있는 메인 데이터
@@ -193,6 +197,13 @@ public class DaoWizardViewController {
 
 	@FXML
 	public void initialize() {
+
+		tbParams.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+		//		this.colProgramTypeLock.setCellValueFactory(v -> v.getValue().lockYnProperty());
+		//		this.colProgramTypeLock.setCellFactory(v ->{
+		//			return 
+		//		});
 
 		tbmSysDaoDVOProperty = new SimpleObjectProperty<>(new TbmSysDaoDVO());
 		colParamTestValue.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -306,6 +317,13 @@ public class DaoWizardViewController {
 			}
 
 		});
+
+		//2016-08-27 custom 항목 추가. 이 항목추가시 typeMapping.properties 파일의 항목도 추가야함.
+		ObservableList<String> collect = DatabaseTypeMappingResourceLoader.getInstance().getEntry().stream()
+				.map(v -> v.getValue().toString()).distinct().collect(FxCollectors.toObservableList());
+		collect.addAll(Arrays.asList("Integer", "Long", "Double"));
+
+		colProgramType.setCellFactory(ChoiceBoxTableCell.forTableColumn(collect));
 
 		lblMessage.setText(MSG_NO_WARNNING);
 
@@ -434,7 +452,7 @@ public class DaoWizardViewController {
 
 		final List<String> velocityKeys = ValueUtil.getVelocityKeys(velocitySQL);
 		ObservableList<TbpSysDaoFieldsDVO> fields = FXCollections.observableArrayList();
-		Set<String> keys = new HashSet<String>(velocityKeys);
+		Set<String> keys = new LinkedHashSet<String>(velocityKeys);
 
 		//기존에 존재했던 값이 있으면 먼저 바인드.
 		ObservableList<TbpSysDaoFieldsDVO> oldFieldList = tbParams.getItems();
@@ -452,10 +470,10 @@ public class DaoWizardViewController {
 			String key = iterator.next();
 
 			/* 2016.4.7 이미 존재하는 데이터는 유지한다. */
-//			Optional<TbpSysDaoFieldsDVO> findAny = tbParams.getItems().stream().filter(v -> key.equals(v.getFieldName())).findAny();
-//			if (findAny.isPresent()) {
-//				continue;
-//			}
+			//			Optional<TbpSysDaoFieldsDVO> findAny = tbParams.getItems().stream().filter(v -> key.equals(v.getFieldName())).findAny();
+			//			if (findAny.isPresent()) {
+			//				continue;
+			//			}
 
 			TbpSysDaoFieldsDVO dvo = new TbpSysDaoFieldsDVO();
 			dvo.setFieldName(key);
@@ -479,8 +497,8 @@ public class DaoWizardViewController {
 	 * 내용 : 변수를 제거함.
 	 *******************************/
 	public void menuItemRemoveOnAction(ActionEvent e) {
-		NullExpresion.ifNotNullDo(tbParams.getSelectionModel().getSelectedItem(), v -> {
-			tbParams.getItems().remove(v);
+		NullExpresion.ifNotNullDo(tbParams.getSelectionModel().getSelectedItems(), v -> {
+			tbParams.getItems().removeAll(v);
 		});
 	}
 
@@ -504,7 +522,12 @@ public class DaoWizardViewController {
 				TableModelDVO dvo = new TableModelDVO();
 
 				dvo.setName(ValueUtil.getPrefixLowerTextMyEdit(m.getColumnName()));
-				dvo.setType(typeConverter.apply(m.getColumnType()));
+				String programType = m.getProgramType();
+				if (programType == null || programType.isEmpty()) {
+					programType = typeConverter.apply(m.getColumnType());
+				}
+				dvo.setType(programType);
+
 				return dvo;
 			}).collect(Collectors.toList());
 
@@ -718,7 +741,15 @@ public class DaoWizardViewController {
 		// 파라미터 컬럼값 반환받는다.
 		ObservableList<TbpSysDaoFieldsDVO> items = tbParams.getItems();
 
+		Map<String, TbpSysDaoColumnsDVO> unmapping = this.tbMappings.getItems().stream().filter(v -> {
+			String lockYn = v.getLockYn();
+			if ("Y".equals(lockYn))
+				return true;
+			return false;
+		}).collect(Collectors.toMap(TbpSysDaoColumnsDVO::getColumnName, v -> v));
+
 		Map<String, Object> paramMap = items.stream().filter(vo -> vo.getTestValue() != null && !vo.getTestValue().isEmpty())
+
 				.collect(Collectors.toMap(TbpSysDaoFieldsDVO::getFieldName, new Function<TbpSysDaoFieldsDVO, Object>() {
 
 					@Override
@@ -738,21 +769,36 @@ public class DaoWizardViewController {
 		SimpleSQLResultView simpleSQLResultView = new SimpleSQLResultView(velocitySQL, paramMap);
 		try {
 			simpleSQLResultView.show();
+
 			List<TableModelDVO> columns = simpleSQLResultView.getColumns();
-			List<TbpSysDaoColumnsDVO> collect = columns.stream().map(vo -> {
+
+			List<TbpSysDaoColumnsDVO> resultList = columns.stream().map(vo -> {
 				TbpSysDaoColumnsDVO dvo = new TbpSysDaoColumnsDVO();
 				dvo.setColumnName(vo.getDatabaseColumnName());
-				dvo.setColumnType(vo.getDatabaseTypeName());
+				String databaseTypeName = vo.getDatabaseTypeName();
+				dvo.setColumnType(databaseTypeName);
+
+				if (unmapping.containsKey(vo.getDatabaseColumnName())) {
+					TbpSysDaoColumnsDVO tmp = unmapping.get(vo.getDatabaseColumnName());
+					dvo.setProgramType(tmp.getProgramType());
+					dvo.setLockYn(tmp.getLockYn());
+				} else {
+					//2016-08-26 새로 추가된 어플리케이션 프로그램 타입. 데이터베이스 -> 프로그램으로 변환되는 데이터 타입
+					String programType = DatabaseTypeMappingResourceLoader.getInstance().get(databaseTypeName);
+					dvo.setProgramType(programType);
+				}
+
 				return dvo;
 			}).collect(Collectors.toList());
 
 			// if (!this.tbMappings.getItems().isEmpty())
-			if (!collect.isEmpty()) {
+			if (!resultList.isEmpty()) {
+
 				this.tbMappings.getItems().clear();
 				getSelectedMethodItem().getTbpSysDaoColumnsDVOList().clear();
 
-				this.tbMappings.getItems().addAll(collect);
-				getSelectedMethodItem().getTbpSysDaoColumnsDVOList().addAll(collect);
+				this.tbMappings.getItems().addAll(resultList);
+				getSelectedMethodItem().getTbpSysDaoColumnsDVOList().addAll(resultList);
 			}
 
 		} catch (IOException e1) {
