@@ -8,7 +8,6 @@
 	<packaging>jar</packaging>
 
 	<name>kyj.Fx.dao.wizard</name>
-	<url>http://maven.apache.org</url>
 
 	<!-- 메이븐 잘 안됨. 오픈소스에 니 이름 넣지 마 -->
 
@@ -18,7 +17,7 @@
 		<logback.version>1.0.13</logback.version>
 		<slf4j.version>1.7.5</slf4j.version>
 		<java.version>1.8</java.version>
-		<deploy.target.dir>${user.home}/.m2/repository/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/0.0.1-SNAPSHOT</deploy.target.dir>
+<!-- 		<deploy.target.dir>${user.home}/.m2/repository/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/0.0.2-SNAPSHOT</deploy.target.dir> -->
 		<!-- 2015.12.10 mar버젼에서 인식이 불가능한 상황이 발생하면서, 추가함. 정확한 원인은 모르겟음. 실행하는데는 문제없으나
 			jar파일처리시 문제. -->
 		<vo.editor.jar.path.name>${user.home}/.m2/repository/kyj/FxVoEditor/kyj.FxVoEditor/0.0.1-SNAPSHOT/kyj.FxVoEditor-0.0.1-SNAPSHOT.jar</vo.editor.jar.path.name>
@@ -152,8 +151,8 @@
 			<groupId>kyj.FxVoEditor</groupId>
 			<artifactId>kyj.FxVoEditor</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${vo.editor.jar.path.name}</systemPath>
+<!-- 			<scope>system</scope> -->
+<!-- 			<systemPath>${vo.editor.jar.path.name}</systemPath> -->
 		</dependency>
 	</dependencies>
 
