@@ -31,12 +31,12 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/db/maria/mariadb-java-client-1.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/richtext/richtextfx-fat-0.6.10.jar"/>
 	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/db/maria/mariadb-java-client-1.4.6.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
