@@ -576,16 +576,16 @@
 			<groupId>kyj.FxVoEditor</groupId>
 			<artifactId>kyj.FxVoEditor</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${vo.editor.jar.path.name}</systemPath>
+<!-- 			<scope>system</scope> -->
+<!-- 			<systemPath>${vo.editor.jar.path.name}</systemPath> -->
 		</dependency>
 
 		<dependency>
 			<groupId>kyj.Fx.dao.wizard</groupId>
 			<artifactId>kyj.Fx.dao.wizard</artifactId>
 			<version>${dao.wizard.jar.version}</version>
-			<scope>system</scope>
-			<systemPath>${dao.wizard.jar.path.name}</systemPath>
+<!-- 			<scope>system</scope> -->
+<!-- 			<systemPath>${dao.wizard.jar.path.name}</systemPath> -->
 		</dependency>
 
 
