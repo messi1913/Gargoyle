@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import com.google.common.base.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -22,12 +23,12 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Objects;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.sun.btrace.BTraceUtils.Strings;
+
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -96,30 +97,29 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	}
 
-	ListChangeListener<Map<ColumnExpression, ObjectProperty<ValueExpression>>> itemChangeListener = new ListChangeListener<Map<ColumnExpression, ObjectProperty<ValueExpression>>>() {
+	private ListChangeListener<Map<ColumnExpression, ObjectProperty<ValueExpression>>> itemChangeListener = new ListChangeListener<Map<ColumnExpression, ObjectProperty<ValueExpression>>>() {
 
 		@Override
-		public void onChanged(ListChangeListener.Change<? extends Map<ColumnExpression, ObjectProperty<ValueExpression>>> c) {
+		public void onChanged(
+				javafx.collections.ListChangeListener.Change<? extends Map<ColumnExpression, ObjectProperty<ValueExpression>>> c) {
+
 			if (c.next()) {
 				if (c.wasAdded()) {
-					//					List<? extends Map<ColumnExpression, ObjectProperty<ValueExpression>>> addedSubList = c.getAddedSubList();
-					for (Map<ColumnExpression, ObjectProperty<ValueExpression>> m : c.getAddedSubList()) {
-
+					List<? extends Map<ColumnExpression, ObjectProperty<ValueExpression>>> addedSubList = c.getAddedSubList();
+					for (Map<ColumnExpression, ObjectProperty<ValueExpression>> m : addedSubList) {
 						m.put(ColumnExpression.INSTANCE_NEW_ROW_META(), new SimpleObjectProperty<>(new ValueExpression()));
 
 						for (TableColumn<Map<ColumnExpression, ObjectProperty<ValueExpression>>, ?> tc : getColumns()) {
 							ColumnExpression _col = (ColumnExpression) tc.getUserData();
-							ValueExpression initialValue = new ValueExpression();
-							initialValue.setRealValue(null);
-							initialValue.setDisplayText("");
-							initialValue.isNew = true;
-							initialValue.isPrimaryKey = _col.isPrimaryColumn;
-							initialValue.setColumnExpression(_col);
-							m.put(_col, new SimpleObjectProperty<>(initialValue));
+							ValueExpression valueExpression = new ValueExpression();
+							valueExpression.setRealValue(null);
+							valueExpression.setDisplayText("");
+							valueExpression.isNew = true;
+							valueExpression.isPrimaryKey = _col.isPrimaryColumn;
+							valueExpression.setColumnExpression(_col);
+							m.put(_col, new SimpleObjectProperty<>(valueExpression));
 						}
-
 					}
-
 				} else if (c.wasRemoved()) {
 					removedList.addAll(c.getRemoved());
 				}
@@ -154,7 +154,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 						try {
 							int columnCount = t.getColumnCount();
 
-							for (int i = 1; i < columnCount; i++) {
+							for (int i = 1; i <= columnCount; i++) {
 
 								String columnName = t.getColumnName(i);
 								ColumnExpression columnExp = new ColumnExpression(columnName);
@@ -177,7 +177,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 								Map<ColumnExpression, ObjectProperty<ValueExpression>> hashMap = new HashMap<>();
 
-								for (int i = 1; i < columnCount; i++) {
+								for (int i = 1; i <= columnCount; i++) {
 									String columnName = t.getColumnName(i);
 									ColumnExpression columnExp = columnMap.get(columnName);//new ColumnExpression(columnName);
 

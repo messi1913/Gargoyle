@@ -1,3 +1,4 @@
+package simple;
 import java.util.StringTokenizer;
 
 public class Test {

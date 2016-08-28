@@ -1,3 +1,4 @@
+package simple;
 import org.junit.Test;
 
 /********************************

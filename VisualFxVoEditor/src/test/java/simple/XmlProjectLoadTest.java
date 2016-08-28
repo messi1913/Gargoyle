@@ -1,3 +1,4 @@
+package simple;
 import java.io.File;
 
 import javax.xml.bind.annotation.XmlRootElement;

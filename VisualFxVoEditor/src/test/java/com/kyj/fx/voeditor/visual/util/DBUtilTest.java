@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -110,17 +111,16 @@ public class DBUtilTest {
 	@Test
 	public void selectCursorTest1() throws Exception {
 
-		
 		String sql = "select * from tbm_sm_realtime_search";
 
 		int startRow = 0;
 		int limitRow = 1000;
 		int length = 1000;
-		
+
 		for (int page = 0; page < 3; page++) {
 
 			startRow = page * length;
-//			limitRow = (page * length) * 2;
+			//			limitRow = (page * length) * 2;
 			Connection connection = DbUtil.getConnection();
 			List<Map<String, Object>> selectCursor = DbUtil.selectCursor(connection, sql, startRow, limitRow);
 			for (int i = 0; i < selectCursor.size(); i++) {
@@ -128,6 +128,46 @@ public class DBUtilTest {
 			}
 
 		}
+
+	}
+
+	@Test
+	public void pksTest() throws Exception {
+		{
+			List<String> pks = DbUtil.pks("tbm_sm_realtime_search");
+			List<String> columns = DbUtil.columns("tbm_sm_realtime_search");
+			System.out.println(pks);
+			System.out.println(columns);
+		}
+		{
+			List<String> pks = DbUtil.pks("study.deparment");
+			List<String> columns = DbUtil.columns("study.deparment");
+			System.out.println(pks);
+			System.out.println(columns);
+		}
+
+		Connection connection = DbUtil.getConnection();
+		DatabaseMetaData metaData = connection.getMetaData();
+		System.out.printf("catalog : %s \n", connection.getCatalog());
+		System.out.printf("schema : %s \n", connection.getSchema());
+		ResultSet rs = metaData.getPrimaryKeys(null, "study", "deparment");
+		System.out.println("#case1");
+		while (rs.next()) {
+			System.out.println(rs.getObject(4));
+		}
+		System.out.println("#case2");
+		//		rs = metaData.getPrimaryKeys("study", null, "deparment");
+		while (rs.next()) {
+			System.out.println(rs.getObject(4));
+		}
+		System.out.println("#case3");
+		rs = metaData.getPrimaryKeys(null, null, "study.deparment");
+		while (rs.next()) {
+			System.out.println(rs.getObject(4));
+		}
+
+		connection.close();
+		//		DbUtil.getConnection().getMetaData().getPrimaryKeys(catalog, schema, table)
 
 	}
 }

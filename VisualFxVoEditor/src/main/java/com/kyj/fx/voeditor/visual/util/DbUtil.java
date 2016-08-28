@@ -759,7 +759,7 @@ public class DbUtil extends ConnectionManager {
 		try (Connection connection = getConnection()) {
 
 			DatabaseMetaData metaData = connection.getMetaData();
-			ResultSet rs = metaData.getColumns(null, null, tableNamePattern, null);
+			ResultSet rs =  COLUMN_CONVERTER.apply(tableNamePattern, metaData); //  metaData.getColumns(null, null, tableNamePattern, null);
 
 			while (rs.next()) {
 				tables.add(converter.apply(rs));
@@ -769,6 +769,38 @@ public class DbUtil extends ConnectionManager {
 		return tables;
 	}
 
+	public static final BiFunction<String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (tableNamePattern, metaData) -> {
+		int dotIdx = tableNamePattern.indexOf('.');
+		try {
+			if (dotIdx >= 0) {
+				String category = tableNamePattern.substring(0, dotIdx);
+				String tableName = tableNamePattern.substring(dotIdx + 1);
+				return metaData.getColumns(category, null, tableName, null);
+			}
+			return metaData.getColumns(null, null, tableNamePattern, null);
+		} catch (Exception e) {
+			//
+		}
+		return null;
+	};
+
+	public static final BiFunction<String, DatabaseMetaData, ResultSet> PRIMARY_CONVERTER = (tableNamePattern, metaData) -> {
+		int dotIdx = tableNamePattern.indexOf('.');
+		try {
+			if (dotIdx >= 0) {
+				String category = tableNamePattern.substring(0, dotIdx);
+				String tableName = tableNamePattern.substring(dotIdx + 1);
+				return metaData.getPrimaryKeys(category, null, tableName);
+			}
+			return metaData.getPrimaryKeys(null, null, tableNamePattern);
+		} catch (Exception e) {
+			//
+		}
+		return null;
+	};
+
+	
+	
 	public static List<String> pks(String tableNamePattern) throws Exception {
 		return pks(getConnection(), tableNamePattern, t -> {
 			try {
@@ -806,10 +838,13 @@ public class DbUtil extends ConnectionManager {
 		List<T> tables = new ArrayList<>();
 
 		DatabaseMetaData metaData = connection.getMetaData();
-		ResultSet rs = metaData.getPrimaryKeys(null, null, tableNamePattern);
 
-		while (rs.next()) {
-			tables.add(converter.apply(rs));
+		ResultSet rs = PRIMARY_CONVERTER.apply(tableNamePattern, metaData); //metaData.getPrimaryKeys(null, null, tableNamePattern);
+
+		if (rs != null) {
+			while (rs.next()) {
+				tables.add(converter.apply(rs));
+			}
 		}
 
 		return tables;
