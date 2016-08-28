@@ -13,11 +13,10 @@ import javax.tools.ToolProvider;
  * Created by trung on 5/3/15.
  */
 public class InMemoryJavaCompiler {
-	static JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
-	static DynamicClassLoader cl = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
 
 	public static Class<?> compile(String className, String sourceCodeInText) throws Exception {
-
+		JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
+		DynamicClassLoader cl = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
 		SourceCode sourceCode = new SourceCode(className, sourceCodeInText);
 		CompiledCode compiledCode = new CompiledCode(className);
 		Iterable<? extends JavaFileObject> compilationUnits = Arrays.asList(sourceCode);
@@ -26,14 +25,13 @@ public class InMemoryJavaCompiler {
 				compiledCode, cl);
 
 		JavaCompiler.CompilationTask task = javac.getTask(null, fileManager, null, null, null, compilationUnits);
-		boolean result = task.call();
+		task.call();
 		return cl.loadClass(className);
 	}
 
-
-
 	public static Class<?> compile(List<SourceCode> codeList, String className) throws Exception {
-
+		JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
+		DynamicClassLoader cl = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
 		ExtendedStandardJavaFileManager fileManager = new ExtendedStandardJavaFileManager(javac.getStandardFileManager(null, null, null),
 				cl);
 
@@ -54,8 +52,7 @@ public class InMemoryJavaCompiler {
 	public static List<String> getDefaultOption() {
 		List<String> optionList = new ArrayList<String>();
 		// set compiler's classpath to be same as the runtime's
-		optionList.addAll(Arrays.asList("-classpath", System.getProperty(
-				"java.class.path") /* + ";" + System.getProperty("java.home") */));
+		optionList.addAll(Arrays.asList("-classpath", System.getProperty("java.class.path") /* + ";" + System.getProperty("java.home") */));
 
 		optionList.stream().flatMap(m -> Stream.of(m.split(";"))).forEach(System.out::println);
 		return optionList;

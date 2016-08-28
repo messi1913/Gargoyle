@@ -107,6 +107,9 @@ public class JavaTextArea extends BorderPane {
 		codeArea.replaceText(0, 0, content);
 	}
 
+	public String getContent(){
+		return codeArea.getText();
+	}
 	public void appendContent(String content) {
 		codeArea.replaceText(0, 0, content);
 	}
