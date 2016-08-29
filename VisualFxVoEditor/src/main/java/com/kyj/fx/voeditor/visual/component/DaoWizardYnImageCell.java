@@ -10,6 +10,8 @@ package com.kyj.fx.voeditor.visual.component;
 import java.io.IOException;
 import java.net.URL;
 
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WritableObjectValue;
 import javafx.scene.control.TableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -51,13 +53,14 @@ public class DaoWizardYnImageCell<S> extends TableCell<S, String> {
 				if (ev.getButton() == MouseButton.PRIMARY) {
 
 					if (getTableColumn().isEditable()) {
-
 						if ("Y".equals(getItem())) {
 							if (callback != null) {
 
 								String newVal = callback.call("Y");
 								super.setItem(newVal);
 								updateItem(newVal, false);
+								updateRealItem("Y");
+
 							}
 
 						} else {
@@ -66,9 +69,12 @@ public class DaoWizardYnImageCell<S> extends TableCell<S, String> {
 								String newVal = callback.call("N");
 								super.setItem(newVal);
 								updateItem(newVal, false);
+								updateRealItem("N");
+
 							}
 
 						}
+
 						ev.consume();
 					}
 
@@ -88,9 +94,26 @@ public class DaoWizardYnImageCell<S> extends TableCell<S, String> {
 	}
 
 	/********************************
-	 * 작성일 :  2016. 8. 27. 작성자 : KYJ
+	 * 작성일 : 2016. 8. 29. 작성자 : KYJ
+	 *
+	 * 실제 Observable Value값을 바꾼다.
+	 * 
+	 * @param value
+	 ********************************/
+	void updateRealItem(String value) {
+		ObservableValue<String> cellObservableValue = getTableColumn().getCellObservableValue(getIndex());
+		if (cellObservableValue instanceof WritableObjectValue) {
+			@SuppressWarnings("unchecked")
+			WritableObjectValue<String> wo = (WritableObjectValue<String>) cellObservableValue;
+			wo.set(value);
+		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 8. 27. 작성자 : KYJ
 	 *
 	 * TableCell에 기본적으로 들어가게 처리할 style을 정의.
+	 * 
 	 * @return
 	 ********************************/
 	private String getStyleText() {

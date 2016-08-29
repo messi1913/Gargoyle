@@ -558,11 +558,14 @@ public class DaoWizardViewController {
 	 * @return
 	 */
 	public TbpSysDaoMethodsDVO getSelectedMethodItem() {
-		int selectedMethodIndex = getSelectedMethodIndex();
-		if (selectedMethodIndex == -1)
-			return null;
-		TbpSysDaoMethodsDVO tbpSysDaoMethodsDVO = tbmSysDaoDVOProperty.get().getTbpSysDaoMethodsDVOList().get(selectedMethodIndex);
-		return tbpSysDaoMethodsDVO;
+		//		int selectedMethodIndex = getSelectedMethodIndex();
+		//		if (selectedMethodIndex == -1)
+		//			return null;
+
+		//bugfix
+		//		TbpSysDaoMethodsDVO tbpSysDaoMethodsDVO = tbmSysDaoDVOProperty.get().getTbpSysDaoMethodsDVOList().get(selectedMethodIndex);
+		return tbMethods.getSelectionModel().getSelectedItem();
+		//		return tbpSysDaoMethodsDVO;
 	}
 
 	/**
@@ -955,6 +958,12 @@ public class DaoWizardViewController {
 		} catch (Exception e) {
 			DialogUtil.showExceptionDailog(e, e.getMessage());
 		}
+	}
+
+	@FXML
+	public void tbMappingsOnMouseClick() {
+
+		LOGGER.debug(tbMappings.getSelectionModel().getSelectedItem().toString());
 	}
 
 	/**

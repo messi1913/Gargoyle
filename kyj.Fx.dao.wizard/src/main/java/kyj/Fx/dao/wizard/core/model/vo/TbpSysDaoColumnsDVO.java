@@ -27,6 +27,7 @@ public class TbpSysDaoColumnsDVO {
 
 	/**
 	 * 프로그램 데이터 타입
+	 * 
 	 * @최초생성일 2016. 8. 26.
 	 */
 	private StringProperty programType;
@@ -37,7 +38,7 @@ public class TbpSysDaoColumnsDVO {
 		this.columnName = new SimpleStringProperty();
 		this.columnType = new SimpleStringProperty();
 		this.programType = new SimpleStringProperty();
-		this.lockYn = new SimpleStringProperty();
+		this.lockYn = new SimpleStringProperty("N");
 	}
 
 	public void setColumnName(String columnName) {
@@ -91,6 +92,12 @@ public class TbpSysDaoColumnsDVO {
 
 	public final void setLockYn(final java.lang.String lockYn) {
 		this.lockYnProperty().set(lockYn);
+	}
+
+	@Override
+	public String toString() {
+		return "TbpSysDaoColumnsDVO [columnName=" + columnName + ", columnType=" + columnType + ", programType=" + programType + ", lockYn="
+				+ lockYn + "]";
 	}
 
 }
