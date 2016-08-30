@@ -717,7 +717,21 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 * @return
 	 */
 	SqlTab createTabItem() {
-		return new SqlTab(this::txtSqlOnKeyEvent);
+		SqlTab sqlTab = new SqlTab(this::txtSqlOnKeyEvent);
+		ContextMenu contextMenu = new ContextMenu();
+		Menu menuFunc = new Menu("Functions");
+		MenuItem menuQueryMacro = new MenuItem("Query-Macro");
+		menuQueryMacro.setOnAction(this::menuQueryMacroOnAction);
+		menuFunc.getItems().add(menuQueryMacro);
+
+		contextMenu.getItems().add(menuFunc);
+		sqlTab.setTxtSqlPaneContextMenu(contextMenu);
+		return sqlTab;
+	}
+
+	public void menuQueryMacroOnAction(ActionEvent e){
+		String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
+		System.out.println(selectedSQLText);
 	}
 
 	/**
