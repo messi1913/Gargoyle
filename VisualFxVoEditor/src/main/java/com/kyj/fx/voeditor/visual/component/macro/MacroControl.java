@@ -21,14 +21,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.util.DbUtil;
+import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
@@ -78,69 +82,89 @@ public class MacroControl extends Control {
 		tbResult.getColumns().clear();
 
 		//		try {
-		DbUtil.select(connection, param, 30, -1, new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, ObjectProperty<Object>>>>() {
 
-			@Override
-			public List<Map<String, ObjectProperty<Object>>> apply(ResultSetMetaData t, ResultSet rs) {
+		String[] split = param.split(";");
 
-				try {
-					int columnCount = t.getColumnCount();
+		connection.setAutoCommit(false);
+		try {
+			for (String sql : split) {
+				String _sql = sql.trim();
+				if (_sql.isEmpty())
+					continue;
 
-					for (int i = 1; i <= columnCount; i++) {
-						String columnName = t.getColumnName(i);
-						TableColumn<Map<String, String>, String> tbCol = new TableColumn<>(columnName);
-						tbCol.setCellFactory(
-								new Callback<TableColumn<Map<String, String>, String>, TableCell<Map<String, String>, String>>() {
+				boolean dml = DbUtil.isDml(_sql);
+				if (dml) {
+					DbUtil.update(connection, _sql);
+				} else {
+					DbUtil.select(connection, _sql, 30, 1000,
+							new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, ObjectProperty<Object>>>>() {
 
-									@Override
-									public TableCell<Map<String, String>, String> call(TableColumn<Map<String, String>, String> param) {
-										return new TableCell<Map<String, String>, String>() {
+								@Override
+								public List<Map<String, ObjectProperty<Object>>> apply(ResultSetMetaData t, ResultSet rs) {
 
-											@Override
-											protected void updateItem(String item, boolean empty) {
-												super.updateItem(item, empty);
-												if (empty) {
-													setGraphic(null);
-												} else {
-													setGraphic(new Label(item));
-												}
+									try {
+										int columnCount = t.getColumnCount();
+
+										for (int i = 1; i <= columnCount; i++) {
+											String columnName = t.getColumnName(i);
+											TableColumn<Map<String, String>, String> tbCol = new TableColumn<>(columnName);
+											tbCol.setCellFactory(
+													new Callback<TableColumn<Map<String, String>, String>, TableCell<Map<String, String>, String>>() {
+
+														@Override
+														public TableCell<Map<String, String>, String> call(
+																TableColumn<Map<String, String>, String> param) {
+															return new TableCell<Map<String, String>, String>() {
+
+																@Override
+																protected void updateItem(String item, boolean empty) {
+																	super.updateItem(item, empty);
+																	if (empty) {
+																		setGraphic(null);
+																	} else {
+																		setGraphic(new Label(item));
+																	}
+																}
+
+															};
+														}
+													});
+
+											tbCol.setCellValueFactory(param -> {
+												return new SimpleStringProperty(param.getValue().get(columnName));
+											});
+
+											tbResult.getColumns().add(tbCol);
+										}
+
+										while (rs.next()) {
+											Map<String, String> hashMap = new HashMap<>();
+
+											for (int i = 1; i <= columnCount; i++) {
+												String columnName = t.getColumnName(i);
+												String value = rs.getString(columnName);
+												hashMap.put(columnName, value);
+
 											}
+											tbResult.getItems().add(hashMap);
 
-										};
+										}
+
+									} catch (SQLException e) {
+										throw new RuntimeException(e);
 									}
-								});
+									return Collections.emptyList();
+								}
 
-						tbCol.setCellValueFactory(param -> {
-							return new SimpleStringProperty(param.getValue().get(columnName));
-						});
-
-						tbResult.getColumns().add(tbCol);
-					}
-
-					while (rs.next()) {
-						Map<String, String> hashMap = new HashMap<>();
-
-						for (int i = 1; i <= columnCount; i++) {
-							String columnName = t.getColumnName(i);
-							String value = rs.getString(columnName);
-							hashMap.put(columnName, value);
-
-						}
-						tbResult.getItems().add(hashMap);
-
-					}
-
-				} catch (SQLException e) {
-					throw new RuntimeException(e);
+							});
 				}
-				return Collections.emptyList();
 			}
-
-		});
-
-		//		} catch (Exception e) {
-		//			errorHandler.accept(e);
-		//		}
+		} catch (Exception e) {
+			connection.rollback();
+			throw new RuntimeException(e);
+		} finally {
+			DbUtil.close(connection);
+		}
 
 	}
 
@@ -153,6 +177,53 @@ public class MacroControl extends Control {
 	 */
 	public boolean stop() {
 		return false;
+	}
+
+	public void tbResultOnKeyReleased() {
+
+		Skin<?> skin = this.getSkin();
+		if (!(skin instanceof MacroBaseSkin)) {
+			return;
+		}
+
+		MacroBaseSkin mskin = (MacroBaseSkin) skin;
+		TableView<Map<String, String>> tbResult = mskin.getTbResult();
+		int type = 1;
+		
+
+		ObservableList<TablePosition> selectedCells = tbResult.getSelectionModel().getSelectedCells();
+
+		TablePosition tablePosition = selectedCells.get(0);
+		TableColumn tableColumn = tablePosition.getTableColumn();
+		int row = tablePosition.getRow();
+		int col = tbResult.getColumns().indexOf(tableColumn);
+
+		switch (type) {
+		case 1:
+			StringBuilder sb = new StringBuilder();
+			for (TablePosition cell : selectedCells) {
+				// TODO :: 첫번째 컬럼(행 선택 기능)도 빈값으로 복사됨..
+				// 행변경시
+				if (row != cell.getRow()) {
+					sb.append("\n");
+					row++;
+				}
+				// 열 변경시
+				else if (col != tbResult.getColumns().indexOf(cell.getTableColumn())) {
+					sb.append("\t");
+				}
+				Object cellData = cell.getTableColumn().getCellData(cell.getRow());
+				sb.append(ValueUtil.decode(cellData, cellData, "").toString());
+			}
+			FxClipboardUtil.putString(sb.toString());
+
+			break;
+		case 2:
+			Object cellData = tableColumn.getCellData(row);
+			FxClipboardUtil.putString(ValueUtil.decode(cellData, cellData, "").toString());
+			break;
+		}
+
 	}
 
 }

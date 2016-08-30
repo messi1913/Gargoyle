@@ -6,7 +6,17 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.macro;
 
+import static javafx.scene.input.KeyCode.DOWN;
+import static javafx.scene.input.KeyCode.ENTER;
+import static javafx.scene.input.KeyCode.LEFT;
+import static javafx.scene.input.KeyCode.RIGHT;
+import static javafx.scene.input.KeyCode.SPACE;
+import static javafx.scene.input.KeyCode.UP;
+import static javafx.scene.input.KeyEvent.KEY_RELEASED;
+
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -15,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
@@ -22,15 +34,21 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
@@ -56,12 +74,35 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	 * @최초생성일 2016. 8. 30.
 	 */
 	private AtomicInteger sleepSecond = new AtomicInteger(5);
+
+	protected static final List<KeyBinding> DATE_CELL_BINDINGS = new ArrayList<KeyBinding>();
+	static {
+		DATE_CELL_BINDINGS.add(new KeyBinding(KeyCode.C, "Clipboard").ctrl());
+	}
+
 	/**
 	 * @param control
 	 */
 	public MacroBaseSkin(MacroControl control) {
+		this(control, new BehaviorBase<MacroControl>(control, DATE_CELL_BINDINGS) {
 
-		this(control, new BehaviorBase<>(control, Collections.<KeyBinding> emptyList()));
+			@Override
+			protected void callActionForEvent(KeyEvent e) {
+				super.callActionForEvent(e);
+			}
+
+			@Override
+			protected void callAction(String name) {
+				System.out.println(name);
+				switch (name) {
+				case "Clipboard":
+					getControl().tbResultOnKeyReleased();
+					break;
+				}
+
+			}
+
+		});
 	}
 
 	/**
@@ -73,6 +114,9 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 
 		rootLayout = new BorderPane();
 		tbResult = new TableView<>();
+		tbResult.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		tbResult.getSelectionModel().setCellSelectionEnabled(true);
+		//		tbResult.addEventFilter(KeyEvent.KEY_RELEASED, this::tbResultOnKeyReleased);
 		textArea = new TextArea();
 		SplitPane splitPane = new SplitPane(textArea, tbResult);
 		splitPane.setOrientation(Orientation.VERTICAL);
@@ -85,9 +129,9 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 		btnStop.addEventHandler(ActionEvent.ACTION, this::btnStopOnAction);
 
 		Label label = new Label(" Wait Sec : 5 ");
-//		NumberTextField numberTextField = new NumberTextField(String.valueOf(sleepSecond.get()));
+		//		NumberTextField numberTextField = new NumberTextField(String.valueOf(sleepSecond.get()));
 
-		HBox buttonBox = new HBox(5,  label,/* numberTextField,*/ btnStart, btnStop);
+		HBox buttonBox = new HBox(5, label, /* numberTextField,*/ btnStart, btnStop);
 		buttonBox.setId("btn-box");
 		buttonBox.setPadding(new Insets(5));
 		buttonBox.setAlignment(Pos.CENTER_RIGHT);
@@ -169,6 +213,9 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 		return this.sleepSecond.get();
 	}
 
+	public TableView<Map<String, String>> getTbResult(){
+		return tbResult;
+	}
 	/**
 	 * 스케줄링 클래스 . 인스턴스당 하나
 	 * 
@@ -213,8 +260,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 					}
 				}
 			};
-			
-			
+
 			//Javafx 처리실행.
 			Platform.runLater(new Runnable() {
 
