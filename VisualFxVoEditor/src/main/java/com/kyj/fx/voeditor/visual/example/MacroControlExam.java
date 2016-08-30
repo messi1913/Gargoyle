@@ -7,16 +7,18 @@
 package com.kyj.fx.voeditor.visual.example;
 
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
+import com.kyj.fx.voeditor.visual.util.DbUtil;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
+ * 스케줄링 컴포넌트 테스튼
  * @author KYJ
  *
  */
-public class MacroControlExam extends Application{
+public class MacroControlExam extends Application {
 
 	/**
 	 * @작성자 : KYJ
@@ -33,7 +35,14 @@ public class MacroControlExam extends Application{
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		primaryStage.setScene(new Scene(new MacroControl()));
+		primaryStage.setScene(new Scene(new MacroControl(() -> {
+			try {
+				return DbUtil.getConnection();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		})));
 		primaryStage.show();
 
 	}

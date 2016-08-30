@@ -130,8 +130,8 @@ public class DbUtil extends ConnectionManager {
 		return select(con, sql);
 	}
 
-	public static List<Map<String, Object>> select(final String sql, int fetchCount, int limitSize,
-			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>> convert) throws Exception {
+	public static <T> List<Map<String, T>> select(final String sql, int fetchCount, int limitSize,
+			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, T>>> convert) throws Exception {
 		Connection con = getConnection();
 		return select(con, sql, fetchCount, limitSize, convert);
 	}
@@ -193,15 +193,15 @@ public class DbUtil extends ConnectionManager {
 				new ResultSetToMapConverter(properties));
 	}
 
-	public static List<Map<String, Object>> select(final Connection con, final String sql, int fetchCount, int limitedSize,
-			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>> convert) throws Exception {
+	public static <T> List<Map<String, T>> select(final Connection con, final String sql, int fetchCount, int limitedSize,
+			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, T>>> convert) throws Exception {
 		return select(con, sql, fetchCount, limitedSize, DEFAULT_PREPAREDSTATEMENT_CONVERTER, convert);
 	}
 
-	public static List<Map<String, Object>> select(final Connection con, final String sql, int fetchCount, int limitedSize,
+	public static <T> List<Map<String, T>> select(final Connection con, final String sql, int fetchCount, int limitedSize,
 			BiFunction<Connection, String, PreparedStatement> prestatementConvert,
-			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>> convert) throws Exception {
-		List<Map<String, Object>> arrayList = null;
+			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, T>>> convert) throws Exception {
+		List<Map<String, T>> arrayList = null;
 
 		try {
 
