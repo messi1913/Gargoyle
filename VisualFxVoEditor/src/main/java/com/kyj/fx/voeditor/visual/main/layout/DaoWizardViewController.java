@@ -202,7 +202,7 @@ public class DaoWizardViewController {
 
 		//		this.colProgramTypeLock.setCellValueFactory(v -> v.getValue().lockYnProperty());
 		//		this.colProgramTypeLock.setCellFactory(v ->{
-		//			return 
+		//			return
 		//		});
 
 		tbmSysDaoDVOProperty = new SimpleObjectProperty<>(new TbmSysDaoDVO());
@@ -963,7 +963,9 @@ public class DaoWizardViewController {
 	@FXML
 	public void tbMappingsOnMouseClick() {
 
-		LOGGER.debug(tbMappings.getSelectionModel().getSelectedItem().toString());
+		TbpSysDaoColumnsDVO selectedItem = tbMappings.getSelectionModel().getSelectedItem();
+		if(selectedItem!=null)
+			LOGGER.debug(selectedItem.toString());
 	}
 
 	/**

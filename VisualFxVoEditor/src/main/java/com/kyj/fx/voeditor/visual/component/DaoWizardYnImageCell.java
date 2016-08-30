@@ -20,9 +20,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 /**
- * 
+ *
  * 데이터값이 Y,혹은 N이냐에 따라 다른 이미지를 보여주기 위한 셀.
- * 
+ *
  * @author KYJ
  * @param <S>
  * @param <T>
@@ -57,20 +57,19 @@ public class DaoWizardYnImageCell<S> extends TableCell<S, String> {
 							if (callback != null) {
 
 								String newVal = callback.call("Y");
-								super.setItem(newVal);
 								updateItem(newVal, false);
-								updateRealItem("Y");
-
+								updateRealItem(newVal);
+								super.setItem(newVal);
 							}
 
 						} else {
 
 							if (callback != null) {
 								String newVal = callback.call("N");
-								super.setItem(newVal);
-								updateItem(newVal, false);
-								updateRealItem("N");
 
+								updateItem(newVal, false);
+								updateRealItem(newVal);
+								super.setItem(newVal);
 							}
 
 						}
@@ -97,7 +96,7 @@ public class DaoWizardYnImageCell<S> extends TableCell<S, String> {
 	 * 작성일 : 2016. 8. 29. 작성자 : KYJ
 	 *
 	 * 실제 Observable Value값을 바꾼다.
-	 * 
+	 *
 	 * @param value
 	 ********************************/
 	void updateRealItem(String value) {
@@ -113,7 +112,7 @@ public class DaoWizardYnImageCell<S> extends TableCell<S, String> {
 	 * 작성일 : 2016. 8. 27. 작성자 : KYJ
 	 *
 	 * TableCell에 기본적으로 들어가게 처리할 style을 정의.
-	 * 
+	 *
 	 * @return
 	 ********************************/
 	private String getStyleText() {
@@ -150,7 +149,7 @@ public class DaoWizardYnImageCell<S> extends TableCell<S, String> {
 
 	/**
 	 * 기본으로 주어지는 처리 기능은 Y로 데이터가 입력되면 N, N이 입력되면 Y로 값을 바꿔주어 상태변화가 나타나게한다.
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 27.
 	 */
 	private Callback<String, String> callback = param -> "Y".equals(param) ? "N" : "Y";
@@ -159,7 +158,7 @@ public class DaoWizardYnImageCell<S> extends TableCell<S, String> {
 	 * 작성일 : 2016. 8. 27. 작성자 : KYJ
 	 *
 	 * 값변환 처리 콜백 처리 기술. 주어진값의 결과에 따라 서로 다른 이미지가 보여지게됨.
-	 * 
+	 *
 	 * @param callback
 	 ********************************/
 	public final void setOnValueChage(Callback<String, String> callback) {
@@ -170,7 +169,7 @@ public class DaoWizardYnImageCell<S> extends TableCell<S, String> {
 	 * 작성일 : 2016. 8. 27. 작성자 : KYJ
 	 *
 	 * 이미지생성1
-	 * 
+	 *
 	 * @throws IOException
 	 ********************************/
 	private void ycreateImageField() throws IOException {
@@ -185,7 +184,7 @@ public class DaoWizardYnImageCell<S> extends TableCell<S, String> {
 	 * 작성일 : 2016. 8. 27. 작성자 : KYJ
 	 *
 	 * 이미지생성2
-	 * 
+	 *
 	 * @throws IOException
 	 ********************************/
 	private void ncreateImageField() throws IOException {
