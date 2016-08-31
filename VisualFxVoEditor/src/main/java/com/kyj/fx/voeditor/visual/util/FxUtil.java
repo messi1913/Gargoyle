@@ -481,8 +481,8 @@ public class FxUtil {
 	 * @작성일 : 2016. 6. 23.
 	 * @param parent
 	 */
-	public static void createStageAndShow(Node parent) {
-		createStageAndShow(new Scene(new BorderPane(parent)), false);
+	public static void createStageAndShow(String title, Node parent) {
+		createStageAndShow(title, new Scene(new BorderPane(parent)), false);
 	}
 
 	/**
@@ -491,8 +491,8 @@ public class FxUtil {
 	 * @param parent
 	 * @param isModal
 	 */
-	public static void createStageAndShow(Node parent, boolean isModal) {
-		createStageAndShow(new Scene(new BorderPane(parent)), isModal);
+	public static void createStageAndShow(String title, Node parent, boolean isModal) {
+		createStageAndShow(title,new Scene(new BorderPane(parent)), isModal);
 	}
 
 	/**
@@ -501,9 +501,9 @@ public class FxUtil {
 	 * @param parent
 	 * @param option
 	 */
-	public static void createStageAndShow(Node parent, Consumer<Stage> option) {
-		createStageAndShow(new Scene(new BorderPane(parent)), option);
-	}
+//	public static void createStageAndShow(String title, Node parent, Consumer<Stage> option) {
+//		createStageAndShow(title, new Scene(new BorderPane(parent)), option);
+//	}
 
 	/**
 	 * @작성자 : KYJ
@@ -521,8 +521,8 @@ public class FxUtil {
 	 * @param parent
 	 * @param isModal
 	 */
-	public static void createStageAndShow(Parent parent, boolean isModal) {
-		createStageAndShow(new Scene(parent), isModal);
+	public static void createStageAndShow(String title, Parent parent, boolean isModal) {
+		createStageAndShow(title, new Scene(parent), isModal);
 	}
 
 	/**
@@ -531,13 +531,23 @@ public class FxUtil {
 	 * @param scene
 	 * @param isModal
 	 */
-	public static void createStageAndShow(Scene scene, boolean isModal) {
+	public static void createStageAndShow(String title, Scene scene, boolean isModal) {
 		Consumer<Stage> option = null;
 		if (isModal) {
 			option = stage -> {
+				stage.setTitle(title);
 				stage.setAlwaysOnTop(true);
 				stage.initModality(Modality.APPLICATION_MODAL);
 				stage.initOwner(stage);
+			};
+		}
+		else
+		{
+			option = stage -> {
+				stage.setTitle(title);
+//				stage.setAlwaysOnTop(true);
+//				stage.initModality(Modality.APPLICATION_MODAL);
+//				stage.initOwner(stage);
 			};
 		}
 
@@ -858,7 +868,7 @@ public class FxUtil {
 	 * 작성일 : 2016. 8. 23. 작성자 : KYJ
 	 *
 	 * Node의 Window 객체를 리턴함.
-	 * 
+	 *
 	 * @param node
 	 * @return
 	 ********************************/
