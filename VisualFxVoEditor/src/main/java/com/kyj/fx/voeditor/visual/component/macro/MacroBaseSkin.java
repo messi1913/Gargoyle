@@ -35,9 +35,9 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * SQL 매크로 기능을 지우너하기 위한 베이스 스킨
@@ -53,8 +53,23 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	private BorderPane rootLayout;
 	private TextArea textArea;
 	private TableView<Map<String, String>> tbResult;
-	private BooleanProperty isStarted = new SimpleBooleanProperty();
 
+	/**
+	 * 스레드가 실행중인지 여부에 따라 값이 TRUE/FALSE로 나뉘며
+	 * 이 값에 따라 버튼활성화 비활성화 및 스레드의 실행상태가 결정된다.
+	 * @최초생성일 2016. 8. 31.
+	 */
+	private BooleanProperty isStarted = new SimpleBooleanProperty();
+	/**
+	 * 종료 요청이 성공적으로 진행된경우 호출되는 이벤트 내용이 기술된다.
+	 * @최초생성일 2016. 8. 31.
+	 */
+	public Consumer<Void> onStopSuccessed;
+	/**
+	 * 처리되는 코드블록에서 에러가 발생되 자동으로 멈춰야되는경우에 호출되는 이벤트 내용이 기술된다.
+	 * @최초생성일 2016. 8. 31.
+	 */
+	public Consumer<Void> onStopErrored;
 	/**
 	 * 스케줄링 대기 시간 기본값 5초
 	 *
@@ -62,6 +77,10 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	 */
 	private AtomicInteger sleepSecond = new AtomicInteger(5);
 
+	/**
+	 * 키 이벤트 정의
+	 * @최초생성일 2016. 8. 31.
+	 */
 	protected static final List<KeyBinding> DATE_CELL_BINDINGS = new ArrayList<KeyBinding>();
 
 	static {
@@ -74,11 +93,12 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	public MacroBaseSkin(MacroControl control) {
 		this(control, new BehaviorBase<MacroControl>(control, DATE_CELL_BINDINGS) {
 
-			@Override
-			protected void callActionForEvent(KeyEvent e) {
-				super.callActionForEvent(e);
-			}
-
+			/*
+			 * 이벤트 함수정의
+			 *
+			 * (non-Javadoc)
+			 * @see com.sun.javafx.scene.control.behavior.BehaviorBase#callAction(java.lang.String)
+			 */
 			@Override
 			protected void callAction(String name) {
 				LOGGER.debug("callAction : {} ", name);
@@ -192,7 +212,20 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	 * @param e
 	 */
 	public void btnStopOnAction(ActionEvent e) {
+		stop();
+	}
+
+	/**
+	 * 스케줄링 정지 처리.
+	 *
+	 * 스케줄링 작업이 끝난 이후에 호출되기때문에
+	 * 리턴값이 바로출력되지않을 수 있다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 31.
+	 */
+	public boolean stop() {
 		isStarted.set(false);
+		return isStarted.get();
 	}
 
 	/********************************
@@ -232,6 +265,26 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	}
 
 	/**
+	 * Stop요청이 들어온경우 성공적으로 정지되면 호출되는 이벤트 정의
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 31.
+	 * @param onStopSuccessed
+	 */
+	public void setOnStopSuccessed(Consumer<Void> onStopSuccessed) {
+		this.onStopSuccessed = onStopSuccessed;
+	}
+
+	/**
+	 * 에러가 발생되서 정지되는경우 호출되는 이벤트 정의
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 31.
+	 * @param onStopErrored
+	 */
+	public void setOnStopErrored(Consumer<Void> onStopErrored) {
+		this.onStopErrored = onStopErrored;
+	}
+
+	/**
 	 * 스케줄링 클래스 . 인스턴스당 하나
 	 *
 	 * @최초생성일 2016. 8. 30.
@@ -260,7 +313,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 						int second = sleepSecond.get() * 1000;
 						Thread.currentThread().sleep(second);
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						LOGGER.error(ValueUtil.toString(e));
 					}
 					LOGGER.debug("Is Restart {} ", isStarted.get());
 
@@ -272,6 +325,9 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 							new Thread(target).start();
 						} else {
 							LOGGER.debug("End Schedule.");
+							if (onStopSuccessed != null) {
+								onStopSuccessed.accept(null);
+							}
 						}
 
 					}
@@ -279,18 +335,18 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 				}
 			};
 
-			//Javafx 처리실행.
+			//Javafx 스레드로 처리실행.
 			Platform.runLater(new Runnable() {
 
 				@Override
 				public void run() {
 					try {
-						if(isStarted.get())
+						if (isStarted.get())
 							MacroBaseSkin.this.getSkinnable().start(tbResult, textArea.getText());
 					} catch (Exception e) {
 
-						//에러가 발생하면 로그를 남기고 중단함.
-						//						LOGGER.error(ValueUtil.toString(e));
+						//에러가 발생하면 중단함.
+
 						onFinished = null;
 						isStarted.set(false);
 						DialogUtil.showExceptionDailog(e);
@@ -301,6 +357,11 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 
 			if (onFinished != null)
 				onFinished.accept(null);
+			else {
+				if (onStopErrored != null)
+					onStopErrored.accept(null);
+			}
+
 		}
 
 	}

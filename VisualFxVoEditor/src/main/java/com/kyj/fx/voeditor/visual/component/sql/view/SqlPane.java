@@ -742,7 +742,18 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	public void menuQueryMacroOnAction(ActionEvent e) {
 		String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
 		MacroControl macroControl = new MacroControl(connectionSupplier, selectedSQLText);
-		FxUtil.createStageAndShow("Query-Macro", macroControl);
+		FxUtil.createStageAndShow(macroControl, stage -> {
+			stage.setTitle("Query-Macro");
+
+			//팝업창을 닫는 요청이 들어온경우 stop()함수를 호출하고 종료
+			stage.setOnCloseRequest(ev -> {
+
+
+				LOGGER.debug("Stop Action Result :stopReuqest ");
+				macroControl.stop();
+
+			});
+		});
 
 	}
 

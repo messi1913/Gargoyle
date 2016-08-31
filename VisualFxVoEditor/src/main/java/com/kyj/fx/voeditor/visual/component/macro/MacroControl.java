@@ -54,6 +54,17 @@ public class MacroControl extends Control {
 	private Supplier<Connection> connectionSupplier;
 	private String initText;
 
+	/**
+	 * @param connectionSupplier
+	 */
+	public MacroControl(Supplier<Connection> connectionSupplier) {
+		this(connectionSupplier, "");
+	}
+
+	/**
+	 * @param connectionSupplier
+	 * @param initText
+	 */
 	public MacroControl(Supplier<Connection> connectionSupplier, String initText) {
 		this.connectionSupplier = connectionSupplier;
 		this.initText = initText;
@@ -99,10 +110,10 @@ public class MacroControl extends Control {
 
 				boolean dml = DbUtil.isDml(_sql);
 				if (dml) {
-					LOGGER.debug("do update : {}" , _sql);
+					LOGGER.debug("do update : {}", _sql);
 					DbUtil.update(connection, _sql);
 				} else {
-					LOGGER.debug("do select : {}" , _sql);
+					LOGGER.debug("do select : {}", _sql);
 					DbUtil.select(connection, _sql, 30, 1000,
 							new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, ObjectProperty<Object>>>>() {
 
@@ -118,24 +129,24 @@ public class MacroControl extends Control {
 											tbCol.setCellFactory(
 													new Callback<TableColumn<Map<String, String>, String>, TableCell<Map<String, String>, String>>() {
 
+												@Override
+												public TableCell<Map<String, String>, String> call(
+														TableColumn<Map<String, String>, String> param) {
+													return new TableCell<Map<String, String>, String>() {
+
 														@Override
-														public TableCell<Map<String, String>, String> call(
-																TableColumn<Map<String, String>, String> param) {
-															return new TableCell<Map<String, String>, String>() {
-
-																@Override
-																protected void updateItem(String item, boolean empty) {
-																	super.updateItem(item, empty);
-																	if (empty) {
-																		setGraphic(null);
-																	} else {
-																		setGraphic(new Label(item));
-																	}
-																}
-
-															};
+														protected void updateItem(String item, boolean empty) {
+															super.updateItem(item, empty);
+															if (empty) {
+																setGraphic(null);
+															} else {
+																setGraphic(new Label(item));
+															}
 														}
-													});
+
+													};
+												}
+											});
 
 											tbCol.setCellValueFactory(param -> {
 												return new SimpleStringProperty(param.getValue().get(columnName));
@@ -184,7 +195,12 @@ public class MacroControl extends Control {
 	 * @return
 	 */
 	public boolean stop() {
-		return false;
+		Skin<?> skin = this.getSkin();
+		if (!(skin instanceof MacroBaseSkin)) {
+			return false;
+		}
+		MacroBaseSkin mskin = (MacroBaseSkin) skin;
+		return mskin.stop();
 	}
 
 	public void tbResultOnKeyReleased() {
@@ -197,7 +213,6 @@ public class MacroControl extends Control {
 		MacroBaseSkin mskin = (MacroBaseSkin) skin;
 		TableView<Map<String, String>> tbResult = mskin.getTbResult();
 		int type = 1;
-
 
 		ObservableList<TablePosition> selectedCells = tbResult.getSelectionModel().getSelectedCells();
 
@@ -233,5 +248,37 @@ public class MacroControl extends Control {
 		}
 
 	}
+
+	/**
+	 * Stop요청이 들어온경우 성공적으로 정지되면 호출되는 이벤트 정의
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 31.
+	 * @param onStopSuccessed
+	 */
+	//	public void setonStopSuccessed(Consumer<Void> onStopSuccessed) {
+	//		Skin<?> skin = this.getSkin();
+	//		if (!(skin instanceof MacroBaseSkin)) {
+	//			return;
+	//		}
+	//
+	//		MacroBaseSkin mskin = (MacroBaseSkin) skin;
+	//		mskin.setOnStopSuccessed(onStopSuccessed);
+	//	}
+
+	/**
+	 * 에러가 발생되서 정지되는경우 호출되는 이벤트 정의
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 31.
+	 * @param onStopErrored
+	 */
+	//	public void setOnStopErrored(Consumer<Void> onStopErrored) {
+	//		Skin<?> skin = this.getSkin();
+	//		if (!(skin instanceof MacroBaseSkin)) {
+	//			return;
+	//		}
+	//
+	//		MacroBaseSkin mskin = (MacroBaseSkin) skin;
+	//		mskin.setOnStopErrored(onStopErrored);
+	//	}
 
 }
