@@ -126,7 +126,7 @@ public class DBUtilTest {
 			for (int i = 0; i < selectCursor.size(); i++) {
 				System.out.printf("%d %s\n", i, selectCursor.get(i));
 			}
-
+			connection.close();
 		}
 
 	}

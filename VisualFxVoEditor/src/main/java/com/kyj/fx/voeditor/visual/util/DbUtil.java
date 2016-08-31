@@ -231,9 +231,10 @@ public class DbUtil extends ConnectionManager {
 			arrayList = convert.apply(metaData, executeQuery);
 		} catch (Throwable e) {
 			throw e;
-		} finally {
-			close();
 		}
+//		finally {
+//			close();
+//		}
 
 		return arrayList;
 	}
@@ -799,8 +800,8 @@ public class DbUtil extends ConnectionManager {
 		return null;
 	};
 
-	
-	
+
+
 	public static List<String> pks(String tableNamePattern) throws Exception {
 		return pks(getConnection(), tableNamePattern, t -> {
 			try {
