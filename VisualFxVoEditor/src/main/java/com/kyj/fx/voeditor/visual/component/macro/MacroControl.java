@@ -38,7 +38,7 @@ import javafx.util.Callback;
 
 /**
  * SQL 매크로 기능을 지우너하기 위한 컨트롤러
- * 
+ *
  * @author KYJ
  *
  */
@@ -48,13 +48,15 @@ public class MacroControl extends Control {
 
 	/**
 	 * 접속가능한 데이터베이스 Connection을 리턴
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 30.
 	 */
 	private Supplier<Connection> connectionSupplier;
+	private String initText;
 
-	public MacroControl(Supplier<Connection> connectionSupplier) {
+	public MacroControl(Supplier<Connection> connectionSupplier, String initText) {
 		this.connectionSupplier = connectionSupplier;
+		this.initText = initText;
 	}
 
 	/* (non-Javadoc)
@@ -62,12 +64,15 @@ public class MacroControl extends Control {
 	 */
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new MacroBaseSkin(this);
+
+		MacroBaseSkin macroBaseSkin = new MacroBaseSkin(this);
+		macroBaseSkin.setInitText(this.initText);
+		return macroBaseSkin;
 	}
 
 	/**
 	 * Start 버튼을 클릭하면 결과가 리턴된다. param으로 입력받은 데이터는 textArea에서 적혀져있는 텍스트문자열.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 30.
 	 * @param param
@@ -94,8 +99,10 @@ public class MacroControl extends Control {
 
 				boolean dml = DbUtil.isDml(_sql);
 				if (dml) {
+					LOGGER.debug("do update : {}" , _sql);
 					DbUtil.update(connection, _sql);
 				} else {
+					LOGGER.debug("do select : {}" , _sql);
 					DbUtil.select(connection, _sql, 30, 1000,
 							new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, ObjectProperty<Object>>>>() {
 
@@ -159,6 +166,7 @@ public class MacroControl extends Control {
 							});
 				}
 			}
+			connection.commit();
 		} catch (Exception e) {
 			connection.rollback();
 			throw new RuntimeException(e);
@@ -170,7 +178,7 @@ public class MacroControl extends Control {
 
 	/**
 	 * 매크로 동작을 멈춘다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 30.
 	 * @return
@@ -189,7 +197,7 @@ public class MacroControl extends Control {
 		MacroBaseSkin mskin = (MacroBaseSkin) skin;
 		TableView<Map<String, String>> tbResult = mskin.getTbResult();
 		int type = 1;
-		
+
 
 		ObservableList<TablePosition> selectedCells = tbResult.getSelectionModel().getSelectedCells();
 

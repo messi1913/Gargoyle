@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
 import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
 import com.kyj.fx.voeditor.visual.component.sql.dock.DockNode;
@@ -49,6 +50,7 @@ import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Application;
@@ -729,9 +731,19 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		return sqlTab;
 	}
 
-	public void menuQueryMacroOnAction(ActionEvent e){
+	/**
+	 * query-macro menu 선택시 발생되는 이벤트에 대한정의.
+	 *
+	 * 기술내용으로는 쿼리 매크로를 처리할 수 있는 팝업을 로드한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 31.
+	 * @param e
+	 */
+	public void menuQueryMacroOnAction(ActionEvent e) {
 		String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
-		System.out.println(selectedSQLText);
+		MacroControl macroControl = new MacroControl(connectionSupplier, selectedSQLText);
+		FxUtil.createStageAndShow("Query-Macro", macroControl);
+
 	}
 
 	/**

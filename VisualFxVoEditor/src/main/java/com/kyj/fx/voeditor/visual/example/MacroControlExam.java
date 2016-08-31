@@ -42,7 +42,7 @@ public class MacroControlExam extends Application {
 				e.printStackTrace();
 			}
 			return null;
-		})));
+		}, "init")));
 		primaryStage.show();
 
 	}

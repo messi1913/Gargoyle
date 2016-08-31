@@ -6,16 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.macro;
 
-import static javafx.scene.input.KeyCode.DOWN;
-import static javafx.scene.input.KeyCode.ENTER;
-import static javafx.scene.input.KeyCode.LEFT;
-import static javafx.scene.input.KeyCode.RIGHT;
-import static javafx.scene.input.KeyCode.SPACE;
-import static javafx.scene.input.KeyCode.UP;
-import static javafx.scene.input.KeyEvent.KEY_RELEASED;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,9 +15,8 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.NumberTextField;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
@@ -34,7 +24,6 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -43,8 +32,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
@@ -54,7 +41,7 @@ import javafx.scene.layout.HBox;
 
 /**
  * SQL 매크로 기능을 지우너하기 위한 베이스 스킨
- * 
+ *
  * @author KYJ
  *
  */
@@ -70,12 +57,13 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 
 	/**
 	 * 스케줄링 대기 시간 기본값 5초
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 30.
 	 */
 	private AtomicInteger sleepSecond = new AtomicInteger(5);
 
 	protected static final List<KeyBinding> DATE_CELL_BINDINGS = new ArrayList<KeyBinding>();
+
 	static {
 		DATE_CELL_BINDINGS.add(new KeyBinding(KeyCode.C, "Clipboard").ctrl());
 	}
@@ -93,7 +81,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 
 			@Override
 			protected void callAction(String name) {
-				System.out.println(name);
+				LOGGER.debug("callAction : {} ", name);
 				switch (name) {
 				case "Clipboard":
 					getControl().tbResultOnKeyReleased();
@@ -128,10 +116,26 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 		btnStart.addEventHandler(ActionEvent.ACTION, this::btnStartOnAction);
 		btnStop.addEventHandler(ActionEvent.ACTION, this::btnStopOnAction);
 
-		Label label = new Label(" Wait Sec : 5 ");
-		//		NumberTextField numberTextField = new NumberTextField(String.valueOf(sleepSecond.get()));
+		Label label = new Label(" Delay Sec : ");
+		NumberTextField numberTextField = new NumberTextField(String.valueOf(sleepSecond.get()));
+		numberTextField.textProperty().addListener((oba, o, n) -> {
+			int parseInt = 5;
+			try {
+				parseInt = Integer.parseInt(n);
+			} catch (NumberFormatException e) {
+			}
 
-		HBox buttonBox = new HBox(5, label, /* numberTextField,*/ btnStart, btnStop);
+			if (0 <= parseInt && parseInt < 1001) {
+				sleepSecond.getAndSet(parseInt);
+			} else {
+				DialogUtil.showMessageDialog("입력 제한 [1 ~ 1000]");
+				numberTextField.setText(o);
+				return;
+			}
+
+		});
+
+		HBox buttonBox = new HBox(5, label, numberTextField, btnStart, btnStop);
 		buttonBox.setId("btn-box");
 		buttonBox.setPadding(new Insets(5));
 		buttonBox.setAlignment(Pos.CENTER_RIGHT);
@@ -182,7 +186,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 
 	/**
 	 * Stop 버튼을 크릭한경우 처리할 이벤트
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 30.
 	 * @param e
@@ -195,7 +199,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	 * 작성일 : 2016. 8. 30. 작성자 : KYJ
 	 *
 	 * 스케줄 대기시간을 정한다. 기본단위 초 기본값 5초
-	 * 
+	 *
 	 * @param second
 	 ********************************/
 	public void setSleepSecond(int second) {
@@ -206,27 +210,38 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	 * 작성일 : 2016. 8. 30. 작성자 : KYJ
 	 *
 	 * 스케줄 대기시간을 리턴 기본값 5초
-	 * 
+	 *
 	 * @return
 	 ********************************/
 	public int getSleepSecond() {
 		return this.sleepSecond.get();
 	}
 
-	public TableView<Map<String, String>> getTbResult(){
+	public TableView<Map<String, String>> getTbResult() {
 		return tbResult;
 	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 31.
+	 * @param initText
+	 */
+	public void setInitText(String initText) {
+		this.textArea.setText(initText);
+
+	}
+
 	/**
 	 * 스케줄링 클래스 . 인스턴스당 하나
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 30.
 	 */
 	private ThreadScheduler target = new ThreadScheduler();
 
 	/***************************
-	 * 
+	 *
 	 * 스케줄링 처리하기위한 Runnble 클래스 정의
-	 * 
+	 *
 	 * @author KYJ
 	 *
 	 ***************************/
@@ -250,14 +265,17 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 					LOGGER.debug("Is Restart {} ", isStarted.get());
 
 					//				if (!updateStop.get()) {
+					synchronized (isStarted) {
 
-					if (isStarted.get()) {
-						LOGGER.debug("ReSchedule");
-						ThreadScheduler newTarget = ThreadScheduler.this;
-						new Thread(newTarget).start();
-					} else {
-						LOGGER.debug("End Schedule.");
+						if (isStarted.get()) {
+							LOGGER.debug("ReSchedule");
+							new Thread(target).start();
+						} else {
+							LOGGER.debug("End Schedule.");
+						}
+
 					}
+
 				}
 			};
 
@@ -267,14 +285,14 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 				@Override
 				public void run() {
 					try {
-						MacroBaseSkin.this.getSkinnable().start(tbResult, textArea.getText());
+						if(isStarted.get())
+							MacroBaseSkin.this.getSkinnable().start(tbResult, textArea.getText());
 					} catch (Exception e) {
 
 						//에러가 발생하면 로그를 남기고 중단함.
 						//						LOGGER.error(ValueUtil.toString(e));
 						onFinished = null;
 						isStarted.set(false);
-
 						DialogUtil.showExceptionDailog(e);
 					}
 
@@ -286,4 +304,5 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 		}
 
 	}
+
 }
