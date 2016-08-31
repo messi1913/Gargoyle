@@ -44,7 +44,7 @@ public class SqlKeywords extends BorderPane {
 	// "select", "from", "group", "by", "where", "join", "and", "update",
 	// "delete", "create", "drop", "set", "not null", "insert into",
 	// "alter", "order" };
-	
+
 	//2016-08-27 정규식 (?i) 추가옵션을 주는경오 대소문자 구분을 무시한다.
 	private static final String KEYWORD_PATTERN = "(?i)\\b(" + String.join("|", SQLKeywordFactory.getKeywords()) + ")\\b";
 	private static final String PAREN_PATTERN = "\\(|\\)";
@@ -285,7 +285,34 @@ public class SqlKeywords extends BorderPane {
 		if (ValueUtil.isEmpty(selectedText)) {
 			String fullText = codeArea.getText();
 			int caretPosition = codeArea.getCaretPosition();
-			return sqlFormatter.split(fullText, caretPosition);
+
+			//bugfix
+			String split = sqlFormatter.split(fullText, caretPosition);
+			return split;
+//			int startIdx = -1;
+//			int endIdx = -1;
+//
+//			for (int i = split.length() - 1; i > 0; i--) {
+//
+//				if (split.charAt(i) == ';') {
+//					endIdx = i;
+//
+//					for (int j = i-1; j > 0; j--) {
+//
+//						if (split.charAt(j) == ';') {
+//							startIdx = j;
+//							break;
+//						}
+//					}
+//					break;
+//				}
+//			}
+//
+//			if (endIdx == -1) {
+//				return split;
+//			} else {
+//				return split.substring(endIdx);
+//			}
 		}
 		return selectedText;
 	}
