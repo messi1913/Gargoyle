@@ -671,19 +671,24 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		SqlTab selectedTab = getSelectedSqlTab();
 		TreeItem<K> schemaTreeItem = selectedItem.getParent();
 		String schema = schemaTreeItem.getValue().toString();
-		Connection connection = connectionSupplier.get();
-		try {
-			String driver = DbUtil.getDriverNameByConnection(connection);
-			String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COLUMNS_WRAPPER, driver);
 
-			Map<String, Object> map = new HashMap<>(2);
-			map.put("databaseName", schema);
-			map.put("tableName", tableName);
+		try (Connection connection = connectionSupplier.get()) {
 
-			sql = ValueUtil.getVelocityToText(sql, map, true);
-			List<String> select = DbUtil.select(connection, sql, 10, (RowMapper<String>) (rs, rowNum) -> rs.getString(1));
-			redueceAction(select, ",",
-					v -> selectedTab.appendTextSql(String.format("select %s \nfrom %s ", v.substring(0, v.length()), tableName)));
+			List<String> columns = DbUtil.columns(connection, tableName);
+			if (columns == null || columns.isEmpty()) {
+				String driver = DbUtil.getDriverNameByConnection(connection);
+				String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COLUMNS_WRAPPER, driver);
+
+				Map<String, Object> map = new HashMap<>(2);
+				map.put("databaseName", schema);
+				map.put("tableName", tableName);
+
+				sql = ValueUtil.getVelocityToText(sql, map, true);
+				columns = DbUtil.select(connection, sql, 10, (RowMapper<String>) (rs, rowNum) -> rs.getString(1));
+			}
+
+			redueceAction(columns, ",\n",
+					v -> selectedTab.appendTextSql(String.format("select\n%s \nfrom %s ", v.substring(0, v.length()), tableName)));
 
 		} catch (Exception e1) {
 			LOGGER.error(ValueUtil.toString(e1));
@@ -747,7 +752,6 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 
 			//팝업창을 닫는 요청이 들어온경우 stop()함수를 호출하고 종료
 			stage.setOnCloseRequest(ev -> {
-
 
 				LOGGER.debug("Stop Action Result :stopReuqest ");
 				macroControl.stop();

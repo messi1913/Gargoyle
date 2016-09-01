@@ -232,9 +232,9 @@ public class DbUtil extends ConnectionManager {
 		} catch (Throwable e) {
 			throw e;
 		}
-//		finally {
-//			close();
-//		}
+		//		finally {
+		//			close();
+		//		}
 
 		return arrayList;
 	}
@@ -291,9 +291,9 @@ public class DbUtil extends ConnectionManager {
 
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 
-			String _sql = ValueUtil.getVelocityToText(sql, paramMap, true);
-			LOGGER.debug(_sql);
-			query = jdbcTemplate.query(_sql, new MapSqlParameterSource(paramMap), rowMapper);
+			//			String _sql = ValueUtil.getVelocityToText(sql, paramMap);
+			//			LOGGER.debug(_sql);
+			query = jdbcTemplate.query(sql, new MapSqlParameterSource(paramMap), rowMapper);
 		} catch (Exception e) {
 			// cleanDataSource();
 			// close(dataSource.getConnection());
@@ -322,8 +322,9 @@ public class DbUtil extends ConnectionManager {
 			dataSource = getDataSource();
 
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String _sql = ValueUtil.getVelocityToText(sql, paramMap.getValues());
-			query = jdbcTemplate.query(_sql, paramMap, rowMapper);
+			//			String _sql = ValueUtil.getVelocityToText(sql, paramMap.getValues());
+
+			query = jdbcTemplate.query(sql, paramMap, rowMapper);
 		} catch (Exception e) {
 
 			// cleanDataSource();
@@ -742,7 +743,27 @@ public class DbUtil extends ConnectionManager {
 	}
 
 	public static List<String> columns(String tableNamePattern) throws Exception {
-		return columns(tableNamePattern, t -> {
+		try (Connection con = getConnection()) {
+			return columns(con, tableNamePattern, t -> {
+				try {
+					return t.getString(4);
+				} catch (SQLException e) {
+					LOGGER.error(ValueUtil.toString(e));
+				}
+				return "";
+			});
+		}
+	}
+
+	public static <T> List<T> columns(String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
+
+		try (Connection con = getConnection()) {
+			return columns(con, tableNamePattern, converter);
+		}
+	}
+
+	public static List<String> columns(Connection con, String tableNamePattern) throws Exception {
+		return columns(con, tableNamePattern, t -> {
 			try {
 				return t.getString(4);
 			} catch (SQLException e) {
@@ -752,20 +773,20 @@ public class DbUtil extends ConnectionManager {
 		});
 	}
 
-	public static <T> List<T> columns(String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
+	public static <T> List<T> columns(Connection connection, String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
 		if (converter == null)
 			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
 
 		List<T> tables = new ArrayList<>();
-		try (Connection connection = getConnection()) {
+		//		try (Connection connection = getConnection()) {
 
-			DatabaseMetaData metaData = connection.getMetaData();
-			ResultSet rs =  COLUMN_CONVERTER.apply(tableNamePattern, metaData); //  metaData.getColumns(null, null, tableNamePattern, null);
+		DatabaseMetaData metaData = connection.getMetaData();
+		ResultSet rs = COLUMN_CONVERTER.apply(tableNamePattern, metaData); //  metaData.getColumns(null, null, tableNamePattern, null);
 
-			while (rs.next()) {
-				tables.add(converter.apply(rs));
-			}
+		while (rs.next()) {
+			tables.add(converter.apply(rs));
 		}
+		//		}
 
 		return tables;
 	}
@@ -799,8 +820,6 @@ public class DbUtil extends ConnectionManager {
 		}
 		return null;
 	};
-
-
 
 	public static List<String> pks(String tableNamePattern) throws Exception {
 		return pks(getConnection(), tableNamePattern, t -> {
