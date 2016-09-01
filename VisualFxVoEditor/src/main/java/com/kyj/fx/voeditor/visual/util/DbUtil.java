@@ -87,7 +87,8 @@ public class DbUtil extends ConnectionManager {
 		}
 	};
 
-	static BiFunction<Connection, String, PreparedStatement> READ_ONLY_CURSOR_PREPAREDSTATEMENT_CONVERTER = (c, sql) -> {
+	static BiFunction<Connection, String, PreparedStatement> READ_ONLY_CURSOR_PREPAREDSTATEMENT_CONVERTER = (c,
+			sql) -> {
 		try {
 			return c.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		} catch (Exception e) {
@@ -161,7 +162,8 @@ public class DbUtil extends ConnectionManager {
 		return selectLimit(con, sql, 10, limitSize);
 	}
 
-	public static List<Map<String, Object>> selectLimit(Connection con, final String sql, int fetchCount, int limitSize) throws Exception {
+	public static List<Map<String, Object>> selectLimit(Connection con, final String sql, int fetchCount, int limitSize)
+			throws Exception {
 		return select(con, sql, fetchCount, limitSize, new ResultSetToMapConverter());
 	}
 
@@ -172,7 +174,8 @@ public class DbUtil extends ConnectionManager {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Map<String, Object>> select(final Connection con, final String sql, int fetchCount) throws Exception {
+	public static List<Map<String, Object>> select(final Connection con, final String sql, int fetchCount)
+			throws Exception {
 		return select(con, sql, fetchCount, -1, new ResultSetToMapConverter());
 	}
 
@@ -181,25 +184,26 @@ public class DbUtil extends ConnectionManager {
 		return select.isEmpty() ? Collections.emptyMap() : select.get(0);
 	}
 
-	public static List<Map<String, Object>> selectCursor(final Connection con, final String sql, int startRow) throws Exception {
+	public static List<Map<String, Object>> selectCursor(final Connection con, final String sql, int startRow)
+			throws Exception {
 		return selectCursor(con, sql, startRow, -1);
 	}
 
-	public static List<Map<String, Object>> selectCursor(final Connection con, final String sql, int startRow, int limitRow)
-			throws Exception {
+	public static List<Map<String, Object>> selectCursor(final Connection con, final String sql, int startRow,
+			int limitRow) throws Exception {
 		Properties properties = new Properties();
 		properties.put(ResultSetToMapConverter.START_ROW, --startRow);
 		return select(con, sql, DEFAULT_FETCH_SIZE, limitRow, READ_ONLY_CURSOR_PREPAREDSTATEMENT_CONVERTER,
 				new ResultSetToMapConverter(properties));
 	}
 
-	public static <T> List<Map<String, T>> select(final Connection con, final String sql, int fetchCount, int limitedSize,
-			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, T>>> convert) throws Exception {
+	public static <T> List<Map<String, T>> select(final Connection con, final String sql, int fetchCount,
+			int limitedSize, BiFunction<ResultSetMetaData, ResultSet, List<Map<String, T>>> convert) throws Exception {
 		return select(con, sql, fetchCount, limitedSize, DEFAULT_PREPAREDSTATEMENT_CONVERTER, convert);
 	}
 
-	public static <T> List<Map<String, T>> select(final Connection con, final String sql, int fetchCount, int limitedSize,
-			BiFunction<Connection, String, PreparedStatement> prestatementConvert,
+	public static <T> List<Map<String, T>> select(final Connection con, final String sql, int fetchCount,
+			int limitedSize, BiFunction<Connection, String, PreparedStatement> prestatementConvert,
 			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, T>>> convert) throws Exception {
 		List<Map<String, T>> arrayList = null;
 
@@ -213,7 +217,7 @@ public class DbUtil extends ConnectionManager {
 			/* 쿼리 타임아웃 시간 설정 SEC */
 			// int queryTimeout = getQueryTimeout();
 
-			prepareStatement = prestatementConvert.apply(con, sql); //con.prepareStatement(sql);
+			prepareStatement = prestatementConvert.apply(con, sql); // con.prepareStatement(sql);
 			// postgre-sql can't
 			// prepareStatement.setQueryTimeout(queryTimeout);
 
@@ -232,14 +236,15 @@ public class DbUtil extends ConnectionManager {
 		} catch (Throwable e) {
 			throw e;
 		}
-		//		finally {
-		//			close();
-		//		}
+		// finally {
+		// close();
+		// }
 
 		return arrayList;
 	}
 
-	public static <T> List<T> select(final Connection con, final String sql, int fetchCount, RowMapper<T> mapper) throws Exception {
+	public static <T> List<T> select(final Connection con, final String sql, int fetchCount, RowMapper<T> mapper)
+			throws Exception {
 		List<T> resultList = Collections.emptyList();
 
 		try {
@@ -278,7 +283,8 @@ public class DbUtil extends ConnectionManager {
 	 * @return
 	 * @throws Exception
 	 */
-	public static <T> List<T> select(final String sql, Map<String, Object> paramMap, RowMapper<T> rowMapper) throws Exception {
+	public static <T> List<T> select(final String sql, Map<String, Object> paramMap, RowMapper<T> rowMapper)
+			throws Exception {
 
 		DataSource dataSource = null;
 		List<T> query = null;
@@ -291,8 +297,8 @@ public class DbUtil extends ConnectionManager {
 
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 
-			//			String _sql = ValueUtil.getVelocityToText(sql, paramMap);
-			//			LOGGER.debug(_sql);
+			// String _sql = ValueUtil.getVelocityToText(sql, paramMap);
+			// LOGGER.debug(_sql);
 			query = jdbcTemplate.query(sql, new MapSqlParameterSource(paramMap), rowMapper);
 		} catch (Exception e) {
 			// cleanDataSource();
@@ -311,7 +317,8 @@ public class DbUtil extends ConnectionManager {
 	 * @return
 	 * @throws Exception
 	 */
-	public static <T> List<T> select(final String sql, MapSqlParameterSource paramMap, RowMapper<T> rowMapper) throws Exception {
+	public static <T> List<T> select(final String sql, MapSqlParameterSource paramMap, RowMapper<T> rowMapper)
+			throws Exception {
 
 		DataSource dataSource = null;
 		List<T> query = null;
@@ -322,7 +329,8 @@ public class DbUtil extends ConnectionManager {
 			dataSource = getDataSource();
 
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			//			String _sql = ValueUtil.getVelocityToText(sql, paramMap.getValues());
+			// String _sql = ValueUtil.getVelocityToText(sql,
+			// paramMap.getValues());
 
 			query = jdbcTemplate.query(sql, paramMap, rowMapper);
 		} catch (Exception e) {
@@ -465,7 +473,8 @@ public class DbUtil extends ConnectionManager {
 	 * @param consumer
 	 * @throws Exception
 	 */
-	public static <T> int getTransactionedScope(T userObj, BiTransactionScope<T, NamedParameterJdbcTemplate> consumer) throws Exception {
+	public static <T> int getTransactionedScope(T userObj, BiTransactionScope<T, NamedParameterJdbcTemplate> consumer)
+			throws Exception {
 		return getTransactionedScope(userObj, consumer, null);
 	}
 
@@ -635,7 +644,8 @@ public class DbUtil extends ConnectionManager {
 	 *            에러발생시 처리
 	 * @return 접속 성공여부
 	 */
-	public static void ping(Supplier<PoolProperties> conSupplier, Consumer<Boolean> onSuccess, Consumer<Throwable> exHandler) {
+	public static void ping(Supplier<PoolProperties> conSupplier, Consumer<Boolean> onSuccess,
+			Consumer<Throwable> exHandler) {
 		ping(conSupplier, onSuccess, exHandler, 3);
 	}
 
@@ -652,8 +662,8 @@ public class DbUtil extends ConnectionManager {
 	 *            핑테스트 대기시간 (Secound)
 	 * @return 접속 성공여부
 	 */
-	public static void ping(Supplier<PoolProperties> conSupplier, Consumer<Boolean> onSuccess, Consumer<Throwable> exHandler,
-			int timeoutSec) {
+	public static void ping(Supplier<PoolProperties> conSupplier, Consumer<Boolean> onSuccess,
+			Consumer<Throwable> exHandler, int timeoutSec) {
 
 		boolean result = false;
 		PoolProperties prop = conSupplier.get();
@@ -730,7 +740,7 @@ public class DbUtil extends ConnectionManager {
 
 			while (rs.next()) {
 
-				//2016-08-18 특정데이터베이스(sqlite)에서는 인덱스 트리거정보도 동시에 출력된다.
+				// 2016-08-18 특정데이터베이스(sqlite)에서는 인덱스 트리거정보도 동시에 출력된다.
 				String tableType = rs.getString(4);
 				if ("TABLE".equals(tableType)) {
 					tables.add(converter.apply(rs));
@@ -773,25 +783,30 @@ public class DbUtil extends ConnectionManager {
 		});
 	}
 
-	public static <T> List<T> columns(Connection connection, String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
+	public static <T> List<T> columns(Connection connection, String tableNamePattern, Function<ResultSet, T> converter)
+			throws Exception {
 		if (converter == null)
 			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
 
 		List<T> tables = new ArrayList<>();
-		//		try (Connection connection = getConnection()) {
+		// try (Connection connection = getConnection()) {
 
 		DatabaseMetaData metaData = connection.getMetaData();
-		ResultSet rs = COLUMN_CONVERTER.apply(tableNamePattern, metaData); //  metaData.getColumns(null, null, tableNamePattern, null);
+		ResultSet rs = COLUMN_CONVERTER.apply(tableNamePattern, metaData); // metaData.getColumns(null,
+																			// null,
+																			// tableNamePattern,
+																			// null);
 
 		while (rs.next()) {
 			tables.add(converter.apply(rs));
 		}
-		//		}
+		// }
 
 		return tables;
 	}
 
-	public static final BiFunction<String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (tableNamePattern, metaData) -> {
+	public static final BiFunction<String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (tableNamePattern,
+			metaData) -> {
 		int dotIdx = tableNamePattern.indexOf('.');
 		try {
 			if (dotIdx >= 0) {
@@ -806,7 +821,8 @@ public class DbUtil extends ConnectionManager {
 		return null;
 	};
 
-	public static final BiFunction<String, DatabaseMetaData, ResultSet> PRIMARY_CONVERTER = (tableNamePattern, metaData) -> {
+	public static final BiFunction<String, DatabaseMetaData, ResultSet> PRIMARY_CONVERTER = (tableNamePattern,
+			metaData) -> {
 		int dotIdx = tableNamePattern.indexOf('.');
 		try {
 			if (dotIdx >= 0) {
@@ -851,7 +867,8 @@ public class DbUtil extends ConnectionManager {
 		return tables;
 	}
 
-	public static <T> List<T> pks(Connection connection, String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
+	public static <T> List<T> pks(Connection connection, String tableNamePattern, Function<ResultSet, T> converter)
+			throws Exception {
 		if (converter == null)
 			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
 
@@ -859,7 +876,9 @@ public class DbUtil extends ConnectionManager {
 
 		DatabaseMetaData metaData = connection.getMetaData();
 
-		ResultSet rs = PRIMARY_CONVERTER.apply(tableNamePattern, metaData); //metaData.getPrimaryKeys(null, null, tableNamePattern);
+		ResultSet rs = PRIMARY_CONVERTER.apply(tableNamePattern, metaData); // metaData.getPrimaryKeys(null,
+																			// null,
+																			// tableNamePattern);
 
 		if (rs != null) {
 			while (rs.next()) {
@@ -868,6 +887,28 @@ public class DbUtil extends ConnectionManager {
 		}
 
 		return tables;
+	}
+
+	/**
+	 * 
+	 * // 16.09.01 >> 쿼리로 부터 테이블을 찾아옴 퍼옴  by Hong
+	 * @param sql
+	 * @return
+	 */
+	public static String getTableNames(String sql) {
+
+		String concatedTables = sql.toUpperCase().replaceAll("Ｆ|Ｗ|Ｃ", " ").replaceAll("(\\r\\n|\\r|\\n)", " ")
+				.replaceAll("/[^/]*/", " ").replaceAll("'[^']*'", " ").replaceAll("\\(", " (").replaceAll("\\)", ") ")
+				.replaceAll(" FROM ", " Ｆ ").replaceAll("INSERT.*INTO", " Ｆ ").replaceAll("SELECT", " Ｗ ") //
+				.replaceAll("UPDATE ", " Ｆ ").replaceAll(" TABLE", " Ｃ ")
+				.replaceAll(
+						" SET | UNION | WHERE |GROUP BY | HAVING | CONNECT BY | START WITH | MODEL | SAMPLE( )*\\(|USING( )*\\(| ON|\\)|$",
+						" Ｗ ")
+				.replaceAll("Ｆ([^Ｆ|Ｗ]+)Ｗ|.", "Ｃ$1")
+				.replaceAll("( FULL| LEFT| RIGHT| CROSS| NATURAL| INNER)?( OUTER)? JOIN ", "Ｃ").replaceAll("Ｃ{1,}", "Ｃ")
+				.replaceAll("\\([^Ｃ]+Ｃ", "").replaceAll("Ｃ", ",");
+
+		return concatedTables;
 	}
 
 	// TODO 구현가능한부분인지 확인.

@@ -133,6 +133,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	private String username;
 	private String password;
 	private Color userColor = null;
+	
+	private String lastExecuteSql = "";
 
 	/**
 	 * 시스템에서 로드할 탭로더 프록시 객체
@@ -340,10 +342,12 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 						String key = v.getId();
 						if (readTypeCheckComboBox.getCheckModel().isChecked(v)) {
 							ResourceLoader.getInstance().put(key, "true");
-							LOGGER.debug(String.format("CHECK : %s value :%s", key, ResourceLoader.getInstance().get(key)));
+							LOGGER.debug(
+									String.format("CHECK : %s value :%s", key, ResourceLoader.getInstance().get(key)));
 						} else {
 							ResourceLoader.getInstance().put(key, "false");
-							LOGGER.debug(String.format("UNCHECK : %s value :%s", key, ResourceLoader.getInstance().get(key)));
+							LOGGER.debug(String.format("UNCHECK : %s value :%s", key,
+									ResourceLoader.getInstance().get(key)));
 						}
 					});
 				}
@@ -505,7 +509,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	public void initialize(Map<String, Object> map) {
 		try {
 			this.url = map.get(ResourceLoader.BASE_KEY_JDBC_URL).toString();
-			this.username = map.get(ResourceLoader.BASE_KEY_JDBC_ID) == null ? "" : map.get(ResourceLoader.BASE_KEY_JDBC_ID).toString();
+			this.username = map.get(ResourceLoader.BASE_KEY_JDBC_ID) == null ? ""
+					: map.get(ResourceLoader.BASE_KEY_JDBC_ID).toString();
 			this.password = map.get(ResourceLoader.BASE_KEY_JDBC_PASS) == null ? ""
 					: EncrypUtil.decryp(map.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString());
 			this.driver = map.get("driver").toString();
@@ -532,7 +537,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		MenuItem menuExportJson = new MenuItem("Export Json");
 		menuExportJson.setOnAction(this::menuExportJsonOnAction);
 
-		Menu menuExportExcelFile = new Menu("Export", null, menuExportExcel, menuExportSpreadSheet, menuExportInsertScript, menuExportJson);
+		Menu menuExportExcelFile = new Menu("Export", null, menuExportExcel, menuExportSpreadSheet,
+				menuExportInsertScript, menuExportJson);
 
 		ContextMenu contextMenu = new ContextMenu(menuExportExcelFile);
 		tbResult.setContextMenu(contextMenu);
@@ -571,7 +577,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		menuReflesh.setOnAction(this::menuRefleshOnAction);
 		menuReflesh.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
-		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuProperties, new SeparatorMenuItem(), menuReflesh);
+		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuProperties, new SeparatorMenuItem(),
+				menuReflesh);
 		schemaTree.setContextMenu(contextMenu);
 
 	}
@@ -637,7 +644,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		List<String> columns = this.getSelectedTreeByTableColumns(selectedItem);
 		SqlTab selectedTab = getSelectedSqlTab();
 
-		//set statement
+		// set statement
 		StringBuffer setStatement = new StringBuffer();
 		if (columns != null && !columns.isEmpty()) {
 			for (String col : columns) {
@@ -646,7 +653,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			setStatement.setLength(setStatement.length() - 1);
 		}
 
-		//where statement
+		// where statement
 		StringBuffer whereStatement = new StringBuffer();
 		if (primaryKeys != null && !primaryKeys.isEmpty()) {
 			for (String col : primaryKeys) {
@@ -655,8 +662,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			whereStatement.setLength(whereStatement.length() - 1);
 		}
 
-		selectedTab.appendTextSql(
-				String.format("update %s \nset %s \nwhere  %s", tableName, setStatement.toString(), whereStatement.toString()));
+		selectedTab.appendTextSql(String.format("update %s \nset %s \nwhere  %s", tableName, setStatement.toString(),
+				whereStatement.toString()));
 	}
 
 	/**
@@ -677,7 +684,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			List<String> columns = DbUtil.columns(connection, tableName);
 			if (columns == null || columns.isEmpty()) {
 				String driver = DbUtil.getDriverNameByConnection(connection);
-				String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COLUMNS_WRAPPER, driver);
+				String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COLUMNS_WRAPPER,
+						driver);
 
 				Map<String, Object> map = new HashMap<>(2);
 				map.put("databaseName", schema);
@@ -687,8 +695,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 				columns = DbUtil.select(connection, sql, 10, (RowMapper<String>) (rs, rowNum) -> rs.getString(1));
 			}
 
-			redueceAction(columns, ",\n",
-					v -> selectedTab.appendTextSql(String.format("select\n%s \nfrom %s ", v.substring(0, v.length()), tableName)));
+			redueceAction(columns, ",\n", v -> selectedTab
+					.appendTextSql(String.format("select\n%s \nfrom %s ", v.substring(0, v.length()), tableName)));
 
 		} catch (Exception e1) {
 			LOGGER.error(ValueUtil.toString(e1));
@@ -740,6 +748,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 * query-macro menu 선택시 발생되는 이벤트에 대한정의.
 	 *
 	 * 기술내용으로는 쿼리 매크로를 처리할 수 있는 팝업을 로드한다.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 31.
 	 * @param e
@@ -750,7 +759,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		FxUtil.createStageAndShow(macroControl, stage -> {
 			stage.setTitle("Query-Macro");
 
-			//팝업창을 닫는 요청이 들어온경우 stop()함수를 호출하고 종료
+			// 팝업창을 닫는 요청이 들어온경우 stop()함수를 호출하고 종료
 			stage.setOnCloseRequest(ev -> {
 
 				LOGGER.debug("Stop Action Result :stopReuqest ");
@@ -872,7 +881,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		List<String> asList = Arrays.asList(split);
 		queryAll(asList, cnt -> {
 			DialogUtil.showMessageDialog(String.format("%d 건 success", cnt));
-		} , (e, bool) -> {
+		}, (e, bool) -> {
 			if (bool)
 				DialogUtil.showExceptionDailog(e);
 		});
@@ -929,13 +938,14 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 * @param param
 	 *            다이나믹 변수
 	 */
+
 	protected void execute(String sql, Map<String, Object> param) {
 		tbResult.getColumns().clear();
 		tbResult.getItems().clear();
-
+		lastExecuteSql = sql;
 		List<Map<String, Object>> query = query(sql, param, success -> {
 			lblStatus.setText(success.size() + " row");
-		} , (exception, showDialog) -> {
+		}, (exception, showDialog) -> {
 			lblStatus.setText(exception.toString());
 			if (showDialog)
 				DialogUtil.showExceptionDailog(this, exception);
@@ -995,7 +1005,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		}
 
 		if (saveFile.exists()) {
-			Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("overwrite ?? ", FILE_OVERWIRTE_MESSAGE);
+			Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("overwrite ?? ",
+					FILE_OVERWIRTE_MESSAGE);
 			showYesOrNoDialog.ifPresent(consume -> {
 				String key = consume.getKey();
 				String value = consume.getValue();
@@ -1009,7 +1020,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 
 		ObservableList<Map<String, Object>> items = this.tbResult.getItems();
 		ToExcelFileFunction toExcelFileFunction = new ToExcelFileFunction();
-		List<String> columns = this.tbResult.getColumns().stream().map(col -> col.getText()).collect(Collectors.toList());
+		List<String> columns = this.tbResult.getColumns().stream().map(col -> col.getText())
+				.collect(Collectors.toList());
 		toExcelFileFunction.generate0(saveFile, columns, items);
 		DialogUtil.showMessageDialog("complete...");
 
@@ -1062,10 +1074,14 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 */
 	public void menuExportInsertScriptOnAction(ActionEvent e) {
 		ObservableList<Map<String, Object>> items = tbResult.getItems();
+
 		if (items.isEmpty())
 			return;
 
-		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
+		
+		// 16.09.01 >> 마지막 수행된 쿼리의 테이블을 찾아 입력해줌  by Hong
+		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.",
+				DbUtil.getTableNames(lastExecuteSql));
 
 		showInputDialog.ifPresent(op -> {
 			String tableName = showInputDialog.get().getValue();
@@ -1110,7 +1126,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 
 			}).map(str -> {
 				/* SQL문 완성처리 */
-				return new StringBuilder().append(insertPreffix).append(collect).append(insertMiddle).append(str).append(";\n").toString();
+				return new StringBuilder().append(insertPreffix).append(collect).append(insertMiddle).append(str)
+						.append(";\n").toString();
 			}).collect(Collectors.toList());
 
 			valueList.forEach(str -> {
