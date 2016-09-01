@@ -59,7 +59,12 @@ public class DbUtil extends ConnectionManager {
 	/**
 	 * @최초생성일 2016. 8. 4.
 	 */
-	private static final int DEFAULT_FETCH_SIZE = 1000;
+	public static final int DEFAULT_FETCH_SIZE = 1000;
+
+	/**
+	 * @최초생성일 2016. 9. 1.
+	 */
+	public static final int DEFAULT_LIMIT_ROW_COUNT = 1000;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DbUtil.class);
 
@@ -820,6 +825,8 @@ public class DbUtil extends ConnectionManager {
 		}
 		return null;
 	};
+
+
 
 	public static List<String> pks(String tableNamePattern) throws Exception {
 		return pks(getConnection(), tableNamePattern, t -> {

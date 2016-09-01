@@ -43,11 +43,12 @@ public class EditableTableViewExam extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
-		Button btnExec = new Button("실행");
-		Button btnAdd = new Button("추가");
+		Button btnExec = new Button("Exec.");
+		Button btnAdd = new Button("Add ");
+		Button btnRemove = new Button("Remove");
+		Button btnSave = new Button("Save");
 		btnAdd.setDisable(true);
-		Button btnRemove = new Button("삭제");
-		Button btnSave = new Button("저장");
+
 
 		TextField textField = new TextField();
 		HBox hBox = new HBox(5, textField, btnExec, btnAdd, btnRemove, btnSave);
@@ -61,7 +62,7 @@ public class EditableTableViewExam extends Application {
 		btnExec.setOnAction(e -> {
 			String tableName = textField.getText();
 			try {
-				editableTableView.readByTableName(tableName);
+				editableTableView.readByTableName("select * from " + tableName, tableName);
 
 			} catch (Exception e1) {
 				e1.printStackTrace();

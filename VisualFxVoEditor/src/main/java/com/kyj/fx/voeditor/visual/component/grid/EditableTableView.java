@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import com.google.common.base.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -23,12 +22,12 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.sun.btrace.BTraceUtils.Strings;
-
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -46,11 +45,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
+import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /***************************
  *
  * 데이터베이스 테이블과 1:1 관계를 가지는 테이블뷰를 생성하고 그 테이블과 관련된 CRUD를 처리할 수 있다.
- * 
+ *
  * @author KYJ
  *
  ***************************/
@@ -65,21 +65,21 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	/**
 	 * 데이터베이스로부터 한번에 가져올 수 있는 FECT_COUNT를 정의.
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 25.
 	 */
-	private static final int FETCH_COUNT = 50;
+	private static final int FETCH_COUNT = DbUtil.DEFAULT_FETCH_SIZE;
 
 	/**
 	 * 데이터베이스로부터 가져올 수 있는 최대 MAX ROW를 정의한다.
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 25.
 	 */
-	private static final int LIMIT_ROW_COUNT = 1000;
+	private static final int LIMIT_ROW_COUNT = DbUtil.DEFAULT_LIMIT_ROW_COUNT;
 
 	/**
 	 * 현재 보여지고 있는 테이블명에 대한 메타정보가 보관된다. 쿼리문 생성시 아래 변수에 바인드된 정보가 사용된다.
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 25.
 	 */
 	private StringProperty tableName = new SimpleStringProperty();
@@ -130,14 +130,14 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	/**
 	 * 테이블명을 입력하면 select문을 생성하여 데이터를 조회후 그리드에 데이터를 맵핑하는 처리를한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 25.
 	 * @param tableName
 	 *            조회하고자하는 테이블명을 기입한다.
 	 * @throws Exception
 	 */
-	public void readByTableName(String tableName) throws Exception {
+	public void readByTableName(String sql, String tableName) throws Exception {
 		getColumns().clear();
 		getItems().clear();
 		removedList.clear();
@@ -145,7 +145,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		List<String> pks = DbUtil.pks(tableName);
 
-		DbUtil.select(String.format("select * from %s", tableName), FETCH_COUNT, LIMIT_ROW_COUNT,
+		DbUtil.select(sql, FETCH_COUNT, LIMIT_ROW_COUNT,
 				new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>>() {
 
 					@Override
@@ -196,7 +196,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 							}
 
 						} catch (SQLException e) {
-							e.printStackTrace();
+							LOGGER.error(ValueUtil.toString(e));
 						}
 						return null;
 					}
@@ -208,7 +208,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	/**
 	 * 저장 기능을 구현
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 25.
 	 */
@@ -572,7 +572,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		/**
 		 * 새로 추가된 로우인지 확인
-		 * 
+		 *
 		 * @최초생성일 2016. 8. 25.
 		 */
 		private static final String $_NEW_ROW$ = "$NewRow$";
@@ -598,7 +598,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		/**
 		 * java.sql.Types 클래스 참조.
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 8. 25.
 		 * @return
@@ -611,7 +611,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		/**
 		 * 새로 추가된 행인지에 대한 메타정보를 제공함.
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 8. 25.
 		 * @return
@@ -784,7 +784,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		/**
 		 * DynamicCallback 생성하는 static 함수.
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 8. 25.
 		 * @param columnName

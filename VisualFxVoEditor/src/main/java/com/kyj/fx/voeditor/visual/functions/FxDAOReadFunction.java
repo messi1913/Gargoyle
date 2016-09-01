@@ -54,8 +54,8 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append("METHOD_DESC \n");
 		sb.append(" FROM meerkat.TBP_SYS_DAO_METHODS \n");
 		sb.append(" WHERE 1=1 \n");
-		sb.append("AND PACKAGE_NAME = ':packageName'\n");
-		sb.append("AND CLASS_NAME = ':className'\n");
+		sb.append("AND PACKAGE_NAME = :packageName\n");
+		sb.append("AND CLASS_NAME = :className\n");
 
 		List<TbpSysDaoMethodsDVO> select = DbUtil.select(sb.toString(), map, new RowMapper<TbpSysDaoMethodsDVO>() {
 
@@ -91,9 +91,9 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append("TEST_VALUE   \n");
 		sb.append(" FROM meerkat.tbp_sys_dao_fields \n");
 		sb.append(" WHERE 1=1 \n");
-		sb.append("AND PACKAGE_NAME = ':packageName'\n");
-		sb.append("AND CLASS_NAME = ':className'\n");
-		sb.append("AND METHOD_NAME = ':methodName'\n");
+		sb.append("AND PACKAGE_NAME = :packageName\n");
+		sb.append("AND CLASS_NAME = :className\n");
+		sb.append("AND METHOD_NAME = :methodName\n");
 		sb.toString();
 
 		Map<String, Object> hashMap = new HashMap<String, Object>();
@@ -124,9 +124,9 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append("LOCK_YN \n");
 		sb.append(" FROM meerkat.tbp_sys_dao_columns \n");
 		sb.append(" WHERE 1=1 \n");
-		sb.append("AND PACKAGE_NAME = ':packageName'\n");
-		sb.append("AND CLASS_NAME = ':className'\n");
-		sb.append("AND METHOD_NAME = ':methodName'\n");
+		sb.append("AND PACKAGE_NAME = :packageName\n");
+		sb.append("AND CLASS_NAME = :className\n");
+		sb.append("AND METHOD_NAME = :methodName\n");
 
 		Map<String, Object> hashMap = new HashMap<String, Object>();
 		hashMap.put("packageName", daoDVO.getPackageName());

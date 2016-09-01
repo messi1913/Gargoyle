@@ -60,7 +60,7 @@ import javafx.collections.ObservableList;
 public class ValueUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValueUtil.class);
-	
+
 	public enum IndexCaseTypes {
 		UPPERCASE, LOWERCASE
 	}
@@ -209,19 +209,44 @@ public class ValueUtil {
 		VelocityContext context = new VelocityContext(paramMap, velocityContext);
 
 		String _dynamicSql = dynamicSql;
-		if (replaceNamedValue) {
-			_dynamicSql = replace(_dynamicSql);
-		}
-		Velocity.evaluate(context, writer, "DaoWizard", _dynamicSql);
 
-		return writer.toString();
+		Velocity.evaluate(context, writer, "DaoWizard", _dynamicSql);
+		String convetedString = writer.toString();
+		//		if (replaceNamedValue) {
+		//			return replace(convetedString, paramMap);
+		//		}
+		return convetedString;
 	}
 
-	private static String replace(String sql) {
+	private static String replace(String sql, Map<String, Object> paramMap) {
 		if (sql == null || sql.trim().isEmpty())
 			return sql;
-		String pattern = ":";
-		return sql.replaceAll(pattern, "\\$");
+
+		//		SqlParameterSource paramSource = new MapSqlParameterSource(paramMap);
+		//
+		//		ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(sql);
+		//		String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, paramSource);
+		//		Object[] params = NamedParameterUtils.buildValueArray(parsedSql, paramSource, null);
+		//		List<SqlParameter> declaredParameters = NamedParameterUtils.buildSqlParameterList(parsedSql, paramSource);
+		//		PreparedStatementCreatorFactory pscf = new PreparedStatementCreatorFactory(sqlToUse, declaredParameters);
+		//		PreparedStatementCreator newPreparedStatementCreator = pscf.newPreparedStatementCreator(params);
+
+		//		return _sql.toString();
+		String _sql = sql.replaceAll(STRING_PATTERN, "");
+		_sql = _sql.replaceAll(COMMENT_PATTERN, "");
+		String pattern = ":\\w+";
+		//		String pattern = ":";
+		String result = regexReplaceMatchs(pattern, _sql, v -> {
+			String replace = v.replaceAll(":", "");
+			String string = paramMap.get(replace).toString();
+			return String.format("%s", string);
+		});
+		//		Optional<String> reduce = regexMatchs.stream().reduce((a, b) -> a.concat(b));
+		//		if (reduce.isPresent())
+		//			return reduce.get();
+		//		return _sql;
+		return result;
+		//		return sql.replaceAll(pattern, "\\$");
 	}
 
 	/**
@@ -235,12 +260,20 @@ public class ValueUtil {
 			return false;
 
 		String _sql = sql;
-		String pattern = "\\$\\w+|:\\w+";
+		//주석에 대해당하는 문자들을 제거
+		_sql = _sql.replaceAll(STRING_PATTERN, "");
+		_sql = _sql.replaceAll(COMMENT_PATTERN, "");
+		//		String pattern = "\\$\\w+|:\\w+";
+		String pattern = "\\$\\w+";
+		//		String pattern = "[( ]+\\$\\w+|=[ ]{0,}:\\w+";
 
 		Pattern compile = Pattern.compile(pattern);
 		Matcher matcher = compile.matcher(_sql);
 		return matcher.find();
 	}
+
+	static final String STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\"|\'([^\"\\\\]|\\\\.)*\'";
+	static final String COMMENT_PATTERN = "(?:/\\*[^;]*?\\*/)|(?:--[^\\n]*)";
 
 	/**
 	 * Velocity Key값 목록을 반환
@@ -250,11 +283,23 @@ public class ValueUtil {
 	 * @param dynamicSql
 	 * @return
 	 */
-	public static List<String> getVelocityKeys(String dynamicSql) {
+	public static List<String> getVelocityKeys(String _dynamicSql) {
+		String dynamicSql = _dynamicSql;
+		//주석에 대해당하는 문자들을 제거
+		dynamicSql = dynamicSql.replaceAll(STRING_PATTERN, "");
+		dynamicSql = dynamicSql.replaceAll(COMMENT_PATTERN, "");
 		String pattern = "\\$\\w+|:\\w+";
-
+		//		String pattern = "[( ]+\\$\\w+|=[ ]{0,}:\\w+";
 		// 맨앞의 특수문자는 제거.
-		return regexMatchs(pattern, dynamicSql, param -> param.substring(1));
+		return regexMatchs(pattern, dynamicSql, param -> {
+			//			String result = param.trim();
+			//			if (result.startsWith("($")) {
+			//				return result.substring(2);
+			//			}
+			//			else if(result.startsWith("="))
+			//				return result.substring(1).trim().substring(1);
+			return param.substring(1);
+		});
 	}
 
 	/**
@@ -492,7 +537,7 @@ public class ValueUtil {
 
 			}
 		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(e));	
+			LOGGER.error(ValueUtil.toString(e));
 		}
 
 		return hashMap;
@@ -883,7 +928,7 @@ public class ValueUtil {
 
 	/**
 	 * String 입력값으로부터 테이블명을 찾아본다. 글자내에 소문자가 포함되면 앞에 '_'를 붙인다.
-	 * 
+	 *
 	 * @param sourceNm
 	 * @return
 	 * @throws ProgramSpecSourceNullException
@@ -901,13 +946,24 @@ public class ValueUtil {
 				if (Character.isUpperCase(charArray[i + 1])) {
 					stringBuffer.append('_');
 				}
-			}// end if
+			} // end if
 
-		}// end for
+		} // end for
 
 		return stringBuffer.toString().toUpperCase();
 	}
-	
-	
-	
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 9. 1.
+	 * @param sql
+	 * @return
+	 */
+	public static boolean isEditScript(String text) {
+		String result = regexMatch("^(?i)edit", text.trim());
+		if (result == null)
+			return false;
+		return true;
+	}
+
 }
