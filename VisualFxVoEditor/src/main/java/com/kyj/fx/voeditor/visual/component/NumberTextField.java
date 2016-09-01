@@ -4,7 +4,7 @@
  *	작성일   : 2016. 8. 30.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual;
+package com.kyj.fx.voeditor.visual.component;
 
 import javafx.scene.control.TextField;
 
