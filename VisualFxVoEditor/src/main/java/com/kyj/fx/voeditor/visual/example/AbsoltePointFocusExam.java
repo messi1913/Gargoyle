@@ -26,7 +26,7 @@ public class AbsoltePointFocusExam extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-
+// 포커스
 		ScrollPane scrPane = new ScrollPane();
 		scrPane.setPrefWidth(ScrollPane.USE_COMPUTED_SIZE);
 
