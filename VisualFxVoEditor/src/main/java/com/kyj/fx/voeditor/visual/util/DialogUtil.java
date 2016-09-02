@@ -359,7 +359,10 @@ public class DialogUtil {
 		// alert.initOwner(owner);
 		// alert.showAndWait();
 
-		new ExceptionDialogComposite(ex, message).show(owner);
+		Platform.runLater(() -> {
+			new ExceptionDialogComposite(ex, message).show(owner);
+		});
+
 	}
 
 	/**
@@ -491,11 +494,14 @@ public class DialogUtil {
 	 * @param apply
 	 */
 	public static void showMessageDialog(Stage initOwner, String title, String headerText, String message, Consumer<Alert> apply) {
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle(title);
-		alert.setHeaderText(headerText);
-		alert.setContentText(message);
-		apply.accept(alert);
+
+		Platform.runLater(() -> {
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle(title);
+			alert.setHeaderText(headerText);
+			alert.setContentText(message);
+			apply.accept(alert);
+		});
 
 		// Dialog<Pair<String, String>> dialog = new Dialog<>();
 		// dialog.setTitle(title);

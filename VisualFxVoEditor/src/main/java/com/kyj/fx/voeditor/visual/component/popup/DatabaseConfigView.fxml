@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import javafx.geometry.*?>
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
 		<TableView fx:id="tbDatabase" editable="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<columns>
@@ -21,8 +24,9 @@
 	<bottom>
 		<HBox alignment="CENTER_RIGHT" spacing="5.0" BorderPane.alignment="CENTER">
 			<children>
-				<Button fx:id="btnSave" mnemonicParsing="false" onMouseClicked="#btnSaveOnMouseClick" prefWidth="60.0" text="Save" />
+				<Button fx:id="btnCreateGargoyleDb" mnemonicParsing="false" onMouseClicked="#btnGargoyleOnMouseClick" prefHeight="23.0" prefWidth="171.0" text="Create Gragoyle Database" />
             <Button fx:id="btnPing" mnemonicParsing="false" onMouseClicked="#btnPingOnMouseClick" prefWidth="60.0" text="Ping" />
+            <Button fx:id="btnSave1" mnemonicParsing="false" onMouseClicked="#btnSaveOnMouseClick" prefWidth="60.0" text="Save" />
 			</children>
 			<padding>
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
