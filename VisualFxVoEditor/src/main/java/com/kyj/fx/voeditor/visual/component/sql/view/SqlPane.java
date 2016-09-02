@@ -397,7 +397,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			endColIndexProperty.addListener(event -> tableSelectCell());
 		}
 
-		editableComposite = new EditableTableViewComposite();
+		editableComposite = new EditableTableViewComposite(connectionSupplier);
 
 
 		tabResult = new Tab("Result", tbResultLayout);

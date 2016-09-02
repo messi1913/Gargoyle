@@ -6,14 +6,14 @@
   *******************************/
 package com.kyj.fx.voeditor.visual.component.grid;
 
+import java.sql.Connection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import org.apache.poi.ss.formula.functions.Columns;
+import java.util.function.Supplier;
 
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.property.ObjectProperty;
@@ -22,6 +22,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
@@ -49,7 +50,7 @@ public class EditableTableViewComposite extends BorderPane {
 	private Button btnRemove;
 	private Button btnSave;
 
-	public EditableTableViewComposite() {
+	public EditableTableViewComposite(Supplier<Connection> connectionSupplier) {
 
 		btnExec = new Button("실행");
 		btnAdd = new Button("추가");
@@ -60,7 +61,8 @@ public class EditableTableViewComposite extends BorderPane {
 		txtTableName = new TextField();
 		HBox hBox = new HBox(5, txtTableName, btnExec, btnAdd, btnRemove, btnSave);
 		hBox.setAlignment(Pos.CENTER_RIGHT);
-		editableTableView = new EditableTableView();
+		hBox.setPadding(new Insets(5));
+		editableTableView = new EditableTableView(connectionSupplier);
 		editableTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 		editableTableView.tableNameProperty().addListener((oba, oldval, newval) -> {
@@ -80,7 +82,12 @@ public class EditableTableViewComposite extends BorderPane {
 		});
 
 		btnSave.setOnAction(ev -> {
-			editableTableView.save();
+
+			try {
+				editableTableView.save();
+			} catch (Exception e) {
+				DialogUtil.showExceptionDailog(e);
+			}
 		});
 
 		editableTableView.setOnMouseClicked(ev -> {
@@ -191,35 +198,40 @@ public class EditableTableViewComposite extends BorderPane {
 	}
 
 	/**
-	 * @param editableTableView the editableTableView to set
+	 * @param editableTableView
+	 *            the editableTableView to set
 	 */
 	public final void setEditableTableView(EditableTableView editableTableView) {
 		this.editableTableView = editableTableView;
 	}
 
 	/**
-	 * @param btnExec the btnExec to set
+	 * @param btnExec
+	 *            the btnExec to set
 	 */
 	public final void setBtnExec(Button btnExec) {
 		this.btnExec = btnExec;
 	}
 
 	/**
-	 * @param btnAdd the btnAdd to set
+	 * @param btnAdd
+	 *            the btnAdd to set
 	 */
 	public final void setBtnAdd(Button btnAdd) {
 		this.btnAdd = btnAdd;
 	}
 
 	/**
-	 * @param btnRemove the btnRemove to set
+	 * @param btnRemove
+	 *            the btnRemove to set
 	 */
 	public final void setBtnRemove(Button btnRemove) {
 		this.btnRemove = btnRemove;
 	}
 
 	/**
-	 * @param btnSave the btnSave to set
+	 * @param btnSave
+	 *            the btnSave to set
 	 */
 	public final void setBtnSave(Button btnSave) {
 		this.btnSave = btnSave;

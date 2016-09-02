@@ -6,6 +6,7 @@
   *******************************/
 package com.kyj.fx.voeditor.visual.component.grid;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -13,10 +14,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -25,8 +28,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Objects;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
-import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.sun.btrace.BTraceUtils.Strings;
 
 import javafx.beans.property.ObjectProperty;
@@ -55,6 +58,8 @@ import kyj.Fx.dao.wizard.core.util.ValueUtil;
  *
  ***************************/
 public class EditableTableView extends TableView<Map<ColumnExpression, ObjectProperty<ValueExpression>>> {
+
+	
 
 	/**
 	 * @최초생성일 2016. 8. 25.
@@ -89,10 +94,21 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	private Map<String, ColumnExpression> columnMap = new ConcurrentHashMap<>();
 
-	public EditableTableView() {
+	/**
+	 * 실행이력정보. select문절만 저장처리.
+	 * @최초생성일 2016. 9. 2.
+	 */
+	private LinkedList<String> history = new LinkedList<String>();
+	private static final int HISTORY_LIMITED_SIZE = 30;
+	
+	
+	private Supplier<Connection> connectionSupplier;
 
+	public EditableTableView(Supplier<Connection> connectionSupplier) {
+		this.connectionSupplier = connectionSupplier;
 		this.setEditable(true);
 
+		//		new ConcurrentLinkedQueue<>();
 		getItems().addListener(itemChangeListener);
 
 	}
@@ -138,105 +154,135 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 	 * @throws Exception
 	 */
 	public void readByTableName(String sql, String tableName) throws Exception {
+		readByTableName(sql, tableName, true);
+	}
+
+	private void readByTableName(String sql, String tableName, boolean appendHist) throws Exception {
 		getColumns().clear();
 		getItems().clear();
 		removedList.clear();
 		columnMap.clear();
 
-		List<String> pks = DbUtil.pks(tableName);
+		try (Connection connection = connectionSupplier.get()) {
+			List<String> pks = DbUtil.pks(connection, tableName);
 
-		DbUtil.select(sql, FETCH_COUNT, LIMIT_ROW_COUNT,
-				new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>>() {
+			DbUtil.select(connection, sql, FETCH_COUNT, LIMIT_ROW_COUNT,
+					new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>>() {
 
-					@Override
-					public List<Map<String, Object>> apply(ResultSetMetaData t, ResultSet u) {
+						@Override
+						public List<Map<String, Object>> apply(ResultSetMetaData t, ResultSet u) {
 
-						try {
-							int columnCount = t.getColumnCount();
-
-							for (int i = 1; i <= columnCount; i++) {
-
-								String columnName = t.getColumnName(i);
-								ColumnExpression columnExp = new ColumnExpression(columnName);
-								columnExp.isPrimaryColumn = pks.contains(columnName);
-								columnExp.setColumnType(t.getColumnType(i));
-
-								TableColumn<Map<ColumnExpression, ObjectProperty<ValueExpression>>, ValueExpression> e = new TableColumn<>(
-										columnName);
-
-								e.setUserData(columnExp);
-								e.setCellValueFactory(DynamicCallback.fromTableColumn(columnExp));
-								e.setCellFactory(DEFAULT_CELL_FACTORY);
-								e.setEditable(true);
-								columnMap.put(columnName, columnExp);
-
-								getColumns().add(e);
-							}
-
-							while (u.next()) {
-
-								Map<ColumnExpression, ObjectProperty<ValueExpression>> hashMap = new HashMap<>();
+							try {
+								int columnCount = t.getColumnCount();
 
 								for (int i = 1; i <= columnCount; i++) {
-									String columnName = t.getColumnName(i);
-									ColumnExpression columnExp = columnMap.get(columnName);//new ColumnExpression(columnName);
 
-									ValueExpression valueExp = new ValueExpression();
-									valueExp.displayText.set(u.getString(columnName));
-									valueExp.isPrimaryKey = pks.contains(columnName);
-									valueExp.realValue.set(u.getObject(columnName));
-									valueExp.setColumnExpression(columnExp);
-									hashMap.put(columnExp, new SimpleObjectProperty<>(valueExp));
+									String columnName = t.getColumnName(i);
+									ColumnExpression columnExp = new ColumnExpression(columnName);
+									columnExp.isPrimaryColumn = pks.contains(columnName);
+									columnExp.setColumnType(t.getColumnType(i));
+
+									TableColumn<Map<ColumnExpression, ObjectProperty<ValueExpression>>, ValueExpression> e = new TableColumn<>(
+											columnName);
+
+									e.setUserData(columnExp);
+									e.setCellValueFactory(DynamicCallback.fromTableColumn(columnExp));
+									e.setCellFactory(DEFAULT_CELL_FACTORY);
+									e.setEditable(true);
+									columnMap.put(columnName, columnExp);
+
+									getColumns().add(e);
 								}
 
-								getItems().removeListener(itemChangeListener);
-								getItems().add(hashMap);
-								getItems().addListener(itemChangeListener);
+								while (u.next()) {
 
+									Map<ColumnExpression, ObjectProperty<ValueExpression>> hashMap = new HashMap<>();
+
+									for (int i = 1; i <= columnCount; i++) {
+										String columnName = t.getColumnName(i);
+										ColumnExpression columnExp = columnMap.get(columnName);//new ColumnExpression(columnName);
+
+										ValueExpression valueExp = new ValueExpression();
+										valueExp.displayText.set(u.getString(columnName));
+										valueExp.isPrimaryKey = pks.contains(columnName);
+										valueExp.realValue.set(u.getObject(columnName));
+										valueExp.setColumnExpression(columnExp);
+										hashMap.put(columnExp, new SimpleObjectProperty<>(valueExp));
+									}
+
+									getItems().removeListener(itemChangeListener);
+									getItems().add(hashMap);
+									getItems().addListener(itemChangeListener);
+
+								}
+
+							} catch (SQLException e) {
+								LOGGER.error(ValueUtil.toString(e));
 							}
-
-						} catch (SQLException e) {
-							LOGGER.error(ValueUtil.toString(e));
+							return null;
 						}
-						return null;
-					}
 
-				});
+					});
 
-		this.tableName.set(tableName);
+			if (appendHist) {
+
+				if (history.size() >= HISTORY_LIMITED_SIZE) {
+					history.removeFirst();
+				}
+
+				history.add(sql);
+			}
+
+			this.tableName.set(tableName);
+		}
+
 	}
 
 	/**
 	 * 저장 기능을 구현
+	 * 
+	 * @throws Exception
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 25.
 	 */
-	public void save() {
+	public void save() throws Exception {
 
 		//		List<String> saveSqlList = new ArrayList<>();
 
+		List<String> saveList = new ArrayList<String>();
 		STATUS statements1 = getStatements(DML.INSERT, (status, list) -> {
-			list.forEach(LOGGER::debug);
+			saveList.addAll(list);
 			return status;
 		});
 
 		STATUS statements2 = getStatements(DML.UPDATE, (status, list) -> {
-			list.forEach(LOGGER::debug);
+			saveList.addAll(list);
 			return status;
 		});
 
 		STATUS statements3 = getStatements(DML.DELETE, (status, list) -> {
-			list.forEach(LOGGER::debug);
+			saveList.addAll(list);
 			return status;
 		});
 
 		if (statements1 == STATUS.OK && statements2 == STATUS.OK && statements3 == STATUS.OK) {
+			try (Connection con = connectionSupplier.get()) {
+				int transactionedScope = DbUtil.getTransactionedScope(con, saveList, (list) -> {
+					return list;
+				}, ex -> {
+					throw new RuntimeException(ex);
+				});
+
+				if (transactionedScope == -1) {
+					throw new GargoyleException("Execute Fail.");
+				} else {
+					readByTableName(history.getLast(), tableName.getValue(), false);
+				}
+			}
 
 		} else {
-
-			DialogUtil.showMessageDialog("Primary Value is Empty.");
-			return;
+			throw new GargoyleException("Primary Value is Empty.");
 		}
 
 	}
@@ -422,7 +468,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			break;
 
 		default:
-			LOGGER.info("# uncatched data type.#########################");
+			LOGGER.info("# uncatched data type. {}   #########################", type);
 			returnValue = singleDot(displayText);
 			break;
 		}
