@@ -141,6 +141,8 @@ abstract class ConnectionManager {
 			dataSource.setPassword(pass);
 			dataSource.setDefaultAutoCommit(false);
 			dataSource.setInitialSize(2);
+			dataSource.setLoginTimeout(3);
+
 		}
 		return dataSource;
 	}

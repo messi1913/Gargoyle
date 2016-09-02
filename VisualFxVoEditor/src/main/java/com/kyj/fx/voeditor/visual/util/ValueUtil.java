@@ -212,9 +212,9 @@ public class ValueUtil {
 
 		Velocity.evaluate(context, writer, "DaoWizard", _dynamicSql);
 		String convetedString = writer.toString();
-		//		if (replaceNamedValue) {
-		//			return replace(convetedString, paramMap);
-		//		}
+				if (replaceNamedValue) {
+					return replace(convetedString, paramMap);
+				}
 		return convetedString;
 	}
 
@@ -232,14 +232,14 @@ public class ValueUtil {
 		//		PreparedStatementCreator newPreparedStatementCreator = pscf.newPreparedStatementCreator(params);
 
 		//		return _sql.toString();
-		String _sql = sql.replaceAll(STRING_PATTERN, "");
-		_sql = _sql.replaceAll(COMMENT_PATTERN, "");
+//		String _sql = sql.replaceAll(STRING_PATTERN, "");
+		String _sql = sql.replaceAll(COMMENT_PATTERN, "");
 		String pattern = ":\\w+";
 		//		String pattern = ":";
 		String result = regexReplaceMatchs(pattern, _sql, v -> {
 			String replace = v.replaceAll(":", "");
 			String string = paramMap.get(replace).toString();
-			return String.format("%s", string);
+			return String.format("'%s'", string);
 		});
 		//		Optional<String> reduce = regexMatchs.stream().reduce((a, b) -> a.concat(b));
 		//		if (reduce.isPresent())
@@ -286,7 +286,7 @@ public class ValueUtil {
 	public static List<String> getVelocityKeys(String _dynamicSql) {
 		String dynamicSql = _dynamicSql;
 		//주석에 대해당하는 문자들을 제거
-		dynamicSql = dynamicSql.replaceAll(STRING_PATTERN, "");
+//		dynamicSql = dynamicSql.replaceAll(STRING_PATTERN, "");
 		dynamicSql = dynamicSql.replaceAll(COMMENT_PATTERN, "");
 		String pattern = "\\$\\w+|:\\w+";
 		//		String pattern = "[( ]+\\$\\w+|=[ ]{0,}:\\w+";

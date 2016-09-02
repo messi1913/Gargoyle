@@ -284,27 +284,31 @@ public class DbUtil extends ConnectionManager {
 	 * @throws Exception
 	 */
 	public static <T> List<T> select(final String sql, Map<String, Object> paramMap, RowMapper<T> rowMapper) throws Exception {
-
 		DataSource dataSource = null;
 		List<T> query = null;
-
 		try {
-
-			noticeQuery(sql);
-
 			dataSource = getDataSource();
+			query = select(dataSource, sql, paramMap, rowMapper);
+		} catch (Exception e) {
+			query = Collections.emptyList();
+		} finally {
+			close(dataSource);
+		}
+		return query;
+	}
 
+	public static <T> List<T> select(DataSource dataSource, final String sql, Map<String, Object> paramMap, RowMapper<T> rowMapper)
+			throws Exception {
+		List<T> query = null;
+		try {
+			noticeQuery(sql);
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 
 			//			String _sql = ValueUtil.getVelocityToText(sql, paramMap);
 			//			LOGGER.debug(_sql);
 			query = jdbcTemplate.query(sql, new MapSqlParameterSource(paramMap), rowMapper);
 		} catch (Exception e) {
-			// cleanDataSource();
-			// close(dataSource.getConnection());
 			throw e;
-		} finally {
-			close(dataSource);
 		}
 		return query;
 	}
@@ -825,8 +829,6 @@ public class DbUtil extends ConnectionManager {
 		}
 		return null;
 	};
-
-
 
 	public static List<String> pks(String tableNamePattern) throws Exception {
 		return pks(getConnection(), tableNamePattern, t -> {
