@@ -60,7 +60,7 @@ import javafx.collections.ObservableList;
 public class ValueUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValueUtil.class);
-	
+
 	public enum IndexCaseTypes {
 		UPPERCASE, LOWERCASE
 	}
@@ -492,7 +492,7 @@ public class ValueUtil {
 
 			}
 		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(e));	
+			LOGGER.error(ValueUtil.toString(e));
 		}
 
 		return hashMap;
@@ -901,13 +901,22 @@ public class ValueUtil {
 				if (Character.isUpperCase(charArray[i + 1])) {
 					stringBuffer.append('_');
 				}
-			}// end if
+			} // end if
 
-		}// end for
+		} // end for
 
 		return stringBuffer.toString().toUpperCase();
 	}
-	
-	
-	
+
+	public static String removeLocalLocation(String dir) {
+		String classDirName = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
+		return dir.replace(classDirName, "");
+	}
+
+	public static String addLocalLocation(String dir) {
+		String classDirName = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
+
+		return classDirName.concat(dir);
+	}
+
 }
