@@ -202,14 +202,14 @@ public class SimpleSQLResultView extends BorderPane {
 				param.put(key, null);
 			else if (value instanceof List) {
 				List<Object> items = (List<Object>) value;
-				StringBuffer sb = new StringBuffer();
-				for (Object obj : items) {
-					sb.append(obj).append(",");
-				}
+//				StringBuffer sb = new StringBuffer();
+//				for (Object obj : items) {
+//					sb.append(obj).append(",");
+//				}
 
-				if (items != null && !items.isEmpty()) //bug fix. sb가 빈 경우 에러발생.
-					sb.setLength(sb.length() - 1);
-				param.put(key, sb.toString());
+//				if (items != null && !items.isEmpty()) //bug fix. sb가 빈 경우 에러발생.
+//					sb.setLength(sb.length() - 1);
+				param.put(key, items);
 			} else
 				param.put(key, value);
 		}
@@ -237,7 +237,7 @@ public class SimpleSQLResultView extends BorderPane {
 		stage.setScene(scene);
 		stage.setAlwaysOnTop(false);
 		//		stage.initModality(Modality.APPLICATION_MODAL);
-		//		stage.initOwner(SharedMemory.getPrimaryStage());
+				stage.initOwner(SharedMemory.getPrimaryStage());
 		stage.showAndWait();
 
 		// 재사용금지 1회성 뷰
