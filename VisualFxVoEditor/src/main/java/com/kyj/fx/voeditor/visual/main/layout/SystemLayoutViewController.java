@@ -333,7 +333,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		List<String> exts = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILE_OPEN_NOT_INPROCESSING_EXTENSION, ",");
 
 		String fileName = file.getName();
-		int dotIndex = fileName.indexOf('.');
+		int dotIndex = fileName.lastIndexOf('.');
 		/* 확장자부분이 없는경우 처리. */
 		if (dotIndex == -1) {
 			openBigText(file);
