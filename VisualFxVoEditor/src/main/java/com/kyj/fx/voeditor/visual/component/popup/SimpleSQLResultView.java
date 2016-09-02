@@ -199,19 +199,19 @@ public class SimpleSQLResultView extends BorderPane {
 			String key = iterator.next();
 			Object value = param.get(key);
 			if (value == null || value.toString().isEmpty())
-				param.put(key, "''");
+				param.put(key, null);
 			else if (value instanceof List) {
 				List<Object> items = (List<Object>) value;
 				StringBuffer sb = new StringBuffer();
 				for (Object obj : items) {
-					sb.append("'").append(obj).append("'").append(",");
+					sb.append(obj).append(",");
 				}
 
 				if (items != null && !items.isEmpty()) //bug fix. sb가 빈 경우 에러발생.
 					sb.setLength(sb.length() - 1);
 				param.put(key, sb.toString());
 			} else
-				param.put(key, "'".concat(value.toString()).concat("'"));
+				param.put(key, value);
 		}
 
 		this.mappingedSqlKeywords.setContent(ValueUtil.getVelocityToText(this.sql, param, true));

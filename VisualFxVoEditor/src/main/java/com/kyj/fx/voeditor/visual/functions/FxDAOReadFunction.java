@@ -18,6 +18,7 @@ import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoColumnsDVO;
 import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoFieldsDVO;
 import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoMethodsDVO;
 
+import org.apache.tomcat.jdbc.pool.DataSource;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -31,17 +32,23 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 
 	@Override
 	public TbmSysDaoDVO apply(TbmSysDaoDVO t) {
-
+		DataSource dataSource = null;
 		try {
-			List<TbpSysDaoMethodsDVO> method = getMethod(t);
+			dataSource = DbUtil.getDataSource();
+			List<TbpSysDaoMethodsDVO> method = getMethod(dataSource, t);
 			t.setTbpSysDaoMethodsDVOList(method);
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				DbUtil.close(dataSource);
+			} catch (Exception e) {
+			}
 		}
 		return t;
 	}
 
-	private List<TbpSysDaoMethodsDVO> getMethod(TbmSysDaoDVO daoDVO) throws Exception {
+	private List<TbpSysDaoMethodsDVO> getMethod(DataSource dataSource, TbmSysDaoDVO daoDVO) throws Exception {
 
 		Map<String, Object> map = ValueUtil.toMap(daoDVO);
 		StringBuffer sb = new StringBuffer();
@@ -57,7 +64,7 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append("AND PACKAGE_NAME = :packageName\n");
 		sb.append("AND CLASS_NAME = :className\n");
 
-		List<TbpSysDaoMethodsDVO> select = DbUtil.select(sb.toString(), map, new RowMapper<TbpSysDaoMethodsDVO>() {
+		List<TbpSysDaoMethodsDVO> select = DbUtil.select(dataSource, sb.toString(), map, new RowMapper<TbpSysDaoMethodsDVO>() {
 
 			@Override
 			public TbpSysDaoMethodsDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -71,10 +78,10 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		});
 
 		for (TbpSysDaoMethodsDVO methodDVO : select) {
-			List<TbpSysDaoColumnsDVO> columns = getColumns(daoDVO, methodDVO);
+			List<TbpSysDaoColumnsDVO> columns = getColumns(dataSource, daoDVO, methodDVO);
 			methodDVO.setTbpSysDaoColumnsDVOList(columns);
 
-			List<TbpSysDaoFieldsDVO> fields = getField(daoDVO, methodDVO);
+			List<TbpSysDaoFieldsDVO> fields = getField(dataSource, daoDVO, methodDVO);
 			methodDVO.setTbpSysDaoFieldsDVOList(fields);
 		}
 
@@ -82,7 +89,7 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 
 	}
 
-	private List<TbpSysDaoFieldsDVO> getField(TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO) throws Exception {
+	private List<TbpSysDaoFieldsDVO> getField(DataSource dataSource, TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT \n");
@@ -101,7 +108,7 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		hashMap.put("className", daoDVO.getClassName());
 		hashMap.put("methodName", methodDVO.getMethodName());
 
-		return DbUtil.select(sb.toString(), hashMap, new RowMapper<TbpSysDaoFieldsDVO>() {
+		return DbUtil.select(dataSource, sb.toString(), hashMap, new RowMapper<TbpSysDaoFieldsDVO>() {
 
 			@Override
 			public TbpSysDaoFieldsDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -114,7 +121,7 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		});
 	}
 
-	List<TbpSysDaoColumnsDVO> getColumns(TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO) throws Exception {
+	List<TbpSysDaoColumnsDVO> getColumns(DataSource dataSource, TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT \n");
@@ -133,7 +140,7 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		hashMap.put("className", daoDVO.getClassName());
 		hashMap.put("methodName", methodDVO.getMethodName());
 
-		return DbUtil.select(sb.toString(), hashMap, new RowMapper<TbpSysDaoColumnsDVO>() {
+		return DbUtil.select(dataSource, sb.toString(), hashMap, new RowMapper<TbpSysDaoColumnsDVO>() {
 
 			@Override
 			public TbpSysDaoColumnsDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
