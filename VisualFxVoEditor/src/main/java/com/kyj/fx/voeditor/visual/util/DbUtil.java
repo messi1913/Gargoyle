@@ -288,13 +288,8 @@ public class DbUtil extends ConnectionManager {
 	 * @return
 	 * @throws Exception
 	 */
-<<<<<<< HEAD
-	public static <T> List<T> select(final String sql, Map<String, Object> paramMap, RowMapper<T> rowMapper)
-			throws Exception {
 
-=======
 	public static <T> List<T> select(final String sql, Map<String, Object> paramMap, RowMapper<T> rowMapper) throws Exception {
->>>>>>> refs/heads/editable_velocity_fix
 		DataSource dataSource = null;
 		List<T> query = null;
 		try {
@@ -904,7 +899,7 @@ public class DbUtil extends ConnectionManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * // 16.09.01 >> 쿼리로 부터 테이블을 찾아옴 퍼옴  by Hong
 	 * @param sql
 	 * @return
