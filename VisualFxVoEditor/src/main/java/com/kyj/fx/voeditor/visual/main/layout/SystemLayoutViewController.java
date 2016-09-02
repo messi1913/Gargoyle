@@ -911,19 +911,26 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			FileWrapper value = selectedItem.getValue();
 			File file = value.getFile();
 			if (file.isDirectory()) {
-				Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Directory Name", "Input New Dir Name");
-				showInputDialog.ifPresent(v -> {
-					String newFileName = v.getValue();
-					File createdNewFile = new File(file, newFileName);
-					boolean mkdir = createdNewFile.mkdir();
-					if (mkdir) {
 
-						TreeItem<FileWrapper> createDefaultNode = projectFileTreeCreator.createDefaultNode(new FileWrapper(createdNewFile));
-						createDefaultNode.setExpanded(true);
-						selectedItem.getChildren().add(createDefaultNode);
-					}
-				});
+				//				Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Directory Name", "Input New Dir Name");
+				//				showInputDialog.ifPresent(v -> {
+				//					String newFileName = v.getValue();
+				//					File createdNewFile = new File(file, newFileName);
+				//					boolean mkdir = createdNewFile.mkdir();
+				//					if (mkdir) {
+				//
+				//						TreeItem<FileWrapper> createDefaultNode = projectFileTreeCreator.createDefaultNode(new FileWrapper(createdNewFile));
+				//						createDefaultNode.setExpanded(true);
+				//						selectedItem.getChildren().add(createDefaultNode);
+				//					}
+				//				});
 
+				File createdNewFile = DialogUtil.showDirSaveDialog(SharedMemory.getPrimaryStage(), file, null);
+				if (createdNewFile != null && createdNewFile.exists()) {
+					TreeItem<FileWrapper> createDefaultNode = projectFileTreeCreator.createDefaultNode(new FileWrapper(createdNewFile));
+					createDefaultNode.setExpanded(true);
+					selectedItem.getChildren().add(createDefaultNode);
+				}
 			}
 		}
 	}
@@ -954,7 +961,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 						TreeItem<FileWrapper> root = selectedItem.getParent();//treeProjectFile.getRoot();
 						root.getChildren().remove(selectedItem);
-						
+
 					}
 				});
 			}
