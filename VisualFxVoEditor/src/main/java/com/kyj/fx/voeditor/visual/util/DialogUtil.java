@@ -85,8 +85,8 @@ public class DialogUtil {
 	 */
 	public static File showPropertyFileSelectDialog(final Window ownerWindow) {
 		return showFileDialog(ownerWindow, chooser -> {
-			chooser.getExtensionFilters()
-					.add(new ExtensionFilter(GargoyleExtensionFilters.PROPERTIES_NAME, GargoyleExtensionFilters.PROPERTIES));
+			chooser.getExtensionFilters().add(
+					new ExtensionFilter(GargoyleExtensionFilters.PROPERTIES_NAME, GargoyleExtensionFilters.PROPERTIES));
 		});
 	}
 
@@ -100,7 +100,8 @@ public class DialogUtil {
 	 */
 	public static File showCssFileSelectDialog(final Window ownerWindow) {
 		return showFileDialog(ownerWindow, chooser -> {
-			chooser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.FX_CSS_NAME, GargoyleExtensionFilters.FX_CSS));
+			chooser.getExtensionFilters()
+					.add(new ExtensionFilter(GargoyleExtensionFilters.FX_CSS_NAME, GargoyleExtensionFilters.FX_CSS));
 		});
 	}
 
@@ -267,42 +268,41 @@ public class DialogUtil {
 		 *
 		 * ex) A팝업이 화면에 떠있는 상태에서 , 또 다른 B 팝업이 뜬 상태에서 에러 다이얼로그가 보여지는경우
 		 *
-		 *  연관성이 없는 A팝업이 화면 최상단으로 올라오는 버그가 있음.
-		 * by kyj.
+		 * 연관성이 없는 A팝업이 화면 최상단으로 올라오는 버그가 있음. by kyj.
 		 *
 		 *
 		 */
-		//		Alert alert = new Alert(AlertType.ERROR);
-		//		alert.setTitle("Exception Dialog");
+		// Alert alert = new Alert(AlertType.ERROR);
+		// alert.setTitle("Exception Dialog");
 		//
-		//		alert.setHeaderText(message);
-		//		alert.setContentText(ex.getMessage());
+		// alert.setHeaderText(message);
+		// alert.setContentText(ex.getMessage());
 		//
-		//		// Create expandable Exception.
-		//		StringWriter sw = new StringWriter();
-		//		PrintWriter pw = new PrintWriter(sw);
-		//		ex.printStackTrace(pw);
-		//		String exceptionText = sw.toString();
+		// // Create expandable Exception.
+		// StringWriter sw = new StringWriter();
+		// PrintWriter pw = new PrintWriter(sw);
+		// ex.printStackTrace(pw);
+		// String exceptionText = sw.toString();
 		//
-		//		Label label = new Label(message);
+		// Label label = new Label(message);
 		//
-		//		TextArea textArea = new TextArea(exceptionText);
-		//		textArea.setEditable(false);
-		//		textArea.setWrapText(true);
+		// TextArea textArea = new TextArea(exceptionText);
+		// textArea.setEditable(false);
+		// textArea.setWrapText(true);
 		//
-		//		textArea.setMaxWidth(Double.MAX_VALUE);
-		//		textArea.setMaxHeight(Double.MAX_VALUE);
-		//		GridPane.setVgrow(textArea, Priority.ALWAYS);
-		//		GridPane.setHgrow(textArea, Priority.ALWAYS);
+		// textArea.setMaxWidth(Double.MAX_VALUE);
+		// textArea.setMaxHeight(Double.MAX_VALUE);
+		// GridPane.setVgrow(textArea, Priority.ALWAYS);
+		// GridPane.setHgrow(textArea, Priority.ALWAYS);
 		//
-		//		GridPane expContent = new GridPane();
-		//		expContent.setMaxWidth(Double.MAX_VALUE);
-		//		expContent.add(label, 0, 0);
-		//		expContent.add(textArea, 0, 1);
+		// GridPane expContent = new GridPane();
+		// expContent.setMaxWidth(Double.MAX_VALUE);
+		// expContent.add(label, 0, 0);
+		// expContent.add(textArea, 0, 1);
 		//
-		//		alert.getDialogPane().setExpandableContent(expContent);
-		//		alert.initOwner(owner);
-		//		alert.showAndWait();
+		// alert.getDialogPane().setExpandableContent(expContent);
+		// alert.initOwner(owner);
+		// alert.showAndWait();
 
 		new ExceptionDialogComposite(ex, message).show(owner);
 	}
@@ -435,19 +435,20 @@ public class DialogUtil {
 	 * @param message
 	 * @param apply
 	 */
-	public static void showMessageDialog(Stage initOwner, String title, String headerText, String message, Consumer<Alert> apply) {
+	public static void showMessageDialog(Stage initOwner, String title, String headerText, String message,
+			Consumer<Alert> apply) {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle(title);
 		alert.setHeaderText(headerText);
 		alert.setContentText(message);
 		apply.accept(alert);
 
-		//		Dialog<Pair<String, String>> dialog = new Dialog<>();
-		//		dialog.setTitle(title);
-		//		dialog.setHeaderText(headerText);
-		//		dialog.setContentText(message);
-		//		dialog.initOwner(initOwner);
-		//		apply.accept(dialog);
+		// Dialog<Pair<String, String>> dialog = new Dialog<>();
+		// dialog.setTitle(title);
+		// dialog.setHeaderText(headerText);
+		// dialog.setContentText(message);
+		// dialog.initOwner(initOwner);
+		// apply.accept(dialog);
 	}
 
 	public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message) {
@@ -489,11 +490,16 @@ public class DialogUtil {
 	}
 
 	public static Optional<Pair<String, String>> showInputDialog(String title, String message) {
-		return showInputDialog(title, message, str -> {
+		return showInputDialog(title, message, "", str -> {
 		});
 	}
 
-	public static Optional<Pair<String, String>> showInputDialog(String title, String message,
+	public static Optional<Pair<String, String>> showInputDialog(String title, String message, String inputValue) {
+		return showInputDialog(title, message, inputValue, str -> {
+		});
+	}
+
+	public static Optional<Pair<String, String>> showInputDialog(String title, String message, String inputValue,
 			Consumer<? super Pair<String, String>> consumer) {
 
 		// Create the custom dialog.
@@ -501,6 +507,11 @@ public class DialogUtil {
 		dialog.setTitle(title);
 		dialog.setHeaderText(message);
 		TextField graphic = new TextField();
+
+		if (inputValue != null && inputValue != "") {
+			graphic.setText(inputValue);
+		}
+
 		dialog.setGraphic(graphic);
 
 		// Set the button types.
@@ -536,7 +547,8 @@ public class DialogUtil {
 	 * @throws IOException
 	 * @User KYJ
 	 */
-	public static void open(Class<?> packageLocation, String fxmlName, int width, int height, boolean modal) throws IOException {
+	public static void open(Class<?> packageLocation, String fxmlName, int width, int height, boolean modal)
+			throws IOException {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(packageLocation.getResource(fxmlName));
 		Parent parent = loader.load();

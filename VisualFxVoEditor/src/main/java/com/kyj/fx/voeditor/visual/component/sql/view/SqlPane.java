@@ -979,8 +979,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			tbResult.getItems().addAll(query);
 			tabPaneResult.getSelectionModel().select(this.tabResult);
 		}
-
-	}
+}
 
 	/**
 	 * 결과 데이터를 테이블에 바인딩
