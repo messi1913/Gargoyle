@@ -31,6 +31,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.velocity.VelocityContext;
@@ -645,6 +647,11 @@ public class ValueUtil {
 
 		return dbmsName;
 	}
+	public static String getDriverToDBMSName(org.apache.tomcat.jdbc.pool.DataSource dataSource) {
+		String dbms = dataSource.getDriverClassName();//ValueUtil.getDriverToDBMSName(driver);
+		return getDriverToDBMSName(dbms);
+	}
+
 
 	/**
 	 * cvs 스트링 형태로 리턴

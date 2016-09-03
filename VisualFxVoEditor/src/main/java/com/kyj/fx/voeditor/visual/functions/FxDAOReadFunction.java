@@ -35,7 +35,8 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		DataSource dataSource = null;
 		try {
 			dataSource = DbUtil.getDataSource();
-			List<TbpSysDaoMethodsDVO> method = getMethod(dataSource, t);
+			boolean existsSchemaDatabase = DbUtil.isExistsSchemaDatabase();
+			List<TbpSysDaoMethodsDVO> method = getMethod(dataSource, t, existsSchemaDatabase);
 			t.setTbpSysDaoMethodsDVOList(method);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -48,7 +49,7 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		return t;
 	}
 
-	private List<TbpSysDaoMethodsDVO> getMethod(DataSource dataSource, TbmSysDaoDVO daoDVO) throws Exception {
+	private List<TbpSysDaoMethodsDVO> getMethod(DataSource dataSource, TbmSysDaoDVO daoDVO, boolean existsSchemaDatabase) throws Exception {
 
 		Map<String, Object> map = ValueUtil.toMap(daoDVO);
 		StringBuffer sb = new StringBuffer();
@@ -59,7 +60,10 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append("RESULT_VO_CLASS  , \n");
 		sb.append("SQL_BODY  , \n");
 		sb.append("METHOD_DESC \n");
-		sb.append(" FROM meerkat.TBP_SYS_DAO_METHODS \n");
+		if (existsSchemaDatabase)
+			sb.append(" FROM meerkat.TBP_SYS_DAO_METHODS \n");
+		else
+			sb.append(" FROM TBP_SYS_DAO_METHODS \n");
 		sb.append(" WHERE 1=1 \n");
 		sb.append("AND PACKAGE_NAME = :packageName\n");
 		sb.append("AND CLASS_NAME = :className\n");
@@ -78,10 +82,10 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		});
 
 		for (TbpSysDaoMethodsDVO methodDVO : select) {
-			List<TbpSysDaoColumnsDVO> columns = getColumns(dataSource, daoDVO, methodDVO);
+			List<TbpSysDaoColumnsDVO> columns = getColumns(dataSource, daoDVO, methodDVO, existsSchemaDatabase);
 			methodDVO.setTbpSysDaoColumnsDVOList(columns);
 
-			List<TbpSysDaoFieldsDVO> fields = getField(dataSource, daoDVO, methodDVO);
+			List<TbpSysDaoFieldsDVO> fields = getField(dataSource, daoDVO, methodDVO, existsSchemaDatabase);
 			methodDVO.setTbpSysDaoFieldsDVOList(fields);
 		}
 
@@ -89,14 +93,18 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 
 	}
 
-	private List<TbpSysDaoFieldsDVO> getField(DataSource dataSource, TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO) throws Exception {
+	private List<TbpSysDaoFieldsDVO> getField(DataSource dataSource, TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO,
+			boolean existsSchemaDatabase) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT \n");
 		sb.append("FIELD_NAME  , \n");
 		sb.append("TYPE  , \n");
 		sb.append("TEST_VALUE   \n");
-		sb.append(" FROM meerkat.tbp_sys_dao_fields \n");
+		if (existsSchemaDatabase)
+			sb.append(" FROM meerkat.tbp_sys_dao_fields \n");
+		else
+			sb.append(" FROM tbp_sys_dao_fields \n");
 		sb.append(" WHERE 1=1 \n");
 		sb.append("AND PACKAGE_NAME = :packageName\n");
 		sb.append("AND CLASS_NAME = :className\n");
@@ -121,7 +129,8 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		});
 	}
 
-	List<TbpSysDaoColumnsDVO> getColumns(DataSource dataSource, TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO) throws Exception {
+	List<TbpSysDaoColumnsDVO> getColumns(DataSource dataSource, TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO,
+			boolean existsSchemaDatabase) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT \n");
@@ -129,7 +138,10 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append("COLUMN_TYPE, \n");
 		sb.append("PROGRAM_TYPE, \n");
 		sb.append("LOCK_YN \n");
-		sb.append(" FROM meerkat.tbp_sys_dao_columns \n");
+		if (existsSchemaDatabase)
+			sb.append(" FROM meerkat.tbp_sys_dao_columns \n");
+		else
+			sb.append(" FROM tbp_sys_dao_columns \n");
 		sb.append(" WHERE 1=1 \n");
 		sb.append("AND PACKAGE_NAME = :packageName\n");
 		sb.append("AND CLASS_NAME = :className\n");

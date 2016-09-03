@@ -796,12 +796,16 @@ public class DaoWizardViewController {
 
 			// if (!this.tbMappings.getItems().isEmpty())
 			if (!resultList.isEmpty()) {
+				try {
+					this.tbMappings.getItems().clear();
+					getSelectedMethodItem().getTbpSysDaoColumnsDVOList().clear();
 
-				this.tbMappings.getItems().clear();
-				getSelectedMethodItem().getTbpSysDaoColumnsDVOList().clear();
+					this.tbMappings.getItems().addAll(resultList);
+					getSelectedMethodItem().getTbpSysDaoColumnsDVOList().addAll(resultList);
+				} catch (NullPointerException n) {
+					DialogUtil.showMessageDialog("메소드를 선택해주세요.");
+				}
 
-				this.tbMappings.getItems().addAll(resultList);
-				getSelectedMethodItem().getTbpSysDaoColumnsDVOList().addAll(resultList);
 			}
 
 		} catch (IOException e1) {
@@ -964,7 +968,7 @@ public class DaoWizardViewController {
 	public void tbMappingsOnMouseClick() {
 
 		TbpSysDaoColumnsDVO selectedItem = tbMappings.getSelectionModel().getSelectedItem();
-		if(selectedItem!=null)
+		if (selectedItem != null)
 			LOGGER.debug(selectedItem.toString());
 	}
 

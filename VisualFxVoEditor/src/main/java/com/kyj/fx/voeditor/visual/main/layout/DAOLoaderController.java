@@ -9,8 +9,6 @@ package com.kyj.fx.voeditor.visual.main.layout;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +19,6 @@ import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.diff.TextBaseComparator;
 import com.kyj.fx.voeditor.visual.main.model.vo.TbmSysDaoMethodsHDVO;
-import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -202,7 +199,7 @@ public class DAOLoaderController {
 
 	private TbmSysDaoMethodsHDVO getHistorySQL(Map<String, Object> paramMap) throws Exception {
 		StringBuffer sb = new StringBuffer();
-		if (isExistsSchemaDatabase())
+		if (DbUtil.isExistsSchemaDatabase())
 			sb.append("select hist_tsp, sql_body from meerkat.tbp_sys_dao_methods_h ");
 		else
 			sb.append("select hist_tsp, sql_body from tbp_sys_dao_methods_h ");
@@ -223,7 +220,7 @@ public class DAOLoaderController {
 	private List<TbmSysDaoMethodsHDVO> listHistoryItems(Map<String, Object> paramMap) throws Exception {
 		StringBuffer sb = new StringBuffer();
 		sb.append("select b.hist_tsp, b.package_name, b.class_name, b.method_name, b.result_vo_class, b.dml_type, fst_reg_dt from \n");
-		if (isExistsSchemaDatabase())
+		if (DbUtil.isExistsSchemaDatabase())
 			sb.append("meerkat.tbm_sys_dao a inner join meerkat.tbp_sys_dao_methods_h b\n");
 		else
 			sb.append("tbm_sys_dao a inner join tbp_sys_dao_methods_h b\n");
@@ -319,7 +316,7 @@ public class DAOLoaderController {
 		}
 		StringBuffer sb = new StringBuffer();
 		sb.append("\n");
-		if (isExistsSchemaDatabase())
+		if (DbUtil.isExistsSchemaDatabase())
 			sb.append("SELECT PACKAGE_NAME, CLASS_NAME,LOCATION,CLASS_DESC,TABLE_NAME FROM meerkat.tbm_sys_dao \n");
 		else
 			sb.append("SELECT PACKAGE_NAME, CLASS_NAME,LOCATION,CLASS_DESC,TABLE_NAME FROM tbm_sys_dao \n");
@@ -344,18 +341,6 @@ public class DAOLoaderController {
 
 	}
 
-	private static boolean isExistsSchemaDatabase() {
-		String driver = DbUtil.getDriver().trim();
-		if (driver == null || driver.isEmpty())
-			return true;
-
-		String drivers = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.NOT_EXISTS_SCHEMA_DRIVER_NAMES);
-		if (drivers != null && !driver.isEmpty()) {
-			drivers = drivers.trim();
-			Optional<String> findFirst = Stream.of(drivers.split(",")).filter(v -> v.equals(driver)).findFirst();
-			return !findFirst.isPresent();
-		}
-		return true;
-	}
+	
 
 }

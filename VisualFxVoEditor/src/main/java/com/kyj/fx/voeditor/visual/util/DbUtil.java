@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +32,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
@@ -493,8 +495,8 @@ public class DbUtil extends ConnectionManager {
 			return template.execute(status -> {
 				try {
 					consumer.scope(userObj, namedParameterJdbcTemplate);
-				} catch (Throwable e) {
 					status.setRollbackOnly();
+				} catch (Throwable e) {
 					LOGGER.error(e.getMessage());
 					if (exceptionHandler != null)
 						exceptionHandler.accept(e);
@@ -910,6 +912,58 @@ public class DbUtil extends ConnectionManager {
 				.replaceAll("Ｃ{1,}", "Ｃ").replaceAll("\\([^Ｃ]+Ｃ", "").replaceAll("Ｃ", ",");
 
 		return concatedTables;
+	}
+
+	/********************************
+	 * 작성일 : 2016. 9. 3. 작성자 : KYJ
+	 *
+	 * 스키마라는 개념이 존재하는 데이터베이스인지 유무
+	 * 
+	 * @return
+	 ********************************/
+	public static boolean isExistsSchemaDatabase() {
+
+		String driver = DbUtil.getDriver().trim();
+		if (driver == null || driver.isEmpty())
+			return true;
+		return isExistsSchemaDatabase(driver);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 9. 3. 작성자 : KYJ
+	 *
+	 * 스키마라는 개념이 존재하는 데이터베이스인지 유무
+	 * 
+	 * @param con
+	 * @return
+	 ********************************/
+	public static boolean isExistsSchemaDatabase(Connection con) {
+		try {
+			String driverName = con.getMetaData().getDriverName();
+			return isExistsSchemaDatabase(driverName);
+		} catch (SQLException e) {
+			//Nothing.
+		}
+		return false;
+	}
+
+	/********************************
+	 * 작성일 : 2016. 9. 3. 작성자 : KYJ
+	 *
+	 * 스키마라는 개념이 존재하는 데이터베이스인지 유무
+	 * 
+	 * @param driver
+	 * @return
+	 ********************************/
+	public static boolean isExistsSchemaDatabase(String driver) {
+
+		String drivers = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.NOT_EXISTS_SCHEMA_DRIVER_NAMES);
+		if (drivers != null && !driver.isEmpty()) {
+			drivers = drivers.trim();
+			Optional<String> findFirst = Stream.of(drivers.split(",")).filter(v -> v.equals(driver)).findFirst();
+			return !findFirst.isPresent();
+		}
+		return true;
 	}
 
 	// TODO 구현가능한부분인지 확인.
