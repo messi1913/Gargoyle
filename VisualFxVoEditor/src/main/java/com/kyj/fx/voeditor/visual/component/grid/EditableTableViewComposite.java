@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.property.ObjectProperty;
@@ -25,6 +26,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
@@ -44,7 +46,7 @@ public class EditableTableViewComposite extends BorderPane {
 
 	private EditableTableView editableTableView;
 	private StringProperty sql = new SimpleStringProperty();
-	private TextField txtTableName;
+	private Label txtTableName;
 	private Button btnExec;
 	private Button btnAdd;
 	private Button btnRemove;
@@ -58,13 +60,15 @@ public class EditableTableViewComposite extends BorderPane {
 		btnRemove = new Button("삭제");
 		btnSave = new Button("저장");
 
-		txtTableName = new TextField();
+		txtTableName = new Label();
+		
 		HBox hBox = new HBox(5, txtTableName, btnExec, btnAdd, btnRemove, btnSave);
 		hBox.setAlignment(Pos.CENTER_RIGHT);
 		hBox.setPadding(new Insets(5));
 		editableTableView = new EditableTableView(connectionSupplier);
 		editableTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
+		editableTableView.getSelectionModel().setCellSelectionEnabled(true);
+		
 		editableTableView.tableNameProperty().addListener((oba, oldval, newval) -> {
 			btnAdd.setDisable(false);
 		});
@@ -82,7 +86,6 @@ public class EditableTableViewComposite extends BorderPane {
 		});
 
 		btnSave.setOnAction(ev -> {
-
 			try {
 				editableTableView.save();
 			} catch (Exception e) {
@@ -90,16 +93,21 @@ public class EditableTableViewComposite extends BorderPane {
 			}
 		});
 
-		editableTableView.setOnMouseClicked(ev -> {
-			Map<ColumnExpression, ObjectProperty<ValueExpression>> selectedItem = editableTableView.getSelectionModel().getSelectedItem();
-			System.out.println(selectedItem);
-		});
+//		editableTableView.setOnMouseClicked(ev -> {
+//			Map<ColumnExpression, ObjectProperty<ValueExpression>> selectedItem = editableTableView.getSelectionModel().getSelectedItem();
+//			System.out.println(selectedItem);
+//			
+//		});
 
+		FxUtil.installClipboardKeyEvent(editableTableView);
+//		editableTableView.addEventHandler(KeyEvent.KEY_RELEASED, this::editableTableViewOnKeyReleased);
 		setTop(hBox);
 		setCenter(editableTableView);
 
 	}
 
+
+	
 	private EventHandler<ActionEvent> defaultExecOnAction = e -> {
 		try {
 			execute();

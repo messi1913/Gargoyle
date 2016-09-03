@@ -374,7 +374,9 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		// Cell 단위로 선택
 		tbResult.getSelectionModel().setCellSelectionEnabled(true);
 		tbResult.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
+		//키 이벤트 기능 설치.
+		FxUtil.installClipboardKeyEvent(tbResult);
+		
 		BorderPane tbResultLayout = new BorderPane(tbResult);
 		lblStatus = new Label("Ready...");
 		lblStatus.setMaxHeight(50d);
@@ -398,7 +400,6 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		}
 
 		editableComposite = new EditableTableViewComposite(connectionSupplier);
-
 
 		tabResult = new Tab("Result", tbResultLayout);
 		tabResult.setClosable(false);
@@ -756,6 +757,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 * query-macro menu 선택시 발생되는 이벤트에 대한정의.
 	 *
 	 * 기술내용으로는 쿼리 매크로를 처리할 수 있는 팝업을 로드한다.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 31.
 	 * @param e
@@ -888,7 +890,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		List<String> asList = Arrays.asList(split);
 		queryAll(asList, cnt -> {
 			DialogUtil.showMessageDialog(String.format("%d 건 success", cnt));
-		} , (e, bool) -> {
+		}, (e, bool) -> {
 			if (bool)
 				DialogUtil.showExceptionDailog(e);
 		});
@@ -912,12 +914,20 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		String sql = selectedItem.getSelectedSQLText();
 		if (sql == null || sql.isEmpty()) {
 			sql = selectedItem.getSqlText();
+
+			if (sql == null || sql.isEmpty())
+				return;
+
 		}
 
-		if (sql == null || sql.isEmpty())
-			return;
+		String trimedSql = sql.trim();
 
-		final String _sql = sql;
+		//2016-09-03 오라클에서는 쿼리문장끝에 ';' 이 포함되면 안되므로 제거
+		if (trimedSql.endsWith(";")) {
+			trimedSql = trimedSql.substring(0, trimedSql.length() - 1);
+		}
+		String _sql = trimedSql;
+
 		if (ValueUtil.isVelocityContext(_sql)) {
 			VariableMappingView mappingView = new VariableMappingView(stage);
 			mappingView.extractVariableFromSql(_sql);
@@ -967,7 +977,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 
 			List<Map<String, Object>> query = query(sql, param, success -> {
 				lblStatus.setText(success.size() + " row");
-			} , (exception, showDialog) -> {
+			}, (exception, showDialog) -> {
 				lblStatus.setText(exception.toString());
 				if (showDialog)
 					DialogUtil.showExceptionDailog(this, exception);
@@ -979,7 +989,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			tbResult.getItems().addAll(query);
 			tabPaneResult.getSelectionModel().select(this.tabResult);
 		}
-}
+	}
 
 	/**
 	 * 결과 데이터를 테이블에 바인딩
