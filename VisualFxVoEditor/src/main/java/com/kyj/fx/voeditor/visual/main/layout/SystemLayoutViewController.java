@@ -25,6 +25,7 @@ import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
 import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
+import com.kyj.fx.voeditor.visual.component.about.AboutController;
 import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenComposite;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
@@ -99,6 +100,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -815,8 +817,24 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 */
 	@FXML
 	public void miAboutOnAction(ActionEvent e) {
-		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
-		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s", url));
+//		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
+//		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s", url));
+		
+		try {
+			BorderPane load = FxUtil.load(AboutController.class);
+			FxUtil.createStageAndShow(load, stage ->{
+				stage.setTitle("Version");
+				stage.setResizable(false);
+				stage.initModality(Modality.NONE);
+				stage.centerOnScreen();
+			});
+			
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+//		AboutController
 	}
 
 	/**
