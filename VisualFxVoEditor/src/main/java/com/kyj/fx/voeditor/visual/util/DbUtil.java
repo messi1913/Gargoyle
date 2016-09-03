@@ -291,9 +291,9 @@ public class DbUtil extends ConnectionManager {
 
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 
-			//			String _sql = ValueUtil.getVelocityToText(sql, paramMap);
-			//			LOGGER.debug(_sql);
-			query = jdbcTemplate.query(sql, new MapSqlParameterSource(paramMap), rowMapper);
+			String _sql = ValueUtil.getVelocityToText(sql, paramMap);
+			LOGGER.debug(_sql);
+			query = jdbcTemplate.query(_sql, new MapSqlParameterSource(paramMap), rowMapper);
 		} catch (Exception e) {
 			// cleanDataSource();
 			// close(dataSource.getConnection());

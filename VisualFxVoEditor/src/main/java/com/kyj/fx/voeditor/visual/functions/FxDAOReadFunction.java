@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import kyj.Fx.dao.wizard.core.model.vo.TbmSysDaoDVO;
 import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoColumnsDVO;
@@ -30,15 +31,31 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 
 	@Override
-	public TbmSysDaoDVO apply(TbmSysDaoDVO t) {
+	public TbmSysDaoDVO apply(TbmSysDaoDVO dvo) {
 
 		try {
-			List<TbpSysDaoMethodsDVO> method = getMethod(t);
-			t.setTbpSysDaoMethodsDVOList(method);
+			List<TbpSysDaoMethodsDVO> methods = getMethod(dvo);
+			dvo.setTbpSysDaoMethodsDVOList(methods);
+
+			List<TbpSysDaoColumnsDVO> columns = getColumns(dvo);
+			List<TbpSysDaoFieldsDVO> fields = getFields(dvo);
+
+			for (TbpSysDaoMethodsDVO m : methods) {
+				List<TbpSysDaoColumnsDVO> collect = columns.stream().filter(c -> m.getMethodName().equals(c.getMethodName()))
+						.collect(Collectors.toList());
+				m.setTbpSysDaoColumnsDVOList(collect);
+			}
+
+			for (TbpSysDaoMethodsDVO m : methods) {
+				List<TbpSysDaoFieldsDVO> collect = fields.stream().filter(c -> m.getMethodName().equals(c.getMethodName()))
+						.collect(Collectors.toList());
+				m.setTbpSysDaoFieldsDVOList(collect);
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return t;
+		return dvo;
 	}
 
 	private List<TbpSysDaoMethodsDVO> getMethod(TbmSysDaoDVO daoDVO) throws Exception {
@@ -54,8 +71,8 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append("METHOD_DESC \n");
 		sb.append(" FROM meerkat.TBP_SYS_DAO_METHODS \n");
 		sb.append(" WHERE 1=1 \n");
-		sb.append("AND PACKAGE_NAME = ':packageName'\n");
-		sb.append("AND CLASS_NAME = ':className'\n");
+		sb.append("AND PACKAGE_NAME = :packageName\n");
+		sb.append("AND CLASS_NAME = :className\n");
 
 		List<TbpSysDaoMethodsDVO> select = DbUtil.select(sb.toString(), map, new RowMapper<TbpSysDaoMethodsDVO>() {
 
@@ -69,79 +86,80 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 				return dvo;
 			}
 		});
-
-		for (TbpSysDaoMethodsDVO methodDVO : select) {
-			List<TbpSysDaoColumnsDVO> columns = getColumns(daoDVO, methodDVO);
-			methodDVO.setTbpSysDaoColumnsDVOList(columns);
-
-			List<TbpSysDaoFieldsDVO> fields = getField(daoDVO, methodDVO);
-			methodDVO.setTbpSysDaoFieldsDVOList(fields);
-		}
-
 		return select;
 
 	}
 
-	private List<TbpSysDaoFieldsDVO> getField(TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO) throws Exception {
+	private List<TbpSysDaoFieldsDVO> getFields(TbmSysDaoDVO daoDVO) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("SELECT \n");
-		sb.append("FIELD_NAME  , \n");
-		sb.append("TYPE  , \n");
-		sb.append("TEST_VALUE   \n");
-		sb.append(" FROM meerkat.tbp_sys_dao_fields \n");
-		sb.append(" WHERE 1=1 \n");
-		sb.append("AND PACKAGE_NAME = ':packageName'\n");
-		sb.append("AND CLASS_NAME = ':className'\n");
-		sb.append("AND METHOD_NAME = ':methodName'\n");
-		sb.toString();
+		sb.append("select\n");
+		sb.append("    method_name ,\n");
+		sb.append("    field_name ,\n");
+		sb.append("    type ,\n");
+		sb.append("    test_value \n");
+		sb.append("from\n");
+		sb.append("    meerkat.tbp_sys_dao_fields \n");
+		sb.append("where\n");
+		sb.append("    1=1 \n");
+		sb.append("    and package_name = :packageName \n");
+		sb.append("    and class_name = :className \n");
+		sb.append("#if($methodName)\n");
+		sb.append("    and method_name = :methodName\n");
+		sb.append("#end\n");
 
 		Map<String, Object> hashMap = new HashMap<String, Object>();
 		hashMap.put("packageName", daoDVO.getPackageName());
 		hashMap.put("className", daoDVO.getClassName());
-		hashMap.put("methodName", methodDVO.getMethodName());
 
 		return DbUtil.select(sb.toString(), hashMap, new RowMapper<TbpSysDaoFieldsDVO>() {
 
 			@Override
 			public TbpSysDaoFieldsDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
 				TbpSysDaoFieldsDVO dvo = new TbpSysDaoFieldsDVO();
-				dvo.setFieldName(rs.getString("FIELD_NAME"));
-				dvo.setTestValue(rs.getString("TEST_VALUE"));
-				dvo.setType(rs.getString("TYPE"));
+				dvo.setMethodName(rs.getString("method_name"));
+				dvo.setFieldName(rs.getString("field_name"));
+				dvo.setType(rs.getString("type"));
+				dvo.setTestValue(rs.getString("test_value"));
 				return dvo;
 			}
 		});
 	}
 
-	List<TbpSysDaoColumnsDVO> getColumns(TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO) throws Exception {
+	List<TbpSysDaoColumnsDVO> getColumns(TbmSysDaoDVO daoDVO) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("SELECT \n");
-		sb.append("COLUMN_NAME  , \n");
-		sb.append("COLUMN_TYPE, \n");
-		sb.append("PROGRAM_TYPE, \n");
-		sb.append("LOCK_YN \n");
-		sb.append(" FROM meerkat.tbp_sys_dao_columns \n");
-		sb.append(" WHERE 1=1 \n");
-		sb.append("AND PACKAGE_NAME = ':packageName'\n");
-		sb.append("AND CLASS_NAME = ':className'\n");
-		sb.append("AND METHOD_NAME = ':methodName'\n");
+		sb.append("select\n");
+		sb.append("    method_name,\n");
+		sb.append("    column_name ,\n");
+		sb.append("    column_type,\n");
+		sb.append("    program_type,\n");
+		sb.append("    lock_yn \n");
+		sb.append("from\n");
+		sb.append("    meerkat.tbp_sys_dao_columns \n");
+		sb.append("where\n");
+		sb.append("    1=1 \n");
+		sb.append("    and package_name = :packageName \n");
+		sb.append("    and class_name = :className \n");
+		sb.append("#if($methodName)\n");
+		sb.append("    and method_name = :methodName\n");
+		sb.append("#end\n");
 
 		Map<String, Object> hashMap = new HashMap<String, Object>();
 		hashMap.put("packageName", daoDVO.getPackageName());
 		hashMap.put("className", daoDVO.getClassName());
-		hashMap.put("methodName", methodDVO.getMethodName());
+		//		hashMap.put("methodName", methodDVO.getMethodName());
 
 		return DbUtil.select(sb.toString(), hashMap, new RowMapper<TbpSysDaoColumnsDVO>() {
 
 			@Override
 			public TbpSysDaoColumnsDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
 				TbpSysDaoColumnsDVO dvo = new TbpSysDaoColumnsDVO();
-				dvo.setColumnType(rs.getString("COLUMN_TYPE"));
-				dvo.setColumnName(rs.getString("COLUMN_NAME"));
-				dvo.setProgramType(rs.getString("PROGRAM_TYPE"));
-				dvo.setLockYn(rs.getString("LOCK_YN"));
+				dvo.setMethodName(rs.getString("method_name"));
+				dvo.setColumnName(rs.getString("column_name"));
+				dvo.setColumnType(rs.getString("column_type"));
+				dvo.setProgramType(rs.getString("program_type"));
+				dvo.setLockYn(rs.getString("lock_yn"));
 				return dvo;
 			}
 		});

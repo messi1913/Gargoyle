@@ -48,7 +48,6 @@ import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import kyj.Fx.dao.wizard.core.model.vo.TbmSysDaoDVO;
@@ -81,6 +80,13 @@ public class DAOLoaderController {
 		MenuItem history = new MenuItem("history");
 		history.setOnAction(this::menuHistoryOnAction);
 		tbSrchDao.setContextMenu(new ContextMenu(history));
+
+		tbSrchDao.getSelectionModel().selectedItemProperty().addListener((arg, ov, nv) -> {
+			if (nv != null) {
+				tbSrchDaoOnMouseClick(nv);
+			}
+		});
+
 	}
 
 	/**
@@ -207,7 +213,7 @@ public class DAOLoaderController {
 		else
 			sb.append("select hist_tsp, sql_body from tbp_sys_dao_methods_h ");
 
-		sb.append("where hist_tsp =':histTsp'");
+		sb.append("where hist_tsp =:histTsp");
 
 		List<TbmSysDaoMethodsHDVO> select = DbUtil.select(sb.toString(), paramMap, (rs, row) -> {
 			TbmSysDaoMethodsHDVO tbmSysDaoMethodsHDVO = new TbmSysDaoMethodsHDVO();
@@ -228,8 +234,8 @@ public class DAOLoaderController {
 		else
 			sb.append("tbm_sys_dao a inner join tbp_sys_dao_methods_h b\n");
 		sb.append("on a.package_name = b.package_name and a.class_name = b.class_name\n");
-		sb.append("and a.package_name = ':packageName' \n");
-		sb.append("and a.class_name =':className'\n");
+		sb.append("and a.package_name = :packageName \n");
+		sb.append("and a.class_name =:className\n");
 		sb.append("order by fst_reg_dt desc\n");
 
 		return DbUtil.select(sb.toString(), paramMap, (rs, row) -> {
@@ -250,44 +256,40 @@ public class DAOLoaderController {
 	}
 
 	@FXML
-	public void tbSrchDaoOnMouseClick(MouseEvent e) {
+	public void tbSrchDaoOnMouseClick(Map<String, Object> selectedItem) {
 
-		if (e.getClickCount() == 2) {
-			Platform.runLater(() -> {
-				try {
-					Map<String, Object> selectedItem = tbSrchDao.getSelectionModel().getSelectedItem();
-					if (selectedItem == null)
-						return;
+		Platform.runLater(() -> {
+			try {
 
-					TbmSysDaoDVO tbmSysDAO = new TbmSysDaoDVO();
-					tbmSysDAO.setClassName(selectedItem.get("CLASS_NAME").toString());
-					tbmSysDAO.setPackageName(selectedItem.get("PACKAGE_NAME").toString());
-					tbmSysDAO.setLocation(selectedItem.get("LOCATION").toString());
-					tbmSysDAO.setClassDesc(selectedItem.get("CLASS_DESC").toString());
-					Object object = selectedItem.get("TABLE_NAME");
-					if (object != null)
-						tbmSysDAO.setTableName(object.toString());
+				TbmSysDaoDVO tbmSysDAO = new TbmSysDaoDVO();
+				tbmSysDAO.setClassName(selectedItem.get("CLASS_NAME").toString());
+				tbmSysDAO.setPackageName(selectedItem.get("PACKAGE_NAME").toString());
+				tbmSysDAO.setLocation(selectedItem.get("LOCATION").toString());
+				tbmSysDAO.setClassDesc(selectedItem.get("CLASS_DESC").toString());
+				Object object = selectedItem.get("TABLE_NAME");
+				if (object != null)
+					tbmSysDAO.setTableName(object.toString());
 
-					FXMLLoader loader = new FXMLLoader();
-					loader.setLocation(getClass().getResource("DaoWizardView.fxml"));
-					BorderPane pane = loader.load();
-					DaoWizardViewController controller = loader.getController();
-					controller.setTbmSysDaoProperty(tbmSysDAO);
+				FXMLLoader loader = new FXMLLoader();
+				loader.setLocation(getClass().getResource("DaoWizardView.fxml"));
+				BorderPane pane = loader.load();
+				DaoWizardViewController controller = loader.getController();
+				controller.setTbmSysDaoProperty(tbmSysDAO);
 
-					Tab tab = new Tab("DaoWizard", pane);
-					this.systemRoot.addTabItem(tab);
-					tab.getTabPane().getSelectionModel().select(tab);
+				Tab tab = new Tab("DaoWizard", pane);
+				this.systemRoot.addTabItem(tab);
+				tab.getTabPane().getSelectionModel().select(tab);
 
-					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
-					tbSrchDao.getItems().addAll(listDAO);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-					LOGGER.error(e1.toString());
-					DialogUtil.showExceptionDailog(e1);
-				}
-			});
+				// 재조회 하면 selected item 초기화 됨.. 
+//				List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
+//				tbSrchDao.getItems().addAll(listDAO);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				LOGGER.error(e1.toString());
+				DialogUtil.showExceptionDailog(e1);
+			}
+		});
 
-		}
 	}
 
 	@FXML
@@ -306,7 +308,6 @@ public class DAOLoaderController {
 	}
 
 	private List<Map<String, Object>> listDAO(String daoName) throws Exception {
-		String a = "a";
 		tbSrchDao.getItems().clear();
 		if (daoName == null || daoName.isEmpty())
 			return FXCollections.emptyObservableList();

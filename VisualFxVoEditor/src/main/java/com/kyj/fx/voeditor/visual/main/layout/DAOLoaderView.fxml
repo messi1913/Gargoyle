@@ -7,7 +7,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.control.cell.MapValueFactory?>
 
-
 <TitledPane maxHeight="1.7976931348623157E308" text="DAO" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.main.layout.DAOLoaderController">
    <content>
       <BorderPane maxHeight="1.7976931348623157E308">
@@ -23,7 +22,7 @@
       		</VBox>
       	</top>
       	<center>
-            		<TableView fx:id="tbSrchDao" cache="false" onMouseClicked="#tbSrchDaoOnMouseClick" BorderPane.alignment="CENTER">
+            		<TableView fx:id="tbSrchDao" cache="false" BorderPane.alignment="CENTER">
             			<columns>
             				<TableColumn fx:id="colSrchClassName" minWidth="100.0" prefWidth="133.0" text="ClassName">
 				</TableColumn>
