@@ -99,8 +99,10 @@ public class SqlTab extends Tab {
 				if (lastIndexOf >= 0) {
 
 					File selectedFile = DialogUtil.showFileSaveDialog(null, choser -> {
-						String dir = System.getProperty("user.home");
-						choser.setInitialDirectory(new File(dir));
+						
+						//경로를 지정하지않을시 마지막에 처리된 경로에 기본으로 로드되므로 주석.
+//						String dir = System.getProperty("user.home");
+//						choser.setInitialDirectory(new File(dir));
 
 						choser.getExtensionFilters()
 								.add(new ExtensionFilter(GargoyleExtensionFilters.SQL_NAME, GargoyleExtensionFilters.SQL));
@@ -108,6 +110,7 @@ public class SqlTab extends Tab {
 								.add(new ExtensionFilter(GargoyleExtensionFilters.ALL_NAME, GargoyleExtensionFilters.ALL));
 
 					});
+					
 					if (selectedFile != null) {
 
 						boolean isWritableStatus = true;
