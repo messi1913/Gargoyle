@@ -11,15 +11,15 @@ SELECT CASE
     FROM ALL_IND_COLUMNS A
     LEFT JOIN ALL_CONSTRAINTS B
      ON   A.TABLE_NAME = B.TABLE_NAME
-         AND B.CONSTRAINT_NAME = A.INDEX_NAME
+         AND B.CONSTRAINT_NAME = A.INDEX_NAME     
 		 #if($databaseName)
-		 AND B.OWNER =  :databaseName
+		 AND B.OWNER =  ':databaseName'
 		 #end
    WHERE     1 = 1
-         AND A.TABLE_NAME = :tableName
+         AND A.TABLE_NAME = ':tableName'
 		 #if($databaseName)
-         AND A.INDEX_OWNER =:databaseName
-         AND A.TABLE_OWNER = :databaseName
+         AND A.INDEX_OWNER =':databaseName'
+         AND A.TABLE_OWNER = ':databaseName'
 		 #end
          AND B.CONSTRAINT_TYPE <> 'C' /*NOT NULL 제약조건*/
 ORDER BY DECODE( CONSTRAINT_TYPE, 'PRI', 0, CONSTRAINT_TYPE ), A.INDEX_NAME, A.COLUMN_POSITION

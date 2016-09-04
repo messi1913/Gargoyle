@@ -10,11 +10,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import kyj.Fx.dao.wizard.core.model.vo.TbmSysDaoDVO;
+import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoColumnsDVO;
+import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoFieldsDVO;
+import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoMethodsDVO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +32,6 @@ import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.IdGenUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
-import kyj.Fx.dao.wizard.core.model.vo.TbmSysDaoDVO;
-import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoColumnsDVO;
-import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoFieldsDVO;
-import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoMethodsDVO;
-
 /**
  * 데이터베이스 저장 처리
  *
@@ -38,17 +39,126 @@ import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoMethodsDVO;
  *
  */
 public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTransactionScope<TbmSysDaoDVO, NamedParameterJdbcTemplate> {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(FxDAOSaveFunction.class);
-
 	private static final String METHOD_DESC = "methodDesc";
 	private static final String METHOD_NAME = "methodName";
-
+	private static final String SQL_CHECK_EXISTS_TBM_SYS_DAO = "SELECT 1 FROM meerkat.TBM_SYS_DAO WHERE PACKAGE_NAME =:packageName AND CLASS_NAME =:className";
+	// private static final String SQL_CHECK_EXISTS_TBM_SYS_DAO_METHOD =
+	// "SELECT 1 FROM meerkat.TBP_SYS_DAO_METHODS WHERE PACKAGE_NAME =:packageName AND CLASS_NAME =:className AND METHOD_NAME = :methodName";
+	private static final Logger LOGGER = LoggerFactory.getLogger(FxDAOSaveFunction.class);
 	private Consumer<Throwable> exceptionHandler;
 
+	private static StringBuffer deleteFieldSQLBuf;
+	private static StringBuffer deleteColumnSQLBuf;
+	private static StringBuffer deleteMethodSQLBuf;
+	private static StringBuffer insertMethodSql;
+	private static StringBuffer insertMethodHistSql;
+	private static StringBuffer insertColumnsSql;
+	private static StringBuffer insertFieldsSql;
+
+	static {
+		deleteFieldSQLBuf = new StringBuffer();
+		deleteFieldSQLBuf.append("DELETE FROM meerkat.TBP_SYS_DAO_FIELDS WHERE 1=1 \n");
+		deleteFieldSQLBuf.append("AND PACKAGE_NAME = :packageName \n");
+		deleteFieldSQLBuf.append("AND CLASS_NAME = :className \n");
+		// deleteFieldSQLBuf.append("AND METHOD_NAME = :methodName\n");
+
+		deleteColumnSQLBuf = new StringBuffer();
+		deleteColumnSQLBuf.append("DELETE FROM meerkat.TBP_SYS_DAO_COLUMNS WHERE 1=1 \n");
+		deleteColumnSQLBuf.append("AND PACKAGE_NAME = :packageName \n");
+		deleteColumnSQLBuf.append("AND CLASS_NAME = :className \n");
+		// deleteColumnSQLBuf.append("AND METHOD_NAME = :methodName\n");
+
+		deleteMethodSQLBuf = new StringBuffer();
+		deleteMethodSQLBuf.append("DELETE FROM meerkat.TBP_SYS_DAO_METHODS WHERE 1=1 \n");
+		deleteMethodSQLBuf.append("AND PACKAGE_NAME = :packageName \n");
+		deleteMethodSQLBuf.append("AND CLASS_NAME = :className \n");
+		// deleteMethodSQLBuf.append("AND METHOD_NAME = :methodName \n");
+
+		// StringBuffer updateMethodsSql = new StringBuffer();
+		// updateMethodsSql.append("UPDATE meerkat.TBP_SYS_DAO_METHODS \n");
+		// updateMethodsSql.append("SET \n");
+		// updateMethodsSql.append("RESULT_VO_CLASS = :resultVoClass ,\n");
+		// updateMethodsSql.append("SQL_BODY = :sqlBody ,\n");
+		// updateMethodsSql.append("METHOD_DESC = :methodDesc \n");
+		// updateMethodsSql.append("WHERE 1=1 \n");
+		// updateMethodsSql.append("AND PACKAGE_NAME = :packageName \n");
+		// updateMethodsSql.append("AND CLASS_NAME = :className \n");
+		// updateMethodsSql.append("AND METHOD_NAME = :methodName\n");
+
+		insertMethodSql = new StringBuffer();
+		insertMethodSql.append("INSERT INTO meerkat.TBP_SYS_DAO_METHODS \n");
+		insertMethodSql.append("(PACKAGE_NAME,\n");
+		insertMethodSql.append("CLASS_NAME,\n");
+		insertMethodSql.append("METHOD_NAME,\n");
+		insertMethodSql.append("RESULT_VO_CLASS,\n");
+		insertMethodSql.append("SQL_BODY,\n");
+		insertMethodSql.append("METHOD_DESC )\n");
+		insertMethodSql.append("VALUES (\n");
+		insertMethodSql.append(":packageName, \n");
+		insertMethodSql.append(":className , \n");
+		insertMethodSql.append(":methodName, \n");
+		insertMethodSql.append(":resultVoClass,\n");
+		insertMethodSql.append(":sqlBody,\n");
+		insertMethodSql.append(":methodDesc ) ");
+
+		insertMethodHistSql = new StringBuffer();
+		insertMethodHistSql.append("INSERT INTO meerkat.TBP_SYS_DAO_METHODS_H \n");
+		insertMethodHistSql.append("(HIST_TSP,\n");
+		insertMethodHistSql.append("PACKAGE_NAME,\n");
+		insertMethodHistSql.append("CLASS_NAME,\n");
+		insertMethodHistSql.append("METHOD_NAME,\n");
+		insertMethodHistSql.append("RESULT_VO_CLASS,\n");
+		insertMethodHistSql.append("SQL_BODY,\n");
+		insertMethodHistSql.append("DML_TYPE,\n");
+		insertMethodHistSql.append("FST_REG_DT,\n");
+		insertMethodHistSql.append("METHOD_DESC )\n");
+		insertMethodHistSql.append("VALUES (\n");
+		insertMethodHistSql.append(":histTsp, \n");
+		insertMethodHistSql.append(":packageName, \n");
+		insertMethodHistSql.append(":className , \n");
+		insertMethodHistSql.append(":methodName, \n");
+		insertMethodHistSql.append(":resultVoClass,\n");
+		insertMethodHistSql.append(":sqlBody,\n");
+		insertMethodHistSql.append(":dmlType,\n");
+		insertMethodHistSql.append(":fstRegDt,\n");
+		insertMethodHistSql.append(":methodDesc ) ");
+
+		insertColumnsSql = new StringBuffer();
+		insertColumnsSql.append("INSERT INTO meerkat.TBP_SYS_DAO_COLUMNS ( \n");
+		insertColumnsSql.append("PACKAGE_NAME,\n");
+		insertColumnsSql.append("CLASS_NAME,\n");
+		insertColumnsSql.append("METHOD_NAME,\n");
+		insertColumnsSql.append("COLUMN_NAME,\n");
+		insertColumnsSql.append("COLUMN_TYPE, \n");
+		insertColumnsSql.append("PROGRAM_TYPE, \n");
+		insertColumnsSql.append("LOCK_YN ) \n");
+		insertColumnsSql.append("VALUES (\n");
+		insertColumnsSql.append(":packageName, \n");
+		insertColumnsSql.append(":className , \n");
+		insertColumnsSql.append(":methodName , \n");
+		insertColumnsSql.append(":columnName, \n");
+		insertColumnsSql.append(":columnType,  \n");
+		insertColumnsSql.append(":programType, \n");
+		insertColumnsSql.append(":lockYn ) \n");
+
+		insertFieldsSql = new StringBuffer();
+		insertFieldsSql.append("INSERT INTO meerkat.TBP_SYS_DAO_FIELDS ( \n");
+		insertFieldsSql.append("PACKAGE_NAME,\n");
+		insertFieldsSql.append("CLASS_NAME,\n");
+		insertFieldsSql.append("METHOD_NAME,\n");
+		insertFieldsSql.append("FIELD_NAME,\n");
+		insertFieldsSql.append("TYPE , \n");
+		insertFieldsSql.append("TEST_VALUE ) \n");
+		insertFieldsSql.append("VALUES (\n");
+		insertFieldsSql.append(":packageName, \n");
+		insertFieldsSql.append(":className , \n");
+		insertFieldsSql.append(":methodName , \n");
+		insertFieldsSql.append(":fieldName, \n");
+		insertFieldsSql.append(":type, \n");
+		insertFieldsSql.append(":testValue ) \n");
+	}
 	public FxDAOSaveFunction(Consumer<Throwable> exceptionHandler) {
 		this.exceptionHandler = exceptionHandler;
-
 	}
 
 	/*
@@ -58,7 +168,6 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 	public Integer apply(TbmSysDaoDVO t) {
 
 		try {
-
 			return DbUtil.getTransactionedScope(t, this, exceptionHandler);
 		} catch (Exception e) {
 			return -1;
@@ -68,9 +177,8 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 	@Override
 	public void scope(TbmSysDaoDVO t, NamedParameterJdbcTemplate u) throws Exception {
 		try {
-			boolean existsSchemaDatabase = DbUtil.isExistsSchemaDatabase();
-			updateTbmSysDao(t, u, existsSchemaDatabase);
-			updateTbmSysDaoMethods(t, u, existsSchemaDatabase);
+			updateTbmSysDao(t, u);
+			updateTbmSysDaoMethods(t, u);
 		} catch (Exception e) {
 			throw e;
 		}
@@ -123,140 +231,10 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 	}
 
 	@SuppressWarnings("unchecked")
-	private void updateTbmSysDaoMethods(TbmSysDaoDVO t, NamedParameterJdbcTemplate u, boolean existsSchemaDatabase) throws Exception {
+	private void updateTbmSysDaoMethods(TbmSysDaoDVO t, NamedParameterJdbcTemplate u) throws Exception {
 		List<TbpSysDaoMethodsDVO> tbpSysDaoMethodsDVOList = t.getTbpSysDaoMethodsDVOList();
 		if (tbpSysDaoMethodsDVOList == null || tbpSysDaoMethodsDVOList.isEmpty())
 			return;
-
-		StringBuffer deleteFieldSQLBuf;
-		StringBuffer deleteColumnSQLBuf;
-		StringBuffer deleteMethodSQLBuf;
-		StringBuffer insertMethodSql;
-		StringBuffer insertMethodHistSql;
-		StringBuffer insertColumnsSql;
-		StringBuffer insertFieldsSql;
-
-		deleteFieldSQLBuf = new StringBuffer();
-		deleteFieldSQLBuf.append("DELETE FROM  \n");
-		if (existsSchemaDatabase)
-			deleteFieldSQLBuf.append(" meerkat.TBP_SYS_DAO_FIELDS \n");
-		else
-			deleteFieldSQLBuf.append(" TBP_SYS_DAO_FIELDS \n");
-		deleteFieldSQLBuf.append(" WHERE 1=1 \n");
-		deleteFieldSQLBuf.append("AND PACKAGE_NAME = :packageName \n");
-		deleteFieldSQLBuf.append("AND CLASS_NAME = :className \n");
-		// deleteFieldSQLBuf.append("AND METHOD_NAME = :methodName\n");
-
-		deleteColumnSQLBuf = new StringBuffer();
-		deleteColumnSQLBuf.append("DELETE FROM  \n");
-		if (existsSchemaDatabase)
-			deleteColumnSQLBuf.append(" meerkat.TBP_SYS_DAO_COLUMNS WHERE 1=1 \n");
-		else
-			deleteColumnSQLBuf.append(" TBP_SYS_DAO_COLUMNS WHERE 1=1 \n");
-		deleteColumnSQLBuf.append("AND PACKAGE_NAME = :packageName \n");
-		deleteColumnSQLBuf.append("AND CLASS_NAME = :className \n");
-		// deleteColumnSQLBuf.append("AND METHOD_NAME = :methodName\n");
-
-		deleteMethodSQLBuf = new StringBuffer();
-		deleteMethodSQLBuf.append("DELETE FROM  \n");
-		if (existsSchemaDatabase)
-			deleteMethodSQLBuf.append("meerkat.TBP_SYS_DAO_METHODS WHERE 1=1 \n");
-		else
-			deleteMethodSQLBuf.append("TBP_SYS_DAO_METHODS WHERE 1=1 \n");
-		deleteMethodSQLBuf.append("AND PACKAGE_NAME = :packageName \n");
-		deleteMethodSQLBuf.append("AND CLASS_NAME = :className \n");
-		// deleteMethodSQLBuf.append("AND METHOD_NAME = :methodName \n");
-
-		insertMethodSql = new StringBuffer();
-		insertMethodSql.append("INSERT INTO  \n");
-		if (existsSchemaDatabase)
-			insertMethodSql.append("meerkat.TBP_SYS_DAO_METHODS \n");
-		else
-			insertMethodSql.append("TBP_SYS_DAO_METHODS \n");
-
-		insertMethodSql.append("(PACKAGE_NAME,\n");
-		insertMethodSql.append("CLASS_NAME,\n");
-		insertMethodSql.append("METHOD_NAME,\n");
-		insertMethodSql.append("RESULT_VO_CLASS,\n");
-		insertMethodSql.append("SQL_BODY,\n");
-		insertMethodSql.append("METHOD_DESC )\n");
-		insertMethodSql.append("VALUES (\n");
-		insertMethodSql.append(":packageName, \n");
-		insertMethodSql.append(":className , \n");
-		insertMethodSql.append(":methodName, \n");
-		insertMethodSql.append(":resultVoClass,\n");
-		insertMethodSql.append(":sqlBody,\n");
-		insertMethodSql.append(":methodDesc ) ");
-
-		insertMethodHistSql = new StringBuffer();
-		insertMethodHistSql.append("INSERT INTO  \n");
-		if (existsSchemaDatabase)
-			insertMethodHistSql.append("meerkat.TBP_SYS_DAO_METHODS_H \n");
-		else
-			insertMethodHistSql.append("TBP_SYS_DAO_METHODS_H \n");
-
-		insertMethodHistSql.append("(HIST_TSP,\n");
-		insertMethodHistSql.append("PACKAGE_NAME,\n");
-		insertMethodHistSql.append("CLASS_NAME,\n");
-		insertMethodHistSql.append("METHOD_NAME,\n");
-		insertMethodHistSql.append("RESULT_VO_CLASS,\n");
-		insertMethodHistSql.append("SQL_BODY,\n");
-		insertMethodHistSql.append("DML_TYPE,\n");
-		insertMethodHistSql.append("FST_REG_DT,\n");
-		insertMethodHistSql.append("METHOD_DESC )\n");
-		insertMethodHistSql.append("VALUES (\n");
-		insertMethodHistSql.append(":histTsp, \n");
-		insertMethodHistSql.append(":packageName, \n");
-		insertMethodHistSql.append(":className , \n");
-		insertMethodHistSql.append(":methodName, \n");
-		insertMethodHistSql.append(":resultVoClass,\n");
-		insertMethodHistSql.append(":sqlBody,\n");
-		insertMethodHistSql.append(":dmlType,\n");
-		insertMethodHistSql.append(":fstRegDt,\n");
-		insertMethodHistSql.append(":methodDesc ) ");
-
-		insertColumnsSql = new StringBuffer();
-		insertColumnsSql.append("INSERT INTO  \n");
-		if (existsSchemaDatabase)
-			insertColumnsSql.append("meerkat.TBP_SYS_DAO_COLUMNS ( \n");
-		else
-			insertColumnsSql.append("TBP_SYS_DAO_COLUMNS ( \n");
-
-		insertColumnsSql.append("PACKAGE_NAME,\n");
-		insertColumnsSql.append("CLASS_NAME,\n");
-		insertColumnsSql.append("METHOD_NAME,\n");
-		insertColumnsSql.append("COLUMN_NAME,\n");
-		insertColumnsSql.append("COLUMN_TYPE, \n");
-		insertColumnsSql.append("PROGRAM_TYPE, \n");
-		insertColumnsSql.append("LOCK_YN ) \n");
-		insertColumnsSql.append("VALUES (\n");
-		insertColumnsSql.append(":packageName, \n");
-		insertColumnsSql.append(":className , \n");
-		insertColumnsSql.append(":methodName , \n");
-		insertColumnsSql.append(":columnName, \n");
-		insertColumnsSql.append(":columnType,  \n");
-		insertColumnsSql.append(":programType, \n");
-		insertColumnsSql.append(":lockYn ) \n");
-
-		insertFieldsSql = new StringBuffer();
-		insertFieldsSql.append("INSERT INTO  \n");
-		if (existsSchemaDatabase)
-			insertFieldsSql.append("meerkat.TBP_SYS_DAO_FIELDS (  \n");
-		else
-			insertFieldsSql.append("TBP_SYS_DAO_FIELDS (  \n");
-		insertFieldsSql.append("PACKAGE_NAME,\n");
-		insertFieldsSql.append("CLASS_NAME,\n");
-		insertFieldsSql.append("METHOD_NAME,\n");
-		insertFieldsSql.append("FIELD_NAME,\n");
-		insertFieldsSql.append("TYPE , \n");
-		insertFieldsSql.append("TEST_VALUE ) \n");
-		insertFieldsSql.append("VALUES (\n");
-		insertFieldsSql.append(":packageName, \n");
-		insertFieldsSql.append(":className , \n");
-		insertFieldsSql.append(":methodName , \n");
-		insertFieldsSql.append(":fieldName, \n");
-		insertFieldsSql.append(":type, \n");
-		insertFieldsSql.append(":testValue ) \n");
 
 		// List<Map<String, Object>> updateMethodList = new ArrayList<>();
 		List<Map<String, Object>> insertMethodList = new ArrayList<>();
@@ -357,21 +335,12 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 
 	}
 
-	private void updateTbmSysDao(TbmSysDaoDVO t, NamedParameterJdbcTemplate u, boolean existsSchemaDatabase) throws Exception {
+	private void updateTbmSysDao(TbmSysDaoDVO t, NamedParameterJdbcTemplate u) throws Exception {
 		StringBuffer sb = new StringBuffer();
 
 		if (t.getClassName() == null || t.getClassName().isEmpty()) {
 			throw new IllegalArgumentException("class Name is null.");
 		}
-
-		StringBuffer sqlCheckExistsTbmSysDao;
-		sqlCheckExistsTbmSysDao = new StringBuffer();
-		sqlCheckExistsTbmSysDao.append("SELECT 1 FROM \n");
-		if (existsSchemaDatabase)
-			sqlCheckExistsTbmSysDao.append("meerkat.TBM_SYS_DAO \n");
-		else
-			sqlCheckExistsTbmSysDao.append("TBM_SYS_DAO \n");
-		sqlCheckExistsTbmSysDao.append("WHERE PACKAGE_NAME =:packageName AND CLASS_NAME =:className");
 
 		Map<String, Object> hashMap = new LinkedHashMap<String, Object>();
 		hashMap.put("packageName", t.getPackageName());
@@ -380,12 +349,8 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 		hashMap.put("classDesc", t.getClassDesc());
 		hashMap.put("tableName", t.getTableName());
 
-		if (checkExists(sqlCheckExistsTbmSysDao.toString(), hashMap, u)) {
-			sb.append("UPDATE\n");
-			if (existsSchemaDatabase)
-				sb.append(" meerkat.TBM_SYS_DAO  \n");
-			else
-				sb.append(" TBM_SYS_DAO  \n");
+		if (checkExists(SQL_CHECK_EXISTS_TBM_SYS_DAO, hashMap, u)) {
+			sb.append("UPDATE meerkat.TBM_SYS_DAO \n");
 			sb.append("SET LOCATION = :location,\n");
 			sb.append("CLASS_NAME =:className,\n");
 			sb.append("TABLE_NAME =:tableName,\n");
@@ -395,12 +360,7 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 			sb.append("AND CLASS_NAME =:className\n");
 
 		} else {
-			sb.append("INSERT INTO \n");
-			if (existsSchemaDatabase)
-				sb.append("meerkat.TBM_SYS_DAO\n");
-			else
-				sb.append("TBM_SYS_DAO\n");
-
+			sb.append("INSERT INTO meerkat.TBM_SYS_DAO\n");
 			sb.append("(PACKAGE_NAME, CLASS_NAME , LOCATION,\n");
 			sb.append("CLASS_DESC, TABLE_NAME\n");
 			sb.append(") VALUES\n");

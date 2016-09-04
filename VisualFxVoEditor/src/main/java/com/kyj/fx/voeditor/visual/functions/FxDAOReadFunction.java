@@ -18,7 +18,6 @@ import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoColumnsDVO;
 import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoFieldsDVO;
 import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoMethodsDVO;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -32,24 +31,17 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 
 	@Override
 	public TbmSysDaoDVO apply(TbmSysDaoDVO t) {
-		DataSource dataSource = null;
+
 		try {
-			dataSource = DbUtil.getDataSource();
-			boolean existsSchemaDatabase = DbUtil.isExistsSchemaDatabase();
-			List<TbpSysDaoMethodsDVO> method = getMethod(dataSource, t, existsSchemaDatabase);
+			List<TbpSysDaoMethodsDVO> method = getMethod(t);
 			t.setTbpSysDaoMethodsDVOList(method);
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				DbUtil.close(dataSource);
-			} catch (Exception e) {
-			}
 		}
 		return t;
 	}
 
-	private List<TbpSysDaoMethodsDVO> getMethod(DataSource dataSource, TbmSysDaoDVO daoDVO, boolean existsSchemaDatabase) throws Exception {
+	private List<TbpSysDaoMethodsDVO> getMethod(TbmSysDaoDVO daoDVO) throws Exception {
 
 		Map<String, Object> map = ValueUtil.toMap(daoDVO);
 		StringBuffer sb = new StringBuffer();
@@ -60,15 +52,12 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append("RESULT_VO_CLASS  , \n");
 		sb.append("SQL_BODY  , \n");
 		sb.append("METHOD_DESC \n");
-		if (existsSchemaDatabase)
-			sb.append(" FROM meerkat.TBP_SYS_DAO_METHODS \n");
-		else
-			sb.append(" FROM TBP_SYS_DAO_METHODS \n");
+		sb.append(" FROM meerkat.TBP_SYS_DAO_METHODS \n");
 		sb.append(" WHERE 1=1 \n");
-		sb.append("AND PACKAGE_NAME = :packageName\n");
-		sb.append("AND CLASS_NAME = :className\n");
+		sb.append("AND PACKAGE_NAME = ':packageName'\n");
+		sb.append("AND CLASS_NAME = ':className'\n");
 
-		List<TbpSysDaoMethodsDVO> select = DbUtil.select(dataSource, sb.toString(), map, new RowMapper<TbpSysDaoMethodsDVO>() {
+		List<TbpSysDaoMethodsDVO> select = DbUtil.select(sb.toString(), map, new RowMapper<TbpSysDaoMethodsDVO>() {
 
 			@Override
 			public TbpSysDaoMethodsDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -82,10 +71,10 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		});
 
 		for (TbpSysDaoMethodsDVO methodDVO : select) {
-			List<TbpSysDaoColumnsDVO> columns = getColumns(dataSource, daoDVO, methodDVO, existsSchemaDatabase);
+			List<TbpSysDaoColumnsDVO> columns = getColumns(daoDVO, methodDVO);
 			methodDVO.setTbpSysDaoColumnsDVOList(columns);
 
-			List<TbpSysDaoFieldsDVO> fields = getField(dataSource, daoDVO, methodDVO, existsSchemaDatabase);
+			List<TbpSysDaoFieldsDVO> fields = getField(daoDVO, methodDVO);
 			methodDVO.setTbpSysDaoFieldsDVOList(fields);
 		}
 
@@ -93,22 +82,18 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 
 	}
 
-	private List<TbpSysDaoFieldsDVO> getField(DataSource dataSource, TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO,
-			boolean existsSchemaDatabase) throws Exception {
+	private List<TbpSysDaoFieldsDVO> getField(TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT \n");
 		sb.append("FIELD_NAME  , \n");
 		sb.append("TYPE  , \n");
 		sb.append("TEST_VALUE   \n");
-		if (existsSchemaDatabase)
-			sb.append(" FROM meerkat.tbp_sys_dao_fields \n");
-		else
-			sb.append(" FROM tbp_sys_dao_fields \n");
+		sb.append(" FROM meerkat.tbp_sys_dao_fields \n");
 		sb.append(" WHERE 1=1 \n");
-		sb.append("AND PACKAGE_NAME = :packageName\n");
-		sb.append("AND CLASS_NAME = :className\n");
-		sb.append("AND METHOD_NAME = :methodName\n");
+		sb.append("AND PACKAGE_NAME = ':packageName'\n");
+		sb.append("AND CLASS_NAME = ':className'\n");
+		sb.append("AND METHOD_NAME = ':methodName'\n");
 		sb.toString();
 
 		Map<String, Object> hashMap = new HashMap<String, Object>();
@@ -116,7 +101,7 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		hashMap.put("className", daoDVO.getClassName());
 		hashMap.put("methodName", methodDVO.getMethodName());
 
-		return DbUtil.select(dataSource, sb.toString(), hashMap, new RowMapper<TbpSysDaoFieldsDVO>() {
+		return DbUtil.select(sb.toString(), hashMap, new RowMapper<TbpSysDaoFieldsDVO>() {
 
 			@Override
 			public TbpSysDaoFieldsDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -129,8 +114,7 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		});
 	}
 
-	List<TbpSysDaoColumnsDVO> getColumns(DataSource dataSource, TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO,
-			boolean existsSchemaDatabase) throws Exception {
+	List<TbpSysDaoColumnsDVO> getColumns(TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT \n");
@@ -138,21 +122,18 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append("COLUMN_TYPE, \n");
 		sb.append("PROGRAM_TYPE, \n");
 		sb.append("LOCK_YN \n");
-		if (existsSchemaDatabase)
-			sb.append(" FROM meerkat.tbp_sys_dao_columns \n");
-		else
-			sb.append(" FROM tbp_sys_dao_columns \n");
+		sb.append(" FROM meerkat.tbp_sys_dao_columns \n");
 		sb.append(" WHERE 1=1 \n");
-		sb.append("AND PACKAGE_NAME = :packageName\n");
-		sb.append("AND CLASS_NAME = :className\n");
-		sb.append("AND METHOD_NAME = :methodName\n");
+		sb.append("AND PACKAGE_NAME = ':packageName'\n");
+		sb.append("AND CLASS_NAME = ':className'\n");
+		sb.append("AND METHOD_NAME = ':methodName'\n");
 
 		Map<String, Object> hashMap = new HashMap<String, Object>();
 		hashMap.put("packageName", daoDVO.getPackageName());
 		hashMap.put("className", daoDVO.getClassName());
 		hashMap.put("methodName", methodDVO.getMethodName());
 
-		return DbUtil.select(dataSource, sb.toString(), hashMap, new RowMapper<TbpSysDaoColumnsDVO>() {
+		return DbUtil.select(sb.toString(), hashMap, new RowMapper<TbpSysDaoColumnsDVO>() {
 
 			@Override
 			public TbpSysDaoColumnsDVO mapRow(ResultSet rs, int rowNum) throws SQLException {

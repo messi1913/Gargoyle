@@ -25,7 +25,6 @@ import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
 import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
-import com.kyj.fx.voeditor.visual.component.about.AboutController;
 import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenComposite;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
@@ -100,7 +99,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -335,7 +333,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		List<String> exts = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILE_OPEN_NOT_INPROCESSING_EXTENSION, ",");
 
 		String fileName = file.getName();
-		int dotIndex = fileName.lastIndexOf('.');
+		int dotIndex = fileName.indexOf('.');
 		/* 확장자부분이 없는경우 처리. */
 		if (dotIndex == -1) {
 			openBigText(file);
@@ -817,24 +815,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 */
 	@FXML
 	public void miAboutOnAction(ActionEvent e) {
-//		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
-//		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s", url));
-		
-		try {
-			BorderPane load = FxUtil.load(AboutController.class);
-			FxUtil.createStageAndShow(load, stage ->{
-				stage.setTitle("Version");
-				stage.setResizable(false);
-				stage.initModality(Modality.NONE);
-				stage.centerOnScreen();
-			});
-			
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-//		AboutController
+		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
+		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s", url));
 	}
 
 	/**
@@ -929,26 +911,19 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			FileWrapper value = selectedItem.getValue();
 			File file = value.getFile();
 			if (file.isDirectory()) {
+				Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Directory Name", "Input New Dir Name");
+				showInputDialog.ifPresent(v -> {
+					String newFileName = v.getValue();
+					File createdNewFile = new File(file, newFileName);
+					boolean mkdir = createdNewFile.mkdir();
+					if (mkdir) {
 
-				//				Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Directory Name", "Input New Dir Name");
-				//				showInputDialog.ifPresent(v -> {
-				//					String newFileName = v.getValue();
-				//					File createdNewFile = new File(file, newFileName);
-				//					boolean mkdir = createdNewFile.mkdir();
-				//					if (mkdir) {
-				//
-				//						TreeItem<FileWrapper> createDefaultNode = projectFileTreeCreator.createDefaultNode(new FileWrapper(createdNewFile));
-				//						createDefaultNode.setExpanded(true);
-				//						selectedItem.getChildren().add(createDefaultNode);
-				//					}
-				//				});
+						TreeItem<FileWrapper> createDefaultNode = projectFileTreeCreator.createDefaultNode(new FileWrapper(createdNewFile));
+						createDefaultNode.setExpanded(true);
+						selectedItem.getChildren().add(createDefaultNode);
+					}
+				});
 
-				File createdNewFile = DialogUtil.showDirSaveDialog(SharedMemory.getPrimaryStage(), file, null);
-				if (createdNewFile != null && createdNewFile.exists()) {
-					TreeItem<FileWrapper> createDefaultNode = projectFileTreeCreator.createDefaultNode(new FileWrapper(createdNewFile));
-					createDefaultNode.setExpanded(true);
-					selectedItem.getChildren().add(createDefaultNode);
-				}
 			}
 		}
 	}
@@ -979,7 +954,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 						TreeItem<FileWrapper> root = selectedItem.getParent();//treeProjectFile.getRoot();
 						root.getChildren().remove(selectedItem);
-
+						
 					}
 				});
 			}

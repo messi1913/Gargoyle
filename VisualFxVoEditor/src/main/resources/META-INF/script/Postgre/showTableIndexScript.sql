@@ -10,8 +10,8 @@ FROM
     JOIN information_schema.key_column_usage AS kcu
       ON tc.constraint_name = kcu.constraint_name
 WHERE 1=1
-AND tc.table_name=:tableName
+AND tc.table_name=':tableName'
 and tc.constraint_type <> 'CHECK'
 #if($databaseName)
-and tc.table_schema=:databaseName
+and tc.table_schema=':databaseName'
 #end

@@ -6,8 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.popup;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,8 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.kyj.fx.voeditor.visual.component.PasswordTextFieldTableCell;
-import com.kyj.fx.voeditor.visual.main.initalize.DatabaseInitializer;
 import com.kyj.fx.voeditor.visual.main.model.vo.Code;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -49,7 +44,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
-import javafx.util.Pair;
 
 /**
  * 데이터베이스 설정 콤포넌트
@@ -285,7 +279,29 @@ public class DatabaseConfigView extends BorderPane {
 	public void btnPingOnMouseClick() {
 
 		DbUtil.ping(() -> {
-			return getPoolProperties();
+
+			Map<String, Object> bufMap = new HashMap<>();
+			tbDatabase.getItems().forEach(item -> {
+
+				Object key = item.get("key");
+				Object value = item.get("value");
+				if (key == null)
+					return;
+				bufMap.put(key.toString(), value.toString());
+			});
+
+			String driver = bufMap.get(ResourceLoader.BASE_KEY_JDBC_DRIVER).toString();
+			String url = bufMap.get(ResourceLoader.BASE_KEY_JDBC_URL).toString();
+			String username = bufMap.get(ResourceLoader.BASE_KEY_JDBC_ID).toString();
+			String password = bufMap.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString();
+			password = decryp(password);
+			PoolProperties poolProperties = new PoolProperties();
+			poolProperties.setDriverClassName(driver);
+			poolProperties.setUrl(url);
+			poolProperties.setUsername(username);
+			poolProperties.setPassword(password);
+
+			return poolProperties;
 		}, (bool) -> {
 			String msg = "fail!";
 			if (bool)
@@ -297,104 +313,4 @@ public class DatabaseConfigView extends BorderPane {
 
 	}
 
-	/********************************
-	 * 작성일 : 2016. 9. 2. 작성자 : KYJ
-	 *
-	 * 드라이버 로드 처리를 위함/
-	 * 
-	 * @param driver
-	 ********************************/
-	private static void classForName(String driver) {
-		try {
-			Class.forName(driver);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private PoolProperties getPoolProperties() {
-		Map<String, Object> bufMap = new HashMap<>();
-		tbDatabase.getItems().forEach(item -> {
-
-			Object key = item.get("key");
-			Object value = item.get("value");
-			if (key == null)
-				return;
-			bufMap.put(key.toString(), value.toString());
-		});
-
-		String driver = bufMap.get(ResourceLoader.BASE_KEY_JDBC_DRIVER).toString();
-		String url = bufMap.get(ResourceLoader.BASE_KEY_JDBC_URL).toString();
-		String username = bufMap.get(ResourceLoader.BASE_KEY_JDBC_ID).toString();
-		String password = bufMap.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString();
-		password = decryp(password);
-		PoolProperties poolProperties = new PoolProperties();
-		poolProperties.setDriverClassName(driver);
-		poolProperties.setUrl(url);
-		poolProperties.setUsername(username);
-		poolProperties.setPassword(password);
-
-		return poolProperties;
-	}
-
-	private Connection getConnection() throws SQLException {
-
-		Map<String, Object> bufMap = new HashMap<>();
-		tbDatabase.getItems().forEach(item -> {
-
-			Object key = item.get("key");
-			Object value = item.get("value");
-			if (key == null)
-				return;
-			bufMap.put(key.toString(), value.toString());
-		});
-
-		String driver = bufMap.get(ResourceLoader.BASE_KEY_JDBC_DRIVER).toString();
-		String url = bufMap.get(ResourceLoader.BASE_KEY_JDBC_URL).toString();
-		String username = bufMap.get(ResourceLoader.BASE_KEY_JDBC_ID).toString();
-		String password = bufMap.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString();
-		password = decryp(password);
-
-		return DriverManager.getConnection(url, username, password);
-	}
-
-	/********************************
-	 * 작성일 : 2016. 9. 2. 작성자 : KYJ
-	 *
-	 * Gargoyle에서 사용하는 데이터베이스 생성
-	 * 
-	 * @throws Exception
-	 * @throws SQLException
-	 ********************************/
-	@FXML
-	public void btnGargoyleOnMouseClick() {
-
-		//생성전 뭔저 확인여부
-		Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Create Database", "Gargoyle용 데이터베이스 생성 확인.");
-
-		showYesOrNoDialog.ifPresent(v -> {
-			if ("Y".equals(v.getValue())) {
-
-				Connection connection = null;
-				try {
-					connection = getConnection();
-					DatabaseInitializer databaseInitializer = new DatabaseInitializer(connection);
-					databaseInitializer.setExceptionHandler(ex -> DialogUtil.showExceptionDailog(ex));
-					databaseInitializer.setOnSuccessHandler(t -> DialogUtil.showMessageDialog("데이터베이스 생성 완료.!"));
-					databaseInitializer.initialize();
-
-				} catch (Exception e) {
-					DialogUtil.showExceptionDailog(e);
-				} finally {
-					try {
-						DbUtil.close(connection);
-					} catch (Exception e) {
-						//
-					}
-				}
-
-			}
-		});
-
-	}
 }

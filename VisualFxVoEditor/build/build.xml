@@ -807,7 +807,7 @@
 
 		<fx:application id="Gagoyle" name="Gargoyle"
 			mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx"
-			version="1.1.0" />
+			version="1.0.9" />
 
 		<mkdir dir="build/classes/META-INF" />
 
@@ -822,7 +822,7 @@
 			<manifest>
 				<attribute name="Implementation-Vendor" value="kyj.fx.wizard" />
 				<attribute name="Implementation-Title" value="Gargoyle" />
-				<attribute name="Implementation-Version" value="1.1.0" />
+				<attribute name="Implementation-Version" value="1.0.9" />
 				<attribute name="JavaFX-Feature-Proxy" value="None" />
 			</manifest>
 		</fx:jar>

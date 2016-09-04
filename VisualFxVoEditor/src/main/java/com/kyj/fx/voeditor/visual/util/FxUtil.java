@@ -60,7 +60,6 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.SnapshotResult;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -493,7 +492,7 @@ public class FxUtil {
 	 * @param isModal
 	 */
 	public static void createStageAndShow(String title, Node parent, boolean isModal) {
-		createStageAndShow(title, new Scene(new BorderPane(parent)), isModal);
+		createStageAndShow(title,new Scene(new BorderPane(parent)), isModal);
 	}
 
 	/**
@@ -502,9 +501,9 @@ public class FxUtil {
 	 * @param parent
 	 * @param option
 	 */
-	//	public static void createStageAndShow(String title, Node parent, Consumer<Stage> option) {
-	//		createStageAndShow(title, new Scene(new BorderPane(parent)), option);
-	//	}
+//	public static void createStageAndShow(String title, Node parent, Consumer<Stage> option) {
+//		createStageAndShow(title, new Scene(new BorderPane(parent)), option);
+//	}
 
 	/**
 	 * @작성자 : KYJ
@@ -541,12 +540,14 @@ public class FxUtil {
 				stage.initModality(Modality.APPLICATION_MODAL);
 				stage.initOwner(stage);
 			};
-		} else {
+		}
+		else
+		{
 			option = stage -> {
 				stage.setTitle(title);
-				//				stage.setAlwaysOnTop(true);
-				//				stage.initModality(Modality.APPLICATION_MODAL);
-				//				stage.initOwner(stage);
+//				stage.setAlwaysOnTop(true);
+//				stage.initModality(Modality.APPLICATION_MODAL);
+//				stage.initOwner(stage);
 			};
 		}
 
@@ -888,17 +889,4 @@ public class FxUtil {
 
 		return null;
 	}
-
-	/********************************
-	 * 작성일 : 2016. 9. 3. 작성자 : KYJ
-	 *
-	 * TableView 키이벤트를 등록
-	 * 
-	 * @param tb
-	 ********************************/
-	public static void installClipboardKeyEvent(TableView<?> tb) {
-		ClipboardKeyEventInstaller.install(tb);
-	}
-	
-
 }
