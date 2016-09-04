@@ -647,11 +647,11 @@ public class ValueUtil {
 
 		return dbmsName;
 	}
-
 	public static String getDriverToDBMSName(org.apache.tomcat.jdbc.pool.DataSource dataSource) {
 		String dbms = dataSource.getDriverClassName();//ValueUtil.getDriverToDBMSName(driver);
 		return getDriverToDBMSName(dbms);
 	}
+
 
 	/**
 	 * cvs 스트링 형태로 리턴
@@ -974,17 +974,6 @@ public class ValueUtil {
 		} // end for
 
 		return stringBuffer.toString().toUpperCase();
-	}
-
-	public static String removeLocalLocation(String dir) {
-		String classDirName = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
-		return dir.replace(classDirName, "");
-	}
-
-	public static String addLocalLocation(String dir) {
-		String classDirName = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
-
-		return classDirName.concat(dir);
 	}
 
 	/**

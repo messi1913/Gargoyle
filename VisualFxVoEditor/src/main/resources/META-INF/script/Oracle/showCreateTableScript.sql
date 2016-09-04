@@ -10,9 +10,9 @@ TABLE_NAME Y,
   FROM  ALL_TABLES
  WHERE  1=1
  #if($databaseName)
-AND OWNER = UPPER(':databaseName')
+AND OWNER = UPPER(:databaseName)
 #end
-AND TABLE_NAME = ':tableName'
+AND TABLE_NAME = :tableName
 UNION
 SELECT
 TC.TABLE_NAME Y,
@@ -33,9 +33,9 @@ COLUMN_ID X,
   AND  O.OBJECT_NAME = TC.TABLE_NAME
   AND O.OBJECT_TYPE = 'TABLE'
   #if($databaseName)
-  AND O.OWNER = UPPER(':databaseName')
+  AND O.OWNER = UPPER(:databaseName)
   #end
-  AND TC.TABLE_NAME = ':tableName'
+  AND TC.TABLE_NAME = :tableName
 UNION
 SELECT
 TABLE_NAME Y,
@@ -55,11 +55,11 @@ TABLE_NAME Y,
             -- ||' TABLESPACE ' || RTRIM(TABLESPACE_NAME) ||CHR(10)
             ||';'||CHR(10)||CHR(10) AS C
   FROM  ALL_TABLES
- WHERE  1=1 
+ WHERE  1=1
 #if($databaseName)
-AND OWNER = UPPER(':databaseName')
+AND OWNER = UPPER(:databaseName)
 #end
-AND TABLE_NAME = ':tableName'
+AND TABLE_NAME = :tableName
  ORDER  BY 1,2
 )
 

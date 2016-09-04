@@ -85,8 +85,8 @@ public class DialogUtil {
 	 */
 	public static File showPropertyFileSelectDialog(final Window ownerWindow) {
 		return showFileDialog(ownerWindow, chooser -> {
-			chooser.getExtensionFilters().add(
-					new ExtensionFilter(GargoyleExtensionFilters.PROPERTIES_NAME, GargoyleExtensionFilters.PROPERTIES));
+			chooser.getExtensionFilters()
+					.add(new ExtensionFilter(GargoyleExtensionFilters.PROPERTIES_NAME, GargoyleExtensionFilters.PROPERTIES));
 		});
 	}
 
@@ -100,9 +100,22 @@ public class DialogUtil {
 	 */
 	public static File showCssFileSelectDialog(final Window ownerWindow) {
 		return showFileDialog(ownerWindow, chooser -> {
-			chooser.getExtensionFilters()
-					.add(new ExtensionFilter(GargoyleExtensionFilters.FX_CSS_NAME, GargoyleExtensionFilters.FX_CSS));
+			chooser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.FX_CSS_NAME, GargoyleExtensionFilters.FX_CSS));
 		});
+	}
+
+	private static File getInitDir() {
+		String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
+		if (ValueUtil.isNotEmpty(path)) {
+			File file = new File(path);
+			if (file.exists()) {
+				if (file.isDirectory())
+					return file;
+				else
+					return file.getParentFile();
+			}
+		}
+		return null;
 	}
 
 	/********************************
@@ -115,15 +128,57 @@ public class DialogUtil {
 	 * @param fileChooser
 	 ********************************/
 	private static void installDefaultPath(FileChooser fileChooser) {
-		String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
-		if (ValueUtil.isNotEmpty(path)) {
-			File file = new File(path);
-			if (file.exists()) {
+		//		String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
+		//		if (ValueUtil.isNotEmpty(path)) {
+		//			File file = new File(path);
+		//			if (file.exists()) {
+		//
+		//				if (file.isFile()) {
+		//					fileChooser.setInitialDirectory(file.getParentFile());
+		//				} else if (file.isDirectory()) {
+		//					fileChooser.setInitialDirectory(file);
+		//				}
+		//			}
+		//		}
+		File initDir = getInitDir();
+		if (initDir != null) {
+			if (initDir.isDirectory()) {
+				if (fileChooser != null) {
+					fileChooser.setInitialDirectory(initDir);
+				}
+			} else {
+				File parentFile = initDir.getParentFile();
+				if (fileChooser != null) {
+					fileChooser.setInitialDirectory(parentFile);
+				}
+			}
+		}
 
-				if (file.isFile()) {
-					fileChooser.setInitialDirectory(file.getParentFile());
-				} else if (file.isDirectory()) {
-					fileChooser.setInitialDirectory(file);
+	}
+
+	private static void installDefaultPath(DirectoryChooser fileChooser) {
+		//		String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
+		//		if (ValueUtil.isNotEmpty(path)) {
+		//			File file = new File(path);
+		//			if (file.exists()) {
+		//
+		//				if (file.isFile()) {
+		//					fileChooser.setInitialDirectory(file.getParentFile());
+		//				} else if (file.isDirectory()) {
+		//					fileChooser.setInitialDirectory(file);
+		//				}
+		//			}
+		//		}
+		File initDir = getInitDir();
+		if (initDir != null) {
+			if (initDir.isDirectory()) {
+				if (fileChooser != null) {
+					fileChooser.setInitialDirectory(initDir);
+				}
+			} else {
+				File parentFile = initDir.getParentFile();
+				if (fileChooser != null) {
+					fileChooser.setInitialDirectory(parentFile);
 				}
 			}
 		}
@@ -304,7 +359,10 @@ public class DialogUtil {
 		// alert.initOwner(owner);
 		// alert.showAndWait();
 
-		new ExceptionDialogComposite(ex, message).show(owner);
+		Platform.runLater(() -> {
+			new ExceptionDialogComposite(ex, message).show(owner);
+		});
+
 	}
 
 	/**
@@ -435,13 +493,15 @@ public class DialogUtil {
 	 * @param message
 	 * @param apply
 	 */
-	public static void showMessageDialog(Stage initOwner, String title, String headerText, String message,
-			Consumer<Alert> apply) {
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle(title);
-		alert.setHeaderText(headerText);
-		alert.setContentText(message);
-		apply.accept(alert);
+	public static void showMessageDialog(Stage initOwner, String title, String headerText, String message, Consumer<Alert> apply) {
+
+		Platform.runLater(() -> {
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle(title);
+			alert.setHeaderText(headerText);
+			alert.setContentText(message);
+			apply.accept(alert);
+		});
 
 		// Dialog<Pair<String, String>> dialog = new Dialog<>();
 		// dialog.setTitle(title);
@@ -547,8 +607,7 @@ public class DialogUtil {
 	 * @throws IOException
 	 * @User KYJ
 	 */
-	public static void open(Class<?> packageLocation, String fxmlName, int width, int height, boolean modal)
-			throws IOException {
+	public static void open(Class<?> packageLocation, String fxmlName, int width, int height, boolean modal) throws IOException {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(packageLocation.getResource(fxmlName));
 		Parent parent = loader.load();
@@ -564,6 +623,27 @@ public class DialogUtil {
 		stage.show();
 
 		// stage.setScene(borderPane, 800, 500);
+
+	}
+
+	public static File showDirSaveDialog(Window ownerWindow, Consumer<DirectoryChooser> option) {
+		return showDirSaveDialog(ownerWindow, getInitDir(), option);
+	}
+
+	public static File showDirSaveDialog(Window ownerWindow, File initDir, Consumer<DirectoryChooser> option) {
+		DirectoryChooser chooser = new DirectoryChooser();
+		chooser.setInitialDirectory(initDir);
+
+		chooser.setTitle("Directory");
+		if (option != null)
+			option.accept(chooser);
+
+		File selectedDir = chooser.showDialog(ownerWindow);
+		if (selectedDir != null && selectedDir.exists()) {
+			applyLastPath(selectedDir);
+		}
+
+		return selectedDir;
 
 	}
 

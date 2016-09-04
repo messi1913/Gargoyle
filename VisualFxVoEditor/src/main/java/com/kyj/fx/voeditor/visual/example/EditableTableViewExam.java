@@ -6,12 +6,15 @@
   *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
+import com.kyj.fx.voeditor.visual.util.DbUtil;
 
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
@@ -43,15 +46,27 @@ public class EditableTableViewExam extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
-		Button btnExec = new Button("실행");
-		Button btnAdd = new Button("추가");
+		Button btnExec = new Button("Exec.");
+		Button btnAdd = new Button("Add ");
+		Button btnRemove = new Button("Remove");
+		Button btnSave = new Button("Save");
 		btnAdd.setDisable(true);
-		Button btnRemove = new Button("삭제");
-		Button btnSave = new Button("저장");
 
 		TextField textField = new TextField();
 		HBox hBox = new HBox(5, textField, btnExec, btnAdd, btnRemove, btnSave);
-		EditableTableView editableTableView = new EditableTableView();
+		EditableTableView editableTableView = new EditableTableView(new Supplier<Connection>() {
+
+			@Override
+			public Connection get() {
+				try {
+					return DbUtil.getConnection();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return null;
+			}
+		});
 
 		editableTableView.tableNameProperty().addListener((oba, oldval, newval) -> {
 			btnAdd.setDisable(false);
@@ -61,7 +76,7 @@ public class EditableTableViewExam extends Application {
 		btnExec.setOnAction(e -> {
 			String tableName = textField.getText();
 			try {
-				editableTableView.readByTableName(tableName);
+				editableTableView.readByTableName("select * from " + tableName, tableName);
 
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -79,7 +94,11 @@ public class EditableTableViewExam extends Application {
 		});
 
 		btnSave.setOnAction(ev -> {
-			editableTableView.save();
+			try {
+				editableTableView.save();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 		});
 
 		editableTableView.setOnMouseClicked(ev -> {

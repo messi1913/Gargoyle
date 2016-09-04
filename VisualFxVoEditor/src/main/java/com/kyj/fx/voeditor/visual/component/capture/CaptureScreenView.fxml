@@ -18,11 +18,11 @@
 				<Insets />
 			</BorderPane.margin>
 			<content>
-				<ImageView fx:id="ivPicture" fitHeight="501.0" fitWidth="692.0" pickOnBounds="true" preserveRatio="true">
-					<viewport>
-						<Rectangle2D />
-					</viewport>
-				</ImageView>
+<!-- 				<ImageView fx:id="ivPicture" fitHeight="501.0" fitWidth="692.0" pickOnBounds="true" preserveRatio="true"> -->
+<!-- 					<viewport> -->
+<!-- 						<Rectangle2D /> -->
+<!-- 					</viewport> -->
+<!-- 				</ImageView> -->
 			</content>
 		</ScrollPane>
 	</center>

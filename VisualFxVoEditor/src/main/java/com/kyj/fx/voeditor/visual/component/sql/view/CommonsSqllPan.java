@@ -35,8 +35,8 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationFrameView;
 import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationUserMetadataVO;
-import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.exceptions.NotYetSupportException;
 import com.kyj.fx.voeditor.visual.functions.ResultSetToMapConverter;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
@@ -49,9 +49,6 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
@@ -272,57 +269,63 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	/*
 	 * 데이터그리드 키 클릭이벤트
 	 */
-	@SuppressWarnings("rawtypes")
 	@Override
 	public void tbResultOnKeyClick(KeyEvent e) {
 
-		int type = -1;
-		if (e.isControlDown() && e.getCode() == KeyCode.C) {
-			if (e.isShiftDown()) {
-				type = 2;
-			} else {
-				type = 1;
-			}
-		}
+		 
+		/*
+		 * 2016-09-03 by kyj.
+		 * SqlPane에서 기본 기능이 되도록 재구현.
+		 * FxUtil.installClipboardKeyEvent(tb);API를 사용.
+		 */
 
-		if (type == -1)
-			return;
-
-		TableView<Map<String, Object>> tbResult = getTbResult();
-		ObservableList<TablePosition> selectedCells = tbResult.getSelectionModel().getSelectedCells();
-
-		TablePosition tablePosition = selectedCells.get(0);
-		TableColumn tableColumn = tablePosition.getTableColumn();
-		int row = tablePosition.getRow();
-		int col = tbResult.getColumns().indexOf(tableColumn);
-
-		switch (type) {
-		case 1:
-			StringBuilder sb = new StringBuilder();
-			for (TablePosition cell : selectedCells) {
-				// TODO :: 첫번째 컬럼(행 선택 기능)도 빈값으로 복사됨..
-				// 행변경시
-				if (row != cell.getRow()) {
-					sb.append("\n");
-					row++;
-				}
-				// 열 변경시
-				else if (col != tbResult.getColumns().indexOf(cell.getTableColumn())) {
-					sb.append("\t");
-				}
-				Object cellData = cell.getTableColumn().getCellData(cell.getRow());
-				sb.append(ValueUtil.decode(cellData, cellData, "").toString());
-			}
-			FxClipboardUtil.putString(sb.toString());
-
-			// Map<String, Object> map = tbResult.getItems().get(row);
-			// FxClipboardUtil.putString(ValueUtil.toCVSString(map));
-			break;
-		case 2:
-			Object cellData = tableColumn.getCellData(row);
-			FxClipboardUtil.putString(ValueUtil.decode(cellData, cellData, "").toString());
-			break;
-		}
+//		int type = -1;
+//		if (e.isControlDown() && e.getCode() == KeyCode.C) {
+//			if (e.isShiftDown()) {
+//				type = 2;
+//			} else {
+//				type = 1;
+//			}
+//		}
+//
+//		if (type == -1)
+//			return;
+//
+//		TableView<Map<String, Object>> tbResult = getTbResult();
+//		ObservableList<TablePosition> selectedCells = tbResult.getSelectionModel().getSelectedCells();
+//
+//		TablePosition tablePosition = selectedCells.get(0);
+//		TableColumn tableColumn = tablePosition.getTableColumn();
+//		int row = tablePosition.getRow();
+//		int col = tbResult.getColumns().indexOf(tableColumn);
+//
+//		switch (type) {
+//		case 1:
+//			StringBuilder sb = new StringBuilder();
+//			for (TablePosition cell : selectedCells) {
+//				// TODO :: 첫번째 컬럼(행 선택 기능)도 빈값으로 복사됨..
+//				// 행변경시
+//				if (row != cell.getRow()) {
+//					sb.append("\n");
+//					row++;
+//				}
+//				// 열 변경시
+//				else if (col != tbResult.getColumns().indexOf(cell.getTableColumn())) {
+//					sb.append("\t");
+//				}
+//				Object cellData = cell.getTableColumn().getCellData(cell.getRow());
+//				sb.append(ValueUtil.decode(cellData, cellData, "").toString());
+//			}
+//			FxClipboardUtil.putString(sb.toString());
+//
+//			// Map<String, Object> map = tbResult.getItems().get(row);
+//			// FxClipboardUtil.putString(ValueUtil.toCVSString(map));
+//			break;
+//		case 2:
+//			Object cellData = tableColumn.getCellData(row);
+//			FxClipboardUtil.putString(ValueUtil.decode(cellData, cellData, "").toString());
+//			break;
+//		}
 
 	}
 

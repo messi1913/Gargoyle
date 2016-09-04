@@ -65,7 +65,8 @@ public class VoWizardUtil {
 
 		Map<String, Object> hashMap = new HashMap<String, Object>();
 		hashMap.put("tableName", tableName);
-		return DbUtil.select(sql, hashMap, new RowMapper<TableMasterDVO>() {
+
+		return DbUtil.select(ValueUtil.getVelocityToText(sql, hashMap, true), hashMap, new RowMapper<TableMasterDVO>() {
 
 			@Override
 			public TableMasterDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -93,10 +94,10 @@ public class VoWizardUtil {
 		String tableName = selectedItem.getTableName();
 		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_COLUMN);
 
-		
+
 		/*
 		 * 2016-08-11 by kyj.
-		 * 
+		 *
 		 * 설정에 대한 sql항목이 없는경우 순수 jdbc 라이브러리를 이용하는 방안으로 구성.
 		 */
 		if (sql == null || sql.isEmpty()) {

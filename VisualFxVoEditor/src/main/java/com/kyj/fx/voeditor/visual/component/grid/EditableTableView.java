@@ -6,6 +6,7 @@
   *******************************/
 package com.kyj.fx.voeditor.visual.component.grid;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -13,22 +14,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import com.google.common.base.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
-import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.sun.btrace.BTraceUtils.Strings;
-
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -46,15 +48,18 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
+import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /***************************
  *
  * 데이터베이스 테이블과 1:1 관계를 가지는 테이블뷰를 생성하고 그 테이블과 관련된 CRUD를 처리할 수 있다.
- * 
+ *
  * @author KYJ
  *
  ***************************/
 public class EditableTableView extends TableView<Map<ColumnExpression, ObjectProperty<ValueExpression>>> {
+
+	
 
 	/**
 	 * @최초생성일 2016. 8. 25.
@@ -65,21 +70,21 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	/**
 	 * 데이터베이스로부터 한번에 가져올 수 있는 FECT_COUNT를 정의.
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 25.
 	 */
-	private static final int FETCH_COUNT = 50;
+	private static final int FETCH_COUNT = DbUtil.DEFAULT_FETCH_SIZE;
 
 	/**
 	 * 데이터베이스로부터 가져올 수 있는 최대 MAX ROW를 정의한다.
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 25.
 	 */
-	private static final int LIMIT_ROW_COUNT = 1000;
+	private static final int LIMIT_ROW_COUNT = DbUtil.DEFAULT_LIMIT_ROW_COUNT;
 
 	/**
 	 * 현재 보여지고 있는 테이블명에 대한 메타정보가 보관된다. 쿼리문 생성시 아래 변수에 바인드된 정보가 사용된다.
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 25.
 	 */
 	private StringProperty tableName = new SimpleStringProperty();
@@ -89,10 +94,21 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	private Map<String, ColumnExpression> columnMap = new ConcurrentHashMap<>();
 
-	public EditableTableView() {
+	/**
+	 * 실행이력정보. select문절만 저장처리.
+	 * @최초생성일 2016. 9. 2.
+	 */
+	private LinkedList<String> history = new LinkedList<String>();
+	private static final int HISTORY_LIMITED_SIZE = 30;
+	
+	
+	private Supplier<Connection> connectionSupplier;
 
+	public EditableTableView(Supplier<Connection> connectionSupplier) {
+		this.connectionSupplier = connectionSupplier;
 		this.setEditable(true);
 
+		//		new ConcurrentLinkedQueue<>();
 		getItems().addListener(itemChangeListener);
 
 	}
@@ -130,113 +146,143 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	/**
 	 * 테이블명을 입력하면 select문을 생성하여 데이터를 조회후 그리드에 데이터를 맵핑하는 처리를한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 25.
 	 * @param tableName
 	 *            조회하고자하는 테이블명을 기입한다.
 	 * @throws Exception
 	 */
-	public void readByTableName(String tableName) throws Exception {
+	public void readByTableName(String sql, String tableName) throws Exception {
+		readByTableName(sql, tableName, true);
+	}
+
+	private void readByTableName(String sql, String tableName, boolean appendHist) throws Exception {
 		getColumns().clear();
 		getItems().clear();
 		removedList.clear();
 		columnMap.clear();
 
-		List<String> pks = DbUtil.pks(tableName);
+		try (Connection connection = connectionSupplier.get()) {
+			List<String> pks = DbUtil.pks(connection, tableName);
 
-		DbUtil.select(String.format("select * from %s", tableName), FETCH_COUNT, LIMIT_ROW_COUNT,
-				new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>>() {
+			DbUtil.select(connection, sql, FETCH_COUNT, LIMIT_ROW_COUNT,
+					new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>>() {
 
-					@Override
-					public List<Map<String, Object>> apply(ResultSetMetaData t, ResultSet u) {
+						@Override
+						public List<Map<String, Object>> apply(ResultSetMetaData t, ResultSet u) {
 
-						try {
-							int columnCount = t.getColumnCount();
-
-							for (int i = 1; i <= columnCount; i++) {
-
-								String columnName = t.getColumnName(i);
-								ColumnExpression columnExp = new ColumnExpression(columnName);
-								columnExp.isPrimaryColumn = pks.contains(columnName);
-								columnExp.setColumnType(t.getColumnType(i));
-
-								TableColumn<Map<ColumnExpression, ObjectProperty<ValueExpression>>, ValueExpression> e = new TableColumn<>(
-										columnName);
-
-								e.setUserData(columnExp);
-								e.setCellValueFactory(DynamicCallback.fromTableColumn(columnExp));
-								e.setCellFactory(DEFAULT_CELL_FACTORY);
-								e.setEditable(true);
-								columnMap.put(columnName, columnExp);
-
-								getColumns().add(e);
-							}
-
-							while (u.next()) {
-
-								Map<ColumnExpression, ObjectProperty<ValueExpression>> hashMap = new HashMap<>();
+							try {
+								int columnCount = t.getColumnCount();
 
 								for (int i = 1; i <= columnCount; i++) {
-									String columnName = t.getColumnName(i);
-									ColumnExpression columnExp = columnMap.get(columnName);//new ColumnExpression(columnName);
 
-									ValueExpression valueExp = new ValueExpression();
-									valueExp.displayText.set(u.getString(columnName));
-									valueExp.isPrimaryKey = pks.contains(columnName);
-									valueExp.realValue.set(u.getObject(columnName));
-									valueExp.setColumnExpression(columnExp);
-									hashMap.put(columnExp, new SimpleObjectProperty<>(valueExp));
+									String columnName = t.getColumnName(i);
+									ColumnExpression columnExp = new ColumnExpression(columnName);
+									columnExp.isPrimaryColumn = pks.contains(columnName);
+									columnExp.setColumnType(t.getColumnType(i));
+
+									TableColumn<Map<ColumnExpression, ObjectProperty<ValueExpression>>, ValueExpression> e = new TableColumn<>(
+											columnName);
+
+									e.setUserData(columnExp);
+									e.setCellValueFactory(DynamicCallback.fromTableColumn(columnExp));
+									e.setCellFactory(DEFAULT_CELL_FACTORY);
+									e.setEditable(true);
+									columnMap.put(columnName, columnExp);
+
+									getColumns().add(e);
 								}
 
-								getItems().removeListener(itemChangeListener);
-								getItems().add(hashMap);
-								getItems().addListener(itemChangeListener);
+								while (u.next()) {
 
+									Map<ColumnExpression, ObjectProperty<ValueExpression>> hashMap = new HashMap<>();
+
+									for (int i = 1; i <= columnCount; i++) {
+										String columnName = t.getColumnName(i);
+										ColumnExpression columnExp = columnMap.get(columnName);//new ColumnExpression(columnName);
+
+										ValueExpression valueExp = new ValueExpression();
+										valueExp.displayText.set(u.getString(columnName));
+										valueExp.isPrimaryKey = pks.contains(columnName);
+										valueExp.realValue.set(u.getObject(columnName));
+										valueExp.setColumnExpression(columnExp);
+										hashMap.put(columnExp, new SimpleObjectProperty<>(valueExp));
+									}
+
+									getItems().removeListener(itemChangeListener);
+									getItems().add(hashMap);
+									getItems().addListener(itemChangeListener);
+
+								}
+
+							} catch (SQLException e) {
+								LOGGER.error(ValueUtil.toString(e));
 							}
-
-						} catch (SQLException e) {
-							e.printStackTrace();
+							return null;
 						}
-						return null;
-					}
 
-				});
+					});
 
-		this.tableName.set(tableName);
+			if (appendHist) {
+
+				if (history.size() >= HISTORY_LIMITED_SIZE) {
+					history.removeFirst();
+				}
+
+				history.add(sql);
+			}
+
+			this.tableName.set(tableName);
+		}
+
 	}
 
 	/**
 	 * 저장 기능을 구현
 	 * 
+	 * @throws Exception
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 25.
 	 */
-	public void save() {
+	public void save() throws Exception {
 
 		//		List<String> saveSqlList = new ArrayList<>();
 
+		List<String> saveList = new ArrayList<String>();
 		STATUS statements1 = getStatements(DML.INSERT, (status, list) -> {
-			list.forEach(LOGGER::debug);
+			saveList.addAll(list);
 			return status;
 		});
 
 		STATUS statements2 = getStatements(DML.UPDATE, (status, list) -> {
-			list.forEach(LOGGER::debug);
+			saveList.addAll(list);
 			return status;
 		});
 
 		STATUS statements3 = getStatements(DML.DELETE, (status, list) -> {
-			list.forEach(LOGGER::debug);
+			saveList.addAll(list);
 			return status;
 		});
 
 		if (statements1 == STATUS.OK && statements2 == STATUS.OK && statements3 == STATUS.OK) {
+			try (Connection con = connectionSupplier.get()) {
+				int transactionedScope = DbUtil.getTransactionedScope(con, saveList, (list) -> {
+					return list;
+				}, ex -> {
+					throw new RuntimeException(ex);
+				});
+
+				if (transactionedScope == -1) {
+					throw new GargoyleException("Execute Fail.");
+				} else {
+					readByTableName(history.getLast(), tableName.getValue(), false);
+				}
+			}
 
 		} else {
-
-			DialogUtil.showMessageDialog("Primary Value is Empty.");
-			return;
+			throw new GargoyleException("Primary Value is Empty.");
 		}
 
 	}
@@ -422,7 +468,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			break;
 
 		default:
-			LOGGER.info("# uncatched data type.#########################");
+			LOGGER.info("# uncatched data type. {}   #########################", type);
 			returnValue = singleDot(displayText);
 			break;
 		}
@@ -572,7 +618,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		/**
 		 * 새로 추가된 로우인지 확인
-		 * 
+		 *
 		 * @최초생성일 2016. 8. 25.
 		 */
 		private static final String $_NEW_ROW$ = "$NewRow$";
@@ -598,7 +644,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		/**
 		 * java.sql.Types 클래스 참조.
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 8. 25.
 		 * @return
@@ -611,7 +657,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		/**
 		 * 새로 추가된 행인지에 대한 메타정보를 제공함.
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 8. 25.
 		 * @return
@@ -784,7 +830,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		/**
 		 * DynamicCallback 생성하는 static 함수.
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 8. 25.
 		 * @param columnName

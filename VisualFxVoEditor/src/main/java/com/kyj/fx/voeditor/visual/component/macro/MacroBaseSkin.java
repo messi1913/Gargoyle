@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.NumberTextField;
+import com.kyj.fx.voeditor.visual.component.NumberTextField;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
