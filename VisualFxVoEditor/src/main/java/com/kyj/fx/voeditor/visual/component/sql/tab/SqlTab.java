@@ -153,6 +153,8 @@ public class SqlTab extends Tab {
 					String fileContent = FileUtil.readFile(showFileDialog, new LoadFileOptionHandler());
 					if (fileContent != null /*공백여부는 체크안함. 파일 내용에 실제 공백이 포함될 수 있으므로...*/) {
 						setTxtSql(fileContent);
+						setText(showFileDialog.getName());
+						
 					}
 				}
 
