@@ -59,12 +59,12 @@ import kyj.Fx.dao.wizard.core.util.ValueUtil;
  ***************************/
 public class EditableTableView extends TableView<Map<ColumnExpression, ObjectProperty<ValueExpression>>> {
 
-	
-
+	private static final String STYLE_MODIFIED_FIELD = "-fx-background-color:#AC777D";
 	/**
 	 * @최초생성일 2016. 8. 25.
 	 */
-	private static final String PRIMARYKEY_TEXT_FILL_STYLE = "-fx-text-fill: #DD5044";
+	private static final String STYLE_PRIMARYKEY = "-fx-text-fill: #DD5044";
+	private static final String STYLE_NULLABLE = "-fx-text-fill: #3D649B";
 
 	private static Logger LOGGER = LoggerFactory.getLogger(EditableTableView.class);
 
@@ -96,12 +96,12 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	/**
 	 * 실행이력정보. select문절만 저장처리.
+	 * 
 	 * @최초생성일 2016. 9. 2.
 	 */
 	private LinkedList<String> history = new LinkedList<String>();
 	private static final int HISTORY_LIMITED_SIZE = 30;
-	
-	
+
 	private Supplier<Connection> connectionSupplier;
 
 	public EditableTableView(Supplier<Connection> connectionSupplier) {
@@ -165,7 +165,26 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		try (Connection connection = connectionSupplier.get()) {
 			List<String> pks = DbUtil.pks(connection, tableName);
+			Map<String, Boolean> columnsToMap = DbUtil.columnsToMap(connection, tableName, rs -> {
+				try {
+					return rs.getString(4);
+				} catch (Exception e) {
+					return null;
+				}
 
+			}, rs -> {
+				try {
+					//					18. IS_NULLABLE String => ISO rules are used to determine the nullability for a column. ◦ YES --- if the column can include NULLs 
+					//							◦ NO --- if the column cannot include NULLs 
+					//							◦ empty string --- if the nullability for the column is unknown 
+
+					return Boolean.valueOf("YES".equals(rs.getString(18)));
+				} catch (Exception e) {
+					return false;
+				}
+			});
+
+			LOGGER.debug("nullable columns ? {} ", columnsToMap);
 			DbUtil.select(connection, sql, FETCH_COUNT, LIMIT_ROW_COUNT,
 					new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, Object>>>() {
 
@@ -180,6 +199,8 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 									String columnName = t.getColumnName(i);
 									ColumnExpression columnExp = new ColumnExpression(columnName);
 									columnExp.isPrimaryColumn = pks.contains(columnName);
+									columnExp.isNullableColumn = columnsToMap.containsKey(columnName)
+											&& (columnsToMap.get(columnName) == true);
 									columnExp.setColumnType(t.getColumnType(i));
 
 									TableColumn<Map<ColumnExpression, ObjectProperty<ValueExpression>>, ValueExpression> e = new TableColumn<>(
@@ -188,7 +209,9 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 									e.setUserData(columnExp);
 									e.setCellValueFactory(DynamicCallback.fromTableColumn(columnExp));
 									e.setCellFactory(DEFAULT_CELL_FACTORY);
+
 									e.setEditable(true);
+
 									columnMap.put(columnName, columnExp);
 
 									getColumns().add(e);
@@ -589,9 +612,11 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 					if (!empty) {
 						if (item.isModified()) {
-							setStyle("-fx-background-color:#AC777D");
+							setStyle(STYLE_MODIFIED_FIELD);
 						} else if (item.getColumnExpression().isPrimaryColumn) {
-							setStyle(PRIMARYKEY_TEXT_FILL_STYLE);
+							setStyle(STYLE_PRIMARYKEY);
+						} else if (!item.getColumnExpression().isNullableColumn()) {
+							setStyle(STYLE_NULLABLE);
 						} else {
 							setStyle(null);
 						}
@@ -605,7 +630,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 			ColumnExpression userData = (ColumnExpression) param.getUserData();
 			if (userData != null && userData.isPrimaryColumn) {
-				cell.setStyle(PRIMARYKEY_TEXT_FILL_STYLE);
+				cell.setStyle(STYLE_PRIMARYKEY);
 			}
 			//			else {
 			//				cell.setStyle(null);
@@ -625,6 +650,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		private String columnName;
 		private boolean isPrimaryColumn;
+		private boolean isNullableColumn;
 		private boolean isMetadata;
 		private int columnType = java.sql.Types.NULL;
 
@@ -668,6 +694,14 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 				NEW_ROW_META.isMetadata = true;
 			}
 			return NEW_ROW_META;
+		}
+
+		public boolean isNullableColumn() {
+			return isNullableColumn;
+		}
+
+		public void setNullableColumn(boolean isNullableColumn) {
+			this.isNullableColumn = isNullableColumn;
 		}
 
 		public static boolean isContainsNewRowMeata(Map<ColumnExpression, ?> map) {
@@ -839,6 +873,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 		static DynamicCallback fromTableColumn(ColumnExpression columnName) {
 			return new DynamicCallback(columnName);
 		}
+
 	}
 
 	public final StringProperty tableNameProperty() {

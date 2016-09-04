@@ -54,4 +54,29 @@ public class KeyValue {
 		return value;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((key.get() == null) ? 0 : key.get().hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		KeyValue other = (KeyValue) obj;
+		if (key == null) {
+			if (other.key != null)
+				return false;
+		} else if (!key.get().equals(other.key.get()))
+			return false;
+		return true;
+	}
+
 }

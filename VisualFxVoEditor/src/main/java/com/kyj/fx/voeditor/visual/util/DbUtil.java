@@ -23,14 +23,15 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -808,6 +809,27 @@ public class DbUtil extends ConnectionManager {
 		}
 		// }
 
+		return tables;
+	}
+
+	public static <K, T> Map<K, T> columnsToMap(Connection connection, String tableNamePattern, Function<ResultSet, K> keyMapper,
+			Function<ResultSet, T> valueMapper) throws Exception {
+		if (keyMapper == null || valueMapper == null)
+			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
+
+		Map<K, T> tables = new LinkedHashMap<>();
+		// try (Connection connection = getConnection()) {
+
+		DatabaseMetaData metaData = connection.getMetaData();
+		ResultSet rs = COLUMN_CONVERTER.apply(tableNamePattern, metaData);
+
+		while (rs.next()) {
+			K k = keyMapper.apply(rs);
+			if (k == null)
+				continue;
+			T t = valueMapper.apply(rs);
+			tables.put(k, t);
+		}
 		return tables;
 	}
 
