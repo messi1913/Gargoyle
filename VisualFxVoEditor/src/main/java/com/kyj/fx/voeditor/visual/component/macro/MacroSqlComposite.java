@@ -48,13 +48,18 @@ public class MacroSqlComposite extends BorderPane {
 
 	@FxPostInitialize
 	public void post() {
-		
+
 		MenuItem menuAddItem = new MenuItem("Add");
 		MenuItem menuDeleteItem = new MenuItem("Delete");
 		tvFavorite.setContextMenu(new ContextMenu(menuAddItem, menuDeleteItem));
-		
+
 		borContent.setCenter(new MacroControl(connectionSupplier, initText));
 
+		MacroFavorTreeItemCreator macroFavorTreeItem = new MacroFavorTreeItemCreator(connectionSupplier);
+
+		MacroItemVO f = new MacroItemVO();
+		tvFavorite.setRoot(macroFavorTreeItem.createRoot(f));
+		tvFavorite.setShowRoot(false);
 	}
 
 }

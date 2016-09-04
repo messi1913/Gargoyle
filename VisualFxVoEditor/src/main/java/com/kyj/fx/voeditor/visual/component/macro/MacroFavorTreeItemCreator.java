@@ -6,7 +6,13 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.macro;
 
+import java.sql.Connection;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +23,38 @@ import javafx.scene.control.TreeItem;
  * @author KYJ
  *
  ***************************/
-public class MacroFavorTreeItem extends TreeItem<MacroItemVO> {
+public class MacroFavorTreeItemCreator {
+
+	private AbstractMacroFavorDAO dao;
+
+	public MacroFavorTreeItemCreator(Supplier<Connection> connectionSupplier) {
+		dao = new MacroFavorDAO(connectionSupplier);
+	}
+
+	class ReadChildrens implements Function<MacroItemVO, List<MacroItemVO>> {
+
+		@Override
+		public List<MacroItemVO> apply(MacroItemVO item) {
+			try {
+				if (item == null || ValueUtil.isEmpty(item.getId())) {
+					return dao.getRoots();
+				} else {
+					return dao.getChildrens(item);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return Collections.emptyList();
+		}
+	}
+
+	/**
+	 * 자식 요소들을 만드는 구체적인 처리로직을 기술.
+	 * 
+	 * @최초생성일 2016. 9. 4.
+	 */
+	private Function<MacroItemVO, List<MacroItemVO>> childrenFunc = new ReadChildrens();
 
 	/**
 	 * 파일 트리를 생성하기 위한 노드를 반환한다.
@@ -27,7 +64,8 @@ public class MacroFavorTreeItem extends TreeItem<MacroItemVO> {
 	 * @return
 	 * @User KYJ
 	 */
-	public static TreeItem<MacroItemVO> createNode(final MacroItemVO f) {
+	public TreeItem<MacroItemVO> createRoot(final MacroItemVO f) {
+
 		TreeItem<MacroItemVO> treeItem = new TreeItem<MacroItemVO>(f) {
 			private boolean isLeaf;
 			private boolean isFirstTimeChildren = true;
@@ -48,7 +86,7 @@ public class MacroFavorTreeItem extends TreeItem<MacroItemVO> {
 					isFirstTimeLeaf = false;
 					MacroItemVO f = getValue();
 
-					if (f.getType() == MACRO_ITEM_TYPE.DIR || f.getChildrens().isEmpty())
+					if (f == null || "F".equals(f.getType()))
 						isLeaf = true;
 					else
 						isLeaf = false;
@@ -63,16 +101,14 @@ public class MacroFavorTreeItem extends TreeItem<MacroItemVO> {
 					return FXCollections.emptyObservableList();
 				}
 
-				List<MacroItemVO> childrens = f.getChildrens();
-				if (f.getType() == MACRO_ITEM_TYPE.FILE || childrens.isEmpty()) {
+				List<MacroItemVO> childrens = childrenFunc.apply(f);
+				if (childrens.isEmpty()) {
 					return FXCollections.emptyObservableList();
-				}
-
-				else {
+				} else {
 					ObservableList<TreeItem<MacroItemVO>> children = FXCollections.observableArrayList();
 					for (MacroItemVO child : childrens) {
-						TreeItem<MacroItemVO> createNode = createNode(child);
-						createNode.setExpanded(true);
+						TreeItem<MacroItemVO> createNode = createRoot(child);
+//						createNode.setExpanded(true);
 						children.add(createNode);
 					}
 
@@ -81,8 +117,8 @@ public class MacroFavorTreeItem extends TreeItem<MacroItemVO> {
 			}
 
 		};
-		
-		
+//		treeItem.setExpanded(true);
+
 		return treeItem;
 	}
 

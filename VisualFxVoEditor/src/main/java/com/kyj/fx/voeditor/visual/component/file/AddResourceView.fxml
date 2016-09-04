@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<fx:root prefHeight="364.0" prefWidth="505.0" type="BorderPane"
+	xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<TabPane fx:id="tabRoot" prefHeight="217.0" prefWidth="505.0"
+			tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+			<tabs>
+				<Tab text="File">
+					<content>
+						<GridPane prefHeight="232.0" prefWidth="505.0">
+							<columnConstraints>
+								<ColumnConstraints hgrow="NEVER" maxWidth="85.0"
+									minWidth="85.0" prefWidth="85.0" />
+								<ColumnConstraints hgrow="ALWAYS"
+									maxWidth="1.7976931348623157E308" />
+							</columnConstraints>
+							<rowConstraints>
+								<RowConstraints maxHeight="36.0" minHeight="36.0"
+									prefHeight="36.0" vgrow="NEVER" />
+								<RowConstraints maxHeight="1.7976931348623157E308"
+									minHeight="222.0" prefHeight="247.0" vgrow="SOMETIMES" />
+							</rowConstraints>
+							<children>
+								<Label text="Name" />
+								<TextField GridPane.columnIndex="1" />
+								<AnchorPane fx:id="anchorFileCont"
+									GridPane.columnSpan="2" GridPane.rowIndex="1">
+									<children>
+										<!-- <TextArea AnchorPane.bottomAnchor="5.0" -->
+										<!-- AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" -->
+										<!-- AnchorPane.topAnchor="5.0" /> -->
+									</children>
+								</AnchorPane>
+							</children>
+						</GridPane>
+					</content>
+				</Tab>
+				<Tab text="Dir">
+					<content>
+
+						<GridPane prefHeight="232.0" prefWidth="505.0">
+							<columnConstraints>
+								<ColumnConstraints hgrow="NEVER" maxWidth="85.0"
+									minWidth="85.0" prefWidth="85.0" />
+								<ColumnConstraints hgrow="ALWAYS"
+									maxWidth="1.7976931348623157E308" />
+							</columnConstraints>
+							<rowConstraints>
+								<RowConstraints maxHeight="36.0" minHeight="36.0"
+									prefHeight="36.0" vgrow="NEVER" />
+								<RowConstraints maxHeight="1.7976931348623157E308"
+									minHeight="222.0" prefHeight="247.0" vgrow="SOMETIMES" />
+							</rowConstraints>
+							<children>
+								<Label text="Name" />
+								<TextField GridPane.columnIndex="1" />
+								<AnchorPane fx:id="anchorDirCont"
+									GridPane.columnSpan="2" GridPane.rowIndex="1">
+									<children>
+										<!-- <TextArea AnchorPane.bottomAnchor="5.0" -->
+										<!-- AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" -->
+										<!-- AnchorPane.topAnchor="5.0" /> -->
+									</children>
+								</AnchorPane>
+							</children>
+						</GridPane>
+					</content>
+				</Tab>
+			</tabs>
+		</TabPane>
+	</center>
+	<top>
+		<HBox alignment="CENTER_LEFT" prefHeight="52.0" prefWidth="505.0"
+			spacing="10.0" BorderPane.alignment="CENTER">
+			<children>
+				<RadioButton fx:id="rdoFile" mnemonicParsing="false"
+					text="File" />
+				<RadioButton fx:id="rdoDir" mnemonicParsing="false"
+					text="Dir" />
+			</children>
+			<padding>
+				<Insets left="10.0" />
+			</padding>
+		</HBox>
+	</top>
+</fx:root>

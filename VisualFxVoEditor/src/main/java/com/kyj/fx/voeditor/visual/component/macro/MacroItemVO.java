@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.component.macro;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 /***************************
@@ -18,16 +19,25 @@ import javafx.collections.ObservableList;
 public class MacroItemVO {
 
 	private StringProperty id;
-	private StringProperty displayText;
+	private StringProperty name;
 	private StringProperty content;
-	private MACRO_ITEM_TYPE type = MACRO_ITEM_TYPE.UNKNOWN;
+
+	/**
+	 * 
+	 * U : Unknown , F : File, D : Dir
+	 * 
+	 * @최초생성일 2016. 9. 4.
+	 */
+	private StringProperty type;
 
 	private ObservableList<MacroItemVO> childrens;
 
 	public MacroItemVO() {
 		this.id = new SimpleStringProperty("");
-		this.displayText = new SimpleStringProperty("");
+		this.name = new SimpleStringProperty("");
 		this.content = new SimpleStringProperty("");
+		this.type = new SimpleStringProperty("U");
+		this.childrens = FXCollections.observableArrayList();
 	}
 
 	public final StringProperty idProperty() {
@@ -42,16 +52,16 @@ public class MacroItemVO {
 		this.idProperty().set(id);
 	}
 
-	public final StringProperty displayTextProperty() {
-		return this.displayText;
+	public final StringProperty nameProperty() {
+		return this.name;
 	}
 
-	public final String getDisplayText() {
-		return this.displayTextProperty().get();
+	public final String getName() {
+		return this.nameProperty().get();
 	}
 
-	public final void setDisplayText(final String displayText) {
-		this.displayTextProperty().set(displayText);
+	public final void setName(final String name) {
+		this.nameProperty().set(name);
 	}
 
 	public final StringProperty contentProperty() {
@@ -74,12 +84,21 @@ public class MacroItemVO {
 		this.childrens = childrens;
 	}
 
-	public MACRO_ITEM_TYPE getType() {
-		return type;
+	public final StringProperty typeProperty() {
+		return this.type;
 	}
 
-	public void setType(MACRO_ITEM_TYPE type) {
-		this.type = type;
+	public final String getType() {
+		return this.typeProperty().get();
+	}
+
+	public final void setType(final String type) {
+		this.typeProperty().set(type);
+	}
+
+	@Override
+	public String toString() {
+		return id.get();
 	}
 
 }

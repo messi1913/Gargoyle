@@ -8,8 +8,6 @@ package com.kyj.fx.voeditor.visual.component.macro;
 
 import com.google.common.base.Function;
 
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
 import javafx.util.Callback;
@@ -25,7 +23,6 @@ public class MacroFavorTreeView extends TreeView<MacroItemVO> implements Callbac
 
 	public MacroFavorTreeView() {
 		setCellFactory(this);
-		
 	}
 
 	/**
@@ -37,14 +34,15 @@ public class MacroFavorTreeView extends TreeView<MacroItemVO> implements Callbac
 
 		@Override
 		public String apply(MacroItemVO input) {
-			return input.getDisplayText();
+			if (input == null)
+				return "";
+			return input.getName();
 		}
 	};
 
 	@Override
 	public TreeCell<MacroItemVO> call(TreeView<MacroItemVO> param) {
 		TreeCell<MacroItemVO> treeCell = createTreeCell();
-		
 		return treeCell;
 	}
 

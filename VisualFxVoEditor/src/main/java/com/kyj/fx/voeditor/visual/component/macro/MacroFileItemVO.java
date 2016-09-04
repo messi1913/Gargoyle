@@ -14,7 +14,7 @@ package com.kyj.fx.voeditor.visual.component.macro;
 public class MacroFileItemVO extends MacroItemVO {
 
 	public MacroFileItemVO() {
-		setType(MACRO_ITEM_TYPE.FILE);
+		setType("F");
 	}
 
 }

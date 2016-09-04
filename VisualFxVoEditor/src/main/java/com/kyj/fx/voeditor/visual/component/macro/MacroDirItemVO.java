@@ -14,7 +14,7 @@ package com.kyj.fx.voeditor.visual.component.macro;
 public class MacroDirItemVO extends MacroItemVO {
 
 	public MacroDirItemVO() {
-		this.setType(MACRO_ITEM_TYPE.DIR);
+		this.setType("D");
 	}
 
 }
