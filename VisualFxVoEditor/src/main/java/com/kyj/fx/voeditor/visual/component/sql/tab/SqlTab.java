@@ -72,7 +72,8 @@ public class SqlTab extends Tab {
 
 			if (event.getEventType() == KeyEvent.KEY_PRESSED) {
 				//				System.out.println("sqlTab");
-
+				
+				tail.append(keyEventDispatcher);
 				tail.append(eventDispatcher);
 
 			}
