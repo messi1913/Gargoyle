@@ -33,14 +33,14 @@ public class CommonTableCreateCodeInformationController extends AbstractTableCre
 	public String getCreateTableSQL(String databaseName, String tableName) {
 
 		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_CREATE_WRAPPER, getDbmsDriver());
-		if(ValueUtil.isNotEmpty(databaseName))
-			sql = sql.replaceAll(":databaseName", databaseName);
-		sql = sql.replaceAll(":tableName", tableName);
+//		if(ValueUtil.isNotEmpty(databaseName))
+//			sql = sql.replaceAll(":databaseName", databaseName);
+//		sql = sql.replaceAll(":tableName", tableName);
 
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("databaseName", databaseName);
 		map.put("tableName", tableName);
-		return ValueUtil.getVelocityToText(sql, map);
+		return ValueUtil.getVelocityToText(sql, map, true);
 	}
 
 	@Override

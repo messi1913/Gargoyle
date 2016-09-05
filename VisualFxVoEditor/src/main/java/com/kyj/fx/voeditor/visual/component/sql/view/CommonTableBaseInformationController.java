@@ -38,17 +38,18 @@ public class CommonTableBaseInformationController extends AbstractTableBaseInfor
 
 		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COMMENT_WRAPPER, getDbmsDriver());
 		if (sql != null) {
-			if (ValueUtil.isNotEmpty(databaseName))
-				sql = sql.replaceAll(":databaseName", databaseName);
-			sql = sql.replaceAll(":tableName", tableName);
+//			if (ValueUtil.isNotEmpty(databaseName))
+//				sql = sql.replaceAll(":databaseName", databaseName);
+//			sql = sql.replaceAll(":tableName", tableName);
+
+			HashMap<String, Object> map = new HashMap<>();
+			map.put("databaseName", databaseName);
+			map.put("tableName", tableName);
+			return ValueUtil.getVelocityToText(sql, map, true);
+
 		}
 
-		HashMap<String, Object> map = new HashMap<>();
-		map.put("databaseName", databaseName);
-		map.put("tableName", tableName);
-		return ValueUtil.getVelocityToText(sql, map);
-
-
+		return "";
 	}
 
 	/*
