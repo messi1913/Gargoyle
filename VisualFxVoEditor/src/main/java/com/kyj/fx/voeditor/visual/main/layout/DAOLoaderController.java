@@ -323,7 +323,7 @@ public class DAOLoaderController {
 
 		sb.append("WHERE 1=1 \n");
 		sb.append("#if($tableName) \n");
-		sb.append("AND CLASS_NAME LIKE %:tableName%  \n");
+		sb.append("AND CLASS_NAME LIKE '%' || :tableName || '%'  \n");
 		sb.append("#end \n");
 		sb.append("LIMIT 100");
 
@@ -341,6 +341,6 @@ public class DAOLoaderController {
 
 	}
 
-	
+
 
 }

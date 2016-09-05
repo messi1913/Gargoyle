@@ -376,7 +376,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		tbResult.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		//키 이벤트 기능 설치.
 		FxUtil.installClipboardKeyEvent(tbResult);
-		
+
 		BorderPane tbResultLayout = new BorderPane(tbResult);
 		lblStatus = new Label("Ready...");
 		lblStatus.setMaxHeight(50d);
@@ -757,7 +757,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 * query-macro menu 선택시 발생되는 이벤트에 대한정의.
 	 *
 	 * 기술내용으로는 쿼리 매크로를 처리할 수 있는 팝업을 로드한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 31.
 	 * @param e
@@ -857,7 +857,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	private void executeAll() {
 		SqlTab selectedItem = sqlTabPane.getSelectedTab();
 
-		String sql = selectedItem.getSelectedSQLText();
+
+		String sql = selectedItem.getSqlText();
 		if (sql == null || sql.isEmpty()) {
 			sql = selectedItem.getSqlText();
 		}

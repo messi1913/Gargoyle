@@ -462,8 +462,8 @@ public class ValueUtil {
 		boolean flag = true;
 		if (obj != null) {
 			if (obj instanceof String) {
-				String valueOf = String.valueOf(obj);
-				flag = valueOf.length() > 0 && valueOf.trim() != "" && !valueOf.equals("null");
+				String valueOf = obj.toString().trim();
+				flag = valueOf.length() > 0 && valueOf != "" && !valueOf.equals("null");
 			} else if (obj instanceof Collection) {
 				Collection<?> list = (Collection<?>) obj;
 				flag = !list.isEmpty();

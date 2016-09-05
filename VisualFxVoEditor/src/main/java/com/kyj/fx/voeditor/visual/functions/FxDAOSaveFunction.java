@@ -44,9 +44,9 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 	private static final String METHOD_DESC = "methodDesc";
 	private static final String METHOD_NAME = "methodName";
 
-	private Consumer<Throwable> exceptionHandler;
+	private Consumer<Exception> exceptionHandler;
 
-	public FxDAOSaveFunction(Consumer<Throwable> exceptionHandler) {
+	public FxDAOSaveFunction(Consumer<Exception> exceptionHandler) {
 		this.exceptionHandler = exceptionHandler;
 
 	}

@@ -15,8 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,7 +47,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
-import javafx.util.Pair;
 
 /**
  * 데이터베이스 설정 콤포넌트
@@ -286,12 +283,12 @@ public class DatabaseConfigView extends BorderPane {
 
 		DbUtil.ping(() -> {
 			return getPoolProperties();
-		}, (bool) -> {
+		} , (bool) -> {
 			String msg = "fail!";
 			if (bool)
 				msg = "success!";
 			DialogUtil.showMessageDialog(msg);
-		}, ex -> {
+		} , ex -> {
 			LOGGER.info(ValueUtil.toString("ping test", ex));
 		});
 
@@ -301,7 +298,7 @@ public class DatabaseConfigView extends BorderPane {
 	 * 작성일 : 2016. 9. 2. 작성자 : KYJ
 	 *
 	 * 드라이버 로드 처리를 위함/
-	 * 
+	 *
 	 * @param driver
 	 ********************************/
 	private static void classForName(String driver) {
@@ -362,7 +359,7 @@ public class DatabaseConfigView extends BorderPane {
 	 * 작성일 : 2016. 9. 2. 작성자 : KYJ
 	 *
 	 * Gargoyle에서 사용하는 데이터베이스 생성
-	 * 
+	 *
 	 * @throws Exception
 	 * @throws SQLException
 	 ********************************/
@@ -370,31 +367,29 @@ public class DatabaseConfigView extends BorderPane {
 	public void btnGargoyleOnMouseClick() {
 
 		//생성전 뭔저 확인여부
-		Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Create Database", "Gargoyle용 데이터베이스 생성 확인.");
+//		Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Create Database", "Gargoyle용 데이터베이스 생성 확인.");
+//
+//		showYesOrNoDialog.ifPresent(v -> {
+//			if ("Y".equals(v.getValue())) {
+//
+//			}
+//		});
 
-		showYesOrNoDialog.ifPresent(v -> {
-			if ("Y".equals(v.getValue())) {
-
-				Connection connection = null;
+		try {
+			DatabaseInitializer databaseInitializer = new DatabaseInitializer(() -> {
 				try {
-					connection = getConnection();
-					DatabaseInitializer databaseInitializer = new DatabaseInitializer(connection);
-					databaseInitializer.setExceptionHandler(ex -> DialogUtil.showExceptionDailog(ex));
-					databaseInitializer.setOnSuccessHandler(t -> DialogUtil.showMessageDialog("데이터베이스 생성 완료.!"));
-					databaseInitializer.initialize();
-
+					return DbUtil.getConnection();
 				} catch (Exception e) {
-					DialogUtil.showExceptionDailog(e);
-				} finally {
-					try {
-						DbUtil.close(connection);
-					} catch (Exception e) {
-						//
-					}
+					return null;
 				}
+			});
+			databaseInitializer.setExceptionHandler(ex -> DialogUtil.showExceptionDailog(ex));
+			databaseInitializer.setOnSuccessHandler(t -> DialogUtil.showMessageDialog("데이터베이스 생성 완료.!"));
+			databaseInitializer.initialize();
 
-			}
-		});
+		} catch (Exception e) {
+			DialogUtil.showExceptionDailog(e);
+		}
 
 	}
 }

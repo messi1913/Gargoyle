@@ -31,7 +31,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -479,16 +478,29 @@ public class DbUtil extends ConnectionManager {
 	 * @param consumer
 	 * @throws Exception
 	 */
-	public static <T> int getTransactionedScope(T userObj, BiTransactionScope<T, NamedParameterJdbcTemplate> consumer) throws Exception {
+	public static <T> int getTransactionedScope(T userObj, BiTransactionScope<T, NamedParameterJdbcTemplate> consumer) {
 		return getTransactionedScope(userObj, consumer, null);
 	}
 
 	public static <T> int getTransactionedScope(T userObj, BiTransactionScope<T, NamedParameterJdbcTemplate> consumer,
-			Consumer<Throwable> exceptionHandler) {
-		DataSource dataSource = null;
+			Consumer<Exception> exceptionHandler) {
 		try {
-			dataSource = getDataSource();
+			return getTransactionedScope(getDataSource(), userObj, consumer, exceptionHandler);
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+			if (exceptionHandler != null)
+				exceptionHandler.accept(e);
+		}
+		return -1;
+	}
+
+	public static <T> int getTransactionedScope(DataSource dataSource, T userObj,
+			BiTransactionScope<T, NamedParameterJdbcTemplate> consumer, Consumer<Exception> exceptionHandler) {
+		//		DataSource dataSource = null;
+		try {
+			//			dataSource = getDataSource();
 			NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+
 			TransactionTemplate template = new TransactionTemplate();
 			DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
 			template.setTransactionManager(transactionManager);
@@ -497,8 +509,8 @@ public class DbUtil extends ConnectionManager {
 				try {
 					consumer.scope(userObj, namedParameterJdbcTemplate);
 					status.setRollbackOnly();
-				} catch (Throwable e) {
-					LOGGER.error(e.getMessage());
+				} catch (Exception e) {
+					LOGGER.error(ValueUtil.toString(e));
 					if (exceptionHandler != null)
 						exceptionHandler.accept(e);
 					return -1;
@@ -521,13 +533,16 @@ public class DbUtil extends ConnectionManager {
 			Consumer<Exception> exceptionHandler) throws Exception {
 		int result = -1;
 		try {
+			LOGGER.debug("is AutoCommit ? : {}", con.getAutoCommit());
 			con.setAutoCommit(false);
-			Statement createStatement = con.createStatement();
-
 			List<String> apply = sqlConverter.apply(userObj);
-
+			Statement createStatement = con.createStatement();
 			for (String sql : apply) {
 
+				/*
+				 * sqlite에서 공백이 포함된 sql은 add한경우 에러.
+				 * 확인해보니 isEmpty함수에 이상이 있는듯하여 수정.
+				 */
 				if (ValueUtil.isEmpty(sql))
 					continue;
 
@@ -538,12 +553,13 @@ public class DbUtil extends ConnectionManager {
 			int[] executeBatch = createStatement.executeBatch();
 
 			con.commit();
-			result = IntStream.of(executeBatch).sum();
+			result = (int) IntStream.of(executeBatch).filter(v -> v == 0).count();
 		} catch (Exception e) {
 			con.rollback();
 			exceptionHandler.accept(e);
+			result = -1;
 		} finally {
-			con.setAutoCommit(false);
+			con.commit();
 			close(con);
 		}
 		return result;
@@ -917,7 +933,7 @@ public class DbUtil extends ConnectionManager {
 	/**
 	 *
 	 * // 16.09.01 >> 쿼리로 부터 테이블을 찾아옴 퍼옴 by Hong
-	 * 
+	 *
 	 * @param sql
 	 * @return
 	 */
@@ -940,7 +956,7 @@ public class DbUtil extends ConnectionManager {
 	 * 작성일 : 2016. 9. 3. 작성자 : KYJ
 	 *
 	 * 스키마라는 개념이 존재하는 데이터베이스인지 유무
-	 * 
+	 *
 	 * @return
 	 ********************************/
 	public static boolean isExistsSchemaDatabase() {
@@ -955,7 +971,7 @@ public class DbUtil extends ConnectionManager {
 	 * 작성일 : 2016. 9. 3. 작성자 : KYJ
 	 *
 	 * 스키마라는 개념이 존재하는 데이터베이스인지 유무
-	 * 
+	 *
 	 * @param con
 	 * @return
 	 ********************************/
@@ -973,7 +989,7 @@ public class DbUtil extends ConnectionManager {
 	 * 작성일 : 2016. 9. 3. 작성자 : KYJ
 	 *
 	 * 스키마라는 개념이 존재하는 데이터베이스인지 유무
-	 * 
+	 *
 	 * @param driver
 	 * @return
 	 ********************************/
