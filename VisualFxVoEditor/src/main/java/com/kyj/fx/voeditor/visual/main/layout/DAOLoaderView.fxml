@@ -23,7 +23,7 @@
       		</VBox>
       	</top>
       	<center>
-            		<TableView fx:id="tbSrchDao" cache="false" onMouseClicked="#tbSrchDaoOnMouseClick" BorderPane.alignment="CENTER">
+            		<TableView fx:id="tbSrchDao" cache="false" BorderPane.alignment="CENTER">
             			<columns>
             				<TableColumn fx:id="colSrchClassName" minWidth="100.0" prefWidth="133.0" text="ClassName">
 				</TableColumn>

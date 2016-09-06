@@ -78,6 +78,8 @@ public class DAOLoaderController {
 		MenuItem history = new MenuItem("history");
 		history.setOnAction(this::menuHistoryOnAction);
 		tbSrchDao.setContextMenu(new ContextMenu(history));
+
+		tbSrchDao.getSelectionModel().selectedItemProperty().addListener((a, o, n) -> tbSrchDaoOnMouseClick(n));
 	}
 
 	/**
@@ -247,12 +249,12 @@ public class DAOLoaderController {
 	}
 
 	@FXML
-	public void tbSrchDaoOnMouseClick(MouseEvent e) {
+	public void tbSrchDaoOnMouseClick(Map<String, Object> selectedItem) {
 
-		if (e.getClickCount() == 2) {
+//		if (e.getClickCount() == 2) {
 			Platform.runLater(() -> {
 				try {
-					Map<String, Object> selectedItem = tbSrchDao.getSelectionModel().getSelectedItem();
+//					Map<String, Object> selectedItem = tbSrchDao.getSelectionModel().getSelectedItem();
 					if (selectedItem == null)
 						return;
 
@@ -275,8 +277,8 @@ public class DAOLoaderController {
 					this.systemRoot.addTabItem(tab);
 					tab.getTabPane().getSelectionModel().select(tab);
 
-					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
-					tbSrchDao.getItems().addAll(listDAO);
+//					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
+//					tbSrchDao.getItems().addAll(listDAO);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					LOGGER.error(e1.toString());
@@ -284,7 +286,7 @@ public class DAOLoaderController {
 				}
 			});
 
-		}
+//		}
 	}
 
 	@FXML
@@ -340,7 +342,5 @@ public class DAOLoaderController {
 		});
 
 	}
-
-
 
 }

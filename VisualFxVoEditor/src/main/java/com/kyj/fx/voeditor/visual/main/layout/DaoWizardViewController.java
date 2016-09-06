@@ -9,7 +9,6 @@ package com.kyj.fx.voeditor.visual.main.layout;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -183,7 +182,7 @@ public class DaoWizardViewController {
 
 		txtPackageName.setText(tbmSysDaoDVO.getPackageName());
 		txtClassName.setText(tbmSysDaoDVO.getClassName());
-		txtDaoLocation.setText(tbmSysDaoDVO.getLocation());
+		txtDaoLocation.setText(ValueUtil.setDir(tbmSysDaoDVO.getLocation()));
 		txtAreaDaoDesc.setText(tbmSysDaoDVO.getClassDesc());
 		txtTableName.setText(tbmSysDaoDVO.getTableName());
 
@@ -329,6 +328,8 @@ public class DaoWizardViewController {
 
 		// 메뉴등록작업
 		applyContextMenu();
+
+		tbMethods.getSelectionModel().selectedItemProperty().addListener((a, o, n) -> tbMethodsOnMouseClick(n));
 
 	}
 
@@ -646,25 +647,24 @@ public class DaoWizardViewController {
 	 * @작성일 : 2015. 10. 21.
 	 * @param e
 	 */
-	@FXML
-	public void tbMethodsOnMouseClick(MouseEvent e) {
-		if (e.getClickCount() == 2) {
-			// tbParams.getItems().clear();
-			List<TbpSysDaoFieldsDVO> selectedFieldItems = getSelectedFieldItems();
-			TbpSysDaoMethodsDVO selectedMethodItem = getSelectedMethodItem();
+	public void tbMethodsOnMouseClick(TbpSysDaoMethodsDVO selectedMethodItem) {
+		//		if (e.getClickCount() == 2) {
+		// tbParams.getItems().clear();
+		List<TbpSysDaoFieldsDVO> selectedFieldItems = getSelectedFieldItems();
+		//			TbpSysDaoMethodsDVO selectedMethodItem = getSelectedMethodItem();
 
-			if (selectedMethodItem != null) {
-				String sqlBody = selectedMethodItem.getSqlBody();
-				txtSql.setContent(sqlBody);
+		if (selectedMethodItem != null) {
+			String sqlBody = selectedMethodItem.getSqlBody();
+			txtSql.setContent(sqlBody);
 
-				List<TbpSysDaoColumnsDVO> tbpSysDaoColumnsDVOList = selectedMethodItem.getTbpSysDaoColumnsDVOList();
-				tbMappings.setItems(FXCollections.observableArrayList(tbpSysDaoColumnsDVOList));
-			}
-
-			if (selectedFieldItems != null)
-				tbParams.setItems(FXCollections.observableList(selectedFieldItems));
-
+			List<TbpSysDaoColumnsDVO> tbpSysDaoColumnsDVOList = selectedMethodItem.getTbpSysDaoColumnsDVOList();
+			tbMappings.setItems(FXCollections.observableArrayList(tbpSysDaoColumnsDVOList));
 		}
+
+		if (selectedFieldItems != null)
+			tbParams.setItems(FXCollections.observableList(selectedFieldItems));
+
+		//		}
 	}
 
 	/**
@@ -918,7 +918,7 @@ public class DaoWizardViewController {
 				showYesOrNoDialog.ifPresent(string -> {
 					if ("Y".equals(string.getValue())) {
 						try {
-							daowizard.toFile(location);
+							daowizard.toFile(ValueUtil.getDir(location));
 						} catch (Exception e) {
 							DialogUtil.showExceptionDailog(e);
 						}
