@@ -15,6 +15,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class TbpSysDaoColumnsDVO {
+
+	private StringProperty methodName;
+
 	private StringProperty columnName;
 	/**
 	 * 데이터베이스 디비 타입
@@ -35,10 +38,23 @@ public class TbpSysDaoColumnsDVO {
 	private StringProperty lockYn;
 
 	public TbpSysDaoColumnsDVO() {
+		this.methodName = new SimpleStringProperty();
 		this.columnName = new SimpleStringProperty();
 		this.columnType = new SimpleStringProperty();
 		this.programType = new SimpleStringProperty();
 		this.lockYn = new SimpleStringProperty("N");
+	}
+
+	public StringProperty methodNameProperty() {
+		return this.methodName;
+	}
+
+	public String getMethodName() {
+		return this.methodNameProperty().get();
+	}
+
+	public void setMethodName(final java.lang.String methodName) {
+		this.methodNameProperty().set(methodName);
 	}
 
 	public void setColumnName(String columnName) {

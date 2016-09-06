@@ -21,8 +21,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -41,7 +39,6 @@ public class ExceptionDialogComposite extends BorderPane {
 
 	/**
 	 * 다이얼로그 제목
-	 * 
 	 * @최초생성일 2016. 8. 23.
 	 */
 	private static final String EXCEPTION_DIALOG_TITLE = "ExceptionDialog";
@@ -94,7 +91,6 @@ public class ExceptionDialogComposite extends BorderPane {
 
 	/**
 	 * 다이얼로그 OPEN.
-	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 23.
 	 * @param node
@@ -112,7 +108,6 @@ public class ExceptionDialogComposite extends BorderPane {
 
 	/**
 	 * 다이얼로그 OPEN.
-	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 23.
 	 * @param root
@@ -122,30 +117,11 @@ public class ExceptionDialogComposite extends BorderPane {
 		stage = new Stage();
 		stage.setTitle(EXCEPTION_DIALOG_TITLE);
 		Scene scene = new Scene(this);
-		scene.setOnKeyPressed(this::sceneOnKeyPressed);
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 		stage.setScene(scene);
 
 		stage.initOwner(root);
 		stage.showAndWait();
-	}
-
-	/********************************
-	 * 작성일 :  2016. 9. 4. 작성자 : KYJ
-	 *
-	 * 키 이벤트 
-	 * 
-	 * 구현내용 :
-	 *   esc키를 누르면 창이 닫힘.
-	 * @param e
-	 ********************************/
-	public void sceneOnKeyPressed(KeyEvent e) {
-		
-		//ESC
-		if (e.getCode() == KeyCode.ESCAPE) {
-			if (stage != null)
-				stage.close();
-		}
 	}
 
 	@FXML

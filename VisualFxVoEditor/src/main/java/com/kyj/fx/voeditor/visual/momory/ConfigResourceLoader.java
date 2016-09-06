@@ -145,11 +145,7 @@ public final class ConfigResourceLoader implements IFileBaseConfiguration {
 	public static final String FILE_ENCODING = "file.encoding";
 	public static final String SUN_JNU_ENCODING = "sun.jnu.encoding";
 
-	/**
-	 * 운영체제 기반 파일 오픈처리
-	 * @최초생성일 2016. 9. 2.
-	 */
-	public static final String FILE_OPEN_NOT_INPROCESSING_EXTENSION = "file.open.not.inprocessing.extensions";
+	public static final String FILE_OPEN_NOT_INPROCESSING_EXTENSION = "file.open.inprocessing.extensions";
 
 	
 	/**

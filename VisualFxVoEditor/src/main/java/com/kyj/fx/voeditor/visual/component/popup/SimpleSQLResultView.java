@@ -199,19 +199,19 @@ public class SimpleSQLResultView extends BorderPane {
 			String key = iterator.next();
 			Object value = param.get(key);
 			if (value == null || value.toString().isEmpty())
-				param.put(key, null);
+				param.put(key, "''");
 			else if (value instanceof List) {
 				List<Object> items = (List<Object>) value;
-//				StringBuffer sb = new StringBuffer();
-//				for (Object obj : items) {
-//					sb.append(obj).append(",");
-//				}
+				StringBuffer sb = new StringBuffer();
+				for (Object obj : items) {
+					sb.append("'").append(obj).append("'").append(",");
+				}
 
-//				if (items != null && !items.isEmpty()) //bug fix. sb가 빈 경우 에러발생.
-//					sb.setLength(sb.length() - 1);
-				param.put(key, items);
+				if (items != null && !items.isEmpty()) //bug fix. sb가 빈 경우 에러발생.
+					sb.setLength(sb.length() - 1);
+				param.put(key, sb.toString());
 			} else
-				param.put(key, value);
+				param.put(key, "'".concat(value.toString()).concat("'"));
 		}
 
 		this.mappingedSqlKeywords.setContent(ValueUtil.getVelocityToText(this.sql, param, true));
@@ -237,7 +237,7 @@ public class SimpleSQLResultView extends BorderPane {
 		stage.setScene(scene);
 		stage.setAlwaysOnTop(false);
 		//		stage.initModality(Modality.APPLICATION_MODAL);
-				stage.initOwner(SharedMemory.getPrimaryStage());
+		//		stage.initOwner(SharedMemory.getPrimaryStage());
 		stage.showAndWait();
 
 		// 재사용금지 1회성 뷰

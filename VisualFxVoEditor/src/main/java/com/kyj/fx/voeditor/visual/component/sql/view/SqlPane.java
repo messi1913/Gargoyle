@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.kyj.fx.voeditor.visual.component.grid.EditableTableViewComposite;
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
 import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
@@ -117,7 +116,6 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 * SQL 조회 결과가 나타난다.
 	 */
 	private TableView<Map<String, Object>> tbResult;
-	private EditableTableViewComposite editableComposite;
 
 	private TableColumn<Map<String, Object>, Object> tcSelectRow;
 
@@ -128,10 +126,6 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	private DockNode sqlEditPane;
 	private SqlTabPane sqlTabPane;
 	private SqlTab sqlTab;
-
-	private TabPane tabPaneResult;
-	private Tab tabResult, tabEdit;
-
 	private CheckComboBox<ReadType> readTypeCheckComboBox;
 
 	private String url;
@@ -374,13 +368,11 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		// Cell 단위로 선택
 		tbResult.getSelectionModel().setCellSelectionEnabled(true);
 		tbResult.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		//키 이벤트 기능 설치.
-		FxUtil.installClipboardKeyEvent(tbResult);
 
 		BorderPane tbResultLayout = new BorderPane(tbResult);
 		lblStatus = new Label("Ready...");
 		lblStatus.setMaxHeight(50d);
-		//		tbResultLayout.setBottom(lblStatus);
+		tbResultLayout.setBottom(lblStatus);
 
 		tbResult.getItems().addListener((ListChangeListener<Map<String, Object>>) arg0 -> {
 			int size = arg0.getList().size();
@@ -399,18 +391,9 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			endColIndexProperty.addListener(event -> tableSelectCell());
 		}
 
-		editableComposite = new EditableTableViewComposite(connectionSupplier);
-
-		tabResult = new Tab("Result", tbResultLayout);
-		tabResult.setClosable(false);
-
-		tabEdit = new Tab("Edit", editableComposite);
-		tabEdit.setClosable(false);
-
-		tabPaneResult = new TabPane(tabResult, tabEdit);
-		BorderPane borDataResult = new BorderPane(tabPaneResult);
-		borDataResult.setBottom(lblStatus);
-		DockNode sqlResultPane = new DockNode(borDataResult, "Result");
+		Tab tab = new Tab("Example", tbResultLayout);
+		tab.setClosable(false);
+		DockNode sqlResultPane = new DockNode(new TabPane(tab), "Result");
 		sqlResultPane.setMinHeight(200);
 		sqlResultPane.setClosable(false);
 		/* 도킹처리 */
@@ -757,7 +740,6 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 * query-macro menu 선택시 발생되는 이벤트에 대한정의.
 	 *
 	 * 기술내용으로는 쿼리 매크로를 처리할 수 있는 팝업을 로드한다.
-	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 31.
 	 * @param e
@@ -857,8 +839,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	private void executeAll() {
 		SqlTab selectedItem = sqlTabPane.getSelectedTab();
 
-
-		String sql = selectedItem.getSqlText();
+		String sql = selectedItem.getSelectedSQLText();
 		if (sql == null || sql.isEmpty()) {
 			sql = selectedItem.getSqlText();
 		}
@@ -891,7 +872,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		List<String> asList = Arrays.asList(split);
 		queryAll(asList, cnt -> {
 			DialogUtil.showMessageDialog(String.format("%d 건 success", cnt));
-		}, (e, bool) -> {
+		} , (e, bool) -> {
 			if (bool)
 				DialogUtil.showExceptionDailog(e);
 		});
@@ -915,20 +896,12 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		String sql = selectedItem.getSelectedSQLText();
 		if (sql == null || sql.isEmpty()) {
 			sql = selectedItem.getSqlText();
-
-			if (sql == null || sql.isEmpty())
-				return;
-
 		}
 
-		String trimedSql = sql.trim();
+		if (sql == null || sql.isEmpty())
+			return;
 
-		//2016-09-03 오라클에서는 쿼리문장끝에 ';' 이 포함되면 안되므로 제거
-		if (trimedSql.endsWith(";")) {
-			trimedSql = trimedSql.substring(0, trimedSql.length() - 1);
-		}
-		String _sql = trimedSql;
-
+		final String _sql = sql;
 		if (ValueUtil.isVelocityContext(_sql)) {
 			VariableMappingView mappingView = new VariableMappingView(stage);
 			mappingView.extractVariableFromSql(_sql);
@@ -957,39 +930,21 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 *            다이나믹 변수
 	 */
 	protected void execute(String sql, Map<String, Object> param) {
+		tbResult.getColumns().clear();
+		tbResult.getItems().clear();
 
-		if (ValueUtil.isEditScript(sql)) {
-
-			editableComposite.getColumns().clear();
-			editableComposite.getItems().clear();
-
-			editableComposite.setSql(sql);
-
-			try {
-				lblStatus.setText(editableComposite.execute() + " row");
-				tabPaneResult.getSelectionModel().select(this.tabEdit);
-			} catch (Exception e) {
-				DialogUtil.showExceptionDailog(this, e);
-			}
-
-		} else {
-			tbResult.getColumns().clear();
-			tbResult.getItems().clear();
-
-			List<Map<String, Object>> query = query(sql, param, success -> {
-				lblStatus.setText(success.size() + " row");
-			}, (exception, showDialog) -> {
-				lblStatus.setText(exception.toString());
-				if (showDialog)
-					DialogUtil.showExceptionDailog(this, exception);
-			});
-			if (query.isEmpty()) {
-				return;
-			}
-			binding(query);
-			tbResult.getItems().addAll(query);
-			tabPaneResult.getSelectionModel().select(this.tabResult);
+		List<Map<String, Object>> query = query(sql, param, success -> {
+			lblStatus.setText(success.size() + " row");
+		} , (exception, showDialog) -> {
+			lblStatus.setText(exception.toString());
+			if (showDialog)
+				DialogUtil.showExceptionDailog(this, exception);
+		});
+		if (query.isEmpty()) {
+			return;
 		}
+		binding(query);
+		tbResult.getItems().addAll(query);
 	}
 
 	/**

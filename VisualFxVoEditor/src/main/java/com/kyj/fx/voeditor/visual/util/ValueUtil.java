@@ -976,6 +976,17 @@ public class ValueUtil {
 		return stringBuffer.toString().toUpperCase();
 	}
 
+	public static String removeLocalLocation(String dir) {
+		String classDirName = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
+		return dir.replace(classDirName, "");
+	}
+
+	public static String addLocalLocation(String dir) {
+		String classDirName = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
+
+		return classDirName.concat(dir);
+	}
+
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 9. 1.

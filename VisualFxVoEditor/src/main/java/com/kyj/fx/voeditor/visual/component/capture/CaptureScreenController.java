@@ -6,14 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.capture;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
-import com.kyj.fx.voeditor.visual.util.FileUtil;
-import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -21,7 +14,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.transform.Scale;
 
@@ -35,10 +27,8 @@ import javafx.scene.transform.Scale;
 @FXMLController(value = "CaptureScreenView.fxml")
 public class CaptureScreenController {
 
-	private File snapShotDir = FileUtil.getTempSnapShotDir();
-
-	//	@FXML
-	//	private ImageView ivPicture;
+	@FXML
+	private ImageView ivPicture;
 	@FXML
 	private ScrollPane spPic;
 	@FXML
@@ -55,6 +45,8 @@ public class CaptureScreenController {
 
 	@FXML
 	public void initialize() {
+
+		ivPicture.getTransforms().add(scale);
 
 		spPic.setOnScroll(ev -> {
 
@@ -86,27 +78,17 @@ public class CaptureScreenController {
 				lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), scaleDeltaY.get()));
 			}
 		});
-
-		spPic.setOnMouseMoved(ev -> {
-			lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), scaleDeltaY.get()));
-		});
-
-	}
-
-	public void createPicutre(String image) throws FileNotFoundException {
-
-		ImageView ivPicture = new ImageView();
-
-		File file = new File(snapShotDir, "tmpImage.png");
-
-		try {
-			ivPicture.getTransforms().add(new Scale(1.3, 1.3));
-			ivPicture.setImage(new Image(new FileInputStream(file)));
-		} catch (FileNotFoundException e) {
-			throw e;
-		}
-
-		ivPicture.getTransforms().add(scale);
+//		spPic.setOnDragDetected(ev -> {
+//			System.out.println("setOnDragDetected");
+//		});
+//
+//		spPic.setOnMousePressed(ev -> {
+//			System.out.println("setOnMousePressed");
+//		});
+//
+//		spPic.setOnMouseDragged(ev -> {
+//			System.out.println("draged");
+//		});
 
 		ivPicture.setOnMouseDragged(ev -> {
 			double dragX = ev.getSceneX() - dragAnchor.getX();
@@ -119,7 +101,10 @@ public class CaptureScreenController {
 			//if new position do not exceeds borders of the rectangle, translate to this position
 			ivPicture.setTranslateX(newXPosition);
 			ivPicture.setTranslateY(newYPosition);
-
+			 
+			 
+//			scale.setPivotX(newXPosition);
+//			scale.setPivotY(newYPosition);
 		});
 
 		ivPicture.setOnMousePressed(ev -> {
@@ -128,8 +113,25 @@ public class CaptureScreenController {
 			dragAnchor = new Point2D(ev.getSceneX(), ev.getSceneY());
 		});
 
-		spPic.setContent(ivPicture);
-		//		spPic.getcon
+//		spPic.setOnMouseDragOver(ev -> {
+//			System.out.println("setOnMouseDragOver");
+//		});
+//		spPic.setOnDragEntered(ev -> {
+//			System.out.println("setOnDragEntered");
+//		});
+//
+//		spPic.setOnDragDone(ev -> {
+//			System.out.println("setOnDragDone");
+//		});
+
+		spPic.setOnMouseMoved(ev -> {
+			lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), scaleDeltaY.get()));
+		});
+
+	}
+
+	public ImageView getIvPicture() {
+		return ivPicture;
 	}
 
 }

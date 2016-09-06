@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.capture;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.function.Consumer;
@@ -15,7 +16,9 @@ import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.transform.Scale;
 
 /***************************
  * 
@@ -47,9 +50,10 @@ public class CaptureScreenComposite {
 
 				if (isWriteSuccess) {
 					try {
-						c.createPicutre("tmpImage.png");
+						c.getIvPicture().getTransforms().add(new Scale(1.3, 1.3));
+						c.getIvPicture().setImage(new Image(new FileInputStream(file)));
 					} catch (FileNotFoundException e) {
-						e.printStackTrace();
+						errorHandler.accept(e);
 					}
 				}
 

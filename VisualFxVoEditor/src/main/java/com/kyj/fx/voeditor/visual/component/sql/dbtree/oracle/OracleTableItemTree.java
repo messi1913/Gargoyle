@@ -41,10 +41,10 @@ public class OracleTableItemTree extends TableItemTree<String> {
 		String driver = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.DBMS_ORACLE);
 		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COLUMNS_WRAPPER, driver);
 
-//		sql = ValueUtil.regexReplaceMatchs(":databaseName", sql, conditions[0]);
+		sql = ValueUtil.regexReplaceMatchs(":databaseName", sql, conditions[0]);
 		// 테이블에 $가 있는 특수문자에서는 에러발생하므로 fix
 		// sql = sql.replaceAll(":tableName", conditions[1]);
-//		sql = ValueUtil.regexReplaceMatchs(":tableName", sql, conditions[1]);
+		sql = ValueUtil.regexReplaceMatchs(":tableName", sql, conditions[1]);
 
 		HashMap<String, Object> map = new HashMap<String,Object>();
 		map.put("databaseName", conditions[0]);

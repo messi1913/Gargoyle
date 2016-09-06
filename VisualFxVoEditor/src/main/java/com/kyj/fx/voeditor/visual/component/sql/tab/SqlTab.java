@@ -72,8 +72,7 @@ public class SqlTab extends Tab {
 
 			if (event.getEventType() == KeyEvent.KEY_PRESSED) {
 				//				System.out.println("sqlTab");
-				
-				tail.append(keyEventDispatcher);
+
 				tail.append(eventDispatcher);
 
 			}
@@ -99,10 +98,8 @@ public class SqlTab extends Tab {
 				if (lastIndexOf >= 0) {
 
 					File selectedFile = DialogUtil.showFileSaveDialog(null, choser -> {
-						
-						//경로를 지정하지않을시 마지막에 처리된 경로에 기본으로 로드되므로 주석.
-//						String dir = System.getProperty("user.home");
-//						choser.setInitialDirectory(new File(dir));
+						String dir = System.getProperty("user.home");
+						choser.setInitialDirectory(new File(dir));
 
 						choser.getExtensionFilters()
 								.add(new ExtensionFilter(GargoyleExtensionFilters.SQL_NAME, GargoyleExtensionFilters.SQL));
@@ -110,7 +107,6 @@ public class SqlTab extends Tab {
 								.add(new ExtensionFilter(GargoyleExtensionFilters.ALL_NAME, GargoyleExtensionFilters.ALL));
 
 					});
-					
 					if (selectedFile != null) {
 
 						boolean isWritableStatus = true;
@@ -153,8 +149,6 @@ public class SqlTab extends Tab {
 					String fileContent = FileUtil.readFile(showFileDialog, new LoadFileOptionHandler());
 					if (fileContent != null /*공백여부는 체크안함. 파일 내용에 실제 공백이 포함될 수 있으므로...*/) {
 						setTxtSql(fileContent);
-						setText(showFileDialog.getName());
-						
 					}
 				}
 

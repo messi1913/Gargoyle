@@ -104,20 +104,6 @@ public class DialogUtil {
 		});
 	}
 
-	private static File getInitDir() {
-		String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
-		if (ValueUtil.isNotEmpty(path)) {
-			File file = new File(path);
-			if (file.exists()) {
-				if (file.isDirectory())
-					return file;
-				else
-					return file.getParentFile();
-			}
-		}
-		return null;
-	}
-
 	/********************************
 	 * 작성일 : 2016. 6. 19. 작성자 : KYJ
 	 *
@@ -128,57 +114,15 @@ public class DialogUtil {
 	 * @param fileChooser
 	 ********************************/
 	private static void installDefaultPath(FileChooser fileChooser) {
-		//		String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
-		//		if (ValueUtil.isNotEmpty(path)) {
-		//			File file = new File(path);
-		//			if (file.exists()) {
-		//
-		//				if (file.isFile()) {
-		//					fileChooser.setInitialDirectory(file.getParentFile());
-		//				} else if (file.isDirectory()) {
-		//					fileChooser.setInitialDirectory(file);
-		//				}
-		//			}
-		//		}
-		File initDir = getInitDir();
-		if (initDir != null) {
-			if (initDir.isDirectory()) {
-				if (fileChooser != null) {
-					fileChooser.setInitialDirectory(initDir);
-				}
-			} else {
-				File parentFile = initDir.getParentFile();
-				if (fileChooser != null) {
-					fileChooser.setInitialDirectory(parentFile);
-				}
-			}
-		}
+		String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
+		if (ValueUtil.isNotEmpty(path)) {
+			File file = new File(path);
+			if (file.exists()) {
 
-	}
-
-	private static void installDefaultPath(DirectoryChooser fileChooser) {
-		//		String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
-		//		if (ValueUtil.isNotEmpty(path)) {
-		//			File file = new File(path);
-		//			if (file.exists()) {
-		//
-		//				if (file.isFile()) {
-		//					fileChooser.setInitialDirectory(file.getParentFile());
-		//				} else if (file.isDirectory()) {
-		//					fileChooser.setInitialDirectory(file);
-		//				}
-		//			}
-		//		}
-		File initDir = getInitDir();
-		if (initDir != null) {
-			if (initDir.isDirectory()) {
-				if (fileChooser != null) {
-					fileChooser.setInitialDirectory(initDir);
-				}
-			} else {
-				File parentFile = initDir.getParentFile();
-				if (fileChooser != null) {
-					fileChooser.setInitialDirectory(parentFile);
+				if (file.isFile()) {
+					fileChooser.setInitialDirectory(file.getParentFile());
+				} else if (file.isDirectory()) {
+					fileChooser.setInitialDirectory(file);
 				}
 			}
 		}
@@ -323,46 +267,44 @@ public class DialogUtil {
 		 *
 		 * ex) A팝업이 화면에 떠있는 상태에서 , 또 다른 B 팝업이 뜬 상태에서 에러 다이얼로그가 보여지는경우
 		 *
-		 * 연관성이 없는 A팝업이 화면 최상단으로 올라오는 버그가 있음. by kyj.
+		 *  연관성이 없는 A팝업이 화면 최상단으로 올라오는 버그가 있음.
+		 * by kyj.
 		 *
 		 *
 		 */
-		// Alert alert = new Alert(AlertType.ERROR);
-		// alert.setTitle("Exception Dialog");
+		//		Alert alert = new Alert(AlertType.ERROR);
+		//		alert.setTitle("Exception Dialog");
 		//
-		// alert.setHeaderText(message);
-		// alert.setContentText(ex.getMessage());
+		//		alert.setHeaderText(message);
+		//		alert.setContentText(ex.getMessage());
 		//
-		// // Create expandable Exception.
-		// StringWriter sw = new StringWriter();
-		// PrintWriter pw = new PrintWriter(sw);
-		// ex.printStackTrace(pw);
-		// String exceptionText = sw.toString();
+		//		// Create expandable Exception.
+		//		StringWriter sw = new StringWriter();
+		//		PrintWriter pw = new PrintWriter(sw);
+		//		ex.printStackTrace(pw);
+		//		String exceptionText = sw.toString();
 		//
-		// Label label = new Label(message);
+		//		Label label = new Label(message);
 		//
-		// TextArea textArea = new TextArea(exceptionText);
-		// textArea.setEditable(false);
-		// textArea.setWrapText(true);
+		//		TextArea textArea = new TextArea(exceptionText);
+		//		textArea.setEditable(false);
+		//		textArea.setWrapText(true);
 		//
-		// textArea.setMaxWidth(Double.MAX_VALUE);
-		// textArea.setMaxHeight(Double.MAX_VALUE);
-		// GridPane.setVgrow(textArea, Priority.ALWAYS);
-		// GridPane.setHgrow(textArea, Priority.ALWAYS);
+		//		textArea.setMaxWidth(Double.MAX_VALUE);
+		//		textArea.setMaxHeight(Double.MAX_VALUE);
+		//		GridPane.setVgrow(textArea, Priority.ALWAYS);
+		//		GridPane.setHgrow(textArea, Priority.ALWAYS);
 		//
-		// GridPane expContent = new GridPane();
-		// expContent.setMaxWidth(Double.MAX_VALUE);
-		// expContent.add(label, 0, 0);
-		// expContent.add(textArea, 0, 1);
+		//		GridPane expContent = new GridPane();
+		//		expContent.setMaxWidth(Double.MAX_VALUE);
+		//		expContent.add(label, 0, 0);
+		//		expContent.add(textArea, 0, 1);
 		//
-		// alert.getDialogPane().setExpandableContent(expContent);
-		// alert.initOwner(owner);
-		// alert.showAndWait();
+		//		alert.getDialogPane().setExpandableContent(expContent);
+		//		alert.initOwner(owner);
+		//		alert.showAndWait();
 
-		Platform.runLater(() -> {
-			new ExceptionDialogComposite(ex, message).show(owner);
-		});
-
+		new ExceptionDialogComposite(ex, message).show(owner);
 	}
 
 	/**
@@ -494,21 +436,18 @@ public class DialogUtil {
 	 * @param apply
 	 */
 	public static void showMessageDialog(Stage initOwner, String title, String headerText, String message, Consumer<Alert> apply) {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle(title);
+		alert.setHeaderText(headerText);
+		alert.setContentText(message);
+		apply.accept(alert);
 
-		Platform.runLater(() -> {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle(title);
-			alert.setHeaderText(headerText);
-			alert.setContentText(message);
-			apply.accept(alert);
-		});
-
-		// Dialog<Pair<String, String>> dialog = new Dialog<>();
-		// dialog.setTitle(title);
-		// dialog.setHeaderText(headerText);
-		// dialog.setContentText(message);
-		// dialog.initOwner(initOwner);
-		// apply.accept(dialog);
+		//		Dialog<Pair<String, String>> dialog = new Dialog<>();
+		//		dialog.setTitle(title);
+		//		dialog.setHeaderText(headerText);
+		//		dialog.setContentText(message);
+		//		dialog.initOwner(initOwner);
+		//		apply.accept(dialog);
 	}
 
 	public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message) {
@@ -550,16 +489,11 @@ public class DialogUtil {
 	}
 
 	public static Optional<Pair<String, String>> showInputDialog(String title, String message) {
-		return showInputDialog(title, message, "", str -> {
+		return showInputDialog(title, message, str -> {
 		});
 	}
 
-	public static Optional<Pair<String, String>> showInputDialog(String title, String message, String inputValue) {
-		return showInputDialog(title, message, inputValue, str -> {
-		});
-	}
-
-	public static Optional<Pair<String, String>> showInputDialog(String title, String message, String inputValue,
+	public static Optional<Pair<String, String>> showInputDialog(String title, String message,
 			Consumer<? super Pair<String, String>> consumer) {
 
 		// Create the custom dialog.
@@ -567,11 +501,6 @@ public class DialogUtil {
 		dialog.setTitle(title);
 		dialog.setHeaderText(message);
 		TextField graphic = new TextField();
-
-		if (inputValue != null && inputValue != "") {
-			graphic.setText(inputValue);
-		}
-
 		dialog.setGraphic(graphic);
 
 		// Set the button types.
@@ -623,27 +552,6 @@ public class DialogUtil {
 		stage.show();
 
 		// stage.setScene(borderPane, 800, 500);
-
-	}
-
-	public static File showDirSaveDialog(Window ownerWindow, Consumer<DirectoryChooser> option) {
-		return showDirSaveDialog(ownerWindow, getInitDir(), option);
-	}
-
-	public static File showDirSaveDialog(Window ownerWindow, File initDir, Consumer<DirectoryChooser> option) {
-		DirectoryChooser chooser = new DirectoryChooser();
-		chooser.setInitialDirectory(initDir);
-
-		chooser.setTitle("Directory");
-		if (option != null)
-			option.accept(chooser);
-
-		File selectedDir = chooser.showDialog(ownerWindow);
-		if (selectedDir != null && selectedDir.exists()) {
-			applyLastPath(selectedDir);
-		}
-
-		return selectedDir;
 
 	}
 

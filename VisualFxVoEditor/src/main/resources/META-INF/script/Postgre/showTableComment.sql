@@ -6,6 +6,6 @@ on c.relnamespace=n.oid
 WHERE 1=1
 and c.relkind = 'r'
 #if($databaseName)
-and nspname=:databaseName
+and nspname=':databaseName'
 #end
-and c.relname = :tableName
+and c.relname = ':tableName'

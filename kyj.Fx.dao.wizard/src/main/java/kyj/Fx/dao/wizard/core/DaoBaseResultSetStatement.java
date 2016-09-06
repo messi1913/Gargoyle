@@ -32,7 +32,7 @@ public class DaoBaseResultSetStatement<T extends BaseResultMapper<M>, M extends 
 	 */
 	private int appendTabKeyCount;
 	private T mapper;
-//	private IResultSetConverter converter;
+	//	private IResultSetConverter converter;
 
 	public DaoBaseResultSetStatement(T mapper) {
 		this(mapper, 0);

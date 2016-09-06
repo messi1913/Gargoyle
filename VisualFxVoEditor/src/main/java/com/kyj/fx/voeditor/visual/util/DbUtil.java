@@ -290,8 +290,16 @@ public class DbUtil extends ConnectionManager {
 		DataSource dataSource = null;
 		List<T> query = null;
 		try {
+
+			noticeQuery(sql);
+
 			dataSource = getDataSource();
-			query = select(dataSource, sql, paramMap, rowMapper);
+
+			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+
+			String _sql = ValueUtil.getVelocityToText(sql, paramMap);
+			LOGGER.debug(_sql);
+			query = jdbcTemplate.query(_sql, new MapSqlParameterSource(paramMap), rowMapper);
 		} catch (Exception e) {
 			query = Collections.emptyList();
 		} finally {

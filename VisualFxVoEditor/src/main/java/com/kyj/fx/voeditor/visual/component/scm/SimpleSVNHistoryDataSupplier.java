@@ -183,11 +183,9 @@ class SimpleSVNHistoryDataSupplier extends AbstracrtSVNHistoryDataSupplier {
 				while (iterator.hasNext()) {
 					String next = iterator.next();
 					SVNLogEntryPath svnLogEntryPath = changedPaths.get(next);
-					SVNNodeKind kind = svnLogEntryPath.getKind();
-					/*2016-09-02 File이면서 UNKNOWN으로 리턴되는 경우가 존재해서 추가.*/
-					if (SVNNodeKind.FILE == kind || SVNNodeKind.UNKNOWN == kind ) {
+					if (SVNNodeKind.FILE == svnLogEntryPath.getKind()) {
 						GargoyleSVNLogEntryPath e = new GargoyleSVNLogEntryPath(svnLogEntryPath.getPath(), svnLogEntryPath.getType(),
-								svnLogEntryPath.getPath(), revision, kind);
+								svnLogEntryPath.getPath(), revision, svnLogEntryPath.getKind());
 						e.setDate(date);
 						arrayList.add(e);
 					}
