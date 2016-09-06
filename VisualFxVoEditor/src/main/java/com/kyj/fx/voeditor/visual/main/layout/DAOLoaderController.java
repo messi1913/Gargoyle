@@ -1,16 +1,9 @@
-/********************************
- *	프로젝트 : VisualFxVoEditor
- *	패키지   : com.kyj.fx.voeditor.visual.main.layout
- *	작성일   : 2015. 11. 2.
- *	작성자   : KYJ
- *******************************/
+
 package com.kyj.fx.voeditor.visual.main.layout;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +14,6 @@ import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.diff.TextBaseComparator;
 import com.kyj.fx.voeditor.visual.main.model.vo.TbmSysDaoMethodsHDVO;
-import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -48,6 +40,7 @@ import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import kyj.Fx.dao.wizard.core.model.vo.TbmSysDaoDVO;
@@ -80,13 +73,6 @@ public class DAOLoaderController {
 		MenuItem history = new MenuItem("history");
 		history.setOnAction(this::menuHistoryOnAction);
 		tbSrchDao.setContextMenu(new ContextMenu(history));
-
-		tbSrchDao.getSelectionModel().selectedItemProperty().addListener((arg, ov, nv) -> {
-			if (nv != null) {
-				tbSrchDaoOnMouseClick(nv);
-			}
-		});
-
 	}
 
 	/**
@@ -208,7 +194,7 @@ public class DAOLoaderController {
 
 	private TbmSysDaoMethodsHDVO getHistorySQL(Map<String, Object> paramMap) throws Exception {
 		StringBuffer sb = new StringBuffer();
-		if (isExistsSchemaDatabase())
+		if (DbUtil.isExistsSchemaDatabase())
 			sb.append("select hist_tsp, sql_body from meerkat.tbp_sys_dao_methods_h ");
 		else
 			sb.append("select hist_tsp, sql_body from tbp_sys_dao_methods_h ");
@@ -229,7 +215,7 @@ public class DAOLoaderController {
 	private List<TbmSysDaoMethodsHDVO> listHistoryItems(Map<String, Object> paramMap) throws Exception {
 		StringBuffer sb = new StringBuffer();
 		sb.append("select b.hist_tsp, b.package_name, b.class_name, b.method_name, b.result_vo_class, b.dml_type, fst_reg_dt from \n");
-		if (isExistsSchemaDatabase())
+		if (DbUtil.isExistsSchemaDatabase())
 			sb.append("meerkat.tbm_sys_dao a inner join meerkat.tbp_sys_dao_methods_h b\n");
 		else
 			sb.append("tbm_sys_dao a inner join tbp_sys_dao_methods_h b\n");
@@ -256,40 +242,44 @@ public class DAOLoaderController {
 	}
 
 	@FXML
-	public void tbSrchDaoOnMouseClick(Map<String, Object> selectedItem) {
+	public void tbSrchDaoOnMouseClick(MouseEvent e) {
 
-		Platform.runLater(() -> {
-			try {
+		if (e.getClickCount() == 2) {
+			Platform.runLater(() -> {
+				try {
+					Map<String, Object> selectedItem = tbSrchDao.getSelectionModel().getSelectedItem();
+					if (selectedItem == null)
+						return;
 
-				TbmSysDaoDVO tbmSysDAO = new TbmSysDaoDVO();
-				tbmSysDAO.setClassName(selectedItem.get("CLASS_NAME").toString());
-				tbmSysDAO.setPackageName(selectedItem.get("PACKAGE_NAME").toString());
-				tbmSysDAO.setLocation(selectedItem.get("LOCATION").toString());
-				tbmSysDAO.setClassDesc(selectedItem.get("CLASS_DESC").toString());
-				Object object = selectedItem.get("TABLE_NAME");
-				if (object != null)
-					tbmSysDAO.setTableName(object.toString());
+					TbmSysDaoDVO tbmSysDAO = new TbmSysDaoDVO();
+					tbmSysDAO.setClassName(selectedItem.get("CLASS_NAME").toString());
+					tbmSysDAO.setPackageName(selectedItem.get("PACKAGE_NAME").toString());
+					tbmSysDAO.setLocation(selectedItem.get("LOCATION").toString());
+					tbmSysDAO.setClassDesc(selectedItem.get("CLASS_DESC").toString());
+					Object object = selectedItem.get("TABLE_NAME");
+					if (object != null)
+						tbmSysDAO.setTableName(object.toString());
 
-				FXMLLoader loader = new FXMLLoader();
-				loader.setLocation(getClass().getResource("DaoWizardView.fxml"));
-				BorderPane pane = loader.load();
-				DaoWizardViewController controller = loader.getController();
-				controller.setTbmSysDaoProperty(tbmSysDAO);
+					FXMLLoader loader = new FXMLLoader();
+					loader.setLocation(getClass().getResource("DaoWizardView.fxml"));
+					BorderPane pane = loader.load();
+					DaoWizardViewController controller = loader.getController();
+					controller.setTbmSysDaoProperty(tbmSysDAO);
 
-				Tab tab = new Tab("DaoWizard", pane);
-				this.systemRoot.addTabItem(tab);
-				tab.getTabPane().getSelectionModel().select(tab);
+					Tab tab = new Tab("DaoWizard", pane);
+					this.systemRoot.addTabItem(tab);
+					tab.getTabPane().getSelectionModel().select(tab);
 
-				// 재조회 하면 selected item 초기화 됨.. 
-//				List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
-//				tbSrchDao.getItems().addAll(listDAO);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-				LOGGER.error(e1.toString());
-				DialogUtil.showExceptionDailog(e1);
-			}
-		});
+					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
+					tbSrchDao.getItems().addAll(listDAO);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					LOGGER.error(e1.toString());
+					DialogUtil.showExceptionDailog(e1);
+				}
+			});
 
+		}
 	}
 
 	@FXML
@@ -321,18 +311,20 @@ public class DAOLoaderController {
 		}
 		StringBuffer sb = new StringBuffer();
 		sb.append("\n");
-		if (isExistsSchemaDatabase())
+		if (DbUtil.isExistsSchemaDatabase())
 			sb.append("SELECT PACKAGE_NAME, CLASS_NAME,LOCATION,CLASS_DESC,TABLE_NAME FROM meerkat.tbm_sys_dao \n");
 		else
 			sb.append("SELECT PACKAGE_NAME, CLASS_NAME,LOCATION,CLASS_DESC,TABLE_NAME FROM tbm_sys_dao \n");
 
 		sb.append("WHERE 1=1 \n");
 		sb.append("#if($tableName) \n");
-		sb.append("AND CLASS_NAME LIKE '%:tableName%'  \n");
+		sb.append("AND CLASS_NAME LIKE '%' || :tableName || '%'  \n");
 		sb.append("#end \n");
 		sb.append("LIMIT 100");
 
-		return DbUtil.select(sb.toString(), param, (rs, rowNum) -> {
+		String velocityToText = ValueUtil.getVelocityToText(sb.toString(), param);
+
+		return DbUtil.select(velocityToText, param, (rs, rowNum) -> {
 			Map<String, Object> hashMap = new HashMap<String, Object>();
 			hashMap.put("PACKAGE_NAME", rs.getObject("PACKAGE_NAME"));
 			hashMap.put("CLASS_NAME", rs.getObject("CLASS_NAME"));
@@ -342,20 +334,6 @@ public class DAOLoaderController {
 			return hashMap;
 		});
 
-	}
-
-	private static boolean isExistsSchemaDatabase() {
-		String driver = DbUtil.getDriver().trim();
-		if (driver == null || driver.isEmpty())
-			return true;
-
-		String drivers = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.NOT_EXISTS_SCHEMA_DRIVER_NAMES);
-		if (drivers != null && !driver.isEmpty()) {
-			drivers = drivers.trim();
-			Optional<String> findFirst = Stream.of(drivers.split(",")).filter(v -> v.equals(driver)).findFirst();
-			return !findFirst.isPresent();
-		}
-		return true;
 	}
 
 }
