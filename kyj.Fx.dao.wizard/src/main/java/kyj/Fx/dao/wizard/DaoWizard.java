@@ -30,7 +30,7 @@ import com.kyj.fx.voeditor.core.model.meta.MethodMeta;
 
 /**
  * Generate VO Class
- * 
+ *
  * @author KYJ
  *
  */
@@ -41,7 +41,7 @@ public class DaoWizard<C extends ClassMeta, M extends TbpSysDaoMethodsDVO, F ext
 	private List<M> methods;
 	/**
 	 * daoWizard에서 fields는 사용할일이 없을것같음. 하지만 만약을 위해 임시적으로 생성.
-	 * 
+	 *
 	 * @최초생성일 2015. 10. 28.
 	 */
 	// private F[] fields;
@@ -49,7 +49,7 @@ public class DaoWizard<C extends ClassMeta, M extends TbpSysDaoMethodsDVO, F ext
 
 	/**
 	 * 생성자 KYJ
-	 * 
+	 *
 	 * @param className
 	 * @param methods
 	 */
@@ -60,7 +60,7 @@ public class DaoWizard<C extends ClassMeta, M extends TbpSysDaoMethodsDVO, F ext
 
 	/**
 	 * 생성자 KYJ
-	 * 
+	 *
 	 * @param className
 	 * @param methods2
 	 */
@@ -70,7 +70,7 @@ public class DaoWizard<C extends ClassMeta, M extends TbpSysDaoMethodsDVO, F ext
 
 	/**
 	 * 생성자 KYJ
-	 * 
+	 *
 	 * @param classMeta
 	 * @param methods
 	 */
@@ -87,7 +87,7 @@ public class DaoWizard<C extends ClassMeta, M extends TbpSysDaoMethodsDVO, F ext
 	 * @param methods
 	 * @User KYJ
 	 */
-	private void checkVarName(List<M> methods) {
+	protected void checkVarName(List<M> methods) {
 		Set<String> set = new HashSet<String>();
 		for (MethodMeta meta : methods) {
 			String name = meta.getName();
@@ -116,7 +116,7 @@ public class DaoWizard<C extends ClassMeta, M extends TbpSysDaoMethodsDVO, F ext
 		this.fxDao.setBuild(true);
 	}
 
-	private void setPackage(ClassMeta classMeta) {
+	protected void setPackage(ClassMeta classMeta) {
 
 		String packageName = classMeta.getPackageName();
 		if (packageName == null || packageName.isEmpty())
@@ -133,7 +133,7 @@ public class DaoWizard<C extends ClassMeta, M extends TbpSysDaoMethodsDVO, F ext
 	 * @return
 	 * @User KYJ
 	 */
-	private IExtractDaoClass<ClassMeta> getIExtractClass() {
+	protected IExtractDaoClass<ClassMeta> getIExtractClass() {
 		return new BaseFxExtractDaoClass();
 	}
 
@@ -144,7 +144,7 @@ public class DaoWizard<C extends ClassMeta, M extends TbpSysDaoMethodsDVO, F ext
 	 * @return
 	 * @User KYJ
 	 */
-	private IExtractField getIExtractField() {
+	protected IExtractField getIExtractField() {
 		return new BaseFxExtractField();
 	}
 
@@ -155,7 +155,7 @@ public class DaoWizard<C extends ClassMeta, M extends TbpSysDaoMethodsDVO, F ext
 	 * @return
 	 * @User KYJ
 	 */
-	private IExtractConstructor getIExtractConstruct() {
+	protected IExtractConstructor getIExtractConstruct() {
 		return new BaseFxExtractConstructor();
 	}
 
@@ -166,7 +166,7 @@ public class DaoWizard<C extends ClassMeta, M extends TbpSysDaoMethodsDVO, F ext
 	 * @return
 	 * @User KYJ
 	 */
-	private IExtractDaoMethod<M> getIExtractMethod() {
+	protected IExtractDaoMethod<M> getIExtractMethod() {
 		return new BaseFxExtractDaoMethod<M>();
 	}
 

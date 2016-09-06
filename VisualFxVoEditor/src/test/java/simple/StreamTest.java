@@ -1,3 +1,4 @@
+package simple;
 import java.util.stream.Stream;
 
 import javax.xml.transform.TransformerException;

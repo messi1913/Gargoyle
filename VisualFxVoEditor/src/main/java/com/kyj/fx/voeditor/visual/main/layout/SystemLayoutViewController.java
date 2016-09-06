@@ -630,8 +630,12 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			menuOpenWidth.getItems().add(openSystemExplorerMenuItem);
 		}
 
-		MenuItem newFileMenuItem = new MenuItem("New");
+		Menu newFileMenuItem = new Menu("New");
+		MenuItem newDir = new MenuItem("Dir");
+		newDir.setOnAction(this::newDirOnAction);
+		newFileMenuItem.getItems().add(newDir);
 		MenuItem deleteFileMenuItem = new MenuItem("Delete");
+		deleteFileMenuItem.setOnAction(this::deleteFileMenuItemOnAction);
 		// 선택한 파일아이템을 VoEditor에서 조회시 사용
 		// MenuItem voEditorMenuItem = new MenuItem("Show VO Editor");
 		// //선택한 파일아이템을 DaoWizard에서 조회시 사용
@@ -710,23 +714,24 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			selectedItem.getChildren().addAll(createNewTree(selectedItem.getValue().getFile()).getChildren());
 		});
 
-		deleteFileMenuItem.setOnAction(event -> {
-			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
-			if (selectedItem != null) {
-				File file = selectedItem.getValue().getFile();
-				if (file != null && file.exists()) {
-					Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("파일삭제.",
-							file.getName() + " 정말 삭제하시겠습니까? \n[휴지통에 보관되지않음.]");
-					showYesOrNoDialog.ifPresent(pair -> {
-						if ("Y".equals(pair.getValue())) {
-							TreeItem<FileWrapper> root = treeProjectFile.getRoot();
-							root.getChildren().remove(selectedItem);
-							file.delete();
-						}
-					});
-				}
-			}
-		});
+		//함수위치로 이동
+		//		deleteFileMenuItem.setOnAction(event -> {
+		//			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		//			if (selectedItem != null) {
+		//				File file = selectedItem.getValue().getFile();
+		//				if (file != null && file.exists()) {
+		//					Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("파일삭제.",
+		//							file.getName() + " 정말 삭제하시겠습니까? \n[휴지통에 보관되지않음.]");
+		//					showYesOrNoDialog.ifPresent(pair -> {
+		//						if ("Y".equals(pair.getValue())) {
+		//							TreeItem<FileWrapper> root = treeProjectFile.getRoot();
+		//							root.getChildren().remove(selectedItem);
+		//							file.delete();
+		//						}
+		//					});
+		//				}
+		//			}
+		//		});
 
 		makeProgramSpecMenuItem.setOnAction(event -> {
 
@@ -767,6 +772,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	}
 
+	private ProjectFileTreeItemCreator projectFileTreeCreator = new ProjectFileTreeItemCreator();
+
 	/**
 	 * 디렉토리 기준으로 파일트리를 새로 생성한다.
 	 *
@@ -776,8 +783,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @User KYJ
 	 */
 	private TreeItem<FileWrapper> createNewTree(File dir) {
-		ProjectFileTreeItemCreator value = new ProjectFileTreeItemCreator();
-		return value.createNode(dir);
+		return projectFileTreeCreator.createNode(dir);
 	}
 
 	@FXML
@@ -890,6 +896,70 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			}
 		});
 		//
+	}
+
+	/********************************
+	 * 작성일 : 2016. 8. 29. 작성자 : KYJ
+	 *
+	 * 디렉토리를 새로 생성한다.
+	 * 
+	 * @param e
+	 ********************************/
+	public void newDirOnAction(ActionEvent e) {
+		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			FileWrapper value = selectedItem.getValue();
+			File file = value.getFile();
+			if (file.isDirectory()) {
+				Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Directory Name", "Input New Dir Name");
+				showInputDialog.ifPresent(v -> {
+					String newFileName = v.getValue();
+					File createdNewFile = new File(file, newFileName);
+					boolean mkdir = createdNewFile.mkdir();
+					if (mkdir) {
+
+						TreeItem<FileWrapper> createDefaultNode = projectFileTreeCreator.createDefaultNode(new FileWrapper(createdNewFile));
+						createDefaultNode.setExpanded(true);
+						selectedItem.getChildren().add(createDefaultNode);
+					}
+				});
+
+			}
+		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 8. 29. 작성자 : KYJ
+	 *
+	 * 파일삭제.
+	 * 
+	 * @param e
+	 ********************************/
+	public void deleteFileMenuItemOnAction(ActionEvent e) {
+
+		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			File file = selectedItem.getValue().getFile();
+			if (file != null && file.exists()) {
+
+				Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("파일삭제.",
+						file.getName() + " 정말 삭제하시겠습니까? \n[휴지통에 보관되지않음.]");
+				showYesOrNoDialog.ifPresent(pair -> {
+					if ("Y".equals(pair.getValue())) {
+
+						if (file.isDirectory())
+							FileUtil.deleteDir(file);
+						else
+							file.delete();
+
+						TreeItem<FileWrapper> root = selectedItem.getParent();//treeProjectFile.getRoot();
+						root.getChildren().remove(selectedItem);
+						
+					}
+				});
+			}
+		}
+
 	}
 
 	/********************************
@@ -1345,15 +1415,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			// stage.initOwner(SharedMemory.getPrimaryStage());
 
 			// stage.initOwner(SharedMemory.getPrimaryStage());
-//			double x = SharedMemory.getPrimaryStage().getX();
-//			double y = SharedMemory.getPrimaryStage().getY();
+			//			double x = SharedMemory.getPrimaryStage().getX();
+			//			double y = SharedMemory.getPrimaryStage().getY();
 			stage.setTitle("Database");
-//			stage.setX(x);
-//			stage.setY(y);
-//			stage.initOwner(SharedMemory.getPrimaryStage());
+			//			stage.setX(x);
+			//			stage.setY(y);
+			//			stage.initOwner(SharedMemory.getPrimaryStage());
 			stage.setAlwaysOnTop(false);
-//			stage.centerOnScreen();
-//			stage.initOwner(SharedMemory.getPrimaryStage());
+			//			stage.centerOnScreen();
+			//			stage.initOwner(SharedMemory.getPrimaryStage());
 			stage.show();
 			// stage.showAndWait();
 

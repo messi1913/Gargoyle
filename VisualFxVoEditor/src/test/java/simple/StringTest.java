@@ -1,3 +1,4 @@
+package simple;
 import java.util.Arrays;
 
 import org.junit.Assert;

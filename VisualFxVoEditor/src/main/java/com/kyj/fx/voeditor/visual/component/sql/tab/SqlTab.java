@@ -26,6 +26,7 @@ import javafx.event.Event;
 import javafx.event.EventDispatchChain;
 import javafx.event.EventDispatcher;
 import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tab;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -207,4 +208,10 @@ public class SqlTab extends Tab {
 		return txtSql.get().getText();
 	}
 
+	public ContextMenu getTxtSqlPaneContextMenu(){
+		return txtSql.get().getCodeArea().getContextMenu();
+	}
+	public void setTxtSqlPaneContextMenu(ContextMenu menu){
+		 txtSql.get().getCodeArea().setContextMenu(menu);
+	}
 }

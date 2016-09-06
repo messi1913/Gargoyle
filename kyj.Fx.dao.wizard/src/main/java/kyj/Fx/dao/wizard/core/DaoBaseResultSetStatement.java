@@ -15,24 +15,24 @@ import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoFieldsDVO;
 import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoMethodsDVO;
 
 /**
- * 
+ *
  * 람다식 기반.
- * 
+ *
  * meerket Core에서 제공되는 AbstractDAO기반의 매퍼부분을 생성한다.
- * 
+ *
  * @author KYJ
  *
  */
-public class DaoBaseResultSetStatement<T extends BaseResultMapper<M>, M extends TbpSysDaoMethodsDVO> extends FxDaoCommons implements
-		Supplier<String> {
+public class DaoBaseResultSetStatement<T extends BaseResultMapper<M>, M extends TbpSysDaoMethodsDVO> extends FxDaoCommons
+		implements Supplier<String> {
 	/**
 	 * 텍스트가 입력될때 들어갈 \t의 수를 정의함.
-	 * 
+	 *
 	 * @최초생성일 2015. 10. 29.
 	 */
 	private int appendTabKeyCount;
 	private T mapper;
-	private IResultSetConverter converter;
+	//	private IResultSetConverter converter;
 
 	public DaoBaseResultSetStatement(T mapper) {
 		this(mapper, 0);
@@ -42,8 +42,16 @@ public class DaoBaseResultSetStatement<T extends BaseResultMapper<M>, M extends 
 		if (mapper == null)
 			throw new IllegalArgumentException("mapper is null");
 		this.appendTabKeyCount = appendTabKeyCount;
-		this.converter = new FxDaoResultSetConverter();
 		this.mapper = mapper;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 26.
+	 * @return
+	 */
+	protected IResultSetConverter resultSetConverter() {
+		return new FxDaoResultSetConverter();
 	}
 
 	public String convert() {
@@ -76,15 +84,15 @@ public class DaoBaseResultSetStatement<T extends BaseResultMapper<M>, M extends 
 		resultSetMappingPart.append(type).append(" ").append(varName).append(" = new ").append(type).append("();\n");
 		/* [끝] Vo생성 statement */
 
+		IResultSetConverter resultSetConverter = resultSetConverter();
 		for (TbpSysDaoColumnsDVO col : columns) {
-			String statement = converter.convert(varName, resultSetVarName, col);
+			String statement = resultSetConverter.convert(varName, resultSetVarName, col);
 			resultSetMappingPart.append(statement).append("\n");
 		}
-		
-		
+
 		returnPart.append(applyedTabKeys(resultSetMappingPart.toString(), 1));
 		returnPart.append(applyedTabKeys("return " + varName + ";", 1));
-		
+
 		returnPart.append("}\n");
 
 		/* return문 베이스 */

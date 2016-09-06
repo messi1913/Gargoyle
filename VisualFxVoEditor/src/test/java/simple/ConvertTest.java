@@ -1,3 +1,4 @@
+package simple;
 import java.io.UnsupportedEncodingException;
 
 import org.junit.Test;

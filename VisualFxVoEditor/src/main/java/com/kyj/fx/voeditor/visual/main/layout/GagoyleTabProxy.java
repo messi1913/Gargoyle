@@ -45,6 +45,11 @@ public class GagoyleTabProxy implements GagoyleTabLoadable {
 				SharedMemory.getSystemLayoutViewController().loadNewSystemTab(tabName, fxmlName);
 			}
 
+			@Override
+			public void loadNewSystemTab(String tableName, CloseableParent<?> parent) {
+				SharedMemory.getSystemLayoutViewController().loadNewSystemTab(tableName, parent);
+			}
+
 		};
 
 		treeProxy = new GargoyleWorkspaceTreeProxy();
@@ -70,6 +75,11 @@ public class GagoyleTabProxy implements GagoyleTabLoadable {
 
 	public void refleshWorkspaceTree() {
 		treeProxy.reflesh();
+	}
+
+	@Override
+	public void loadNewSystemTab(String tableName, CloseableParent<?> parent) {
+		loadableProxy.loadNewSystemTab(tableName, parent);
 	}
 
 }

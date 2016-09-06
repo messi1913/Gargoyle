@@ -26,7 +26,7 @@ public class BaseFxExtractDaoMethod<T extends TbpSysDaoMethodsDVO> extends FxDao
 
 	/**
 	 * 사용할 버퍼 클래스 명
-	 * 
+	 *
 	 * @최초생성일 2015. 10. 28.
 	 */
 	public static final String STRING_BUFFER_CLASS_TYPE = "StringBuffer";
@@ -38,7 +38,7 @@ public class BaseFxExtractDaoMethod<T extends TbpSysDaoMethodsDVO> extends FxDao
 
 	/**
 	 * TODO 환경변수파일에 등록하여 관리
-	 * 
+	 *
 	 * @최초생성일 2015. 11. 2.
 	 */
 	public static final String STRING_METHOD_PARAMETER_VARIABLE_NAME = "paramMap";
@@ -142,21 +142,32 @@ public class BaseFxExtractDaoMethod<T extends TbpSysDaoMethodsDVO> extends FxDao
 
 	/**
 	 * 결과 sql을 맵핑.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 29.
 	 * @param vo
 	 * @param t
 	 */
-	public String resultSetMappingBody(FxDao vo, T t) {
+	protected String resultSetMappingBody(FxDao vo, T t) {
+		//		BaseResultMapper<T> baseResultMapper = baseResultMapper(vo, t);
+		//		baseResultMapper.setStringBufferVarName(STRING_BUFFER_VARIABLE_NAME);
+		//		baseResultMapper.setParameterMapVarName(STRING_METHOD_PARAMETER_VARIABLE_NAME);
+		return daoBaseResultSetStatement(vo, t).convert();
+	}
+
+	protected BaseResultMapper<T> baseResultMapper(FxDao vo, T t) {
 		BaseResultMapper<T> baseResultMapper = new BaseResultMapper<>(vo, t);
 		baseResultMapper.setStringBufferVarName(STRING_BUFFER_VARIABLE_NAME);
 		baseResultMapper.setParameterMapVarName(STRING_METHOD_PARAMETER_VARIABLE_NAME);
-		DaoBaseResultSetStatement<BaseResultMapper<T>, T> daoBaseResultSetStatement = new DaoBaseResultSetStatement<BaseResultMapper<T>, T>(
-				baseResultMapper, 2);
-		return daoBaseResultSetStatement.convert();
+		return baseResultMapper;
 	}
 
+	protected DaoBaseResultSetStatement<BaseResultMapper<T>, T> daoBaseResultSetStatement(FxDao vo, T t) {
+		BaseResultMapper<T> baseResultMapper = baseResultMapper(vo, t);
+		return new DaoBaseResultSetStatement<BaseResultMapper<T>, T>(baseResultMapper, 2);
+	}
+
+	@Override
 	public void work(FxDao vo, List<T> methods) {
 
 		try {
@@ -177,7 +188,7 @@ public class BaseFxExtractDaoMethod<T extends TbpSysDaoMethodsDVO> extends FxDao
 
 	/**
 	 * 개발자 코드로 sql문을 감쌈.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 28.
 	 * @param sql

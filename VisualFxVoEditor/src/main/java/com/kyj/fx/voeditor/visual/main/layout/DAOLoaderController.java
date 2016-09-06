@@ -1,16 +1,9 @@
-/********************************
- *	프로젝트 : VisualFxVoEditor
- *	패키지   : com.kyj.fx.voeditor.visual.main.layout
- *	작성일   : 2015. 11. 2.
- *	작성자   : KYJ
- *******************************/
+
 package com.kyj.fx.voeditor.visual.main.layout;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +14,6 @@ import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.diff.TextBaseComparator;
 import com.kyj.fx.voeditor.visual.main.model.vo.TbmSysDaoMethodsHDVO;
-import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -46,6 +38,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -80,6 +73,8 @@ public class DAOLoaderController {
 		MenuItem history = new MenuItem("history");
 		history.setOnAction(this::menuHistoryOnAction);
 		tbSrchDao.setContextMenu(new ContextMenu(history));
+
+		tbSrchDao.getSelectionModel().selectedItemProperty().addListener((a, o, n) -> tbSrchDaoOnMouseClick(n));
 	}
 
 	/**
@@ -201,12 +196,12 @@ public class DAOLoaderController {
 
 	private TbmSysDaoMethodsHDVO getHistorySQL(Map<String, Object> paramMap) throws Exception {
 		StringBuffer sb = new StringBuffer();
-		if (isExistsSchemaDatabase())
+		if (DbUtil.isExistsSchemaDatabase())
 			sb.append("select hist_tsp, sql_body from meerkat.tbp_sys_dao_methods_h ");
 		else
 			sb.append("select hist_tsp, sql_body from tbp_sys_dao_methods_h ");
-		
-		sb.append("where hist_tsp =':histTsp'");
+
+		sb.append("where hist_tsp =:histTsp");
 
 		List<TbmSysDaoMethodsHDVO> select = DbUtil.select(sb.toString(), paramMap, (rs, row) -> {
 			TbmSysDaoMethodsHDVO tbmSysDaoMethodsHDVO = new TbmSysDaoMethodsHDVO();
@@ -222,13 +217,13 @@ public class DAOLoaderController {
 	private List<TbmSysDaoMethodsHDVO> listHistoryItems(Map<String, Object> paramMap) throws Exception {
 		StringBuffer sb = new StringBuffer();
 		sb.append("select b.hist_tsp, b.package_name, b.class_name, b.method_name, b.result_vo_class, b.dml_type, fst_reg_dt from \n");
-		if (isExistsSchemaDatabase())
+		if (DbUtil.isExistsSchemaDatabase())
 			sb.append("meerkat.tbm_sys_dao a inner join meerkat.tbp_sys_dao_methods_h b\n");
 		else
 			sb.append("tbm_sys_dao a inner join tbp_sys_dao_methods_h b\n");
 		sb.append("on a.package_name = b.package_name and a.class_name = b.class_name\n");
-		sb.append("and a.package_name = ':packageName' \n");
-		sb.append("and a.class_name =':className'\n");
+		sb.append("and a.package_name = :packageName \n");
+		sb.append("and a.class_name =:className\n");
 		sb.append("order by fst_reg_dt desc\n");
 
 		return DbUtil.select(sb.toString(), paramMap, (rs, row) -> {
@@ -249,12 +244,12 @@ public class DAOLoaderController {
 	}
 
 	@FXML
-	public void tbSrchDaoOnMouseClick(MouseEvent e) {
+	public void tbSrchDaoOnMouseClick(Map<String, Object> selectedItem) {
 
-		if (e.getClickCount() == 2) {
+//		if (e.getClickCount() == 2) {
 			Platform.runLater(() -> {
 				try {
-					Map<String, Object> selectedItem = tbSrchDao.getSelectionModel().getSelectedItem();
+//					Map<String, Object> selectedItem = tbSrchDao.getSelectionModel().getSelectedItem();
 					if (selectedItem == null)
 						return;
 
@@ -277,8 +272,8 @@ public class DAOLoaderController {
 					this.systemRoot.addTabItem(tab);
 					tab.getTabPane().getSelectionModel().select(tab);
 
-					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
-					tbSrchDao.getItems().addAll(listDAO);
+//					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
+//					tbSrchDao.getItems().addAll(listDAO);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					LOGGER.error(e1.toString());
@@ -286,20 +281,21 @@ public class DAOLoaderController {
 				}
 			});
 
-		}
+//		}
 	}
 
 	@FXML
 	public void txtSrchTableOnKeyReleased(KeyEvent e) {
-
-		Platform.runLater(() -> {
-			try {
-				List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
-				tbSrchDao.getItems().addAll(listDAO);
-			} catch (Exception e1) {
-				DialogUtil.showExceptionDailog(e1);
-			}
-		});
+		if (KeyCode.ENTER.equals(e.getCode())) {
+			Platform.runLater(() -> {
+				try {
+					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
+					tbSrchDao.getItems().addAll(listDAO);
+				} catch (Exception e1) {
+					DialogUtil.showExceptionDailog(e1);
+				}
+			});
+		}
 
 	}
 
@@ -307,7 +303,6 @@ public class DAOLoaderController {
 		tbSrchDao.getItems().clear();
 		if (daoName == null || daoName.isEmpty())
 			return FXCollections.emptyObservableList();
-
 
 		Map<String, Object> param = new HashMap<String, Object>();
 
@@ -318,18 +313,20 @@ public class DAOLoaderController {
 		}
 		StringBuffer sb = new StringBuffer();
 		sb.append("\n");
-		if(isExistsSchemaDatabase())
+		if (DbUtil.isExistsSchemaDatabase())
 			sb.append("SELECT PACKAGE_NAME, CLASS_NAME,LOCATION,CLASS_DESC,TABLE_NAME FROM meerkat.tbm_sys_dao \n");
 		else
 			sb.append("SELECT PACKAGE_NAME, CLASS_NAME,LOCATION,CLASS_DESC,TABLE_NAME FROM tbm_sys_dao \n");
-		
+
 		sb.append("WHERE 1=1 \n");
 		sb.append("#if($tableName) \n");
-		sb.append("AND CLASS_NAME LIKE '%:tableName%'  \n");
+		sb.append("AND CLASS_NAME LIKE '%' || :tableName || '%'  \n");
 		sb.append("#end \n");
 		sb.append("LIMIT 100");
 
-		return DbUtil.select(sb.toString(), param, (rs, rowNum) -> {
+		String velocityToText = ValueUtil.getVelocityToText(sb.toString(), param);
+
+		return DbUtil.select(velocityToText, param, (rs, rowNum) -> {
 			Map<String, Object> hashMap = new HashMap<String, Object>();
 			hashMap.put("PACKAGE_NAME", rs.getObject("PACKAGE_NAME"));
 			hashMap.put("CLASS_NAME", rs.getObject("CLASS_NAME"));
@@ -339,21 +336,6 @@ public class DAOLoaderController {
 			return hashMap;
 		});
 
-	}
-
-	
-	private static boolean isExistsSchemaDatabase() {
-		String driver = DbUtil.getDriver().trim();
-		if (driver == null || driver.isEmpty())
-			return true;
-
-		String drivers = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.NOT_EXISTS_SCHEMA_DRIVER_NAMES);
-		if (drivers != null && !driver.isEmpty()) {
-			drivers = drivers.trim();
-			Optional<String> findFirst = Stream.of(drivers.split(",")).filter(v -> v.equals(driver)).findFirst();
-			return !findFirst.isPresent();
-		}
-		return true;
 	}
 
 }

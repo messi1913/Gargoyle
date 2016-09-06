@@ -10,7 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
+
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -33,7 +34,7 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 /**
  * 데이터베이스 저장 처리
- * 
+ *
  * @author KYJ
  *
  */
@@ -128,13 +129,17 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 		insertColumnsSql.append("CLASS_NAME,\n");
 		insertColumnsSql.append("METHOD_NAME,\n");
 		insertColumnsSql.append("COLUMN_NAME,\n");
-		insertColumnsSql.append("COLUMN_TYPE ) \n");
+		insertColumnsSql.append("COLUMN_TYPE, \n");
+		insertColumnsSql.append("PROGRAM_TYPE, \n");
+		insertColumnsSql.append("LOCK_YN ) \n");
 		insertColumnsSql.append("VALUES (\n");
 		insertColumnsSql.append(":packageName, \n");
 		insertColumnsSql.append(":className , \n");
 		insertColumnsSql.append(":methodName , \n");
 		insertColumnsSql.append(":columnName, \n");
-		insertColumnsSql.append(":columnType ) \n");
+		insertColumnsSql.append(":columnType,  \n");
+		insertColumnsSql.append(":programType, \n");
+		insertColumnsSql.append(":lockYn ) \n");
 
 		insertFieldsSql = new StringBuffer();
 		insertFieldsSql.append("INSERT INTO meerkat.TBP_SYS_DAO_FIELDS ( \n");
@@ -247,7 +252,7 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 						methodDVO.getMethodName()));
 				LOGGER.debug(String.format("히스토리 ID : %s", methodMap.get("histTsp").toString()));
 				methodMap.put("dmlType", "D");
-				deleteMethodList.add(new HashMap<>(methodMap));
+				deleteMethodList.add(new LinkedHashMap<>(methodMap));
 				// continue;
 				// }
 			}
@@ -296,7 +301,7 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 			int dsize = deleteMethodList.size();
 
 			if (dsize != 0) {
-				Map<String, Object>[] array = deleteMethodList.toArray(new HashMap[dsize]);
+				Map<String, Object>[] array = deleteMethodList.toArray(new LinkedHashMap[dsize]);
 				batchUpdate(deleteMethodSQLBuf.toString(), array, u);
 				batchUpdate(insertMethodHistSql.toString(), array, u);
 			}
@@ -311,18 +316,18 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 			// insert batch
 
 			if (isize != 0) {
-				Map<String, Object>[] array = insertMethodList.toArray(new HashMap[isize]);
+				Map<String, Object>[] array = insertMethodList.toArray(new LinkedHashMap[isize]);
 				batchUpdate(insertMethodSql.toString(), array, u);
 				batchUpdate(insertMethodHistSql.toString(), array, u);
 			}
 
 			// column insert batch
 			if (!columnsInsertList.isEmpty())
-				batchUpdate(insertColumnsSql.toString(), columnsInsertList.toArray(new HashMap[columnsInsertList.size()]), u);
+				batchUpdate(insertColumnsSql.toString(), columnsInsertList.toArray(new LinkedHashMap[columnsInsertList.size()]), u);
 
 			// field insert batch
 			if (!fieldsInsertList.isEmpty())
-				batchUpdate(insertFieldsSql.toString(), fieldsInsertList.toArray(new HashMap[fieldsInsertList.size()]), u);
+				batchUpdate(insertFieldsSql.toString(), fieldsInsertList.toArray(new LinkedHashMap[fieldsInsertList.size()]), u);
 
 		} catch (Exception e) {
 			throw e;
@@ -337,7 +342,7 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 			throw new IllegalArgumentException("class Name is null.");
 		}
 
-		Map<String, Object> hashMap = new HashMap<String, Object>();
+		Map<String, Object> hashMap = new LinkedHashMap<String, Object>();
 		hashMap.put("packageName", t.getPackageName());
 		hashMap.put("className", t.getClassName());
 		hashMap.put("location", t.getLocation());
@@ -386,7 +391,7 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 
 	/**
 	 * 조회결과를 단순히 boolean으로만 리턴한다. 즉 조회되는 데이터가 있는지 없는지 확인처리만 하기위한 함수.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 30.
 	 * @param sql
@@ -410,7 +415,7 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 
 	/**
 	 * batchupdate를 수행한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 11. 2.
 	 * @param sql
@@ -423,7 +428,7 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 
 	/**
 	 * batchupdate를 수행한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 11. 2.
 	 * @param sql

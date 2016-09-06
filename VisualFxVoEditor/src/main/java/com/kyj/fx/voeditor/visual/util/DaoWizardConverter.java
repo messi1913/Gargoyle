@@ -8,13 +8,14 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.util.function.BiFunction;
 
-import kyj.Fx.dao.wizard.DaoWizard;
-import kyj.Fx.dao.wizard.core.model.vo.TbmSysDaoDVO;
-import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoMethodsDVO;
-
 import com.kyj.fx.voeditor.core.model.meta.ClassMeta;
 import com.kyj.fx.voeditor.core.model.meta.FieldMeta;
 import com.kyj.fx.voeditor.visual.functions.DefaultGenerateDaoWizardFunction;
+import com.kyj.fx.voeditor.visual.functions.TypeChangedGenerateDaoWizardFunction;
+
+import kyj.Fx.dao.wizard.DaoWizard;
+import kyj.Fx.dao.wizard.core.model.vo.TbmSysDaoDVO;
+import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoMethodsDVO;
 
 /**
  * @author KYJ
@@ -32,7 +33,7 @@ public class DaoWizardConverter {
 
 	/**
 	 * 생성자
-	 * 
+	 *
 	 * @param classMeta2
 	 * @param tbmSysDaoDVO
 	 */
@@ -43,25 +44,40 @@ public class DaoWizardConverter {
 	}
 
 	/**
-	 * Vo를 생성하기 위한 기본 모델을 반환
-	 * 
+	 *  Vo를 생성하기 위한 기본 모델을 반환
+	 *
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 15.
 	 * @return
+	 *
+	 *2016-08-26
+	 * @deprecated TypeChangedGenerateDaoWizardFunction 함수 사용.
 	 */
+	@Deprecated
 	private BiFunction<ClassMeta, TbmSysDaoDVO, DaoWizard<ClassMeta, TbpSysDaoMethodsDVO, FieldMeta>> defaultGenertateVoEditorBiConsumer() {
 		return new DefaultGenerateDaoWizardFunction<ClassMeta, TbmSysDaoDVO, TbpSysDaoMethodsDVO, FieldMeta>();
 	}
 
 	/**
+	 * 타입을 변환할 수 있는 기능을 제공하기위한 컨버터
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 26.
+	 * @return
+	 */
+	private BiFunction<ClassMeta, TbmSysDaoDVO, DaoWizard<ClassMeta, TbpSysDaoMethodsDVO, FieldMeta>> typeChangedGenertateVoEditorBiConsumer() {
+		return new TypeChangedGenerateDaoWizardFunction<ClassMeta, TbmSysDaoDVO, TbpSysDaoMethodsDVO, FieldMeta>();
+	}
+
+	/**
 	 * 변환처리
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 16.
 	 * @return
 	 */
 	public DaoWizard<ClassMeta, TbpSysDaoMethodsDVO, FieldMeta> convert() {
-		return defaultGenertateVoEditorBiConsumer().apply(classMeta, daoDVO);
+		return typeChangedGenertateVoEditorBiConsumer().apply(classMeta, daoDVO);
 	}
 
 }

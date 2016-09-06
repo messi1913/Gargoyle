@@ -7,14 +7,17 @@
  *******************************/
 package kyj.Fx.dao.wizard.core.model.vo;
 
+import javafx.beans.property.SimpleStringProperty;
 /**
  * @author KYJ
  *
  */
 import javafx.beans.property.StringProperty;
-import javafx.beans.property.SimpleStringProperty;
 
 public class TbpSysDaoColumnsDVO {
+
+	private StringProperty methodName;
+
 	private StringProperty columnName;
 	/**
 	 * 데이터베이스 디비 타입
@@ -25,9 +28,33 @@ public class TbpSysDaoColumnsDVO {
 	 */
 	private StringProperty columnType;
 
+	/**
+	 * 프로그램 데이터 타입
+	 * 
+	 * @최초생성일 2016. 8. 26.
+	 */
+	private StringProperty programType;
+
+	private StringProperty lockYn;
+
 	public TbpSysDaoColumnsDVO() {
+		this.methodName = new SimpleStringProperty();
 		this.columnName = new SimpleStringProperty();
 		this.columnType = new SimpleStringProperty();
+		this.programType = new SimpleStringProperty();
+		this.lockYn = new SimpleStringProperty("N");
+	}
+
+	public StringProperty methodNameProperty() {
+		return this.methodName;
+	}
+
+	public String getMethodName() {
+		return this.methodNameProperty().get();
+	}
+
+	public void setMethodName(final java.lang.String methodName) {
+		this.methodNameProperty().set(methodName);
 	}
 
 	public void setColumnName(String columnName) {
@@ -58,4 +85,35 @@ public class TbpSysDaoColumnsDVO {
 	public StringProperty columnTypeProperty() {
 		return columnType;
 	}
+
+	public final StringProperty programTypeProperty() {
+		return this.programType;
+	}
+
+	public final java.lang.String getProgramType() {
+		return this.programTypeProperty().get();
+	}
+
+	public final void setProgramType(final java.lang.String programType) {
+		this.programTypeProperty().set(programType);
+	}
+
+	public final StringProperty lockYnProperty() {
+		return this.lockYn;
+	}
+
+	public final java.lang.String getLockYn() {
+		return this.lockYnProperty().get();
+	}
+
+	public final void setLockYn(final java.lang.String lockYn) {
+		this.lockYnProperty().set(lockYn);
+	}
+
+	@Override
+	public String toString() {
+		return "TbpSysDaoColumnsDVO [columnName=" + columnName + ", columnType=" + columnType + ", programType=" + programType + ", lockYn="
+				+ lockYn + "]";
+	}
+
 }

@@ -22,9 +22,10 @@ public class FxDaoResultSetConverter implements IResultSetConverter {
 		StringBuffer sb = new StringBuffer();
 		String columnName = col.getColumnName();
 		String columnType = col.getColumnType();
+		String programType = col.getProgramType();
 
 		sb.append(varName).append(".").append(setStatement(columnName)).append("(")
-				.append(getStatement(resultSetVarName, columnType, columnName)).append(");");
+				.append(getStatement(resultSetVarName, columnType, programType, columnName)).append(");");
 		return sb.toString();
 	}
 
@@ -38,8 +39,14 @@ public class FxDaoResultSetConverter implements IResultSetConverter {
 		return setter;
 	}
 
-	private String getStatement(String resultSetVarName, String columnType, String dbColumnName) {
-		return resultSetVarName + "." + "get" + getTypeTo(columnType) + "(\"" + dbColumnName + "\")";
+	private String getStatement(String resultSetVarName, String columnType, String programType, String dbColumnName) {
+		String typeTo = getTypeTo(columnType);
+
+		if (programType != null && !programType.isEmpty()) {
+			typeTo = programType;
+		}
+
+		return resultSetVarName + "." + "get" + typeTo + "(\"" + dbColumnName + "\")";
 	}
 
 	private String getSetterStatement(String str) {

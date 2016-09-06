@@ -14,9 +14,13 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.component.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.beans.NamedArg;
+import javafx.beans.property.BooleanProperty;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -51,12 +55,16 @@ public class JavaTextView extends BorderPane {
 	// private StringProperty textProperty;
 	private Stage stage = new Stage();
 
-	public JavaTextView(String content) {
-		this(content, true, null);
+	public JavaTextView() {
+		this("", true, e -> LOGGER.error(ValueUtil.toString(e)));
+	}
+
+	public JavaTextView(@NamedArg("content") String content) {
+		this(content, true, e -> LOGGER.error(ValueUtil.toString(e)));
 	}
 
 	public JavaTextView(String content, boolean showButtons) {
-		this(content, showButtons, null);
+		this(content, showButtons, e -> LOGGER.error(ValueUtil.toString(e)));
 	}
 
 	public JavaTextView(String content, boolean showButtons, ExceptionHandler handler) {
@@ -66,6 +74,7 @@ public class JavaTextView extends BorderPane {
 		javaTextArea = new JavaTextArea();
 		javaTextArea.setEditable(false);
 		javaTextArea.setContent(content);
+
 
 		/*
 		FXMLLoader loader = new FXMLLoader();
@@ -77,6 +86,11 @@ public class JavaTextView extends BorderPane {
 		FxUtil.loadRoot(JavaTextView.class, this, ex -> handler.handle(ex));
 	}
 
+	@FxPostInitialize
+	public void initPost() {
+		
+	}
+
 	@FXML
 	public void initialize() {
 		hboxButtons.setVisible(showButtons);
@@ -84,12 +98,28 @@ public class JavaTextView extends BorderPane {
 		//		javaTextArea.setContent(content);
 	}
 
+	public BooleanProperty btnCloseVisibleProperty() {
+		return this.btnClose.visibleProperty();
+	}
+
+	public void setBtnCloseVisible(boolean visible) {
+		this.btnClose.setVisible(visible);
+	}
+
+	public boolean getBtnVisible() {
+		return this.btnClose.isVisible();
+	}
+
 	public void setContent(String content) {
 		javaTextArea.setContent(content);
 	}
 
+	public String getContent() {
+		return javaTextArea.getContent();
+	}
+
 	public void setEditable(boolean editable) {
-		javaTextArea.setEditable(false);
+		javaTextArea.setEditable(editable);
 	}
 
 	public void show(double width, double height) throws IOException {
@@ -108,7 +138,7 @@ public class JavaTextView extends BorderPane {
 
 		Scene scene = new Scene(this, width, height);
 		stage.setScene(scene);
-//		stage.initModality(Modality.APPLICATION_MODAL);
+		//		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.initOwner(root);
 		stage.show();
 

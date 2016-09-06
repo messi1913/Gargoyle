@@ -7,6 +7,9 @@
  *******************************/
 package kyj.Fx.dao.wizard.core.model.vo;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 /**
  * @author KYJ
  *
@@ -16,14 +19,39 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class TbpSysDaoFieldsDVO {
+
+	private StringProperty methodName;
+
 	private StringProperty fieldName;
+
 	private StringProperty type;
+
 	private StringProperty testValue;
+	/**
+	 * 정렬순서
+	 * 
+	 * @최초생성일 2016. 8. 26.
+	 */
+	private IntegerProperty sortSeq;
 
 	public TbpSysDaoFieldsDVO() {
+		this.methodName = new SimpleStringProperty();
 		this.fieldName = new SimpleStringProperty();
 		this.testValue = new SimpleStringProperty();
 		this.type = new SimpleStringProperty("Nomal");
+		this.sortSeq = new SimpleIntegerProperty();
+	}
+
+	public StringProperty methodNameProperty() {
+		return this.methodName;
+	}
+
+	public String getMethodName() {
+		return this.methodNameProperty().get();
+	}
+
+	public void setMethodName(final java.lang.String methodName) {
+		this.methodNameProperty().set(methodName);
 	}
 
 	public void setType(String type) {
@@ -61,4 +89,17 @@ public class TbpSysDaoFieldsDVO {
 	public StringProperty testValueProperty() {
 		return testValue;
 	}
+
+	public final IntegerProperty sortSeqProperty() {
+		return this.sortSeq;
+	}
+
+	public final int getSortSeq() {
+		return this.sortSeqProperty().get();
+	}
+
+	public final void setSortSeq(final int sortSeq) {
+		this.sortSeqProperty().set(sortSeq);
+	}
+
 }

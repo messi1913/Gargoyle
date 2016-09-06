@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
 import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
 import com.kyj.fx.voeditor.visual.component.sql.dock.DockNode;
@@ -49,6 +50,7 @@ import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Application;
@@ -669,19 +671,24 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		SqlTab selectedTab = getSelectedSqlTab();
 		TreeItem<K> schemaTreeItem = selectedItem.getParent();
 		String schema = schemaTreeItem.getValue().toString();
-		Connection connection = connectionSupplier.get();
-		try {
-			String driver = DbUtil.getDriverNameByConnection(connection);
-			String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COLUMNS_WRAPPER, driver);
 
-			Map<String, Object> map = new HashMap<>(2);
-			map.put("databaseName", schema);
-			map.put("tableName", tableName);
+		try (Connection connection = connectionSupplier.get()) {
 
-			sql = ValueUtil.getVelocityToText(sql, map, true);
-			List<String> select = DbUtil.select(connection, sql, 10, (RowMapper<String>) (rs, rowNum) -> rs.getString(1));
-			redueceAction(select, ",",
-					v -> selectedTab.appendTextSql(String.format("select %s \nfrom %s ", v.substring(0, v.length()), tableName)));
+			List<String> columns = DbUtil.columns(connection, tableName);
+			if (columns == null || columns.isEmpty()) {
+				String driver = DbUtil.getDriverNameByConnection(connection);
+				String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COLUMNS_WRAPPER, driver);
+
+				Map<String, Object> map = new HashMap<>(2);
+				map.put("databaseName", schema);
+				map.put("tableName", tableName);
+
+				sql = ValueUtil.getVelocityToText(sql, map, true);
+				columns = DbUtil.select(connection, sql, 10, (RowMapper<String>) (rs, rowNum) -> rs.getString(1));
+			}
+
+			redueceAction(columns, ",\n",
+					v -> selectedTab.appendTextSql(String.format("select\n%s \nfrom %s ", v.substring(0, v.length()), tableName)));
 
 		} catch (Exception e1) {
 			LOGGER.error(ValueUtil.toString(e1));
@@ -717,7 +724,41 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 * @return
 	 */
 	SqlTab createTabItem() {
-		return new SqlTab(this::txtSqlOnKeyEvent);
+		SqlTab sqlTab = new SqlTab(this::txtSqlOnKeyEvent);
+		ContextMenu contextMenu = new ContextMenu();
+		Menu menuFunc = new Menu("Functions");
+		MenuItem menuQueryMacro = new MenuItem("Query-Macro");
+		menuQueryMacro.setOnAction(this::menuQueryMacroOnAction);
+		menuFunc.getItems().add(menuQueryMacro);
+
+		contextMenu.getItems().add(menuFunc);
+		sqlTab.setTxtSqlPaneContextMenu(contextMenu);
+		return sqlTab;
+	}
+
+	/**
+	 * query-macro menu 선택시 발생되는 이벤트에 대한정의.
+	 *
+	 * 기술내용으로는 쿼리 매크로를 처리할 수 있는 팝업을 로드한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 8. 31.
+	 * @param e
+	 */
+	public void menuQueryMacroOnAction(ActionEvent e) {
+		String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
+		MacroControl macroControl = new MacroControl(connectionSupplier, selectedSQLText);
+		FxUtil.createStageAndShow(macroControl, stage -> {
+			stage.setTitle("Query-Macro");
+
+			//팝업창을 닫는 요청이 들어온경우 stop()함수를 호출하고 종료
+			stage.setOnCloseRequest(ev -> {
+
+				LOGGER.debug("Stop Action Result :stopReuqest ");
+				macroControl.stop();
+
+			});
+		});
+
 	}
 
 	/**
