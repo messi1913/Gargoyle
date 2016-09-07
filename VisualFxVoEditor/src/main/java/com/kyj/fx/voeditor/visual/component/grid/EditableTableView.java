@@ -96,7 +96,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	/**
 	 * 실행이력정보. select문절만 저장처리.
-	 * 
+	 *
 	 * @최초생성일 2016. 9. 2.
 	 */
 	private LinkedList<String> history = new LinkedList<String>();
@@ -174,9 +174,9 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 			}, rs -> {
 				try {
-					//					18. IS_NULLABLE String => ISO rules are used to determine the nullability for a column. ◦ YES --- if the column can include NULLs 
-					//							◦ NO --- if the column cannot include NULLs 
-					//							◦ empty string --- if the nullability for the column is unknown 
+					//					18. IS_NULLABLE String => ISO rules are used to determine the nullability for a column. ◦ YES --- if the column can include NULLs
+					//							◦ NO --- if the column cannot include NULLs
+					//							◦ empty string --- if the nullability for the column is unknown
 
 					return Boolean.valueOf("YES".equals(rs.getString(18)));
 				} catch (Exception e) {
@@ -263,7 +263,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	/**
 	 * 저장 기능을 구현
-	 * 
+	 *
 	 * @throws Exception
 	 *
 	 * @작성자 : KYJ
@@ -409,7 +409,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 				}
 				break;
 			case DELETE:
-				saveSqlList.add(String.format("delete %s where 1=1 %s", this.tableName.get(), whereStatement.toString()));
+				saveSqlList.add(String.format("delete from %s where 1=1 %s", this.tableName.get(), whereStatement.toString()));
 				break;
 			}
 
