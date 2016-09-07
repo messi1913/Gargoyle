@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import kyj.Fx.dao.wizard.core.model.vo.TbmSysDaoDVO;
 import kyj.Fx.dao.wizard.core.model.vo.TbpSysDaoColumnsDVO;
@@ -36,8 +37,18 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		try {
 			dataSource = DbUtil.getDataSource();
 			boolean existsSchemaDatabase = DbUtil.isExistsSchemaDatabase();
-			List<TbpSysDaoMethodsDVO> method = getMethod(dataSource, t, existsSchemaDatabase);
-			t.setTbpSysDaoMethodsDVOList(method);
+			List<TbpSysDaoMethodsDVO> methods = getMethod(dataSource, t, existsSchemaDatabase);
+			List<TbpSysDaoColumnsDVO> columns = getColumns(dataSource, t, existsSchemaDatabase);
+			List<TbpSysDaoFieldsDVO> fields = getField(dataSource, t, existsSchemaDatabase);
+
+			for (TbpSysDaoMethodsDVO m : methods) {
+				m.setTbpSysDaoColumnsDVOList(
+						columns.stream().filter(col -> m.getMethodName().equals(col.getMethodName())).collect(Collectors.toList()));
+				m.setTbpSysDaoFieldsDVOList(
+						fields.stream().filter(col -> m.getMethodName().equals(col.getMethodName())).collect(Collectors.toList()));
+			}
+
+			t.setTbpSysDaoMethodsDVOList(methods);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -80,24 +91,15 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 				return dvo;
 			}
 		});
-
-		for (TbpSysDaoMethodsDVO methodDVO : select) {
-			List<TbpSysDaoColumnsDVO> columns = getColumns(dataSource, daoDVO, methodDVO, existsSchemaDatabase);
-			methodDVO.setTbpSysDaoColumnsDVOList(columns);
-
-			List<TbpSysDaoFieldsDVO> fields = getField(dataSource, daoDVO, methodDVO, existsSchemaDatabase);
-			methodDVO.setTbpSysDaoFieldsDVOList(fields);
-		}
-
 		return select;
 
 	}
 
-	private List<TbpSysDaoFieldsDVO> getField(DataSource dataSource, TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO,
-			boolean existsSchemaDatabase) throws Exception {
+	private List<TbpSysDaoFieldsDVO> getField(DataSource dataSource, TbmSysDaoDVO daoDVO, boolean existsSchemaDatabase) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT \n");
+		sb.append("METHOD_NAME  , \n");
 		sb.append("FIELD_NAME  , \n");
 		sb.append("TYPE  , \n");
 		sb.append("TEST_VALUE   \n");
@@ -108,13 +110,15 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append(" WHERE 1=1 \n");
 		sb.append("AND PACKAGE_NAME = :packageName\n");
 		sb.append("AND CLASS_NAME = :className\n");
-		sb.append("AND METHOD_NAME = :methodName\n");
+//		sb.append("#if($methodName)\n");
+//		sb.append("    and method_name = :methodName\n");
+//		sb.append("#end\n");
 		sb.toString();
 
 		Map<String, Object> hashMap = new HashMap<String, Object>();
 		hashMap.put("packageName", daoDVO.getPackageName());
 		hashMap.put("className", daoDVO.getClassName());
-		hashMap.put("methodName", methodDVO.getMethodName());
+		//		hashMap.put("methodName", methodDVO.getMethodName());
 
 		return DbUtil.select(dataSource, sb.toString(), hashMap, new RowMapper<TbpSysDaoFieldsDVO>() {
 
@@ -124,16 +128,17 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 				dvo.setFieldName(rs.getString("FIELD_NAME"));
 				dvo.setTestValue(rs.getString("TEST_VALUE"));
 				dvo.setType(rs.getString("TYPE"));
+				dvo.setMethodName(rs.getString("METHOD_NAME"));
 				return dvo;
 			}
 		});
 	}
 
-	List<TbpSysDaoColumnsDVO> getColumns(DataSource dataSource, TbmSysDaoDVO daoDVO, TbpSysDaoMethodsDVO methodDVO,
-			boolean existsSchemaDatabase) throws Exception {
+	List<TbpSysDaoColumnsDVO> getColumns(DataSource dataSource, TbmSysDaoDVO daoDVO, boolean existsSchemaDatabase) throws Exception {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT \n");
+		sb.append("METHOD_NAME  , \n");
 		sb.append("COLUMN_NAME  , \n");
 		sb.append("COLUMN_TYPE, \n");
 		sb.append("PROGRAM_TYPE, \n");
@@ -145,18 +150,21 @@ public class FxDAOReadFunction implements Function<TbmSysDaoDVO, TbmSysDaoDVO> {
 		sb.append(" WHERE 1=1 \n");
 		sb.append("AND PACKAGE_NAME = :packageName\n");
 		sb.append("AND CLASS_NAME = :className\n");
-		sb.append("AND METHOD_NAME = :methodName\n");
+//		sb.append("#if($methodName)\n");
+//		sb.append("    and method_name = :methodName\n");
+//		sb.append("#end\n");
 
 		Map<String, Object> hashMap = new HashMap<String, Object>();
 		hashMap.put("packageName", daoDVO.getPackageName());
 		hashMap.put("className", daoDVO.getClassName());
-		hashMap.put("methodName", methodDVO.getMethodName());
+		//		hashMap.put("methodName", methodDVO.getMethodName());
 
 		return DbUtil.select(dataSource, sb.toString(), hashMap, new RowMapper<TbpSysDaoColumnsDVO>() {
 
 			@Override
 			public TbpSysDaoColumnsDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
 				TbpSysDaoColumnsDVO dvo = new TbpSysDaoColumnsDVO();
+				dvo.setMethodName(rs.getString("METHOD_NAME"));
 				dvo.setColumnType(rs.getString("COLUMN_TYPE"));
 				dvo.setColumnName(rs.getString("COLUMN_NAME"));
 				dvo.setProgramType(rs.getString("PROGRAM_TYPE"));

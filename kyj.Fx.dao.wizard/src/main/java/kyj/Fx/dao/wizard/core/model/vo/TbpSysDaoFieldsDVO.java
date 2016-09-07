@@ -19,6 +19,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class TbpSysDaoFieldsDVO {
+	private StringProperty methodName;
 
 	private StringProperty fieldName;
 
@@ -27,15 +28,29 @@ public class TbpSysDaoFieldsDVO {
 	private StringProperty testValue;
 	/**
 	 * 정렬순서
+	 * 
 	 * @최초생성일 2016. 8. 26.
 	 */
 	private IntegerProperty sortSeq;
 
 	public TbpSysDaoFieldsDVO() {
+		this.methodName = new SimpleStringProperty();
 		this.fieldName = new SimpleStringProperty();
 		this.testValue = new SimpleStringProperty();
 		this.type = new SimpleStringProperty("Nomal");
 		this.sortSeq = new SimpleIntegerProperty();
+	}
+
+	public void setMethodName(String methodName) {
+		this.methodName.set(methodName);
+	}
+
+	public String getMethodName() {
+		return methodName.get();
+	}
+
+	public StringProperty methodNameProperty() {
+		return methodName;
 	}
 
 	public void setType(String type) {
