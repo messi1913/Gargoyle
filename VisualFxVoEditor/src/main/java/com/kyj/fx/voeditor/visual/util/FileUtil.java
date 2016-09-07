@@ -81,7 +81,7 @@ public class FileUtil {
 
 	/**
 	 * XML 파일 확장자
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 19.
 	 */
 	private static final String XML = ".xml";
@@ -139,7 +139,7 @@ public class FileUtil {
 
 	/**
 	 * 파일 읽기 처리.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 26.
 	 * @param file
@@ -202,15 +202,13 @@ public class FileUtil {
 	 * @Date 2015. 10. 18.
 	 * @param file
 	 * @return
-	 * @throws FileNotFoundException
-	 * @throws IOException
 	 * @User KYJ
 	 */
-	public static boolean isJavaFile(File file) throws FileNotFoundException {
+	public static boolean isJavaFile(File file) {
 		if (file.exists()) {
 			return isJavaFile(file.getName());
 		}
-		throw new FileNotFoundException("file not found");
+		return false;
 	}
 
 	public static boolean isJavaFile(String fileName) {
@@ -249,7 +247,7 @@ public class FileUtil {
 	 * 작성일 : 2016. 8. 19. 작성자 : KYJ
 	 *
 	 * XML 파일 여부
-	 * 
+	 *
 	 * @param file
 	 * @return
 	 ********************************/
@@ -264,7 +262,7 @@ public class FileUtil {
 	 * 작성일 : 2016. 8. 19. 작성자 : KYJ
 	 *
 	 * XML 파일 여부
-	 * 
+	 *
 	 * @param fileName
 	 * @return
 	 ********************************/

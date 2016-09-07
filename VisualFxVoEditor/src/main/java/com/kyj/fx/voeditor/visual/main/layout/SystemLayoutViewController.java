@@ -22,10 +22,10 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.component.FileWrapper;
 import com.kyj.fx.voeditor.visual.component.ImageViewPane;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
+import com.kyj.fx.voeditor.visual.component.JavaProjectMemberFileTreeItem;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
 import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
-import com.kyj.fx.voeditor.visual.component.about.AboutController;
 import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenComposite;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
@@ -100,7 +100,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -335,7 +334,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		List<String> exts = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILE_OPEN_NOT_INPROCESSING_EXTENSION, ",");
 
 		String fileName = file.getName();
-		int dotIndex = fileName.lastIndexOf('.');
+		int dotIndex = fileName.indexOf('.');
 		/* 확장자부분이 없는경우 처리. */
 		if (dotIndex == -1) {
 			openBigText(file);
@@ -587,10 +586,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		menuItemOpenWithSceneBuilder.setOnAction(this::menuItemOpenWithSceneBuilderOnAction);
 		menuOpenWidth.setOnShowing(event -> {
 
+			/*[시작]씬빌더 열기 기능 처리*/
 			String sceneBuilderLocation = ResourceLoader.getInstance().get(ResourceLoader.SCENEBUILDER_LOCATION);
 			TreeItem<FileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
 			boolean isRemoveOpenWidthSceneBuilderMenuItem = true;
-			boolean isDisableSCMGraphsMenuItem = true;
 
 			if (selectedTreeItem != null) {
 				FileWrapper fileWrapper = selectedTreeItem.getValue();
@@ -609,17 +608,51 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					} else {
 						menuItemOpenWithSceneBuilder.setDisable(true);
 					}
-				} // else if (selectedTreeItem instanceof
-					// JavaProjectFileTreeItem) {
-				if (fileWrapper.isSVNConnected())
-					isDisableSCMGraphsMenuItem = false;
-				// }
+				}
+
 			}
 
 			if (isRemoveOpenWidthSceneBuilderMenuItem)
 				menuOpenWidth.getItems().remove(menuItemOpenWithSceneBuilder);
+			/*[끝]씬빌더 열기 기능 처리*/
 
+		});
+
+		Menu menuRunAs = new Menu("Run As");
+
+		fileTreeContextMenu.setOnShowing(ev -> {
+			TreeItem<FileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
+
+			/*[시작] SVN Graph 관련 Disable 여부 체크*/
+			boolean isDisableSCMGraphsMenuItem = true;
+			if (selectedTreeItem != null) {
+				menuRunAs.getItems().clear();
+				FileWrapper fileWrapper = selectedTreeItem.getValue();
+				File file = fileWrapper.getFile();
+				if (fileWrapper.isSVNConnected())
+					isDisableSCMGraphsMenuItem = false;
+				//				if(fileWrapper.is)
+
+				if (fileWrapper.isJavaProjectFile()) {
+					LOGGER.debug("isJavaProjectFile true");
+					//TODO 자바 프로젝트 파일인경우 처리할 항목 기술.
+					menuRunAs.getItems().add(new MenuItem("Java Application"));
+				}
+
+				if (selectedTreeItem instanceof JavaProjectMemberFileTreeItem) {
+					LOGGER.debug("projectFile Member true");
+					//TODO 메인함수인지 아닌지 여부를 결정해서 Java Application 기능 처리.
+
+					if (FileUtil.isJavaFile(file)) {
+						menuRunAs.getItems().add(new MenuItem("Java Application"));
+					}
+				}
+				menuRunAs.getItems().add(new SeparatorMenuItem());
+				menuRunAs.getItems().add(new MenuItem("Run Configurations"));
+
+			}
 			menuItemSCMGraphs.setDisable(isDisableSCMGraphsMenuItem);
+			/*[끝] SVN Graph 관련 Disable 여부 체크*/
 
 		});
 		/***********************************************************************************/
@@ -667,8 +700,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem,
 				deleteFileMenuItem, /* voEditorMenuItem, daoWizardMenuItem, */
-				voEditorMenuItem, /* setVoEditorMenuItem, */ setDaoWizardMenuItem, refleshMenuItem, chodeAnalysisMenuItem,
-				makeProgramSpecMenuItem, menuItemSCMGraphs, new SeparatorMenuItem(), menuProperties);
+				voEditorMenuItem, /* setVoEditorMenuItem, */ setDaoWizardMenuItem, chodeAnalysisMenuItem, makeProgramSpecMenuItem,
+				menuItemSCMGraphs, new SeparatorMenuItem(), refleshMenuItem, new SeparatorMenuItem(), menuRunAs, new SeparatorMenuItem(),
+				menuProperties);
 
 		// daoWizardMenuItem.addEventHandler(ActionEvent.ACTION,
 		// this::daoWizardMenuItemOnActionEvent);
@@ -817,24 +851,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 */
 	@FXML
 	public void miAboutOnAction(ActionEvent e) {
-//		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
-//		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s", url));
-		
-		try {
-			BorderPane load = FxUtil.load(AboutController.class);
-			FxUtil.createStageAndShow(load, stage ->{
-				stage.setTitle("Version");
-				stage.setResizable(false);
-				stage.initModality(Modality.NONE);
-				stage.centerOnScreen();
-			});
-			
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-//		AboutController
+		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
+		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s", url));
 	}
 
 	/**
@@ -920,7 +938,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * 작성일 : 2016. 8. 29. 작성자 : KYJ
 	 *
 	 * 디렉토리를 새로 생성한다.
-	 * 
+	 *
 	 * @param e
 	 ********************************/
 	public void newDirOnAction(ActionEvent e) {
@@ -929,26 +947,19 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			FileWrapper value = selectedItem.getValue();
 			File file = value.getFile();
 			if (file.isDirectory()) {
+				Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Directory Name", "Input New Dir Name");
+				showInputDialog.ifPresent(v -> {
+					String newFileName = v.getValue();
+					File createdNewFile = new File(file, newFileName);
+					boolean mkdir = createdNewFile.mkdir();
+					if (mkdir) {
 
-				//				Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Directory Name", "Input New Dir Name");
-				//				showInputDialog.ifPresent(v -> {
-				//					String newFileName = v.getValue();
-				//					File createdNewFile = new File(file, newFileName);
-				//					boolean mkdir = createdNewFile.mkdir();
-				//					if (mkdir) {
-				//
-				//						TreeItem<FileWrapper> createDefaultNode = projectFileTreeCreator.createDefaultNode(new FileWrapper(createdNewFile));
-				//						createDefaultNode.setExpanded(true);
-				//						selectedItem.getChildren().add(createDefaultNode);
-				//					}
-				//				});
+						TreeItem<FileWrapper> createDefaultNode = projectFileTreeCreator.createDefaultNode(new FileWrapper(createdNewFile));
+						createDefaultNode.setExpanded(true);
+						selectedItem.getChildren().add(createDefaultNode);
+					}
+				});
 
-				File createdNewFile = DialogUtil.showDirSaveDialog(SharedMemory.getPrimaryStage(), file, null);
-				if (createdNewFile != null && createdNewFile.exists()) {
-					TreeItem<FileWrapper> createDefaultNode = projectFileTreeCreator.createDefaultNode(new FileWrapper(createdNewFile));
-					createDefaultNode.setExpanded(true);
-					selectedItem.getChildren().add(createDefaultNode);
-				}
 			}
 		}
 	}
@@ -957,7 +968,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * 작성일 : 2016. 8. 29. 작성자 : KYJ
 	 *
 	 * 파일삭제.
-	 * 
+	 *
 	 * @param e
 	 ********************************/
 	public void deleteFileMenuItemOnAction(ActionEvent e) {
