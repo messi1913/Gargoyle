@@ -660,11 +660,11 @@ public class ValueUtil {
 
 		return dbmsName;
 	}
+
 	public static String getDriverToDBMSName(org.apache.tomcat.jdbc.pool.DataSource dataSource) {
 		String dbms = dataSource.getDriverClassName();//ValueUtil.getDriverToDBMSName(driver);
 		return getDriverToDBMSName(dbms);
 	}
-
 
 	/**
 	 * cvs 스트링 형태로 리턴
@@ -1000,6 +1000,18 @@ public class ValueUtil {
 		if (result == null)
 			return false;
 		return true;
+	}
+
+	public static String addBaseDir(String path) {
+		String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
+		if (path.startsWith("\\")) {
+			return baseDir.concat(path);
+		}
+		return path;
+	}
+
+	public static String removeBaseDir(String path) {
+		return path.replace(ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR), "");
 	}
 
 }

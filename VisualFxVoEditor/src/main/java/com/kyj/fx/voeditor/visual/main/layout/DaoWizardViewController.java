@@ -9,7 +9,6 @@ package com.kyj.fx.voeditor.visual.main.layout;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -183,7 +182,7 @@ public class DaoWizardViewController {
 
 		txtPackageName.setText(tbmSysDaoDVO.getPackageName());
 		txtClassName.setText(tbmSysDaoDVO.getClassName());
-		txtDaoLocation.setText(tbmSysDaoDVO.getLocation());
+		txtDaoLocation.setText(ValueUtil.removeBaseDir(tbmSysDaoDVO.getLocation()));
 		txtAreaDaoDesc.setText(tbmSysDaoDVO.getClassDesc());
 		txtTableName.setText(tbmSysDaoDVO.getTableName());
 
@@ -918,7 +917,7 @@ public class DaoWizardViewController {
 				showYesOrNoDialog.ifPresent(string -> {
 					if ("Y".equals(string.getValue())) {
 						try {
-							daowizard.toFile(location);
+							daowizard.toFile(ValueUtil.addBaseDir(location));
 						} catch (Exception e) {
 							DialogUtil.showExceptionDailog(e);
 						}

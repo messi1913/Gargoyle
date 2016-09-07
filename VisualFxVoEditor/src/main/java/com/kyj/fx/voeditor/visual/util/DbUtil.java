@@ -508,8 +508,9 @@ public class DbUtil extends ConnectionManager {
 			return template.execute(status -> {
 				try {
 					consumer.scope(userObj, namedParameterJdbcTemplate);
-					status.setRollbackOnly();
+					
 				} catch (Exception e) {
+					status.setRollbackOnly();
 					LOGGER.error(ValueUtil.toString(e));
 					if (exceptionHandler != null)
 						exceptionHandler.accept(e);
