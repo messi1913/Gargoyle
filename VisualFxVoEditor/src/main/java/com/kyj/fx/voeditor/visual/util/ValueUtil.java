@@ -26,12 +26,11 @@ import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang.SystemUtils;
@@ -456,6 +455,20 @@ public class ValueUtil {
 			return empty;
 		}
 		return value;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 5. 26.
+	 * @param value
+	 * @param notEmptyThan
+	 * @param emptyThan
+	 * @return
+	 */
+	public static <T, R> R decode(T value, Function<T, R> notEmptyThan, Supplier<R> emptyThan) {
+		if (isNotEmpty(value))
+			return notEmptyThan.apply(value);
+		return emptyThan.get();
 	}
 
 	public static boolean isNotEmpty(Object obj) {
