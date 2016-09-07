@@ -528,7 +528,22 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			this.driver = map.get("driver").toString();
 
 			this.userColor = map.get("color") == null ? null : Color.web(map.get("color").toString());
-			this.setTitle(this.url);
+
+			String alias = map.get("alias") == null ? "" : map.get("alias").toString();
+			if (ValueUtil.isEmpty(alias)) {
+				this.setTitle(this.url);
+			} else {
+				this.setTitle(String.format("%s - %s", alias, this.url));
+			}
+
+			if (ValueUtil.isNotEmpty(userColor)) {
+				String backGroundColor = String.format("#%02X%02X%02X", (int) (userColor.getRed() * 255), (int) (userColor.getGreen() * 255),
+						(int) (userColor.getBlue() * 255));
+				String textColor = String.format("#%02X%02X%02X", 255- (int) (userColor.getRed() * 255), 255-(int) (userColor.getGreen() * 255),
+						255-(int) (userColor.getBlue() * 255));
+				sqlEditPane.getDockTitleBar().getLabel().setStyle("-fx-text-fill:" + textColor);
+				sqlEditPane.getDockTitleBar().setStyle("-fx-background-color:" + backGroundColor);
+			}
 		} catch (Exception e) {
 			DialogUtil.showExceptionDailog(this, e, "초기화 실패....");
 		}
@@ -856,7 +871,6 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 */
 	private void executeAll() {
 		SqlTab selectedItem = sqlTabPane.getSelectedTab();
-
 
 		String sql = selectedItem.getSqlText();
 		if (sql == null || sql.isEmpty()) {
