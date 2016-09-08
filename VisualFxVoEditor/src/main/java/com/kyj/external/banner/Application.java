@@ -15,7 +15,8 @@ public class Application {
 
 	public static void main(String[] args) {
 
-		
+
+
 		ImageBanner banner = new ImageBanner(Application.class.getResource("api.jpg"));
 		String bannerStr = banner.printBanner(Integer.parseInt(DEFAULT_MAX_WIDTH), Double.parseDouble(DEFAULT_ASPECT_RATIO), true, false);
 //		System.out.println(bannerStr);
