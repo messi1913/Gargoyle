@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.popup;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
@@ -250,6 +252,7 @@ public class TableOpenResourceView {
 
 			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
+				DialogUtil.showExceptionDailog(e1);
 			}
 
 		}
