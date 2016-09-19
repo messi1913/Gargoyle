@@ -214,9 +214,9 @@ public class ValueUtil {
 		Velocity.evaluate(context, writer, "DaoWizard", _dynamicSql);
 		String convetedString = writer.toString();
 		if (replaceNamedValue) {
-			return replace(convetedString, paramMap);
+			convetedString = replace(convetedString, paramMap);
 		}
-		return convetedString;
+		return convetedString.trim();
 	}
 
 	private static String replace(String sql, Map<String, Object> paramMap) {
