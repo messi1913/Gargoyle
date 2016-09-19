@@ -124,7 +124,7 @@ public class DatabaseInitializer implements Initializable {
 				try (Connection con = this.connectionSupplier.get()) {
 					
 					int transactionedScope = DbUtil.getTransactionedScope(con, split, t -> Arrays.asList(t), exceptionHandler);
-					if (transactionedScope == 1) {
+					if (transactionedScope != -1) {
 						if (onSuccessHandler != null)
 							onSuccessHandler.accept(null);
 					}
