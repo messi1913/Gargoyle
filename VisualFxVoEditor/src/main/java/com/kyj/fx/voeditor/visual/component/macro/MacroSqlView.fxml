@@ -1,17 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import com.kyj.fx.voeditor.visual.component.macro.*?>
 
 <fx:root prefHeight="880.0" prefWidth="1306.0" type="BorderPane"
 	xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
-		<SplitPane dividerPositions="0.26993865030674846"
+		<SplitPane dividerPositions="0.20475460122699388"
 			BorderPane.alignment="CENTER">
 			<items>
-				<MacroFavorTreeView fx:id="tvFavorite"
-					prefHeight="878.0" prefWidth="328.0" />
+				<BorderPane fx:id="borTree" maxWidth="600.0" prefHeight="200.0"
+					prefWidth="200.0">
+					<center>
+						<MacroFavorTreeView fx:id="tvFavorite"
+							prefHeight="878.0" prefWidth="328.0" />
+					</center>
+					<top>
+						<HBox alignment="CENTER_LEFT" minWidth="300.0" spacing="5.0"
+							BorderPane.alignment="CENTER">
+							<children>
+
+								<Button fx:id="btnAdd" mnemonicParsing="false" prefWidth="80.0"
+									text="Add" onAction="#addOnAction" />
+
+								<Button fx:id="btnModify" mnemonicParsing="false"
+									prefWidth="80.0" text="Modify" onAction="#modifyOnAction" />
+
+								<Button fx:id="btnRemove" mnemonicParsing="false"
+									prefWidth="80.0" text="Remove" onAction="#removeOnAction" />
+									
+							</children>
+							<padding>
+								<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+							</padding>
+						</HBox>
+					</top>
+				</BorderPane>
+
 				<BorderPane fx:id="borContent" prefHeight="200.0"
 					prefWidth="200.0">
 

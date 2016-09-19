@@ -9,6 +9,9 @@ package com.kyj.fx.voeditor.visual.component.macro;
 import java.sql.Connection;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
@@ -16,6 +19,9 @@ import com.kyj.fx.voeditor.visual.util.FxUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCharacterCombination;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
 
 /***************************
@@ -28,8 +34,14 @@ import javafx.scene.layout.BorderPane;
 @FXMLController(value = "MacroSqlView.fxml", isSelfController = true)
 public class MacroSqlComposite extends BorderPane {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(MacroSqlComposite.class);
+
+	@FXML
+	private BorderPane borTree;
+
 	@FXML
 	private MacroFavorTreeView tvFavorite;
+
 	@FXML
 	private BorderPane borContent;
 
@@ -50,7 +62,17 @@ public class MacroSqlComposite extends BorderPane {
 	public void post() {
 
 		MenuItem menuAddItem = new MenuItem("Add");
+		menuAddItem.setAccelerator(new KeyCodeCombination(KeyCode.INSERT, KeyCharacterCombination.CONTROL_DOWN));
+		menuAddItem.setOnAction(e -> {
+			addOnAction();
+		});
+
 		MenuItem menuDeleteItem = new MenuItem("Delete");
+		menuDeleteItem.setAccelerator(new KeyCodeCombination(KeyCode.DELETE, KeyCharacterCombination.CONTROL_DOWN));
+		menuDeleteItem.setOnAction(e -> {
+			addOnAction();
+		});
+
 		tvFavorite.setContextMenu(new ContextMenu(menuAddItem, menuDeleteItem));
 
 		borContent.setCenter(new MacroControl(connectionSupplier, initText));
@@ -62,4 +84,17 @@ public class MacroSqlComposite extends BorderPane {
 		tvFavorite.setShowRoot(false);
 	}
 
+	@FXML
+	public void addOnAction() {
+		LOGGER.debug("add item");
+	}
+
+	@FXML
+	public void modifyOnAction(){
+		
+	}
+	
+	public void removeOnAction(){
+		
+	}
 }

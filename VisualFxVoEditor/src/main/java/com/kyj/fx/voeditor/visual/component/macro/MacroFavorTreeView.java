@@ -36,7 +36,7 @@ public class MacroFavorTreeView extends TreeView<MacroItemVO> implements Callbac
 		public String apply(MacroItemVO input) {
 			if (input == null)
 				return "";
-			return input.getName();
+			return input.getMacroName();
 		}
 	};
 

@@ -36,7 +36,7 @@ public class MacroFavorTreeItemCreator {
 		@Override
 		public List<MacroItemVO> apply(MacroItemVO item) {
 			try {
-				if (item == null || ValueUtil.isEmpty(item.getId())) {
+				if (item == null || ValueUtil.isEmpty(item.getMacroId())) {
 					return dao.getRoots();
 				} else {
 					return dao.getChildrens(item);
@@ -86,7 +86,7 @@ public class MacroFavorTreeItemCreator {
 					isFirstTimeLeaf = false;
 					MacroItemVO f = getValue();
 
-					if (f == null || "F".equals(f.getType()))
+					if (f == null || "F".equals(f.getMacroItemType()))
 						isLeaf = true;
 					else
 						isLeaf = false;

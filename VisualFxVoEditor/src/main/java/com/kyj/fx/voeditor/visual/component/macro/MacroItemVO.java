@@ -18,8 +18,9 @@ import javafx.collections.ObservableList;
  ***************************/
 public class MacroItemVO {
 
-	private StringProperty id;
-	private StringProperty name;
+	private StringProperty parentMacroId;
+	private StringProperty macroId;
+	private StringProperty macroName;
 	private StringProperty content;
 
 	/**
@@ -28,40 +29,53 @@ public class MacroItemVO {
 	 * 
 	 * @최초생성일 2016. 9. 4.
 	 */
-	private StringProperty type;
+	private StringProperty macroItemType;
 
 	private ObservableList<MacroItemVO> childrens;
 
 	public MacroItemVO() {
-		this.id = new SimpleStringProperty("");
-		this.name = new SimpleStringProperty("");
+		this.parentMacroId = new SimpleStringProperty();
+		this.macroId = new SimpleStringProperty("");
+		this.macroName = new SimpleStringProperty("");
 		this.content = new SimpleStringProperty("");
-		this.type = new SimpleStringProperty("U");
+		this.macroItemType = new SimpleStringProperty("U");
 		this.childrens = FXCollections.observableArrayList();
 	}
 
-	public final StringProperty idProperty() {
-		return this.id;
+	public final StringProperty parentMacroIdProperty() {
+		return this.parentMacroId;
 	}
 
-	public final String getId() {
-		return this.idProperty().get();
+	public final String getParentMacroId() {
+		return this.parentMacroIdProperty().get();
 	}
 
-	public final void setId(final String id) {
-		this.idProperty().set(id);
+	public final void setParentMacroId(final String parentMacroId) {
+		this.parentMacroIdProperty().set(parentMacroId);
 	}
 
-	public final StringProperty nameProperty() {
-		return this.name;
+	public final StringProperty macroIdProperty() {
+		return this.macroId;
 	}
 
-	public final String getName() {
-		return this.nameProperty().get();
+	public final String getMacroId() {
+		return this.macroIdProperty().get();
 	}
 
-	public final void setName(final String name) {
-		this.nameProperty().set(name);
+	public final void setMacroId(final String macroId) {
+		this.macroIdProperty().set(macroId);
+	}
+
+	public final StringProperty macroNameProperty() {
+		return this.macroName;
+	}
+
+	public final String getMacroName() {
+		return this.macroNameProperty().get();
+	}
+
+	public final void setMacroName(final String macroName) {
+		this.macroNameProperty().set(macroName);
 	}
 
 	public final StringProperty contentProperty() {
@@ -76,29 +90,21 @@ public class MacroItemVO {
 		this.contentProperty().set(content);
 	}
 
-	public ObservableList<MacroItemVO> getChildrens() {
-		return childrens;
+	public final StringProperty macroItemTypeProperty() {
+		return this.macroItemType;
 	}
 
-	public void setChildrens(ObservableList<MacroItemVO> childrens) {
-		this.childrens = childrens;
+	public final String getMacroItemType() {
+		return this.macroItemTypeProperty().get();
 	}
 
-	public final StringProperty typeProperty() {
-		return this.type;
-	}
-
-	public final String getType() {
-		return this.typeProperty().get();
-	}
-
-	public final void setType(final String type) {
-		this.typeProperty().set(type);
+	public final void setMacroItemType(final String macroItemType) {
+		this.macroItemTypeProperty().set(macroItemType);
 	}
 
 	@Override
 	public String toString() {
-		return id.get();
+		return macroId.get();
 	}
 
 }
