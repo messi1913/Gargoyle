@@ -6,8 +6,10 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
+import java.util.Date;
 import java.util.HashMap;
 
+import org.apache.velocity.VelocityContext;
 import org.junit.Test;
 
 /**
@@ -33,5 +35,146 @@ public class ValueUtilTest {
 	@Test(expected = IndexOutOfBoundsException.class)
 	public void substringExceptionTest() {
 		System.out.println("asdasd".substring(0, 30));
+	}
+
+	@Test
+	public void velocityTest() {
+
+		/********************************************************/
+		/*
+		 * foreach문을 활용한 sql문 반복[1]
+		 *
+		 * 변수 활용
+		 */
+		/********************************************************/
+		{
+			StringBuffer sb = new StringBuffer();
+			sb.append("\n");
+			sb.append("\n");
+			sb.append("#set($aaa=[1,2,3,4,5])\n");
+			sb.append("\n");
+			sb.append("select 1 from a\n");
+			sb.append("where 1=1\n");
+			sb.append("#foreach($a in $aaa)\n");
+			sb.append("and a = $a\n");
+			sb.append("#end\n");
+			sb.toString();
+
+			String velocityToText = ValueUtil.getVelocityToText(sb.toString(), new HashMap<>());
+			System.out.println(velocityToText);
+		}
+		/********************************************************/
+		/*
+		 * foreach문을 활용한 sql문 반복[2]
+		 * 상수 활용
+		 */
+		/********************************************************/
+		{
+			StringBuffer sb = new StringBuffer();
+			sb.append("\n");
+			sb.append("\n");
+			sb.append("\n");
+			sb.append("\n");
+			sb.append("select 1 from a\n");
+			sb.append("where 1=1\n");
+			sb.append("#foreach($a in [1..5])\n");
+			sb.append("and a = $a\n");
+			sb.append("#end\n");
+			sb.toString();
+			String velocityToText = ValueUtil.getVelocityToText(sb.toString(), new HashMap<>());
+			System.out.println(velocityToText);
+		}
+		/********************************************************/
+		/*
+		 * 매크로 적용 예제.
+		 *
+		 */
+		/********************************************************/
+		{
+			StringBuffer sb = new StringBuffer();
+			//선언
+			sb.append("#macro(test) \n");
+			sb.append("	#foreach($a in [1..5]) ");
+			sb.append("$a");
+			sb.append("	#end \n");
+			sb.append("#end \n");
+			sb.append("\n");
+			sb.append("\n");
+			//사용
+			sb.append("#test()  <br> ");
+			sb.toString();
+			String velocityToText = ValueUtil.getVelocityToText(sb.toString(), new HashMap<>());
+			System.out.println(velocityToText);
+		}
+		/********************************************************/
+		/*
+		 * 타입 클래스를 보여줌.
+		 *
+		 */
+		/********************************************************/
+		{
+			StringBuffer sb = new StringBuffer();
+			sb.append("#set($string='this is a string')\n");
+			sb.append("#set($bool = true)\n");
+			sb.append("#set($numbe = 2)\n");
+			sb.append("#set($array=[1,2,3,4,5])\n");
+			sb.append("\n");
+			sb.append("\n");
+			sb.append("$string.class<br>\n");
+			sb.append("$bool.class<br>\n");
+			sb.append("$number.class<br>\n");
+			sb.append("$array.class<br>\n");
+			sb.toString();
+			String velocityToText = ValueUtil.getVelocityToText(sb.toString(), new HashMap<>());
+			System.out.println(velocityToText);
+		}
+
+		{
+
+			System.out.println();
+			/********************************************************/
+			/*
+			 * Velocity Context 확장 example.
+			 *
+			 * 예제에서는 $date변수 사용시 현재 날짜를 리턴하게 만듬.
+			 */
+			/********************************************************/
+			StringBuffer sb = new StringBuffer();
+			sb.append("$date\n");
+			sb.toString();
+			HashMap<String, Object> hashMap = new HashMap<>();
+			//			hashMap.put("date", "someDate");
+			String velocityToText = ValueUtil.getVelocityToText(sb.toString(), hashMap, false, new VelocityContext() {
+
+				/* (non-Javadoc)
+				 * @see org.apache.velocity.VelocityContext#internalGet(java.lang.String)
+				 */
+				@Override
+				public Object internalGet(String key) {
+					if ("date".equals(key))
+						return new Date();
+					return super.internalGet(key);
+				}
+
+				/* (non-Javadoc)
+				 * @see org.apache.velocity.VelocityContext#internalContainsKey(java.lang.Object)
+				 */
+				@Override
+				public boolean internalContainsKey(Object key) {
+					return super.internalContainsKey(key);
+				}
+
+				/* (non-Javadoc)
+				 * @see org.apache.velocity.VelocityContext#internalGetKeys()
+				 */
+				@Override
+				public Object[] internalGetKeys() {
+					return super.internalGetKeys();
+				}
+
+			});
+			System.out.println(velocityToText);
+		}
+
 	}
 }
