@@ -49,6 +49,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecSourceNullException;
+import com.kyj.fx.voeditor.visual.framework.velocity.ExtensionDateFormatVelocityContext;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.sun.star.lang.IllegalArgumentException;
 
@@ -207,7 +208,7 @@ public class ValueUtil {
 	public static String getVelocityToText(String dynamicSql, Map<String, Object> paramMap, boolean replaceNamedValue,
 			Context velocityContext) {
 		StringWriter writer = new StringWriter();
-		VelocityContext context = new VelocityContext(paramMap, velocityContext);
+		VelocityContext context = new VelocityContext(paramMap, new ExtensionDateFormatVelocityContext(velocityContext));
 
 		String _dynamicSql = dynamicSql;
 
