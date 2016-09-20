@@ -1,6 +1,12 @@
+/********************************
+ *	프로젝트 : btrace
+ *	패키지   : com.kyj.trace.btrace.btrace.external
+ *	작성일   : 2016. 5. 25.
+ *	작성자   : KYJ
+ *******************************/
 package com.kyj.external.school;
 
-import org.apache.http.HttpEntity;
+import static com.sun.btrace.BTraceUtils.println;
 
 import com.sun.btrace.BTraceUtils;
 import com.sun.btrace.annotations.BTrace;
@@ -17,41 +23,63 @@ import com.sun.btrace.annotations.Self;
 @BTrace
 public class SosRequestCapture {
 
+	private static final String DS_CLASS = "com.samsung.sds.sos.client.core.screen.AbstractScreen";
 	private static final String DS_CLASS_HTTP_CLIENT = "com.samsung.sds.sos.context.http.HttpClientManager";
 
-	// @OnMethod(clazz = DS_CLASS_HTTP_CLIENT, method = "doAction", location =
-	// @Location(Kind.ENTRY) )
-	// public static void afterdoAction_return() {
-	//
-	// BTraceUtils.println("entry time : " +
-	// BTraceUtils.currentThreadCpuTime());
+	@OnMethod(clazz = DS_CLASS, method = "doRequest", location = @Location(Kind.ENTRY) )
+	public static void beforeDoRequest_entry(@Self Object obj) {
+		println("beforeDoRequest");
+		println(obj);
+		println("Print Fields");
+		BTraceUtils.printFields(obj);
+		BTraceUtils.printFields(obj, true);
+		println("Field");
+		Class<?> classOf = BTraceUtils.classOf(obj);
+//		BTraceUtils.print(classOf);
+		Class<?> superclass = BTraceUtils.getSuperclass(classOf);
+
+		BTraceUtils.print(superclass);
+		BTraceUtils.field(superclass, "abstractSVO");
+
+	}
+
+	@OnMethod(clazz = DS_CLASS, method = "doRequest")
+	public static void beforeDoRequest_() {
+		println("beforeRequest?");
+	}
+
+	@OnMethod(clazz = DS_CLASS, method = "doRequest", location = @Location(Kind.RETURN) )
+	public static void afterDoRequest__return() {
+		println("afterDoRequest__return");
+	}
+
+	// @OnMethod(clazz = DS_CLASS_HTTP_CLIENT, method = "doAction")
+	// public static void beforedoAction(@Self Object obj) {
+	// println("before doaction");
+	// println(obj);
+	// println("before doaction2");
 	// }
+
+	@OnMethod(clazz = DS_CLASS_HTTP_CLIENT, method = "doAction", location = @Location(Kind.ENTRY) )
+	public static void beforeDoAction_enrty() {
+		// 메소드내용 진입
+		println("beforeDoAction_enrty");
+	}
+
+	@OnMethod(clazz = DS_CLASS_HTTP_CLIENT, method = "doAction")
+	public static void beforedoAction() {
+		// 메소드 내용 진입전
+		println("beforedoAction");
+	}
 
 	@OnMethod(clazz = DS_CLASS_HTTP_CLIENT, method = "doAction", location = @Location(Kind.RETURN) )
-	public static void afterdoAction_return(@Return Object param) {
-		BTraceUtils.printFields(param);
-	}
+	public static void afterdoAction_return(@Return Object connection) {
+		// 메소드 내용 진입후
+		println("afterdoAction_return");
+		println(connection);
+		BTraceUtils.printFields(connection);
+		println("after doaction");
 
-	@OnMethod(clazz = "org.apache.http.client.methods.HttpPost", method = "addHeader")
-	public static void addHeader_self(@Self Object param) {
-		BTraceUtils.printFields(param);
 	}
-
-	@OnMethod(clazz = "org.apache.http.client.methods.HttpEntityEnclosingRequestBase", method = "setEntity")
-	public static void setEntity_entry(HttpEntity param) {
-		BTraceUtils.printFields(param);
-	}
-
-	@OnMethod(clazz = "org.apache.http.message.AbstractHttpMessage", method = "addHeader")
-	public static void setEntity_entry(final String name, final String value) {
-		BTraceUtils.print(name + " , " + value);
-	}
-
-	// @OnMethod(clazz = DS_CLASS_HTTP_CLIENT, method = "addHeader", location =
-	// @Location(Kind.RETURN) )
-	// public static void addHeader_return(@Return CloseableHttpResponse param)
-	// {
-	// BTraceUtils.printFields(param);
-	// }
 
 }

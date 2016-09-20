@@ -8,6 +8,8 @@ package com.kyj.trace.btrace.btrace.external;
 
 import static com.sun.btrace.BTraceUtils.println;
 
+import java.lang.reflect.Field;
+
 import com.sun.btrace.BTraceUtils;
 import com.sun.btrace.annotations.BTrace;
 import com.sun.btrace.annotations.Kind;
@@ -30,6 +32,32 @@ public class SosRequestCapture {
 	public static void beforeDoRequest_entry(@Self Object obj) {
 		println("beforeDoRequest");
 		println(obj);
+		println("Print Fields");
+		BTraceUtils.printFields(obj);
+		BTraceUtils.printFields(obj, true);
+		println("Field");
+		Class<?> classOf = BTraceUtils.classOf(obj);
+//		BTraceUtils.print(classOf);
+		Class<?> superclass = BTraceUtils.getSuperclass(classOf);
+
+		println("AbstractMain ::: #####");
+		BTraceUtils.println(superclass);
+		Class<?> superclass2 = BTraceUtils.getSuperclass(superclass);
+		println("#####");
+		println("AbstractScreen ::: #####");
+		BTraceUtils.println(superclass2);
+		println("#####1");
+		Field field = BTraceUtils.field(superclass2, "abstractSVO");
+		println("#####2");
+		Object object = BTraceUtils.get(field, obj);
+
+		println("#####3");
+		println("AbstractSVO ::: #####");
+		BTraceUtils.print(object);
+		BTraceUtils.printFields(object);
+		String xml = BTraceUtils.toXML(object);
+		BTraceUtils.println(xml);
+
 	}
 
 	@OnMethod(clazz = DS_CLASS, method = "doRequest")
