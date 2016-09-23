@@ -9,6 +9,7 @@ package com.kyj.fx.voeditor.visual.main.layout;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import kyj.Fx.dao.wizard.core.model.vo.TbmSysDaoDVO;
 
 /**
@@ -77,7 +79,11 @@ public class DAOLoaderController {
 
 		MenuItem history = new MenuItem("history");
 		history.setOnAction(this::menuHistoryOnAction);
-		tbSrchDao.setContextMenu(new ContextMenu(history));
+
+		MenuItem menuRemove = new MenuItem("remove");
+		menuRemove.setOnAction(this::menuRemoveOnAction);
+
+		tbSrchDao.setContextMenu(new ContextMenu(history, menuRemove));
 	}
 
 	/**
@@ -162,6 +168,49 @@ public class DAOLoaderController {
 
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 9. 23.
+	 * @param e
+	 */
+	public void menuRemoveOnAction(ActionEvent e) {
+		Map<String, Object> selectedItem = tbSrchDao.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			String className = (String) selectedItem.get("CLASS_NAME");
+			Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Remove Item",
+					"Are you sure ?  \nRemove Target : " + className);
+
+			showYesOrNoDialog.ifPresent(v -> {
+
+				if ("Y".equals(v.getValue())) {
+					try {
+
+						//삭제
+						int count = removDAO(selectedItem);
+
+						if (count != -1) {
+							//삭제성공.
+							//재조회
+							List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
+							tbSrchDao.getItems().addAll(listDAO);
+							//DialogUtil.showMessageDialog(className + " 삭제 완료.");
+						} else {
+							//삭제 실패.
+							DialogUtil.showMessageDialog(className + " 일치하는 조건이 없습니다. ");
+						}
+
+
+					} catch (Exception e1) {
+						LOGGER.error(ValueUtil.toString(e1));
+						DialogUtil.showExceptionDailog(e1);
+					}
+				}
+			});
+
+		}
+
+	}
+
 	private String getSqlBody(String histTsp) throws Exception {
 		Map<String, Object> param = new HashMap<>();
 		param.put("histTsp", histTsp);
@@ -195,6 +244,27 @@ public class DAOLoaderController {
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * DAO iTEM 삭제.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 9. 23.
+	 * @param paramMap
+	 * @return
+	 * @throws Exception
+	 */
+	private int removDAO(Map<String, Object> paramMap) throws Exception {
+		StringBuffer sb = new StringBuffer();
+		if (DbUtil.isExistsSchemaDatabase()) {
+			sb.append("delete from meerkat.tbm_sys_dao\n");
+		} else {
+			sb.append("delete from tbm_sys_dao\n");
+		}
+		sb.append("where package_name =:packageName\n");
+		sb.append("and class_name =:className\n");
+
+		return DbUtil.update(sb.toString(), paramMap);
 	}
 
 	private TbmSysDaoMethodsHDVO getHistorySQL(Map<String, Object> paramMap) throws Exception {
@@ -276,8 +346,8 @@ public class DAOLoaderController {
 					tab.getTabPane().getSelectionModel().select(tab);
 
 					//2016-09-23 굳히 재조회 할 필요없으므로 주석.
-//					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
-//					tbSrchDao.getItems().addAll(listDAO);
+					//					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
+					//					tbSrchDao.getItems().addAll(listDAO);
 				} catch (Exception e1) {
 					LOGGER.error(e1.toString());
 					DialogUtil.showExceptionDailog(e1);
@@ -340,7 +410,5 @@ public class DAOLoaderController {
 		});
 
 	}
-
-
 
 }
