@@ -275,10 +275,10 @@ public class DAOLoaderController {
 					this.systemRoot.addTabItem(tab);
 					tab.getTabPane().getSelectionModel().select(tab);
 
-					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
-					tbSrchDao.getItems().addAll(listDAO);
+					//2016-09-23 굳히 재조회 할 필요없으므로 주석.
+//					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
+//					tbSrchDao.getItems().addAll(listDAO);
 				} catch (Exception e1) {
-					e1.printStackTrace();
 					LOGGER.error(e1.toString());
 					DialogUtil.showExceptionDailog(e1);
 				}
