@@ -139,7 +139,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 					} else {
 						LOGGER.debug("search result empty.");
 					}
-
+					
 					
 				}
 			} catch (Exception e1) {
@@ -272,7 +272,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	@Override
 	public void tbResultOnKeyClick(KeyEvent e) {
 
-		 
+
 		/*
 		 * 2016-09-03 by kyj.
 		 * SqlPane에서 기본 기능이 되도록 재구현.
@@ -669,7 +669,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	 */
 	private String getDynmicSQL(String query, Map<String, Object> param, boolean appendQuote) {
 		String sql = query;
-		if (!param.isEmpty()) {
+//		if (!param.isEmpty()) {
 			HashMap<String, Object> reMapping = new HashMap<>();
 			Iterator<String> it = param.keySet().iterator();
 			while (it.hasNext()) {
@@ -680,9 +680,9 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 				}
 			}
 			sql = ValueUtil.getVelocityToText(query, reMapping, true);
-		} else {
-			throw new RuntimeException(String.format("param is empty... \nparams :%s", param.keySet().toString()));
-		}
+//		} else {
+//			throw new RuntimeException(String.format("param is empty... \nparams :%s", param.keySet().toString()));
+//		}
 		return sql;
 	}
 

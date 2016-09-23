@@ -32,6 +32,7 @@ import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
 import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
 import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
@@ -893,12 +894,44 @@ public class FxUtil {
 	 * 작성일 : 2016. 9. 3. 작성자 : KYJ
 	 *
 	 * TableView 키이벤트를 등록
-	 * 
+	 *
 	 * @param tb
 	 ********************************/
 	public static void installClipboardKeyEvent(TableView<?> tb) {
 		ClipboardKeyEventInstaller.install(tb);
 	}
-	
 
+	/**
+	 * 편의성 처리를 위해 완성코드 리턴.
+	 * @author KYJ
+	 *
+	 */
+	public static class EasyFxUtils {
+
+		/**
+		 * 어플리케이션 코드를 만들어주는 팝업을 보여준다.
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 9. 23.
+		 * @param sql
+		 * @throws IOException
+		 */
+		public static void showApplicationCode(String sql) {
+			String[] split = sql.split("\n");
+			StringBuilder sb = new StringBuilder();
+			sb.append("StringBuffer sb = new StringBuffer();\n");
+			for (String str : split) {
+				sb.append("sb.append(\"").append(str).append("\\n").append("\");\n");
+			}
+			sb.append("sb.toString();");
+
+			LOGGER.debug(sb.toString());
+
+			try {
+				new JavaTextView(sb.toString()).show(800, 500);
+			} catch (IOException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+		}
+
+	}
 }

@@ -26,6 +26,7 @@ import javafx.event.Event;
 import javafx.event.EventDispatchChain;
 import javafx.event.EventDispatcher;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tab;
 import javafx.scene.input.KeyCode;
@@ -70,13 +71,14 @@ public class SqlTab extends Tab {
 
 		content.setEventDispatcher((event, tail) -> {
 
-			if (event.getEventType() == KeyEvent.KEY_PRESSED) {
-				//				System.out.println("sqlTab");
-				
+			EventType<? extends Event> eventType = event.getEventType();
+			if (eventType == KeyEvent.KEY_PRESSED) {
+
 				tail.append(keyEventDispatcher);
 				tail.append(eventDispatcher);
 
 			}
+
 			Event dispatchEvent = eventDispatcher.dispatchEvent(event, tail);
 			return dispatchEvent;
 
@@ -99,10 +101,10 @@ public class SqlTab extends Tab {
 				if (lastIndexOf >= 0) {
 
 					File selectedFile = DialogUtil.showFileSaveDialog(null, choser -> {
-						
+
 						//경로를 지정하지않을시 마지막에 처리된 경로에 기본으로 로드되므로 주석.
-//						String dir = System.getProperty("user.home");
-//						choser.setInitialDirectory(new File(dir));
+						//						String dir = System.getProperty("user.home");
+						//						choser.setInitialDirectory(new File(dir));
 
 						choser.getExtensionFilters()
 								.add(new ExtensionFilter(GargoyleExtensionFilters.SQL_NAME, GargoyleExtensionFilters.SQL));
@@ -110,7 +112,7 @@ public class SqlTab extends Tab {
 								.add(new ExtensionFilter(GargoyleExtensionFilters.ALL_NAME, GargoyleExtensionFilters.ALL));
 
 					});
-					
+
 					if (selectedFile != null) {
 
 						boolean isWritableStatus = true;
@@ -154,7 +156,7 @@ public class SqlTab extends Tab {
 					if (fileContent != null /*공백여부는 체크안함. 파일 내용에 실제 공백이 포함될 수 있으므로...*/) {
 						setTxtSql(fileContent);
 						setText(showFileDialog.getName());
-						
+
 					}
 				}
 
@@ -214,10 +216,11 @@ public class SqlTab extends Tab {
 		return txtSql.get().getText();
 	}
 
-	public ContextMenu getTxtSqlPaneContextMenu(){
+	public ContextMenu getTxtSqlPaneContextMenu() {
 		return txtSql.get().getCodeArea().getContextMenu();
 	}
-	public void setTxtSqlPaneContextMenu(ContextMenu menu){
-		 txtSql.get().getCodeArea().setContextMenu(menu);
+
+	public void setTxtSqlPaneContextMenu(ContextMenu menu) {
+		txtSql.get().getCodeArea().setContextMenu(menu);
 	}
 }

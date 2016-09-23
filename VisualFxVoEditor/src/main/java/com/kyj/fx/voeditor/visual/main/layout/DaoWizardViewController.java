@@ -53,6 +53,7 @@ import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxCollectors;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -869,20 +870,14 @@ public class DaoWizardViewController {
 	@FXML
 	public void btnShowAppCodeOnMouseClick() throws IOException {
 		String sql = txtSql.getText();
-		String[] split = sql.split("\n");
-		StringBuilder sb = new StringBuilder();
-		sb.append("StringBuffer sb = new StringBuffer();\n");
-		for (String str : split) {
-			sb.append("sb.append(\"").append(str).append("\\n").append("\");\n");
-		}
-		sb.append("sb.toString();");
+		/*
+		 * 2016-09-23
+		 * 어플리케이션을 만들어주는 로직을 API로 수정.
+		 */
+		FxUtil.EasyFxUtils.showApplicationCode(sql);
 
-		LOGGER.debug(sb.toString());
-
-		new JavaTextView(sb.toString()).show(800, 500);
 
 	}
-
 	/**
 	 * DAO Wizard 생성 버튼 이벤트
 	 *

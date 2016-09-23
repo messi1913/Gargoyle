@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +40,7 @@ import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SQLPaneMotionable;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTabPane;
+import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.framework.BigDataDVO;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
 import com.kyj.fx.voeditor.visual.main.layout.GagoyleTabProxy;
@@ -537,10 +539,10 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			}
 
 			if (ValueUtil.isNotEmpty(userColor)) {
-				String backGroundColor = String.format("#%02X%02X%02X", (int) (userColor.getRed() * 255), (int) (userColor.getGreen() * 255),
-						(int) (userColor.getBlue() * 255));
-				String textColor = String.format("#%02X%02X%02X", 255- (int) (userColor.getRed() * 255), 255-(int) (userColor.getGreen() * 255),
-						255-(int) (userColor.getBlue() * 255));
+				String backGroundColor = String.format("#%02X%02X%02X", (int) (userColor.getRed() * 255),
+						(int) (userColor.getGreen() * 255), (int) (userColor.getBlue() * 255));
+				String textColor = String.format("#%02X%02X%02X", 255 - (int) (userColor.getRed() * 255),
+						255 - (int) (userColor.getGreen() * 255), 255 - (int) (userColor.getBlue() * 255));
 				sqlEditPane.getDockTitleBar().getLabel().setStyle("-fx-text-fill:" + textColor);
 				sqlEditPane.getDockTitleBar().setStyle("-fx-background-color:" + backGroundColor);
 			}
@@ -759,9 +761,17 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		SqlTab sqlTab = new SqlTab(this::txtSqlOnKeyEvent);
 		ContextMenu contextMenu = new ContextMenu();
 		Menu menuFunc = new Menu("Functions");
+
 		MenuItem menuQueryMacro = new MenuItem("Query-Macro");
 		menuQueryMacro.setOnAction(this::menuQueryMacroOnAction);
-		menuFunc.getItems().add(menuQueryMacro);
+
+		MenuItem menuFormatter = new MenuItem("Formatter (CTRL + SHIFT + F)");
+		menuFormatter.setOnAction(this::menuFormatterOnAction);
+
+		MenuItem menuShowApplicationCode = new MenuItem("Show Application Code");
+		menuShowApplicationCode.setOnAction(this::menuShowApplicationCodeOnAction);
+
+		menuFunc.getItems().addAll(menuQueryMacro, menuFormatter, menuShowApplicationCode);
 
 		contextMenu.getItems().add(menuFunc);
 		sqlTab.setTxtSqlPaneContextMenu(contextMenu);
@@ -792,6 +802,27 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			});
 		});
 
+	}
+
+	/**
+	 * Sql 포멧처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 9. 23.
+	 * @param e
+	 */
+	public void menuFormatterOnAction(ActionEvent e) {
+		SqlKeywords sqlNode = this.sqlTab.getSqlNode();
+		sqlNode.doSqlFormat();
+	}
+
+	/**
+	 * Application Code를 보여주는 팝업
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 9. 23.
+	 * @param e
+	 */
+	public void menuShowApplicationCodeOnAction(ActionEvent e) {
+		FxUtil.EasyFxUtils.showApplicationCode(this.sqlTab.getSqlText());
 	}
 
 	/**
@@ -905,7 +936,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		List<String> asList = Arrays.asList(split);
 		queryAll(asList, cnt -> {
 			DialogUtil.showMessageDialog(String.format("%d 건 success", cnt));
-		}, (e, bool) -> {
+		} , (e, bool) -> {
 			if (bool)
 				DialogUtil.showExceptionDailog(e);
 		});
@@ -992,7 +1023,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 
 			List<Map<String, Object>> query = query(sql, param, success -> {
 				lblStatus.setText(success.size() + " row");
-			}, (exception, showDialog) -> {
+			} , (exception, showDialog) -> {
 				lblStatus.setText(exception.toString());
 				if (showDialog)
 					DialogUtil.showExceptionDailog(this, exception);

@@ -209,17 +209,7 @@ public class SqlKeywords extends BorderPane {
 		// CTRL + SHIFT + F 포멧팅
 		else if (e.getCode() == KeyCode.F && (e.isControlDown() && e.isShiftDown())) {
 
-			String selectedText = codeArea.getSelectedText();
-			if (ValueUtil.isNotEmpty(selectedText)) {
-				// codeArea.replaceSelection(sqlFormatter.format(selectedText));
-				replaceSelection(sqlFormatter.format(selectedText));
-			} else {
-				String format = sqlFormatter.format(codeArea.getText());
-				// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-				// codeArea.clear();
-				// codeArea.appendText(format);
-				setContent(format);
-			}
+			doSqlFormat();
 			e.consume();
 		}
 		// Ctr + U 선택된 문자 또는 전체 문자를 대문자로 치환
@@ -252,6 +242,29 @@ public class SqlKeywords extends BorderPane {
 			}
 			e.consume();
 		}
+	}
+
+	/**
+	 * Sql 포멧처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 9. 23.
+	 */
+	public void doSqlFormat() {
+		String selectedText = codeArea.getSelectedText();
+		if (ValueUtil.isNotEmpty(selectedText)) {
+			// codeArea.replaceSelection(sqlFormatter.format(selectedText));
+			replaceSelection(getSqlFormat(selectedText));
+		} else {
+			String format = getSqlFormat(codeArea.getText());
+			// 2016.2.15 undo,redo처리를 위해 setContent로 변경
+			// codeArea.clear();
+			// codeArea.appendText(format);
+			setContent(format);
+		}
+	}
+
+	public String getSqlFormat(String sql) {
+		return sqlFormatter.format(sql);
 	}
 
 	private void setContent(int start, int end, String text) {
@@ -289,30 +302,30 @@ public class SqlKeywords extends BorderPane {
 			//bugfix
 			String split = sqlFormatter.split(fullText, caretPosition);
 			return split;
-//			int startIdx = -1;
-//			int endIdx = -1;
-//
-//			for (int i = split.length() - 1; i > 0; i--) {
-//
-//				if (split.charAt(i) == ';') {
-//					endIdx = i;
-//
-//					for (int j = i-1; j > 0; j--) {
-//
-//						if (split.charAt(j) == ';') {
-//							startIdx = j;
-//							break;
-//						}
-//					}
-//					break;
-//				}
-//			}
-//
-//			if (endIdx == -1) {
-//				return split;
-//			} else {
-//				return split.substring(endIdx);
-//			}
+			//			int startIdx = -1;
+			//			int endIdx = -1;
+			//
+			//			for (int i = split.length() - 1; i > 0; i--) {
+			//
+			//				if (split.charAt(i) == ';') {
+			//					endIdx = i;
+			//
+			//					for (int j = i-1; j > 0; j--) {
+			//
+			//						if (split.charAt(j) == ';') {
+			//							startIdx = j;
+			//							break;
+			//						}
+			//					}
+			//					break;
+			//				}
+			//			}
+			//
+			//			if (endIdx == -1) {
+			//				return split;
+			//			} else {
+			//				return split.substring(endIdx);
+			//			}
 		}
 		return selectedText;
 	}

@@ -88,7 +88,7 @@ public class JavaTextView extends BorderPane {
 
 	@FxPostInitialize
 	public void initPost() {
-		
+
 	}
 
 	@FXML
@@ -137,6 +137,7 @@ public class JavaTextView extends BorderPane {
 		});
 
 		Scene scene = new Scene(this, width, height);
+		stage.setTitle("JavaTextView Popup");
 		stage.setScene(scene);
 		//		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.initOwner(root);
