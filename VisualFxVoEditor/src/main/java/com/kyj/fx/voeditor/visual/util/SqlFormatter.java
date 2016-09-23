@@ -24,6 +24,8 @@ public class SqlFormatter implements Formatter {
 	private static final Set<String> QUANTIFIERS = new HashSet<String>();
 	private static final Set<String> DML = new HashSet<String>();
 	private static final Set<String> MISC = new HashSet<String>();
+	private static final Set<String> BEGIN_VELOCITY = new HashSet<String>();
+	private static final Set<String> END_VELOCITY = new HashSet<String>();
 
 	static {
 		BEGIN_CLAUSES.add("left");
@@ -48,8 +50,12 @@ public class SqlFormatter implements Formatter {
 		LOGICAL.add("when");
 		LOGICAL.add("else");
 		LOGICAL.add("end");
-		LOGICAL.add("#if");
-		LOGICAL.add("#end");
+
+		BEGIN_VELOCITY.add("#if");
+
+		END_VELOCITY.add("#end");
+		//		LOGICAL.add("#if");
+		//		LOGICAL.add("#end");
 
 		QUANTIFIERS.add("in");
 		QUANTIFIERS.add("all");
@@ -147,17 +153,25 @@ public class SqlFormatter implements Formatter {
 					commaAfterOn();
 				}
 
+				else if (BEGIN_VELOCITY.contains(token) /*&& BEGIN_VELOCITY.contains(lastToken)*/) {
+					beginNewVelocity();
+				}
+				else if (END_VELOCITY.contains(lcToken)) {
+					endNewVelocity();
+				}
+
 				else if ("(".equals(token)) {
+					//					if(!VELOCITY.contains(lastToken))
 					openParen();
 				} else if (")".equals(token)) {
+					//					if(!VELOCITY.contains(lastToken))
 					closeParen();
 				}
 
+
 				else if (BEGIN_CLAUSES.contains(lcToken)) {
 					beginNewClause();
-				}
-
-				else if (END_CLAUSES.contains(lcToken)) {
+				} else if (END_CLAUSES.contains(lcToken)) {
 					endNewClause();
 				} else if ("select".equals(lcToken)) {
 					select();
@@ -200,6 +214,43 @@ public class SqlFormatter implements Formatter {
 
 			}
 			return result.toString();
+		}
+
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 9. 23.
+		 */
+		private void beginNewVelocity() {
+			inFunction++;
+//			beginLine = true;
+			newline();
+			out();
+		}
+
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 9. 23.
+		 */
+		private void endNewVelocity() {
+//			beginLine = false;
+			newline();
+			out();
+//			newline();
+			//			if (!afterBeginBeforeEnd) {
+			//				indent--;
+			//				if (afterOn) {
+			//					indent--;
+			//					afterOn = false;
+			//				}
+			//				newline();
+			//			}
+			//			out();
+			//			if (!"union".equals(lcToken)) {
+			//				indent++;
+			//			}
+			//			newline();
+			//			afterBeginBeforeEnd = false;
+			//			afterByOrSetOrFromOrSelect = "by".equals(lcToken) || "set".equals(lcToken) || "from".equals(lcToken);
 		}
 
 		private void commaAfterOn() {
@@ -342,6 +393,7 @@ public class SqlFormatter implements Formatter {
 				parensSinceSelect = parenCounts.removeLast().intValue();
 				afterByOrSetOrFromOrSelect = afterByOrFromOrSelects.removeLast().booleanValue();
 			}
+
 			if (inFunction > 0) {
 				inFunction--;
 				out();
@@ -360,6 +412,7 @@ public class SqlFormatter implements Formatter {
 			if (isFunctionName(lastToken) || inFunction > 0) {
 				inFunction++;
 			}
+
 			beginLine = false;
 			if (inFunction > 0) {
 				out();
