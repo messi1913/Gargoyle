@@ -17,15 +17,15 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.framework.pdf.core.PDFHelper;
+import com.kyj.fx.voeditor.visual.framework.pdf.core.PDFHelperBuilder;
 
 /**
  * @author KYJ
  *
  */
-public class SimpleTextPDFHelper extends PDFHelper<PDPage, PDPageContentStream> {
+public class SimpleTextPDFHelpeBuilder extends PDFHelperBuilder<PDPage, PDPageContentStream> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleTextPDFHelper.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleTextPDFHelpeBuilder.class);
 
 	private String content;
 
@@ -35,11 +35,11 @@ public class SimpleTextPDFHelper extends PDFHelper<PDPage, PDPageContentStream> 
 	 * @param pdfUtil
 	 * @param document
 	 */
-	public SimpleTextPDFHelper(File f) {
+	public SimpleTextPDFHelpeBuilder(File f) {
 		this(f, "");
 	}
 
-	public SimpleTextPDFHelper(File f, String content) {
+	public SimpleTextPDFHelpeBuilder(File f, String content) {
 		super(f);
 		this.content = content;
 	}

@@ -25,8 +25,8 @@ import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.framework.pdf.concreate.SimpleTextPDFHelper;
-import com.kyj.fx.voeditor.visual.framework.pdf.core.PDFHelper;
+import com.kyj.fx.voeditor.visual.framework.pdf.concreate.SimpleTextPDFHelpeBuilder;
+import com.kyj.fx.voeditor.visual.framework.pdf.core.PDFHelperBuilder;
 
 public class PDFUtil {
 
@@ -63,7 +63,7 @@ public class PDFUtil {
 		//			flag = false;
 		//			LOGGER.error(ValueUtil.toString(e1));
 		//		}
-		PDFHelper<PDPage, PDPageContentStream> helper = new SimpleTextPDFHelper(f, text);
+		PDFHelperBuilder<PDPage, PDPageContentStream> helper = new SimpleTextPDFHelpeBuilder(f, text);
 		helper.setPageCount(1);
 		helper.setExceptionHandler(errorHandler);
 

@@ -26,7 +26,7 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
  * @author KYJ
  *
  */
-public abstract class PDFHelper<P extends PDPage, S extends PDPageContentStream> implements PDFMotionable<P, S>, PDFResourcea {
+public abstract class PDFHelperBuilder<P extends PDPage, S extends PDPageContentStream> implements PDFMotionable<P, S>, PDFResourcea {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PDFUtil.class);
 
@@ -34,16 +34,17 @@ public abstract class PDFHelper<P extends PDPage, S extends PDPageContentStream>
 	private int newPageCount = 1;
 	private PDDocument document;
 	private PDFont defaultFont;
+	private URL customFontUrl;
 
 	private Consumer<Exception> errorHandler = e -> {
 		throw new RuntimeException(e);
 	};
 
-	public PDFHelper(File newFile) {
+	public PDFHelperBuilder(File newFile) {
 		this.newFile = newFile;
 	}
 
-	public PDFHelper<P, S> setPageCount(int newPageCount) {
+	public PDFHelperBuilder<P, S> setPageCount(int newPageCount) {
 		this.newPageCount = newPageCount;
 		return this;
 	}
@@ -54,8 +55,9 @@ public abstract class PDFHelper<P extends PDPage, S extends PDPageContentStream>
 	 * @작성일 : 2016. 9. 26.
 	 * @param errorHandler
 	 */
-	public void setExceptionHandler(Consumer<Exception> errorHandler) {
+	public PDFHelperBuilder<P, S> setExceptionHandler(Consumer<Exception> errorHandler) {
 		this.errorHandler = errorHandler;
+		return this;
 	}
 
 	/* (non-Javadoc)
@@ -81,13 +83,10 @@ public abstract class PDFHelper<P extends PDPage, S extends PDPageContentStream>
 		return defaultFont;
 	}
 
-
-	public PDFont getDefaultFont(URL fontResource) throws IOException {
-		if (defaultFont == null)
-			defaultFont = PDFResourcea.super.getDefaultFont();
-		return defaultFont;
+	public PDFHelperBuilder<P, S> setCustomFont(URL customFontUrl) {
+		this.customFontUrl = customFontUrl;
+		return this;
 	}
-
 
 	public boolean build() {
 
@@ -97,10 +96,15 @@ public abstract class PDFHelper<P extends PDPage, S extends PDPageContentStream>
 
 			//Font Load
 			try {
-				defaultFont = getDefaultFont();
+				if (this.customFontUrl != null)
+					defaultFont = PDFUtil.getFont(document, this.customFontUrl);
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				errorHandler.accept(e);
+				return false;
 			}
+
+			if (defaultFont == null)
+				defaultFont = getDefaultFont();
 
 			for (int i = 0; i < newPageCount; i++) {
 
