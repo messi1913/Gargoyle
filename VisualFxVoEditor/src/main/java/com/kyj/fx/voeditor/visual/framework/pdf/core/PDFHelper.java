@@ -8,11 +8,13 @@ package com.kyj.fx.voeditor.visual.framework.pdf.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.function.Consumer;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,8 @@ public abstract class PDFHelper<P extends PDPage, S extends PDPageContentStream>
 	private File newFile;
 	private int newPageCount = 1;
 	private PDDocument document;
+	private PDFont defaultFont;
+
 	private Consumer<Exception> errorHandler = e -> {
 		throw new RuntimeException(e);
 	};
@@ -67,10 +71,36 @@ public abstract class PDFHelper<P extends PDPage, S extends PDPageContentStream>
 	 */
 	public abstract void accept(PDPage t, PDPageContentStream u) throws Exception;
 
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.framework.pdf.core.PDFResourcea#getDefaultFont()
+	 */
+	@Override
+	public PDFont getDefaultFont() throws IOException {
+		if (defaultFont == null)
+			defaultFont = PDFResourcea.super.getDefaultFont();
+		return defaultFont;
+	}
+
+
+	public PDFont getDefaultFont(URL fontResource) throws IOException {
+		if (defaultFont == null)
+			defaultFont = PDFResourcea.super.getDefaultFont();
+		return defaultFont;
+	}
+
+
 	public boolean build() {
+
 		boolean flag = true;
 		try {
 			document = new PDDocument();
+
+			//Font Load
+			try {
+				defaultFont = getDefaultFont();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 
 			for (int i = 0; i < newPageCount; i++) {
 

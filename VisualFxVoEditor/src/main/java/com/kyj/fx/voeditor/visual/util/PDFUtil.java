@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.function.Consumer;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -96,6 +97,12 @@ public class PDFUtil {
 		PDFont font = PDType0Font.load(doc, ClassLoader.getSystemClassLoader().getResourceAsStream("fonts/NANUMBARUNGOTHIC.TTF"));
 		return font;
 	}
+
+	public static PDFont getFont(PDDocument doc, URL fontURL) throws IOException {
+		PDFont font = PDType0Font.load(doc, fontURL.openStream());
+		return font;
+	}
+
 	/**
 	 * 비효율적이므로 deprecated
 	 *

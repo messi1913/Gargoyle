@@ -14,7 +14,8 @@ import java.util.List;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.pdf.core.PDFHelper;
 
@@ -24,20 +25,23 @@ import com.kyj.fx.voeditor.visual.framework.pdf.core.PDFHelper;
  */
 public class SimpleTextPDFHelper extends PDFHelper<PDPage, PDPageContentStream> {
 
-	private String text = "";
-	int offsetRow = 0;
+	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleTextPDFHelper.class);
+
+	private String content;
+
+	private List<String> lines = new ArrayList<String>();
 
 	/**
 	 * @param pdfUtil
 	 * @param document
 	 */
 	public SimpleTextPDFHelper(File f) {
-		super(f);
+		this(f, "");
 	}
 
-	public SimpleTextPDFHelper(File f, String text) {
+	public SimpleTextPDFHelper(File f, String content) {
 		super(f);
-		this.text = text;
+		this.content = content;
 	}
 
 	//	public SimpleTextPDFConsumer(String text) {
@@ -50,11 +54,16 @@ public class SimpleTextPDFHelper extends PDFHelper<PDPage, PDPageContentStream> 
 	@Override
 	public void accept(PDPage page, PDPageContentStream contentStream) throws Exception {
 
-		drawText(page, contentStream, text);
+		String[] texts = this.content.split("\n");
+		for (String text : texts) {
+			drawText(page, contentStream, text);
+		}
 
 	}
 
-	public void drawText(PDPage page, PDPageContentStream contentStream, String text) throws IOException {
+	public void drawText(PDPage page, PDPageContentStream contentStream, String _text) throws IOException {
+
+		String text = _text;
 		//		contentStream.beginText();
 		//		contentStream.setFont(getDefaultFont(), 12);
 		//		contentStream.newLine();
@@ -62,37 +71,39 @@ public class SimpleTextPDFHelper extends PDFHelper<PDPage, PDPageContentStream> 
 		//		contentStream.showText(this.text);
 		//		contentStream.endText();
 
-		PDFont defaultFont = getDefaultFont();
 		float fontSize = 25;
 		float leading = 1.5f * fontSize;
 
-		PDRectangle mediabox = page.getMediaBox(); //page.findMediaBox();
+		PDRectangle mediabox = page.getMediaBox();
 		float margin = 72;
 		float width = mediabox.getWidth() - 2 * margin;
 		float startX = mediabox.getLowerLeftX() + margin;
 		float startY = mediabox.getUpperRightY() - margin;
 
-		//		String text = "I am trying to create a PDF file with a lot of text contents in the document. I am using PDFBox";
-		List<String> lines = new ArrayList<String>();
 		int lastSpace = -1;
 		while (text.length() > 0) {
-			int spaceIndex = text.indexOf(' ', lastSpace + 1);
-			if (spaceIndex < 0)
+
+			int spaceIndex = text.indexOf(' ', lastSpace + 1);//text.indexOf("\n", lastSpace + 1);
+			if (spaceIndex < 0) {
 				spaceIndex = text.length();
+			}
+
 			String subString = text.substring(0, spaceIndex);
-			float size = fontSize * defaultFont.getStringWidth(subString) / 1000;
-			System.out.printf("'%s' - %f of %f\n", subString, size, width);
+			float size = fontSize * getDefaultFont().getStringWidth(subString) / 1000;
+			LOGGER.debug("'{}' - {} of {}\n", subString, size, width);
 			if (size > width) {
+
 				if (lastSpace < 0)
 					lastSpace = spaceIndex;
+
 				subString = text.substring(0, lastSpace);
 				lines.add(subString);
 				text = text.substring(lastSpace).trim();
-				System.out.printf("'%s' is line\n", subString);
+				LOGGER.debug("'{}' is line\n", subString);
 				lastSpace = -1;
 			} else if (spaceIndex == text.length()) {
 				lines.add(text);
-				System.out.printf("'%s' is line\n", text);
+				LOGGER.debug("'{}' is line\n", text);
 				text = "";
 			} else {
 				lastSpace = spaceIndex;
@@ -100,7 +111,7 @@ public class SimpleTextPDFHelper extends PDFHelper<PDPage, PDPageContentStream> 
 		}
 
 		contentStream.beginText();
-		contentStream.setFont(defaultFont, fontSize);
+		contentStream.setFont(getDefaultFont(), fontSize);
 		contentStream.newLineAtOffset(startX, startY);
 		for (String line : lines) {
 			contentStream.showText(line);
