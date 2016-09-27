@@ -11,6 +11,8 @@ import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.kyj.fx.voeditor.visual.framework.pdf.concreate.TablePDFHelpeBuilder;
+
 /**
  * @author KYJ
  *
@@ -21,13 +23,20 @@ public class PdfUtilTest {
 	public void test() {
 		File newFile = new File("Hello.pdf");
 
-		String text = "HelloWorld! \nhell abcdefghijklmnopqrstuvwxyz sadasdasdasasdas asdasdasdasdas \n\nzzzz";
-		boolean createNew = PDFUtil.createNew(newFile, text);
+//		String text = "HelloWorld! \nhell abcdefghijklmnopqrstuvwxyz sadasdasdasasdas asdasdasdasdas \n\nzzzz";
+//		boolean createNew = PDFUtil.createNew(newFile, text);
+		String[][] contents = {{"a","b", "1"},
+                {"c","d", "2"},
+                {"e","f", "3"},
+                {"g","h", "4"},
+                {"i","j", "5"}} ;
 
-		if (createNew)
+		TablePDFHelpeBuilder tablePDFHelpeBuilder = new TablePDFHelpeBuilder(newFile, contents);
+		boolean build = tablePDFHelpeBuilder.build();
+		if (build)
 			FileUtil.openFile(newFile);
 
-		Assert.assertEquals(true, createNew);
+		Assert.assertEquals(true, build);
 
 	}
 }
