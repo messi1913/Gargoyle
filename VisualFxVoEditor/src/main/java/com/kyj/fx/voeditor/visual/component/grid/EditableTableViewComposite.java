@@ -142,7 +142,7 @@ public class EditableTableViewComposite extends BorderPane {
 	}
 
 	public static String findTableNameBySql(String text) {
-		String[] split = text.trim().split("\\s");
+		String[] split = text.trim().split("\\s+");
 		boolean isStart = false;
 		String tableName = null;
 		for (String str : split) {
