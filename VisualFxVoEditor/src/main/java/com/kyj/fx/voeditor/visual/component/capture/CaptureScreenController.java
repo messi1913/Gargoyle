@@ -9,6 +9,7 @@ package com.kyj.fx.voeditor.visual.component.capture;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Map;
 
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
@@ -17,6 +18,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
@@ -58,9 +60,11 @@ public class CaptureScreenController {
 	private Scale scale = new Scale(1, 1);
 	private DoubleProperty scaleDeltaX = new SimpleDoubleProperty(1);
 	private DoubleProperty scaleDeltaY = new SimpleDoubleProperty(1);
-	private double initX;
-	private double initY;
-	private Point2D dragAnchor;
+
+	//	private double initX;
+	//	private double initY;
+
+	//	private Point2D dragAnchor;
 
 	private static final String STATUS_FORMAT = "scale : %f  x : %f  y : %f items : %d";
 
@@ -118,12 +122,12 @@ public class CaptureScreenController {
 					scale.setPivotY(ev.getY());
 				}
 
-				lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), scaleDeltaY.get(), itemCount.get()));
+				lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), ev.getY(), itemCount.get()));
 			}
 		});
 
 		anchorBoard.setOnMouseMoved(ev -> {
-			lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), scaleDeltaY.get(), itemCount.get()));
+			lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), ev.getY(), itemCount.get()));
 		});
 
 	}
@@ -149,62 +153,74 @@ public class CaptureScreenController {
 		}
 		addItemEvent(ivPicture);
 
-//		ivPicture.getTransforms().add(scale);
-//
-//		ivPicture.setOnMouseDragged(ev -> {
-//			double dragX = ev.getSceneX() - dragAnchor.getX();
-//			double dragY = ev.getSceneY() - dragAnchor.getY();
-//			//calculate new position of the circle
-//
-//			double newXPosition = initX + dragX;
-//			double newYPosition = initY + dragY;
-//
-//			//if new position do not exceeds borders of the rectangle, translate to this position
-//			ivPicture.setTranslateX(newXPosition);
-//			ivPicture.setTranslateY(newYPosition);
-//
-//		});
-//
-//		ivPicture.setOnMousePressed(ev -> {
-//			initX = ivPicture.getTranslateX();
-//			initY = ivPicture.getTranslateY();
-//			dragAnchor = new Point2D(ev.getSceneX(), ev.getSceneY());
-//		});
+		//		ivPicture.getTransforms().add(scale);
+		//
+		//		ivPicture.setOnMouseDragged(ev -> {
+		//			double dragX = ev.getSceneX() - dragAnchor.getX();
+		//			double dragY = ev.getSceneY() - dragAnchor.getY();
+		//			//calculate new position of the circle
+		//
+		//			double newXPosition = initX + dragX;
+		//			double newYPosition = initY + dragY;
+		//
+		//			//if new position do not exceeds borders of the rectangle, translate to this position
+		//			ivPicture.setTranslateX(newXPosition);
+		//			ivPicture.setTranslateY(newYPosition);
+		//
+		//		});
+		//
+		//		ivPicture.setOnMousePressed(ev -> {
+		//			initX = ivPicture.getTranslateX();
+		//			initY = ivPicture.getTranslateY();
+		//			dragAnchor = new Point2D(ev.getSceneX(), ev.getSceneY());
+		//		});
 
 		anchorBoard.getChildren().add(ivPicture);
 
 		//		spPic.getcon
 	}
 
+	private Map<Node, Location> initLocation = FXCollections.observableHashMap();
+
 	protected void addItemEvent(Node newNode) {
 
-//		newNode.getTransforms().add(new Scale(1.3, 1.3));
+		//		newNode.getTransforms().add(new Scale(1.3, 1.3));
+		initLocation.put(newNode, new Location());
 
 		newNode.getTransforms().add(scale);
 
 		newNode.setOnMouseDragged(ev -> {
+
+			Location location = initLocation.get(newNode);
+
+			Point2D dragAnchor = location.getDragAnchor();
 			double dragX = ev.getSceneX() - dragAnchor.getX();
 			double dragY = ev.getSceneY() - dragAnchor.getY();
 			//calculate new position of the circle
 
-			double newXPosition = initX + dragX;
-			double newYPosition = initY + dragY;
+			double newXPosition = location.getInitX() + dragX;
+			double newYPosition = location.getInitY() + dragY;
 
 			//if new position do not exceeds borders of the rectangle, translate to this position
 			newNode.setTranslateX(newXPosition);
 			newNode.setTranslateY(newYPosition);
 
+			ev.consume();
 		});
 
 		newNode.setOnMousePressed(ev -> {
-			initX = newNode.getTranslateX();
-			initY = newNode.getTranslateY();
-			dragAnchor = new Point2D(ev.getSceneX(), ev.getSceneY());
+
+			Location location = initLocation.get(newNode);
+			location.setInitX(newNode.getTranslateX());
+			location.setInitY(newNode.getTranslateY());
+			location.setDragAnchor(new Point2D(ev.getSceneX(), ev.getSceneY()));
+
+			ev.consume();
+
 		});
 	}
 
-
-	protected void addChildren(Node n){
+	protected void addChildren(Node n) {
 		anchorBoard.getChildren().add(n);
 	}
 }

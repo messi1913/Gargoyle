@@ -44,22 +44,24 @@ public class CaptureItemHandler {
 
 		Button btn = new Button("텍스트");
 		btn.setOnAction(e -> {
-			Label e2 = new Label("텍스트");
-			e2.getTransforms().add(new Scale(5, 5));
+			Label label = new Label("텍스트");
+			label.getTransforms().add(new Scale(5, 5));
 
-			e2.setOnMouseClicked(ev -> {
+			label.setOnMouseClicked(ev -> {
+				
 				if (ev.getClickCount() == 2) {
 					DialogUtil.showInputDialog(btn, "Text", "Input Text").ifPresent(v -> {
 						//						v.getValue()
 						if (ValueUtil.isNotEmpty(v.getValue())) {
-							e2.setText(v.getValue());
+							label.setText(v.getValue());
 						}
 					});
+					ev.consume();
 				}
 			});
 
-			controller.addItemEvent(e2);
-			controller.addChildren(e2);
+			controller.addItemEvent(label);
+			controller.addChildren(label);
 		});
 
 		items.add(btn);
@@ -82,6 +84,8 @@ public class CaptureItemHandler {
 			//			rectangle.getTransforms().add(new Scale(5, 2));
 			controller.addItemEvent(rectangle);
 			controller.addChildren(rectangle);
+
+			//			rectangle.getlay
 		});
 
 		items.add(btn);
