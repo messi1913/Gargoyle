@@ -9,26 +9,30 @@ package com.kyj.fx.voeditor.visual.component.capture;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
-import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.transform.Scale;
 
 /***************************
- * 
+ *
  * 캡쳐후 미리보기 기능 지원.
- * 
+ *
  * @author KYJ
  *
  ***************************/
@@ -41,22 +45,53 @@ public class CaptureScreenController {
 	//	private ImageView ivPicture;
 	@FXML
 	private ScrollPane spPic;
+
+	private AnchorPane anchorBoard;
+
+	private IntegerProperty itemCount = new SimpleIntegerProperty();
+
 	@FXML
 	private Label lblStatus;
+	@FXML
+	private FlowPane flowItems;
 
-	Scale scale = new Scale(1, 1);
-	DoubleProperty scaleDeltaX = new SimpleDoubleProperty(1);
-	DoubleProperty scaleDeltaY = new SimpleDoubleProperty(1);
+	private Scale scale = new Scale(1, 1);
+	private DoubleProperty scaleDeltaX = new SimpleDoubleProperty(1);
+	private DoubleProperty scaleDeltaY = new SimpleDoubleProperty(1);
 	private double initX;
 	private double initY;
 	private Point2D dragAnchor;
 
-	private static final String STATUS_FORMAT = "scale : %f  x : %f  y : %f";
+	private static final String STATUS_FORMAT = "scale : %f  x : %f  y : %f items : %d";
+
+	private CaptureItemHandler itemHandler;
 
 	@FXML
 	public void initialize() {
 
-		spPic.setOnScroll(ev -> {
+		itemHandler = new CaptureItemHandler(this);
+
+		flowItems.getChildren().addAll(itemHandler.getItems());
+		anchorBoard = new AnchorPane();
+
+		//아이템 카운트 수를 핸들링하는 이벤트 리스너
+		anchorBoard.getChildren().addListener((ListChangeListener) c -> {
+			if (c.next()) {
+				if (c.wasAdded()) {
+					int addedSize = c.getAddedSize();
+					itemCount.add(addedSize);
+
+				}
+
+				else if (c.wasRemoved()) {
+					itemCount.subtract(c.getRemovedSize());
+				}
+			}
+		});
+
+		spPic.setContent(anchorBoard);
+
+		anchorBoard.setOnScroll(ev -> {
 
 			if (ev.isControlDown()) {
 				//				ObservableList<Transform> transforms = ivPicture.getTransforms();
@@ -83,14 +118,21 @@ public class CaptureScreenController {
 					scale.setPivotY(ev.getY());
 				}
 
-				lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), scaleDeltaY.get()));
+				lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), scaleDeltaY.get(), itemCount.get()));
 			}
 		});
 
-		spPic.setOnMouseMoved(ev -> {
-			lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), scaleDeltaY.get()));
+		anchorBoard.setOnMouseMoved(ev -> {
+			lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), scaleDeltaY.get(), itemCount.get()));
 		});
 
+	}
+
+	/**
+	 * @return the anchorBoard
+	 */
+	public final AnchorPane getAnchorBoard() {
+		return anchorBoard;
 	}
 
 	public void createPicutre(String image) throws FileNotFoundException {
@@ -105,10 +147,42 @@ public class CaptureScreenController {
 		} catch (FileNotFoundException e) {
 			throw e;
 		}
+		addItemEvent(ivPicture);
 
-		ivPicture.getTransforms().add(scale);
+//		ivPicture.getTransforms().add(scale);
+//
+//		ivPicture.setOnMouseDragged(ev -> {
+//			double dragX = ev.getSceneX() - dragAnchor.getX();
+//			double dragY = ev.getSceneY() - dragAnchor.getY();
+//			//calculate new position of the circle
+//
+//			double newXPosition = initX + dragX;
+//			double newYPosition = initY + dragY;
+//
+//			//if new position do not exceeds borders of the rectangle, translate to this position
+//			ivPicture.setTranslateX(newXPosition);
+//			ivPicture.setTranslateY(newYPosition);
+//
+//		});
+//
+//		ivPicture.setOnMousePressed(ev -> {
+//			initX = ivPicture.getTranslateX();
+//			initY = ivPicture.getTranslateY();
+//			dragAnchor = new Point2D(ev.getSceneX(), ev.getSceneY());
+//		});
 
-		ivPicture.setOnMouseDragged(ev -> {
+		anchorBoard.getChildren().add(ivPicture);
+
+		//		spPic.getcon
+	}
+
+	protected void addItemEvent(Node newNode) {
+
+//		newNode.getTransforms().add(new Scale(1.3, 1.3));
+
+		newNode.getTransforms().add(scale);
+
+		newNode.setOnMouseDragged(ev -> {
 			double dragX = ev.getSceneX() - dragAnchor.getX();
 			double dragY = ev.getSceneY() - dragAnchor.getY();
 			//calculate new position of the circle
@@ -117,19 +191,20 @@ public class CaptureScreenController {
 			double newYPosition = initY + dragY;
 
 			//if new position do not exceeds borders of the rectangle, translate to this position
-			ivPicture.setTranslateX(newXPosition);
-			ivPicture.setTranslateY(newYPosition);
+			newNode.setTranslateX(newXPosition);
+			newNode.setTranslateY(newYPosition);
 
 		});
 
-		ivPicture.setOnMousePressed(ev -> {
-			initX = ivPicture.getTranslateX();
-			initY = ivPicture.getTranslateY();
+		newNode.setOnMousePressed(ev -> {
+			initX = newNode.getTranslateX();
+			initY = newNode.getTranslateY();
 			dragAnchor = new Point2D(ev.getSceneX(), ev.getSceneY());
 		});
-
-		spPic.setContent(ivPicture);
-		//		spPic.getcon
 	}
 
+
+	protected void addChildren(Node n){
+		anchorBoard.getChildren().add(n);
+	}
 }

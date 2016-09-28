@@ -245,7 +245,7 @@ public class DialogUtil {
 
 	/**
 	 * Exception Dialog 예외가 발생햇을때 표시할 다이얼로그
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 22.
 	 * @param owner
@@ -286,7 +286,7 @@ public class DialogUtil {
 
 	/**
 	 * Exception Dialog 예외가 발생햇을때 표시할 다이얼로그
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 22.
 	 * @param owner
@@ -298,7 +298,7 @@ public class DialogUtil {
 
 	/**
 	 * Exception Dialog 예외가 발생햇을때 표시할 다이얼로그
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 22.
 	 * @param owner
@@ -549,17 +549,27 @@ public class DialogUtil {
 
 	}
 
+	public static Optional<Pair<String, String>> showInputDialog(Node owner, String title, String message) {
+		return showInputDialog(owner.getScene().getWindow(), title, message, "", str -> {
+		});
+	}
+
+	public static Optional<Pair<String, String>> showInputDialog(Window owner, String title, String message) {
+		return showInputDialog(owner, title, message, "", str -> {
+		});
+	}
+
 	public static Optional<Pair<String, String>> showInputDialog(String title, String message) {
-		return showInputDialog(title, message, "", str -> {
+		return showInputDialog(null, title, message, "", str -> {
 		});
 	}
 
 	public static Optional<Pair<String, String>> showInputDialog(String title, String message, String inputValue) {
-		return showInputDialog(title, message, inputValue, str -> {
+		return showInputDialog(null, title, message, inputValue, str -> {
 		});
 	}
 
-	public static Optional<Pair<String, String>> showInputDialog(String title, String message, String inputValue,
+	public static Optional<Pair<String, String>> showInputDialog(Window owner, String title, String message, String inputValue,
 			Consumer<? super Pair<String, String>> consumer) {
 
 		// Create the custom dialog.
@@ -587,6 +597,7 @@ public class DialogUtil {
 			}
 		});
 
+		dialog.initOwner(owner);
 		Optional<Pair<String, String>> result = dialog.showAndWait();
 
 		result.ifPresent(consumer);
