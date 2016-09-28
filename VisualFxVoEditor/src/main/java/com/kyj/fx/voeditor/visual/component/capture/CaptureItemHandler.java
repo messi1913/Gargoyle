@@ -26,7 +26,7 @@ public class CaptureItemHandler {
 
 	private CaptureScreenController controller;
 
-	private ObservableList<Node> items;
+	protected ObservableList<Node> items;
 
 	/**
 	 * @param captureScreenController
