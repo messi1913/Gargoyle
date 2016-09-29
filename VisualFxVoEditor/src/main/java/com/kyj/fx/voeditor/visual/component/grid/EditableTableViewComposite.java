@@ -54,21 +54,21 @@ public class EditableTableViewComposite extends BorderPane {
 
 	public EditableTableViewComposite(Supplier<Connection> connectionSupplier) {
 
-		btnExec = new Button("실행");
+		btnExec = new Button("조회");
 		btnAdd = new Button("추가");
 		btnAdd.setDisable(true);
 		btnRemove = new Button("삭제");
 		btnSave = new Button("저장");
 
 		txtTableName = new Label();
-		
+
 		HBox hBox = new HBox(5, txtTableName, btnExec, btnAdd, btnRemove, btnSave);
 		hBox.setAlignment(Pos.CENTER_RIGHT);
 		hBox.setPadding(new Insets(5));
 		editableTableView = new EditableTableView(connectionSupplier);
 		editableTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		editableTableView.getSelectionModel().setCellSelectionEnabled(true);
-		
+
 		editableTableView.tableNameProperty().addListener((oba, oldval, newval) -> {
 			btnAdd.setDisable(false);
 		});
@@ -96,7 +96,7 @@ public class EditableTableViewComposite extends BorderPane {
 //		editableTableView.setOnMouseClicked(ev -> {
 //			Map<ColumnExpression, ObjectProperty<ValueExpression>> selectedItem = editableTableView.getSelectionModel().getSelectedItem();
 //			System.out.println(selectedItem);
-//			
+//
 //		});
 
 		FxUtil.installClipboardKeyEvent(editableTableView);
@@ -107,7 +107,7 @@ public class EditableTableViewComposite extends BorderPane {
 	}
 
 
-	
+
 	private EventHandler<ActionEvent> defaultExecOnAction = e -> {
 		try {
 			execute();
