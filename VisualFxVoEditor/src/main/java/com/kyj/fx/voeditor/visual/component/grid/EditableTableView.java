@@ -172,7 +172,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 					return null;
 				}
 
-			}, rs -> {
+			} , rs -> {
 				try {
 					//					18. IS_NULLABLE String => ISO rules are used to determine the nullability for a column. ◦ YES --- if the column can include NULLs
 					//							◦ NO --- if the column cannot include NULLs
@@ -293,7 +293,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			try (Connection con = connectionSupplier.get()) {
 				int transactionedScope = DbUtil.getTransactionedScope(con, saveList, (list) -> {
 					return list;
-				}, ex -> {
+				} , ex -> {
 					throw new RuntimeException(ex);
 				});
 
@@ -339,6 +339,23 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		int modifiedCnt = 0;
 
+		//키값이 존재하지않는 테이블인경우 where조건은 수정되지않는 컬럼으로 사용.
+		boolean isNotContainsPrimaryTable = false;
+
+		//키값도 존재하지않을뿐더러 변경된 컬럼도 없는경우
+		boolean isNotContainsModifiedTable = false;
+
+		if (items != null && !items.isEmpty()) {
+			long count = items.get(0).values().stream().filter(vo -> vo.getValue().isPrimaryKey).count();
+			if (count == 0)
+				isNotContainsPrimaryTable = true;
+			else {
+				long modifiedCount = items.get(0).values().stream().filter(vo -> vo.getValue().isModified).count();
+				if (modifiedCount == 0)
+					isNotContainsModifiedTable = true;
+			}
+		}
+
 		for (Map<ColumnExpression, ObjectProperty<ValueExpression>> m : items) {
 
 			StringBuffer whereStatement = new StringBuffer();
@@ -368,13 +385,21 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 					if (valueExp.getDisplayText() == null || valueExp.getDisplayText().isEmpty()) {
 						return function.apply(STATUS.PK_VAL_IS_EMPTY, Collections.emptyList());
 					}
-
 					whereStatement.append(String.format("and %s  = '%s'", colummExp, valueExp.getRealValue()));
 				}
 
 				if (valueExp.isModified) {
 					setStatement.append(String.format("%s  = %s,", colummExp, getValue(colummExp, valueExp) /*valueExp.getDisplayText()*/));
 					modifiedCnt++;
+
+					if (isNotContainsPrimaryTable) {
+						whereStatement.append(String.format("and %s  = '%s'", colummExp, valueExp.getRealValue()));
+					}
+
+				}
+
+				if (!valueExp.isPrimaryKey && !valueExp.isModified && (isNotContainsPrimaryTable | isNotContainsModifiedTable)) {
+					whereStatement.append(String.format("and %s  = '%s'", colummExp, valueExp.getRealValue()));
 				}
 
 				columnsStatement.append(String.format("%s,", colummExp));
