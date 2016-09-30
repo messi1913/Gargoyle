@@ -15,8 +15,6 @@ import org.ky.pmd.core.PMD;
 
 import com.google.common.io.Files;
 
-import net.sourceforge.pmd.util.FileUtil;
-
 /***************************
  * 
  * @author KYJ
@@ -26,15 +24,18 @@ public class PMDTest {
 
 	@Test
 	public void test() throws IOException{
-		File javaFile = new File("src/test/java/pmd/core/PMDTest.java");
-		String ruleSetFile = "java-basic";//new File("rulesets/java/basic.xml").getAbsolutePath();
+		String fileString = "C:\\Users\\KYJ\\git\\Gargoyle\\VisualFxVoEditor\\src\\main\\java\\com\\kyj\\fx\\voeditor\\visual\\util\\ValueUtil.java";
+		
+		File javaFile = new File(fileString);
+		String ruleSetFile = /*"java-basic";*/new File("rulesets/java/basic.xml").getAbsolutePath();
 		String pmdReportFileName = new File("result.xml").getAbsolutePath();
 		System.out.println(javaFile.getAbsolutePath());
 		System.out.println(pmdReportFileName);
 //		String[] args = new String[] { "-d ", javaFile.getAbsolutePath(), "-f", "xml", "-R", ruleSetFile, "-r", pmdReportFileName , "-version" , "1.8", "-language", "java" , "-debug" };
 		
 		String string = Files.toString(javaFile, Charset.forName("UTF-8"));
-		String[] args = new String[] { "-sourceText ", string, "-f", "xml", "-R", ruleSetFile, "-r", pmdReportFileName , "-version" , "1.8", "-language", "java" , "-debug" };
+//		System.out.println(string);
+		String[] args = new String[] { "-sourceText ",string, "-f", "xml", "-R", ruleSetFile, "-r", pmdReportFileName , "-version" , "1.8", "-language", "java" , "-debug" };
 		
 		PMD.main(args);
 	}

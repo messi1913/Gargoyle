@@ -136,6 +136,7 @@ public class PMDParameters {
         configuration.setInputFilePath(params.getFileListPath());
         configuration.setInputUri(params.getUri());
         configuration.setReportFormat(params.getFormat());
+        configuration.setSourceText(params.getSourceText());
         configuration.setBenchmark(params.isBenchmark());
         configuration.setDebug(params.isDebug());
         configuration.setMinimumPriority(params.getMinimumPriority());

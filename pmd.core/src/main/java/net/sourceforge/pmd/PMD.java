@@ -6,9 +6,11 @@ package net.sourceforge.pmd;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -448,6 +450,29 @@ public class PMD {
               throw new RuntimeException("Problem with Input File Path: " + inputFilePath, ex);
             }
 
+        }
+        
+        if(null != configuration.getSourceText())
+        {
+//        	 String content = configuration.getSourceText();
+//             File file = new File(inputFilePath);
+//             try {
+//               if (!file.exists()) {
+//                 LOG.log(Level.SEVERE, "Problem with Input File Path", inputFilePath);
+//                 throw new RuntimeException("Problem with Input File Path: " + inputFilePath);
+//               } else {
+                 String filePaths = "SourceBase"; //"SourceBase";//FileUtils.readFileToString(new File(inputFilePath));
+                 filePaths = StringUtils.trimToEmpty(filePaths);
+                 filePaths = filePaths.replaceAll("\\r?\\n", ",");
+                 filePaths = filePaths.replaceAll(",+", ",");
+
+                 
+                 files.addAll(Arrays.asList(new ReaderDataSource(new StringReader(configuration.getSourceText()), filePaths)));
+//               }
+//             } catch (IOException ex) {
+//               LOG.log(Level.SEVERE, "Problem with Input File", ex);
+//               throw new RuntimeException("Problem with Input File Path: " + inputFilePath, ex);
+//             }
         }
         return files;
     }
