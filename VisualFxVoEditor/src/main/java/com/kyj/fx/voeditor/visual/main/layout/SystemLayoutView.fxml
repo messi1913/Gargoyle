@@ -55,7 +55,7 @@
 												<!-- <children> -->
 												<!-- <VBox prefHeight="200.0" prefWidth="100.0" -->
 												<!-- AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="0.0" -->
-												<!-- AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="0.0" 
+												<!-- AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="0.0"
 													/> -->
 												<!-- </children> -->
 												<!-- </AnchorPane> -->
@@ -193,7 +193,14 @@
 										</MenuItem>
 									</items>
 								</Menu>
-							
+
+								<Menu mnemonicParsing="false" text="PMD">
+									<items>
+										<MenuItem mnemonicParsing="false" onAction="#lblPmdDesignerOnAction" text="PMD Designer">
+										</MenuItem>
+									</items>
+								</Menu>
+
 							</items>
 						</Menu>
 						<Menu fx:id="menuPlugins" mnemonicParsing="false" text="Plugins" />

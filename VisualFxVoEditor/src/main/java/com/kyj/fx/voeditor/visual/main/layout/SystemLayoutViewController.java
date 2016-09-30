@@ -1676,6 +1676,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	}
 
+	public void lblPmdDesignerOnAction(){
+//		loadNewSystemTab("PMD Designer", new PMD);
+	}
+
 	/*
 	 * 쿼리 리스너 구현체.
 	 *
