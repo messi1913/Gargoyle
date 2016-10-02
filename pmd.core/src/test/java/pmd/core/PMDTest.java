@@ -35,7 +35,7 @@ public class PMDTest {
 		
 		String string = Files.toString(javaFile, Charset.forName("UTF-8"));
 //		System.out.println(string);
-		String[] args = new String[] { "-sourceText ",string, "-f", "xml", "-R", ruleSetFile, "-r", pmdReportFileName , "-version" , "1.8", "-language", "java" , "-debug" };
+		String[] args = new String[] { "-sourceText ",string, "-f", "dbXml", "-R", ruleSetFile, "-r", pmdReportFileName , "-version" , "1.8", "-language", "java" ,  "-P", "driver=jdbc.oracle,url=10.20.2.2,id=ccc,password=ccc" };
 		
 		PMD.main(args);
 	}
