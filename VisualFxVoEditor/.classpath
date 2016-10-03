@@ -38,5 +38,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/db/maria/mariadb-java-client-1.4.6.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/pmd.core"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
