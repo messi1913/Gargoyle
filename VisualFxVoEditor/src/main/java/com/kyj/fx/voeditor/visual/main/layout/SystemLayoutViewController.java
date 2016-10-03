@@ -515,7 +515,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		try {
 			String content1 = FileUtils.readFileToString(file, "UTF-8");
 			JavaTextView javaTextView = new JavaTextView(content1, false);
-			javaTextView.setEditable(false);
+			//2016-10-03 editable 주석 해제.
+//			javaTextView.setEditable(false);
 			loadNewSystemTab(file.getName(), javaTextView);
 		} catch (IOException e1) {
 			LOGGER.debug(ValueUtil.toString(e1));

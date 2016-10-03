@@ -15,7 +15,16 @@ import org.fxmisc.richtext.StyleSpansBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.popup.TextSearchAndReplaceView;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
+
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
+import javafx.scene.control.IndexRange;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -48,6 +57,27 @@ public class JavaTextArea extends BorderPane {
 	private CodeArea codeArea;
 	private Label lblLineInfo = new Label();
 
+	private static final String CHARACTERS_MATCH = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
+
+	// 선택 범위 지정
+	private EventHandler<? super MouseEvent> defaultSelectionHandler = event -> {
+		if (event.getClickCount() == 1) {
+			// codeArea.setStyleSpans(0,
+			// groupBackgroundColor(codeArea.getText(),
+			// codeArea.getCaretPosition()));
+		} else if (event.getClickCount() == 2) {
+			String selectedText = codeArea.getSelectedText();
+			if (ValueUtil.isNotEmpty(selectedText)) {
+				IndexRange selection = codeArea.getSelection();
+				String ltrimText = selectedText.replaceAll("^\\s+", "");
+				String firstStr = ltrimText.substring(0, 1).replaceAll(CHARACTERS_MATCH, "");
+				int start = selection.getStart();
+				int end = selection.getEnd();
+				codeArea.selectRange(start + (selectedText.length() - ltrimText.length() + 1 - firstStr.length()), end);
+			}
+		}
+	};
+
 	public JavaTextArea() {
 
 		codeArea = new CodeArea();
@@ -61,6 +91,11 @@ public class JavaTextArea extends BorderPane {
 				.subscribe(change -> {
 					codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
 				});
+		// 마우스 클릭이벤트 정의
+		codeArea.addEventHandler(KeyEvent.KEY_PRESSED, this::codeAreaKeyClick);
+		// codeArea.setOnKeyPressed(this::codeAreaKeyClick);
+		//
+		codeArea.setOnMouseClicked(defaultSelectionHandler);
 
 		//		codeArea.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
 		//				.successionEnds(Duration.millis(500)).supplyTask(this::computeHighlightingAsync).awaitLatest(codeArea.richChanges())
@@ -102,22 +137,38 @@ public class JavaTextArea extends BorderPane {
 		codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
 	}
 
-	public void setContent(String content) {
-		codeArea.clear();
-		codeArea.replaceText(0, 0, content);
-	}
+	//	public void setContent(String content) {
+	//		codeArea.clear();
+	//		codeArea.replaceText(0, 0, content);
+	//	}
 
-	public String getContent(){
+	public String getContent() {
 		return codeArea.getText();
 	}
-	public void appendContent(String content) {
-		codeArea.replaceText(0, 0, content);
-	}
+
+	//	public void appendContent(String content) {
+	//		codeArea.replaceText(0, 0, content);
+	//	}
 
 	protected void setContent(List<String> readLines) {
-		codeArea.replaceText(readLines.stream().collect(Collectors.joining("\n")));
+		setContent(readLines.stream().collect(Collectors.joining("\n")));
 	}
 
+	private void setContent(int start, int end, String text) {
+		codeArea.getUndoManager().mark();
+		codeArea.replaceText(start, end, text);
+		codeArea.getUndoManager().mark();
+	}
+	
+	public void setContent(String content) {
+		codeArea.getUndoManager().mark();
+		codeArea.clear();
+		codeArea.replaceText(content);
+		codeArea.getUndoManager().mark();
+	}
+	
+
+	
 	public void setEditable(boolean editable) {
 		this.codeArea.setEditable(editable);
 	}
@@ -166,5 +217,135 @@ public class JavaTextArea extends BorderPane {
 	//	private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
 	//		codeArea.setStyleSpans(0, highlighting);
 	//	}
+
+	/**
+	 * 키클릭 이벤트 처리
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 12. 14.
+	 * @param e
+	 */
+	public void codeAreaKeyClick(KeyEvent e) {
+		// System.out.println("sqlKeywords");
+		// System.out.println(e.getCode());
+		// CTRL + F 찾기
+		if ((e.getCode() == KeyCode.F) && (e.isControlDown() && !e.isShiftDown())) {
+
+			ObservableValue<String> textProperty = codeArea.textProperty();
+			TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(this, textProperty);
+
+			textSearchView.setOnSearchResultListener((vo) -> {
+
+				switch (vo.getSearchType()) {
+				case SEARCH_SIMPLE: {
+					int startIndex = vo.getStartIndex();
+					int endIndex = vo.getEndIndex();
+					codeArea.selectRange(startIndex, endIndex);
+					LOGGER.debug(String.format("find text : %s startIdx :%d endIdx :%d", vo.getSearchText(), startIndex, endIndex));
+					break;
+				}
+				case SEARCH_ALL: {
+					int startIndex = vo.getStartIndex();
+					String searchText = vo.getSearchText();
+					String replaceText = vo.getReplaceText();
+					// codeArea.replaceText(startIndex, startIndex +
+					// searchText.length(), replaceText);
+					setContent(startIndex, startIndex + searchText.length(), replaceText);
+					break;
+				}
+				}
+
+			});
+
+			textSearchView.setOnReplaceResultListener(vo -> {
+				switch (vo.getReaplceType()) {
+				case SIMPLE: {
+					String reaplceResult = vo.getReaplceResult();
+					setContent(reaplceResult);
+					break;
+				}
+				case ALL: {
+					String reaplceResult = vo.getReaplceResult();
+					setContent(reaplceResult);
+					break;
+				}
+				}
+			});
+
+			textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
+				if (newval)
+					LOGGER.debug("User Select Locale Scope..");
+				else
+					LOGGER.debug("User Select Gloval Scope..");
+			});
+
+			codeArea.setOnMouseClicked(event -> {
+
+				IndexRange selection = codeArea.getSelection();
+				int start = selection.getStart();
+				textSearchView.setSlidingStartIndexProperty(start);
+
+			});
+
+			textSearchView.show();
+
+			codeArea.setOnMouseClicked(defaultSelectionHandler);
+
+			e.consume();
+		}
+		// CTRL + SHIFT + F 포멧팅
+		//		else if (e.getCode() == KeyCode.F && (e.isControlDown() && e.isShiftDown())) {
+		//
+		//			doSqlFormat();
+		//			e.consume();
+		//		}
+		// Ctr + U 선택된 문자 또는 전체 문자를 대문자로 치환
+		else if (e.getCode() == KeyCode.U && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+			String selectedText = codeArea.getSelectedText();
+			if (ValueUtil.isNotEmpty(selectedText)) {
+				// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
+				replaceSelection(ValueUtil.toUpperCase(selectedText));
+			} else {
+				String text = codeArea.getText();
+				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
+				// codeArea.clear();
+				// codeArea.appendText(sqlFormatter.toUpperCase(text));
+				setContent(ValueUtil.toUpperCase(text));
+			}
+			e.consume();
+		}
+		// Ctr + L 선택된 문자 또는 전체 문자를 소문자로 치환
+		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+			String selectedText = codeArea.getSelectedText();
+			if (ValueUtil.isNotEmpty(selectedText)) {
+				// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));
+				replaceSelection(ValueUtil.toLowerCase(selectedText));
+			} else {
+				String text = codeArea.getText();
+				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
+				// codeArea.clear();
+				// codeArea.appendText(sqlFormatter.toLowerCase(text));
+				setContent(ValueUtil.toUpperCase(text));
+			}
+			e.consume();
+		}
+	}
+
+
+
+	public void replaceSelection(String selection) {
+		codeArea.getUndoManager().mark();
+		codeArea.replaceSelection(selection);
+		codeArea.getUndoManager().mark();
+	}
+	
+	
+
+	public void appendContent(String content) {
+		codeArea.getUndoManager().mark();
+		// codeArea.replaceText(0, 0, content);
+		codeArea.appendText(content);
+		codeArea.getUndoManager().mark();
+	}
 
 }

@@ -6,11 +6,12 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.springframework.util.SystemPropertyUtils;
-
 /**
  * Performs formatting of basic SQL statements (DML + query).
  *
+ *
+ * 2016-10-03 일부 함수 ValueUtil로 코드이동. by kyj.
+ * 
  * @author Gavin King
  * @author Steve Ebersole
  */
@@ -463,6 +464,8 @@ public class SqlFormatter implements Formatter {
 		}
 	}
 
+	
+	
 	@Override
 	public String toUpperCase(String sql) {
 		return toUpperLowerCase(sql, true);
@@ -474,58 +477,7 @@ public class SqlFormatter implements Formatter {
 	}
 
 	private String toUpperLowerCase(String sql, boolean isUpper) {
-		StringBuffer result = new StringBuffer();
-		StringTokenizer tokens = new StringTokenizer(sql, "'-/*\n", true);
-		String token;
-		while (tokens.hasMoreTokens()) {
-			token = tokens.nextToken();
-			// 변수
-			if ("'".equals(token)) {
-				String t;
-				do {
-					t = tokens.nextToken();
-					token += t;
-				} while (!"'".equals(t) && tokens.hasMoreTokens());
-
-				result.append(token);
-			}
-			// 주석 /**/
-			else if ("/".equals(token)) {
-				String t;
-				t = tokens.nextToken();
-				token += t;
-				if ("*".equals(t)) {
-					do {
-						t = tokens.nextToken();
-						token += t;
-					} while (!token.endsWith("*/"));
-				}
-
-				result.append(token);
-			}
-			// 주석 --
-			else if ("-".equals(token)) {
-				String t;
-				t = tokens.nextToken();
-				token += t;
-				if ("-".equals(t)) {
-					do {
-						t = tokens.nextToken();
-						token += t;
-					} while (!token.endsWith("\n"));
-				}
-				result.append(token);
-			}
-			// 문자 저장
-			else {
-				if (isUpper) {
-					result.append(token.toUpperCase());
-				} else {
-					result.append(token.toLowerCase());
-				}
-			}
-		}
-		return result.toString();
+		return ValueUtil.toUpperLowerCase(sql,isUpper);
 	}
 
 	@Override

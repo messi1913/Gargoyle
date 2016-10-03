@@ -72,7 +72,7 @@ public class JavaTextView extends BorderPane {
 		//		this.content = content;
 		this.showButtons = showButtons;
 		javaTextArea = new JavaTextArea();
-		javaTextArea.setEditable(false);
+//		javaTextArea.setEditable(false);
 		javaTextArea.setContent(content);
 
 

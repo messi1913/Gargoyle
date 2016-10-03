@@ -6,7 +6,6 @@ package net.sourceforge.pmd.renderers;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -25,26 +24,24 @@ public class RendererFactory {
 	private static final Logger LOG = Logger.getLogger(RendererFactory.class.getName());
 
 	//2016-10-01 final 키워드 삭제.
-	public static Map<String, Class<? extends Renderer>> REPORT_FORMAT_TO_RENDERER;
+	public static final Map<String, Class<? extends Renderer>> REPORT_FORMAT_TO_RENDERER = new TreeMap<>();
 	static {
 
-		Map<String, Class<? extends Renderer>> map = new TreeMap<>();
-		//2016-10-01 추가 by kyj.
-		map.put(DatabaseXmlRenderer.NAME, DatabaseXmlRenderer.class);
-		
-		map.put(CodeClimateRenderer.NAME, CodeClimateRenderer.class);
-		map.put(XMLRenderer.NAME, XMLRenderer.class);
-		map.put(IDEAJRenderer.NAME, IDEAJRenderer.class);
-		map.put(TextColorRenderer.NAME, TextColorRenderer.class);
-		map.put(TextRenderer.NAME, TextRenderer.class);
-		map.put(TextPadRenderer.NAME, TextPadRenderer.class);
-		map.put(EmacsRenderer.NAME, EmacsRenderer.class);
-		map.put(CSVRenderer.NAME, CSVRenderer.class);
-		map.put(HTMLRenderer.NAME, HTMLRenderer.class);
-		map.put(XSLTRenderer.NAME, XSLTRenderer.class);
-		map.put(YAHTMLRenderer.NAME, YAHTMLRenderer.class);
-		map.put(SummaryHTMLRenderer.NAME, SummaryHTMLRenderer.class);
-		map.put(VBHTMLRenderer.NAME, VBHTMLRenderer.class);
+//		2016-10-01 추가 by kyj.
+		REPORT_FORMAT_TO_RENDERER.put(DatabaseXmlRenderer.NAME, DatabaseXmlRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(CodeClimateRenderer.NAME, CodeClimateRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(XMLRenderer.NAME, XMLRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(IDEAJRenderer.NAME, IDEAJRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(TextColorRenderer.NAME, TextColorRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(TextRenderer.NAME, TextRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(TextPadRenderer.NAME, TextPadRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(EmacsRenderer.NAME, EmacsRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(CSVRenderer.NAME, CSVRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(HTMLRenderer.NAME, HTMLRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(XSLTRenderer.NAME, XSLTRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(YAHTMLRenderer.NAME, YAHTMLRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(SummaryHTMLRenderer.NAME, SummaryHTMLRenderer.class);
+		REPORT_FORMAT_TO_RENDERER.put(VBHTMLRenderer.NAME, VBHTMLRenderer.class);
 		
 		//2016-10-01 수정불가능하므로 삭제.
 //		REPORT_FORMAT_TO_RENDERER = Collections.unmodifiableMap(map);

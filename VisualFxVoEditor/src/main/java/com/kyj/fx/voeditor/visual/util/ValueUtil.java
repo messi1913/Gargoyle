@@ -1015,4 +1015,88 @@ public class ValueUtil {
 		return path.replace(ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR), "");
 	}
 
+	/********************************
+	 * 작성일 : 2016. 10. 3. 작성자 : 
+	 *
+	 * @param sql
+	 * @return
+	 ********************************/
+	
+	public static String toUpperCase(String sql) {
+		return toUpperLowerCase(sql, true);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 10. 3. 작성자 : 
+	 *
+	 * @param sql
+	 * @return
+	 ********************************/
+	public static String toLowerCase(String sql) {
+		return toUpperLowerCase(sql, false);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 10. 3. 작성자 :
+	 *
+	 * 대소문자로 뷴류
+	 * 
+	 * @param sql
+	 * @param isUpper
+	 * @return
+	 ********************************/
+	public static String toUpperLowerCase(String sql, boolean isUpper) {
+		StringBuffer result = new StringBuffer();
+		StringTokenizer tokens = new StringTokenizer(sql, "'-/*\n", true);
+		String token;
+		while (tokens.hasMoreTokens()) {
+			token = tokens.nextToken();
+			// 변수
+			if ("'".equals(token)) {
+				String t;
+				do {
+					t = tokens.nextToken();
+					token += t;
+				} while (!"'".equals(t) && tokens.hasMoreTokens());
+
+				result.append(token);
+			}
+			// 주석 /**/
+			else if ("/".equals(token)) {
+				String t;
+				t = tokens.nextToken();
+				token += t;
+				if ("*".equals(t)) {
+					do {
+						t = tokens.nextToken();
+						token += t;
+					} while (!token.endsWith("*/"));
+				}
+
+				result.append(token);
+			}
+			// 주석 --
+			else if ("-".equals(token)) {
+				String t;
+				t = tokens.nextToken();
+				token += t;
+				if ("-".equals(t)) {
+					do {
+						t = tokens.nextToken();
+						token += t;
+					} while (!token.endsWith("\n"));
+				}
+				result.append(token);
+			}
+			// 문자 저장
+			else {
+				if (isUpper) {
+					result.append(token.toUpperCase());
+				} else {
+					result.append(token.toLowerCase());
+				}
+			}
+		}
+		return result.toString();
+	}
 }
