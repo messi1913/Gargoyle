@@ -27,11 +27,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/antlr-runtime-3.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/antlr4-runtime-4.5.2-1.jar"/>
 	<classpathentry kind="lib" path="lib/asm-5.0.4.jar"/>
@@ -41,7 +36,6 @@
 	<classpathentry kind="lib" path="lib/javacc-5.0.jar"/>
 	<classpathentry kind="lib" path="lib/jaxen-1.1.6.jar"/>
 	<classpathentry kind="lib" path="lib/jcommander-1.48.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-apex-5.5.1-apex-jorje-shaded.jar"/>
 	<classpathentry kind="lib" path="lib/pmd-apex-5.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/pmd-cpp-5.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/pmd-cs-5.5.1.jar"/>
