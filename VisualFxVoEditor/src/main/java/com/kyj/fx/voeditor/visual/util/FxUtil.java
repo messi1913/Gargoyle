@@ -62,10 +62,12 @@ import javafx.scene.SnapshotResult;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -933,5 +935,16 @@ public class FxUtil {
 			}
 		}
 
+	}
+
+	/**
+	 * 툴팁 처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 4.
+	 * @param v
+	 * @param string
+	 */
+	public static void installTooltip(Node node, String string) {
+		Tooltip.install(node, new Tooltip(string));
 	}
 }

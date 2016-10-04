@@ -18,15 +18,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.kyj.fx.voeditor.visual.component.chart.AttachedTextValuePieChart;
 import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.PieChart.Data;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableView;
+import javafx.util.StringConverter;
 
 /**
  * @author KYJ
@@ -38,6 +42,9 @@ public class FilePropertiesComposite extends TabPane implements Function<File, L
 
 	@FXML
 	private TableView<Map<String, Object>> tbFileProperties;
+
+	@FXML
+	private AttachedTextValuePieChart picChart;
 
 	/**
 	 */
@@ -67,10 +74,27 @@ public class FilePropertiesComposite extends TabPane implements Function<File, L
 
 	@FXML
 	public void initialize() {
+		StringConverter<PieChart.Data> labelConverter = new StringConverter<PieChart.Data>() {
+
+			@Override
+			public String toString(Data d) {
+				String formatedValue = String.format("%s\n%.2f %%", d.getName(), d.getPieValue());
+				return formatedValue;
+			}
+
+			@Override
+			public Data fromString(String string) {
+				return null;
+			}
+		};
+		picChart.setLabelConverter(labelConverter);
+		picChart.setTooltipConverter(labelConverter);
+
 		tbFileProperties.getItems().addAll(apply(this.file));
 
 		tbFileProperties.getSelectionModel().setCellSelectionEnabled(true);
 		tbFileProperties.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
 		FxClipboardUtil.installCopyPasteHandler(tbFileProperties);
 	}
 
@@ -90,9 +114,11 @@ public class FilePropertiesComposite extends TabPane implements Function<File, L
 	public List<Map<String, Object>> apply(File file) {
 		ObservableList<Map<String, Object>> items = FXCollections.observableArrayList();
 
-		long totalSpace = this.file.getTotalSpace();
-		long usableSpace = this.file.getUsableSpace();
-		long freeSpace = this.file.getFreeSpace();
+		Long totalSpace = this.file.getTotalSpace();
+		Long usableSpace = this.file.getUsableSpace();
+		Long freeSpace = this.file.getFreeSpace();
+		Long fileSize = this.file.length();
+
 		String name = this.file.getName();
 		boolean isExecutable = this.file.canExecute();
 		boolean isWriable = this.file.canWrite();
@@ -100,17 +126,27 @@ public class FilePropertiesComposite extends TabPane implements Function<File, L
 		boolean hidden = this.file.isHidden();
 		String path = this.file.getAbsolutePath();
 
+		//grid
 		items.add(toMap("name", name));
 		items.add(toMap("path", path));
 
-		items.add(toMap("totalSpace(byte)", toNumber(totalSpace)));
-		items.add(toMap("usableSpace(byte)", toNumber(usableSpace)));
-		items.add(toMap("freeSpace(byte)", toNumber(freeSpace)));
+		items.add(toMap("totalSpace(byte)", toNumberString(totalSpace)));
+		items.add(toMap("usableSpace(byte)", toNumberString(usableSpace)));
+		items.add(toMap("freeSpace(byte)", toNumberString(freeSpace)));
+		items.add(toMap("fileSize(byte)", toNumberString(fileSize)));
 
 		items.add(toMap("isExecutable", isExecutable));
 		items.add(toMap("isWriable", isWriable));
 		items.add(toMap("isReadable", isReadable));
 		items.add(toMap("hidden", hidden));
+
+		//chart
+		ObservableList<Map<String, Object>> sizeItems = FXCollections.observableArrayList();
+		sizeItems.add(toMap("totalSpace(byte)", totalSpace.toString()));
+		sizeItems.add(toMap("usableSpace(byte)", usableSpace.toString()));
+		sizeItems.add(toMap("freeSpace(byte)", freeSpace.toString()));
+		sizeItems.add(toMap("fileSize(byte)", fileSize.toString()));
+		this.picChart.setData(ChartCreator.convertNewData(totalSpace, sizeItems));
 
 		try {
 
@@ -138,7 +174,7 @@ public class FilePropertiesComposite extends TabPane implements Function<File, L
 		return format.format(new Date(dateval));
 	}
 
-	private String toNumber(long number) {
+	private String toNumberString(long number) {
 		return String.format("%,d", number);
 	}
 
@@ -148,5 +184,23 @@ public class FilePropertiesComposite extends TabPane implements Function<File, L
 		map.put("value", value);
 		return map;
 	}
+
 	/**********************************************************************************************/
+
+	static class ChartCreator {
+
+		static ObservableList<Data> convertNewData(long totalSpace, ObservableList<Map<String, Object>> items) {
+
+			ObservableList<Data> charItmes = FXCollections.observableArrayList();
+			for (Map<String, Object> m : items) {
+
+				long value = Long.valueOf(m.get("value").toString(), 10);
+				long percent = value * 100 / totalSpace;
+				String key = m.get("key").toString().replace("(byte)", "");
+				Data e = new Data(key, percent);
+				charItmes.add(e);
+			}
+			return charItmes;
+		}
+	}
 }
