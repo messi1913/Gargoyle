@@ -15,6 +15,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +55,7 @@ import net.sourceforge.pmd.benchmark.Benchmarker;
 import net.sourceforge.pmd.benchmark.TextReport;
 import net.sourceforge.pmd.cli.PMDParameters;
 import net.sourceforge.pmd.lang.Language;
+import net.sourceforge.pmd.lang.LanguageFilenameFilter;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.LanguageVersionDiscoverer;
@@ -61,6 +63,7 @@ import net.sourceforge.pmd.renderers.DatabaseXmlRenderer;
 import net.sourceforge.pmd.renderers.Renderer;
 import net.sourceforge.pmd.stat.Metric;
 import net.sourceforge.pmd.util.ClasspathClassLoader;
+import net.sourceforge.pmd.util.FileUtil;
 import net.sourceforge.pmd.util.IOUtil;
 import net.sourceforge.pmd.util.datasource.DataSource;
 import net.sourceforge.pmd.util.datasource.ReaderDataSource;
@@ -104,6 +107,15 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 		violationLabel = new Label();
 		setBottom(violationLabel);
 
+		if (this.sourceFile.isDirectory()) {
+			dirFilePmd(this.sourceFile);
+		} else {
+			simpleFilePmd(this.sourceFile);
+		}
+
+	}
+
+	private void simpleFilePmd(File file) {
 		try {
 			stringWriter.getBuffer().setLength(0);
 			String sourceCode = Files.toString(this.sourceFile, Charset.forName("UTF-8"));
@@ -135,7 +147,48 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 		} catch (IOException e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}
+	}
 
+	private void dirFilePmd(File file) {
+		try {
+			stringWriter.getBuffer().setLength(0);
+			//			String sourceCode = Files.toString(this.sourceFile, Charset.forName("UTF-8"));
+			//			javaTextArea.setContent(sourceCode);
+
+			PMDParameters params = new PMDParameters();
+			try {
+				Field declaredField = PMDParameters.class.getDeclaredField("sourceDir");
+				if (declaredField != null) {
+					declaredField.setAccessible(true);
+					declaredField.set(params, file.getAbsolutePath());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			//			transformParametersIntoConfiguration(params);
+			long start = System.nanoTime();
+
+			int violations = doPMD.doPMD(transformParametersIntoConfiguration(params));
+			long end = System.nanoTime();
+			Benchmarker.mark(Benchmark.TotalPMD, end - start, 0);
+
+			TextReport report = new TextReport();
+
+			try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+				report.generate(Benchmarker.values(), new PrintStream(out));
+				out.flush();
+				LOGGER.debug(out.toString("UTF-8"));
+			}
+
+			Platform.runLater(() -> {
+				xmlEditor.setContent(stringWriter.getBuffer().toString());
+				violationLabel.setText(String.format(VIOLATION_TEXT_FORMAT, violations));
+			});
+
+		} catch (IOException e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
 	}
 
 	public PMDConfiguration transformParametersIntoConfiguration(PMDParameters params) {
@@ -145,7 +198,7 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 		//					"Please provide a parameter for source root directory (-dir or -d), database URI (-uri or -u), or file list path (-filelist).");
 		//		}
 		PMDConfiguration configuration = new PMDConfiguration();
-		//		configuration.setInputPaths(params.getSourceDir());
+		configuration.setInputPaths(params.getSourceDir());
 		//		configuration.setInputFilePath(params.getFileListPath());
 		//		configuration.setInputUri(params.getUri());
 		configuration.setReportFormat(REPORT_FILE_FORMAT);
@@ -286,18 +339,26 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 
 		private List<DataSource> internalGetApplicableFiles(PMDConfiguration configuration, Set<Language> languages) {
 			List<DataSource> files = new ArrayList<>();
+			LanguageFilenameFilter fileSelector = new LanguageFilenameFilter(languages);
 
-			//			if (null != configuration.getSourceText()) {
-			String filePaths = "SourceBase";
-			filePaths = filePaths.replaceAll("\\r?\\n", ",");
-			filePaths = filePaths.replaceAll(",+", ",");
+			if (null != configuration.getInputPaths()) {
+				files.addAll(FileUtil.collectFiles(configuration.getInputPaths(), fileSelector));
+			}
 
-			String sourceText = configuration.getSourceText();
-			try {
-				Reader reader = new StringReader(sourceText);
-				files.addAll(Arrays.asList(new ReaderDataSource(reader, filePaths)));
-			} catch (Exception e) {
-				e.printStackTrace();
+			if (null != configuration.getSourceText()) {
+
+				String filePaths = "SourceBase";
+				filePaths = filePaths.replaceAll("\\r?\\n", ",");
+				filePaths = filePaths.replaceAll(",+", ",");
+
+				String sourceText = configuration.getSourceText();
+				try {
+					Reader reader = new StringReader(sourceText);
+					files.addAll(Arrays.asList(new ReaderDataSource(reader, filePaths)));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
 			}
 
 			return files;

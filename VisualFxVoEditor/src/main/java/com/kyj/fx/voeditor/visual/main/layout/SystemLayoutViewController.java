@@ -12,10 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.ky.pmd.core.PMD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -659,6 +661,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					menuRunPmd.setUserData(file);
 					menuRunPmd.setOnAction(this::menuRunPmdOnAction);
 					menuPMD.getItems().add(menuRunPmd);
+				}
+
+				if (file.isDirectory()) {
+					MenuItem menuRunAllPmd = new MenuItem("Run All PMD");
+					menuRunAllPmd.setUserData(file);
+					menuRunAllPmd.setOnAction(this::menuRunPmdOnAction);
+					menuPMD.getItems().add(menuRunAllPmd);
 				}
 
 				//항상출력
