@@ -6,9 +6,11 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.pmd;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -24,6 +26,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.io.Files;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
@@ -34,6 +39,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
+import kyj.Fx.dao.wizard.core.util.ValueUtil;
 import net.sourceforge.pmd.PMDConfiguration;
 import net.sourceforge.pmd.ReportListener;
 import net.sourceforge.pmd.Rule;
@@ -60,12 +66,14 @@ import net.sourceforge.pmd.util.datasource.DataSource;
 import net.sourceforge.pmd.util.datasource.ReaderDataSource;
 
 /***************************
- * 
+ *
  * @author KYJ
  *
  ***************************/
 
 public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseable, Closeable {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PMDCheckComposite.class);
 
 	private File sourceFile;
 
@@ -83,7 +91,7 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 	private static final String REPORT_FILE_FORMAT = "xml";
 	private static final String VIOLATION_TEXT_FORMAT = "Violation : %d";
 
-	public PMDCheckComposite(File sourceFile) throws IOException {
+	public PMDCheckComposite(File sourceFile) {
 		this.sourceFile = sourceFile;
 
 		javaTextArea = new JavaTextArea();
@@ -112,7 +120,12 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 			Benchmarker.mark(Benchmark.TotalPMD, end - start, 0);
 
 			TextReport report = new TextReport();
-			report.generate(Benchmarker.values(), System.err);
+
+			try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+				report.generate(Benchmarker.values(), new PrintStream(out));
+				out.flush();
+				LOGGER.debug(out.toString("UTF-8"));
+			}
 
 			Platform.runLater(() -> {
 				xmlEditor.setContent(stringWriter.getBuffer().toString());
@@ -120,7 +133,7 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 			});
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(ValueUtil.toString(e));
 		}
 
 	}
@@ -171,7 +184,7 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 
 	/***************************
 	 * PMD 처리
-	 * 
+	 *
 	 * @author KYJ
 	 *
 	 ***************************/
@@ -256,7 +269,7 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 
 		/**
 		 * Determines all the files, that should be analyzed by PMD.
-		 * 
+		 *
 		 * @param configuration
 		 *            contains either the file path or the DB URI, from where to load the files
 		 * @param languages

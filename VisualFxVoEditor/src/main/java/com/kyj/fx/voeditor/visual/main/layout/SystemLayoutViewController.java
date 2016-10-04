@@ -31,6 +31,8 @@ import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
 import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
 import com.kyj.fx.voeditor.visual.component.file.FilePropertiesComposite;
+import com.kyj.fx.voeditor.visual.component.pmd.DesignerFxComposite;
+import com.kyj.fx.voeditor.visual.component.pmd.PMDCheckComposite;
 import com.kyj.fx.voeditor.visual.component.popup.BigTextView;
 import com.kyj.fx.voeditor.visual.component.popup.FXMLTextView;
 import com.kyj.fx.voeditor.visual.component.popup.GagoyleWorkspaceOpenResourceView;
@@ -58,6 +60,7 @@ import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
+import com.kyj.fx.voeditor.visual.util.PMDUtil;
 import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.model.SpecResource;
@@ -516,7 +519,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			String content1 = FileUtils.readFileToString(file, "UTF-8");
 			JavaTextView javaTextView = new JavaTextView(content1, false);
 			//2016-10-03 editable 주석 해제.
-//			javaTextView.setEditable(false);
+			//			javaTextView.setEditable(false);
 			loadNewSystemTab(file.getName(), javaTextView);
 		} catch (IOException e1) {
 			LOGGER.debug(ValueUtil.toString(e1));
@@ -620,6 +623,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		});
 
 		Menu menuRunAs = new Menu("Run As");
+		Menu menuPMD = new Menu("PMD");
 
 		fileTreeContextMenu.setOnShowing(ev -> {
 			TreeItem<FileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
@@ -628,6 +632,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			boolean isDisableSCMGraphsMenuItem = true;
 			if (selectedTreeItem != null) {
 				menuRunAs.getItems().clear();
+				menuPMD.getItems().clear();
 				FileWrapper fileWrapper = selectedTreeItem.getValue();
 				File file = fileWrapper.getFile();
 				if (fileWrapper.isSVNConnected())
@@ -648,6 +653,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						menuRunAs.getItems().add(new MenuItem("Java Application"));
 					}
 				}
+
+				if (PMDUtil.isSupportedLanguageVersions(file)) {
+					MenuItem menuRunPmd = new MenuItem("Run PMD");
+					menuRunPmd.setUserData(file);
+					menuRunPmd.setOnAction(this::menuRunPmdOnAction);
+					menuPMD.getItems().add(menuRunPmd);
+				}
+
+				//항상출력
 				menuRunAs.getItems().add(new SeparatorMenuItem());
 				menuRunAs.getItems().add(new MenuItem("Run Configurations"));
 
@@ -702,8 +716,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem,
 				deleteFileMenuItem, /* voEditorMenuItem, daoWizardMenuItem, */
 				voEditorMenuItem, /* setVoEditorMenuItem, */ setDaoWizardMenuItem, chodeAnalysisMenuItem, makeProgramSpecMenuItem,
-				menuItemSCMGraphs, new SeparatorMenuItem(), refleshMenuItem, new SeparatorMenuItem(), menuRunAs, new SeparatorMenuItem(),
-				menuProperties);
+				menuItemSCMGraphs, new SeparatorMenuItem(), refleshMenuItem, new SeparatorMenuItem(), menuPMD, new SeparatorMenuItem(),
+				menuRunAs, new SeparatorMenuItem(), menuProperties);
 
 		// daoWizardMenuItem.addEventHandler(ActionEvent.ACTION,
 		// this::daoWizardMenuItemOnActionEvent);
@@ -997,6 +1011,21 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			}
 		}
 
+	}
+
+	/**
+	 * PMD 실행처리
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 4.
+	 * @param e
+	 */
+	public void menuRunPmdOnAction(ActionEvent e) {
+		MenuItem source = (MenuItem) e.getSource();
+		File file = (File) source.getUserData();
+		if (file != null && file.exists()) {
+			String name = file.getName();
+			loadNewSystemTab(String.format("PMD - %s", name), new PMDCheckComposite(file));
+		}
 	}
 
 	/********************************
@@ -1677,8 +1706,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	}
 
-	public void lblPmdDesignerOnAction(){
-//		loadNewSystemTab("PMD Designer", new PMD);
+	public void lblPmdDesignerOnAction() {
+		loadNewSystemTab("PMD Designer", new DesignerFxComposite());
 	}
 
 	/*

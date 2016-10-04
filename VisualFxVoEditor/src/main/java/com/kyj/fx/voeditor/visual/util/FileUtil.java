@@ -630,4 +630,26 @@ public class FileUtil {
 		});
 
 	}
+
+	/**
+	 * 파일확장자 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 4.
+	 * @param extension
+	 */
+	public static String getFileExtension(File fileName) {
+		return getFileExtension(fileName.getName());
+	}
+
+	/**
+	 * 파일확장자 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 4.
+	 * @param fileName
+	 * @return
+	 */
+	public static String getFileExtension(String fileName) {
+		int dotIndex = fileName.lastIndexOf('.');
+		return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
+	}
 }

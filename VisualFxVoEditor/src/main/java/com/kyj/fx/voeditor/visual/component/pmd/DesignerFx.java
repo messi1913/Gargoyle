@@ -68,6 +68,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -121,6 +123,8 @@ import net.sourceforge.pmd.lang.xpath.Initializer;
 import net.sourceforge.pmd.util.StringUtil;
 
 public class DesignerFx implements ClipboardOwner {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DesignerFx.class);
 
 	/**
 	 * @최초생성일 2016. 9. 30.
@@ -215,11 +219,17 @@ public class DesignerFx implements ClipboardOwner {
 		List<LanguageVersion> languageVersions = new ArrayList<>();
 		for (LanguageVersion languageVersion : LanguageRegistry.findAllVersions()) {
 			LanguageVersionHandler languageVersionHandler = languageVersion.getLanguageVersionHandler();
+
 			if (languageVersionHandler != null) {
 				Parser parser = languageVersionHandler.getParser(languageVersionHandler.getDefaultParserOptions());
 				if (parser != null && parser.canParse()) {
 					languageVersions.add(languageVersion);
+					LOGGER.debug("support parser: {}", parser.toString());
+				} else {
+					LOGGER.debug("not support parser: {}", parser.toString());
 				}
+			} else {
+				LOGGER.debug("not support parser (handler is null): {}", languageVersion.toString());
 			}
 		}
 		return languageVersions.toArray(new LanguageVersion[languageVersions.size()]);
@@ -573,55 +583,55 @@ public class DesignerFx implements ClipboardOwner {
 		}
 	}
 
-//	private class XPathListener implements ActionListener {
-//		public void actionPerformed(ActionEvent ae) {
-//			xpathResults.clear();
-//			if (StringUtil.isEmpty(xpathQueryArea.getText())) {
-//				xpathResults.addElement("XPath query field is empty.");
-//				xpathResultList.repaint();
-//				codeEditorPane.requestFocus();
-//				return;
-//			}
-//			Node c = getCompilationUnit();
-//			try {
-//				XPathRule xpathRule = new XPathRule() {
-//					@Override
-//					public void addViolation(Object data, Node node, String arg) {
-//						xpathResults.addElement(node);
-//					}
-//				};
-//				xpathRule.setMessage("");
-//				xpathRule.setLanguage(getLanguageVersion().getLanguage());
-//				xpathRule.setXPath(xpathQueryArea.getText());
-//				Object userData = xpathVersionButtonGroup.getSelectedToggle().getUserData();
-//				xpathRule.setVersion(userData.toString());
-//				//				xpathRule.setVersion(xpathVersionButtonGroup.getSelection().getActionCommand());
-//
-//				RuleSet ruleSet = new RuleSet();
-//				ruleSet.addRule(xpathRule);
-//
-//				RuleSets ruleSets = new RuleSets(ruleSet);
-//
-//				RuleContext ruleContext = new RuleContext();
-//				ruleContext.setLanguageVersion(getLanguageVersion());
-//
-//				List<Node> nodes = new ArrayList<Node>();
-//				nodes.add(c);
-//				ruleSets.apply(nodes, ruleContext, xpathRule.getLanguage());
-//
-//				if (xpathResults.isEmpty()) {
-//					xpathResults.addElement("No matching nodes " + System.currentTimeMillis());
-//				}
-//			} catch (ParseException pe) {
-//				xpathResults.addElement(pe.fillInStackTrace().getMessage());
-//			}
-//			xpathResultList.repaint();
-//			//			xpathQueryArea.requestFocus();
-//		}
-//	}
+	//	private class XPathListener implements ActionListener {
+	//		public void actionPerformed(ActionEvent ae) {
+	//			xpathResults.clear();
+	//			if (StringUtil.isEmpty(xpathQueryArea.getText())) {
+	//				xpathResults.addElement("XPath query field is empty.");
+	//				xpathResultList.repaint();
+	//				codeEditorPane.requestFocus();
+	//				return;
+	//			}
+	//			Node c = getCompilationUnit();
+	//			try {
+	//				XPathRule xpathRule = new XPathRule() {
+	//					@Override
+	//					public void addViolation(Object data, Node node, String arg) {
+	//						xpathResults.addElement(node);
+	//					}
+	//				};
+	//				xpathRule.setMessage("");
+	//				xpathRule.setLanguage(getLanguageVersion().getLanguage());
+	//				xpathRule.setXPath(xpathQueryArea.getText());
+	//				Object userData = xpathVersionButtonGroup.getSelectedToggle().getUserData();
+	//				xpathRule.setVersion(userData.toString());
+	//				//				xpathRule.setVersion(xpathVersionButtonGroup.getSelection().getActionCommand());
+	//
+	//				RuleSet ruleSet = new RuleSet();
+	//				ruleSet.addRule(xpathRule);
+	//
+	//				RuleSets ruleSets = new RuleSets(ruleSet);
+	//
+	//				RuleContext ruleContext = new RuleContext();
+	//				ruleContext.setLanguageVersion(getLanguageVersion());
+	//
+	//				List<Node> nodes = new ArrayList<Node>();
+	//				nodes.add(c);
+	//				ruleSets.apply(nodes, ruleContext, xpathRule.getLanguage());
+	//
+	//				if (xpathResults.isEmpty()) {
+	//					xpathResults.addElement("No matching nodes " + System.currentTimeMillis());
+	//				}
+	//			} catch (ParseException pe) {
+	//				xpathResults.addElement(pe.fillInStackTrace().getMessage());
+	//			}
+	//			xpathResultList.repaint();
+	//			//			xpathQueryArea.requestFocus();
+	//		}
+	//	}
 	private class XPathListener implements ActionListener {
 		@Override
-        public void actionPerformed(ActionEvent ae) {
+		public void actionPerformed(ActionEvent ae) {
 			xpathResults.clear();
 			if (StringUtil.isEmpty(xpathQueryArea.getText())) {
 				xpathResults.addElement("XPath query field is empty.");
@@ -640,7 +650,7 @@ public class DesignerFx implements ClipboardOwner {
 				xpathRule.setMessage("");
 				xpathRule.setLanguage(getLanguageVersion().getLanguage());
 				xpathRule.setXPath(xpathQueryArea.getText());
-//				xpathRule.setVersion(xpathVersionButtonGroup.getSelection().getActionCommand());
+				//				xpathRule.setVersion(xpathVersionButtonGroup.getSelection().getActionCommand());
 				Object userData = xpathVersionButtonGroup.getSelectedToggle().getUserData();
 				xpathRule.setVersion(userData.toString());
 
@@ -666,7 +676,6 @@ public class DesignerFx implements ClipboardOwner {
 			xpathQueryArea.requestFocus();
 		}
 	}
-
 
 	private class SymbolTableListener implements TreeSelectionListener {
 		public void valueChanged(TreeSelectionEvent e) {
