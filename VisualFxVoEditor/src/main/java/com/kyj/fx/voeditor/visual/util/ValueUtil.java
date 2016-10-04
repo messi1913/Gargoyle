@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -1016,18 +1017,18 @@ public class ValueUtil {
 	}
 
 	/********************************
-	 * 작성일 : 2016. 10. 3. 작성자 : 
+	 * 작성일 : 2016. 10. 3. 작성자 :
 	 *
 	 * @param sql
 	 * @return
 	 ********************************/
-	
+
 	public static String toUpperCase(String sql) {
 		return toUpperLowerCase(sql, true);
 	}
 
 	/********************************
-	 * 작성일 : 2016. 10. 3. 작성자 : 
+	 * 작성일 : 2016. 10. 3. 작성자 :
 	 *
 	 * @param sql
 	 * @return
@@ -1040,7 +1041,7 @@ public class ValueUtil {
 	 * 작성일 : 2016. 10. 3. 작성자 :
 	 *
 	 * 대소문자로 뷴류
-	 * 
+	 *
 	 * @param sql
 	 * @param isUpper
 	 * @return
@@ -1098,5 +1099,35 @@ public class ValueUtil {
 			}
 		}
 		return result.toString();
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 4.
+	 * @param value
+	 */
+	public static boolean isNumber(String value) {
+		int length = value.length();
+		for (int i = 0; i < length; value.length())
+			if (!Character.isDigit(value.charAt(i)))
+				return false;
+		return length == 0 ? false : true;
+
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 4.
+	 * @param value
+	 */
+	public static void ifNumberPresent(String value, Consumer<Double> action) {
+		int length = value.length();
+		for (int i = 0; i < length; i++)
+			if (!Character.isDigit(value.charAt(i)))
+				return;
+		if (length == 0 ? false : true) {
+			action.accept(Double.parseDouble(value));
+		}
+
 	}
 }

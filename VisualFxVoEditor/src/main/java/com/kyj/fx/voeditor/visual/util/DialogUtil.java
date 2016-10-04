@@ -8,10 +8,12 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.kyj.fx.voeditor.visual.component.popup.BaseDialogComposite;
 import com.kyj.fx.voeditor.visual.component.popup.ExceptionDialogComposite;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -19,6 +21,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -27,6 +30,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
@@ -572,37 +578,82 @@ public class DialogUtil {
 	public static Optional<Pair<String, String>> showInputDialog(Window owner, String title, String message, String inputValue,
 			Consumer<? super Pair<String, String>> consumer) {
 
-		// Create the custom dialog.
-		Dialog<Pair<String, String>> dialog = new Dialog<>();
-		dialog.setTitle(title);
-		dialog.setHeaderText(message);
-		TextField graphic = new TextField();
+		BaseDialogComposite composite = new BaseDialogComposite(title, message);
+		Button btnOk = new Button("OK");
+		btnOk.setMinWidth(80d);
+		Button btnCancel = new Button("Cancel");
+		btnCancel.setMinWidth(80d);
+		composite.addButton(btnOk);
+		composite.addButton(btnCancel);
+		TextField text = new TextField();
+		composite.setGraphic(text);
+		Optional<Pair<String, String>> empty = Optional.empty();
+		SimpleObjectProperty<Optional<Pair<String, String>>> prop = new SimpleObjectProperty<>(empty);
 
-		if (inputValue != null && inputValue != "") {
-			graphic.setText(inputValue);
-		}
+		//Modal
+		composite.show(owner, stage -> {
+			stage.initModality(Modality.APPLICATION_MODAL);
+			text.requestFocus();
 
-		dialog.setGraphic(graphic);
+			text.addEventHandler(KeyEvent.KEY_RELEASED, ev -> {
+				if (ev.getCode() == KeyCode.ENTER) {
+					Optional<Pair<String, String>> pair = Optional.of(new Pair<>("OK", text.getText()));
+					prop.set(pair);
+					stage.close();
+				}
+			});
 
-		// Set the button types.
-		ButtonType okBtn = new ButtonType("OK", ButtonData.OK_DONE);
+			btnOk.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
+				Optional<Pair<String, String>> pair = Optional.of(new Pair<>("OK", text.getText()));
+				prop.set(pair);
+				stage.close();
+			});
 
-		dialog.getDialogPane().getButtonTypes().add(okBtn);
+			btnCancel.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
+				stage.close();
+			});
 
-		dialog.setResultConverter(dialogButton -> {
-			if (dialogButton == okBtn) {
-				return new Pair<>("OK", graphic.getText());
-			} else {
-				return null;
-			}
 		});
 
-		dialog.initOwner(owner);
-		Optional<Pair<String, String>> result = dialog.showAndWait();
-
-		result.ifPresent(consumer);
-
-		return result;
+		return prop.get();
+		// Create the custom dialog.
+		//		Dialog<Pair<String, String>> dialog = new Dialog<>();
+		//		dialog.setTitle(title);
+		//		dialog.setHeaderText(message);
+		//		TextField text = new TextField();
+		//		text.setFocusTraversable(true);
+		//
+		//		dialog.setGraphic(text);
+		//		text.requestFocus();
+		//
+		//		// Set the button types.
+		//		ButtonType okBtn = new ButtonType("OK", ButtonData.OK_DONE);
+		//
+		//		dialog.getDialogPane().getButtonTypes().add(okBtn);
+		//
+		//		dialog.setResultConverter(dialogButton -> {
+		//			if (dialogButton == okBtn) {
+		//				return new Pair<>("OK", text.getText());
+		//			} else {
+		//				return null;
+		//			}
+		//		});
+		//
+		//		if (inputValue != null && inputValue != "") {
+		//			text.setText(inputValue);
+		//		}
+		//
+		//		dialog.initModality(Modality.APPLICATION_MODAL);
+		//		dialog.initOwner(owner);
+		//		dialog.getGraphic().requestFocus();
+		//		//		dialog.initModality(Modality.APPLICATION_MODAL);
+		//		//		graphic.setFocusTraversable(true);
+		//
+		//		Optional<Pair<String, String>> result = dialog.showAndWait();
+		//
+		//		result.ifPresent(consumer);
+		//
+		//		return result;
 
 	}
 

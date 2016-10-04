@@ -3,19 +3,23 @@ package com.kyj.fx.voeditor.visual.component.text;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.richtext.NavigationActions.SelectionPolicy;
 import org.fxmisc.richtext.Paragraph;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
+import org.fxmisc.richtext.TwoDimensional.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.popup.TextSearchAndReplaceView;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.value.ObservableValue;
@@ -26,6 +30,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.util.Pair;
 
 /**
  * @author KYJ
@@ -159,16 +164,14 @@ public class JavaTextArea extends BorderPane {
 		codeArea.replaceText(start, end, text);
 		codeArea.getUndoManager().mark();
 	}
-	
+
 	public void setContent(String content) {
 		codeArea.getUndoManager().mark();
 		codeArea.clear();
 		codeArea.replaceText(content);
 		codeArea.getUndoManager().mark();
 	}
-	
 
-	
 	public void setEditable(boolean editable) {
 		this.codeArea.setEditable(editable);
 	}
@@ -299,8 +302,8 @@ public class JavaTextArea extends BorderPane {
 		//			doSqlFormat();
 		//			e.consume();
 		//		}
-		// Ctr + U 선택된 문자 또는 전체 문자를 대문자로 치환
-		else if (e.getCode() == KeyCode.U && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+		// Ctr + ALT +  U 선택된 문자 또는 전체 문자를 대문자로 치환
+		else if (e.getCode() == KeyCode.U && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
 			String selectedText = codeArea.getSelectedText();
 			if (ValueUtil.isNotEmpty(selectedText)) {
 				// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
@@ -314,8 +317,8 @@ public class JavaTextArea extends BorderPane {
 			}
 			e.consume();
 		}
-		// Ctr + L 선택된 문자 또는 전체 문자를 소문자로 치환
-		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+		// Ctr + ALT + L 선택된 문자 또는 전체 문자를 소문자로 치환
+		else if (e.getCode() == KeyCode.L && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
 			String selectedText = codeArea.getSelectedText();
 			if (ValueUtil.isNotEmpty(selectedText)) {
 				// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));
@@ -329,23 +332,50 @@ public class JavaTextArea extends BorderPane {
 			}
 			e.consume();
 		}
+		// CTRL + L 특정 라인위치로 이동
+		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+			Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Go to Line", "Enter line number");
+			showInputDialog.ifPresent(v -> {
+
+				ValueUtil.ifNumberPresent(v.getValue(), num -> {
+
+					moveToLine(num.intValue());
+
+				});
+			});
+
+		}
 	}
-
-
 
 	public void replaceSelection(String selection) {
 		codeArea.getUndoManager().mark();
 		codeArea.replaceSelection(selection);
 		codeArea.getUndoManager().mark();
 	}
-	
-	
 
 	public void appendContent(String content) {
 		codeArea.getUndoManager().mark();
 		// codeArea.replaceText(0, 0, content);
 		codeArea.appendText(content);
 		codeArea.getUndoManager().mark();
+	}
+
+	/**
+	 * 특정라인으로 이동처리하는 메소드
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 4.
+	 * @param moveToLine
+	 */
+	@SuppressWarnings("rawtypes")
+	private void moveToLine(int moveToLine) {
+		int position = 0;
+		int row = moveToLine;
+		int length = 0;
+		for (Paragraph par : codeArea.getParagraphs().subList(0, row)) {
+			position += par.length() + 1; // account for line terminators
+			length = par.length() + 1;
+		}
+		codeArea.positionCaret(position - length);
 	}
 
 }
