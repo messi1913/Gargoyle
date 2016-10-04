@@ -63,5 +63,6 @@
 	<classpathentry kind="lib" path="lib/scala-library-2.10.4.jar"/>
 	<classpathentry kind="lib" path="lib/scala-reflect-2.10.4.jar"/>
 	<classpathentry kind="lib" path="lib/pmd-core-5.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-apex-5.5.1-apex-jorje-shaded.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
