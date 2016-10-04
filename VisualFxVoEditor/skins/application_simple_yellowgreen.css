@@ -11,6 +11,13 @@ HBox
 HBox Label
 {
 	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
+}
+
+HBox > .radio-button > .text
+{
+	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
 }
 
 .menu-bar{
