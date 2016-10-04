@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -467,10 +468,11 @@ public class VoEditorController {
 			@Override
 			public void accept(FileChooser choser) {
 				String fileName = txtClassName.getText();
-//				File dir = SystemUtils.getUserDir();
+				//				File dir = SystemUtils.getUserDir();
 				choser.setInitialFileName(fileName);
-//				choser.setInitialDirectory(dir);
-				choser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.XLSX_NAME, GargoyleExtensionFilters.XLSX, GargoyleExtensionFilters.XLS));
+				//				choser.setInitialDirectory(dir);
+				choser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.XLSX_NAME, GargoyleExtensionFilters.XLSX,
+						GargoyleExtensionFilters.XLS));
 			}
 		});
 
@@ -588,9 +590,13 @@ public class VoEditorController {
 			if (name.startsWith("set") || name.startsWith("get")) {
 				String fieldName = ValueUtil.getIndexLowercase(name.substring(3, name.length()), 0);
 				Pair<FieldMeta, Integer> pair = fieldMes.get(fieldName);
-				int count = pair.getValue().intValue() + 1;
-				Pair<FieldMeta, Integer> createPair = createPair(pair.getKey(), count);
-				fieldMes.put(fieldName, createPair);
+
+				if (pair != null) {
+					int count = pair.getValue().intValue() + 1;
+					Pair<FieldMeta, Integer> createPair = createPair(pair.getKey(), count);
+					fieldMes.put(fieldName, createPair);
+				}
+
 			}
 
 			super.visit(n, arg);
@@ -617,9 +623,12 @@ public class VoEditorController {
 					if (fieldName == null)
 						return;
 
+					//static 필드는 처리하지않음.
+					if(Modifier.isStatic(modifiers))
+						return;
+
 					FieldMeta fieldMeta = ClassTypeResourceLoader.getInstance().get(cOrInterfaceType.getName(),
 							err -> LOGGER.error(ValueUtil.toString(err)));
-
 
 					if (fieldMeta == null) {
 						super.visit(n, arg);
