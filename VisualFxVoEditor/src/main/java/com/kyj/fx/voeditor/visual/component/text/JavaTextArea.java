@@ -1,20 +1,21 @@
 package com.kyj.fx.voeditor.visual.component.text;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import org.fxmisc.richtext.NavigationActions.SelectionPolicy;
 import org.fxmisc.richtext.Paragraph;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
-import org.fxmisc.richtext.TwoDimensional.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.Label;
@@ -61,6 +63,7 @@ public class JavaTextArea extends BorderPane {
 
 	private CodeArea codeArea;
 	private Label lblLineInfo = new Label();
+	private ExecutorService executor;
 
 	private static final String CHARACTERS_MATCH = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
 
@@ -84,7 +87,7 @@ public class JavaTextArea extends BorderPane {
 	};
 
 	public JavaTextArea() {
-
+		executor = Executors.newSingleThreadExecutor();
 		codeArea = new CodeArea();
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
@@ -92,10 +95,22 @@ public class JavaTextArea extends BorderPane {
 		//			codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
 		//		});
 
+		//		codeArea.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
+		//				.subscribe(change -> {
+		//					codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
+		//				});
+
 		codeArea.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
-				.subscribe(change -> {
-					codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
-				});
+				.successionEnds(Duration.ofMillis(500)).supplyTask(this::computeHighlightingAsync).awaitLatest(codeArea.richChanges())
+				.filterMap(t -> {
+					if (t.isSuccess()) {
+						return Optional.of(t.get());
+					} else {
+						t.getFailure().printStackTrace();
+						return Optional.empty();
+					}
+				}).subscribe(this::applyHighlighting);
+
 		// 마우스 클릭이벤트 정의
 		codeArea.addEventHandler(KeyEvent.KEY_PRESSED, this::codeAreaKeyClick);
 		// codeArea.setOnKeyPressed(this::codeAreaKeyClick);
@@ -196,6 +211,31 @@ public class JavaTextArea extends BorderPane {
 		return codeArea.getParagraph(index);
 	}
 
+	//	private static StyleSpans<Collection<String>> computeHighlighting(String text) {
+	//		Matcher matcher = PATTERN.matcher(text);
+	//		int lastKwEnd = 0;
+	//		StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+	//		while (matcher.find()) {
+	//			String styleClass = matcher.group("KEYWORD") != null ? "keyword"
+	//					: matcher.group("PAREN") != null ? "paren"
+	//							: matcher.group("BRACE") != null ? "brace"
+	//									: matcher.group("BRACKET") != null ? "bracket"
+	//											: matcher.group("SEMICOLON") != null ? "semicolon"
+	//													: matcher.group("STRING") != null ? "string"
+	//															: matcher.group("COMMENT") != null ? "comment" : null;
+	//			/* never happens */ assert styleClass != null;
+	//			spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
+	//			spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
+	//			lastKwEnd = matcher.end();
+	//		}
+	//		spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
+	//		return spansBuilder.create();
+	//	}
+
+	private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
+		codeArea.setStyleSpans(0, highlighting);
+	}
+
 	private static StyleSpans<Collection<String>> computeHighlighting(String text) {
 		Matcher matcher = PATTERN.matcher(text);
 		int lastKwEnd = 0;
@@ -215,6 +255,18 @@ public class JavaTextArea extends BorderPane {
 		}
 		spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
 		return spansBuilder.create();
+	}
+
+	private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
+		String text = codeArea.getText();
+		Task<StyleSpans<Collection<String>>> task = new Task<StyleSpans<Collection<String>>>() {
+			@Override
+			protected StyleSpans<Collection<String>> call() throws Exception {
+				return computeHighlighting(text);
+			}
+		};
+		executor.execute(task);
+		return task;
 	}
 
 	//	private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
