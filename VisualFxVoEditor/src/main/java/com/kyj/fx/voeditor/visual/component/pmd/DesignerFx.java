@@ -224,12 +224,12 @@ public class DesignerFx implements ClipboardOwner {
 				Parser parser = languageVersionHandler.getParser(languageVersionHandler.getDefaultParserOptions());
 				if (parser != null && parser.canParse()) {
 					languageVersions.add(languageVersion);
-					LOGGER.debug("support parser: {}", parser.toString());
-				} else {
-					LOGGER.debug("not support parser: {}", parser.toString());
+//					LOGGER.debug("support parser: {}", languageVersion.getName());
+//				} else {
+//					LOGGER.debug("not support parser: {}", languageVersion.getName());
 				}
-			} else {
-				LOGGER.debug("not support parser (handler is null): {}", languageVersion.toString());
+//			} else {
+//				LOGGER.debug("not support parser (handler is null): {}", languageVersion.getName());
 			}
 		}
 		return languageVersions.toArray(new LanguageVersion[languageVersions.size()]);
