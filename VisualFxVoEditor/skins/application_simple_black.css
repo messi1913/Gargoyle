@@ -21,12 +21,6 @@ HBox > .radio-button > .text
 	-fx-fill:#FFFFFF;
 }
 
-
-VBox Label
-{
-	-fx-text-fill:#FFFFFF;
-}
-
 .menu-bar{
     -fx-background-color: #777E87;
 }
