@@ -150,7 +150,14 @@ public class FileUtil {
 		String content = "";
 		try {
 
+			if (file != null && options == null)
+				return FileUtils.readFileToString(file, "UTF-8");
+
 			if (file == null) {
+
+				if (options == null)
+					return null;
+
 				Function<File, String> fileNotFoundThan = options.getFileNotFoundThan();
 				if (fileNotFoundThan != null) {
 					content = fileNotFoundThan.apply(file);
