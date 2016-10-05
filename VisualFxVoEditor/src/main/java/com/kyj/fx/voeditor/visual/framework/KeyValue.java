@@ -4,7 +4,7 @@
  *	작성일   : 2015. 10. 22.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.component.popup;
+package com.kyj.fx.voeditor.visual.framework;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

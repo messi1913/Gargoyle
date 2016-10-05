@@ -4,7 +4,7 @@
  *	작성일   : 2015. 10. 18.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.component;
+package com.kyj.fx.voeditor.visual.framework.handler;
 
 /**
  * @author KYJ
