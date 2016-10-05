@@ -1130,4 +1130,16 @@ public class ValueUtil {
 		}
 
 	}
+
+	/**
+	 * 대소문자 무시 일치하는 문자열이 포함되면 true
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 5.
+	 * @param findText
+	 * @param target
+	 * @return
+	 */
+	public static boolean hasTextIgnorecase(String target, String findText) {
+		return org.apache.commons.lang.StringUtils.containsIgnoreCase(target, findText);
+	}
 }
