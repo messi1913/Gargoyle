@@ -124,6 +124,10 @@ public class RuntimeClassUtil {
 		return resultList;
 	}
 
+	public static void addShutdownHook(Runnable run) {
+		addShutdownHook(new Thread(run));
+	}
+
 	public static void addShutdownHook(Thread t) {
 		Runtime.getRuntime().addShutdownHook(t);
 	}

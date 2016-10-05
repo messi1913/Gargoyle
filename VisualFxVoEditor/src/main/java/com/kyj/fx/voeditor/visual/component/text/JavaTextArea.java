@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.popup.TextSearchAndReplaceView;
+import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -87,7 +87,15 @@ public class JavaTextArea extends BorderPane {
 	};
 
 	public JavaTextArea() {
-		executor = Executors.newSingleThreadExecutor();
+		executor = ExecutorDemons.newSingleThreadExecutor();
+		//
+		//		RuntimeClassUtil.addShutdownHook(() -> {
+		//
+		//			if (!executor.isTerminated())
+		//				executor.shutdownNow();
+		//
+		//		});
+
 		codeArea = new CodeArea();
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
@@ -265,7 +273,9 @@ public class JavaTextArea extends BorderPane {
 				return computeHighlighting(text);
 			}
 		};
+
 		executor.execute(task);
+
 		return task;
 	}
 
