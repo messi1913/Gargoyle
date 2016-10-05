@@ -23,6 +23,5 @@ public class DesignerFxComposite extends BorderPane {
 		designerFx = new DesignerFx(null);
 		setTop(designerFx.getFxMenuBar());
 		setCenter(designerFx.getJSplitPane());
-
 	}
 }

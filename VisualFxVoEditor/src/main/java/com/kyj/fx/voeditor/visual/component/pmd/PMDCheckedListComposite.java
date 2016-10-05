@@ -19,23 +19,28 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
-import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
-import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.pmd.DoPMD;
+import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
+import javafx.util.Callback;
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
 import net.sourceforge.pmd.PMDConfiguration;
+import net.sourceforge.pmd.ReportListener;
+import net.sourceforge.pmd.RuleViolation;
 import net.sourceforge.pmd.benchmark.Benchmark;
 import net.sourceforge.pmd.benchmark.Benchmarker;
 import net.sourceforge.pmd.benchmark.TextReport;
 import net.sourceforge.pmd.cli.PMDParameters;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.stat.Metric;
 
 /***************************
  *
@@ -43,15 +48,44 @@ import net.sourceforge.pmd.lang.LanguageVersion;
  *
  ***************************/
 
-public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseable, Closeable {
+public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(PMDCheckComposite.class);
+	public PMDCheckedListComposite(File sourceFile) {
+		this(new BorderPane(), sourceFile);
+	}
+
+	public PMDCheckedListComposite(BorderPane root, File sourceFile) {
+		super(root);
+		this.sourceFile = sourceFile;
+
+		javaTextArea = new JavaTextArea();
+		lvViolation = new ListView<>();
+
+		lvViolation.setCellFactory(ruleCheckListener);
+		SplitPane splitPane = new SplitPane(javaTextArea, lvViolation);
+		splitPane.setOrientation(Orientation.VERTICAL);
+		splitPane.setDividerPositions(0.7d, 0.3d);
+
+		root.setCenter(splitPane);
+		violationLabel = new Label();
+		root.setBottom(violationLabel);
+
+	}
+
+	/**
+	 * @param parent
+	 */
+	//	public PMDCheckedListComposite(BorderPane parent) {
+	//		super(parent);
+	//	}
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PMDCheckedListComposite.class);
 
 	private File sourceFile;
 
 	private JavaTextArea javaTextArea;
 
-	private XMLEditor xmlEditor;
+	private ListView<RuleViolation> lvViolation;
 
 	private Label violationLabel;
 
@@ -61,45 +95,40 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 	private static final String REPORT_FILE_FORMAT = "xml";
 	private static final String VIOLATION_TEXT_FORMAT = "Violation : %d";
 
-	public PMDCheckComposite(File sourceFile) {
-		this.sourceFile = sourceFile;
-
-		javaTextArea = new JavaTextArea();
-		xmlEditor = new XMLEditor();
-		SplitPane splitPane = new SplitPane(javaTextArea, xmlEditor);
-		splitPane.setOrientation(Orientation.VERTICAL);
-		splitPane.setDividerPositions(0.7d, 0.3d);
-
-		setCenter(splitPane);
-		violationLabel = new Label();
-		setBottom(violationLabel);
-
+	public void run() {
 		if (this.sourceFile.isDirectory()) {
 			dirFilePmd(this.sourceFile);
 		} else {
 			simpleFilePmd(this.sourceFile);
 		}
+	}
+
+	public void runAsynch() {
+
+		new Thread(() -> {
+			if (this.sourceFile.isDirectory()) {
+				dirFilePmd(this.sourceFile);
+			} else {
+				simpleFilePmd(this.sourceFile);
+			}
+		}).start();
 
 	}
 
 	private void simpleFilePmd(File file) {
 		try {
-
 			String sourceCode = Files.toString(this.sourceFile, Charset.forName("UTF-8"));
-			javaTextArea.setContent(sourceCode);
-
 			PMDParameters params = new PMDParameters();
 			params.setSourceText(sourceCode);
 
 			//			transformParametersIntoConfiguration(params);
 			long start = System.nanoTime();
 
-			int violations = doPMD.doPMD(transformParametersIntoConfiguration(params));
+			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListener);
 			long end = System.nanoTime();
 			Benchmarker.mark(Benchmark.TotalPMD, end - start, 0);
 
 			TextReport report = new TextReport();
-
 			try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 				report.generate(Benchmarker.values(), new PrintStream(out));
 				out.flush();
@@ -107,8 +136,8 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 			}
 
 			Platform.runLater(() -> {
-				xmlEditor.setContent(doPMD.getResultString());
-				violationLabel.setText(String.format(VIOLATION_TEXT_FORMAT, violations));
+				javaTextArea.setContent(sourceCode);
+				violationLabel.setText(String.format(VIOLATION_TEXT_FORMAT, lvViolation.getItems().size()));
 			});
 
 		} catch (IOException e) {
@@ -118,9 +147,6 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 
 	private void dirFilePmd(File file) {
 		try {
-			//			String sourceCode = Files.toString(this.sourceFile, Charset.forName("UTF-8"));
-			//			javaTextArea.setContent(sourceCode);
-
 			PMDParameters params = new PMDParameters();
 			try {
 				Field declaredField = PMDParameters.class.getDeclaredField("sourceDir");
@@ -134,8 +160,7 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 
 			//			transformParametersIntoConfiguration(params);
 			long start = System.nanoTime();
-
-			int violations = doPMD.doPMD(transformParametersIntoConfiguration(params));
+			doPMD.doPMD(transformParametersIntoConfiguration(params));
 			long end = System.nanoTime();
 			Benchmarker.mark(Benchmark.TotalPMD, end - start, 0);
 
@@ -148,8 +173,7 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 			}
 
 			Platform.runLater(() -> {
-				xmlEditor.setContent(doPMD.getResultString());
-				violationLabel.setText(String.format(VIOLATION_TEXT_FORMAT, violations));
+				violationLabel.setText(String.format(VIOLATION_TEXT_FORMAT, lvViolation.getItems().size()));
 			});
 
 		} catch (IOException e) {
@@ -182,7 +206,7 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 		configuration.setSourceEncoding("UTF-8");
 		//	        configuration.setStressTest(params.isStress());
 		configuration.setSuppressMarker(params.getSuppressmarker());
-//		configuration.setThreads(1);
+		configuration.setThreads(1);
 		configuration.setFailOnViolation(params.isFailOnViolation());
 
 		LanguageVersion languageVersion = LanguageRegistry.findLanguageVersionByTerseName(params.getLanguage() + " " + params.getVersion());
@@ -197,19 +221,36 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 		return configuration;
 	}
 
-	@Override
-	public void closeRequest() {
-		try {
-			doPMD.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+	private Callback<ListView<RuleViolation>, ListCell<RuleViolation>> ruleCheckListener = new Callback<ListView<RuleViolation>, ListCell<RuleViolation>>() {
+		/* (non-Javadoc)
+		 * @see javafx.util.Callback#call(java.lang.Object)
+		 */
+		@Override
+		public ListCell<RuleViolation> call(ListView<RuleViolation> param) {
+			return new PMDListCell();
+		}
+	};
+
+	private ReportListener reportListener = new ReportListener() {
+
+		@Override
+		public void ruleViolationAdded(RuleViolation ruleViolation) {
+			lvViolation.getItems().add(ruleViolation);
 		}
 
-	}
+		@Override
+		public void metricAdded(Metric metric) {
 
+		}
+
+	};
+
+	/* (non-Javadoc)
+	 * @see java.io.Closeable#close()
+	 */
 	@Override
 	public void close() throws IOException {
-		closeRequest();
+		doPMD.close();
 	}
 
 }

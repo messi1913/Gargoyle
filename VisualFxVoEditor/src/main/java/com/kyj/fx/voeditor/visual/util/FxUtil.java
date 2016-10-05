@@ -67,7 +67,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -280,8 +279,8 @@ public class FxUtil {
 			String fxml, Consumer<C> controllerAction) throws Exception {
 		URL resource = controllerClass.getResource(fxml);
 
-		FXMLLoader loader = new FXMLLoader(resource);
-
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(resource);
 		if (controller.isSelfController() && rootInstance != null) {
 			try {
 				loader.setRoot(rootInstance);
