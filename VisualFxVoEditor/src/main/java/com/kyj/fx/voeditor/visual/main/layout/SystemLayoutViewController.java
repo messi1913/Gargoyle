@@ -12,12 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
-import org.ky.pmd.core.PMD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +32,7 @@ import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
 import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
 import com.kyj.fx.voeditor.visual.component.file.FilePropertiesComposite;
 import com.kyj.fx.voeditor.visual.component.pmd.DesignerFxComposite;
-import com.kyj.fx.voeditor.visual.component.pmd.PMDCheckComposite;
+import com.kyj.fx.voeditor.visual.component.pmd.PMDCheckedListComposite;
 import com.kyj.fx.voeditor.visual.component.popup.BigTextView;
 import com.kyj.fx.voeditor.visual.component.popup.FXMLTextView;
 import com.kyj.fx.voeditor.visual.component.popup.GagoyleWorkspaceOpenResourceView;
@@ -1033,7 +1031,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		File file = (File) source.getUserData();
 		if (file != null && file.exists()) {
 			String name = file.getName();
-			loadNewSystemTab(String.format("PMD - %s", name), new PMDCheckComposite(file));
+			PMDCheckedListComposite parent = new PMDCheckedListComposite(file);
+			loadNewSystemTab(String.format("PMD - %s", name), parent);
+			parent.runAsynch();
 		}
 	}
 
