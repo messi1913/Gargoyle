@@ -49,7 +49,8 @@ public final class PMDGargoyleThreadProcessor extends AbstractPMDProcessor {
 
 			Report report = PMD.setupReport(rs, ctx, niceFileName);
 			// overtake the listener
-			report.addSynchronizedListeners(ctx.getReport().getSynchronizedListeners());
+			//bug fix 2016-10-05 by kyj. 결과가 중복되서 출력됨.
+//			report.addSynchronizedListeners(ctx.getReport().getSynchronizedListeners());
 			//	        ctx.setReport(report);
 			//	        ctx.setSourceCodeFilename(niceFileName);
 

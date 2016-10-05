@@ -31,8 +31,18 @@ public class PMDListCell extends ListCell<RuleViolation> {
 	//		}
 	//	};
 
-	public PMDListCell() {
+//	VBox value = new VBox();
+//	HBox hBox = new HBox(5);
+//	Label index = new Label();
+//	Label fileName = new Label();
+//	Label methodName = new Label();
+//	Label message = new Label();
 
+	public PMDListCell() {
+//		hBox.setStyle("-fx-background-color:transparent");
+//		index.setStyle("-fx-text-fill:black;");
+//		hBox.getChildren().addAll(index, value);
+//		value.getChildren().addAll(fileName, methodName, message);
 	}
 
 	//	public PMDListCell(StringConverter<RuleViolation> stringConverter) {
@@ -52,13 +62,15 @@ public class PMDListCell extends ListCell<RuleViolation> {
 			setGraphic(null);
 		} else {
 			VBox value = new VBox();
-			HBox hBox = new HBox();
-			hBox.setStyle("-fx-background-color:transparent");
+			HBox hBox = new HBox(5);
 			Label index = new Label();
-			hBox.getChildren().addAll(index, value);
 			Label fileName = new Label();
 			Label methodName = new Label();
 			Label message = new Label();
+
+			hBox.setStyle("-fx-background-color:transparent");
+			index.setStyle("-fx-text-fill:black;");
+			hBox.getChildren().addAll(index, value);
 			value.getChildren().addAll(fileName, methodName, message);
 
 			index.setText(String.valueOf(getIndex()));

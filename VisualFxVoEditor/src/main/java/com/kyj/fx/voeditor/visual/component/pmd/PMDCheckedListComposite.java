@@ -21,23 +21,28 @@ import com.google.common.io.Files;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.framework.pmd.DoPMD;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
 import net.sourceforge.pmd.PMDConfiguration;
 import net.sourceforge.pmd.ReportListener;
+import net.sourceforge.pmd.Rule;
 import net.sourceforge.pmd.RuleViolation;
 import net.sourceforge.pmd.benchmark.Benchmark;
 import net.sourceforge.pmd.benchmark.Benchmarker;
 import net.sourceforge.pmd.benchmark.TextReport;
 import net.sourceforge.pmd.cli.PMDParameters;
+import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.stat.Metric;
@@ -49,28 +54,6 @@ import net.sourceforge.pmd.stat.Metric;
  ***************************/
 
 public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
-
-	public PMDCheckedListComposite(File sourceFile) {
-		this(new BorderPane(), sourceFile);
-	}
-
-	public PMDCheckedListComposite(BorderPane root, File sourceFile) {
-		super(root);
-		this.sourceFile = sourceFile;
-
-		javaTextArea = new JavaTextArea();
-		lvViolation = new ListView<>();
-
-		lvViolation.setCellFactory(ruleCheckListener);
-		SplitPane splitPane = new SplitPane(javaTextArea, lvViolation);
-		splitPane.setOrientation(Orientation.VERTICAL);
-		splitPane.setDividerPositions(0.7d, 0.3d);
-
-		root.setCenter(splitPane);
-		violationLabel = new Label();
-		root.setBottom(violationLabel);
-
-	}
 
 	/**
 	 * @param parent
@@ -94,6 +77,28 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	private static final String RESULTSET = new File("rulesets/java/basic.xml").getAbsolutePath();
 	private static final String REPORT_FILE_FORMAT = "xml";
 	private static final String VIOLATION_TEXT_FORMAT = "Violation : %d";
+
+	public PMDCheckedListComposite(File sourceFile) {
+		this(new BorderPane(), sourceFile);
+	}
+
+	public PMDCheckedListComposite(BorderPane root, File sourceFile) {
+		super(root);
+		this.sourceFile = sourceFile;
+
+		javaTextArea = new JavaTextArea();
+		lvViolation = new ListView<>();
+
+		lvViolation.setCellFactory(ruleCheckListener);
+		SplitPane splitPane = new SplitPane(javaTextArea, lvViolation);
+		splitPane.setOrientation(Orientation.VERTICAL);
+		splitPane.setDividerPositions(0.7d, 0.3d);
+
+		root.setCenter(splitPane);
+		violationLabel = new Label();
+		root.setBottom(violationLabel);
+
+	}
 
 	public void run() {
 		if (this.sourceFile.isDirectory()) {
@@ -160,7 +165,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 			//			transformParametersIntoConfiguration(params);
 			long start = System.nanoTime();
-			doPMD.doPMD(transformParametersIntoConfiguration(params));
+			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListener);
 			long end = System.nanoTime();
 			Benchmarker.mark(Benchmark.TotalPMD, end - start, 0);
 
@@ -201,13 +206,13 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		configuration.setReportProperties(params.getProperties());
 		//		configuration.setReportShortNames(params.isShortnames());
 		configuration.setRuleSets(RESULTSET);
-		configuration.setRuleSetFactoryCompatibilityEnabled(true);
+//		configuration.setRuleSetFactoryCompatibilityEnabled(true);
 		configuration.setShowSuppressedViolations(params.isShowsuppressed());
 		configuration.setSourceEncoding("UTF-8");
 		//	        configuration.setStressTest(params.isStress());
-		configuration.setSuppressMarker(params.getSuppressmarker());
+//		configuration.setSuppressMarker(params.getSuppressmarker());
 		configuration.setThreads(1);
-		configuration.setFailOnViolation(params.isFailOnViolation());
+//		configuration.setFailOnViolation(params.isFailOnViolation());
 
 		LanguageVersion languageVersion = LanguageRegistry.findLanguageVersionByTerseName(params.getLanguage() + " " + params.getVersion());
 		if (languageVersion != null) {
@@ -218,8 +223,11 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Invalid auxiliary classpath: " + e.getMessage(), e);
 		}
+
 		return configuration;
 	}
+
+	private SimpleObjectProperty<File> lastSelectedFileProperty = new SimpleObjectProperty<>();
 
 	private Callback<ListView<RuleViolation>, ListCell<RuleViolation>> ruleCheckListener = new Callback<ListView<RuleViolation>, ListCell<RuleViolation>>() {
 		/* (non-Javadoc)
@@ -227,7 +235,36 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		 */
 		@Override
 		public ListCell<RuleViolation> call(ListView<RuleViolation> param) {
-			return new PMDListCell();
+			PMDListCell pmdListCell = new PMDListCell();
+			pmdListCell.setOnMouseClicked(ev -> {
+
+				if (ev.getButton() == MouseButton.PRIMARY && ev.getClickCount() == 2) {
+					RuleViolation item = pmdListCell.getItem();
+					int beginLine = item.getBeginLine();
+
+					JavaTextArea javaTextArea = PMDCheckedListComposite.this.javaTextArea;
+
+					if (PMDCheckedListComposite.this.sourceFile.isFile()) {
+						javaTextArea.moveToLine(beginLine);
+					}
+					//디렉토리 선택의 경우만..
+					else {
+						String filename = item.getFilename();
+						File file = new File(filename);
+
+						File lastReadFile = lastSelectedFileProperty.get();
+
+						if ((lastReadFile == null && file.exists()) || !(lastReadFile.equals(file))) {
+							LOGGER.debug("Read File :: {}", file);
+							javaTextArea.setContent(FileUtil.readFile(file, null));
+							javaTextArea.moveToLine(beginLine);
+							lastSelectedFileProperty.set(file);
+						}
+					}
+				}
+
+			});
+			return pmdListCell;
 		}
 	};
 
@@ -235,6 +272,13 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 		@Override
 		public void ruleViolationAdded(RuleViolation ruleViolation) {
+			Rule rule = ruleViolation.getRule();
+			String name = rule.getName();
+			String ruleSetName = rule.getRuleSetName();
+			Language language = rule.getLanguage();
+
+
+			LOGGER.debug("{}\n rulesetName : {}\nruleName :{}\nLang:{}", ruleViolation.toString(), ruleSetName, name, language.toString());
 			lvViolation.getItems().add(ruleViolation);
 		}
 

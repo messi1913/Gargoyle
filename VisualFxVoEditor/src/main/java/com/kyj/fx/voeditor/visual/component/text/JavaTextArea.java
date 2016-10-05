@@ -429,7 +429,7 @@ public class JavaTextArea extends BorderPane {
 	 * @param moveToLine
 	 */
 	@SuppressWarnings("rawtypes")
-	private void moveToLine(int moveToLine) {
+	public int moveToLine(int moveToLine) {
 		int position = 0;
 		int row = moveToLine;
 		int length = 0;
@@ -437,7 +437,10 @@ public class JavaTextArea extends BorderPane {
 			position += par.length() + 1; // account for line terminators
 			length = par.length() + 1;
 		}
-		codeArea.positionCaret(position - length);
+		int pos = position - length;
+		codeArea.positionCaret(pos);
+		codeArea.requestFocus();
+		return pos;
 	}
 
 }

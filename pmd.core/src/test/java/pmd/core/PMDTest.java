@@ -25,7 +25,7 @@ public class PMDTest {
 
 	@Test
 	public void test() throws IOException, InterruptedException {
-		String fileString = "C:\\Users\\KYJ\\git\\Gargoyle\\VisualFxVoEditor\\src\\main\\java\\com\\kyj\\fx\\voeditor\\visual\\util\\ValueUtil.java";
+		String fileString = "C:\\Users\\KYJ\\eclipse\\jee-neon\\workspace\\sos-server\\src\\main\\java\\com\\samsung\\sds\\sos\\server\\util\\ValueUtil.java";
 
 		File javaFile = new File(fileString);
 		String ruleSetFile = /*"java-basic";*/new File("rulesets/java/basic.xml").getAbsolutePath();
