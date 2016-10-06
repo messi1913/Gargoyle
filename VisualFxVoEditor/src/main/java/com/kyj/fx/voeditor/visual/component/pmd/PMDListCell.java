@@ -9,6 +9,9 @@ package com.kyj.fx.voeditor.visual.component.pmd;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import jfxtras.scene.layout.HBox;
 import net.sourceforge.pmd.RuleViolation;
 
@@ -67,16 +70,24 @@ public class PMDListCell extends ListCell<RuleViolation> {
 			Label fileName = new Label();
 			Label methodName = new Label();
 			Label message = new Label();
+			Label line = new Label();
 
+
+			TextFlow lineExp = new TextFlow();
+			Text text = new Text("Index :");
+			text.setStyle("-fx-font-weight:bold;");
+			lineExp.getChildren().addAll(text, new Text(String.valueOf(getIndex())));
 			hBox.setStyle("-fx-background-color:transparent");
 			index.setStyle("-fx-text-fill:black;");
-			hBox.getChildren().addAll(index, value);
+			line.setStyle("-fx-text-fill:black;");
+			hBox.getChildren().addAll(lineExp, line, value);
 			value.getChildren().addAll(fileName, methodName, message);
 
-			index.setText(String.valueOf(getIndex()));
-			fileName.setText(item.getFilename());
-			methodName.setText(item.getMethodName());
-			message.setText(item.getRule().getMessage());
+//			index.setText(String.format("index : %d", getIndex()));
+			fileName.setText(String.format("File Name : %s", item.getFilename()));
+			methodName.setText(String.format("Method name : %s", item.getMethodName()));
+			message.setText(String.format("Message : %s", item.getRule().getMessage()));
+			line.setText(String.format("Line : %d", item.getBeginLine()));
 			setGraphic(hBox);
 		}
 	}

@@ -10,6 +10,7 @@ import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
 
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 
 public class XMLEditor extends BorderPane {
@@ -27,24 +28,35 @@ public class XMLEditor extends BorderPane {
 	private static final int GROUP_ATTRIBUTE_VALUE = 3;
 
 	private CodeArea codeArea;
+	private CodeAreaHelper codeHelperDeligator;
 
 	public XMLEditor() {
 		codeArea = new CodeArea();
+		codeHelperDeligator = new CodeAreaHelper(codeArea);
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+		codeArea.setOnKeyPressed(this::codeAreaKeyClick);
 
 		codeArea.textProperty().addListener((obs, oldText, newText) -> {
 			codeArea.setStyleSpans(0, computeHighlighting(newText));
 		});
 
-		
 		setCenter(codeArea);
 		this.getStylesheets().add(JavaTextArea.class.getResource("xml-highlighting.css").toExternalForm());
 
 	}
 
+	/**
+	 * 키클릭 이벤트 처리
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 6.
+	 * @param e
+	 */
+	public void codeAreaKeyClick(KeyEvent e) {
+		codeHelperDeligator.codeAreaKeyClick(e);
+	}
+
 	public void setContent(String content) {
-		codeArea.clear();
-		codeArea.replaceText(0, 0, content);
+		codeHelperDeligator.setContent(content);
 	}
 
 	private static StyleSpans<Collection<String>> computeHighlighting(String text) {
@@ -96,5 +108,25 @@ public class XMLEditor extends BorderPane {
 
 	public void setEditable(boolean editable) {
 		codeArea.setEditable(editable);
+	}
+
+	/**
+	 * 특정라인으로 이동처리하는 메소드
+	 *
+	 * 특정라인블록 전체를 선택처리함.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 4.
+	 * @param moveToLine
+	 */
+	public void moveToLine(int moveToLine) {
+		codeHelperDeligator.moveToLine(moveToLine);
+	}
+
+	public void moveToLine(int moveToLine, int startCol) {
+		codeHelperDeligator.moveToLine(moveToLine, startCol);
+	}
+
+	public void moveToLine(int moveToLine, int startCol, int endCol) {
+		codeHelperDeligator.moveToLine(moveToLine, startCol, endCol);
 	}
 }

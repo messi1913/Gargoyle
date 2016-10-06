@@ -191,6 +191,9 @@ public class DoPMD implements Closeable {
 		if (null != configuration.getSourceText()) {
 
 			String filePaths = "SourceBase";
+			if (null != configuration.getSourceFileName()) {
+				filePaths = configuration.getSourceFileName();
+			}
 			filePaths = filePaths.replaceAll("\\r?\\n", ",");
 			filePaths = filePaths.replaceAll(",+", ",");
 

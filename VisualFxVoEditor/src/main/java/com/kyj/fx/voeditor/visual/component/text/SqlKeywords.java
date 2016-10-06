@@ -1,8 +1,5 @@
 package com.kyj.fx.voeditor.visual.component.text;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.Character.UnicodeBlock;
-import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.regex.Matcher;
@@ -16,19 +13,11 @@ import org.fxmisc.richtext.StyleSpansBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.component.popup.TextSearchAndReplaceView;
-import com.kyj.fx.voeditor.visual.util.SqlFormatter;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.event.EventHandler;
-import javafx.scene.control.IndexRange;
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 
 public class SqlKeywords extends BorderPane {
@@ -56,50 +45,34 @@ public class SqlKeywords extends BorderPane {
 	// "/\\*(.|\\R)*?\\*/";
 	private static final String COMMENT_PATTERN = "(?:/\\*[^;]*?\\*/)|(?:--[^\\n]*)";
 
-	private static final String CHARACTERS_MATCH = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
-
 	private static final Pattern PATTERN = Pattern.compile("(?<KEYWORD>" + KEYWORD_PATTERN + ")" + "|(?<PAREN>" + PAREN_PATTERN + ")"
 			+ "|(?<BRACE>" + BRACE_PATTERN + ")" + "|(?<BRACKET>" + BRACKET_PATTERN + ")" + "|(?<SEMICOLON>" + SEMICOLON_PATTERN + ")"
 			+ "|(?<STRING>" + STRING_PATTERN + ")" + "|(?<COMMENT>" + COMMENT_PATTERN + ")");
 
 	private CodeArea codeArea;
 
-	private Label lblLineInfo = new Label();
+	/**
+	 * 코드 처리관련 Helper 클래스
+	 * @최초생성일 2016. 10. 6.
+	 */
+	private CodeAreaHelper codeHelperDeligator;
 
-	private SqlFormatter sqlFormatter = new SqlFormatter();
+	private Label lblLineInfo = new Label();
 
 	public CodeArea getCodeArea() {
 		return codeArea;
 	}
 
-	// 선택 범위 지정
-	private EventHandler<? super MouseEvent> defaultSelectionHandler = event -> {
-		if (event.getClickCount() == 1) {
-			// codeArea.setStyleSpans(0,
-			// groupBackgroundColor(codeArea.getText(),
-			// codeArea.getCaretPosition()));
-		} else if (event.getClickCount() == 2) {
-			String selectedText = codeArea.getSelectedText();
-			if (ValueUtil.isNotEmpty(selectedText)) {
-				IndexRange selection = codeArea.getSelection();
-				String ltrimText = selectedText.replaceAll("^\\s+", "");
-				String firstStr = ltrimText.substring(0, 1).replaceAll(CHARACTERS_MATCH, "");
-				int start = selection.getStart();
-				int end = selection.getEnd();
-				codeArea.selectRange(start + (selectedText.length() - ltrimText.length() + 1 - firstStr.length()), end);
-			}
-		}
-	};
-
 	public SqlKeywords() {
 
 		codeArea = new CodeArea();
+		codeHelperDeligator = new SqlCodeAreaHelper(codeArea);
+
 		codeArea.appendText("");
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
 		codeArea.richChanges().subscribe(change -> {
 			Platform.runLater(() -> {
-
 				codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
 
 			});
@@ -107,9 +80,9 @@ public class SqlKeywords extends BorderPane {
 
 		// 마우스 클릭이벤트 정의
 		codeArea.addEventHandler(KeyEvent.KEY_PRESSED, this::codeAreaKeyClick);
-		// codeArea.setOnKeyPressed(this::codeAreaKeyClick);
+		codeArea.setOnKeyPressed(this::codeAreaKeyClick);
 		//
-		codeArea.setOnMouseClicked(defaultSelectionHandler);
+		//		codeArea.setOnMouseClicked(defaultSelectionHandler);
 
 		// 선택라인정보 보여주는 기능 추가.
 		codeArea.selectionProperty().addListener((oba, oldval, newval) -> {
@@ -139,109 +112,7 @@ public class SqlKeywords extends BorderPane {
 	 * @param e
 	 */
 	public void codeAreaKeyClick(KeyEvent e) {
-		// System.out.println("sqlKeywords");
-		// System.out.println(e.getCode());
-		// CTRL + F 찾기
-		if ((e.getCode() == KeyCode.F) && (e.isControlDown() && !e.isShiftDown())) {
-
-			ObservableValue<String> textProperty = codeArea.textProperty();
-			TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(this, textProperty);
-
-			textSearchView.setOnSearchResultListener((vo) -> {
-
-				switch (vo.getSearchType()) {
-				case SEARCH_SIMPLE: {
-					int startIndex = vo.getStartIndex();
-					int endIndex = vo.getEndIndex();
-					codeArea.selectRange(startIndex, endIndex);
-					LOGGER.debug(String.format("find text : %s startIdx :%d endIdx :%d", vo.getSearchText(), startIndex, endIndex));
-					break;
-				}
-				case SEARCH_ALL: {
-					int startIndex = vo.getStartIndex();
-					String searchText = vo.getSearchText();
-					String replaceText = vo.getReplaceText();
-					// codeArea.replaceText(startIndex, startIndex +
-					// searchText.length(), replaceText);
-					setContent(startIndex, startIndex + searchText.length(), replaceText);
-					break;
-				}
-				}
-
-			});
-
-			textSearchView.setOnReplaceResultListener(vo -> {
-				switch (vo.getReaplceType()) {
-				case SIMPLE: {
-					String reaplceResult = vo.getReaplceResult();
-					setContent(reaplceResult);
-					break;
-				}
-				case ALL: {
-					String reaplceResult = vo.getReaplceResult();
-					setContent(reaplceResult);
-					break;
-				}
-				}
-			});
-
-			textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
-				if (newval)
-					LOGGER.debug("User Select Locale Scope..");
-				else
-					LOGGER.debug("User Select Gloval Scope..");
-			});
-
-			codeArea.setOnMouseClicked(event -> {
-
-				IndexRange selection = codeArea.getSelection();
-				int start = selection.getStart();
-				textSearchView.setSlidingStartIndexProperty(start);
-
-			});
-
-			textSearchView.show();
-
-			codeArea.setOnMouseClicked(defaultSelectionHandler);
-
-			e.consume();
-		}
-		// CTRL + SHIFT + F 포멧팅
-		else if (e.getCode() == KeyCode.F && (e.isControlDown() && e.isShiftDown())) {
-
-			doSqlFormat();
-			e.consume();
-		}
-		// Ctr + U 선택된 문자 또는 전체 문자를 대문자로 치환
-		else if (e.getCode() == KeyCode.U && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
-			String selectedText = codeArea.getSelectedText();
-			if (ValueUtil.isNotEmpty(selectedText)) {
-				// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
-				replaceSelection(sqlFormatter.toUpperCase(selectedText));
-			} else {
-				String text = codeArea.getText();
-				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-				// codeArea.clear();
-				// codeArea.appendText(sqlFormatter.toUpperCase(text));
-				setContent(sqlFormatter.toUpperCase(text));
-			}
-			e.consume();
-		}
-		// Ctr + L 선택된 문자 또는 전체 문자를 소문자로 치환
-		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
-			String selectedText = codeArea.getSelectedText();
-			if (ValueUtil.isNotEmpty(selectedText)) {
-				// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));
-				replaceSelection(sqlFormatter.toLowerCase(selectedText));
-			} else {
-				String text = codeArea.getText();
-				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-				// codeArea.clear();
-				// codeArea.appendText(sqlFormatter.toLowerCase(text));
-				setContent(sqlFormatter.toUpperCase(text));
-			}
-			e.consume();
-		}
+		codeHelperDeligator.codeAreaKeyClick(e);
 	}
 
 	/**
@@ -250,88 +121,35 @@ public class SqlKeywords extends BorderPane {
 	 * @작성일 : 2016. 9. 23.
 	 */
 	public void doSqlFormat() {
-		String selectedText = codeArea.getSelectedText();
-		if (ValueUtil.isNotEmpty(selectedText)) {
-			// codeArea.replaceSelection(sqlFormatter.format(selectedText));
-			replaceSelection(getSqlFormat(selectedText));
-		} else {
-			String format = getSqlFormat(codeArea.getText());
-			// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-			// codeArea.clear();
-			// codeArea.appendText(format);
-			setContent(format);
-		}
+		codeHelperDeligator.doSqlFormat();
 	}
 
 	public String getSqlFormat(String sql) {
-		return sqlFormatter.format(sql);
+		return codeHelperDeligator.getSqlFormat(sql);
 	}
 
 	private void setContent(int start, int end, String text) {
-		codeArea.getUndoManager().mark();
-		codeArea.replaceText(start, end, text);
-		codeArea.getUndoManager().mark();
+		codeHelperDeligator.setContent(start, end, text);
 	}
 
 	public void replaceSelection(String selection) {
-		codeArea.getUndoManager().mark();
-		codeArea.replaceSelection(selection);
-		codeArea.getUndoManager().mark();
+		codeHelperDeligator.replaceSelection(selection);
 	}
 
 	public void setContent(String content) {
-		codeArea.getUndoManager().mark();
-		codeArea.clear();
-		codeArea.replaceText(0, 0, content);
-		codeArea.getUndoManager().mark();
+		codeHelperDeligator.setContent(content);
 	}
 
 	public void appendContent(String content) {
-		codeArea.getUndoManager().mark();
-		// codeArea.replaceText(0, 0, content);
-		codeArea.appendText(content);
-		codeArea.getUndoManager().mark();
+		codeHelperDeligator.appendContent(content);
 	}
 
 	public String getSelectedText() {
-		String selectedText = codeArea.getSelectedText();
-		if (ValueUtil.isEmpty(selectedText)) {
-			String fullText = codeArea.getText();
-			int caretPosition = codeArea.getCaretPosition();
-
-			//bugfix
-			String split = sqlFormatter.split(fullText, caretPosition);
-			return split;
-			//			int startIdx = -1;
-			//			int endIdx = -1;
-			//
-			//			for (int i = split.length() - 1; i > 0; i--) {
-			//
-			//				if (split.charAt(i) == ';') {
-			//					endIdx = i;
-			//
-			//					for (int j = i-1; j > 0; j--) {
-			//
-			//						if (split.charAt(j) == ';') {
-			//							startIdx = j;
-			//							break;
-			//						}
-			//					}
-			//					break;
-			//				}
-			//			}
-			//
-			//			if (endIdx == -1) {
-			//				return split;
-			//			} else {
-			//				return split.substring(endIdx);
-			//			}
-		}
-		return selectedText;
+		return codeHelperDeligator.getSelectedText();
 	}
 
 	public String getText() {
-		return codeArea.getText();
+		return codeHelperDeligator.getText();
 	}
 
 	private static StyleSpans<Collection<String>> computeHighlighting(String _text) {
@@ -422,4 +240,23 @@ public class SqlKeywords extends BorderPane {
 		codeArea.editableProperty().set(editable);
 	}
 
+	/**
+	 * 특정라인으로 이동처리하는 메소드
+	 *
+	 * 특정라인블록 전체를 선택처리함.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 4.
+	 * @param moveToLine
+	 */
+	public void moveToLine(int moveToLine) {
+		codeHelperDeligator.moveToLine(moveToLine);
+	}
+
+	public void moveToLine(int moveToLine, int startCol) {
+		codeHelperDeligator.moveToLine(moveToLine, startCol);
+	}
+
+	public void moveToLine(int moveToLine, int startCol, int endCol) {
+		codeHelperDeligator.moveToLine(moveToLine, startCol, endCol);
+	}
 }

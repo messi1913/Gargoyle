@@ -29,6 +29,9 @@ public class PMDParameters {
     @Parameter(names = { "-dir", "-d" }, description = "Root directory for sources.", required = false)
     private String sourceDir;
 
+    @Parameter(names = { "-sourceFileName", "-sfn" }, description = "source code file name.", required = false)
+    private String sourceFileName;
+
     @Parameter(names = { "-sourceText", "-source" }, description = "source code text.", required = false)
     private String sourceText;
 
@@ -264,6 +267,22 @@ public class PMDParameters {
     public void setUri(String uri) {
         this.uri = uri;
     }
+
+
+
+	/**
+	 * @return the sourceFileName
+	 */
+	public final String getSourceFileName() {
+		return sourceFileName;
+	}
+
+	/**
+	 * @param sourceFileName the sourceFileName to set
+	 */
+	public final void setSourceFileName(String sourceFileName) {
+		this.sourceFileName = sourceFileName;
+	}
 
 	/**
 	 * @return the sourceText

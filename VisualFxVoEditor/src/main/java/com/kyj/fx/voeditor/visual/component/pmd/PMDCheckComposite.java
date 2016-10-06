@@ -89,6 +89,7 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 			javaTextArea.setContent(sourceCode);
 
 			PMDParameters params = new PMDParameters();
+			params.setSourceFileName(file.getAbsolutePath());
 			params.setSourceText(sourceCode);
 
 			//			transformParametersIntoConfiguration(params);
@@ -168,6 +169,7 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 		//		configuration.setInputFilePath(params.getFileListPath());
 		//		configuration.setInputUri(params.getUri());
 		configuration.setReportFormat(REPORT_FILE_FORMAT);
+		configuration.setSourceFileName(params.getSourceFileName());
 		configuration.setSourceText(params.getSourceText());
 		//		configuration.setBenchmark(params.isBenchmark());
 		configuration.setDebug(params.isDebug());

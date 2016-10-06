@@ -18,27 +18,27 @@ import org.fxmisc.richtext.StyleSpansBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.component.popup.TextSearchAndReplaceView;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
-import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.util.Pair;
 
 /**
  * @author KYJ
  *
  */
 public class JavaTextArea extends BorderPane {
+
+	/**
+	 * @최초생성일 2016. 10. 6.
+	 */
+	private static final String POSISION_FORMAT = "line : %d selectionStart : %d selectionEnd : %d column : %d  anchor : %d caret : %d";
 
 	@SuppressWarnings("unused")
 	private static Logger LOGGER = LoggerFactory.getLogger(SqlKeywords.class);
@@ -62,6 +62,7 @@ public class JavaTextArea extends BorderPane {
 			+ "|(?<STRING>" + STRING_PATTERN + ")" + "|(?<COMMENT>" + COMMENT_PATTERN + ")");
 
 	private CodeArea codeArea;
+	private CodeAreaHelper codeHelperDeligator;
 	private Label lblLineInfo = new Label();
 	private ExecutorService executor;
 
@@ -88,6 +89,7 @@ public class JavaTextArea extends BorderPane {
 
 	public JavaTextArea() {
 		executor = ExecutorDemons.newSingleThreadExecutor();
+
 		//
 		//		RuntimeClassUtil.addShutdownHook(() -> {
 		//
@@ -97,6 +99,7 @@ public class JavaTextArea extends BorderPane {
 		//		});
 
 		codeArea = new CodeArea();
+		codeHelperDeligator = new CodeAreaHelper(codeArea);
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
 		//		codeArea.richChanges().subscribe(change -> {
@@ -141,8 +144,8 @@ public class JavaTextArea extends BorderPane {
 			int end = newval.getEnd();
 			int caretColumn = codeArea.getCaretColumn();
 
-			String format = String.format("line : %d selectionStart : %d selectionEnd : %d column : %d  anchor : %d",
-					codeArea.getCurrentParagraph() + 1, start + 1, end + 1, caretColumn + 1, codeArea.getAnchor());
+			String format = String.format(POSISION_FORMAT, codeArea.getCurrentParagraph() + 1, start + 1, end + 1, caretColumn + 1,
+					codeArea.getAnchor(), codeArea.getCaretPosition());
 
 			lblLineInfo.setText(format);
 		});
@@ -171,7 +174,7 @@ public class JavaTextArea extends BorderPane {
 	//	}
 
 	public String getContent() {
-		return codeArea.getText();
+		return codeHelperDeligator.getText();
 	}
 
 	//	public void appendContent(String content) {
@@ -183,16 +186,11 @@ public class JavaTextArea extends BorderPane {
 	}
 
 	private void setContent(int start, int end, String text) {
-		codeArea.getUndoManager().mark();
-		codeArea.replaceText(start, end, text);
-		codeArea.getUndoManager().mark();
+		codeHelperDeligator.setContent(start, end, text);
 	}
 
 	public void setContent(String content) {
-		codeArea.getUndoManager().mark();
-		codeArea.clear();
-		codeArea.replaceText(content);
-		codeArea.getUndoManager().mark();
+		codeHelperDeligator.setContent(content);
 	}
 
 	public void setEditable(boolean editable) {
@@ -204,11 +202,12 @@ public class JavaTextArea extends BorderPane {
 	}
 
 	public final String getText() {
-		return codeArea.getText();
+		return codeHelperDeligator.getText();
 	}
 
 	public final String getText(int start, int end) {
 		return codeArea.getText(start, end);
+
 	}
 
 	public String getText(int paragraph) {
@@ -291,156 +290,155 @@ public class JavaTextArea extends BorderPane {
 	 * @param e
 	 */
 	public void codeAreaKeyClick(KeyEvent e) {
-		// System.out.println("sqlKeywords");
-		// System.out.println(e.getCode());
-		// CTRL + F 찾기
-		if ((e.getCode() == KeyCode.F) && (e.isControlDown() && !e.isShiftDown())) {
-
-			ObservableValue<String> textProperty = codeArea.textProperty();
-			TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(this, textProperty);
-
-			textSearchView.setOnSearchResultListener((vo) -> {
-
-				switch (vo.getSearchType()) {
-				case SEARCH_SIMPLE: {
-					int startIndex = vo.getStartIndex();
-					int endIndex = vo.getEndIndex();
-					codeArea.selectRange(startIndex, endIndex);
-					LOGGER.debug(String.format("find text : %s startIdx :%d endIdx :%d", vo.getSearchText(), startIndex, endIndex));
-					break;
-				}
-				case SEARCH_ALL: {
-					int startIndex = vo.getStartIndex();
-					String searchText = vo.getSearchText();
-					String replaceText = vo.getReplaceText();
-					// codeArea.replaceText(startIndex, startIndex +
-					// searchText.length(), replaceText);
-					setContent(startIndex, startIndex + searchText.length(), replaceText);
-					break;
-				}
-				}
-
-			});
-
-			textSearchView.setOnReplaceResultListener(vo -> {
-				switch (vo.getReaplceType()) {
-				case SIMPLE: {
-					String reaplceResult = vo.getReaplceResult();
-					setContent(reaplceResult);
-					break;
-				}
-				case ALL: {
-					String reaplceResult = vo.getReaplceResult();
-					setContent(reaplceResult);
-					break;
-				}
-				}
-			});
-
-			textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
-				if (newval)
-					LOGGER.debug("User Select Locale Scope..");
-				else
-					LOGGER.debug("User Select Gloval Scope..");
-			});
-
-			codeArea.setOnMouseClicked(event -> {
-
-				IndexRange selection = codeArea.getSelection();
-				int start = selection.getStart();
-				textSearchView.setSlidingStartIndexProperty(start);
-
-			});
-
-			textSearchView.show();
-
-			codeArea.setOnMouseClicked(defaultSelectionHandler);
-
-			e.consume();
-		}
-		// CTRL + SHIFT + F 포멧팅
-		//		else if (e.getCode() == KeyCode.F && (e.isControlDown() && e.isShiftDown())) {
-		//
-		//			doSqlFormat();
-		//			e.consume();
-		//		}
-		// Ctr + ALT +  U 선택된 문자 또는 전체 문자를 대문자로 치환
-		else if (e.getCode() == KeyCode.U && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
-			String selectedText = codeArea.getSelectedText();
-			if (ValueUtil.isNotEmpty(selectedText)) {
-				// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
-				replaceSelection(ValueUtil.toUpperCase(selectedText));
-			} else {
-				String text = codeArea.getText();
-				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-				// codeArea.clear();
-				// codeArea.appendText(sqlFormatter.toUpperCase(text));
-				setContent(ValueUtil.toUpperCase(text));
-			}
-			e.consume();
-		}
-		// Ctr + ALT + L 선택된 문자 또는 전체 문자를 소문자로 치환
-		else if (e.getCode() == KeyCode.L && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
-			String selectedText = codeArea.getSelectedText();
-			if (ValueUtil.isNotEmpty(selectedText)) {
-				// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));
-				replaceSelection(ValueUtil.toLowerCase(selectedText));
-			} else {
-				String text = codeArea.getText();
-				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-				// codeArea.clear();
-				// codeArea.appendText(sqlFormatter.toLowerCase(text));
-				setContent(ValueUtil.toUpperCase(text));
-			}
-			e.consume();
-		}
-		// CTRL + L 특정 라인위치로 이동
-		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
-			Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Go to Line", "Enter line number");
-			showInputDialog.ifPresent(v -> {
-
-				ValueUtil.ifNumberPresent(v.getValue(), num -> {
-
-					moveToLine(num.intValue());
-
-				});
-			});
-
-		}
+		codeHelperDeligator.codeAreaKeyClick(e);
+//
+//		if ((e.getCode() == KeyCode.F) && (e.isControlDown() && !e.isShiftDown())) {
+//
+//			ObservableValue<String> textProperty = codeArea.textProperty();
+//			TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(this, textProperty);
+//
+//			textSearchView.setOnSearchResultListener((vo) -> {
+//
+//				switch (vo.getSearchType()) {
+//				case SEARCH_SIMPLE: {
+//					int startIndex = vo.getStartIndex();
+//					int endIndex = vo.getEndIndex();
+//					codeArea.selectRange(startIndex, endIndex);
+//					LOGGER.debug(String.format("find text : %s startIdx :%d endIdx :%d", vo.getSearchText(), startIndex, endIndex));
+//					break;
+//				}
+//				case SEARCH_ALL: {
+//					int startIndex = vo.getStartIndex();
+//					String searchText = vo.getSearchText();
+//					String replaceText = vo.getReplaceText();
+//					// codeArea.replaceText(startIndex, startIndex +
+//					// searchText.length(), replaceText);
+//					setContent(startIndex, startIndex + searchText.length(), replaceText);
+//					break;
+//				}
+//				}
+//
+//			});
+//
+//			textSearchView.setOnReplaceResultListener(vo -> {
+//				switch (vo.getReaplceType()) {
+//				case SIMPLE: {
+//					String reaplceResult = vo.getReaplceResult();
+//					setContent(reaplceResult);
+//					break;
+//				}
+//				case ALL: {
+//					String reaplceResult = vo.getReaplceResult();
+//					setContent(reaplceResult);
+//					break;
+//				}
+//				}
+//			});
+//
+//			textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
+//				if (newval)
+//					LOGGER.debug("User Select Locale Scope..");
+//				else
+//					LOGGER.debug("User Select Gloval Scope..");
+//			});
+//
+//			codeArea.setOnMouseClicked(event -> {
+//
+//				IndexRange selection = codeArea.getSelection();
+//				int start = selection.getStart();
+//				textSearchView.setSlidingStartIndexProperty(start);
+//
+//			});
+//
+//			textSearchView.show();
+//
+//			codeArea.setOnMouseClicked(defaultSelectionHandler);
+//
+//			e.consume();
+//		}
+//		// CTRL + SHIFT + F 포멧팅
+//		//		else if (e.getCode() == KeyCode.F && (e.isControlDown() && e.isShiftDown())) {
+//		//
+//		//			doSqlFormat();
+//		//			e.consume();
+//		//		}
+//		// Ctr + ALT +  U 선택된 문자 또는 전체 문자를 대문자로 치환
+//		else if (e.getCode() == KeyCode.U && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
+//			String selectedText = codeArea.getSelectedText();
+//			if (ValueUtil.isNotEmpty(selectedText)) {
+//				// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
+//				replaceSelection(ValueUtil.toUpperCase(selectedText));
+//			} else {
+//				String text = codeArea.getText();
+//				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
+//				// codeArea.clear();
+//				// codeArea.appendText(sqlFormatter.toUpperCase(text));
+//				setContent(ValueUtil.toUpperCase(text));
+//			}
+//			e.consume();
+//		}
+//		// Ctr + ALT + L 선택된 문자 또는 전체 문자를 소문자로 치환
+//		else if (e.getCode() == KeyCode.L && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
+//			String selectedText = codeArea.getSelectedText();
+//			if (ValueUtil.isNotEmpty(selectedText)) {
+//				// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));
+//				replaceSelection(ValueUtil.toLowerCase(selectedText));
+//			} else {
+//				String text = codeArea.getText();
+//				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
+//				// codeArea.clear();
+//				// codeArea.appendText(sqlFormatter.toLowerCase(text));
+//				setContent(ValueUtil.toUpperCase(text));
+//			}
+//			e.consume();
+//		}
+//		// CTRL + L 특정 라인위치로 이동
+//		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+//			Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Go to Line", "Enter line number");
+//			showInputDialog.ifPresent(v -> {
+//
+//				ValueUtil.ifNumberPresent(v.getValue(), num -> {
+//
+//					moveToLine(num.intValue());
+//
+//				});
+//			});
+//
+//		}
 	}
 
 	public void replaceSelection(String selection) {
-		codeArea.getUndoManager().mark();
-		codeArea.replaceSelection(selection);
-		codeArea.getUndoManager().mark();
+		codeHelperDeligator.replaceSelection(selection);
+//		codeArea.getUndoManager().mark();
+//		codeArea.replaceSelection(selection);
+//		codeArea.getUndoManager().mark();
 	}
 
 	public void appendContent(String content) {
-		codeArea.getUndoManager().mark();
-		// codeArea.replaceText(0, 0, content);
-		codeArea.appendText(content);
-		codeArea.getUndoManager().mark();
+		codeHelperDeligator.appendContent(content);
+//		codeArea.getUndoManager().mark();
+//		codeArea.appendText(content);
+//		codeArea.getUndoManager().mark();
 	}
 
 	/**
 	 * 특정라인으로 이동처리하는 메소드
+	 *
+	 * 특정라인블록 전체를 선택처리함.
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param moveToLine
 	 */
-	@SuppressWarnings("rawtypes")
-	public int moveToLine(int moveToLine) {
-		int position = 0;
-		int row = moveToLine;
-		int length = 0;
-		for (Paragraph par : codeArea.getParagraphs().subList(0, row)) {
-			position += par.length() + 1; // account for line terminators
-			length = par.length() + 1;
-		}
-		int pos = position - length;
-		codeArea.positionCaret(pos);
-		codeArea.requestFocus();
-		return pos;
+	public void moveToLine(int moveToLine) {
+		codeHelperDeligator.moveToLine(moveToLine);
+	}
+
+	public void moveToLine(int moveToLine, int startCol) {
+		codeHelperDeligator.moveToLine(moveToLine, startCol);
+	}
+
+	public void moveToLine(int moveToLine, int startCol, int endCol) {
+		codeHelperDeligator.moveToLine(moveToLine, startCol, endCol);
 	}
 
 }

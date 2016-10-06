@@ -123,7 +123,9 @@ public class CreateXMLRulePanelFx extends JPanel implements ActionListener {
 		appendLn(buffer, "  message=\"" + rulemsgField.getText() + '\"');
 		appendLn(buffer, "  class=\"" + (hasXPathQuery ? "net.sourceforge.pmd.lang.rule.XPathRule" : "") + "\">");
 		appendLn(buffer, "  <description>");
+		appendLn(buffer, "<![CDATA[");
 		appendLn(buffer, "  " + ruledescField.getText());
+		appendLn(buffer, "]]>");
 		appendLn(buffer, "  </description>");
 		if (hasXPathQuery) {
 			appendLn(buffer, "  <properties>");

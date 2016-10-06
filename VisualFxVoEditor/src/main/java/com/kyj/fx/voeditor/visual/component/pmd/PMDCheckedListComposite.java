@@ -56,6 +56,11 @@ import net.sourceforge.pmd.stat.Metric;
 public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
+	 * @최초생성일 2016. 10. 6.
+	 */
+	private static final String RULESETS_FILE_FORMAT = "rulesets/%s/basic.xml";
+
+	/**
 	 * @param parent
 	 */
 	//	public PMDCheckedListComposite(BorderPane parent) {
@@ -74,7 +79,6 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	private DoPMD doPMD = new DoPMD();
 
-	private static final String RESULTSET = new File("rulesets/java/basic.xml").getAbsolutePath();
 	private static final String REPORT_FILE_FORMAT = "xml";
 	private static final String VIOLATION_TEXT_FORMAT = "Violation : %d";
 
@@ -124,7 +128,21 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		try {
 			String sourceCode = Files.toString(this.sourceFile, Charset.forName("UTF-8"));
 			PMDParameters params = new PMDParameters();
+			params.setSourceFileName(file.getAbsolutePath());
 			params.setSourceText(sourceCode);
+
+			if (!FileUtil.isJavaFile(file)) {
+				String fileExtension = FileUtil.getFileExtension(file);
+				try {
+					Field declaredField = PMDParameters.class.getDeclaredField("language");
+					if (declaredField != null) {
+						declaredField.setAccessible(true);
+						declaredField.set(params, fileExtension);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
 			//			transformParametersIntoConfiguration(params);
 			long start = System.nanoTime();
@@ -163,6 +181,19 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 				e.printStackTrace();
 			}
 
+			if (!FileUtil.isJavaFile(file)) {
+				String fileExtension = FileUtil.getFileExtension(file);
+				try {
+					Field declaredField = PMDParameters.class.getDeclaredField("language");
+					if (declaredField != null) {
+						declaredField.setAccessible(true);
+						declaredField.set(params, fileExtension);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
 			//			transformParametersIntoConfiguration(params);
 			long start = System.nanoTime();
 			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListener);
@@ -197,6 +228,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		//		configuration.setInputFilePath(params.getFileListPath());
 		//		configuration.setInputUri(params.getUri());
 		configuration.setReportFormat(REPORT_FILE_FORMAT);
+		configuration.setSourceFileName(params.getSourceFileName());
 		configuration.setSourceText(params.getSourceText());
 		//		configuration.setBenchmark(params.isBenchmark());
 		configuration.setDebug(params.isDebug());
@@ -205,16 +237,23 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		configuration.setReportFile(params.getReportfile());
 		configuration.setReportProperties(params.getProperties());
 		//		configuration.setReportShortNames(params.isShortnames());
+
+		String language = params.getLanguage();
+		String RESULTSET = new File(String.format(RULESETS_FILE_FORMAT, "java")).getAbsolutePath();
+		if (null != language) {
+			RESULTSET = new File(String.format(RULESETS_FILE_FORMAT, language)).getAbsolutePath();
+		}
+
 		configuration.setRuleSets(RESULTSET);
-//		configuration.setRuleSetFactoryCompatibilityEnabled(true);
+		//		configuration.setRuleSetFactoryCompatibilityEnabled(true);
 		configuration.setShowSuppressedViolations(params.isShowsuppressed());
 		configuration.setSourceEncoding("UTF-8");
 		//	        configuration.setStressTest(params.isStress());
-//		configuration.setSuppressMarker(params.getSuppressmarker());
+		//		configuration.setSuppressMarker(params.getSuppressmarker());
 		configuration.setThreads(1);
-//		configuration.setFailOnViolation(params.isFailOnViolation());
+		//		configuration.setFailOnViolation(params.isFailOnViolation());
 
-		LanguageVersion languageVersion = LanguageRegistry.findLanguageVersionByTerseName(params.getLanguage() + " " + params.getVersion());
+		LanguageVersion languageVersion = LanguageRegistry.findLanguageVersionByTerseName(language + " " + params.getVersion());
 		if (languageVersion != null) {
 			configuration.getLanguageVersionDiscoverer().setDefaultLanguageVersion(languageVersion);
 		}
@@ -241,11 +280,15 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 				if (ev.getButton() == MouseButton.PRIMARY && ev.getClickCount() == 2) {
 					RuleViolation item = pmdListCell.getItem();
 					int beginLine = item.getBeginLine();
-
+					int endLine = item.getEndLine();
+					int beginColumn = item.getBeginColumn();
+					int endColumn = item.getEndColumn();
+					LOGGER.debug("pmd meta violation index : begineLine : {} , endLine : {} , begine col : {} , end col : {}", beginLine,
+							endLine, beginColumn, endColumn);
 					JavaTextArea javaTextArea = PMDCheckedListComposite.this.javaTextArea;
 
 					if (PMDCheckedListComposite.this.sourceFile.isFile()) {
-						javaTextArea.moveToLine(beginLine);
+						javaTextArea.moveToLine(beginLine, beginColumn);
 					}
 					//디렉토리 선택의 경우만..
 					else {
@@ -276,7 +319,6 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			String name = rule.getName();
 			String ruleSetName = rule.getRuleSetName();
 			Language language = rule.getLanguage();
-
 
 			LOGGER.debug("{}\n rulesetName : {}\nruleName :{}\nLang:{}", ruleViolation.toString(), ruleSetName, name, language.toString());
 			lvViolation.getItems().add(ruleViolation);

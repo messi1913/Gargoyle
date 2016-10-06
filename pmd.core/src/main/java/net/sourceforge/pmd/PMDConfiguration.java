@@ -67,6 +67,7 @@ public class PMDConfiguration extends AbstractConfiguration {
 	private String inputPaths;
 	private String inputUri;
 	private String inputFilePath;
+	private String sourceFileName;
 	private String sourceText;
 	private boolean ruleSetFactoryCompatibilityEnabled = true;
 
@@ -471,7 +472,7 @@ public class PMDConfiguration extends AbstractConfiguration {
 
 	/**
 	 * Whether PMD should exit with status 4 (the default behavior, true) if violations are found or just with 0 (to not break the build, e.g.).
-	 * 
+	 *
 	 * @return failOnViolation
 	 */
 	public boolean isFailOnViolation() {
@@ -480,7 +481,7 @@ public class PMDConfiguration extends AbstractConfiguration {
 
 	/**
 	 * Sets whether PMD should exit with status 4 (the default behavior, true) if violations are found or just with 0 (to not break the build, e.g.).
-	 * 
+	 *
 	 * @param failOnViolation
 	 *            failOnViolation
 	 */
@@ -509,6 +510,20 @@ public class PMDConfiguration extends AbstractConfiguration {
 	 */
 	public void setRuleSetFactoryCompatibilityEnabled(boolean ruleSetFactoryCompatibilityEnabled) {
 		this.ruleSetFactoryCompatibilityEnabled = ruleSetFactoryCompatibilityEnabled;
+	}
+
+	/**
+	 * @return the sourceFileName
+	 */
+	public final String getSourceFileName() {
+		return sourceFileName;
+	}
+
+	/**
+	 * @param sourceFileName the sourceFileName to set
+	 */
+	public final void setSourceFileName(String sourceFileName) {
+		this.sourceFileName = sourceFileName;
 	}
 
 	public String getSourceText() {

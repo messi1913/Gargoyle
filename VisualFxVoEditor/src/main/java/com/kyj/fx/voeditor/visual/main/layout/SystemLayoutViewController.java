@@ -1163,6 +1163,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					treeProjectFile.getSelectionModel().select(search);
 					treeProjectFile.getFocusModel().focus(treeProjectFile.getSelectionModel().getSelectedIndex());
 					treeProjectFile.scrollTo(treeProjectFile.getSelectionModel().getSelectedIndex());
+
+					openFile(data);
 				}
 
 			} catch (Exception e) {
