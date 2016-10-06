@@ -6,6 +6,8 @@ package com.kyj.fx.voeditor.visual.component;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * 파일트리를 표현하기 위한 기본단위 래퍼클래스
@@ -13,7 +15,7 @@ import java.io.Serializable;
  * @author KYJ
  *
  */
-public class FileWrapper implements Serializable{
+public class FileWrapper implements Serializable {
 	/**
 	 * @최초생성일 2016. 7. 18.
 	 */
@@ -33,13 +35,13 @@ public class FileWrapper implements Serializable{
 
 	/**
 	 * 자바 프로젝트인지 유무
-	 * 
+	 *
 	 * @최초생성일 2016. 7. 10.
 	 */
 	private boolean isJavaProjectFile;
 	/**
 	 * svn 연결이 되었는지 유무
-	 * 
+	 *
 	 * @최초생성일 2016. 7. 10.
 	 */
 	private boolean isSVNConnected;
@@ -91,13 +93,27 @@ public class FileWrapper implements Serializable{
 
 	public File[] listFiles() {
 
-		return this.file.listFiles((dir, name) -> {
+		File[] listFiles = this.file.listFiles((dir, name) -> {
 			if (!isShowHiddenFile()) {
 				return !name.startsWith(".");
 			}
 			return true;
 		});
+		Arrays.sort(listFiles, new Comparator<File>() {
 
+			@Override
+			public int compare(File o1, File o2) {
+
+				if (o1.isDirectory())
+					return -1;
+
+				if (o2.isDirectory())
+					return 1;
+
+				return 0;
+			}
+		});
+		return listFiles;
 	}
 
 	public boolean isJavaProjectFile() {
