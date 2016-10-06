@@ -382,7 +382,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 				if (valueExp.isPrimaryKey) {
 
 					//기본키값이 빈 경우 메세지.
-					if (valueExp.getDisplayText() == null || valueExp.getDisplayText().isEmpty()) {
+					if (valueExp.getDisplayText() == null    /*|| valueExp.getDisplayText().isEmpty()*/) {
 						return function.apply(STATUS.PK_VAL_IS_EMPTY, Collections.emptyList());
 					}
 					whereStatement.append(String.format("and %s  = '%s'", colummExp, valueExp.getRealValue()));
