@@ -88,6 +88,12 @@ import javafx.util.Callback;
  *
  ***************************/
 public class FxUtil {
+
+	/**
+	 * @최초생성일 2016. 10. 6.
+	 */
+	public static final String FONTS_NANUMBARUNGOTHIC_TTF = "fonts/NANUMBARUNGOTHIC.TTF";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(FxUtil.class);
 
 	/**
@@ -946,4 +952,6 @@ public class FxUtil {
 	public static void installTooltip(Node node, String string) {
 		Tooltip.install(node, new Tooltip(string));
 	}
+
+
 }

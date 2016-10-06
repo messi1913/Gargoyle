@@ -99,7 +99,7 @@ public class JavaTextArea extends BorderPane {
 		//		});
 
 		codeArea = new CodeArea();
-		codeHelperDeligator = new CodeAreaHelper(codeArea);
+		codeHelperDeligator = new JavaCodeAreaHelper(codeArea);
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
 		//		codeArea.richChanges().subscribe(change -> {

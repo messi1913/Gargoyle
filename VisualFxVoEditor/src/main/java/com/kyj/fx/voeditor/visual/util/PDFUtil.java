@@ -94,7 +94,7 @@ public class PDFUtil {
 	public static PDFont getFont(PDDocument doc) throws IOException {
 //		GraphicsEnvironment localGraphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
 //		Font[] allFonts = localGraphicsEnvironment.getAllFonts();
-		PDFont font = PDType0Font.load(doc, ClassLoader.getSystemClassLoader().getResourceAsStream("fonts/NANUMBARUNGOTHIC.TTF"));
+		PDFont font = PDType0Font.load(doc, ClassLoader.getSystemClassLoader().getResourceAsStream(FxUtil.FONTS_NANUMBARUNGOTHIC_TTF));
 		return font;
 	}
 

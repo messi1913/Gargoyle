@@ -6,6 +6,8 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.config.item.node;
 
+import javafx.scene.image.Image;
+
 /**
  * @author KYJ
  *
@@ -20,8 +22,30 @@ public abstract class AbstractRunItem implements IRunableItem, IRunableItemActio
 		return getRunableType().name();
 	}
 
+	/**
+	 * ListView에 보여지게 될 DisplayName
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 6.
+	 * @return
+	 */
 	public String getDisplayName() {
-		return getName();
+		return getClassPackageName();
 	}
+
+	/**
+	 * class package name
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 6.
+	 * @return
+	 */
+	public abstract String getClassPackageName();
+
+	/**
+	 * 대표 이미지
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 6.
+	 * @return
+	 */
+	public abstract Image getImage();
 
 }

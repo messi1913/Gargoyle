@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.component.config.item.node;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.Tab;
+import javafx.scene.image.Image;
 
 /**
  * @author KYJ
@@ -64,5 +65,22 @@ public class JspRunableItem extends AbstractRunItem {
 	public void apply() {
 		// TODO Auto-generated method stub
 
+	}
+
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.config.item.node.AbstractRunItem#getClassPackageName()
+	 */
+	@Override
+	public String getClassPackageName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.config.item.node.AbstractRunItem#getImage()
+	 */
+	@Override
+	public Image getImage() {
+		return null;
 	}
 }

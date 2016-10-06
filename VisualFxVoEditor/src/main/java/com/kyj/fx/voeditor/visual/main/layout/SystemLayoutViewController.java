@@ -344,7 +344,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			return;
 		}
 
-		String EXTENSION = fileName.substring(dotIndex);
+
+		String EXTENSION = FileUtil.getFileExtension(fileName);
 		Optional<String> findFirst = exts.stream().filter(ext -> EXTENSION.equals(ext) || EXTENSION.isEmpty()).findFirst();
 		if (findFirst.isPresent()) {
 			/* open OS Denpendency. */
