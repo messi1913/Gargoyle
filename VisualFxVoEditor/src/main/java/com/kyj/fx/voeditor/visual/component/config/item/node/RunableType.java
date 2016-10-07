@@ -12,7 +12,7 @@ package com.kyj.fx.voeditor.visual.component.config.item.node;
  */
 public enum RunableType {
 
-	JAVA, JSP ;
+	JAVA, JSP;
 
 	/**
 	 * @작성자 : KYJ
@@ -22,6 +22,5 @@ public enum RunableType {
 	public String getName() {
 		return this.name();
 	}
-
 
 }

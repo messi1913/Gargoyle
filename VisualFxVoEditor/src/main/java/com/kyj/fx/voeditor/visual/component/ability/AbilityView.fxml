@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.Double?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.shape.Polygon?>
+<?import javafx.scene.shape.Polyline?>
+
+<SplitPane dividerPositions="0.3708838821490468" maxHeight="-Infinity"
+	maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+	prefHeight="878.0" prefWidth="1156.0" xmlns:fx="http://javafx.com/fxml/1"
+	xmlns="http://javafx.com/javafx/8.0.60">
+	<items>
+		<BorderPane prefHeight="200.0" prefWidth="200.0">
+			<top>
+				<ImageView fitHeight="315.0" fitWidth="432.0"
+					pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+					<image>
+						<Image
+							url="@../../../../../../../../../../../../../Pictures/sample2.jpg" />
+					</image>
+				</ImageView>
+			</top>
+			<center>
+				<TableView BorderPane.alignment="CENTER">
+					<columns>
+						<TableColumn prefWidth="75.0" text="C1" />
+						<TableColumn prefWidth="75.0" text="C2" />
+					</columns>
+				</TableView>
+			</center>
+		</BorderPane>
+		<AnchorPane prefHeight="200.0" prefWidth="200.0">
+			<children>
+				<Polygon fill="DODGERBLUE" layoutX="373.0" layoutY="364.0"
+					stroke="BLACK" strokeType="INSIDE">
+					<points>
+						<Double fx:value="-50.0" />
+						<Double fx:value="30.0" />
+
+						<Double fx:value="0.0" />
+						<Double fx:value="60.0" />
+
+						<Double fx:value="50.0" />
+						<Double fx:value="30.0" />
+
+						<Double fx:value="50.0" />
+						<Double fx:value="-30.0" />
+
+						<Double fx:value="0.0" />
+						<Double fx:value="-60.0" />
+
+						<Double fx:value="-50.0" />
+						<Double fx:value="-30.0" />
+					</points>
+				</Polygon>
+				<Polyline fill="CHARTREUSE" layoutX="289.0" layoutY="537.0"
+					strokeType="INSIDE">
+					<points>
+						<Double fx:value="-50.0" />
+						<Double fx:value="-40.0" />
+						<Double fx:value="50.0" />
+						<Double fx:value="-40.0" />
+						<Double fx:value="0.0" />
+						<Double fx:value="60.0" />
+						<Double fx:value="-50.0" />
+						<Double fx:value="-40.0" />
+					</points>
+				</Polyline>
+				<Polygon layoutX="208.0" layoutY="414.0" stroke="#f2ff00"
+					strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="1.0"
+					strokeType="OUTSIDE" strokeWidth="2.0">
+					<points>
+						<Double fx:value="-50.0" />
+						<Double fx:value="40.0" />
+						<Double fx:value="50.0" />
+						<Double fx:value="40.0" />
+						<Double fx:value="0.0" />
+						<Double fx:value="-60.0" />
+					</points>
+				</Polygon>
+			</children>
+		</AnchorPane>
+	</items>
+</SplitPane>

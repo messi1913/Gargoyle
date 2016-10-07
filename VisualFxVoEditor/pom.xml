@@ -600,6 +600,13 @@
 			<!-- <systemPath>${dao.wizard.jar.path.name}</systemPath> -->
 		</dependency>
 
+		<dependency>
+			<groupId>kyj.pmd</groupId>
+			<artifactId>pmd.core</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<!-- <scope>system</scope> -->
+			<!-- <systemPath>${dao.wizard.jar.path.name}</systemPath> -->
+		</dependency>
 
 		<dependency>
 			<groupId>ojdbc14</groupId>

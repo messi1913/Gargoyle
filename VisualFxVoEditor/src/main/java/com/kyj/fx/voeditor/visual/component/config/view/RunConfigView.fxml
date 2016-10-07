@@ -68,13 +68,13 @@
             </BorderPane>
             <BorderPane>
                <center>
-                  <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+                  <TabPane fx:id="tabPaneContents" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
                </center>
                <top>
                   <HBox spacing="5.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
                      <children>
                         <Label text="Name :" HBox.hgrow="NEVER" />
-                        <TextField />
+                        <TextField fx:id="txtDisplayName" />
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

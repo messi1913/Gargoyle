@@ -6,8 +6,9 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.config.item.node;
 
+import com.kyj.fx.voeditor.visual.component.config.view.RunConfigTab;
+
 import javafx.collections.ObservableList;
-import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
 
 /**
@@ -28,7 +29,7 @@ public class JspRunableItem extends AbstractRunItem {
 	 * @see com.kyj.fx.voeditor.visual.component.config.node.IRunableItem#getTabs()
 	 */
 	@Override
-	public ObservableList<Tab> getTabs() {
+	public ObservableList<RunConfigTab> getTabs() {
 		return null;
 	}
 
