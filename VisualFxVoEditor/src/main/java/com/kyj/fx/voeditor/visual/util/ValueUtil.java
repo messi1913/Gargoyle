@@ -1108,7 +1108,7 @@ public class ValueUtil {
 	 */
 	public static boolean isNumber(String value) {
 		int length = value.length();
-		for (int i = 0; i < length; value.length())
+		for (int i = 0; i < length; i++)
 			if (!Character.isDigit(value.charAt(i)))
 				return false;
 		return length == 0 ? false : true;
