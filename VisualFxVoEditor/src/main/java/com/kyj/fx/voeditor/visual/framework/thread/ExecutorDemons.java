@@ -19,12 +19,18 @@ import java.util.concurrent.ThreadFactory;
 public class ExecutorDemons {
 
 	/**
+	 * @최초생성일 2016. 10. 12.
+	 */
+	private static final String DEAMON_THREAD_NAME = "Gargoye-Excutor-Deamon-Thread";
+
+	/**
 	 * 데몬스레드 그룹을 만드는 스레드 팩토리
 	 * @최초생성일 2016. 10. 5.
 	 */
 	private static final ThreadFactory deamonThreadFactory = r -> {
 		Thread t = Executors.defaultThreadFactory().newThread(r);
 		t.setDaemon(true);
+		t.setName(DEAMON_THREAD_NAME);
 		return t;
 	};
 
