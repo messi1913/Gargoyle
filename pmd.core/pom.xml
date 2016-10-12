@@ -31,27 +31,27 @@
 
 
 			<!-- any other plugins -->
-<!-- 			<plugin> -->
-<!-- 				<artifactId>maven-assembly-plugin</artifactId> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<phase>package</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>single</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
+			<!-- <plugin> -->
+			<!-- <artifactId>maven-assembly-plugin</artifactId> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <phase>package</phase> -->
+			<!-- <goals> -->
+			<!-- <goal>single</goal> -->
+			<!-- </goals> -->
+			<!-- </execution> -->
 
-<!-- 				</executions> -->
-<!-- 				<configuration> -->
-<!-- 					<descriptorRefs> -->
-<!-- 						<descriptorRef>jar-with-dependencies</descriptorRef> -->
-<!-- 					</descriptorRefs> -->
-<!-- 					<detail> -->
+			<!-- </executions> -->
+			<!-- <configuration> -->
+			<!-- <descriptorRefs> -->
+			<!-- <descriptorRef>jar-with-dependencies</descriptorRef> -->
+			<!-- </descriptorRefs> -->
+			<!-- <detail> -->
 
-<!-- 					</detail>	 -->
-<!-- 				</configuration> -->
+			<!-- </detail> -->
+			<!-- </configuration> -->
 
-<!-- 			</plugin> -->
+			<!-- </plugin> -->
 
 
 		</plugins>
@@ -92,6 +92,308 @@
 		<!-- <artifactId>ant-testutil</artifactId> -->
 		<!-- <version>${ant.version}</version> -->
 		<!-- </dependency> -->
+
+
+		<dependency>
+			<groupId>antlr-runtime</groupId>
+			<artifactId>antlr-runtime</artifactId>
+			<version>3.5.2</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/antlr-runtime-3.5.2.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>antlr4-runtime-4.5.2</groupId>
+			<artifactId>antlr4-runtime-4.5.2</artifactId>
+			<version>1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/antlr4-runtime-4.5.2-1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>5.0.4</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/asm-5.0.4.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/commons-io-2.4.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang3</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/commons-lang3-3.4.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.5</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/gson-2.5.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>javacc</groupId>
+			<artifactId>javacc</artifactId>
+			<version>5.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/javacc-5.0.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>jaxen</groupId>
+			<artifactId>jaxen</artifactId>
+			<version>1.1.6</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/jaxen-1.1.6.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>jcommander</groupId>
+			<artifactId>jcommander</artifactId>
+			<version>1.48</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/jcommander-1.48.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-apex-5.5.1-apex-jorje</groupId>
+			<artifactId>pmd-apex-5.5.1-apex-jorje</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-apex-5.5.1-apex-jorje-shaded.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-apex</groupId>
+			<artifactId>pmd-apex</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-apex-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-core</groupId>
+			<artifactId>pmd-core</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-core-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-cpp</groupId>
+			<artifactId>pmd-cpp</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-cpp-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-cs</groupId>
+			<artifactId>pmd-cs</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-cs-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-fortran</groupId>
+			<artifactId>pmd-fortran</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-fortran-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-go</groupId>
+			<artifactId>pmd-go</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-go-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-java</groupId>
+			<artifactId>pmd-java</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-java-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-javascript</groupId>
+			<artifactId>pmd-javascript</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-javascript-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-jsp</groupId>
+			<artifactId>pmd-jsp</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-jsp-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-matlab</groupId>
+			<artifactId>pmd-matlab</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-matlab-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-objectivec</groupId>
+			<artifactId>pmd-objectivec</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-objectivec-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-perl</groupId>
+			<artifactId>pmd-perl</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-perl-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-php</groupId>
+			<artifactId>pmd-php</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-php-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-plsql</groupId>
+			<artifactId>pmd-plsql</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-plsql-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-python</groupId>
+			<artifactId>pmd-python</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-python-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-ruby</groupId>
+			<artifactId>pmd-ruby</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-ruby-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-scala</groupId>
+			<artifactId>pmd-scala</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-scala-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-swift</groupId>
+			<artifactId>pmd-swift</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-swift-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-ui</groupId>
+			<artifactId>pmd-ui</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-ui-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-vm</groupId>
+			<artifactId>pmd-vm</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-vm-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>pmd-xml</groupId>
+			<artifactId>pmd-xml</artifactId>
+			<version>5.5.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/pmd-xml-5.5.1.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>rhino</groupId>
+			<artifactId>rhino</artifactId>
+			<version>1.7.7</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/rhino-1.7.7.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>saxon-9.1.0.8</groupId>
+			<artifactId>saxon-9.1.0.8</artifactId>
+			<version>dom</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/saxon-9.1.0.8-dom.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>saxon</groupId>
+			<artifactId>saxon</artifactId>
+			<version>9.1.0.8</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/saxon-9.1.0.8.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>scala-compiler</groupId>
+			<artifactId>scala-compiler</artifactId>
+			<version>2.10.4</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/scala-compiler-2.10.4.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>scala-library</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>2.10.4</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/scala-library-2.10.4.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>scala-reflect</groupId>
+			<artifactId>scala-reflect</artifactId>
+			<version>2.10.4</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/scala-reflect-2.10.4.jar</systemPath>
+		</dependency>
+
+
+
+
+
 	</dependencies>
 
 
