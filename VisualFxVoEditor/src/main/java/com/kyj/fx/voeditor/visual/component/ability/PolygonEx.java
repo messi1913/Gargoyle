@@ -11,11 +11,11 @@ package com.kyj.fx.voeditor.visual.component.ability;
  *
  */
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class PolygonEx extends Application {
@@ -23,14 +23,14 @@ public class PolygonEx extends Application {
 	@Override
 	public void start(Stage stage) {
 
-		Group g = new Group();
-
+		Pane g = new Pane();
+		ScrollPane convert = XY.convert(g);
 		{
 			//한 점의 좌표가 주어진경우
-			double x = 250;
-			double y = 250;
+			double x = 150;
+			double y = 150;
 			//빗변의 길이
-			double r = 500;
+			double r = 100;
 			double degree = Math.atan2(y, x);
 
 			double x1 = x + (r / Math.tan(degree));
@@ -40,14 +40,21 @@ public class PolygonEx extends Application {
 			double y2 = y + y - r;
 
 			Polygon polygon = new Polygon();
+
+			polygon.setLayoutX(x);
+			polygon.setLayoutY(x);
 			polygon.getPoints().addAll(new Double[] { x, y, x1, y1, x2, y2 });
+
+
+
 			g.getChildren().add(polygon);
+			g.getChildren().add(new Line(1,1,10,10));
 		}
 
 		{
 			//한 점의 좌표가 주어진경우
-			double x = 50;
-			double y = 50;
+			double x = 150;
+			double y = 150;
 			//빗변의 길이
 			double r = 100;
 			double degree = Math.atan2(y, x);
@@ -81,7 +88,7 @@ public class PolygonEx extends Application {
 		//		text2.setY(y2 - 20);
 		//		g.getChildren().addAll(polygon, text, text1, text2);
 
-		Scene scene = new Scene(XY.convert(g), 1800, 900);
+		Scene scene = new Scene(convert, 1800, 900);
 		stage.setScene(scene);
 		stage.show();
 	}

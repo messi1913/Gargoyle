@@ -1263,6 +1263,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				FilePropertiesComposite composite = new FilePropertiesComposite(file);
 				FxUtil.createStageAndShow(composite, stage -> {
+					stage.setTitle(FilePropertiesComposite.TITLE);
 					stage.initOwner(SharedMemory.getPrimaryStage());
 				});
 			}

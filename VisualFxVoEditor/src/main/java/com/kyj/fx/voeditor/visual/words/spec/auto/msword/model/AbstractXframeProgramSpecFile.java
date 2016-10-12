@@ -13,8 +13,8 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecSourceException;
+import com.kyj.fx.voeditor.visual.framework.comment.CodeCommentFactory;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.CodeCommentFactory;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.InspectorSourceMeta;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.XframeJsAnalysis;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
@@ -24,7 +24,7 @@ import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.TableDVO;
 
 /**
  * @author KYJ
- * 
+ *
  */
 public abstract class AbstractXframeProgramSpecFile implements IProgramSpecFile {
 
@@ -52,7 +52,7 @@ public abstract class AbstractXframeProgramSpecFile implements IProgramSpecFile 
 
 	/**
 	 * 파일명 반환
-	 * 
+	 *
 	 * @return
 	 */
 	public String getFileName() {
@@ -61,7 +61,7 @@ public abstract class AbstractXframeProgramSpecFile implements IProgramSpecFile 
 
 	/**
 	 * 파일명 반환
-	 * 
+	 *
 	 * @return
 	 */
 	public String getFullFileName() {
@@ -70,7 +70,7 @@ public abstract class AbstractXframeProgramSpecFile implements IProgramSpecFile 
 
 	/**
 	 * 프로젝트명
-	 * 
+	 *
 	 * @return
 	 */
 	public String getProjectName() {
@@ -79,7 +79,7 @@ public abstract class AbstractXframeProgramSpecFile implements IProgramSpecFile 
 
 	/**
 	 * 프로젝트명
-	 * 
+	 *
 	 * @param projectName
 	 */
 	public void setProjectName(String projectName) {
@@ -92,7 +92,7 @@ public abstract class AbstractXframeProgramSpecFile implements IProgramSpecFile 
 
 	/**
 	 * 메소드의 주석을 찾은 다음 반환
-	 * 
+	 *
 	 * @param methodName
 	 *            접근지정자, 반환값, 메소드명.. exception등이 포함된 메소드명
 	 * @return
@@ -196,13 +196,13 @@ public abstract class AbstractXframeProgramSpecFile implements IProgramSpecFile 
 
 	/**
 	 * 소스코드 분석
-	 * 
+	 *
 	 * @return
 	 */
 	public abstract List<SourceAnalysisDVO> anaysis();
 
 	/**
-	 * 
+	 *
 	 */
 	public void toProgreamSpec() {
 
@@ -214,7 +214,7 @@ public abstract class AbstractXframeProgramSpecFile implements IProgramSpecFile 
 
 	/**
 	 * 경로 및 확장자가 없는 단순한 이름
-	 * 
+	 *
 	 * @return
 	 */
 	public String getFileSimpleName() {
@@ -224,7 +224,7 @@ public abstract class AbstractXframeProgramSpecFile implements IProgramSpecFile 
 
 	/**
 	 * 소스ID를 이용하여 MES 화면 ID에 해당하는 단순한 이름.
-	 * 
+	 *
 	 * @return
 	 */
 	public abstract List<TableDVO> getTableList();
@@ -282,7 +282,7 @@ public abstract class AbstractXframeProgramSpecFile implements IProgramSpecFile 
 
 	/**
 	 * 파라미터 스트링으로부터 정규화된 데이터셋으로 변환한다.
-	 * 
+	 *
 	 * @param parameterString
 	 * @return
 	 */

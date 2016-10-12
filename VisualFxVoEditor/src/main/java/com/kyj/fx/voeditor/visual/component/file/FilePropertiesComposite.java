@@ -38,6 +38,8 @@ import javafx.util.StringConverter;
  */
 public class FilePropertiesComposite extends TabPane implements Function<File, List<Map<String, Object>>> {
 
+	public static final String TITLE = "File Properties";
+
 	private File file;
 
 	@FXML
@@ -126,6 +128,24 @@ public class FilePropertiesComposite extends TabPane implements Function<File, L
 		boolean hidden = this.file.isHidden();
 		String path = this.file.getAbsolutePath();
 
+		int totalCnt = 0;
+		int fileCnt = 0;
+		int dirCnt = 0;
+
+		if(file.isDirectory())
+		{
+			for (File f : file.listFiles()) {
+
+				if (f.isFile())
+					fileCnt++;
+
+				else if (f.isDirectory())
+					dirCnt++;
+
+				totalCnt++;
+			}
+		}
+
 		//grid
 		items.add(toMap("name", name));
 		items.add(toMap("path", path));
@@ -161,9 +181,14 @@ public class FilePropertiesComposite extends TabPane implements Function<File, L
 			items.add(toMap("lastModifiedTime", toDate(lastModifiedTime.toMillis())));
 			items.add(toMap("symbolicLink", symbolicLink));
 
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		items.add(toMap("all file count", totalCnt));
+		items.add(toMap("only file count ", fileCnt));
+		items.add(toMap("only dir count", dirCnt));
 
 		return items;
 	}

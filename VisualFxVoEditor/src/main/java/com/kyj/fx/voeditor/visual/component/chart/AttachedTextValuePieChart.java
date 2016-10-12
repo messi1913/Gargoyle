@@ -17,10 +17,14 @@ import javafx.util.StringConverter;
 
 /**
  * javafx에서 제공되지않는 기능에 대한 처리를 도와주는 PieChart
+ *
+ * 라벨링.
  * @author KYJ
  *
  */
 public class AttachedTextValuePieChart extends PieChart {
+
+	public AttachedTextValuePieChart(){}
 
 	/**
 	 * textlabel 텍스쳐 처리

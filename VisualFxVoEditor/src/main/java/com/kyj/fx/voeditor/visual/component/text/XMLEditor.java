@@ -15,7 +15,13 @@ import javafx.scene.layout.BorderPane;
 
 public class XMLEditor extends BorderPane {
 
-	private static final Pattern XML_TAG = Pattern.compile("(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))" + "|(?<COMMENT><!--[^<>]+-->)");
+	/**
+	 * @최초생성일 2016. 10. 12.
+	 */
+	private static final String REGEX = "(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))" + "|(?<COMMENT><!--[^<>]+-->)";
+	private static final String REGEX2 = "(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))" + "|(?<COMMENT><!--[^!]+-->)";
+
+	private static final Pattern XML_TAG = Pattern.compile(REGEX2);
 
 	private static final Pattern ATTRIBUTES = Pattern.compile("(\\w+\\h*)(=)(\\h*\"[^\"]+\")");
 

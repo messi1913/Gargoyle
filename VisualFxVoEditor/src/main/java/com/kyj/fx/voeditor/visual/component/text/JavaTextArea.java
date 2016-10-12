@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.function.IntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -21,8 +22,10 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
@@ -100,7 +103,7 @@ public class JavaTextArea extends BorderPane {
 
 		codeArea = new CodeArea();
 		codeHelperDeligator = new JavaCodeAreaHelper(codeArea);
-		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+		codeArea.setParagraphGraphicFactory(getLineFactory());
 
 		//		codeArea.richChanges().subscribe(change -> {
 		//			codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
@@ -163,6 +166,10 @@ public class JavaTextArea extends BorderPane {
 
 	}
 
+	protected IntFunction<Node> getLineFactory() {
+		return LineNumberFactory.get(codeArea);
+	}
+
 	public void setKeywords(String[] keywords) {
 		KEYWORDS = keywords;
 		codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
@@ -218,6 +225,13 @@ public class JavaTextArea extends BorderPane {
 		return codeArea.getParagraph(index);
 	}
 
+	public ObservableList<Paragraph<Collection<String>>> getParagraphs() {
+		return codeArea.getParagraphs();
+	}
+
+	public IndexRange getParagraphSelection(int paragraph) {
+		return codeArea.getParagraphSelection(paragraph);
+	}
 	//	private static StyleSpans<Collection<String>> computeHighlighting(String text) {
 	//		Matcher matcher = PATTERN.matcher(text);
 	//		int lastKwEnd = 0;
@@ -291,134 +305,134 @@ public class JavaTextArea extends BorderPane {
 	 */
 	public void codeAreaKeyClick(KeyEvent e) {
 		codeHelperDeligator.codeAreaKeyClick(e);
-//
-//		if ((e.getCode() == KeyCode.F) && (e.isControlDown() && !e.isShiftDown())) {
-//
-//			ObservableValue<String> textProperty = codeArea.textProperty();
-//			TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(this, textProperty);
-//
-//			textSearchView.setOnSearchResultListener((vo) -> {
-//
-//				switch (vo.getSearchType()) {
-//				case SEARCH_SIMPLE: {
-//					int startIndex = vo.getStartIndex();
-//					int endIndex = vo.getEndIndex();
-//					codeArea.selectRange(startIndex, endIndex);
-//					LOGGER.debug(String.format("find text : %s startIdx :%d endIdx :%d", vo.getSearchText(), startIndex, endIndex));
-//					break;
-//				}
-//				case SEARCH_ALL: {
-//					int startIndex = vo.getStartIndex();
-//					String searchText = vo.getSearchText();
-//					String replaceText = vo.getReplaceText();
-//					// codeArea.replaceText(startIndex, startIndex +
-//					// searchText.length(), replaceText);
-//					setContent(startIndex, startIndex + searchText.length(), replaceText);
-//					break;
-//				}
-//				}
-//
-//			});
-//
-//			textSearchView.setOnReplaceResultListener(vo -> {
-//				switch (vo.getReaplceType()) {
-//				case SIMPLE: {
-//					String reaplceResult = vo.getReaplceResult();
-//					setContent(reaplceResult);
-//					break;
-//				}
-//				case ALL: {
-//					String reaplceResult = vo.getReaplceResult();
-//					setContent(reaplceResult);
-//					break;
-//				}
-//				}
-//			});
-//
-//			textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
-//				if (newval)
-//					LOGGER.debug("User Select Locale Scope..");
-//				else
-//					LOGGER.debug("User Select Gloval Scope..");
-//			});
-//
-//			codeArea.setOnMouseClicked(event -> {
-//
-//				IndexRange selection = codeArea.getSelection();
-//				int start = selection.getStart();
-//				textSearchView.setSlidingStartIndexProperty(start);
-//
-//			});
-//
-//			textSearchView.show();
-//
-//			codeArea.setOnMouseClicked(defaultSelectionHandler);
-//
-//			e.consume();
-//		}
-//		// CTRL + SHIFT + F 포멧팅
-//		//		else if (e.getCode() == KeyCode.F && (e.isControlDown() && e.isShiftDown())) {
-//		//
-//		//			doSqlFormat();
-//		//			e.consume();
-//		//		}
-//		// Ctr + ALT +  U 선택된 문자 또는 전체 문자를 대문자로 치환
-//		else if (e.getCode() == KeyCode.U && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
-//			String selectedText = codeArea.getSelectedText();
-//			if (ValueUtil.isNotEmpty(selectedText)) {
-//				// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
-//				replaceSelection(ValueUtil.toUpperCase(selectedText));
-//			} else {
-//				String text = codeArea.getText();
-//				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-//				// codeArea.clear();
-//				// codeArea.appendText(sqlFormatter.toUpperCase(text));
-//				setContent(ValueUtil.toUpperCase(text));
-//			}
-//			e.consume();
-//		}
-//		// Ctr + ALT + L 선택된 문자 또는 전체 문자를 소문자로 치환
-//		else if (e.getCode() == KeyCode.L && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
-//			String selectedText = codeArea.getSelectedText();
-//			if (ValueUtil.isNotEmpty(selectedText)) {
-//				// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));
-//				replaceSelection(ValueUtil.toLowerCase(selectedText));
-//			} else {
-//				String text = codeArea.getText();
-//				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-//				// codeArea.clear();
-//				// codeArea.appendText(sqlFormatter.toLowerCase(text));
-//				setContent(ValueUtil.toUpperCase(text));
-//			}
-//			e.consume();
-//		}
-//		// CTRL + L 특정 라인위치로 이동
-//		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
-//			Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Go to Line", "Enter line number");
-//			showInputDialog.ifPresent(v -> {
-//
-//				ValueUtil.ifNumberPresent(v.getValue(), num -> {
-//
-//					moveToLine(num.intValue());
-//
-//				});
-//			});
-//
-//		}
+		//
+		//		if ((e.getCode() == KeyCode.F) && (e.isControlDown() && !e.isShiftDown())) {
+		//
+		//			ObservableValue<String> textProperty = codeArea.textProperty();
+		//			TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(this, textProperty);
+		//
+		//			textSearchView.setOnSearchResultListener((vo) -> {
+		//
+		//				switch (vo.getSearchType()) {
+		//				case SEARCH_SIMPLE: {
+		//					int startIndex = vo.getStartIndex();
+		//					int endIndex = vo.getEndIndex();
+		//					codeArea.selectRange(startIndex, endIndex);
+		//					LOGGER.debug(String.format("find text : %s startIdx :%d endIdx :%d", vo.getSearchText(), startIndex, endIndex));
+		//					break;
+		//				}
+		//				case SEARCH_ALL: {
+		//					int startIndex = vo.getStartIndex();
+		//					String searchText = vo.getSearchText();
+		//					String replaceText = vo.getReplaceText();
+		//					// codeArea.replaceText(startIndex, startIndex +
+		//					// searchText.length(), replaceText);
+		//					setContent(startIndex, startIndex + searchText.length(), replaceText);
+		//					break;
+		//				}
+		//				}
+		//
+		//			});
+		//
+		//			textSearchView.setOnReplaceResultListener(vo -> {
+		//				switch (vo.getReaplceType()) {
+		//				case SIMPLE: {
+		//					String reaplceResult = vo.getReaplceResult();
+		//					setContent(reaplceResult);
+		//					break;
+		//				}
+		//				case ALL: {
+		//					String reaplceResult = vo.getReaplceResult();
+		//					setContent(reaplceResult);
+		//					break;
+		//				}
+		//				}
+		//			});
+		//
+		//			textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
+		//				if (newval)
+		//					LOGGER.debug("User Select Locale Scope..");
+		//				else
+		//					LOGGER.debug("User Select Gloval Scope..");
+		//			});
+		//
+		//			codeArea.setOnMouseClicked(event -> {
+		//
+		//				IndexRange selection = codeArea.getSelection();
+		//				int start = selection.getStart();
+		//				textSearchView.setSlidingStartIndexProperty(start);
+		//
+		//			});
+		//
+		//			textSearchView.show();
+		//
+		//			codeArea.setOnMouseClicked(defaultSelectionHandler);
+		//
+		//			e.consume();
+		//		}
+		//		// CTRL + SHIFT + F 포멧팅
+		//		//		else if (e.getCode() == KeyCode.F && (e.isControlDown() && e.isShiftDown())) {
+		//		//
+		//		//			doSqlFormat();
+		//		//			e.consume();
+		//		//		}
+		//		// Ctr + ALT +  U 선택된 문자 또는 전체 문자를 대문자로 치환
+		//		else if (e.getCode() == KeyCode.U && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
+		//			String selectedText = codeArea.getSelectedText();
+		//			if (ValueUtil.isNotEmpty(selectedText)) {
+		//				// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
+		//				replaceSelection(ValueUtil.toUpperCase(selectedText));
+		//			} else {
+		//				String text = codeArea.getText();
+		//				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
+		//				// codeArea.clear();
+		//				// codeArea.appendText(sqlFormatter.toUpperCase(text));
+		//				setContent(ValueUtil.toUpperCase(text));
+		//			}
+		//			e.consume();
+		//		}
+		//		// Ctr + ALT + L 선택된 문자 또는 전체 문자를 소문자로 치환
+		//		else if (e.getCode() == KeyCode.L && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
+		//			String selectedText = codeArea.getSelectedText();
+		//			if (ValueUtil.isNotEmpty(selectedText)) {
+		//				// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));
+		//				replaceSelection(ValueUtil.toLowerCase(selectedText));
+		//			} else {
+		//				String text = codeArea.getText();
+		//				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
+		//				// codeArea.clear();
+		//				// codeArea.appendText(sqlFormatter.toLowerCase(text));
+		//				setContent(ValueUtil.toUpperCase(text));
+		//			}
+		//			e.consume();
+		//		}
+		//		// CTRL + L 특정 라인위치로 이동
+		//		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+		//			Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Go to Line", "Enter line number");
+		//			showInputDialog.ifPresent(v -> {
+		//
+		//				ValueUtil.ifNumberPresent(v.getValue(), num -> {
+		//
+		//					moveToLine(num.intValue());
+		//
+		//				});
+		//			});
+		//
+		//		}
 	}
 
 	public void replaceSelection(String selection) {
 		codeHelperDeligator.replaceSelection(selection);
-//		codeArea.getUndoManager().mark();
-//		codeArea.replaceSelection(selection);
-//		codeArea.getUndoManager().mark();
+		//		codeArea.getUndoManager().mark();
+		//		codeArea.replaceSelection(selection);
+		//		codeArea.getUndoManager().mark();
 	}
 
 	public void appendContent(String content) {
 		codeHelperDeligator.appendContent(content);
-//		codeArea.getUndoManager().mark();
-//		codeArea.appendText(content);
-//		codeArea.getUndoManager().mark();
+		//		codeArea.getUndoManager().mark();
+		//		codeArea.appendText(content);
+		//		codeArea.getUndoManager().mark();
 	}
 
 	/**
@@ -439,6 +453,13 @@ public class JavaTextArea extends BorderPane {
 
 	public void moveToLine(int moveToLine, int startCol, int endCol) {
 		codeHelperDeligator.moveToLine(moveToLine, startCol, endCol);
+	}
+
+	/**
+	 * @return the codeArea
+	 */
+	public final CodeArea getCodeArea() {
+		return codeArea;
 	}
 
 }

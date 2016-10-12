@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 
 public class XY {
 
@@ -42,6 +43,12 @@ public class XY {
 				longLine.setEndX(i);
 				longLine.setEndY(3600);
 				g.getChildren().add(longLine);
+//				Group group = new Group();
+//				Text text = new Text(String.valueOf(i));
+//				text.setX(i);
+//				text.setY(5);
+//				group.getChildren().addAll(longLine, text);
+//				g.getChildren().add(group);
 			}
 
 			else

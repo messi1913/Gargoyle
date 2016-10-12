@@ -13,8 +13,8 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecSourceException;
+import com.kyj.fx.voeditor.visual.framework.comment.CodeCommentFactory;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.CodeCommentFactory;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.InspectorSourceMeta;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.JavaSourceAnalysis;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;

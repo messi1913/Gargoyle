@@ -1142,4 +1142,37 @@ public class ValueUtil {
 	public static boolean hasTextIgnorecase(String target, String findText) {
 		return org.apache.commons.lang.StringUtils.containsIgnoreCase(target, findText);
 	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 12.
+	 * @param code
+	 * @return
+	 */
+	public static List<String> toList(String code) {
+		return toList(code, () -> "\n");
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 12.
+	 * @param code
+	 * @return
+	 */
+	public static List<String> toList(String code, Supplier<String> regexSeparators) {
+		String[] split = code.split(regexSeparators.get());
+		return Stream.of(split).collect(Collectors.toList());
+	}
+
+	/**
+	 * 주석 자동화 처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 12.
+	 * @param code
+	 * @param appendLineKeyword 코멘트가 추가되는 행의 첫번째줄에 키워드라고 표시할 문자 기입.
+	 * @return
+	 */
+	public static List<String> toAutoCommentedList(String code, String appendLineKeyword) {
+		return CodeCommentUtil.doAutoComment(code, appendLineKeyword);
+	}
 }

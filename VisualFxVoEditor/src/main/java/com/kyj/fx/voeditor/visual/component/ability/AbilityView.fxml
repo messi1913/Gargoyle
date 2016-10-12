@@ -11,18 +11,13 @@
 <?import javafx.scene.shape.Polygon?>
 <?import javafx.scene.shape.Polyline?>
 
-<SplitPane dividerPositions="0.3708838821490468" maxHeight="-Infinity"
-	maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-	prefHeight="878.0" prefWidth="1156.0" xmlns:fx="http://javafx.com/fxml/1"
-	xmlns="http://javafx.com/javafx/8.0.60">
+<SplitPane dividerPositions="0.3708838821490468" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="878.0" prefWidth="1156.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<items>
 		<BorderPane prefHeight="200.0" prefWidth="200.0">
 			<top>
-				<ImageView fitHeight="315.0" fitWidth="432.0"
-					pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+				<ImageView fitHeight="315.0" fitWidth="432.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
 					<image>
-						<Image
-							url="@../../../../../../../../../../../../../Pictures/sample2.jpg" />
+						<Image url="@../../../../../../../../../../../../../Pictures/sample2.jpg" />
 					</image>
 				</ImageView>
 			</top>
@@ -37,8 +32,7 @@
 		</BorderPane>
 		<AnchorPane prefHeight="200.0" prefWidth="200.0">
 			<children>
-				<Polygon fill="DODGERBLUE" layoutX="373.0" layoutY="364.0"
-					stroke="BLACK" strokeType="INSIDE">
+				<Polygon fill="DODGERBLUE" layoutX="308.0" layoutY="357.0" stroke="BLACK" strokeType="INSIDE">
 					<points>
 						<Double fx:value="-50.0" />
 						<Double fx:value="30.0" />
@@ -59,8 +53,7 @@
 						<Double fx:value="-30.0" />
 					</points>
 				</Polygon>
-				<Polyline fill="CHARTREUSE" layoutX="289.0" layoutY="537.0"
-					strokeType="INSIDE">
+				<Polyline fill="CHARTREUSE" layoutX="625.0" layoutY="73.0" strokeType="INSIDE">
 					<points>
 						<Double fx:value="-50.0" />
 						<Double fx:value="-40.0" />
@@ -72,9 +65,7 @@
 						<Double fx:value="-40.0" />
 					</points>
 				</Polyline>
-				<Polygon layoutX="208.0" layoutY="414.0" stroke="#f2ff00"
-					strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="1.0"
-					strokeType="OUTSIDE" strokeWidth="2.0">
+				<Polygon layoutX="504.0" layoutY="54.0" stroke="#f2ff00" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="1.0" strokeType="OUTSIDE" strokeWidth="2.0">
 					<points>
 						<Double fx:value="-50.0" />
 						<Double fx:value="40.0" />
