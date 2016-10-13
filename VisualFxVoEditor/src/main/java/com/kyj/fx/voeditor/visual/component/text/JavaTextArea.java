@@ -16,6 +16,7 @@ import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.Paragraph;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
+import org.fxmisc.richtext.NavigationActions.SelectionPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,6 +158,8 @@ public class JavaTextArea extends BorderPane {
 		lblLineInfo.setMinHeight(USE_COMPUTED_SIZE);
 		lblLineInfo.setMaxHeight(USE_COMPUTED_SIZE);
 
+
+
 		this.setCenter(codeArea);
 		this.setBottom(lblLineInfo);
 		// this.getChildren().add(codeArea);
@@ -166,7 +169,7 @@ public class JavaTextArea extends BorderPane {
 
 	}
 
-	protected IntFunction<Node> getLineFactory() {
+	public IntFunction<Node> getLineFactory() {
 		return LineNumberFactory.get(codeArea);
 	}
 
@@ -462,4 +465,15 @@ public class JavaTextArea extends BorderPane {
 		return codeArea;
 	}
 
+	public Integer getCurrentLine() {
+		return codeHelperDeligator.getCurrentLine();
+	}
+
+	public void lineStart(SelectionPolicy pol){
+		codeArea.lineStart(pol);
+	}
+
+	public void clearSelection(){
+		codeArea.deselect();
+	}
 }

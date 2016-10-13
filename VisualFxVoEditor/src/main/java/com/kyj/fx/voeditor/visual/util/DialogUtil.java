@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.kyj.fx.voeditor.visual.component.popup.BaseDialogComposite;
 import com.kyj.fx.voeditor.visual.component.popup.ExceptionDialogComposite;
@@ -556,27 +557,27 @@ public class DialogUtil {
 	}
 
 	public static Optional<Pair<String, String>> showInputDialog(Node owner, String title, String message) {
-		return showInputDialog(owner.getScene().getWindow(), title, message, "", str -> {
-		});
+		return showInputDialog(owner.getScene().getWindow(), title, message, "", null);
+	}
+
+	public static Optional<Pair<String, String>> showInputDialog(Node owner, String title, String message, Predicate<String> satisfied) {
+		return showInputDialog(owner.getScene().getWindow(), title, message, "", satisfied);
 	}
 
 	public static Optional<Pair<String, String>> showInputDialog(Window owner, String title, String message) {
-		return showInputDialog(owner, title, message, "", str -> {
-		});
+		return showInputDialog(owner, title, message, "", null);
 	}
 
 	public static Optional<Pair<String, String>> showInputDialog(String title, String message) {
-		return showInputDialog(null, title, message, "", str -> {
-		});
+		return showInputDialog(null, title, message, "", null);
 	}
 
 	public static Optional<Pair<String, String>> showInputDialog(String title, String message, String inputValue) {
-		return showInputDialog(null, title, message, inputValue, str -> {
-		});
+		return showInputDialog(null, title, message, inputValue, null);
 	}
 
 	public static Optional<Pair<String, String>> showInputDialog(Window owner, String title, String message, String inputValue,
-			Consumer<? super Pair<String, String>> consumer) {
+			Predicate<String> satisfied) {
 
 		BaseDialogComposite composite = new BaseDialogComposite(title, message);
 		Button btnOk = new Button("OK");
@@ -597,9 +598,26 @@ public class DialogUtil {
 
 			text.addEventHandler(KeyEvent.KEY_RELEASED, ev -> {
 				if (ev.getCode() == KeyCode.ENTER) {
+
 					Optional<Pair<String, String>> pair = Optional.of(new Pair<>("OK", text.getText()));
 					prop.set(pair);
-					stage.close();
+
+					if (satisfied != null) {
+
+						if (satisfied.test(text.getText())) {
+							stage.close();
+						}
+					}
+
+				} else {
+
+					if (satisfied != null) {
+						if (satisfied.test(text.getText())) {
+							btnOk.setDisable(false);
+						} else
+							btnOk.setDisable(true);
+
+					}
 				}
 			});
 

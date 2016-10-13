@@ -10,7 +10,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.pmd.PMDCheckedListComposite;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -26,6 +29,9 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.util.Pair;
 import net.sourceforge.pmd.benchmark.Benchmark;
 import net.sourceforge.pmd.benchmark.Benchmarker;
 import net.sourceforge.pmd.benchmark.TextReport;
@@ -36,6 +42,9 @@ import net.sourceforge.pmd.cli.PMDParameters;
  *  코드 처리 관련 Helper 클래스
  *
  *   CodeArea클래스와 연관된 모든 공통처리내용이 구현된다.
+ *
+ *
+ *    		2016-10-13 kyj 라인이동 기능 추가.
  *
  * @author KYJ
  *
@@ -92,6 +101,7 @@ public class JavaCodeAreaHelper extends CodeAreaHelper implements EventHandler<A
 	 * @최초생성일 2016. 10. 12.
 	 */
 	public static final String appendLineKeyword = "+";
+
 	/**
 	 * 주석 자동화 처리
 	 * @작성자 : KYJ
@@ -180,6 +190,52 @@ public class JavaCodeAreaHelper extends CodeAreaHelper implements EventHandler<A
 			stage.setWidth(1200d);
 			stage.setHeight(800d);
 		});
+	}
+
+	@Override
+	public void codeAreaKeyClick(KeyEvent e) {
+
+		/*
+		 * CTRL + SHIFT + U
+		 * 대문자
+		 */
+		if (e.getCode() == KeyCode.U && (e.isControlDown() && !e.isAltDown() && e.isShiftDown())) {
+			if (e.isConsumed())
+				return;
+			String selectedText = codeArea.getSelectedText();
+			if (ValueUtil.isNotEmpty(selectedText)) {
+				replaceSelection(sqlFormatter.toUpperCase(selectedText));
+			}
+			e.consume();
+		}
+		// Ctr + SHIFT + L 선택된 문자 또는 전체 문자를 소문자로 치환
+		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && e.isShiftDown())) {
+			if (e.isConsumed())
+				return;
+			String selectedText = codeArea.getSelectedText();
+			if (ValueUtil.isNotEmpty(selectedText)) {
+				replaceSelection(sqlFormatter.toLowerCase(selectedText));
+			}
+			e.consume();
+		}
+		//CTRL + L 라인이동
+		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+
+			Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog(this.codeArea, "Go to Line", "라인입력.",
+					str -> ValueUtil.isNumber(str));
+
+			showInputDialog.ifPresent(v -> {
+				String value = v.getValue();
+				BigDecimal bigDecimal = new BigDecimal(value);
+				int intValue = bigDecimal.intValue();
+				moveToLine(intValue);
+
+			});
+
+			e.consume();
+		}
+
+		super.codeAreaKeyClick(e);
 	}
 
 }

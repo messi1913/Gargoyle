@@ -25,7 +25,7 @@ public class JavaTextAreaForAutoComment extends JavaTextArea {
 	 * @see com.kyj.fx.voeditor.visual.component.text.JavaTextArea#getLineFactory()
 	 */
 	@Override
-	protected IntFunction<Node> getLineFactory() {
+	public IntFunction<Node> getLineFactory() {
 		return MarkedLineNumberFactory.get(this.getCodeArea());
 	}
 

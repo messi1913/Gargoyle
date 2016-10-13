@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.function.BinaryOperator;
@@ -1068,10 +1069,20 @@ public class ValueUtil {
 				t = tokens.nextToken();
 				token += t;
 				if ("*".equals(t)) {
+
+					/*
+					 * 2016-10-13 NoSuchElementException 예외처리
+					 * by kyj. 주석에 해당하는 내용은 대소문자 처리안함에 관련된 로직인데
+					 * 예외에 걸림.
+					 */
+					try{
 					do {
-						t = tokens.nextToken();
+							t = tokens.nextToken();
+
 						token += t;
 					} while (!token.endsWith("*/"));
+					}catch(NoSuchElementException e){}
+
 				}
 
 				result.append(token);

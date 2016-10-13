@@ -11,7 +11,14 @@ import java.util.Collection;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.Paragraph;
 
+import javafx.collections.ObservableList;
+
 /**
+ *     2016-10-13 by kyj
+ *      텍스트의 라인보다 입력라인이 큰경우 발생되는 moveToLine IndexOfOfBoundException 수정
+ *
+ * CodeArea클래스의 도움을 주는 Helper 클래스. 주로 이동관련 처리를 담당함.
+ *
  * @author KYJ
  *
  */
@@ -21,6 +28,10 @@ public class CodeAreaMoveLineHelper {
 
 	public CodeAreaMoveLineHelper(CodeArea codeArea) {
 		this.codeArea = codeArea;
+	}
+
+	public Integer getCurrentLine() {
+		return codeArea.currentParagraphProperty().getValue();
 	}
 
 	/**
@@ -36,10 +47,14 @@ public class CodeAreaMoveLineHelper {
 
 		int position = 0;
 		int row = moveToLine - 1;
-		for (Paragraph par : codeArea.getParagraphs().subList(0, row)) {
+		ObservableList<Paragraph<Collection<String>>> paragraphs = codeArea.getParagraphs();
+		if (paragraphs.size() < moveToLine)
+			return;
+
+		for (Paragraph par : paragraphs.subList(0, row)) {
 			position += par.length() + 1; // account for line terminators
 		}
-		Paragraph<Collection<String>> paragraph = codeArea.getParagraphs().get(row);
+		Paragraph<Collection<String>> paragraph = paragraphs.get(row);
 		int length = paragraph.length();
 		codeArea.selectRange(position, (position + length));
 	}
@@ -48,10 +63,14 @@ public class CodeAreaMoveLineHelper {
 	public void moveToLine(int moveToLine, int startCol) {
 		int position = 0;
 		int row = moveToLine - 1;
-		for (Paragraph par : codeArea.getParagraphs().subList(0, row)) {
+		ObservableList<Paragraph<Collection<String>>> paragraphs = codeArea.getParagraphs();
+		if (paragraphs.size() < moveToLine)
+			return;
+
+		for (Paragraph par : paragraphs.subList(0, row)) {
 			position += par.length() + 1; // account for line terminators
 		}
-		Paragraph<Collection<String>> paragraph = codeArea.getParagraphs().get(row);
+		Paragraph<Collection<String>> paragraph = paragraphs.get(row);
 		int length = paragraph.length();
 
 		int lineStartLength = position + startCol;
@@ -64,7 +83,12 @@ public class CodeAreaMoveLineHelper {
 
 		int position = 0;
 		int row = moveToLine - 1;
-		for (Paragraph par : codeArea.getParagraphs().subList(0, row)) {
+
+		ObservableList<Paragraph<Collection<String>>> paragraphs = codeArea.getParagraphs();
+		if (paragraphs.size() < moveToLine)
+			return;
+
+		for (Paragraph par : paragraphs.subList(0, row)) {
 			position += par.length() + 1; // account for line terminators
 		}
 		//		Paragraph<Collection<String>> paragraph = codeArea.getParagraphs().get(row);

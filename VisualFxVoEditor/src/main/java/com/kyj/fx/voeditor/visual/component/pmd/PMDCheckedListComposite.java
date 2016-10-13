@@ -20,6 +20,7 @@ import java.util.function.IntFunction;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.IndexedCheckModel;
 import org.fxmisc.richtext.Paragraph;
+import org.fxmisc.richtext.NavigationActions.SelectionPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +101,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	private ObservableList<RuleViolation> violationList = FXCollections.observableArrayList();
 
 	protected Label violationLabel;
+	private CheckComboBox<RulePriority> checkComboBox;
 
 	/**
 	 * PMD 처리에 대한 코어 로직.
@@ -132,7 +134,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			 * @see com.kyj.fx.voeditor.visual.component.text.JavaTextAreaForAutoComment#getLineFactory()
 			 */
 			@Override
-			protected IntFunction<Node> getLineFactory() {
+			public IntFunction<Node> getLineFactory() {
 				MarkedLineNumberFactory lineFactory = (MarkedLineNumberFactory) super.getLineFactory();
 
 				//PMD에서 오류라고 측정한 값을 마킹하기 위해 값의 속성값을 리턴
@@ -146,7 +148,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 							RuleViolation ruleViolation = findFirst.get();
 
 							RulePriority priority = ruleViolation.getRule().getPriority();
-							LOGGER.debug("violation toString : {} ", priority.toString());
+//							LOGGER.debug("violation toString : {} ", priority.toString());
 							return priority.getPriority();
 						}
 						return 0;
@@ -162,15 +164,17 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 						Rectangle rectangle = new Rectangle();
 						rectangle.setWidth(10d);
 						rectangle.setHeight(10d);
-
+						rectangle.setStyle("-fx-fill:transparent");
 						if (typeValue >= 1) {
-							LOGGER.debug("priority value : {} ", typeValue);
-							rectangle.setStyle(PMDListCell.getPriorityStyle(typeValue));
+
+							ObservableList<RulePriority> checkedItems = checkComboBox.getCheckModel().getCheckedItems();
+							checkedItems.stream().filter(c -> {
+								return c.getPriority() == typeValue;
+							}).findFirst().ifPresent(v -> {
+//								LOGGER.debug("priority value : {} ", typeValue);
+								rectangle.setStyle(PMDListCell.getPriorityStyle(typeValue));
+							});
 						}
-
-						else
-							rectangle.setStyle("-fx-fill:transparent");
-
 						return rectangle;
 					}
 				});
@@ -178,6 +182,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			}
 
 		};
+
 		lvViolation = new ListView<>();
 
 		lvViolation.setCellFactory(ruleCheckListener);
@@ -186,7 +191,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		splitPane.setOrientation(Orientation.VERTICAL);
 		splitPane.setDividerPositions(0.7d, 0.3d);
 
-		CheckComboBox<RulePriority> checkComboBox = new CheckComboBox<>();
+		checkComboBox = new CheckComboBox<>();
 		checkComboBox.getItems().addAll(RulePriority.values());
 
 		IndexedCheckModel<RulePriority> checkModel = checkComboBox.getCheckModel();
@@ -294,6 +299,8 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		Platform.runLater(() -> {
 			javaTextArea.setContent(sourceCode);
 			violationLabel.setText(String.format(VIOLATION_TEXT_FORMAT, lvViolation.getItems().size()));
+			javaTextArea.moveToLine(1);
+			javaTextArea.clearSelection();
 		});
 	}
 
@@ -512,6 +519,11 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			violationList.stream().filter(v1 -> list.contains(v1.getRule().getPriority())).forEach(v2 -> {
 				lvViolation.getItems().add(v2);
 			});
+
+//			javaTextArea.lineStart(SelectionPolicy.CLEAR);
+//			javaTextArea.getCodeArea();
+
+//			javaTextArea.requestFocus();
 
 		}
 	};

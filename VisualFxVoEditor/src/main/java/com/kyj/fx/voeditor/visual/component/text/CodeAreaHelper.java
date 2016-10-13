@@ -143,6 +143,9 @@ public class CodeAreaHelper {
 		// CTRL + F 찾기
 		if ((e.getCode() == KeyCode.F) && (e.isControlDown() && !e.isShiftDown())) {
 
+			if(e.isConsumed())
+				return;
+
 			ObservableValue<String> textProperty = codeArea.textProperty();
 			TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(codeArea, textProperty);
 
@@ -216,32 +219,44 @@ public class CodeAreaHelper {
 		//		}
 		// Ctr + U 선택된 문자 또는 전체 문자를 대문자로 치환
 		else if (e.getCode() == KeyCode.U && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+			if(e.isConsumed())
+				return;
+
 			String selectedText = codeArea.getSelectedText();
 			if (ValueUtil.isNotEmpty(selectedText)) {
 				// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
 				replaceSelection(sqlFormatter.toUpperCase(selectedText));
-			} else {
-				String text = codeArea.getText();
-				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-				// codeArea.clear();
-				// codeArea.appendText(sqlFormatter.toUpperCase(text));
-				setContent(sqlFormatter.toUpperCase(text));
 			}
+			//2016.10.13 선택된 문자가 없는경우 치환안함.
+//			else {
+//				String text = codeArea.getText();
+								//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
+								// codeArea.clear();
+								// codeArea.appendText(sqlFormatter.toUpperCase(text));
+//				setContent(sqlFormatter.toUpperCase(text));
+//			}
 			e.consume();
 		}
 		// Ctr + L 선택된 문자 또는 전체 문자를 소문자로 치환
 		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+
+			if(e.isConsumed())
+				return;
+
 			String selectedText = codeArea.getSelectedText();
 			if (ValueUtil.isNotEmpty(selectedText)) {
 				// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));
 				replaceSelection(sqlFormatter.toLowerCase(selectedText));
-			} else {
-				String text = codeArea.getText();
-				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-				// codeArea.clear();
-				// codeArea.appendText(sqlFormatter.toLowerCase(text));
-				setContent(sqlFormatter.toUpperCase(text));
 			}
+
+			//2016.10.13 선택된 문자가 없는경우 치환안함.
+//			else {
+//				String text = codeArea.getText();
+										//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
+										// codeArea.clear();
+										// codeArea.appendText(sqlFormatter.toLowerCase(text));
+//				setContent(sqlFormatter.toUpperCase(text));
+//			}
 			e.consume();
 		}
 	}
@@ -264,6 +279,10 @@ public class CodeAreaHelper {
 
 	public void moveToLine(int moveToLine, int startCol, int endCol) {
 		codeMoveDeligator.moveToLine(moveToLine, startCol, endCol);
+	}
+
+	public Integer getCurrentLine() {
+		return codeMoveDeligator.getCurrentLine();
 	}
 
 }
