@@ -27,42 +27,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/antlr-runtime-3.5.2.jar"/>
-	<classpathentry kind="lib" path="lib/antlr4-runtime-4.5.2-1.jar"/>
-	<classpathentry kind="lib" path="lib/asm-5.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
-	<classpathentry kind="lib" path="lib/commons-lang3-3.4.jar"/>
-	<classpathentry kind="lib" path="lib/gson-2.5.jar"/>
-	<classpathentry kind="lib" path="lib/javacc-5.0.jar"/>
-	<classpathentry kind="lib" path="lib/jaxen-1.1.6.jar"/>
-	<classpathentry kind="lib" path="lib/jcommander-1.48.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-apex-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-cpp-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-cs-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-fortran-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-go-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-java-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-javascript-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-jsp-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-matlab-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-objectivec-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-perl-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-php-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-plsql-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-python-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-ruby-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-scala-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-swift-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-ui-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-vm-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-xml-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/rhino-1.7.7.jar"/>
-	<classpathentry kind="lib" path="lib/saxon-9.1.0.8-dom.jar"/>
-	<classpathentry kind="lib" path="lib/saxon-9.1.0.8.jar"/>
-	<classpathentry kind="lib" path="lib/scala-compiler-2.10.4.jar"/>
-	<classpathentry kind="lib" path="lib/scala-library-2.10.4.jar"/>
-	<classpathentry kind="lib" path="lib/scala-reflect-2.10.4.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-core-5.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-apex-5.5.1-apex-jorje-shaded.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
