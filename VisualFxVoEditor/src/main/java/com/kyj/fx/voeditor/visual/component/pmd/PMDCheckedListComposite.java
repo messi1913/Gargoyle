@@ -8,36 +8,41 @@ package com.kyj.fx.voeditor.visual.component.pmd;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.function.IntFunction;
 
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.IndexedCheckModel;
+import org.fxmisc.richtext.Paragraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
+import com.kyj.fx.voeditor.visual.component.text.JavaTextAreaForAutoComment;
+import com.kyj.fx.voeditor.visual.component.text.MarkedLineNumberFactory;
+import com.kyj.fx.voeditor.visual.component.text.MarkedLineNumberFactory.GraphicsMapper;
+import com.kyj.fx.voeditor.visual.component.text.MarkedLineNumberFactory.LineMapper;
 import com.kyj.fx.voeditor.visual.framework.pmd.DoPMD;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -45,6 +50,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Callback;
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
 import net.sourceforge.pmd.PMDConfiguration;
@@ -72,7 +78,10 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	/**
 	 * @최초생성일 2016. 10. 6.
 	 */
+	@Deprecated
 	private static final String RULESETS_FILE_FORMAT = "rulesets/%s/basic.xml";
+
+	private static final String RULESETS_PROPERTIES_FILE_FORMAT = "rulesets/%s/rulesets.properties";
 
 	/**
 	 * @param parent
@@ -92,21 +101,83 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	protected Label violationLabel;
 
+	/**
+	 * PMD 처리에 대한 코어 로직.
+	 * @최초생성일 2016. 10. 13.
+	 */
 	protected DoPMD doPMD = new DoPMD();
 
 	protected static final String REPORT_FILE_FORMAT = "xml";
 	protected static final String VIOLATION_TEXT_FORMAT = "Violation : %d";
 
+	/**
+	 * @param sourceFile
+	 */
 	public PMDCheckedListComposite(File sourceFile) {
 		this(new BorderPane(), sourceFile);
 
 	}
 
+	/**
+	 * @param root
+	 * @param sourceFile
+	 */
 	public PMDCheckedListComposite(BorderPane root, File sourceFile) {
 		super(root);
 		this.sourceFile = sourceFile;
 
-		javaTextArea = new JavaTextArea();
+		javaTextArea = new JavaTextAreaForAutoComment() {
+
+			/* (non-Javadoc)
+			 * @see com.kyj.fx.voeditor.visual.component.text.JavaTextAreaForAutoComment#getLineFactory()
+			 */
+			@Override
+			protected IntFunction<Node> getLineFactory() {
+				MarkedLineNumberFactory lineFactory = (MarkedLineNumberFactory) super.getLineFactory();
+
+				//PMD에서 오류라고 측정한 값을 마킹하기 위해 값의 속성값을 리턴
+				lineFactory.setLineMarkFactory(new LineMapper<Integer>() {
+
+					@Override
+					public Integer map(int row, Paragraph<?> pra) {
+
+						Optional<RuleViolation> findFirst = violationList.stream().filter(v -> v.getBeginLine() == row).findFirst();
+						if (findFirst.isPresent()) {
+							RuleViolation ruleViolation = findFirst.get();
+
+							RulePriority priority = ruleViolation.getRule().getPriority();
+							LOGGER.debug("violation toString : {} ", priority.toString());
+							return priority.getPriority();
+						}
+						return 0;
+					}
+
+				});
+
+				//PMD에서 오류라고 측정한 값을 UI에 마킹하기 위해 체크.
+				lineFactory.setGraphicsMapperFactory(new GraphicsMapper<Node>() {
+
+					@Override
+					public Node map(int row, Paragraph<?> pra, int typeValue) {
+						Rectangle rectangle = new Rectangle();
+						rectangle.setWidth(10d);
+						rectangle.setHeight(10d);
+
+						if (typeValue >= 1) {
+							LOGGER.debug("priority value : {} ", typeValue);
+							rectangle.setStyle(PMDListCell.getPriorityStyle(typeValue));
+						}
+
+						else
+							rectangle.setStyle("-fx-fill:transparent");
+
+						return rectangle;
+					}
+				});
+				return lineFactory;
+			}
+
+		};
 		lvViolation = new ListView<>();
 
 		lvViolation.setCellFactory(ruleCheckListener);
@@ -134,6 +205,11 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	}
 
+	/**
+	 * PMD 검사를 동기 처리
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 13.
+	 */
 	public void run() {
 		if (this.sourceFile.isDirectory()) {
 			dirFilePmd(this.sourceFile);
@@ -142,6 +218,11 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		}
 	}
 
+	/**
+	 * PMD 검사를 비동기 처리
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 13.
+	 */
 	public void runAsynch() {
 
 		new Thread(() -> {
@@ -154,6 +235,12 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	}
 
+	/**
+	 * 파일 1개를 대상으로 PMD 체크하기 위한 처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 13.
+	 * @param file
+	 */
 	protected void simpleFilePmd(File file) {
 		try {
 			String sourceCode = Files.toString(this.sourceFile, Charset.forName("UTF-8"));
@@ -220,7 +307,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 					declaredField.set(params, file.getAbsolutePath());
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error(ValueUtil.toString(e));
 			}
 
 			//			if (!FileUtil.isJavaFile(file)) {
@@ -259,6 +346,30 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		}
 	}
 
+	/**
+	 * 룰셋 파일 목록을 읽어옴.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 13.
+	 * @param language
+	 * @return
+	 */
+	protected String getRuleSets(String language) {
+		String result = "";
+		try {
+			File file = new File(String.format(RULESETS_PROPERTIES_FILE_FORMAT, "java"));
+			Properties properties = new Properties();
+			properties.load(new FileInputStream(file));
+			Object object = properties.get("rulesets.filenames");
+			result = object == null ? null : object.toString();
+		} catch (IOException e) {
+
+		}
+		if (result == null)
+			result = new File(String.format(RULESETS_FILE_FORMAT, language)).getAbsolutePath();
+
+		return result;
+	}
+
 	public PMDConfiguration transformParametersIntoConfiguration(PMDParameters params) {
 		//		if (null == params.getSourceDir() && null == params.getUri() && null == params.getFileListPath()
 		//				&& null == params.getSourceText()) {
@@ -281,12 +392,12 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		//		configuration.setReportShortNames(params.isShortnames());
 
 		String language = params.getLanguage();
-		String RESULTSET = new File(String.format(RULESETS_FILE_FORMAT, "java")).getAbsolutePath();
-		if (null != language) {
-			RESULTSET = new File(String.format(RULESETS_FILE_FORMAT, language)).getAbsolutePath();
-		}
+		//		String RESULTSET = new File(String.format(RULESETS_FILE_FORMAT, "java")).getAbsolutePath();
+		//		if (null != language) {
+		//			RESULTSET = new File(String.format(RULESETS_FILE_FORMAT, language)).getAbsolutePath();
+		//		}
 
-		configuration.setRuleSets(RESULTSET);
+		configuration.setRuleSets(getRuleSets(language));
 		//		configuration.setRuleSetFactoryCompatibilityEnabled(true);
 		configuration.setShowSuppressedViolations(params.isShowsuppressed());
 		configuration.setSourceEncoding("UTF-8");
