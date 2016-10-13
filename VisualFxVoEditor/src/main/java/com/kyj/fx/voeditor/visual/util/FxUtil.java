@@ -490,6 +490,9 @@ public class FxUtil {
 	 * @작성일 : 2016. 6. 23.
 	 * @param parent
 	 */
+	public static void createStageAndShow(Node parent) {
+		createStageAndShow(parent.getClass().getSimpleName(), new Scene(new BorderPane(parent)), false);
+	}
 	public static void createStageAndShow(String title, Node parent) {
 		createStageAndShow(title, new Scene(new BorderPane(parent)), false);
 	}
