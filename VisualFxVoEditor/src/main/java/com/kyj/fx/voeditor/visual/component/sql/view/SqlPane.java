@@ -7,7 +7,6 @@
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,6 +81,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -759,13 +759,14 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 */
 	SqlTab createTabItem() {
 		SqlTab sqlTab = new SqlTab(this::txtSqlOnKeyEvent);
-		ContextMenu contextMenu = new ContextMenu();
+		ContextMenu contextMenu = sqlTab.getTxtSqlPaneContextMenu();
 		Menu menuFunc = new Menu("Functions");
 
 		MenuItem menuQueryMacro = new MenuItem("Query-Macro");
 		menuQueryMacro.setOnAction(this::menuQueryMacroOnAction);
 
-		MenuItem menuFormatter = new MenuItem("Formatter (CTRL + SHIFT + F)");
+		MenuItem menuFormatter = new MenuItem("SQL Formatter");
+		menuFormatter.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN));
 		menuFormatter.setOnAction(this::menuFormatterOnAction);
 
 		MenuItem menuShowApplicationCode = new MenuItem("Show Application Code");
@@ -774,7 +775,6 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		menuFunc.getItems().addAll(menuQueryMacro, menuFormatter, menuShowApplicationCode);
 
 		contextMenu.getItems().add(menuFunc);
-		sqlTab.setTxtSqlPaneContextMenu(contextMenu);
 		return sqlTab;
 	}
 

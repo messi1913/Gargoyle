@@ -138,7 +138,7 @@ public class Main extends Application {
 		if (baseDir == null || baseDir.isEmpty() || !new File(baseDir).exists()) {
 			SelectWorkspaceView selectWorkspaceView = new SelectWorkspaceView();
 			@SuppressWarnings("rawtypes")
-			ResultDialog show = selectWorkspaceView.show();
+			ResultDialog show = selectWorkspaceView.showAndWait();
 
 			if (ResultDialog.CANCEL == show.getStatus()) {
 				Platform.exit();

@@ -86,7 +86,7 @@ public class SelectWorkspaceView extends AnchorPane {
 	 * @return
 	 * @User KYJ
 	 */
-	public ResultDialog<Object> show() {
+	public ResultDialog<Object> showAndWait() {
 		stage = new Stage();
 		Scene scene = new Scene(this);
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());

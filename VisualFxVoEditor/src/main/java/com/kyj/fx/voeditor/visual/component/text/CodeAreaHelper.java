@@ -6,20 +6,31 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
+import java.math.BigDecimal;
+import java.util.Optional;
+
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.popup.TextSearchAndReplaceView;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.SqlFormatter;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.IndexRange;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.util.Pair;
 
 /**
  *
@@ -40,10 +51,44 @@ public class CodeAreaHelper {
 	protected SqlFormatter sqlFormatter = new SqlFormatter();
 	protected CodeAreaMoveLineHelper codeMoveDeligator;
 
+	protected ContextMenu contextMenu;
+	protected Menu menuSearch;
+	protected MenuItem miFindReplace;
+	protected MenuItem menuMoveToLine;
+	protected MenuItem miToUppercase;
+	protected MenuItem miToLowercase;
+
 	public CodeAreaHelper(CodeArea codeArea) {
 		this.codeArea = codeArea;
 		this.codeArea.setOnMouseClicked(defaultSelectionHandler);
 		codeMoveDeligator = new CodeAreaMoveLineHelper(codeArea);
+		contextMenu = codeArea.getContextMenu();
+		if (contextMenu == null) {
+			contextMenu = new ContextMenu();
+			codeArea.setContextMenu(contextMenu);
+		}
+		createMenus();
+	}
+
+	protected void createMenus() {
+		menuSearch = new Menu("Search");
+		miFindReplace = new MenuItem("Find/Replace");
+		menuMoveToLine = new MenuItem("Move to line");
+		miToUppercase = new MenuItem("To Uppercase");
+		miToLowercase = new MenuItem("To Lowercase");
+
+		miFindReplace.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN));
+		miFindReplace.setOnAction(this::findReplaceEvent);
+		menuMoveToLine.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
+		menuMoveToLine.setOnAction(this::moveToLineEvent);
+		miToUppercase.setAccelerator(new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
+		miToUppercase.setOnAction(this::toUppercaseEvent);
+		miToLowercase.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
+		miToLowercase.setOnAction(this::toLowercaseEvent);
+
+		menuSearch.getItems().add(miFindReplace);
+		codeArea.getContextMenu().getItems().addAll(menuSearch, menuMoveToLine, miToUppercase, miToLowercase);
+
 	}
 
 	public void setContent(String content) {
@@ -131,6 +176,131 @@ public class CodeAreaHelper {
 	};
 
 	/**
+	 * 찾기 바꾸기 이벤트
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 13.
+	 * @param e
+	 */
+	protected void findReplaceEvent(Event e) {
+
+		if (e.isConsumed())
+			return;
+
+		ObservableValue<String> textProperty = codeArea.textProperty();
+		TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(codeArea, textProperty);
+
+		textSearchView.setOnSearchResultListener((vo) -> {
+
+			switch (vo.getSearchType()) {
+			case SEARCH_SIMPLE: {
+				int startIndex = vo.getStartIndex();
+				int endIndex = vo.getEndIndex();
+				codeArea.selectRange(startIndex, endIndex);
+				LOGGER.debug(String.format("find text : %s startIdx :%d endIdx :%d", vo.getSearchText(), startIndex, endIndex));
+				break;
+			}
+			case SEARCH_ALL: {
+				int startIndex = vo.getStartIndex();
+				String searchText = vo.getSearchText();
+				String replaceText = vo.getReplaceText();
+
+				//					codeArea.getUndoManager().mark();
+				//					codeArea.replaceText(startIndex, (startIndex + searchText.length()), replaceText);
+				setContent(startIndex, startIndex + searchText.length(), replaceText);
+				//					codeArea.getUndoManager().mark();
+
+				break;
+			}
+			}
+
+		});
+
+		textSearchView.setOnReplaceResultListener(vo -> {
+			switch (vo.getReaplceType()) {
+			case SIMPLE: {
+				String reaplceResult = vo.getReaplceResult();
+				setContent(reaplceResult);
+				break;
+			}
+			case ALL: {
+				String reaplceResult = vo.getReaplceResult();
+				setContent(reaplceResult);
+				break;
+			}
+			}
+		});
+
+		textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
+			if (newval)
+				LOGGER.debug("User Select Locale Scope..");
+			else
+				LOGGER.debug("User Select Gloval Scope..");
+		});
+
+		codeArea.setOnMouseClicked(event -> {
+
+			IndexRange selection = codeArea.getSelection();
+			int start = selection.getStart();
+			textSearchView.setSlidingStartIndexProperty(start);
+
+		});
+
+		textSearchView.show();
+
+		codeArea.setOnMouseClicked(defaultSelectionHandler);
+
+		e.consume();
+	}
+
+	protected void toUppercaseEvent(KeyEvent e) {
+		if (e.getCode() == KeyCode.U && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+			if (e.isConsumed())
+				return;
+			toUppercaseEvent(e);
+			e.consume();
+		}
+	}
+
+	protected void toLowercaseEvent(KeyEvent e) {
+		if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+
+			if (e.isConsumed())
+				return;
+			toLowercaseEvent(e);
+			e.consume();
+		}
+	}
+
+	private void toUppercaseEvent(Event e) {
+		String selectedText = codeArea.getSelectedText();
+		if (ValueUtil.isNotEmpty(selectedText)) {
+			// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
+			replaceSelection(sqlFormatter.toUpperCase(selectedText));
+		}
+	}
+
+	private void toLowercaseEvent(Event e) {
+		String selectedText = codeArea.getSelectedText();
+		if (ValueUtil.isNotEmpty(selectedText)) {
+			// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));
+			replaceSelection(sqlFormatter.toLowerCase(selectedText));
+		}
+	}
+
+	protected void moveToLineEvent(Event e) {
+		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog(this.codeArea, "Go to Line", "Input Line Number",
+				str -> ValueUtil.isNumber(str));
+
+		showInputDialog.ifPresent(v -> {
+			String value = v.getValue();
+			BigDecimal bigDecimal = new BigDecimal(value);
+			int intValue = bigDecimal.intValue();
+			moveToLine(intValue);
+		});
+		e.consume();
+	}
+
+	/**
 	 * 키클릭 이벤트 처리
 	 *
 	 * @작성자 : KYJ
@@ -141,124 +311,14 @@ public class CodeAreaHelper {
 		// System.out.println("sqlKeywords");
 		// System.out.println(e.getCode());
 		// CTRL + F 찾기
-		if ((e.getCode() == KeyCode.F) && (e.isControlDown() && !e.isShiftDown())) {
-
-			if(e.isConsumed())
-				return;
-
-			ObservableValue<String> textProperty = codeArea.textProperty();
-			TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(codeArea, textProperty);
-
-			textSearchView.setOnSearchResultListener((vo) -> {
-
-				switch (vo.getSearchType()) {
-				case SEARCH_SIMPLE: {
-					int startIndex = vo.getStartIndex();
-					int endIndex = vo.getEndIndex();
-					codeArea.selectRange(startIndex, endIndex);
-					LOGGER.debug(String.format("find text : %s startIdx :%d endIdx :%d", vo.getSearchText(), startIndex, endIndex));
-					break;
-				}
-				case SEARCH_ALL: {
-					int startIndex = vo.getStartIndex();
-					String searchText = vo.getSearchText();
-					String replaceText = vo.getReplaceText();
-
-					//					codeArea.getUndoManager().mark();
-					//					codeArea.replaceText(startIndex, (startIndex + searchText.length()), replaceText);
-					setContent(startIndex, startIndex + searchText.length(), replaceText);
-					//					codeArea.getUndoManager().mark();
-
-					break;
-				}
-				}
-
-			});
-
-			textSearchView.setOnReplaceResultListener(vo -> {
-				switch (vo.getReaplceType()) {
-				case SIMPLE: {
-					String reaplceResult = vo.getReaplceResult();
-					setContent(reaplceResult);
-					break;
-				}
-				case ALL: {
-					String reaplceResult = vo.getReaplceResult();
-					setContent(reaplceResult);
-					break;
-				}
-				}
-			});
-
-			textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
-				if (newval)
-					LOGGER.debug("User Select Locale Scope..");
-				else
-					LOGGER.debug("User Select Gloval Scope..");
-			});
-
-			codeArea.setOnMouseClicked(event -> {
-
-				IndexRange selection = codeArea.getSelection();
-				int start = selection.getStart();
-				textSearchView.setSlidingStartIndexProperty(start);
-
-			});
-
-			textSearchView.show();
-
-			codeArea.setOnMouseClicked(defaultSelectionHandler);
-
-			e.consume();
-		}
-		// CTRL + SHIFT + F 포멧팅
-		//		else if (e.getCode() == KeyCode.F && (e.isControlDown() && e.isShiftDown())) {
-		//
-		//			doSqlFormat();
-		//			e.consume();
+		//		if ((e.getCode() == KeyCode.F) && (e.isControlDown() && !e.isShiftDown())) {
+		//			findReplaceEvent(e);
 		//		}
 		// Ctr + U 선택된 문자 또는 전체 문자를 대문자로 치환
-		else if (e.getCode() == KeyCode.U && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
-			if(e.isConsumed())
-				return;
-
-			String selectedText = codeArea.getSelectedText();
-			if (ValueUtil.isNotEmpty(selectedText)) {
-				// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
-				replaceSelection(sqlFormatter.toUpperCase(selectedText));
-			}
-			//2016.10.13 선택된 문자가 없는경우 치환안함.
-//			else {
-//				String text = codeArea.getText();
-								//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-								// codeArea.clear();
-								// codeArea.appendText(sqlFormatter.toUpperCase(text));
-//				setContent(sqlFormatter.toUpperCase(text));
-//			}
-			e.consume();
-		}
+//		toUppercaseEvent(e);
 		// Ctr + L 선택된 문자 또는 전체 문자를 소문자로 치환
-		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+//		toLowercaseEvent(e);
 
-			if(e.isConsumed())
-				return;
-
-			String selectedText = codeArea.getSelectedText();
-			if (ValueUtil.isNotEmpty(selectedText)) {
-				// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));
-				replaceSelection(sqlFormatter.toLowerCase(selectedText));
-			}
-
-			//2016.10.13 선택된 문자가 없는경우 치환안함.
-//			else {
-//				String text = codeArea.getText();
-										//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-										// codeArea.clear();
-										// codeArea.appendText(sqlFormatter.toLowerCase(text));
-//				setContent(sqlFormatter.toUpperCase(text));
-//			}
-			e.consume();
-		}
 	}
 
 	/**

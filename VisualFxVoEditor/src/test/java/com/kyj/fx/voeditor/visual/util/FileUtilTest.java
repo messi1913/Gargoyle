@@ -13,14 +13,18 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.sun.btrace.BTraceUtils.Strings;
 
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.BooleanProperty;
@@ -80,7 +84,6 @@ public class FileUtilTest {
 					WatchEvent<Path> ev = (WatchEvent<Path>) event;
 					Path fileName = ev.context();
 
-					
 					System.out.println(kind.name() + ": " + fileName);
 
 					if (key == ENTRY_MODIFY && fileName.toString().equals("DirectoryWatchDemo.java")) {
@@ -109,5 +112,40 @@ public class FileUtilTest {
 		});
 
 		Thread.sleep(2000);
+	}
+
+	@Test
+	public void hexRead() throws IOException {
+		{
+			byte[] readAllBytes = Files.readAllBytes(new File("nas.docx").toPath());
+
+			for (int i = 0; i < readAllBytes.length; i++) {
+
+				if (i % 16 == 0)
+					System.out.println("");
+
+				byte b = readAllBytes[i];
+				System.out.print(Strings.toHexString(b));
+
+			}
+		}
+
+		System.out.println("##############################################################");
+		System.out.println("##############################################################");
+		System.out.println("##############################################################");
+
+		{
+			byte[] readAllBytes = Files.readAllBytes(new File("unnas.docx").toPath());
+
+			for (int i = 0; i < readAllBytes.length; i++) {
+
+				if (i % 16 == 0)
+					System.out.println("");
+
+				byte b = readAllBytes[i];
+				System.out.print(Strings.toHexString(b));
+
+			}
+		}
 	}
 }

@@ -41,6 +41,7 @@ import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.InstanceTypes;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
@@ -493,6 +494,7 @@ public class FxUtil {
 	public static void createStageAndShow(Node parent) {
 		createStageAndShow(parent.getClass().getSimpleName(), new Scene(new BorderPane(parent)), false);
 	}
+
 	public static void createStageAndShow(String title, Node parent) {
 		createStageAndShow(title, new Scene(new BorderPane(parent)), false);
 	}
@@ -525,6 +527,19 @@ public class FxUtil {
 	 */
 	public static void createStageAndShow(Parent parent, Consumer<Stage> option) {
 		createStageAndShow(new Scene(parent), option);
+	}
+
+	public static void createStageAndShow(CloseableParent<? extends Parent> cloableParent, Consumer<Stage> option) {
+
+		Stage stage = craeteStage(cloableParent.getParent(), option);
+		stage.setOnCloseRequest(ev -> {
+			try {
+				cloableParent.close();
+			} catch (Exception e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+		});
+		stage.show();
 	}
 
 	/**
@@ -600,6 +615,10 @@ public class FxUtil {
 		if (option != null)
 			option.accept(stage);
 		return stage;
+	}
+
+	public static Stage craeteStage(Parent parent, Consumer<Stage> option) {
+		return craeteStage(new Scene(parent), option);
 	}
 
 	/********************************
@@ -955,6 +974,5 @@ public class FxUtil {
 	public static void installTooltip(Node node, String string) {
 		Tooltip.install(node, new Tooltip(string));
 	}
-
 
 }

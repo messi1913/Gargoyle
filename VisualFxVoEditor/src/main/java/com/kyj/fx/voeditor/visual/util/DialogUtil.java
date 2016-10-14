@@ -241,6 +241,7 @@ public class DialogUtil {
 	public static File showDirectoryDialog(final Window ownerWindow, Consumer<DirectoryChooser> option) {
 		DirectoryChooser chooser = new DirectoryChooser();
 		chooser.setTitle("Open Resource Directory");
+		installDefaultPath(chooser);
 		if (option != null)
 			option.accept(chooser);
 		return chooser.showDialog(ownerWindow);

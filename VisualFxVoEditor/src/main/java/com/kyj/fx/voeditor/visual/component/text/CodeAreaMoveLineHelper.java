@@ -31,7 +31,7 @@ public class CodeAreaMoveLineHelper {
 	}
 
 	public Integer getCurrentLine() {
-		return codeArea.currentParagraphProperty().getValue();
+		return codeArea.getCurrentParagraph();
 	}
 
 	/**

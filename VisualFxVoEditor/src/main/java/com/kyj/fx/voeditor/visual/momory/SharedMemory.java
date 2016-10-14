@@ -63,6 +63,8 @@ public class SharedMemory {
 
 	private static List<ProjectInfo> listSources;
 
+	private static Object lock = new Object();
+
 	public final static Stage getPrimaryStage() {
 		return primaryStage;
 	}
@@ -175,7 +177,7 @@ public class SharedMemory {
 
 						String classDirName = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
 						try {
-							listClases = DynamicClassLoader.listSources(classDirName);
+							listSources = DynamicClassLoader.listSources(classDirName);
 						} catch (Exception e) {
 							LOGGER.error(String.format("exception %s", e.toString()));
 						}
@@ -197,13 +199,18 @@ public class SharedMemory {
 	 * @작성일 : 2015. 11. 27.
 	 */
 	public static void init() {
-		if (listClases != null) {
-			listClases.clear();
+
+		synchronized (lock) {
+
+			if (listClases != null) {
+				listClases.clear();
+			}
+
+			if (listSources != null)
+				listSources.clear();
+			initLoad();
 		}
 
-		if (listSources != null)
-			listSources.clear();
-		initLoad();
 	}
 
 	public static void setWorkspaceTab(TabPane tabPanWorkspace) {

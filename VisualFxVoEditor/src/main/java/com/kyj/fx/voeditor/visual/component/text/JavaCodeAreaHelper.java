@@ -10,28 +10,26 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.pmd.PMDCheckedListComposite;
+import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
-import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.util.Pair;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import net.sourceforge.pmd.benchmark.Benchmark;
 import net.sourceforge.pmd.benchmark.Benchmarker;
 import net.sourceforge.pmd.benchmark.TextReport;
@@ -59,7 +57,6 @@ public class JavaCodeAreaHelper extends CodeAreaHelper implements EventHandler<A
 
 	public JavaCodeAreaHelper(CodeArea codeArea) {
 		super(codeArea);
-		createContextMenu();
 	}
 
 	/**
@@ -67,20 +64,18 @@ public class JavaCodeAreaHelper extends CodeAreaHelper implements EventHandler<A
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 6.
 	 */
-	private void createContextMenu() {
+	@Override
+	protected void createMenus() {
+		super.createMenus();
 		menuPmd = new Menu("PMD");
 		menuRunPmd = new MenuItem("Run PMD");
 		menuAutoComment = new MenuItem("Auto Comment");
 
 		menuRunPmd.setOnAction(this);
 		menuAutoComment.setOnAction(this);
+
 		menuPmd.getItems().addAll(menuRunPmd);
-		ContextMenu contextMenu = codeArea.getContextMenu();
-		if (contextMenu == null) {
-			contextMenu = new ContextMenu();
-			codeArea.setContextMenu(contextMenu);
-		}
-		contextMenu.getItems().addAll(menuPmd, menuAutoComment);
+		codeArea.getContextMenu().getItems().addAll(menuPmd, new SeparatorMenuItem(), menuAutoComment);
 	}
 
 	/* (non-Javadoc)
@@ -183,59 +178,95 @@ public class JavaCodeAreaHelper extends CodeAreaHelper implements EventHandler<A
 
 		pmdCheckedListComposite.run();
 
-		FxUtil.createStageAndShow(pmdCheckedListComposite.getParent(), stage -> {
+		CloseableParent<BorderPane> closa = pmdCheckedListComposite;
+		Consumer<Stage> option = stage -> {
 			stage.setTitle("PMD Check.");
 			//Owner를 Root로 지정.
 			stage.initOwner(SharedMemory.getPrimaryStage());
 			stage.setWidth(1200d);
 			stage.setHeight(800d);
-		});
+		};
+
+		FxUtil.createStageAndShow(closa, option);
 	}
 
-	@Override
-	public void codeAreaKeyClick(KeyEvent e) {
+	//	@Override
+	//	public void codeAreaKeyClick(KeyEvent e) {
+	//
+	//		/*
+	//		 * CTRL + SHIFT + U
+	//		 * 대문자
+	//		 */
+	//		//		if (e.getCode() == KeyCode.U && (e.isControlDown() && !e.isAltDown() && e.isShiftDown())) {
+	//		//			if (e.isConsumed())
+	//		//				return;
+	//		//			String selectedText = codeArea.getSelectedText();
+	//		//			if (ValueUtil.isNotEmpty(selectedText)) {
+	//		//				replaceSelection(sqlFormatter.toUpperCase(selectedText));
+	//		//			}
+	//		//			e.consume();
+	//		//		}
+	//		// Ctr + SHIFT + L 선택된 문자 또는 전체 문자를 소문자로 치환
+	//		//		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && e.isShiftDown())) {
+	//		//			if (e.isConsumed())
+	//		//				return;
+	//		//			String selectedText = codeArea.getSelectedText();
+	//		//			if (ValueUtil.isNotEmpty(selectedText)) {
+	//		//				replaceSelection(sqlFormatter.toLowerCase(selectedText));
+	//		//			}
+	//		//			e.consume();
+	//		//		}
+	//		//CTRL + L 라인이동
+	//		//		if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+	//		//
+	//		//			Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog(this.codeArea, "Go to Line", "라인입력.",
+	//		//					str -> ValueUtil.isNumber(str));
+	//		//
+	//		//			showInputDialog.ifPresent(v -> {
+	//		//				String value = v.getValue();
+	//		//				BigDecimal bigDecimal = new BigDecimal(value);
+	//		//				int intValue = bigDecimal.intValue();
+	//		//				moveToLine(intValue);
+	//		//
+	//		//			});
+	//		//
+	//		//			e.consume();
+	//		//		}
+	//
+	//		super.codeAreaKeyClick(e);
+	//	}
 
-		/*
-		 * CTRL + SHIFT + U
-		 * 대문자
-		 */
-		if (e.getCode() == KeyCode.U && (e.isControlDown() && !e.isAltDown() && e.isShiftDown())) {
-			if (e.isConsumed())
-				return;
-			String selectedText = codeArea.getSelectedText();
-			if (ValueUtil.isNotEmpty(selectedText)) {
-				replaceSelection(sqlFormatter.toUpperCase(selectedText));
-			}
-			e.consume();
-		}
-		// Ctr + SHIFT + L 선택된 문자 또는 전체 문자를 소문자로 치환
-		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && e.isShiftDown())) {
-			if (e.isConsumed())
-				return;
-			String selectedText = codeArea.getSelectedText();
-			if (ValueUtil.isNotEmpty(selectedText)) {
-				replaceSelection(sqlFormatter.toLowerCase(selectedText));
-			}
-			e.consume();
-		}
-		//CTRL + L 라인이동
-		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.text.CodeAreaHelper#toUppercaseKeyEvent(javafx.scene.input.KeyEvent)
+	 */
+	//	@Override
+	//	protected void toUppercaseKeyEvent(KeyEvent e) {
+	//
+	//		if (e.getCode() == KeyCode.U && (e.isControlDown() && !e.isAltDown() && e.isShiftDown())) {
+	//			if (e.isConsumed())
+	//				return;
+	//			String selectedText = codeArea.getSelectedText();
+	//			if (ValueUtil.isNotEmpty(selectedText)) {
+	//				replaceSelection(sqlFormatter.toUpperCase(selectedText));
+	//			}
+	//			e.consume();
+	//		}
+	//	}
 
-			Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog(this.codeArea, "Go to Line", "라인입력.",
-					str -> ValueUtil.isNumber(str));
-
-			showInputDialog.ifPresent(v -> {
-				String value = v.getValue();
-				BigDecimal bigDecimal = new BigDecimal(value);
-				int intValue = bigDecimal.intValue();
-				moveToLine(intValue);
-
-			});
-
-			e.consume();
-		}
-
-		super.codeAreaKeyClick(e);
-	}
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.text.CodeAreaHelper#toLowercaseKeyEvent(javafx.scene.input.KeyEvent)
+	 */
+	//	@Override
+	//	protected void toLowercaseKeyEvent(KeyEvent e) {
+	//		if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && e.isShiftDown())) {
+	//			if (e.isConsumed())
+	//				return;
+	//			String selectedText = codeArea.getSelectedText();
+	//			if (ValueUtil.isNotEmpty(selectedText)) {
+	//				replaceSelection(sqlFormatter.toLowerCase(selectedText));
+	//			}
+	//			e.consume();
+	//		}
+	//	}
 
 }

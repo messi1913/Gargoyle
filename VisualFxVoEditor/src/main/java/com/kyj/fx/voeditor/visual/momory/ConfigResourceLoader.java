@@ -151,13 +151,12 @@ public final class ConfigResourceLoader implements IFileBaseConfiguration {
 	 */
 	public static final String FILE_OPEN_NOT_INPROCESSING_EXTENSION = "file.open.not.inprocessing.extensions";
 
-	
 	/**
 	 * 스키마라는 개념이 없는 DBMS의 Driver들을 나열함.
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 10.
 	 */
-	public static final String NOT_EXISTS_SCHEMA_DRIVER_NAMES="not.exists.schema.driver.names";
+	public static final String NOT_EXISTS_SCHEMA_DRIVER_NAMES = "not.exists.schema.driver.names";
 	/**
 	 * SVN 기본 설정 항목들이 기록된 키
 	 *
@@ -165,7 +164,7 @@ public final class ConfigResourceLoader implements IFileBaseConfiguration {
 	 */
 	public static final String SVN_BASE_KEYS = "svn.base.keys";
 
-	public static final String ABOUT_PAGE_URL= "about.page.url";
+	public static final String ABOUT_PAGE_URL = "about.page.url";
 
 	public static ConfigResourceLoader getInstance() {
 		if (loader == null) {
@@ -215,7 +214,7 @@ public final class ConfigResourceLoader implements IFileBaseConfiguration {
 			// String driver =
 			// ResourceLoader.getInstance().get(ResourceLoader.BASE_KEY_JDBC_DRIVER);'
 			String newKey = "";
-			if(driver!=null)
+			if (driver != null)
 				newKey = key.replaceAll("\\{driver\\}", driver);
 			property = properties.getProperty(newKey, defValue);
 		} else {

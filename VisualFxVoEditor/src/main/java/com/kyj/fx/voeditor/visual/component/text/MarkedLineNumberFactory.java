@@ -22,7 +22,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 
@@ -95,7 +95,6 @@ public class MarkedLineNumberFactory implements IntFunction<Node> {
 	public static interface GraphicsMapper<T extends Node> {
 
 		public T map(int row, Paragraph<?> pra, int typeValue);
-
 	}
 
 	/**
@@ -134,15 +133,13 @@ public class MarkedLineNumberFactory implements IntFunction<Node> {
 
 			@Override
 			public Node map(int row, Paragraph<?> pra, int typeValue) {
-				Rectangle rectangle = new Rectangle();
-				rectangle.setWidth(10d);
-				rectangle.setHeight(10d);
-				if (typeValue == 1)
-					rectangle.setStyle(ADDED_COMMNET_STYLE);
-				else
-					rectangle.setStyle(TRANSPARENT_STYLE);
+				Circle g = new Circle(5d);
+				g.setStyle("-fx-fill:transparent");
 
-				return rectangle;
+				if (typeValue == 1)
+					g.setStyle(ADDED_COMMNET_STYLE);
+
+				return g;
 
 			}
 		};

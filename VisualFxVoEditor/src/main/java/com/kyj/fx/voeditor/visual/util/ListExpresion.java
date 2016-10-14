@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * @author KYJ
@@ -54,4 +55,19 @@ public class ListExpresion {
 			return null;
 		}
 	}
+
+	/**
+	 * 빈값여부를 체크하고 스트림객체를 생성하는 함수.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 14.
+	 * @param values
+	 * @return
+	 */
+	public static <T> Stream<T> of(List<T> values) {
+		if (values != null && !values.isEmpty())
+			return values.stream();
+		return Stream.empty();
+	}
+
+
 }

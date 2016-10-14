@@ -344,7 +344,6 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			return;
 		}
 
-
 		String EXTENSION = FileUtil.getFileExtension(fileName);
 		Optional<String> findFirst = exts.stream().filter(ext -> EXTENSION.equals(ext) || EXTENSION.isEmpty()).findFirst();
 		if (findFirst.isPresent()) {
@@ -856,12 +855,19 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	@FXML
 	public void menuSwitchWorkspaceOnAction(ActionEvent e) throws IOException {
 		SelectWorkspaceView view = new SelectWorkspaceView();
-		ResultDialog<Object> show = view.show();
+		ResultDialog<Object> show = view.showAndWait();
 		if (show != null && ResultDialog.OK == show.getStatus()) {
 			String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
 			selectDirFile = new File(baseDir);
 			treeProjectFile.setRoot(createNewTree(selectDirFile));
 			treeProjectFile.setShowRoot(false);
+
+			// 2016-10-14 kyj Resource 리로팅
+			SharedMemory.init();
+
+			//TODO 열러있던 탭을 모두 close, 이 처리가 되기전에 열려있는 창에대한 문구 표시 필요
+			//			tabPanWorkspace.getTabs().clear();
+
 		}
 	}
 
@@ -1033,7 +1039,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		if (file != null && file.exists()) {
 			String name = file.getName();
 			PMDCheckedListComposite parent = new PMDCheckedListComposite(file);
-			loadNewSystemTab(String.format("PMD - %s", name), parent);
+			loadNewSystemTab(String.format("PMD - %s", name), (CloseableParent<BorderPane>) parent);
 			parent.runAsynch();
 		}
 	}

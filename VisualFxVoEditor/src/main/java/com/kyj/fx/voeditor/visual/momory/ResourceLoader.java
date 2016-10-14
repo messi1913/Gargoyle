@@ -11,9 +11,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.Properties;
 import java.util.Set;
 
@@ -71,14 +75,13 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static final String ORG_H2_DRIVER = "org.h2.Driver";
 	public static final String ORG_SQLITE_JDBC = "org.sqlite.JDBC";
 
-
 	public static final String START_URL = "start.url";
 
 	/**
 	 * 씬빌더 위치정보
 	 * @최초생성일 2016. 6. 19.
 	 */
-	public static final String SCENEBUILDER_LOCATION= "scenebuilder.location";
+	public static final String SCENEBUILDER_LOCATION = "scenebuilder.location";
 
 	/**
 	 * 사용자가 파일트리에서 선택한 경로 정보
@@ -106,6 +109,12 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	 * @최초생성일 2016. 2. 11.
 	 */
 	public static final String APPLY_MAX_ROW_COUNT = "apply.max.row.count";
+
+	/**
+	 * PMD에서 유저가 선택한 상태 값 배열
+	 * @최초생성일 2016. 10. 14.
+	 */
+	public static final String PMD_SELECTED_PRIORITY_VALUES = "pmd.selected.priority.values";
 
 	private String[] baseKeys = { BASE_KEY_JDBC_INFO, BASE_KEY_JDBC_DRIVER, BASE_KEY_JDBC_URL, BASE_KEY_JDBC_ID, BASE_KEY_JDBC_PASS,
 			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES };
@@ -232,6 +241,20 @@ public class ResourceLoader implements IFileBaseConfiguration {
 		if (property == null || property.isEmpty())
 			return ConfigResourceLoader.getInstance().get(key, roopCount);
 		return property;
+	}
+
+	/**
+	 * 키에 해당하는 값을 deliminater로 분리시킨후 리턴한다..
+	 *
+	 * @param key
+	 * @param deliminater
+	 * @return
+	 */
+	public List<String> getValues(String key, String deliminater) {
+		Object object = properties.get(key);
+		if (object != null)
+			return Stream.of(object.toString().split(deliminater)).map(str -> str.trim()).collect(Collectors.toList());
+		return Collections.emptyList();
 	}
 
 	public Enumeration<Object> keySet() {
