@@ -96,6 +96,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -894,11 +895,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	private ContextMenu closeContextMenu() {
 
 		MenuItem closeMenuItem = new MenuItem("Close");
+		
 		closeMenuItem.setOnAction(hander -> {
 			Tab tab = tabPanWorkspace.getSelectionModel().getSelectedItem();
 			closeTab(tab);
 		});
-		MenuItem closeAllMenuItem = new MenuItem("Close All");
+		MenuItem closeAllMenuItem = new MenuItem("Close All   CTRL + SHIFT + W");
+		
 		closeAllMenuItem.setOnAction(handler -> {
 			for (int i = tabPanWorkspace.getTabs().size() - 1; i >= 1; i--) {
 				Tab tab = tabPanWorkspace.getTabs().get(i);
