@@ -590,6 +590,12 @@
 			<version>0.0.1-SNAPSHOT</version>
 			<!-- <scope>system</scope> -->
 			<!-- <systemPath>${vo.editor.jar.path.name}</systemPath> -->
+			<exclusions>
+				<exclusion>
+					<groupId>commons-lang</groupId>
+					<artifactId>commons-lang</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

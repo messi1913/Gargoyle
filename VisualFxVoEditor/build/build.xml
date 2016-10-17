@@ -17,8 +17,10 @@
 		<delete dir="externalLibs" />
 		<delete dir="project" />
 		<delete dir="projectRefs" />
-
+		<delete dir="pmdLibs" />
+		
 		<mkdir dir="externalLibs" />
+		<mkdir dir="pmdLibs" />
 
 		<copy todir="externalLibs">
 			<fileset dir="${user.home}\.m2\repository\org\openoffice\ridl\2.3.0">
@@ -301,8 +303,8 @@
 		</copy>
 		<copy todir="externalLibs">
 			<fileset
-				dir="${user.home}\.m2\repository\org\controlsfx\controlsfx\8.40.10">
-				<filename name="controlsfx-8.40.10.jar" />
+				dir="${user.home}\.m2\repository\org\controlsfx\controlsfx\8.40.12">
+				<filename name="controlsfx-8.40.12.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
@@ -551,8 +553,66 @@
 				<filename name="kyj.FxVoEditor-0.0.1-SNAPSHOT.jar" />
 			</fileset>
 		</copy>
+		
+		
+		<copy todir="externalLibs">
+			<fileset
+				dir="${user.home}\.m2\repository\kyj\pmd\pmd.core\0.0.1-SNAPSHOT">
+				<filename name="pmd.core-0.0.1-SNAPSHOT.jar" />
+			</fileset>
+		</copy>
+		
+		
+		<!-- [start] jfxtras -->
+		<copy todir="externalLibs">
+			<fileset
+				dir="${user.home}\.m2\repository\org\jfxtras\jfxtras-agenda\8.0-r5">
+				<filename name="jfxtras-agenda-8.0-r5.jar" />
+			</fileset>
+		</copy>
+	
+		<copy todir="externalLibs">
+			<fileset
+				dir="${user.home}\.m2\repository\org\jfxtras\jfxtras-common\8.0-r5">
+				<filename name="jfxtras-common-8.0-r5.jar" />
+			</fileset>
+		</copy>
+		
+		<copy todir="externalLibs">
+			<fileset
+				dir="${user.home}\.m2\repository\org\jfxtras\jfxtras-controls\8.0-r5">
+				<filename name="jfxtras-controls-8.0-r5.jar" />
+			</fileset>
+		</copy>
+		
+		<copy todir="externalLibs">
+			<fileset
+				dir="${user.home}\.m2\repository\org\jfxtras\jfxtras-fxml\8.0-r5">
+				<filename name="jfxtras-fxml-8.0-r5.jar" />
+			</fileset>
+		</copy>
+		<!-- [end] jfxtras -->
+		
+		<!-- [start] jfoenix -->
+		
+		<copy todir="externalLibs">
+			<fileset
+				dir="${user.home}\.m2\repository\com\jfoenix\jfoenix\1.0.0">
+				<filename name="jfoenix-1.0.0.jar" />
+			</fileset>
+		</copy>
+		
+		<!-- [end] jfoenix -->
+		
+		
 
+		
+		<copy todir="pmdLibs">
+		    	<fileset dir="${basedir}\..\..\pmd.core\lib">
+		    	</fileset>
+		</copy>
 
+		
 		<mkdir dir="project" />
 		<!-- <copy todir="project"> <fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
 			<include name="src\test\resources/**" /> </fileset> </copy> -->
@@ -580,17 +640,27 @@
 				<include name="src\main\java/**" />
 			</fileset>
 		</copy>
+		
+<!-- 		<copy todir="project"> -->
+<!-- 			<fileset dir="${user.home}\git\Gargoyle\pmd.core"> -->
+<!-- 				<include name="src\main\java/**" /> -->
+<!-- 			</fileset> -->
+<!-- 		</copy> -->
+		
 		<!-- <copy todir="project"> <fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
 			<include name="src\test\java/**" /> </fileset> </copy> -->
 
 		<mkdir dir="projectRefs" />
+		
+		
+		
 	</target>
 	<target name='do-compile'>
 		<delete dir="build" />
 		<mkdir dir="build/src" />
 		<mkdir dir="build/libs" />
 		<mkdir dir="build/classes" />
-
+	
 		<!-- Copy project-libs references -->
 		<copy todir="build/libs">
 			<fileset dir="externalLibs">
@@ -610,7 +680,7 @@
 				<include name="pdfbox-tools-2.0.0.jar" />
 				<include name="richtextfx-0.6.10.jar" />
 				<include name="reactfx-2.0-M4u1.jar" />
-				<include name="controlsfx-8.40.10.jar" />
+				<include name="controlsfx-8.40.12.jar" />
 				<include name="jcl-over-slf4j-1.7.7.jar" />
 				<include name="mail-1.4.7.jar" />
 				<include name="xmlbeans-2.6.0.jar" />
@@ -690,10 +760,25 @@
 
 				<include name="kyj.Fx.dao.wizard-0.0.3-SNAPSHOT.jar" />
 				<include name="kyj.FxVoEditor-0.0.1-SNAPSHOT.jar" />
-
+				<include name="pmd.core-0.0.1-SNAPSHOT.jar" />
+				
+				
+				<include name="jfxtras-agenda-8.0-r5.jar" />
+				<include name="jfxtras-common-8.0-r5.jar" />
+				<include name="jfxtras-controls-8.0-r5.jar" />
+				<include name="jfxtras-fxml-8.0-r5.jar" />
+				
+				<include name="jfoenix-1.0.0.jar" />
+				
+		
 			</fileset>
 		</copy>
 
+		<copy todir="build/libs">
+			<fileset dir="pmdLibs">
+			    <include name="**"/>
+			</fileset>
+		</copy>
 		<!-- Copy project references -->
 
 		<!-- Copy project sources itself -->
@@ -763,11 +848,17 @@
 		<mkdir dir="dist/skins" />
 		<mkdir dir="dist/plugins" />
 		<mkdir dir="dist/btrace" />
-
+		<mkdir dir="dist/rulesets" />
 
 
 		<copy todir="dist/libs">
 			<fileset dir="externalLibs">
+				<include name="*" />
+			</fileset>
+		</copy>
+		
+		<copy todir="dist/libs">
+			<fileset dir="pmdLibs">
 				<include name="*" />
 			</fileset>
 		</copy>
@@ -789,6 +880,13 @@
 				<include name="*" />
 			</fileset>
 		</copy>
+		
+		<copy todir="dist/rulesets">
+			<fileset dir="../rulesets">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		
 
 		<copyfile src="../UserConf.properties" dest="dist/UserConf.properties" />
 
@@ -801,13 +899,13 @@
 			<fx:fileset dir="dist" includes="btrace/**" />
 			<fx:fileset dir="dist" includes="plugins/**" />
 			<fx:fileset dir="dist" includes="skins/**" />
-
+			<fx:fileset dir="dist" includes="rulesets/**" />
 
 		</fx:resources>
 
 		<fx:application id="Gagoyle" name="Gargoyle"
 			mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx"
-			version="1.1.1" />
+			version="1.2.0" />
 
 		<mkdir dir="build/classes/META-INF" />
 
@@ -822,7 +920,7 @@
 			<manifest>
 				<attribute name="Implementation-Vendor" value="kyj.fx.wizard" />
 				<attribute name="Implementation-Title" value="Gargoyle" />
-				<attribute name="Implementation-Version" value="1.1.1" />
+				<attribute name="Implementation-Version" value="1.2.0" />
 				<attribute name="JavaFX-Feature-Proxy" value="None" />
 			</manifest>
 		</fx:jar>

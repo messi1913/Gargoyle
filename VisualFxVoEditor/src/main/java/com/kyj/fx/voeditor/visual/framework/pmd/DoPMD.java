@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.kyj.fx.voeditor.visual.component.pmd.PMDGargoyleThreadProcessor;
 
-import net.sourceforge.pmd.PMDConfiguration;
 import net.sourceforge.pmd.ReportListener;
 import net.sourceforge.pmd.Rule;
 import net.sourceforge.pmd.RuleContext;
@@ -32,14 +31,12 @@ import net.sourceforge.pmd.RuleSet;
 import net.sourceforge.pmd.RuleSetFactory;
 import net.sourceforge.pmd.RuleSets;
 import net.sourceforge.pmd.RuleViolation;
-import net.sourceforge.pmd.RulesetsFactoryUtils;
 import net.sourceforge.pmd.benchmark.Benchmark;
 import net.sourceforge.pmd.benchmark.Benchmarker;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageFilenameFilter;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.LanguageVersionDiscoverer;
-import net.sourceforge.pmd.renderers.DatabaseXmlRenderer;
 import net.sourceforge.pmd.renderers.Renderer;
 import net.sourceforge.pmd.stat.Metric;
 import net.sourceforge.pmd.util.ClasspathClassLoader;
@@ -75,11 +72,11 @@ public class DoPMD implements Closeable {
 	 *            the configure to use
 	 * @return number of violations found.
 	 */
-	public int doPMD(PMDConfiguration configuration) {
+	public int doPMD(GargoylePMDConfiguration configuration) {
 		return doPMD(configuration, (ReportListener) null);
 	}
 
-	public int doPMD(PMDConfiguration configuration, ReportListener... listeners) {
+	public int doPMD(GargoylePMDConfiguration configuration, ReportListener... listeners) {
 
 		// Load the RuleSets
 		RuleSetFactory ruleSetFactory = RulesetsFactoryUtils.getRulesetFactory(configuration);
@@ -146,7 +143,7 @@ public class DoPMD implements Closeable {
 		}
 	}
 
-	private Set<Language> getApplicableLanguages(PMDConfiguration configuration, RuleSets ruleSets) {
+	private Set<Language> getApplicableLanguages(GargoylePMDConfiguration configuration, RuleSets ruleSets) {
 		Set<Language> languages = new HashSet<>();
 		LanguageVersionDiscoverer discoverer = configuration.getLanguageVersionDiscoverer();
 
@@ -172,7 +169,7 @@ public class DoPMD implements Closeable {
 	 *            used to filter by file extension
 	 * @return List<DataSource> of files
 	 */
-	public List<DataSource> getApplicableFiles(PMDConfiguration configuration, Set<Language> languages) {
+	public List<DataSource> getApplicableFiles(GargoylePMDConfiguration configuration, Set<Language> languages) {
 		long startFiles = System.nanoTime();
 		List<DataSource> files = internalGetApplicableFiles(configuration, languages);
 		long endFiles = System.nanoTime();
@@ -180,7 +177,7 @@ public class DoPMD implements Closeable {
 		return files;
 	}
 
-	private List<DataSource> internalGetApplicableFiles(PMDConfiguration configuration, Set<Language> languages) {
+	private List<DataSource> internalGetApplicableFiles(GargoylePMDConfiguration configuration, Set<Language> languages) {
 		List<DataSource> files = new ArrayList<>();
 		LanguageFilenameFilter fileSelector = new LanguageFilenameFilter(languages);
 
@@ -224,7 +221,7 @@ public class DoPMD implements Closeable {
 	 * @param renderers
 	 *            List<Renderer>
 	 */
-	public void processFiles(final PMDConfiguration configuration, final RuleSetFactory ruleSetFactory, final List<DataSource> files,
+	public void processFiles(final GargoylePMDConfiguration configuration, final RuleSetFactory ruleSetFactory, final List<DataSource> files,
 			final RuleContext ctx, final List<Renderer> renderers) {
 
 		sortFiles(configuration, files);
@@ -247,7 +244,7 @@ public class DoPMD implements Closeable {
 		}
 	}
 
-	private void sortFiles(final PMDConfiguration configuration, final List<DataSource> files) {
+	private void sortFiles(final GargoylePMDConfiguration configuration, final List<DataSource> files) {
 		if (configuration.isStressTest()) {
 			// randomize processing order
 			Collections.shuffle(files);

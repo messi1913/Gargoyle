@@ -7,14 +7,14 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.framework.pmd.GargoylePMDConfiguration;
+
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
 import net.sourceforge.pmd.PMD;
-import net.sourceforge.pmd.PMDConfiguration;
 import net.sourceforge.pmd.PMDException;
 import net.sourceforge.pmd.Report;
 import net.sourceforge.pmd.RuleContext;
@@ -33,7 +33,7 @@ public final class PMDGargoyleThreadProcessor extends AbstractPMDProcessor {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PMDGargoyleThreadProcessor.class);
 
-	public PMDGargoyleThreadProcessor(PMDConfiguration configuration) {
+	public PMDGargoyleThreadProcessor(GargoylePMDConfiguration configuration) {
 		super(configuration);
 	}
 
@@ -50,7 +50,7 @@ public final class PMDGargoyleThreadProcessor extends AbstractPMDProcessor {
 			Report report = PMD.setupReport(rs, ctx, niceFileName);
 			// overtake the listener
 			//bug fix 2016-10-05 by kyj. 결과가 중복되서 출력됨.
-//			report.addSynchronizedListeners(ctx.getReport().getSynchronizedListeners());
+			//			report.addSynchronizedListeners(ctx.getReport().getSynchronizedListeners());
 			//	        ctx.setReport(report);
 			//	        ctx.setSourceCodeFilename(niceFileName);
 
@@ -69,18 +69,18 @@ public final class PMDGargoyleThreadProcessor extends AbstractPMDProcessor {
 				processor.processSourceCode(stream, rs, ctx);
 			} catch (PMDException pmde) {
 
-//				LOGGER.error(ValueUtil.toString(pmde));
+				//				LOGGER.error(ValueUtil.toString(pmde));
 				//				if (LOG.isLoggable(Level.FINE)) {
 				//					LOG.log(Level.FINE, "Error while processing file: " + niceFileName, pmde.getCause());
 				//				}
 
 				report.addError(new Report.ProcessingError(pmde.getMessage(), niceFileName));
 			} catch (IOException ioe) {
-//				LOGGER.error(ValueUtil.toString(ioe));
+				//				LOGGER.error(ValueUtil.toString(ioe));
 				// unexpected exception: log and stop executor service
 				addError(report, "Unable to read source file", ioe, niceFileName);
 			} catch (RuntimeException re) {
-//				LOGGER.error(ValueUtil.toString(re));
+				//				LOGGER.error(ValueUtil.toString(re));
 				// unexpected exception: log and stop executor service
 				addError(report, "RuntimeException while processing file", re, niceFileName);
 			}

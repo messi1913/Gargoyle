@@ -34,6 +34,8 @@ import com.kyj.fx.voeditor.visual.component.text.MarkedLineNumberFactory;
 import com.kyj.fx.voeditor.visual.component.text.MarkedLineNumberFactory.GraphicsMapper;
 import com.kyj.fx.voeditor.visual.component.text.MarkedLineNumberFactory.LineMapper;
 import com.kyj.fx.voeditor.visual.framework.pmd.DoPMD;
+import com.kyj.fx.voeditor.visual.framework.pmd.GargoylePMDConfiguration;
+import com.kyj.fx.voeditor.visual.framework.pmd.GargoylePMDParameters;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
@@ -49,7 +51,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.IndexRange;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -60,7 +61,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 import javafx.util.Callback;
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
-import net.sourceforge.pmd.PMDConfiguration;
 import net.sourceforge.pmd.ReportListener;
 import net.sourceforge.pmd.Rule;
 import net.sourceforge.pmd.RulePriority;
@@ -68,7 +68,6 @@ import net.sourceforge.pmd.RuleViolation;
 import net.sourceforge.pmd.benchmark.Benchmark;
 import net.sourceforge.pmd.benchmark.Benchmarker;
 import net.sourceforge.pmd.benchmark.TextReport;
-import net.sourceforge.pmd.cli.PMDParameters;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
@@ -111,6 +110,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * PMD 처리에 대한 코어 로직.
+	 * 
 	 * @최초생성일 2016. 10. 13.
 	 */
 	protected DoPMD doPMD = new DoPMD();
@@ -227,6 +227,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * PMD 검사를 동기 처리
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 13.
 	 */
@@ -240,6 +241,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * PMD 검사를 비동기 처리
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 13.
 	 */
@@ -257,6 +259,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * 파일 1개를 대상으로 PMD 체크하기 위한 처리.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 13.
 	 * @param file
@@ -264,14 +267,14 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	protected void simpleFilePmd(File file) {
 		try {
 			String sourceCode = Files.toString(this.sourceFile, Charset.forName("UTF-8"));
-			PMDParameters params = new PMDParameters();
+			GargoylePMDParameters params = new GargoylePMDParameters();
 			params.setSourceFileName(file.getAbsolutePath());
 			params.setSourceText(sourceCode);
 
 			if (!FileUtil.isJavaFile(file)) {
 				String fileExtension = FileUtil.getFileExtension(file);
 				try {
-					Field declaredField = PMDParameters.class.getDeclaredField("language");
+					Field declaredField = GargoylePMDParameters.class.getDeclaredField("language");
 					if (declaredField != null) {
 						declaredField.setAccessible(true);
 						declaredField.set(params, fileExtension);
@@ -321,9 +324,9 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	protected void dirFilePmd(File file) {
 		try {
-			PMDParameters params = new PMDParameters();
+			GargoylePMDParameters params = new GargoylePMDParameters();
 			try {
-				Field declaredField = PMDParameters.class.getDeclaredField("sourceDir");
+				Field declaredField = GargoylePMDParameters.class.getDeclaredField("sourceDir");
 				if (declaredField != null) {
 					declaredField.setAccessible(true);
 					declaredField.set(params, file.getAbsolutePath());
@@ -370,6 +373,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * 룰셋 파일 목록을 읽어옴.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 13.
 	 * @param language
@@ -392,13 +396,13 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		return result;
 	}
 
-	public PMDConfiguration transformParametersIntoConfiguration(PMDParameters params) {
+	public GargoylePMDConfiguration transformParametersIntoConfiguration(GargoylePMDParameters params) {
 		//		if (null == params.getSourceDir() && null == params.getUri() && null == params.getFileListPath()
 		//				&& null == params.getSourceText()) {
 		//			throw new IllegalArgumentException(
 		//					"Please provide a parameter for source root directory (-dir or -d), database URI (-uri or -u), or file list path (-filelist).");
 		//		}
-		PMDConfiguration configuration = new PMDConfiguration();
+		GargoylePMDConfiguration configuration = new GargoylePMDConfiguration();
 		configuration.setInputPaths(params.getSourceDir());
 		//		configuration.setInputFilePath(params.getFileListPath());
 		//		configuration.setInputUri(params.getUri());
@@ -529,6 +533,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * 위험도 아이템 변경 리스너
+	 * 
 	 * @최초생성일 2016. 10. 6.
 	 */
 	private ListChangeListener<RulePriority> chkPriorityChangeListener = (ListChangeListener<RulePriority>) c -> {

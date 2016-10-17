@@ -22,6 +22,8 @@ import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.pmd.DoPMD;
+import com.kyj.fx.voeditor.visual.framework.pmd.GargoylePMDConfiguration;
+import com.kyj.fx.voeditor.visual.framework.pmd.GargoylePMDParameters;
 
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
@@ -29,11 +31,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
-import net.sourceforge.pmd.PMDConfiguration;
 import net.sourceforge.pmd.benchmark.Benchmark;
 import net.sourceforge.pmd.benchmark.Benchmarker;
 import net.sourceforge.pmd.benchmark.TextReport;
-import net.sourceforge.pmd.cli.PMDParameters;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 
@@ -88,7 +88,7 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 			String sourceCode = Files.toString(this.sourceFile, Charset.forName("UTF-8"));
 			javaTextArea.setContent(sourceCode);
 
-			PMDParameters params = new PMDParameters();
+			GargoylePMDParameters params = new GargoylePMDParameters();
 			params.setSourceFileName(file.getAbsolutePath());
 			params.setSourceText(sourceCode);
 
@@ -122,9 +122,9 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 			//			String sourceCode = Files.toString(this.sourceFile, Charset.forName("UTF-8"));
 			//			javaTextArea.setContent(sourceCode);
 
-			PMDParameters params = new PMDParameters();
+			GargoylePMDParameters params = new GargoylePMDParameters();
 			try {
-				Field declaredField = PMDParameters.class.getDeclaredField("sourceDir");
+				Field declaredField = GargoylePMDParameters.class.getDeclaredField("sourceDir");
 				if (declaredField != null) {
 					declaredField.setAccessible(true);
 					declaredField.set(params, file.getAbsolutePath());
@@ -158,13 +158,13 @@ public class PMDCheckComposite extends BorderPane implements PrimaryStageCloseab
 		}
 	}
 
-	public PMDConfiguration transformParametersIntoConfiguration(PMDParameters params) {
+	public GargoylePMDConfiguration transformParametersIntoConfiguration(GargoylePMDParameters params) {
 		//		if (null == params.getSourceDir() && null == params.getUri() && null == params.getFileListPath()
 		//				&& null == params.getSourceText()) {
 		//			throw new IllegalArgumentException(
 		//					"Please provide a parameter for source root directory (-dir or -d), database URI (-uri or -u), or file list path (-filelist).");
 		//		}
-		PMDConfiguration configuration = new PMDConfiguration();
+		GargoylePMDConfiguration configuration = new GargoylePMDConfiguration();
 		configuration.setInputPaths(params.getSourceDir());
 		//		configuration.setInputFilePath(params.getFileListPath());
 		//		configuration.setInputUri(params.getUri());

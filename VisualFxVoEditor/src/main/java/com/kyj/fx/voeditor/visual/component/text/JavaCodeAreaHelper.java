@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.pmd.PMDCheckedListComposite;
+import com.kyj.fx.voeditor.visual.framework.pmd.GargoylePMDParameters;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
@@ -33,7 +34,7 @@ import javafx.stage.Stage;
 import net.sourceforge.pmd.benchmark.Benchmark;
 import net.sourceforge.pmd.benchmark.Benchmarker;
 import net.sourceforge.pmd.benchmark.TextReport;
-import net.sourceforge.pmd.cli.PMDParameters;
+
 
 /**
  *
@@ -135,7 +136,7 @@ public class JavaCodeAreaHelper extends CodeAreaHelper implements EventHandler<A
 			protected void simpleFilePmd(File file) {
 
 				try {
-					PMDParameters params = new PMDParameters();
+					GargoylePMDParameters params = new GargoylePMDParameters();
 					String sourceCode = codeArea.getText();
 					params.setSourceFileName("Java");
 					params.setSourceText(sourceCode);
