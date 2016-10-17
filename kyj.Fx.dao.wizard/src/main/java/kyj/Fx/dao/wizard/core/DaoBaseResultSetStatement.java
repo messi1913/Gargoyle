@@ -32,17 +32,34 @@ public class DaoBaseResultSetStatement<T extends BaseResultMapper<M>, M extends 
 	 */
 	private int appendTabKeyCount;
 	private T mapper;
-//	private IResultSetConverter converter;
+	private IRetrunStatement baseReturnStatement;
+	//	private IResultSetConverter converter;
 
 	public DaoBaseResultSetStatement(T mapper) {
 		this(mapper, 0);
 	}
 
+	/**
+	 * @param mapper
+	 * @param appendTabKeyCount
+	 *    결과 기술시 preffix로  \t가 붙을 숫자를 기입
+	 */
 	public DaoBaseResultSetStatement(T mapper, int appendTabKeyCount) {
+		this(mapper, new RetrunStatement(), appendTabKeyCount);
+	}
+
+	/**
+	 * @param baseResultMapper
+	 * @param baseReturnStatement
+	 * @param i
+	 */
+	public DaoBaseResultSetStatement(T mapper, IRetrunStatement baseReturnStatement, int appendTabKeyCount) {
 		if (mapper == null)
 			throw new IllegalArgumentException("mapper is null");
+
 		this.appendTabKeyCount = appendTabKeyCount;
 		this.mapper = mapper;
+		this.baseReturnStatement = baseReturnStatement;
 	}
 
 	/**
@@ -96,7 +113,8 @@ public class DaoBaseResultSetStatement<T extends BaseResultMapper<M>, M extends 
 		returnPart.append("}\n");
 
 		/* return문 베이스 */
-		resultPart.append("return query(").append(returnPart.toString()).append(");");
+
+		resultPart.append(baseReturnStatement.returnKeyword()).append(baseReturnStatement.getReturnStatement(returnPart.toString())); //.append(" query(").append(returnPart.toString()).append(");");
 
 		return applyedTabKeys(resultPart.toString(), this.appendTabKeyCount);
 	}
