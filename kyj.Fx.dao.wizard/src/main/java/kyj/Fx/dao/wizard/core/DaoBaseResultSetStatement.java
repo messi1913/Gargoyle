@@ -125,6 +125,20 @@ public class DaoBaseResultSetStatement<T extends BaseResultMapper<M>, M extends 
 	}
 
 	/**
+	 * @return the mapper
+	 */
+	public final T getMapper() {
+		return mapper;
+	}
+
+	/**
+	 * @return the baseReturnStatement
+	 */
+	public final IRetrunStatement getBaseReturnStatement() {
+		return baseReturnStatement;
+	}
+
+	/**
 	 * @return the appendTabKeyCount
 	 */
 	public int getAppendTabKeyCount() {
@@ -138,5 +152,6 @@ public class DaoBaseResultSetStatement<T extends BaseResultMapper<M>, M extends 
 	public void setAppendTabKeyCount(int appendTabKeyCount) {
 		this.appendTabKeyCount = appendTabKeyCount;
 	}
+
 
 }
