@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class BaseFxExtractDaoMethod<T extends TbpSysDaoMethodsDVO> extends FxDaoCommons implements IExtractDaoMethod<T> {
+
+
 	private static Logger LOGGER = LoggerFactory.getLogger(BaseFxExtractDaoMethod.class);
 
 	/**
@@ -162,9 +164,20 @@ public class BaseFxExtractDaoMethod<T extends TbpSysDaoMethodsDVO> extends FxDao
 		return baseResultMapper;
 	}
 
+	protected IRetrunStatement baseReturnStatement() {
+		return new RetrunStatement();
+	}
+
 	protected DaoBaseResultSetStatement<BaseResultMapper<T>, T> daoBaseResultSetStatement(FxDao vo, T t) {
+
+		//타입을 매핑하는 기본로직.
 		BaseResultMapper<T> baseResultMapper = baseResultMapper(vo, t);
-		return new DaoBaseResultSetStatement<BaseResultMapper<T>, T>(baseResultMapper, 2);
+
+		//리턴문을 기술하는 처리로직
+		IRetrunStatement baseReturnStatement = baseReturnStatement();
+
+		//메소드 전체내용을 기술하는 로직을 처리하는 클래스 생성후 리턴
+		return new DaoBaseResultSetStatement<BaseResultMapper<T>, T>(baseResultMapper, baseReturnStatement, 2);
 	}
 
 	@Override
@@ -175,7 +188,8 @@ public class BaseFxExtractDaoMethod<T extends TbpSysDaoMethodsDVO> extends FxDao
 				extract(vo, method);
 			}
 		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(e));
+			throw new RuntimeException(e);
+//			LOGGER.error(ValueUtil.toString(e));
 		}
 
 		// 기본적으로 import되는 항목

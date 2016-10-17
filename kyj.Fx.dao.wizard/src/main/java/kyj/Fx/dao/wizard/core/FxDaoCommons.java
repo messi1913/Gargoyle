@@ -57,7 +57,7 @@ public class FxDaoCommons {
 
 	/**
 	 * 기본형이 아닌 타입인경우 import항목을 추가한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 28.
 	 * @param vo
@@ -91,7 +91,7 @@ public class FxDaoCommons {
 
 	/**
 	 * 문자열로 구성된 (패키지명 + 클래스명) 텍스트중에서 타입클래스이름을 반환
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 29.
 	 * @param packageFullClassName
@@ -108,7 +108,7 @@ public class FxDaoCommons {
 
 	/**
 	 * 변수명반환
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 29.
 	 * @param packageFullClassName
@@ -149,7 +149,7 @@ public class FxDaoCommons {
 
 	/**
 	 * 파라미터 클래스정보에 동일한 클래스타입이 존재하는지 확인한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 28.
 	 * @param params
@@ -173,11 +173,12 @@ public class FxDaoCommons {
 
 	/**
 	 * 텍스트 앞부분에 count수만큼 \t을 추가함.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 29.
 	 * @param str
 	 * @param count
+	 * 				결과 기술시 preffix로  \t가 붙을 숫자를 기입
 	 * @return
 	 */
 	public String applyedTabKeys(String str, final int count) {
@@ -186,11 +187,12 @@ public class FxDaoCommons {
 
 	/**
 	 * 텍스트 앞부분에 count수만큼 \t을 추가하고 추가적으로 텍스트앞에 붙을내용이 있으면 Supplier를 작성하여 붙인다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 29.
 	 * @param str
 	 * @param count
+	 * 				결과 기술시 preffix로  \t가 붙을 숫자를 기입
 	 * @param preAppendText
 	 * @return
 	 */
@@ -235,7 +237,7 @@ public class FxDaoCommons {
 
 	/**
 	 * str 문자열에서 index에 해당하는 부분만 대문자, 혹은 소문자로 고친다. (IndexCaseTypes에 따른 설정)
-	 * 
+	 *
 	 * @param str
 	 *            target
 	 * @param index
@@ -248,7 +250,7 @@ public class FxDaoCommons {
 		StringBuffer sb = new StringBuffer();
 		if(str == null || str.isEmpty())
 			return str;
-		
+
 		// DEFAULT UPPERCASE
 		char indexChar = Character.toUpperCase(str.charAt(index));
 		if (type == IndexCaseTypes.LOWERCASE) {
@@ -268,7 +270,7 @@ public class FxDaoCommons {
 
 	/**
 	 * str 문자열에서 index에 해당하는 부분만 대문자로 고친다.
-	 * 
+	 *
 	 * @param str
 	 * @param index
 	 * @return
@@ -279,7 +281,7 @@ public class FxDaoCommons {
 
 	/**
 	 * str 문자열에서 index에 해당하는 부분만 소문자로 고친다.
-	 * 
+	 *
 	 * @param str
 	 * @param index
 	 * @return
