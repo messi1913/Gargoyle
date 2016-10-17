@@ -541,8 +541,8 @@
 
 		<copy todir="externalLibs">
 			<fileset
-				dir="${user.home}\.m2\repository\kyj\Fx\dao\wizard\kyj.Fx.dao.wizard\0.0.2-SNAPSHOT">
-				<filename name="kyj.Fx.dao.wizard-0.0.2-SNAPSHOT.jar" />
+				dir="${user.home}\.m2\repository\kyj\Fx\dao\wizard\kyj.Fx.dao.wizard\0.0.3-SNAPSHOT">
+				<filename name="kyj.Fx.dao.wizard-0.0.3-SNAPSHOT.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
@@ -554,7 +554,7 @@
 
 
 		<mkdir dir="project" />
-		<!-- <copy todir="project"> <fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor"> 
+		<!-- <copy todir="project"> <fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
 			<include name="src\test\resources/**" /> </fileset> </copy> -->
 		<copy todir="project">
 			<fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
@@ -566,7 +566,7 @@
 				<include name="src\main\resources/**" />
 			</fileset>
 		</copy>
-		<!-- <copy todir="project"> <fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor"> 
+		<!-- <copy todir="project"> <fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
 			<include name="src\main\projmagt/**" /> </fileset> </copy> -->
 
 		<copy todir="project">
@@ -580,7 +580,7 @@
 				<include name="src\main\java/**" />
 			</fileset>
 		</copy>
-		<!-- <copy todir="project"> <fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor"> 
+		<!-- <copy todir="project"> <fileset dir="${user.home}\git\Gargoyle\VisualFxVoEditor">
 			<include name="src\test\java/**" /> </fileset> </copy> -->
 
 		<mkdir dir="projectRefs" />
@@ -688,7 +688,7 @@
 				<include name="sqlite-jdbc-3.8.11.2.jar" />
 				<include name="javaparser-core-2.4.0.jar" />
 
-				<include name="kyj.Fx.dao.wizard-0.0.2-SNAPSHOT.jar" />
+				<include name="kyj.Fx.dao.wizard-0.0.3-SNAPSHOT.jar" />
 				<include name="kyj.FxVoEditor-0.0.1-SNAPSHOT.jar" />
 
 			</fileset>
@@ -698,9 +698,9 @@
 
 		<!-- Copy project sources itself -->
 
-		<!-- <copy todir="build/src"> <fileset dir="project/src/test/java"> <include 
-			name="**/*" /> </fileset> </copy> <copy todir="build/src"> <fileset dir="project/src/test/compiler"> 
-			<include name="**/*" /> </fileset> </copy> <copy todir="build/src"> <fileset 
+		<!-- <copy todir="build/src"> <fileset dir="project/src/test/java"> <include
+			name="**/*" /> </fileset> </copy> <copy todir="build/src"> <fileset dir="project/src/test/compiler">
+			<include name="**/*" /> </fileset> </copy> <copy todir="build/src"> <fileset
 			dir="project/src/test/resources"> <include name="**/*" /> </fileset> </copy> -->
 
 
@@ -829,7 +829,7 @@
 
 
 		<mkdir dir="deploy" />
-		<!-- Need to use ${basedir} because somehow the ant task is calculating 
+		<!-- Need to use ${basedir} because somehow the ant task is calculating
 			the directory differently -->
 		<fx:deploy embedJNLP="false" extension="false" includeDT="false"
 			offlineAllowed="true" outdir="${basedir}/deploy" outfile="VisualFxVoEditor"
