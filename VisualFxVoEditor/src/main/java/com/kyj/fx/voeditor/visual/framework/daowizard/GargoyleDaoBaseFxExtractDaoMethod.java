@@ -4,7 +4,7 @@
  *	작성일   : 2016. 10. 17.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.framework.parser;
+package com.kyj.fx.voeditor.visual.framework.daowizard;
 
 import java.util.StringTokenizer;
 
@@ -48,6 +48,15 @@ public class GargoyleDaoBaseFxExtractDaoMethod<T extends BaseResultMapper<M>, M 
 	 */
 	public GargoyleDaoBaseFxExtractDaoMethod(T mapper, IRetrunStatement baseReturnStatement, int appendTabKeyCount) {
 		super(mapper, baseReturnStatement, appendTabKeyCount);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see kyj.Fx.dao.wizard.core.DaoBaseResultSetStatement#convert()
+	 */
+	@Override
+	public String convert() {
+		return super.convert();
 	}
 
 	protected IRetrunStatement baseReturnStatement() {

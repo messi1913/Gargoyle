@@ -40,6 +40,7 @@ import com.kyj.fx.voeditor.visual.component.popup.MeerketAbstractVoOpenClassReso
 import com.kyj.fx.voeditor.visual.component.popup.SimpleSQLResultView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.events.CommonContextMenuEvent;
+import com.kyj.fx.voeditor.visual.framework.daowizard.GargoyleDaoWizardFactory.Wizardtype;
 import com.kyj.fx.voeditor.visual.functions.DatabaseTypeMappingFunction;
 import com.kyj.fx.voeditor.visual.functions.FxDAOReadFunction;
 import com.kyj.fx.voeditor.visual.functions.FxDAOSaveFunction;
@@ -906,13 +907,14 @@ public class DaoWizardViewController {
 			// tbmSysDaoDVO.setExtendClassNameStr(extendsBaseClass);
 
 			DaoWizardConverter converter = new DaoWizardConverter(classMeta, tbmSysDaoDVOProperty.get());
+			converter.createWizard(Wizardtype.meerkatbase);
 			DaoWizard<ClassMeta, TbpSysDaoMethodsDVO, FieldMeta> daowizard = converter.convert();
 			if (location != null && !location.isEmpty()) {
 				Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("파일생성여부", "파일도 만드시겠습니까? ");
 				showYesOrNoDialog.ifPresent(string -> {
 					if ("Y".equals(string.getValue())) {
 						try {
-							daowizard.toFile(ValueUtil.addBaseDir(location));
+							daowizard.toFile(ValueUtil.appendBaseDir(location));
 						} catch (Exception e) {
 							DialogUtil.showExceptionDailog(e);
 						}

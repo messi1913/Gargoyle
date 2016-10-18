@@ -1005,7 +1005,14 @@ public class ValueUtil {
 		return true;
 	}
 
-	public static String addBaseDir(String path) {
+	/**
+	 * 인자로 받아온 path에 baseDir 디렉토리 경로를 붙여주어 절대경로로 바꾼다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 18.
+	 * @param path
+	 * @return
+	 */
+	public static String appendBaseDir(String path) {
 		String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
 		if (path.startsWith("\\")) {
 			return baseDir.concat(path);
@@ -1013,6 +1020,13 @@ public class ValueUtil {
 		return path;
 	}
 
+	/**
+	 * 인자로 받아온 path에서 baseDir 절대경로가 있으면 제거한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 18.
+	 * @param path
+	 * @return
+	 */
 	public static String removeBaseDir(String path) {
 		return path.replace(ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR), "");
 	}

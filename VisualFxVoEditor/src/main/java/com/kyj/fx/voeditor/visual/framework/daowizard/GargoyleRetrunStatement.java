@@ -4,7 +4,7 @@
  *	작성일   : 2016. 10. 17.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.framework.parser;
+package com.kyj.fx.voeditor.visual.framework.daowizard;
 
 import kyj.Fx.dao.wizard.core.RetrunStatement;
 

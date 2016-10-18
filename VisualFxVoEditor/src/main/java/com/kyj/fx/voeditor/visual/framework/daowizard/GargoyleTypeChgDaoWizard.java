@@ -4,7 +4,7 @@
  *	작성일   : 2016. 10. 17.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.framework.parser;
+package com.kyj.fx.voeditor.visual.framework.daowizard;
 
 import java.util.List;
 
@@ -14,6 +14,7 @@ import com.kyj.fx.voeditor.core.model.meta.FieldMeta;
 import kyj.Fx.dao.wizard.DaoWizard;
 import kyj.Fx.dao.wizard.core.BaseFxExtractDaoMethod;
 import kyj.Fx.dao.wizard.core.DaoBaseResultSetStatement;
+import kyj.Fx.dao.wizard.core.IExtractDaoClass;
 import kyj.Fx.dao.wizard.core.IExtractDaoMethod;
 import kyj.Fx.dao.wizard.core.RetrunStatement;
 import kyj.Fx.dao.wizard.core.model.vo.BaseResultMapper;
@@ -38,6 +39,17 @@ public class GargoyleTypeChgDaoWizard<C extends ClassMeta, DAO extends TbmSysDao
 
 	public GargoyleTypeChgDaoWizard(String className, M... methods) {
 		super(className, methods);
+	}
+	
+	
+
+	/* (non-Javadoc)
+	 * @see kyj.Fx.dao.wizard.DaoWizard#getIExtractClass()
+	 */
+	@Override
+	protected IExtractDaoClass<ClassMeta> getIExtractClass() {
+		// TODO Auto-generated method stub
+		return super.getIExtractClass();
 	}
 
 	/* (non-Javadoc)
