@@ -35,7 +35,6 @@ import net.sourceforge.pmd.benchmark.Benchmark;
 import net.sourceforge.pmd.benchmark.Benchmarker;
 import net.sourceforge.pmd.benchmark.TextReport;
 
-
 /**
  *
  *  코드 처리 관련 Helper 클래스
@@ -157,7 +156,8 @@ public class JavaCodeAreaHelper extends CodeAreaHelper implements EventHandler<A
 					//			transformParametersIntoConfiguration(params);
 					long start = System.nanoTime();
 
-					doPMD.doPMD(transformParametersIntoConfiguration(params), reportListenerPropertyProperty().get());
+					doPMD.doPMD(transformParametersIntoConfiguration(params), reportListenerPropertyProperty().get(),
+							violationCountingListenerProperty().get());
 					long end = System.nanoTime();
 					Benchmarker.mark(Benchmark.TotalPMD, end - start, 0);
 

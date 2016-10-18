@@ -693,7 +693,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		newDir.setOnAction(this::newDirOnAction);
 		newFileMenuItem.getItems().add(newDir);
 		MenuItem deleteFileMenuItem = new MenuItem("Delete");
+
+		KeyCodeCombination value = new KeyCodeCombination(KeyCode.DELETE);
+		deleteFileMenuItem.setAccelerator(value);
 		deleteFileMenuItem.setOnAction(this::deleteFileMenuItemOnAction);
+
 		// 선택한 파일아이템을 VoEditor에서 조회시 사용
 		// MenuItem voEditorMenuItem = new MenuItem("Show VO Editor");
 		// //선택한 파일아이템을 DaoWizard에서 조회시 사용
@@ -895,13 +899,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	private ContextMenu closeContextMenu() {
 
 		MenuItem closeMenuItem = new MenuItem("Close");
-		
+
 		closeMenuItem.setOnAction(hander -> {
 			Tab tab = tabPanWorkspace.getSelectionModel().getSelectedItem();
 			closeTab(tab);
 		});
 		MenuItem closeAllMenuItem = new MenuItem("Close All   CTRL + SHIFT + W");
-		
+
 		closeAllMenuItem.setOnAction(handler -> {
 			for (int i = tabPanWorkspace.getTabs().size() - 1; i >= 1; i--) {
 				Tab tab = tabPanWorkspace.getTabs().get(i);
@@ -1162,7 +1166,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param event
 	 ********************************/
 	public void treeProjectFileOnKeyPressed(KeyEvent event) {
-		if (event.getCode() == KeyCode.R && event.isControlDown() && event.isShiftDown()) {
+		if (event.getCode() == KeyCode.R && event.isControlDown() && event.isShiftDown() && !event.isAltDown()) {
 			try {
 				GagoyleWorkspaceOpenResourceView resourceView = new GagoyleWorkspaceOpenResourceView();
 				ResultDialog<File> show = resourceView.show();
@@ -1180,6 +1184,14 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			} catch (Exception e) {
 				LOGGER.error(ValueUtil.toString(e));
 			}
+		} else if (event.getCode() == KeyCode.DELETE && !event.isControlDown() && !event.isShiftDown() && !event.isAltDown()) {
+
+			//이벤트 발생시킴.
+			ActionEvent.fireEvent(tail -> tail.append((event1, tail1) -> {
+				deleteFileMenuItemOnAction((ActionEvent) event1);
+				return event1;
+			}), new ActionEvent());
+
 		}
 	}
 

@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
@@ -59,6 +60,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
 import net.sourceforge.pmd.ReportListener;
@@ -82,6 +85,8 @@ import net.sourceforge.pmd.stat.Metric;
 public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
+	 * @Deprecated  RULESETS_PROPERTIES_FILE_FORMAT 상수에 있는 rulesets.properties파일의
+	 * 기술내용을 참조하여 기술할것.
 	 * @최초생성일 2016. 10. 6.
 	 */
 	@Deprecated
@@ -105,18 +110,23 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	private ListView<RuleViolation> lvViolation;
 	private ObservableList<RuleViolation> violationList = FXCollections.observableArrayList();
 
-	protected Label violationLabel;
+	protected TextFlow violationLabel;
 	private CheckComboBox<RulePriority> checkComboBox;
 
 	/**
 	 * PMD 처리에 대한 코어 로직.
-	 * 
+	 *
 	 * @최초생성일 2016. 10. 13.
 	 */
 	protected DoPMD doPMD = new DoPMD();
 
 	protected static final String REPORT_FILE_FORMAT = "xml";
-	protected static final String VIOLATION_TEXT_FORMAT = "Violation : %d";
+
+	AtomicInteger priorTotal = new AtomicInteger(0);
+	AtomicInteger priorHigh = new AtomicInteger(0);
+	AtomicInteger priorMediumHigh = new AtomicInteger(0);
+	AtomicInteger priorMedium = new AtomicInteger(0);
+	AtomicInteger priorEtc = new AtomicInteger(0);
 
 	/**
 	 * @param sourceFile
@@ -215,7 +225,8 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		value.setPadding(new Insets(5));
 		borderPane.setTop(value);
 		root.setCenter(splitPane);
-		violationLabel = new Label();
+		violationLabel = new TextFlow();
+
 		root.setBottom(violationLabel);
 
 	}
@@ -227,7 +238,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * PMD 검사를 동기 처리
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 13.
 	 */
@@ -241,7 +252,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * PMD 검사를 비동기 처리
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 13.
 	 */
@@ -259,7 +270,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * 파일 1개를 대상으로 PMD 체크하기 위한 처리.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 13.
 	 * @param file
@@ -287,7 +298,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			//			transformParametersIntoConfiguration(params);
 			long start = System.nanoTime();
 
-			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListenerProperty.get());
+			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListenerProperty.get(), violationCountingListener.get());
 			long end = System.nanoTime();
 			Benchmarker.mark(Benchmark.TotalPMD, end - start, 0);
 
@@ -305,7 +316,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		}
 	}
 
-	public Label getViolationLabel() {
+	public TextFlow getViolationLabel() {
 		return this.violationLabel;
 	}
 
@@ -316,10 +327,43 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	protected void updateStatus(String sourceCode) {
 		Platform.runLater(() -> {
 			javaTextArea.setContent(sourceCode);
-			violationLabel.setText(String.format(VIOLATION_TEXT_FORMAT, lvViolation.getItems().size()));
+
+			updateViolationLabel();
 			javaTextArea.moveToLine(1);
 			javaTextArea.clearSelection();
 		});
+	}
+
+	private void updateViolationLabel() {
+
+		String VIOLATION_TEXT_FORMAT_PREFIIX = "Violation ";
+		String VIOLATION_TEXT_FORMAT_TOTAL = "Total : %d ";
+		String VIOLATION_TEXT_FORMAT_HIGH = "High : %d ";
+		String VIOLATION_TEXT_FORMAT_MEDIUM_HIGH = "Medium High : %d ";
+		String VIOLATION_TEXT_FORMAT_MEDIUM = "Medium : %d ";
+		String VIOLATION_TEXT_FORMAT_ETC = "Etc : %d ";
+
+		Text priffix = new Text(VIOLATION_TEXT_FORMAT_PREFIIX);
+		priffix.setStyle("-fx-font-size:11pt; -fx-font-style:italic;");
+		Text total = new Text(String.format(VIOLATION_TEXT_FORMAT_TOTAL, priorTotal.get()));
+		Text high = new Text(String.format(VIOLATION_TEXT_FORMAT_HIGH, priorHigh.get()));
+		high.setStyle(PMDListCell.getPriorityStyle(RulePriority.HIGH));
+		Text mediumHigh = new Text(String.format(VIOLATION_TEXT_FORMAT_MEDIUM_HIGH, priorMediumHigh.get()));
+		mediumHigh.setStyle(PMDListCell.getPriorityStyle(RulePriority.MEDIUM_HIGH));
+		Text medium = new Text(String.format(VIOLATION_TEXT_FORMAT_MEDIUM, priorMedium.get()));
+		medium.setStyle(PMDListCell.getPriorityStyle(RulePriority.MEDIUM));
+		Text etc = new Text(String.format(VIOLATION_TEXT_FORMAT_ETC, priorEtc.get()));
+
+		//		Text element = new Text(String.format(VIOLATION_TEXT_FORMAT, priorTotal.get(), priorHigh.get(), priorMediumHigh.get(),
+		//				priorMedium.get(), priorEtc.get()));
+
+		violationLabel.getChildren().add(priffix);
+		violationLabel.getChildren().add(total);
+		violationLabel.getChildren().add(high);
+		violationLabel.getChildren().add(mediumHigh);
+		violationLabel.getChildren().add(medium);
+		violationLabel.getChildren().add(etc);
+
 	}
 
 	protected void dirFilePmd(File file) {
@@ -350,7 +394,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 			//			transformParametersIntoConfiguration(params);
 			long start = System.nanoTime();
-			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListenerProperty.get());
+			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListenerProperty.get(), violationCountingListener.get());
 			long end = System.nanoTime();
 			Benchmarker.mark(Benchmark.TotalPMD, end - start, 0);
 
@@ -363,7 +407,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			}
 
 			Platform.runLater(() -> {
-				violationLabel.setText(String.format(VIOLATION_TEXT_FORMAT, lvViolation.getItems().size()));
+				updateViolationLabel();
 			});
 
 		} catch (IOException e) {
@@ -373,7 +417,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * 룰셋 파일 목록을 읽어옴.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 13.
 	 * @param language
@@ -521,6 +565,46 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	};
 
+	/**
+	 * 위반 내용에대한 counting 리스너
+	 * @최초생성일 2016. 10. 18.
+	 */
+	private final ReportListener defaultViolationCountingListener = new ReportListener() {
+
+		@Override
+		public void ruleViolationAdded(RuleViolation r) {
+
+			switch (r.getRule().getPriority()) {
+			case HIGH:
+				priorHigh.incrementAndGet();
+				break;
+
+			case MEDIUM_HIGH:
+
+				priorMediumHigh.incrementAndGet();
+				break;
+
+			case MEDIUM:
+				priorMedium.incrementAndGet();
+				break;
+
+			default:
+				priorEtc.incrementAndGet();
+				break;
+			}
+			priorTotal.incrementAndGet();
+		}
+
+		@Override
+		public void metricAdded(Metric arg0) {
+			// TODO Auto-generated method stub
+
+		}
+	};
+
+	private ObjectProperty<ReportListener> violationCountingListener = new SimpleObjectProperty<ReportListener>(
+			defaultViolationCountingListener);
+
 	private ObjectProperty<ReportListener> reportListenerProperty = new SimpleObjectProperty<>(defaultReportListener);
 
 	public final ReportListener getDefaultReportListener() {
@@ -533,7 +617,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * 위험도 아이템 변경 리스너
-	 * 
+	 *
 	 * @최초생성일 2016. 10. 6.
 	 */
 	private ListChangeListener<RulePriority> chkPriorityChangeListener = (ListChangeListener<RulePriority>) c -> {
@@ -588,6 +672,18 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	public final void setReportListenerProperty(final net.sourceforge.pmd.ReportListener reportListenerProperty) {
 		this.reportListenerPropertyProperty().set(reportListenerProperty);
+	}
+
+	public final ObjectProperty<ReportListener> violationCountingListenerProperty() {
+		return this.violationCountingListener;
+	}
+
+	public final net.sourceforge.pmd.ReportListener getViolationCountingListener() {
+		return this.violationCountingListenerProperty().get();
+	}
+
+	public final void setViolationCountingListener(final net.sourceforge.pmd.ReportListener violationCountingListener) {
+		this.violationCountingListenerProperty().set(violationCountingListener);
 	}
 
 }
