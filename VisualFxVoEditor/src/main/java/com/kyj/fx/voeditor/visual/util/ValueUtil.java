@@ -1200,4 +1200,18 @@ public class ValueUtil {
 	public static List<String> toAutoCommentedList(String code, String appendLineKeyword) {
 		return CodeCommentUtil.doAutoComment(code, appendLineKeyword);
 	}
+
+
+	/**
+	 * 문자열로된 텍스트로부터 파일명만 추출하는 정규식 패턴을 적용한후 리턴받음.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 18.
+	 * @param fileName
+	 * @return
+	 */
+	public static String getSimpleFileName(String fileName){
+
+		//경로를 나타내는 특수문자만 제거한 모든 텍스트중 가장 마지막에 있는 텍스트 리턴.
+		return ValueUtil.regexMatch("[^\\\\]{1,}$", fileName);
+	}
 }

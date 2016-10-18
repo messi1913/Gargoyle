@@ -159,7 +159,7 @@ public class PMDViolationFilebyBarChartComposite extends AbstractPMDViolationBar
 
 		public String getFileName() {
 			String filename = this.ruleViolation.getFilename();
-			String simpleName = ValueUtil.regexMatch("[^\\\\]{1,}$", filename);
+			String simpleName = ValueUtil.getSimpleFileName(filename);
 			return simpleName;
 		}
 
