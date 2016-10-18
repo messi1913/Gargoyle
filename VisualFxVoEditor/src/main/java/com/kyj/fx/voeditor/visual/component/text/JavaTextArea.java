@@ -68,7 +68,14 @@ public class JavaTextArea extends BorderPane {
 	private CodeArea codeArea;
 	private CodeAreaHelper codeHelperDeligator;
 	private Label lblLineInfo = new Label();
-	private ExecutorService executor;
+
+	/**
+	 * 인스턴스의 수와 상관없이 무조건 1개의 서비스로 사용.
+	 * 처음에 생성자에 생성했는데, 스레드수가 너무 많이 늘어남. 사실 이 클래스는 어플리케이션당 하나만 사용하여
+	 * 관리해도 상관없다고 판단.
+	 * @최초생성일 2016. 10. 18.
+	 */
+	private static final ExecutorService executor = ExecutorDemons.newSingleThreadExecutor();
 
 	private static final String CHARACTERS_MATCH = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
 
@@ -92,7 +99,7 @@ public class JavaTextArea extends BorderPane {
 	};
 
 	public JavaTextArea() {
-		executor = ExecutorDemons.newSingleThreadExecutor();
+
 
 		//
 		//		RuntimeClassUtil.addShutdownHook(() -> {
