@@ -6,6 +6,8 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.chart;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,7 +36,17 @@ import javafx.scene.layout.BorderPane;
 
 public abstract class RangeSliderLineChartComposite<T> extends BorderPane implements ListChangeListener<T> {
 
-	public LineChart<String, Number> chart = new LineChart<>(new CategoryAxis(), new NumberAxis());
+	/**
+	 * @최초생성일 2016. 10. 18.
+	 */
+	private NumberAxis yAxis;
+
+	/**
+	 * @최초생성일 2016. 10. 18.
+	 */
+	private CategoryAxis xAxis;
+
+	public LineChart<String, Number> chart;
 
 	public RangeSlider slider = new RangeSlider();
 
@@ -44,8 +56,13 @@ public abstract class RangeSliderLineChartComposite<T> extends BorderPane implem
 	private DoubleProperty displaySize = new SimpleDoubleProperty(15d);
 
 	public RangeSliderLineChartComposite() throws Exception {
+		yAxis = createNumberAxis();
+		xAxis = createCategoryAxis();
+		xAxis.setTickLabelsVisible(true);
+		chart = new LineChart<>(xAxis, yAxis);
 		this.setCenter(chart);
 		this.setBottom(slider);
+
 		initialize();
 	}
 
@@ -55,9 +72,8 @@ public abstract class RangeSliderLineChartComposite<T> extends BorderPane implem
 
 		items.addListener(this);
 
-		slider.setMajorTickUnit(5d);
-
-		slider.setMajorTickUnit(5d);
+		slider.setMajorTickUnit(3d);
+		slider.setMajorTickUnit(3d);
 
 		slider.setMin(0D);
 		slider.setMax(0D);
@@ -67,56 +83,93 @@ public abstract class RangeSliderLineChartComposite<T> extends BorderPane implem
 		slider.setShowTickLabels(true);
 		slider.setShowTickMarks(true);
 		slider.setBlockIncrement(10);
-		
-		
+
 		this.displaySize.bind(slider.maxProperty());
 
 		slider.lowValueProperty().addListener((oba, oldval, newval) -> {
+
+			if (items.isEmpty())
+				return;
+
 			int start = newval.intValue();
 			ObservableList<Data<String, Number>> subList = items.stream().skip(start).limit(displaySize.intValue())
 					.map(v -> converter.apply(v)).collect(FxCollectors.toObservableList());
-			Series<String, Number> chartSeries = new Series<>("", subList);
+			Series<String, Number> chartSeries = createNewSeries("", subList);
 			chart.getData().clear();
 			chart.getData().add(chartSeries);
 		});
 
 		slider.highValueProperty().addListener((oba, oldval, newval) -> {
+
+			if (items.isEmpty())
+				return;
+
 			int start = (int) slider.getLowValue();
-			int size = Math.abs(start - newval.intValue() - 2);
+			int size = Math.abs(start - newval.intValue());
 			ObservableList<Data<String, Number>> subList = items.stream().skip(start).limit(size).map(v -> converter.apply(v))
 					.collect(FxCollectors.toObservableList());
-			Series<String, Number> chartSeries = new Series<>("", subList);
+
 			chart.getData().clear();
-			chart.getData().add(chartSeries);
+			if (!subList.isEmpty()) {
+				Series<String, Number> chartSeries = createNewSeries("", subList);
+				chart.getData().add(chartSeries);
+			}
+
 		});
 
-		
+	}
 
+	protected NumberAxis createNumberAxis() {
+		return new NumberAxis();
+	}
+
+	protected CategoryAxis createCategoryAxis() {
+		return new CategoryAxis();
+	}
+	//	public Series<String, Number> createNewSeries() {
+	//		return createNewSeries("", FXCollections.observableArrayList());
+	//	}
+
+	protected Series<String, Number> createNewSeries(String seriesName, ObservableList<Data<String, Number>> subList) {
+		Series<String, Number> series = new Series<>(subList);
+		series.setName(seriesName);
+		return series;
 	}
 
 	@Override
 	public void onChanged(javafx.collections.ListChangeListener.Change<? extends T> c) {
 		if (c.next()) {
 
-			if (c.wasAdded()) {
-				int start = 0;
-				int end = 5;
-				Series<String, Number> chartSeries = new Series<>();
-				chartSeries.getData().addAll(items.subList(start, end).stream().map(v -> converter.apply(v)).collect(Collectors.toList()));
-				chart.getData().add(chartSeries);
-				
-				this.slider.setMax(this.items.size());
-				this.slider.setLowValue(5D);
-				this.slider.setHighValue(displaySize.doubleValue());
-				
+			if (c.wasPermutated() || c.wasUpdated() || c.wasReplaced())
+				return;
+
+			int end = 5;
+
+			ObservableList<Data<String, Number>> collect = items.stream().limit(end).map(v -> converter.apply(v)).filter(v -> v != null)
+					.collect(FxCollectors.toObservableList());
+
+			Series<String, Number> chartSeries = createNewSeries("", collect);
+
+			//			if (c.wasAdded()) {
+			//
+			//
+			//
+			//			}
+			//
+			//			else if (c.wasRemoved()) {
+			//
+			//			}
+
+			//			chartSeries.getData().addAll(collect);
+			chart.getData().clear();
+			chart.getData().add(chartSeries);
+
+			int size = this.items.size();
+			if (size != 0) {
+				this.slider.setMax(size - 1);
+				this.slider.setHighValue(size - 1);
 			}
 
-			else if (c.wasRemoved()) {
-
-			}
-
-			
-			
 		}
 
 	}

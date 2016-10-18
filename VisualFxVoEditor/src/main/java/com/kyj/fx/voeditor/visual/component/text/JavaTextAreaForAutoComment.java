@@ -9,6 +9,9 @@ import javafx.scene.Node;
 /**
  *
  * 자동화 코멘트 화면에서 필요한 텍스팅 포멧처리
+ *
+ * 자동화된 코멘트가 달린 라인이라는걸 표현하기 위해
+ * getLineFactory()함수를 오버라이드
  * @author KYJ
  *
  */

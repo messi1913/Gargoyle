@@ -222,13 +222,20 @@
 			<systemPath>${project.basedir}/lib/pmd-go-5.5.1.jar</systemPath>
 		</dependency>
 
+<!-- 		<dependency> -->
+<!-- 			<groupId>pmd-java</groupId> -->
+<!-- 			<artifactId>pmd-java</artifactId> -->
+<!-- 			<version>5.5.1</version> -->
+<!-- 			<scope>system</scope> -->
+<!-- 			<systemPath>${project.basedir}/lib/pmd-java-5.5.1.jar</systemPath> -->
+<!-- 		</dependency> -->
+		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd-java -->
 		<dependency>
-			<groupId>pmd-java</groupId>
-			<artifactId>pmd-java</artifactId>
-			<version>5.5.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/pmd-java-5.5.1.jar</systemPath>
+		    <groupId>net.sourceforge.pmd</groupId>
+		    <artifactId>pmd-java</artifactId>
+		    <version>5.5.1</version>
 		</dependency>
+
 
 		<dependency>
 			<groupId>pmd-javascript</groupId>

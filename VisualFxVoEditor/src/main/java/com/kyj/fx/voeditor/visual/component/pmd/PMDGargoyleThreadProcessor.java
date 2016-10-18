@@ -65,7 +65,7 @@ public final class PMDGargoyleThreadProcessor extends AbstractPMDProcessor {
 
 			try {
 				InputStream stream = new BufferedInputStream(dataSource.getInputStream());
-				ctx.setLanguageVersion(null);
+//				ctx.setLanguageVersion(null);
 				processor.processSourceCode(stream, rs, ctx);
 			} catch (PMDException pmde) {
 

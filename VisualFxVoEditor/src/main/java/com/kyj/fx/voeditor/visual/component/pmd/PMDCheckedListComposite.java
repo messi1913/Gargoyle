@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 import org.controlsfx.control.CheckComboBox;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
+import com.kyj.fx.voeditor.visual.component.pmd.chart.PMDViolationFilebyBarChartComposite;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextAreaForAutoComment;
 import com.kyj.fx.voeditor.visual.component.text.MarkedLineNumberFactory;
@@ -105,6 +107,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	private File sourceFile;
 
+	private SplitPane splitPane;
 	private JavaTextArea javaTextArea;
 
 	private ListView<RuleViolation> lvViolation;
@@ -128,6 +131,8 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	AtomicInteger priorMedium = new AtomicInteger(0);
 	AtomicInteger priorEtc = new AtomicInteger(0);
 
+	private PMDViolationFilebyBarChartComposite barchart;
+
 	/**
 	 * @param sourceFile
 	 */
@@ -143,7 +148,26 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	public PMDCheckedListComposite(BorderPane root, File sourceFile) {
 		super(root);
 		this.sourceFile = sourceFile;
+		barchart = new PMDViolationFilebyBarChartComposite() {
 
+			/* (non-Javadoc)
+			 * @see com.kyj.fx.voeditor.visual.component.pmd.chart.PMDViolationChartVisualable#ruleViolationFilter()
+			 */
+			@Override
+			public Predicate<RuleViolation> ruleViolationFilter() {
+
+				return ruleViolation -> {
+					ObservableList<RulePriority> checkedItems = checkComboBox.getCheckModel().getCheckedItems();
+					Rule rule = ruleViolation.getRule();
+					RulePriority priority = rule.getPriority();
+					return checkedItems.stream().filter(c -> c == priority).findFirst().isPresent();
+
+				};
+			}
+			
+			
+
+		};
 		javaTextArea = new JavaTextAreaForAutoComment() {
 
 			/* (non-Javadoc)
@@ -204,8 +228,9 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		lvViolation = new ListView<>();
 
 		lvViolation.setCellFactory(ruleCheckListener);
+
 		BorderPane borderPane = new BorderPane(lvViolation);
-		SplitPane splitPane = new SplitPane(javaTextArea, borderPane);
+		splitPane = new SplitPane(javaTextArea, borderPane);
 		splitPane.setOrientation(Orientation.VERTICAL);
 		splitPane.setDividerPositions(0.7d, 0.3d);
 
@@ -369,6 +394,9 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	protected void dirFilePmd(File file) {
 		try {
 			GargoylePMDParameters params = new GargoylePMDParameters();
+
+			splitPane.getItems().set(0, barchart);
+
 			try {
 				Field declaredField = GargoylePMDParameters.class.getDeclaredField("sourceDir");
 				if (declaredField != null) {
@@ -394,7 +422,8 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 			//			transformParametersIntoConfiguration(params);
 			long start = System.nanoTime();
-			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListenerProperty.get(), violationCountingListener.get());
+			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListenerProperty.get(), violationCountingListener.get(),
+					barchart.getReportListener());
 			long end = System.nanoTime();
 			Benchmarker.mark(Benchmark.TotalPMD, end - start, 0);
 
@@ -408,6 +437,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 			Platform.runLater(() -> {
 				updateViolationLabel();
+				barchart.build();
 			});
 
 		} catch (IOException e) {
@@ -552,7 +582,9 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			checkedItems.stream().filter(c -> c == priority).findFirst().ifPresent(v -> {
 				LOGGER.debug("{}\n rulesetName : {}\nruleName :{}\nLang:{}", ruleViolation.toString(), ruleSetName, name,
 						language.toString());
-				lvViolation.getItems().add(ruleViolation);
+
+				Platform.runLater(() -> lvViolation.getItems().add(ruleViolation));
+
 			});
 			violationList.add(ruleViolation);
 
@@ -627,9 +659,14 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			//선택된 필터정보
 			ObservableList<? extends RulePriority> list = c.getList();
 
+
+			barchart.clean();
+
 			violationList.stream().filter(v1 -> list.contains(v1.getRule().getPriority())).forEach(v2 -> {
 				lvViolation.getItems().add(v2);
+				barchart.violationAdapter().ruleViolationAdded(v2);
 			});
+
 
 			//			Integer currentLine = javaTextArea.getCurrentLine() + 1;
 
@@ -644,6 +681,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 				javaTextArea.getCodeArea().clearStyle(v);
 			});
 
+			barchart.build();
 			//			javaTextArea.moveToLine(currentLine);
 		}
 	};

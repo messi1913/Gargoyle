@@ -91,18 +91,22 @@ public class PMDListCell extends ListCell<RuleViolation> {
 		if (empty) {
 			setGraphic(null);
 		} else {
-			VBox value = new VBox();
+			VBox vBox = new VBox();
 			HBox hBox = new HBox(5);
 			Text index = new Text();
-			Text priority = new Text();
-
-			Text fileName = new Text();
-			Text methodName = new Text();
-			Text message = new Text();
-			Text line = new Text();
 
 			TextFlow lineExp = new TextFlow();
+			Text line = new Text();
+
+			Text priority = new Text();
+			Text fileName = new Text();
+			Text methodName = new Text();
+			Text title = new Text();
+
+			Text message = new Text();
+
 			Text text = new Text("Index :");
+
 			text.setStyle("-fx-font-weight:bold;");
 			lineExp.getChildren().addAll(text, new Text(String.valueOf(getIndex())));
 			RulePriority prior = item.getRule().getPriority();
@@ -110,8 +114,8 @@ public class PMDListCell extends ListCell<RuleViolation> {
 			hBox.setStyle("-fx-background-color:transparent");
 			index.setStyle("-fx-fill:black;");
 			line.setStyle("-fx-fill:black;");
-			hBox.getChildren().addAll(lineExp, line, value);
-			value.getChildren().addAll(priority, fileName, methodName, message);
+			hBox.getChildren().addAll(lineExp, line, vBox);
+			vBox.getChildren().addAll(priority, fileName, methodName, title, message);
 
 			int priorityLevel = prior.getPriority();
 			priority.setStyle(getPriorityStyle(prior));
@@ -120,6 +124,8 @@ public class PMDListCell extends ListCell<RuleViolation> {
 			fileName.setText(String.format("파일위치명 : %s", item.getFilename()));
 			methodName.setText(String.format("메소드명 : %s", item.getMethodName()));
 			//						message.setStyle("-fx-font-style:italic;-fx-font-smoothing-type: lcd;");
+
+			title.setText(String.format("룰셋명 : %s   위반사항이름 : %s", item.getRule().getRuleSetName(), item.getRule().getName()));
 			message.setText(String.format("관련 메세지 : %s", item.getRule().getMessage()));
 
 			//			message.setFont(Font.font(default1.getFamily(), FontWeight.BOLD, default1.getSize()));
