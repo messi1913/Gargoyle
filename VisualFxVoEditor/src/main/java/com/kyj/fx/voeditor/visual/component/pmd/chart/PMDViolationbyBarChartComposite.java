@@ -24,13 +24,13 @@ import javafx.util.StringConverter;
  * @author KYJ
  *
  */
-public class PMDViolationbyBarChartComposite extends AbstractPMDViolationBarChartComposite implements BiConsumer<Data, Node> {
+public class PMDViolationbyBarChartComposite extends AbstractPMDViolationBarChartComposite {
 
 	private AttachedTextValuePieChart picChart;
 
 	/**
-	 * 중복되는 데이터를 제거하기위한 데이터셋
-	 * summary
+	 * 중복되는 데이터를 제거하기위한 데이터셋 summary
+	 * 
 	 * @최초생성일 2016. 10. 18.
 	 */
 	private ObservableMap<ReuleViolationWrapper, Integer> observableHashMap;
@@ -39,6 +39,7 @@ public class PMDViolationbyBarChartComposite extends AbstractPMDViolationBarChar
 
 	/**
 	 * 집계된 총 갯수
+	 * 
 	 * @최초생성일 2016. 10. 19.
 	 */
 	private IntegerProperty total = new SimpleIntegerProperty();
@@ -70,9 +71,14 @@ public class PMDViolationbyBarChartComposite extends AbstractPMDViolationBarChar
 
 		});
 
-		picChart.setChartGraphicsCustomAction(this);
+		picChart.setChartGraphicsCustomAction((data, node) -> {
+			chartGraphicsCustomAction(data, node);
+		});
+
+	
 		dataList = picChart.getData();
-//		picChart.setOnMouseClicked(this::picChartOnMouseClick);
+		
+		//		picChart.setOnMouseClicked(this::picChartOnMouseClick);
 		return picChart;
 	}
 
@@ -86,6 +92,7 @@ public class PMDViolationbyBarChartComposite extends AbstractPMDViolationBarChar
 
 	/**
 	 * Summary
+	 * 
 	 * @최초생성일 2016. 10. 19.
 	 */
 	private PMDVioationAdapter pmdVioationAdapter = ruleViolation -> {
@@ -129,8 +136,19 @@ public class PMDViolationbyBarChartComposite extends AbstractPMDViolationBarChar
 	/*
 	 *  PI차트의 그래픽 아이템 노드를 선택한 경우 발생됨.
 	 */
-	@Override
-	public void accept(Data t, Node u) {
+
+	public void chartGraphicsCustomAction(Data d, Node n) {
+
+	}
+
+	/********************************
+	 * 작성일 : 2016. 10. 20. 작성자 : KYJ
+	 *
+	 * 시리즈 라벨 action 처리.
+	 * 
+	 * @param node
+	 ********************************/
+	public void seriesLegendLabelCustomAction(Data d, Node node) {
 
 	}
 

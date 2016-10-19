@@ -92,8 +92,7 @@ import net.sourceforge.pmd.stat.Metric;
 public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
-	 * @Deprecated  RULESETS_PROPERTIES_FILE_FORMAT 상수에 있는 rulesets.properties파일의
-	 * 기술내용을 참조하여 기술할것.
+	 * @Deprecated RULESETS_PROPERTIES_FILE_FORMAT 상수에 있는 rulesets.properties파일의 기술내용을 참조하여 기술할것.
 	 * @최초생성일 2016. 10. 6.
 	 */
 	@Deprecated
@@ -175,8 +174,8 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			 * @see com.kyj.fx.voeditor.visual.component.pmd.chart.PMDViolationbyBarChartComposite#accept(javafx.scene.chart.PieChart.Data, javafx.scene.Node)
 			 */
 			@Override
-			public void accept(Data t, Node u) {
-				super.accept(t, u);
+			public void chartGraphicsCustomAction(Data t, Node u) {
+				super.chartGraphicsCustomAction(t, u);
 
 				u.setOnMouseEntered(ev -> {
 					u.setCursor(Cursor.HAND);
@@ -198,8 +197,21 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 			}
 
-		};
+			@Override
+			public void seriesLegendLabelCustomAction(Data data, Node node) {
+				super.seriesLegendLabelCustomAction(data, node);
 
+				node.setOnMouseClicked(ev -> {
+
+					ObservableList<RuleViolation> items = PMDCheckedListComposite.this.lvViolation.getItems();
+					List<RuleViolation> collect = PMDCheckedListComposite.this.violationList.stream().filter(ruleViolationFilter())
+							.filter(v -> ValueUtil.equals(data.getName(), ValueUtil.getSimpleFileName(v.getFilename())))
+							.collect(Collectors.toList());
+					items.setAll(collect);
+				});
+			}
+
+		};
 
 		javaTextArea = new JavaTextAreaForAutoComment() {
 
@@ -605,8 +617,8 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 			ObservableList<RulePriority> checkedItems = checkComboBox.getCheckModel().getCheckedItems();
 			checkedItems.stream().filter(c -> c == priority).findFirst().ifPresent(v -> {
-				LOGGER.debug("{}\n rulesetName : {}\nruleName :{}\nLang:{}", ruleViolation.toString(), ruleSetName, name,
-						language.toString());
+				//				LOGGER.debug("{}\n rulesetName : {}\nruleName :{}\nLang:{}", ruleViolation.toString(), ruleSetName, name,
+				//						language.toString());
 
 				Platform.runLater(() -> lvViolation.getItems().add(ruleViolation));
 
@@ -624,6 +636,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * 위반 내용에대한 counting 리스너
+	 * 
 	 * @최초생성일 2016. 10. 18.
 	 */
 	private final ReportListener defaultViolationCountingListener = new ReportListener() {

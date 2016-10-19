@@ -8,9 +8,9 @@ package com.kyj.fx.voeditor.visual.component.chart;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.sun.javafx.charts.Legend;
 
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
@@ -31,15 +31,23 @@ import javafx.util.StringConverter;
 public class AttachedTextValuePieChart extends PieChart {
 
 	public AttachedTextValuePieChart() {
+
+	}
+
+	public Legend getChartLegend() {
+		return (Legend) super.getLegend();
 	}
 
 	/**
 	 * textlabel 텍스쳐 처리
+	 * 
 	 * @최초생성일 2016. 10. 4.
 	 */
 	private StringConverter<Data> labelConverter;
+
 	/**
 	 * 그래프에서 툴팁 처리
+	 * 
 	 * @최초생성일 2016. 10. 4.
 	 */
 	private StringConverter<Data> tooltipConverter;
@@ -66,6 +74,7 @@ public class AttachedTextValuePieChart extends PieChart {
 
 	/**
 	 * 사용자 특화 Action처리 지원
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 19.
 	 * @param customAction
@@ -80,6 +89,7 @@ public class AttachedTextValuePieChart extends PieChart {
 	@Override
 	protected void layoutChartChildren(double top, double left, double contentWidth, double contentHeight) {
 		if (getLabelsVisible()) {
+
 			getData().forEach(d -> {
 
 				if (tooltipConverter != null || customAction != null) {
@@ -94,6 +104,8 @@ public class AttachedTextValuePieChart extends PieChart {
 					});
 				}
 
+				//				System.out.println(d.getNode().lookupAll(".chart-legend-item"));
+
 				if (labelConverter != null) {
 					Optional<Node> opTextNode = this.lookupAll(".chart-pie-label").stream()
 							.filter(n -> n instanceof Text && ((Text) n).getText().contains(d.getName())).findAny();
@@ -103,6 +115,18 @@ public class AttachedTextValuePieChart extends PieChart {
 					}
 				}
 			});
+
+			//			Legend legend = (Legend) getLegend();
+			//			legend.getItems().forEach(item->{
+			//				
+			//				item.
+			//				
+			//			});
+			//			if (isLegendVisible() && seriesLegendLabelCustomAction != null) {
+			//				this.lookupAll(".chart-legend-item").stream().forEach(v -> {
+			//					System.out.println(v);
+			//				});
+			//			}
 
 		}
 		super.layoutChartChildren(top, left, contentWidth, contentHeight);
