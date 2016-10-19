@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.controlsfx.control.CheckComboBox;
@@ -30,7 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
-import com.kyj.fx.voeditor.visual.component.pmd.chart.PMDViolationFilebyBarChartComposite;
+import com.kyj.fx.voeditor.visual.component.pmd.chart.AbstractPMDViolationBarChartComposite;
+import com.kyj.fx.voeditor.visual.component.pmd.chart.PMDViolationbyBarChartComposite;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextAreaForAutoComment;
 import com.kyj.fx.voeditor.visual.component.text.MarkedLineNumberFactory;
@@ -41,8 +43,10 @@ import com.kyj.fx.voeditor.visual.framework.pmd.GargoylePMDConfiguration;
 import com.kyj.fx.voeditor.visual.framework.pmd.GargoylePMDParameters;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.ListExpresion;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -53,7 +57,9 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.chart.PieChart.Data;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -65,7 +71,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 import net.sourceforge.pmd.ReportListener;
 import net.sourceforge.pmd.Rule;
 import net.sourceforge.pmd.RulePriority;
@@ -110,6 +115,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	private SplitPane splitPane;
 	private JavaTextArea javaTextArea;
 
+	private BorderPane borLvViolationRoot;
 	private ListView<RuleViolation> lvViolation;
 	private ObservableList<RuleViolation> violationList = FXCollections.observableArrayList();
 
@@ -131,7 +137,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	AtomicInteger priorMedium = new AtomicInteger(0);
 	AtomicInteger priorEtc = new AtomicInteger(0);
 
-	private PMDViolationFilebyBarChartComposite barchart;
+	private AbstractPMDViolationBarChartComposite barchart;
 
 	/**
 	 * @param sourceFile
@@ -148,7 +154,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	public PMDCheckedListComposite(BorderPane root, File sourceFile) {
 		super(root);
 		this.sourceFile = sourceFile;
-		barchart = new PMDViolationFilebyBarChartComposite() {
+		barchart = new PMDViolationbyBarChartComposite() {
 
 			/* (non-Javadoc)
 			 * @see com.kyj.fx.voeditor.visual.component.pmd.chart.PMDViolationChartVisualable#ruleViolationFilter()
@@ -164,10 +170,37 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 				};
 			}
-			
-			
+
+			/* (non-Javadoc)
+			 * @see com.kyj.fx.voeditor.visual.component.pmd.chart.PMDViolationbyBarChartComposite#accept(javafx.scene.chart.PieChart.Data, javafx.scene.Node)
+			 */
+			@Override
+			public void accept(Data t, Node u) {
+				super.accept(t, u);
+
+				u.setOnMouseEntered(ev -> {
+					u.setCursor(Cursor.HAND);
+				});
+
+				u.setOnMouseExited(ev -> {
+					u.setCursor(Cursor.DEFAULT);
+				});
+
+				u.setOnMouseClicked(ev -> {
+
+					ObservableList<RuleViolation> items = PMDCheckedListComposite.this.lvViolation.getItems();
+					List<RuleViolation> collect = PMDCheckedListComposite.this.violationList.stream().filter(ruleViolationFilter())
+							.filter(v -> ValueUtil.equals(t.getName(), ValueUtil.getSimpleFileName(v.getFilename())))
+							.collect(Collectors.toList());
+					items.setAll(collect);
+
+				});
+
+			}
 
 		};
+
+
 		javaTextArea = new JavaTextAreaForAutoComment() {
 
 			/* (non-Javadoc)
@@ -229,8 +262,8 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 		lvViolation.setCellFactory(ruleCheckListener);
 
-		BorderPane borderPane = new BorderPane(lvViolation);
-		splitPane = new SplitPane(javaTextArea, borderPane);
+		borLvViolationRoot = new BorderPane(lvViolation);
+		splitPane = new SplitPane(javaTextArea, borLvViolationRoot);
 		splitPane.setOrientation(Orientation.VERTICAL);
 		splitPane.setDividerPositions(0.7d, 0.3d);
 
@@ -248,7 +281,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		value.setAlignment(Pos.CENTER_RIGHT);
 		//		value.setStyle("-fx-background-color:transparent;");
 		value.setPadding(new Insets(5));
-		borderPane.setTop(value);
+		borLvViolationRoot.setTop(value);
 		root.setCenter(splitPane);
 		violationLabel = new TextFlow();
 
@@ -407,20 +440,6 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 				LOGGER.error(ValueUtil.toString(e));
 			}
 
-			//			if (!FileUtil.isJavaFile(file)) {
-			//				String fileExtension = FileUtil.getFileExtension(file);
-			//				try {
-			//					Field declaredField = PMDParameters.class.getDeclaredField("language");
-			//					if (declaredField != null) {
-			//						declaredField.setAccessible(true);
-			//						declaredField.set(params, fileExtension);
-			//					}
-			//				} catch (Exception e) {
-			//					e.printStackTrace();
-			//				}
-			//			}
-
-			//			transformParametersIntoConfiguration(params);
 			long start = System.nanoTime();
 			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListenerProperty.get(), violationCountingListener.get(),
 					barchart.getReportListener());
@@ -538,26 +557,32 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 					int endColumn = item.getEndColumn();
 					LOGGER.debug("pmd meta violation index : begineLine : {} , endLine : {} , begine col : {} , end col : {}", beginLine,
 							endLine, beginColumn, endColumn);
-					JavaTextArea javaTextArea = PMDCheckedListComposite.this.javaTextArea;
 
 					//					if (PMDCheckedListComposite.this.sourceFile.isFile()) {
 					//					javaTextArea.moveToLine(beginLine);
 					//					}
 					//디렉토리 선택의 경우만..
 					if (sourceFile != null && sourceFile.isDirectory()) {
+						JavaTextArea javaTextArea = new JavaTextArea();
 						String filename = item.getFilename();
 						File file = new File(filename);
 
-						File lastReadFile = lastSelectedFileProperty.get();
+						//						File lastReadFile = lastSelectedFileProperty.get();
 
-						if ((lastReadFile == null && file.exists()) || !(lastReadFile.equals(file))) {
-							LOGGER.debug("Read File :: {}", file);
-							javaTextArea.setContent(FileUtil.readFile(file, null));
-							//							javaTextArea.moveToLine(beginLine);
-							lastSelectedFileProperty.set(file);
-						}
+						String readFile = FileUtil.readFile(file, true, null);
+
+						//						if ((lastReadFile == null && file.exists()) || !(lastReadFile.equals(file))) {
+
+						javaTextArea.setContent(readFile);
+						//							javaTextArea.moveToLine(beginLine);
+						lastSelectedFileProperty.set(file);
+						//						}
+
+						SharedMemory.getSystemLayoutViewController().loadNewSystemTab(file.getName(), javaTextArea);
 						javaTextArea.moveToLine(beginLine);
+
 					} else {
+						JavaTextArea javaTextArea = PMDCheckedListComposite.this.javaTextArea;
 						javaTextArea.moveToLine(beginLine);
 					}
 				}
@@ -659,14 +684,12 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			//선택된 필터정보
 			ObservableList<? extends RulePriority> list = c.getList();
 
-
 			barchart.clean();
 
 			violationList.stream().filter(v1 -> list.contains(v1.getRule().getPriority())).forEach(v2 -> {
 				lvViolation.getItems().add(v2);
 				barchart.violationAdapter().ruleViolationAdded(v2);
 			});
-
 
 			//			Integer currentLine = javaTextArea.getCurrentLine() + 1;
 

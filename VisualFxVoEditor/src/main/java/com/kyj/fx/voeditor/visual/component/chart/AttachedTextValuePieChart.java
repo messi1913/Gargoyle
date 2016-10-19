@@ -7,6 +7,8 @@
 package com.kyj.fx.voeditor.visual.component.chart;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
@@ -22,9 +24,14 @@ import javafx.util.StringConverter;
  * @author KYJ
  *
  */
+/**
+ * @author KYJ
+ *
+ */
 public class AttachedTextValuePieChart extends PieChart {
 
-	public AttachedTextValuePieChart(){}
+	public AttachedTextValuePieChart() {
+	}
 
 	/**
 	 * textlabel 텍스쳐 처리
@@ -55,6 +62,18 @@ public class AttachedTextValuePieChart extends PieChart {
 		this.tooltipConverter = tooltipConverter;
 	}
 
+	private BiConsumer<Data, Node> customAction;
+
+	/**
+	 * 사용자 특화 Action처리 지원
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 19.
+	 * @param customAction
+	 */
+	public void setChartGraphicsCustomAction(BiConsumer<Data, Node> customAction) {
+		this.customAction = customAction;
+	}
+
 	/* (non-Javadoc)
 	 * @see javafx.scene.chart.PieChart#layoutChartChildren(double, double, double, double)
 	 */
@@ -63,9 +82,15 @@ public class AttachedTextValuePieChart extends PieChart {
 		if (getLabelsVisible()) {
 			getData().forEach(d -> {
 
-				if (tooltipConverter != null) {
+				if (tooltipConverter != null || customAction != null) {
 					d.getNode().lookupAll(".chart-pie").stream().forEach(v -> {
-						FxUtil.installTooltip(v, tooltipConverter.toString(d));
+
+						if (tooltipConverter != null)
+							FxUtil.installTooltip(v, tooltipConverter.toString(d));
+
+						if (customAction != null) {
+							customAction.accept(d, v);
+						}
 					});
 				}
 

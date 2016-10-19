@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.output.StringBuilderWriter;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -45,7 +46,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -743,7 +743,8 @@ public class ValueUtil {
 	}
 
 	public static String toCamelCase(final String name) {
-		String[] names = StringUtils.tokenizeToStringArray(name.toLowerCase(), "_");
+
+		String[] names = tokenizeToStringArray(name.toLowerCase(), "_");
 		StringBuffer buf = new StringBuffer();
 		int i = 0;
 		for (String n : names) {
@@ -754,6 +755,84 @@ public class ValueUtil {
 
 	public static String capitalize(String name) {
 		return StringUtils.capitalize(name);
+	}
+
+	/**
+	 * from springframework
+	 *
+	 * Tokenize the given String into a String array via a StringTokenizer.
+	 * Trims tokens and omits empty tokens.
+	 * <p>The given delimiters string is supposed to consist of any number of
+	 * delimiter characters. Each of those characters can be used to separate
+	 * tokens. A delimiter is always a single character; for multi-character
+	 * delimiters, consider using {@code delimitedListToStringArray}
+	 * @param str the String to tokenize
+	 * @param delimiters the delimiter characters, assembled as String
+	 * (each of those characters is individually considered as delimiter).
+	 * @return an array of the tokens
+	 * @see java.util.StringTokenizer
+	 * @see String#trim()
+	 * @see #delimitedListToStringArray
+	 */
+	public static String[] tokenizeToStringArray(String str, String delimiters) {
+		return tokenizeToStringArray(str, delimiters, true, true);
+	}
+
+	/**
+	 *
+	 *from springframework.
+	 *
+	 * Tokenize the given String into a String array via a StringTokenizer.
+	 * <p>The given delimiters string is supposed to consist of any number of
+	 * delimiter characters. Each of those characters can be used to separate
+	 * tokens. A delimiter is always a single character; for multi-character
+	 * delimiters, consider using {@code delimitedListToStringArray}
+	 * @param str the String to tokenize
+	 * @param delimiters the delimiter characters, assembled as String
+	 * (each of those characters is individually considered as delimiter)
+	 * @param trimTokens trim the tokens via String's {@code trim}
+	 * @param ignoreEmptyTokens omit empty tokens from the result array
+	 * (only applies to tokens that are empty after trimming; StringTokenizer
+	 * will not consider subsequent delimiters as token in the first place).
+	 * @return an array of the tokens ({@code null} if the input String
+	 * was {@code null})
+	 * @see java.util.StringTokenizer
+	 * @see String#trim()
+	 * @see #delimitedListToStringArray
+	 */
+	public static String[] tokenizeToStringArray(String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
+
+		if (str == null) {
+			return null;
+		}
+		StringTokenizer st = new StringTokenizer(str, delimiters);
+		List<String> tokens = new ArrayList<String>();
+		while (st.hasMoreTokens()) {
+			String token = st.nextToken();
+			if (trimTokens) {
+				token = token.trim();
+			}
+			if (!ignoreEmptyTokens || token.length() > 0) {
+				tokens.add(token);
+			}
+		}
+		return toStringArray(tokens);
+	}
+
+	/**
+	 * from springframework.
+	 *
+	 * Copy the given Collection into a String array.
+	 * The Collection must contain String elements only.
+	 * @param collection the Collection to copy
+	 * @return the String array ({@code null} if the passed-in
+	 * Collection was {@code null})
+	 */
+	public static String[] toStringArray(Collection<String> collection) {
+		if (collection == null) {
+			return null;
+		}
+		return collection.toArray(new String[collection.size()]);
 	}
 
 	/**
@@ -1089,13 +1168,14 @@ public class ValueUtil {
 					 * by kyj. 주석에 해당하는 내용은 대소문자 처리안함에 관련된 로직인데
 					 * 예외에 걸림.
 					 */
-					try{
-					do {
+					try {
+						do {
 							t = tokens.nextToken();
 
-						token += t;
-					} while (!token.endsWith("*/"));
-					}catch(NoSuchElementException e){}
+							token += t;
+						} while (!token.endsWith("*/"));
+					} catch (NoSuchElementException e) {
+					}
 
 				}
 
@@ -1201,7 +1281,6 @@ public class ValueUtil {
 		return CodeCommentUtil.doAutoComment(code, appendLineKeyword);
 	}
 
-
 	/**
 	 * 문자열로된 텍스트로부터 파일명만 추출하는 정규식 패턴을 적용한후 리턴받음.
 	 * @작성자 : KYJ
@@ -1209,9 +1288,19 @@ public class ValueUtil {
 	 * @param fileName
 	 * @return
 	 */
-	public static String getSimpleFileName(String fileName){
+	public static String getSimpleFileName(String fileName) {
 
 		//경로를 나타내는 특수문자만 제거한 모든 텍스트중 가장 마지막에 있는 텍스트 리턴.
 		return ValueUtil.regexMatch("[^\\\\]{1,}$", fileName);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 19.
+	 * @param string
+	 * @param string2
+	 */
+	public static boolean equals(String str1, String str2) {
+		return StringUtils.equals(str1, str2);
 	}
 }

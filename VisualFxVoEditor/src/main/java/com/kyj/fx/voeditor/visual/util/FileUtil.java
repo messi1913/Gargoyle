@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -37,6 +38,7 @@ import com.kyj.fx.voeditor.visual.component.FileWrapper;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
 import com.kyj.fx.voeditor.visual.framework.FileCheckConverter;
+import com.kyj.fx.voeditor.visual.framework.collections.CachedMap;
 import com.kyj.fx.voeditor.visual.framework.model.proj.ProjectDescription;
 import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
 import com.kyj.fx.voeditor.visual.functions.LoadFileOptionHandler;
@@ -137,21 +139,48 @@ public class FileUtil {
 		return isSuccess;
 	}
 
+	private static final Map<File, String> cacheReadFile = new CachedMap<>(60000);
+
+	/**
+	 *  파일 읽기 처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 19.
+	 * @param file
+	 * @param options
+	 * @return
+	 */
+	public static String readFile(File file, LoadFileOptionHandler options) {
+		return readFile(file, false, options);
+	}
+
 	/**
 	 * 파일 읽기 처리.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 26.
 	 * @param file
+	 * @param useCache
+	 * 			메모리에 읽어온 파일의 컨텐츠를 임시저장함.
 	 * @param options
 	 * @return
 	 */
-	public static String readFile(File file, LoadFileOptionHandler options) {
+	public static String readFile(File file, boolean useCache, LoadFileOptionHandler options) {
 		String content = "";
+
+		if (useCache && cacheReadFile.containsKey(file)) {
+			LOGGER.debug(" file -> {} read from cache.  ", file);
+			return cacheReadFile.get(file);
+		}
+
 		try {
 
-			if (file != null && options == null)
-				return FileUtils.readFileToString(file, "UTF-8");
+			if (file != null && options == null) {
+				content = FileUtils.readFileToString(file, "UTF-8");
+				if (useCache)
+					cacheReadFile.put(file, content);
+
+				return content;
+			}
 
 			if (file == null) {
 
@@ -199,6 +228,10 @@ public class FileUtil {
 			options.setException(e);
 			LOGGER.error(ValueUtil.toString(e));
 		}
+
+		if (useCache)
+			cacheReadFile.put(file, content);
+
 		return content;
 
 	}

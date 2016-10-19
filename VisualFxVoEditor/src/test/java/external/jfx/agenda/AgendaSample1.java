@@ -24,16 +24,20 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import jfxtras.internal.scene.control.skin.agenda.AgendaSkin;
 import jfxtras.scene.control.agenda.Agenda;
 import jfxtras.scene.control.agenda.Agenda.Appointment;
 import jfxtras.scene.control.agenda.Agenda.LocalDateTimeRange;
+import jfxtras.scene.control.agenda.AgendaSkinSwitcher;
 
 public class AgendaSample1 extends Application {
 
 	final Agenda agenda;
+	final AgendaSkinSwitcher agendaSkinSwitcher;
 
 	public AgendaSample1() {
 		agenda = new Agenda();
+		agendaSkinSwitcher = new AgendaSkinSwitcher(agenda);
 
 		// setup appointment groups
 		final Map<String, Agenda.AppointmentGroup> lAppointmentGroupMap = new TreeMap<String, Agenda.AppointmentGroup>();
@@ -45,9 +49,13 @@ public class AgendaSample1 extends Application {
 		agenda.newAppointmentCallbackProperty().set(new Callback<Agenda.LocalDateTimeRange, Agenda.Appointment>() {
 			@Override
 			public Agenda.Appointment call(LocalDateTimeRange dateTimeRange) {
+
+
 				return new Agenda.AppointmentImplLocal().withStartLocalDateTime(dateTimeRange.getStartLocalDateTime())
 						.withEndLocalDateTime(dateTimeRange.getEndLocalDateTime()).withSummary("new").withDescription("new")
 						.withAppointmentGroup(lAppointmentGroupMap.get("group01"));
+
+
 			}
 		});
 
@@ -211,7 +219,11 @@ public class AgendaSample1 extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
-		primaryStage.setScene(new Scene(new BorderPane(agenda)));
+		BorderPane root = new BorderPane(agenda);
+		root.setTop(this.agendaSkinSwitcher);
+
+		primaryStage.setScene(new Scene(root));
+
 		primaryStage.show();
 
 	}

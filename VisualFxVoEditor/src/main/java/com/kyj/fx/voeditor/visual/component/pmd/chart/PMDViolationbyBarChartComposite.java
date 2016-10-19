@@ -6,22 +6,74 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.pmd.chart;
 
+import java.util.function.BiConsumer;
+
+import com.kyj.fx.voeditor.visual.component.chart.AttachedTextValuePieChart;
+
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.scene.Node;
-import net.sourceforge.pmd.RuleViolation;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.PieChart.Data;
+import javafx.util.StringConverter;
 
 /**
  * @author KYJ
  *
  */
-public class PMDViolationbyBarChartComposite extends AbstractPMDViolationBarChartComposite {
+public class PMDViolationbyBarChartComposite extends AbstractPMDViolationBarChartComposite implements BiConsumer<Data, Node> {
+
+	private AttachedTextValuePieChart picChart;
+
+	/**
+	 * 중복되는 데이터를 제거하기위한 데이터셋
+	 * summary
+	 * @최초생성일 2016. 10. 18.
+	 */
+	private ObservableMap<ReuleViolationWrapper, Integer> observableHashMap;
+
+	private ObservableList<javafx.scene.chart.PieChart.Data> dataList;
+
+	/**
+	 * 집계된 총 갯수
+	 * @최초생성일 2016. 10. 19.
+	 */
+	private IntegerProperty total = new SimpleIntegerProperty();
+
+	public PMDViolationbyBarChartComposite() {
+		observableHashMap = FXCollections.observableHashMap();
+	}
 
 	/* (non-Javadoc)
 	 * @see com.kyj.fx.voeditor.visual.component.pmd.chart.PMDViolationChartVisualable#createNode()
 	 */
 	@Override
 	public Node createNode() {
-		// TODO Auto-generated method stub
-		return null;
+		picChart = new AttachedTextValuePieChart();
+		picChart.setLabelConverter(new StringConverter<PieChart.Data>() {
+
+			@Override
+			public String toString(PieChart.Data object) {
+				int value = (int) object.getPieValue();
+				double percent = (value * 100) / total.get();
+				return String.format("%s\ncount : %d\n%.2f%%", object.getName(), value, percent);
+			}
+
+			@Override
+			public PieChart.Data fromString(String string) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+		});
+
+		picChart.setChartGraphicsCustomAction(this);
+		dataList = picChart.getData();
+//		picChart.setOnMouseClicked(this::picChartOnMouseClick);
+		return picChart;
 	}
 
 	/* (non-Javadoc)
@@ -29,22 +81,38 @@ public class PMDViolationbyBarChartComposite extends AbstractPMDViolationBarChar
 	 */
 	@Override
 	public PMDVioationAdapter violationAdapter() {
-		return new PMDVioationAdapter() {
-
-			@Override
-			public void ruleViolationAdded(RuleViolation ruleViolation) {
-
-			}
-
-		};
+		return pmdVioationAdapter;
 	}
+
+	/**
+	 * Summary
+	 * @최초생성일 2016. 10. 19.
+	 */
+	private PMDVioationAdapter pmdVioationAdapter = ruleViolation -> {
+		ReuleViolationWrapper wrapper = new ReuleViolationWrapper(ruleViolation);
+
+		if (observableHashMap.containsKey(wrapper)) {
+			Integer integer = observableHashMap.get(wrapper);
+			observableHashMap.put(wrapper, Integer.sum(integer.intValue(), 1));
+		} else {
+			observableHashMap.put(wrapper, Integer.valueOf(1));
+		}
+	};
 
 	/* (non-Javadoc)
 	 * @see com.kyj.fx.voeditor.visual.component.pmd.chart.PMDViolationChartVisualable#build()
 	 */
 	@Override
 	public void build() {
-		// TODO Auto-generated method stub
+		Integer size = observableHashMap.values().stream().reduce((a, b) -> a + b).get();
+		total.set(size);
+		//Summary
+		observableHashMap.entrySet().forEach(v -> {
+			String name = v.getKey().toString();
+
+			Integer value = v.getValue();
+			dataList.add(new Data(name, value));
+		});
 
 	}
 
@@ -53,7 +121,16 @@ public class PMDViolationbyBarChartComposite extends AbstractPMDViolationBarChar
 	 */
 	@Override
 	public void clean() {
-		// TODO Auto-generated method stub
+		observableHashMap.clear();
+		dataList.clear();
+
+	}
+
+	/*
+	 *  PI차트의 그래픽 아이템 노드를 선택한 경우 발생됨.
+	 */
+	@Override
+	public void accept(Data t, Node u) {
 
 	}
 
