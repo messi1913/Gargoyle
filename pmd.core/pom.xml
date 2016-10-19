@@ -87,6 +87,13 @@
 			<version>${ant.version}</version>
 			<scope>runtime</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+
 		<!-- <dependency> -->
 		<!-- <groupId>org.apache.ant</groupId> -->
 		<!-- <artifactId>ant-testutil</artifactId> -->
@@ -118,13 +125,6 @@
 			<systemPath>${project.basedir}/lib/asm-5.0.4.jar</systemPath>
 		</dependency>
 
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/commons-io-2.4.jar</systemPath>
-		</dependency>
 
 		<dependency>
 			<groupId>commons-lang3</groupId>
@@ -150,13 +150,13 @@
 			<systemPath>${project.basedir}/lib/javacc-5.0.jar</systemPath>
 		</dependency>
 
-		<dependency>
-			<groupId>jaxen</groupId>
-			<artifactId>jaxen</artifactId>
-			<version>1.1.6</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jaxen-1.1.6.jar</systemPath>
-		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>jaxen</groupId> -->
+		<!-- <artifactId>jaxen</artifactId> -->
+		<!-- <version>1.1.6</version> -->
+		<!-- <scope>system</scope> -->
+		<!-- <systemPath>${project.basedir}/lib/jaxen-1.1.6.jar</systemPath> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>jcommander</groupId>
@@ -222,18 +222,40 @@
 			<systemPath>${project.basedir}/lib/pmd-go-5.5.1.jar</systemPath>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>pmd-java</groupId> -->
-<!-- 			<artifactId>pmd-java</artifactId> -->
-<!-- 			<version>5.5.1</version> -->
-<!-- 			<scope>system</scope> -->
-<!-- 			<systemPath>${project.basedir}/lib/pmd-java-5.5.1.jar</systemPath> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>pmd-java</groupId> -->
+		<!-- <artifactId>pmd-java</artifactId> -->
+		<!-- <version>5.5.1</version> -->
+		<!-- <scope>system</scope> -->
+		<!-- <systemPath>${project.basedir}/lib/pmd-java-5.5.1.jar</systemPath> -->
+		<!-- </dependency> -->
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd-java -->
 		<dependency>
-		    <groupId>net.sourceforge.pmd</groupId>
-		    <artifactId>pmd-java</artifactId>
-		    <version>5.5.1</version>
+			<groupId>net.sourceforge.pmd</groupId>
+			<artifactId>pmd-java</artifactId>
+			<version>5.5.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sourceforge.saxon</groupId>
+					<artifactId>saxon</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jaxen</groupId>
+					<artifactId>jaxen</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.pmd</groupId>
+					<artifactId>pmd-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.java.dev.javacc</groupId>
+					<artifactId>javacc</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.ow2.asm</groupId>
+					<artifactId>asm</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 
@@ -358,20 +380,48 @@
 		</dependency>
 
 		<dependency>
-			<groupId>saxon-9.1.0.8</groupId>
-			<artifactId>saxon-9.1.0.8</artifactId>
-			<version>dom</version>
+			<groupId>saxon-9.1.0.8-dom</groupId>
+			<artifactId>saxon-9.1.0.8-dom</artifactId>
+			<version>9.1.0.8</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/saxon-9.1.0.8-dom.jar</systemPath>
 		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>net.sf.saxon</groupId> -->
+		<!-- <artifactId>saxon-dom</artifactId> -->
+		<!-- <version>9.1.0.8</version> -->
+		<!-- </dependency> -->
+
 
 		<dependency>
-			<groupId>saxon</groupId>
-			<artifactId>saxon</artifactId>
+			<groupId>saxon-9.1.0.8</groupId>
+			<artifactId>saxon-9.1.0.8</artifactId>
 			<version>9.1.0.8</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/saxon-9.1.0.8.jar</systemPath>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sf.saxon/saxon -->
+		<!-- <dependency> -->
+		<!-- <groupId>net.sf.saxon</groupId> -->
+		<!-- <artifactId>saxon</artifactId> -->
+		<!-- <version>9.1.0.8</version> -->
+		<!-- </dependency> -->
+
+
+		<!-- <dependency> -->
+		<!-- <groupId>saxon</groupId> -->
+		<!-- <artifactId>saxon</artifactId> -->
+		<!-- <version>9.1.0.8</version> -->
+		<!-- <scope>system</scope> -->
+		<!-- <systemPath>${project.basedir}/lib/saxon-9.1.0.8.jar</systemPath> -->
+		<!-- </dependency> -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>commons-io</groupId> -->
+		<!-- <artifactId>commons-io</artifactId> -->
+		<!-- <version>2.4</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>scala-compiler</groupId>
@@ -433,4 +483,27 @@
 	</repositories>
 
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.beust</groupId>
+				<artifactId>jcommander</artifactId>
+				<version>1.48</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sourceforge.saxon</groupId>
+				<artifactId>saxon</artifactId>
+				<version>9.1.0.8</version>
+			</dependency>
+
+
+
+			<dependency>
+				<groupId>jaxen</groupId>
+				<artifactId>jaxen</artifactId>
+				<version>1.1.6</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
 </project>
