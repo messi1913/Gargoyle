@@ -17,11 +17,19 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
+import com.kyj.fx.voeditor.visual.main.Main;
+
 /**
  * @author KYJ
  *
  */
-public class CachedMap<K, V> implements Map<K, V> {
+public class CachedMap<K, V> implements Map<K, V>, PrimaryStageCloseable {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(CachedMap.class);
 
 	private Map<K, V> valueMap;
 	private HashMap<K, TimerTask> scheduleMap;
@@ -42,6 +50,7 @@ public class CachedMap<K, V> implements Map<K, V> {
 
 	public void addOnExpiredListeners(Consumer<Object> listener) {
 		this.expiredListeners.add(listener);
+
 	}
 
 	/**
@@ -50,6 +59,7 @@ public class CachedMap<K, V> implements Map<K, V> {
 	 */
 	public CachedMap(long cachetime) {
 		this(new HashMap<>(), cachetime);
+
 	}
 
 	/**
@@ -62,6 +72,9 @@ public class CachedMap<K, V> implements Map<K, V> {
 		this.timer = new Timer();
 		this.cachetime = cachetime;
 		this.scheduleMap = new HashMap<>();
+
+		//timer클래스가 종료되는 시점에 종료처리하기위해 리스너에 등록.
+		Main.addPrimaryStageCloseListener(this);
 	}
 
 	/* (non-Javadoc)
@@ -205,6 +218,7 @@ public class CachedMap<K, V> implements Map<K, V> {
 
 		};
 		timer.schedule(task, cachetime);
+
 		scheduleMap.put(key, task);
 	}
 
@@ -247,6 +261,17 @@ public class CachedMap<K, V> implements Map<K, V> {
 				scheduleCancelListeners.forEach(v -> v.accept(next));
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable#closeRequest()
+	 */
+	@Override
+	public void closeRequest() {
+		LOGGER.debug("CachedMap cancel request.");
+
+		//반드시 호출할것.
+		timer.cancel();
 	}
 
 }
