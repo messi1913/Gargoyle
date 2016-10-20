@@ -140,9 +140,12 @@ public class VoWizardUtil {
 			});
 
 		} else {
+
 			Map<String, Object> hashMap = new HashMap<String, Object>();
 			hashMap.put("tableName", tableName);
-			return DbUtil.select(sql, hashMap, new RowMapper<TableModelDVO>() {
+
+			String convertedSql = ValueUtil.getVelocityToText(sql, hashMap);
+			return DbUtil.select(convertedSql, hashMap, new RowMapper<TableModelDVO>() {
 
 				@Override
 				public TableModelDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
