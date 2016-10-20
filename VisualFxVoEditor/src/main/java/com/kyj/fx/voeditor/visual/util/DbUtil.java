@@ -293,6 +293,7 @@ public class DbUtil extends ConnectionManager {
 			dataSource = getDataSource();
 			query = select(dataSource, sql, paramMap, rowMapper);
 		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
 			query = Collections.emptyList();
 		} finally {
 			close(dataSource);
@@ -508,7 +509,7 @@ public class DbUtil extends ConnectionManager {
 			return template.execute(status -> {
 				try {
 					consumer.scope(userObj, namedParameterJdbcTemplate);
-					
+
 				} catch (Exception e) {
 					status.setRollbackOnly();
 					LOGGER.error(ValueUtil.toString(e));
