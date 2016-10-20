@@ -47,7 +47,7 @@ import net.sourceforge.pmd.benchmark.TextReport;
  * @author KYJ
  *
  */
-public class JavaCodeAreaHelper extends CodeAreaHelper implements EventHandler<ActionEvent> {
+public class JavaCodeAreaHelper extends CodeAreaHelper<CodeArea> implements EventHandler<ActionEvent> {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(JavaCodeAreaHelper.class);
 
@@ -65,7 +65,7 @@ public class JavaCodeAreaHelper extends CodeAreaHelper implements EventHandler<A
 	 * @작성일 : 2016. 10. 6.
 	 */
 	@Override
-	protected void createMenus() {
+	public void createMenus() {
 		super.createMenus();
 		menuPmd = new Menu("PMD");
 		menuRunPmd = new MenuItem("Run PMD");

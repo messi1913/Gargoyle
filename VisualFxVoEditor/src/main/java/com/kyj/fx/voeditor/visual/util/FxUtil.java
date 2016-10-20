@@ -513,6 +513,16 @@ public class FxUtil {
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 23.
 	 * @param parent
+	 * @param isModal
+	 */
+	public static void createStageAndShow(String title, Parent parent, boolean isModal) {
+		createStageAndShow(title, new Scene(parent), isModal);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 6. 23.
+	 * @param parent
 	 * @param option
 	 */
 	//	public static void createStageAndShow(String title, Node parent, Consumer<Stage> option) {
@@ -542,15 +552,7 @@ public class FxUtil {
 		stage.show();
 	}
 
-	/**
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 6. 23.
-	 * @param parent
-	 * @param isModal
-	 */
-	public static void createStageAndShow(String title, Parent parent, boolean isModal) {
-		createStageAndShow(title, new Scene(parent), isModal);
-	}
+
 
 	/**
 	 * @작성자 : KYJ

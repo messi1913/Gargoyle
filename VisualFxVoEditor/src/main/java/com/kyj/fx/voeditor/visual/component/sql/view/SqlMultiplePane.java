@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
 import com.kyj.fx.voeditor.visual.component.sql.dock.DockNode;
 import com.kyj.fx.voeditor.visual.component.sql.dock.DockPane;
@@ -33,6 +32,7 @@ import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SQLPaneMotionable;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTabPane;
+import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.framework.BigDataDVO;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
 import com.kyj.fx.voeditor.visual.main.layout.GagoyleTabProxy;
@@ -45,6 +45,7 @@ import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -82,6 +83,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
@@ -531,11 +533,11 @@ public abstract class SqlMultiplePane<T, K> extends DockPane implements ISchemaT
 					if (item instanceof BigDataDVO) {
 						BigDataDVO dataDVO = (BigDataDVO) item;
 
-						try {
-							new SimpleTextView(dataDVO.getValue()).show();
-						} catch (Exception e) {
-							LOGGER.error(ValueUtil.toString(e));
-						}
+						FxUtil.createStageAndShow(new SimpleTextView(dataDVO.getValue()), stage->{
+							stage.setAlwaysOnTop(true);
+							stage.initModality(Modality.APPLICATION_MODAL);
+							stage.initOwner(SqlMultiplePane.this.getScene().getWindow());
+						});
 					}
 
 				}

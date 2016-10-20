@@ -41,13 +41,13 @@ import javafx.util.Pair;
  * @author KYJ
  *
  */
-public class CodeAreaHelper {
+public class CodeAreaHelper<T extends CodeArea> {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(SqlKeywords.class);
 
 	private static final String CHARACTERS_MATCH = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
 
-	protected CodeArea codeArea;
+	protected T codeArea;
 	protected SqlFormatter sqlFormatter = new SqlFormatter();
 	protected CodeAreaMoveLineHelper codeMoveDeligator;
 
@@ -58,10 +58,11 @@ public class CodeAreaHelper {
 	protected MenuItem miToUppercase;
 	protected MenuItem miToLowercase;
 
-	public CodeAreaHelper(CodeArea codeArea) {
+	public CodeAreaHelper(T codeArea) {
 		this.codeArea = codeArea;
 		this.codeArea.setOnMouseClicked(defaultSelectionHandler);
 		codeMoveDeligator = new CodeAreaMoveLineHelper(codeArea);
+
 		contextMenu = codeArea.getContextMenu();
 		if (contextMenu == null) {
 			contextMenu = new ContextMenu();
@@ -70,7 +71,7 @@ public class CodeAreaHelper {
 		createMenus();
 	}
 
-	protected void createMenus() {
+	public void createMenus() {
 		menuSearch = new Menu("Search");
 		miFindReplace = new MenuItem("Find/Replace");
 		menuMoveToLine = new MenuItem("Move to line");
@@ -89,6 +90,15 @@ public class CodeAreaHelper {
 		menuSearch.getItems().add(miFindReplace);
 		codeArea.getContextMenu().getItems().addAll(menuSearch, menuMoveToLine, miToUppercase, miToLowercase);
 
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 20.
+	 * @param appendable
+	 */
+	public void customMenuHandler(CodeAreaCustomMenusHandler<T> appendable) {
+		appendable.customMenus(this.codeArea, this.contextMenu);
 	}
 
 	public void setContent(String content) {
@@ -315,9 +325,9 @@ public class CodeAreaHelper {
 		//			findReplaceEvent(e);
 		//		}
 		// Ctr + U 선택된 문자 또는 전체 문자를 대문자로 치환
-//		toUppercaseEvent(e);
+		//		toUppercaseEvent(e);
 		// Ctr + L 선택된 문자 또는 전체 문자를 소문자로 치환
-//		toLowercaseEvent(e);
+		//		toLowercaseEvent(e);
 
 	}
 

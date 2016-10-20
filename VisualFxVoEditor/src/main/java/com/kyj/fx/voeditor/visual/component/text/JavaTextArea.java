@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.richtext.NavigationActions.SelectionPolicy;
 import org.fxmisc.richtext.Paragraph;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
-import org.fxmisc.richtext.NavigationActions.SelectionPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +66,7 @@ public class JavaTextArea extends BorderPane {
 			+ "|(?<STRING>" + STRING_PATTERN + ")" + "|(?<COMMENT>" + COMMENT_PATTERN + ")");
 
 	private CodeArea codeArea;
-	private CodeAreaHelper codeHelperDeligator;
+	private CodeAreaHelper<CodeArea> codeHelperDeligator;
 	private Label lblLineInfo = new Label();
 
 	/**

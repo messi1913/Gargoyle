@@ -24,7 +24,7 @@ import javafx.scene.input.KeyEvent;
  * @author KYJ
  *
  */
-public class SqlCodeAreaHelper extends CodeAreaHelper {
+public class SqlCodeAreaHelper extends CodeAreaHelper<CodeArea> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SqlCodeAreaHelper.class);
 
@@ -69,6 +69,7 @@ public class SqlCodeAreaHelper extends CodeAreaHelper {
 			doSqlFormat();
 			e.consume();
 		}
+
 	}
 
 	/**

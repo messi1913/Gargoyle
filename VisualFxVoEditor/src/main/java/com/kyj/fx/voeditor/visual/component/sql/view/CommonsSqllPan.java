@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.component.ResultDialog;
-import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeCallback;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ColumnItemTree;
@@ -114,40 +112,17 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			FxClipboardUtil.putString(clipTarget);
 		}
 
+		//테이블을 찾는 리소스 뷰를 오픈한다.
 		else if (KeyCode.R == e.getCode() && e.isControlDown() && e.isShiftDown()) {
-			try {
-				TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier);
-				ResultDialog<Map<String, Object>> show = tableOpenResourceView.show(this);
-
-				Map<String, Object> data = show.getData();
-				if (ValueUtil.isNotEmpty(data)) {
-
-					String schema = tableOpenResourceView.getSchema(data);
-					String databaseName = tableOpenResourceView.getDatabaseName(data);
-					String tableName = tableOpenResourceView.getTableName(data);
-
-					TreeItem<DatabaseItemTree<String>> search = search(schema, databaseName, tableName);
-
-					if (search != null) {
-						TreeView<DatabaseItemTree<String>> schemaTree = getSchemaTree();
-						schemaTree.getSelectionModel().select(search);
-						schemaTree.getFocusModel().focus(schemaTree.getSelectionModel().getSelectedIndex());
-						schemaTree.scrollTo(schemaTree.getSelectionModel().getSelectedIndex());
-
-						LOGGER.debug(search.toString());
-						LOGGER.debug(data.toString());
-					} else {
-						LOGGER.debug("search result empty.");
-					}
-					
-					
-				}
-			} catch (Exception e1) {
-				LOGGER.error(ValueUtil.toString(e1));
-			}
+			showTableResourceView();
+			e.consume();
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#search(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
 	public TreeItem<DatabaseItemTree<String>> search(String schema, String databaseName, String tableName) {
 		TreeItem<DatabaseItemTree<String>> root = getSchemaTree().getRoot();
 
@@ -272,60 +247,59 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	@Override
 	public void tbResultOnKeyClick(KeyEvent e) {
 
-
 		/*
 		 * 2016-09-03 by kyj.
 		 * SqlPane에서 기본 기능이 되도록 재구현.
 		 * FxUtil.installClipboardKeyEvent(tb);API를 사용.
 		 */
 
-//		int type = -1;
-//		if (e.isControlDown() && e.getCode() == KeyCode.C) {
-//			if (e.isShiftDown()) {
-//				type = 2;
-//			} else {
-//				type = 1;
-//			}
-//		}
-//
-//		if (type == -1)
-//			return;
-//
-//		TableView<Map<String, Object>> tbResult = getTbResult();
-//		ObservableList<TablePosition> selectedCells = tbResult.getSelectionModel().getSelectedCells();
-//
-//		TablePosition tablePosition = selectedCells.get(0);
-//		TableColumn tableColumn = tablePosition.getTableColumn();
-//		int row = tablePosition.getRow();
-//		int col = tbResult.getColumns().indexOf(tableColumn);
-//
-//		switch (type) {
-//		case 1:
-//			StringBuilder sb = new StringBuilder();
-//			for (TablePosition cell : selectedCells) {
-//				// TODO :: 첫번째 컬럼(행 선택 기능)도 빈값으로 복사됨..
-//				// 행변경시
-//				if (row != cell.getRow()) {
-//					sb.append("\n");
-//					row++;
-//				}
-//				// 열 변경시
-//				else if (col != tbResult.getColumns().indexOf(cell.getTableColumn())) {
-//					sb.append("\t");
-//				}
-//				Object cellData = cell.getTableColumn().getCellData(cell.getRow());
-//				sb.append(ValueUtil.decode(cellData, cellData, "").toString());
-//			}
-//			FxClipboardUtil.putString(sb.toString());
-//
-//			// Map<String, Object> map = tbResult.getItems().get(row);
-//			// FxClipboardUtil.putString(ValueUtil.toCVSString(map));
-//			break;
-//		case 2:
-//			Object cellData = tableColumn.getCellData(row);
-//			FxClipboardUtil.putString(ValueUtil.decode(cellData, cellData, "").toString());
-//			break;
-//		}
+		//		int type = -1;
+		//		if (e.isControlDown() && e.getCode() == KeyCode.C) {
+		//			if (e.isShiftDown()) {
+		//				type = 2;
+		//			} else {
+		//				type = 1;
+		//			}
+		//		}
+		//
+		//		if (type == -1)
+		//			return;
+		//
+		//		TableView<Map<String, Object>> tbResult = getTbResult();
+		//		ObservableList<TablePosition> selectedCells = tbResult.getSelectionModel().getSelectedCells();
+		//
+		//		TablePosition tablePosition = selectedCells.get(0);
+		//		TableColumn tableColumn = tablePosition.getTableColumn();
+		//		int row = tablePosition.getRow();
+		//		int col = tbResult.getColumns().indexOf(tableColumn);
+		//
+		//		switch (type) {
+		//		case 1:
+		//			StringBuilder sb = new StringBuilder();
+		//			for (TablePosition cell : selectedCells) {
+		//				// TODO :: 첫번째 컬럼(행 선택 기능)도 빈값으로 복사됨..
+		//				// 행변경시
+		//				if (row != cell.getRow()) {
+		//					sb.append("\n");
+		//					row++;
+		//				}
+		//				// 열 변경시
+		//				else if (col != tbResult.getColumns().indexOf(cell.getTableColumn())) {
+		//					sb.append("\t");
+		//				}
+		//				Object cellData = cell.getTableColumn().getCellData(cell.getRow());
+		//				sb.append(ValueUtil.decode(cellData, cellData, "").toString());
+		//			}
+		//			FxClipboardUtil.putString(sb.toString());
+		//
+		//			// Map<String, Object> map = tbResult.getItems().get(row);
+		//			// FxClipboardUtil.putString(ValueUtil.toCVSString(map));
+		//			break;
+		//		case 2:
+		//			Object cellData = tableColumn.getCellData(row);
+		//			FxClipboardUtil.putString(ValueUtil.decode(cellData, cellData, "").toString());
+		//			break;
+		//		}
 
 	}
 
@@ -532,7 +506,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			result = DbUtil.getTransactionedScope(con, queryArray, arr -> {
 				List<String> collect = arr.stream().filter(str -> ValueUtil.isNotEmpty(str)).collect(Collectors.toList());
 				return collect;
-			}, ex -> {
+			} , ex -> {
 				LOGGER.error(ValueUtil.toString(ex));
 				exceptionHandler.accept(ex, true);
 			});
@@ -669,20 +643,20 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	 */
 	private String getDynmicSQL(String query, Map<String, Object> param, boolean appendQuote) {
 		String sql = query;
-//		if (!param.isEmpty()) {
-			HashMap<String, Object> reMapping = new HashMap<>();
-			Iterator<String> it = param.keySet().iterator();
-			while (it.hasNext()) {
-				String key = it.next();
-				Object value = param.get(key);
-				if (value != null) {
-					reMapping.put(key, appendQuote ? "'".concat(value.toString()).concat("'") : value.toString());
-				}
+		//		if (!param.isEmpty()) {
+		HashMap<String, Object> reMapping = new HashMap<>();
+		Iterator<String> it = param.keySet().iterator();
+		while (it.hasNext()) {
+			String key = it.next();
+			Object value = param.get(key);
+			if (value != null) {
+				reMapping.put(key, appendQuote ? "'".concat(value.toString()).concat("'") : value.toString());
 			}
-			sql = ValueUtil.getVelocityToText(query, reMapping, true);
-//		} else {
-//			throw new RuntimeException(String.format("param is empty... \nparams :%s", param.keySet().toString()));
-//		}
+		}
+		sql = ValueUtil.getVelocityToText(query, reMapping, true);
+		//		} else {
+		//			throw new RuntimeException(String.format("param is empty... \nparams :%s", param.keySet().toString()));
+		//		}
 		return sql;
 	}
 
@@ -880,7 +854,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 				sql = getDynmicSQL(sql, paramMap, false);
 				columnList = query(sql, paramMap, (param) -> {
 
-				}, (err, bool) -> {
+				} , (err, bool) -> {
 					if (bool)
 						DialogUtil.showExceptionDailog(err);
 				}).stream().map(m -> {

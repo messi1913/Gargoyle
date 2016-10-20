@@ -66,6 +66,7 @@ public class SqlKeywords extends BorderPane {
 	public SqlKeywords() {
 
 		codeArea = new CodeArea();
+
 		codeHelperDeligator = new SqlCodeAreaHelper(codeArea);
 
 		codeArea.appendText("");
@@ -102,6 +103,13 @@ public class SqlKeywords extends BorderPane {
 		// this.getChildren().add();
 		this.getStylesheets().add(SqlKeywords.class.getResource("java-keywords.css").toExternalForm());
 
+	}
+
+	/**
+	 * @return the codeHelperDeligator
+	 */
+	public final CodeAreaHelper getCodeHelperDeligator() {
+		return codeHelperDeligator;
 	}
 
 	/**
@@ -258,5 +266,14 @@ public class SqlKeywords extends BorderPane {
 
 	public void moveToLine(int moveToLine, int startCol, int endCol) {
 		codeHelperDeligator.moveToLine(moveToLine, startCol, endCol);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 20.
+	 * @param appendable
+	 */
+	public void customMenuHandler(CodeAreaCustomMenusHandler appendable) {
+		codeHelperDeligator.customMenuHandler(appendable);
 	}
 }

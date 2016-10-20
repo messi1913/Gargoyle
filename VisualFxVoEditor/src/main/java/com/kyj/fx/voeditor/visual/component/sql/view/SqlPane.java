@@ -28,9 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableViewComposite;
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
-import com.kyj.fx.voeditor.visual.component.popup.SimpleTextView;
+import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
 import com.kyj.fx.voeditor.visual.component.sql.dock.DockNode;
 import com.kyj.fx.voeditor.visual.component.sql.dock.DockPane;
@@ -39,6 +40,7 @@ import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SQLPaneMotionable;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTabPane;
+import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.framework.BigDataDVO;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
@@ -89,6 +91,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
@@ -503,11 +506,17 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 					if (item instanceof BigDataDVO) {
 						BigDataDVO dataDVO = (BigDataDVO) item;
 
-						try {
-							new SimpleTextView(dataDVO.getValue()).show();
-						} catch (Exception e) {
-							LOGGER.error(ValueUtil.toString(e));
-						}
+						//						{
+						FxUtil.createStageAndShow(new SimpleTextView(dataDVO.getValue()), stage -> {
+							stage.setAlwaysOnTop(true);
+							stage.initModality(Modality.APPLICATION_MODAL);
+							stage.initOwner(SqlPane.this.getScene().getWindow());
+						});
+
+						//							new SimpleTextView(dataDVO.getValue()).show();
+						//						} catch (Exception e) {
+						//							LOGGER.error(ValueUtil.toString(e));
+						//						}
 					}
 
 				}
@@ -596,7 +605,12 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		// MenuItem menuPrimaryKeys = new MenuItem("Primary Keys");
 
 		MenuItem menuShowData = new MenuItem("Show 100 rows");
+		menuShowData.setAccelerator(new KeyCodeCombination(KeyCode.F1));;
 		menuShowData.setOnAction(this::show100RowAction);
+
+		MenuItem menuFindTable = new MenuItem("Find Table");
+		menuFindTable.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN));
+		menuFindTable.setOnAction(this::showFileTableOnAction);
 
 		MenuItem menuProperties = new MenuItem("Properties");
 		menuProperties.setOnAction(this::showProperties);
@@ -605,7 +619,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		menuReflesh.setOnAction(this::menuRefleshOnAction);
 		menuReflesh.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
-		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuProperties, new SeparatorMenuItem(), menuReflesh);
+		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuFindTable, menuProperties, new SeparatorMenuItem(), menuReflesh);
 		schemaTree.setContextMenu(contextMenu);
 
 	}
@@ -1134,9 +1148,18 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		});
 
 		try {
-			SimpleTextView simpleTextView = new SimpleTextView(clip.toString());
-			simpleTextView.setWrapText(false);
-			simpleTextView.show(false);
+
+			SimpleTextView parent = new SimpleTextView(clip.toString());
+			parent.setWrapText(false);
+			FxUtil.createStageAndShow(parent, stage -> {
+				//				stage.setAlwaysOnTop(true);
+				//				stage.initModality(Modality.APPLICATION_MODAL);
+				//				stage.initOwner(SqlPane.this.getScene().getWindow());
+			});
+
+			//			SimpleTextView simpleTextView = new SimpleTextView(clip.toString());
+			//			simpleTextView.setWrapText(false);
+			//			simpleTextView.show(false);
 		} catch (Exception e1) {
 			LOGGER.error(ValueUtil.toString(e1));
 		}
@@ -1207,15 +1230,11 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 				clip.append(str);
 			});
 
-			try {
-				SimpleTextView simpleTextView = new SimpleTextView(clip.toString());
-				simpleTextView.setWrapText(false);
-				simpleTextView.show(false);
-			} catch (Exception e1) {
-				LOGGER.error(ValueUtil.toString(e1));
-
-			}
-
+			SimpleTextView parent = new SimpleTextView(clip.toString());
+			parent.setWrapText(false);
+			FxUtil.createStageAndShow(parent, stage -> {
+				stage.setTitle(String.format("[InsertScript] Table : %s", tableName));
+			});
 		});
 
 	}
@@ -1276,6 +1295,10 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		show100RowAction();
 	}
 
+	public void showFileTableOnAction(ActionEvent e) {
+		showTableResourceView();
+	}
+
 	/**
 	 * 테이블 속성 조회
 	 *
@@ -1288,6 +1311,54 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 			showProperties(connectionSupplier, value);
 		}
 
+	}
+
+	/**
+	 * 검색 추상함수
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 20.
+	 * @param schema
+	 * @param databaseName
+	 * @param tableName
+	 * @return
+	 */
+	public abstract TreeItem<K> search(String schema, String databaseName, String tableName);
+
+	/**
+	 * 테이블을 찾는 리소스 뷰를 오픈
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 20.
+	 */
+	protected void showTableResourceView() {
+		try {
+			TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier);
+			ResultDialog<Map<String, Object>> show = tableOpenResourceView.show(this);
+
+			Map<String, Object> data = show.getData();
+			if (ValueUtil.isNotEmpty(data)) {
+
+				String schema = tableOpenResourceView.getSchema(data);
+				String databaseName = tableOpenResourceView.getDatabaseName(data);
+				String tableName = tableOpenResourceView.getTableName(data);
+
+				TreeItem<K> search = search(schema, databaseName, tableName);
+
+				if (search != null) {
+					TreeView<K> schemaTree = getSchemaTree();
+					schemaTree.getSelectionModel().select(search);
+					schemaTree.getFocusModel().focus(schemaTree.getSelectionModel().getSelectedIndex());
+					schemaTree.scrollTo(schemaTree.getSelectionModel().getSelectedIndex());
+
+					LOGGER.debug(search.toString());
+					LOGGER.debug(data.toString());
+				} else {
+					LOGGER.debug("search result empty.");
+				}
+
+			}
+		} catch (Exception e1) {
+			LOGGER.error(ValueUtil.toString(e1));
+		}
 	}
 
 }
