@@ -39,10 +39,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 import jfxtras.scene.layout.GridPane;
-import jfxtras.scene.layout.HBox;
 
 /**
  * 포스트그레 SQL 패널
