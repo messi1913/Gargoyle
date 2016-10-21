@@ -8,10 +8,12 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import com.kyj.fx.voeditor.visual.component.popup.BaseDialogComposite;
 import com.kyj.fx.voeditor.visual.component.popup.ExceptionDialogComposite;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.util.DialogUtil.CustomInputDialogAction;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -36,6 +38,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -557,6 +560,72 @@ public class DialogUtil {
 
 	}
 
+	public static interface CustomInputDialogAction<T extends Node, V> {
+		public T getNode();
+
+		public V okClickValue();
+
+		public V cancelClickValue();
+	}
+
+	/**
+	 * Graphics 부분을 커스텀 처리할 수 있는 InputDialog
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 21.
+	 * @param owner
+	 * @param title
+	 * @param message
+	 * @param customGrahics
+	 * @return
+	 */
+	public static <T extends Node, V> Optional<Pair<String, V>> showInputCustomDialog(Window owner, String title, String message,
+			CustomInputDialogAction<T, V> customGrahics) {
+		BaseDialogComposite composite = new BaseDialogComposite(title, message);
+		Button btnOk = new Button("OK");
+		btnOk.setMinWidth(80d);
+		Button btnCancel = new Button("Cancel");
+		btnCancel.setMinWidth(80d);
+		composite.addButton(btnOk);
+		composite.addButton(btnCancel);
+		Optional<Pair<String, V>> empty = Optional.empty();
+		SimpleObjectProperty<Optional<Pair<String, V>>> prop = new SimpleObjectProperty<>(empty);
+		T node = customGrahics.getNode();
+		composite.setGraphic(node);
+
+		//Modal
+		composite.show(owner, stage -> {
+
+			stage.initModality(Modality.APPLICATION_MODAL);
+			node.requestFocus();
+
+			stage.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
+
+				if (ev.getCode() == KeyCode.ENTER) {
+					Optional<Pair<String, V>> pair = Optional.of(new Pair<>("OK", customGrahics.okClickValue()));
+					prop.set(pair);
+					stage.close();
+				}
+
+			});
+
+			btnOk.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
+				Optional<Pair<String, V>> pair = Optional.of(new Pair<>("OK", customGrahics.okClickValue()));
+				prop.set(pair);
+				stage.close();
+			});
+
+			btnCancel.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
+				Optional<Pair<String, V>> pair = Optional.of(new Pair<>("Cancel", customGrahics.cancelClickValue()));
+				prop.set(pair);
+				stage.close();
+			});
+
+		});
+
+		return prop.get();
+
+	}
+
 	public static Optional<Pair<String, String>> showInputDialog(Node owner, String title, String message) {
 		return showInputDialog(owner.getScene().getWindow(), title, message, "", null);
 	}
@@ -587,7 +656,9 @@ public class DialogUtil {
 		btnCancel.setMinWidth(80d);
 		composite.addButton(btnOk);
 		composite.addButton(btnCancel);
+
 		TextField text = new TextField();
+
 		composite.setGraphic(text);
 		Optional<Pair<String, String>> empty = Optional.empty();
 		SimpleObjectProperty<Optional<Pair<String, String>>> prop = new SimpleObjectProperty<>(empty);

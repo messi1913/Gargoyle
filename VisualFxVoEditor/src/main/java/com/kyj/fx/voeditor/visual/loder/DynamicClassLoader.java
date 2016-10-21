@@ -255,8 +255,10 @@ public class DynamicClassLoader {
 				List<ProjectInfo> collect = parsingClassPath.toStream().filter(
 
 						entry -> {
-							boolean notEmpty = ValueUtil.isNotEmpty(entry.getOutput());
+//							boolean notEmpty = ValueUtil.isNotEmpty(entry.getOutput());
+							boolean notEmpty = ValueUtil.isNotEmpty(entry.getPath());
 							LOGGER.debug(String.format("srch entry path : %s is Traget %b ", entry.getPath(), notEmpty));
+//
 
 							return notEmpty;
 						}

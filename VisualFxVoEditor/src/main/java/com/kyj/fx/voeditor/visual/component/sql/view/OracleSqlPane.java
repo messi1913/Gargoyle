@@ -13,8 +13,11 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.oracle.OracleDatabaseItemTree;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 
+import javafx.event.ActionEvent;
 import javafx.scene.control.TreeItem;
+import javafx.stage.Stage;
 
 /**
  * 오라클 조회 패널
@@ -41,6 +44,15 @@ public class OracleSqlPane extends CommonsSqllPan {
 			e.printStackTrace();
 		}
 		return null;
+
+	}
+
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#menuExportMergeScriptOnAction(javafx.event.ActionEvent)
+	 */
+	@Override
+	public void menuExportMergeScriptOnAction(ActionEvent e) {
+		DialogUtil.showMessageDialog((Stage) this.getScene().getWindow(), "Not yet support");
 
 	}
 

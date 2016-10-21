@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.component.popup;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,19 +44,20 @@ public class GagoyleWorkspaceOpenResourceView {
 			@Override
 			public List<File> getClassesByLoader(List<ProjectInfo> list) {
 
+				if (list == null)
+					return Collections.emptyList();
+
 				List<File> arrayList = new ArrayList<>();
 
-				list.forEach(proj -> {
+				list.stream().filter(v -> v != null).forEach(proj -> {
 
-					List<File> collect = proj.getJavaSources().stream().map(c -> {
+					List<File> collect = proj.getJavaSources().stream().filter(v -> v != null).map(c -> {
 
 						// String filePath = c.replace('.', File.separatorChar);
 						// filePath = filePath.concat(".class");
-
 						File file = new File(c);
-
 						return file;
-					}).collect(Collectors.toList());
+					}).filter(/*파일이 워크스페이스내에서 삭제된경우 exists가 false가 리턴될 수있다.*/ v -> v.exists()).collect(Collectors.toList());
 
 					arrayList.addAll(collect);
 				});
@@ -70,6 +72,7 @@ public class GagoyleWorkspaceOpenResourceView {
 
 					@Override
 					public String toString(File object) {
+
 						return String.format("%s   ///  [%s]", object.getName(), FileUtil.toRelativizeForGagoyle(object));
 					}
 

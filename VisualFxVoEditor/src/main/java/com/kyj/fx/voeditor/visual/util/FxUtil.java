@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -45,6 +46,7 @@ import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
+import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
@@ -63,6 +65,7 @@ import javafx.scene.SnapshotResult;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
@@ -552,8 +555,6 @@ public class FxUtil {
 		stage.show();
 	}
 
-
-
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 23.
@@ -977,4 +978,22 @@ public class FxUtil {
 		Tooltip.install(node, new Tooltip(string));
 	}
 
+	/**
+	 * TextField에 텍스트Auto Binding 설치
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 21.
+	 * @param textField
+	 * @param suggestions
+	 */
+	public static void installAutoTextFieldBinding(TextField textField, Supplier<List<String>> suggestions) {
+		if (suggestions == null || suggestions.get() == null)
+			return;
+
+		AutoCompletionTextFieldBinding<String> autoCompletionTextFieldBinding = new AutoCompletionTextFieldBinding<>(textField, param -> {
+			String userText = param.getUserText();
+			return suggestions.get().stream().filter(v -> v.startsWith(userText)).collect(Collectors.toList());
+		});
+		autoCompletionTextFieldBinding.setVisibleRowCount(10);
+
+	}
 }

@@ -4,6 +4,7 @@
  */
 package com.kyj.fx.voeditor.visual.momory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -109,6 +110,12 @@ public class SharedMemory {
 
 		String classDirName = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
 		try {
+			File file = new File(classDirName);
+
+			if (!file.exists()) {
+				throw new RuntimeException("base dir does not exists.");
+			}
+
 			if (listClases == null || reflesh)
 				listClases = DynamicClassLoader.listClases(classDirName);
 		} catch (Exception e) {

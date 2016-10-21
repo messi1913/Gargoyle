@@ -21,6 +21,8 @@ import javafx.scene.input.MouseEvent;
  */
 public abstract class AbstractOpenClassResourceView<R> extends ResourceView<R> {
 
+	private RESOURCE_TYPE resourceType;
+
 	enum RESOURCE_TYPE {
 		CLASS, SOURCE
 	}
@@ -34,8 +36,13 @@ public abstract class AbstractOpenClassResourceView<R> extends ResourceView<R> {
 		this(RESOURCE_TYPE.CLASS);
 	}
 
-	public AbstractOpenClassResourceView(RESOURCE_TYPE type) throws Exception {
-		switch (type) {
+	public AbstractOpenClassResourceView(RESOURCE_TYPE resourceType) throws Exception {
+		this.resourceType = resourceType;
+		findResource();
+	}
+
+	private void findResource() {
+		switch (resourceType) {
 		case CLASS:
 			setResources(getClassesByLoader(SharedMemory.loadClasses()));
 
@@ -49,7 +56,8 @@ public abstract class AbstractOpenClassResourceView<R> extends ResourceView<R> {
 	}
 
 	public void btnRefleshOnMouseClick(MouseEvent event) {
-		setResources(getClassesByLoader(SharedMemory.loadClasses(true)));
+		//setResources(getClassesByLoader(SharedMemory.loadClasses(true)));
+		findResource();
 		lvResources.getItems().addAll(getResources());
 	}
 

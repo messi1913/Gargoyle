@@ -572,10 +572,13 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		MenuItem menuExportInsertScript = new MenuItem("Export Insert Script");
 		menuExportInsertScript.setOnAction(this::menuExportInsertScriptOnAction);
 
+		MenuItem menuExportMergeScript = new MenuItem("Export Merge Script");
+		menuExportMergeScript.setOnAction(this::menuExportMergeScriptOnAction);
+
 		MenuItem menuExportJson = new MenuItem("Export Json");
 		menuExportJson.setOnAction(this::menuExportJsonOnAction);
 
-		Menu menuExportExcelFile = new Menu("Export", null, menuExportExcel, menuExportSpreadSheet, menuExportInsertScript, menuExportJson);
+		Menu menuExportExcelFile = new Menu("Export", null, menuExportExcel, menuExportSpreadSheet, menuExportInsertScript, menuExportMergeScript, menuExportJson);
 
 		ContextMenu contextMenu = new ContextMenu(menuExportExcelFile);
 		tbResult.setContextMenu(contextMenu);
@@ -1167,7 +1170,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	}
 
 	/**
-	 * Export Import Script.
+	 * Export Insert Script.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 10.
@@ -1279,6 +1282,15 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		parent.paste(putString, 0, 0);
 		tabProxy.loadNewSystemTab(SystemLayoutViewController.TAB_TITLE_SPREAD_SHEET, parent);
 	}
+
+	/**
+	 * Merge문 스크립트 작성 추출.
+	 * @작성자 : HJH
+	 * @작성일 : 2016. 10. 21.
+	 * @param e
+	 */
+	public abstract void menuExportMergeScriptOnAction(ActionEvent e) ;
+
 
 	public TableView<Map<String, Object>> getTbResult() {
 		return tbResult;

@@ -23,6 +23,14 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
  */
 public class PostgreTableItemTree extends TableItemTree<String> {
 
+	/**
+	 * dirty..
+	 * @throws Exception
+	 */
+	public PostgreTableItemTree() throws Exception {
+
+	}
+
 	public PostgreTableItemTree(SchemaItemTree<String> parent, String name) throws Exception {
 		super(parent, name);
 	}
@@ -41,7 +49,7 @@ public class PostgreTableItemTree extends TableItemTree<String> {
 		sb.append("	SELECT C.COLUMN_NAME, 'Y' AS PK\n");
 		sb.append("	FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE C, INFORMATION_SCHEMA.TABLE_CONSTRAINTS S  \n");
 		sb.append("	WHERE C.CONSTRAINT_NAME = S.CONSTRAINT_NAME  \n");
-		sb.append("	AND S.CONSTRAINT_TYPE = 'PRIMARY KEY' AND C.TABLE_NAME = '"+conditions[1]+"') AS A RIGHT OUTER JOIN \n");
+		sb.append("	AND S.CONSTRAINT_TYPE = 'PRIMARY KEY' AND C.TABLE_NAME = '" + conditions[1] + "') AS A RIGHT OUTER JOIN \n");
 		sb.append("	INFORMATION_SCHEMA.COLUMNS AS B \n");
 		sb.append("	ON A.COLUMN_NAME = B.COLUMN_NAME\n");
 		sb.append("	WHERE B.TABLE_NAME = '" + conditions[1] + "' and B.TABLE_SCHEMA = '" + conditions[0] + "'\n");
