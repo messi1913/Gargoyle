@@ -32,7 +32,7 @@ import net.sourceforge.pmd.ReportListener;
 public class PMDViolationChartComposite extends AbstractPMDViolationChartComposite {
 
 	private ObjectProperty<VIEW_TYPE> selectedViewType = new SimpleObjectProperty<PMDViolationChartComposite.VIEW_TYPE>(
-			VIEW_TYPE.GROUP_BY_FILE_LINE);
+			VIEW_TYPE.GROUP_BY_FILE_PIE);
 
 	private ObjectProperty<AbstractPMDViolationChartComposite> viewComposite = new SimpleObjectProperty<AbstractPMDViolationChartComposite>();
 
