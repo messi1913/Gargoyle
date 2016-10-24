@@ -137,8 +137,17 @@ public final class ConfigResourceLoader implements IFileBaseConfiguration {
 	public static final String DML_KEYWORD = "dml.keywords";
 	/**
 	 * 클래스로더가 로드될때 로드하지않을 특정 디렉토리명을 기술한 키값
+	 * 2016-10-24 byj
+	 * use  FILTER_NOT_SRCH_DIR_NAME_CLASS_TYPE or FILTER_NOT_SRCH_DIR_NAME_SOURCE_TYPE
+	 * 탐색 유형을 좀 더 구체적으로 정의함, 컴파일 or 소스
 	 */
+	@Deprecated
 	public static final String FILTER_NOT_SRCH_DIR_NAME = "filter.not.srch.dir.name";
+
+	public static final String FILTER_NOT_SRCH_DIR_NAME_CLASS_TYPE = "filter.not.srch.dir.name.class.type";
+
+	public static final String FILTER_NOT_SRCH_DIR_NAME_SOURCE_TYPE = "filter.not.srch.dir.name.source.type";
+
 
 	public static final String VO_RESOURCE_FILTERING_NAME = "vo.resource.filtering.name";
 

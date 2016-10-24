@@ -255,10 +255,10 @@ public class DynamicClassLoader {
 				List<ProjectInfo> collect = parsingClassPath.toStream().filter(
 
 						entry -> {
-//							boolean notEmpty = ValueUtil.isNotEmpty(entry.getOutput());
+							//							boolean notEmpty = ValueUtil.isNotEmpty(entry.getOutput());
 							boolean notEmpty = ValueUtil.isNotEmpty(entry.getPath());
 							LOGGER.debug(String.format("srch entry path : %s is Traget %b ", entry.getPath(), notEmpty));
-//
+							//
 
 							return notEmpty;
 						}
@@ -312,7 +312,7 @@ public class DynamicClassLoader {
 	 * @return
 	 */
 	public static List<File> findClassPaths(File filePathName) {
-		return new FileSearcher(filePathName, 2, new String[]{CLASSPATH_FILE_NAME}).find();
+		return new FileSearcher(filePathName, 2, new String[] { CLASSPATH_FILE_NAME }).find();
 	}
 
 	/**
@@ -337,7 +337,19 @@ public class DynamicClassLoader {
 			}
 		};
 
-		List<String> find = new FileSearcher(filePathName, -1,  new String[]{CLASS_FILE_EXTENSION} ).find(toPackageName);
+		FileSearcher fileSearcher = new FileSearcher(filePathName, -1, new String[] { CLASS_FILE_EXTENSION }, new Predicate<File>() {
+
+			// 탐색하지않을 파일명을 기입한다.
+			List<String> exceptNames = ConfigResourceLoader.getInstance()
+					.getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME_SOURCE_TYPE, ",");
+
+			@Override
+			public boolean test(File file) {
+				return !exceptNames.contains(file.getName());
+			}
+		});
+
+		List<String> find = fileSearcher.find(toPackageName);
 		return find.stream().distinct().collect(Collectors.toList());
 	}
 
@@ -365,7 +377,21 @@ public class DynamicClassLoader {
 			return absolutePath;
 		};
 
-		List<String> find = new FileSearcher(filePathName, -1, new String[] { JAVA_FILE_EXTENSION, FXML_FILE_EXTENSION }).find(toPackageName);
+		FileSearcher fileSearcher = new FileSearcher(filePathName, -1, new String[] { JAVA_FILE_EXTENSION, FXML_FILE_EXTENSION },
+				new Predicate<File>() {
+
+					// 탐색하지않을 파일명을 기입한다.
+					List<String> exceptNames = ConfigResourceLoader.getInstance()
+							.getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME_CLASS_TYPE, ",");
+
+					@Override
+					public boolean test(File file) {
+						return !exceptNames.contains(file.getName());
+					}
+				});
+
+		List<String> find = fileSearcher.find(toPackageName);
+
 		return find.stream().distinct().collect(Collectors.toList());
 	}
 
@@ -581,10 +607,16 @@ class FileSearcher {
 	private int maxLevel = 1;
 
 	private String[] fileExtensions;
-	private Predicate<File> filter = new Predicate<File>() {
+	private Predicate<File> filter;
 
-		// 탐색하지않을 파일명을 기입한다.
-		List<String> exceptNames = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME, ",");
+	private static final Predicate<File> DEFAULT_FILTER = new Predicate<File>() {
+
+		/*
+		 *  탐색하지않을 파일명을 기입한다.
+		 *  디폴트로는 소스 디렉토리가 존재하는 위치에 있는 대상은 필터링된다.
+		 */
+		List<String> exceptNames = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME_SOURCE_TYPE,
+				",");
 
 		@Override
 		public boolean test(File file) {
@@ -592,14 +624,38 @@ class FileSearcher {
 		}
 	};
 
+	/**
+	 * @return the filter
+	 */
+	public final Predicate<File> getFilter() {
+		return filter;
+	}
+
+	/**
+	 * @param filter the filter to set
+	 */
+	//	public final void setFilter(Predicate<File> filter) {
+	//		this.filter = filter;
+	//	}
+
 	public FileSearcher(File root) {
-		this(root, -1, new String[] { DynamicClassLoader.CLASSPATH_FILE_NAME });
+
+		this(root, -1, new String[] { DynamicClassLoader.CLASSPATH_FILE_NAME }, DEFAULT_FILTER);
+	}
+
+	public FileSearcher(File root, Predicate<File> filter) {
+		this(root, -1, new String[] { DynamicClassLoader.CLASSPATH_FILE_NAME }, filter);
 	}
 
 	public FileSearcher(File root, int maxLevel, String[] fileExtensions) {
+		this(root, -1, new String[] { DynamicClassLoader.CLASSPATH_FILE_NAME }, DEFAULT_FILTER);
+	}
+
+	public FileSearcher(File root, int maxLevel, String[] fileExtensions, Predicate<File> filter) {
 		this.root = root;
 		this.maxLevel = maxLevel;
 		this.fileExtensions = fileExtensions;
+		this.filter = filter;
 	}
 
 	public List<File> find() {
@@ -618,7 +674,7 @@ class FileSearcher {
 	}
 
 	private <T> void findClassPaths(List<T> findFiles, File file, int currentLevel, Function<File, T> func) {
-		if (!filter.test(file)) {
+		if (!getFilter().test(file)) {
 			LOGGER.debug(String.format("탐색하지않는 디렉토리 %s", file.getAbsolutePath()));
 			return;
 		}

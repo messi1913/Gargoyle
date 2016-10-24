@@ -15,8 +15,10 @@ import java.util.stream.Collectors;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.component.popup.AbstractOpenClassResourceView.RESOURCE_TYPE;
 import com.kyj.fx.voeditor.visual.loder.ProjectInfo;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 
+import javafx.scene.input.MouseEvent;
 import javafx.util.StringConverter;
 
 /***************************
@@ -39,6 +41,13 @@ public class GagoyleWorkspaceOpenResourceView {
 				return value.getAbsolutePath().toUpperCase().indexOf(text.toUpperCase()) >= 0;
 				//				return value.getAbsolutePath().indexOf(text) >= 0;
 
+			}
+
+			public void btnRefleshOnMouseClick(MouseEvent event) {
+				//setResources(getClassesByLoader(SharedMemory.loadClasses(true)));
+
+				setResources(getClassesByLoader(SharedMemory.loadSources(true)));
+				lvResources.getItems().addAll(getResources());
 			}
 
 			@Override
