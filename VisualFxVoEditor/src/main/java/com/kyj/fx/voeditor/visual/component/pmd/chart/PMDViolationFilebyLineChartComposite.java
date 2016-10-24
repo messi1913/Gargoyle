@@ -6,8 +6,12 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.pmd.chart;
 
+import java.util.function.Predicate;
+
+import org.controlsfx.control.CheckComboBox;
+
 import com.kyj.fx.voeditor.visual.component.chart.RangeSliderLineChartComposite;
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.fx.voeditor.visual.component.pmd.PMDCheckedListComposite;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,13 +20,17 @@ import javafx.scene.Node;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
+import net.sourceforge.pmd.Rule;
+import net.sourceforge.pmd.RulePriority;
 import net.sourceforge.pmd.RuleViolation;
 
 /**
  * @author KYJ
  *
  */
-public class PMDViolationFilebyBarChartComposite extends AbstractPMDViolationBarChartComposite {
+@SuppressWarnings("rawtypes")
+public class PMDViolationFilebyLineChartComposite extends AbstractPMDViolationChartComposite
+		implements ChartCustomAction<javafx.scene.chart.XYChart.Data> {
 
 	/**
 	 *  ObservableMap에 집계된 데이터를 기반으로 차트로 표현하기 위한 dataList
@@ -42,9 +50,11 @@ public class PMDViolationFilebyBarChartComposite extends AbstractPMDViolationBar
 	 * @최초생성일 2016. 10. 18.
 	 */
 	private RangeSliderLineChartComposite<Data<String, Number>> sliderLineChartComposite = null;
+	private PMDCheckedListComposite checkedListComposite;
 
-	public PMDViolationFilebyBarChartComposite() {
+	public PMDViolationFilebyLineChartComposite(PMDCheckedListComposite checkedListComposite) {
 		observableHashMap = FXCollections.observableHashMap();
+		this.checkedListComposite = checkedListComposite;
 	}
 
 	/* (non-Javadoc)
@@ -133,6 +143,64 @@ public class PMDViolationFilebyBarChartComposite extends AbstractPMDViolationBar
 	public void clean() {
 		observableHashMap.clear();
 		dataList.clear();
+	}
+
+	@Override
+	public Predicate<RuleViolation> ruleViolationFilter() {
+
+		return ruleViolation -> {
+			CheckComboBox<RulePriority> checkComboBox = this.checkedListComposite.getViolationCheckComboBox();
+			ObservableList<RulePriority> checkedItems = checkComboBox.getCheckModel().getCheckedItems();
+			Rule rule = ruleViolation.getRule();
+			RulePriority priority = rule.getPriority();
+			return checkedItems.stream().filter(c -> c == priority).findFirst().isPresent();
+
+		};
+	}
+
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.pmd.chart.ChartCustomAction#seriesLegendLabelCustomAction(javafx.scene.chart.PieChart.Data, javafx.scene.Node)
+	 */
+	@Override
+	public void seriesLegendLabelCustomAction(Data t, Node u) {
+
+//		u.setOnMouseEntered(ev -> {
+//			u.setCursor(Cursor.HAND);
+//		});
+//
+//		u.setOnMouseExited(ev -> {
+//			u.setCursor(Cursor.DEFAULT);
+//		});
+//
+//		u.setOnMouseClicked(ev -> {
+//
+//			ListView<RuleViolation> lvViolation = this.checkedListComposite.getLvViolation();
+//			ObservableList<RuleViolation> items = lvViolation.getItems();
+//			ObservableList<RuleViolation> violationList = this.checkedListComposite.getViolationList();
+//			List<RuleViolation> collect = violationList.stream().filter(ruleViolationFilter())
+//					.filter(v -> ValueUtil.equals(t.getName(), ValueUtil.getSimpleFileName(v.getFilename()))).collect(Collectors.toList());
+//			items.setAll(collect);
+//
+//		});
+
+	}
+
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.pmd.chart.ChartCustomAction#chartGraphicsCustomAction(java.lang.Object, javafx.scene.Node)
+	 */
+	@Override
+	public void chartGraphicsCustomAction(Data data, Node node) {
+//		node.setOnMouseClicked(ev -> {
+//
+//			ListView<RuleViolation> lvViolation = this.checkedListComposite.getLvViolation();
+//			ObservableList<RuleViolation> violationList = this.checkedListComposite.getViolationList();
+//			ObservableList<RuleViolation> items = lvViolation.getItems();
+//			List<RuleViolation> collect = violationList.stream().filter(ruleViolationFilter())
+//					.filter(v -> ValueUtil.equals(data.getName(), ValueUtil.getSimpleFileName(v.getFilename())))
+//					.collect(Collectors.toList());
+//			items.setAll(collect);
+//		});
+
 	}
 
 }

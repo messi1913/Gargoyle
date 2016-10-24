@@ -36,6 +36,7 @@ public interface PMDViolationChartVisualable {
 
 	/**
 	 * PMD violation 대리자
+	 * 데이터 변환용으로 사용됨
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 18.
 	 * @return
@@ -44,6 +45,7 @@ public interface PMDViolationChartVisualable {
 
 	/**
 	 * adapter로 넘길 대상인지 여부를 판단하는 역할 처리.
+	 * UI상으로 사용할 데이터인지 필터링 처리함.
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 18.
 	 * @return

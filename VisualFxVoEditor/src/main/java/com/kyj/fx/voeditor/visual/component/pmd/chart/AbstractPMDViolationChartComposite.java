@@ -9,6 +9,7 @@ package com.kyj.fx.voeditor.visual.component.pmd.chart;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import net.sourceforge.pmd.ReportListener;
@@ -20,14 +21,14 @@ import net.sourceforge.pmd.stat.Metric;
  * @author KYJ
  *
  */
-public abstract class AbstractPMDViolationBarChartComposite extends BorderPane implements PMDViolationChartVisualable {
+public abstract class AbstractPMDViolationChartComposite extends BorderPane implements PMDViolationChartVisualable {
 
 	private Predicate<RuleViolation> ruleViolationFilter;
 
 	/**
 	 * @param layout
 	 */
-	public AbstractPMDViolationBarChartComposite() {
+	public AbstractPMDViolationChartComposite() {
 		this(null);
 	}
 
@@ -35,12 +36,15 @@ public abstract class AbstractPMDViolationBarChartComposite extends BorderPane i
 	 * @param initLayout
 	 * 		초기 BorderPane 레이아웃에 배치할 영역이 따로 존재하는경우 구현처리함.
 	 */
-	public AbstractPMDViolationBarChartComposite(BiConsumer<BorderPane, Node> initLayout) {
+	public AbstractPMDViolationChartComposite(BiConsumer<BorderPane, Node> initLayout) {
 		ruleViolationFilter = ruleViolationFilter();
-		if (initLayout != null) {
-			initLayout.accept(this, createNode());
-		} else
-			setCenter(createNode());
+
+		Platform.runLater(() -> {
+			if (initLayout != null) {
+				initLayout.accept(this, createNode());
+			} else
+				setCenter(createNode());
+		});
 
 	}
 
