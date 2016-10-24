@@ -21,6 +21,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.kyj.fx.voeditor.visual.component.pmd.PMDGargoyleThreadProcessor;
 
@@ -77,6 +80,11 @@ public class DoPMD implements Closeable {
 	}
 
 	public int doPMD(GargoylePMDConfiguration configuration, ReportListener... listeners) {
+		return doPMD(configuration, Stream.of(listeners).collect(Collectors.toList()));
+
+	}
+
+	public int doPMD(GargoylePMDConfiguration configuration, List<ReportListener> listeners) {
 
 		// Load the RuleSets
 		RuleSetFactory ruleSetFactory = RulesetsFactoryUtils.getRulesetFactory(configuration);
@@ -113,7 +121,7 @@ public class DoPMD implements Closeable {
 				}
 			});
 
-			if (listeners != null && listeners.length != 0) {
+			if (listeners != null && !listeners.isEmpty()) {
 
 				for (ReportListener l : listeners)
 					ctx.getReport().addListener(l);
@@ -221,8 +229,8 @@ public class DoPMD implements Closeable {
 	 * @param renderers
 	 *            List<Renderer>
 	 */
-	public void processFiles(final GargoylePMDConfiguration configuration, final RuleSetFactory ruleSetFactory, final List<DataSource> files,
-			final RuleContext ctx, final List<Renderer> renderers) {
+	public void processFiles(final GargoylePMDConfiguration configuration, final RuleSetFactory ruleSetFactory,
+			final List<DataSource> files, final RuleContext ctx, final List<Renderer> renderers) {
 
 		sortFiles(configuration, files);
 

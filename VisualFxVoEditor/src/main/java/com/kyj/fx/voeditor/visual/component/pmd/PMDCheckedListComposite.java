@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
-import com.kyj.fx.voeditor.visual.component.pmd.chart.AbstractPMDViolationChartComposite;
-import com.kyj.fx.voeditor.visual.component.pmd.chart.PMDViolationbyBarChartComposite;
+import com.kyj.fx.voeditor.visual.component.pmd.chart.PMDViolationChartComposite;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextAreaForAutoComment;
 import com.kyj.fx.voeditor.visual.component.text.MarkedLineNumberFactory;
@@ -132,7 +132,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	AtomicInteger priorMedium = new AtomicInteger(0);
 	AtomicInteger priorEtc = new AtomicInteger(0);
 
-	private AbstractPMDViolationChartComposite chartComposite;
+	private PMDViolationChartComposite chartComposite;
 
 	/**
 	 * @param sourceFile
@@ -149,7 +149,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	public PMDCheckedListComposite(BorderPane root, File sourceFile) {
 		super(root);
 		this.sourceFile = sourceFile;
-		chartComposite = new PMDViolationbyBarChartComposite(this);
+		chartComposite = new PMDViolationChartComposite(this);
 
 		javaTextArea = new JavaTextAreaForAutoComment() {
 
@@ -399,8 +399,13 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			}
 
 			long start = System.nanoTime();
-			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListenerProperty.get(), violationCountingListener.get(),
-					chartComposite.getReportListener());
+
+			List<ReportListener> listeners = new ArrayList<>();
+			listeners.addAll(chartComposite.getAvalilableReportListenerList());
+			listeners.add(reportListenerProperty.get());
+			listeners.add(violationCountingListener.get());
+
+			doPMD.doPMD(transformParametersIntoConfiguration(params), listeners);
 			long end = System.nanoTime();
 			Benchmarker.mark(Benchmark.TotalPMD, end - start, 0);
 
