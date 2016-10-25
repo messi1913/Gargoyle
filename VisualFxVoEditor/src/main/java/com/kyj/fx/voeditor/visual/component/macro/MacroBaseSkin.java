@@ -6,16 +6,24 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.macro;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.NumberTextField;
+import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
@@ -23,7 +31,9 @@ import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -32,11 +42,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.util.Callback;
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
@@ -166,9 +180,13 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 			if (n) {
 				btnStart.setDisable(true);
 				btnStop.setDisable(false);
+				textArea.setEditable(false);
+				textArea.setBlendMode(BlendMode.DARKEN);
 			} else {
 				btnStart.setDisable(false);
 				btnStop.setDisable(true);
+				textArea.setEditable(true);
+				textArea.setBlendMode(null);
 			}
 		});
 
@@ -200,8 +218,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	 * @param e
 	 */
 	public void btnStartOnAction(ActionEvent e) {
-		isStarted.set(true);
-		new Thread(target).start();
+		start();
 	}
 
 	/**
@@ -213,6 +230,17 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	 */
 	public void btnStopOnAction(ActionEvent e) {
 		stop();
+	}
+
+	/**
+	 * 스케줄링 시작 처리
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 25.
+	 */
+	public void start() {
+		isStarted.set(true);
+		new Thread(target).start();
 	}
 
 	/**
@@ -342,7 +370,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 				public void run() {
 					try {
 						if (isStarted.get())
-							MacroBaseSkin.this.getSkinnable().start(tbResult, textArea.getText());
+							start(tbResult, textArea.getText());
 					} catch (Exception e) {
 
 						//에러가 발생하면 중단함.
@@ -364,6 +392,112 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 
 		}
 
+	}
+
+	/**
+	 * Start 버튼을 클릭하면 결과가 리턴된다. param으로 입력받은 데이터는 textArea에서 적혀져있는 텍스트문자열.
+	 *
+	 * 2016-10-25 Skin클래스안으로 이동처리.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 25.
+	 * @param tbResult
+	 * @param param
+	 * @throws Exception
+	 */
+	public void start(TableView<Map<String, String>> tbResult, String param) throws Exception {
+		Connection connection = getSkinnable().getConnectionSupplier().get();
+
+		tbResult.getItems().clear();
+		tbResult.getColumns().clear();
+
+		//		try {
+
+		String[] split = param.split(";");
+
+		connection.setAutoCommit(false);
+		try {
+			for (String sql : split) {
+				String _sql = sql.trim();
+				if (_sql.isEmpty())
+					continue;
+
+				boolean dml = DbUtil.isDml(_sql);
+				if (dml) {
+					LOGGER.debug("do update : {}", _sql);
+					DbUtil.update(connection, _sql);
+				} else {
+					LOGGER.debug("do select : {}", _sql);
+					DbUtil.select(connection, _sql, 30, 1000,
+							new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, ObjectProperty<Object>>>>() {
+
+								@Override
+								public List<Map<String, ObjectProperty<Object>>> apply(ResultSetMetaData t, ResultSet rs) {
+
+									try {
+										int columnCount = t.getColumnCount();
+
+										for (int i = 1; i <= columnCount; i++) {
+											String columnName = t.getColumnName(i);
+											TableColumn<Map<String, String>, String> tbCol = new TableColumn<>(columnName);
+											tbCol.setCellFactory(
+													new Callback<TableColumn<Map<String, String>, String>, TableCell<Map<String, String>, String>>() {
+
+												@Override
+												public TableCell<Map<String, String>, String> call(
+														TableColumn<Map<String, String>, String> param) {
+													return new TableCell<Map<String, String>, String>() {
+
+														@Override
+														protected void updateItem(String item, boolean empty) {
+															super.updateItem(item, empty);
+															if (empty) {
+																setGraphic(null);
+															} else {
+																setGraphic(new Label(item));
+															}
+														}
+
+													};
+												}
+											});
+
+											tbCol.setCellValueFactory(param -> {
+												return new SimpleStringProperty(param.getValue().get(columnName));
+											});
+
+											tbResult.getColumns().add(tbCol);
+										}
+
+										while (rs.next()) {
+											Map<String, String> hashMap = new HashMap<>();
+
+											for (int i = 1; i <= columnCount; i++) {
+												String columnName = t.getColumnName(i);
+												String value = rs.getString(columnName);
+												hashMap.put(columnName, value);
+
+											}
+											tbResult.getItems().add(hashMap);
+
+										}
+
+									} catch (SQLException e) {
+										throw new RuntimeException(e);
+									}
+									return Collections.emptyList();
+								}
+
+							});
+				}
+			}
+			connection.commit();
+		} catch (Exception e) {
+			connection.rollback();
+			throw new RuntimeException(e);
+		} finally {
+			DbUtil.close(connection);
+		}
 	}
 
 }
