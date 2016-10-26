@@ -42,10 +42,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.kyj.fx.voeditor.visual.component.dock.pane.DockEvent;
-import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.sun.javafx.beans.IDProperty;
 import com.sun.javafx.event.EventHandlerManager;
+import com.sun.javafx.scene.control.ControlAcceleratorSupport;
 
 import javafx.beans.DefaultProperty;
 import javafx.beans.InvalidationListener;
@@ -63,6 +62,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
@@ -76,17 +76,18 @@ import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
 
 /**
  * <p>Tabs are placed within a {@link TabPane}, where each tab represents a single
@@ -135,7 +136,6 @@ public class DockTab implements EventTarget, Styleable {
 		setContent(content);
 		styleClass.addAll(DEFAULT_STYLE_CLASS);
 
-	
 	}
 
 	/***************************************************************************
@@ -239,7 +239,7 @@ public class DockTab implements EventTarget, Styleable {
 				@Override
 				protected void invalidated() {
 					if (getOnSelectionChanged() != null) {
-						Event.fireEvent(DockTab.this, new Event(SELECTION_CHANGED_EVENT));
+						Event.fireEvent(DockTab.this, new Event(DOCK_SELECTION_CHANGED_EVENT));
 					}
 				}
 
@@ -482,7 +482,7 @@ public class DockTab implements EventTarget, Styleable {
 	/**
 	 * <p>Called when the tab becomes selected or unselected.</p>
 	 */
-	public static final EventType<Event> SELECTION_CHANGED_EVENT = new EventType<Event>(Event.ANY, "SELECTION_CHANGED_EVENT");
+	public static final EventType<Event> DOCK_SELECTION_CHANGED_EVENT = new EventType<Event>(Event.ANY, "DOCK_SELECTION_CHANGED_EVENT");
 	private ObjectProperty<EventHandler<Event>> onSelectionChanged;
 
 	/**
@@ -509,7 +509,7 @@ public class DockTab implements EventTarget, Styleable {
 			onSelectionChanged = new ObjectPropertyBase<EventHandler<Event>>() {
 				@Override
 				protected void invalidated() {
-					setEventHandler(SELECTION_CHANGED_EVENT, get());
+					setEventHandler(DOCK_SELECTION_CHANGED_EVENT, get());
 				}
 
 				@Override
@@ -529,7 +529,7 @@ public class DockTab implements EventTarget, Styleable {
 	/**
 	 * <p>Called when a user closes this tab. This is useful for freeing up memory.</p>
 	 */
-	public static final EventType<Event> CLOSED_EVENT = new EventType<Event>(Event.ANY, "TAB_CLOSED");
+	public static final EventType<Event> DOCK_CLOSED_EVENT = new EventType<Event>(Event.ANY, "DOCK_TAB_CLOSED");
 	private ObjectProperty<EventHandler<Event>> onClosed;
 
 	/**
@@ -556,7 +556,7 @@ public class DockTab implements EventTarget, Styleable {
 			onClosed = new ObjectPropertyBase<EventHandler<Event>>() {
 				@Override
 				protected void invalidated() {
-					setEventHandler(CLOSED_EVENT, get());
+					setEventHandler(DOCK_CLOSED_EVENT, get());
 				}
 
 				@Override
@@ -715,7 +715,7 @@ public class DockTab implements EventTarget, Styleable {
 	* received event.
 	* @since JavaFX 8.0
 	*/
-	public static final EventType<Event> TAB_CLOSE_REQUEST_EVENT = new EventType<Event>(Event.ANY, "TAB_CLOSE_REQUEST_EVENT");
+	public static final EventType<Event> DOCK_TAB_CLOSE_REQUEST_EVENT = new EventType<Event>(Event.ANY, "DOCK_TAB_CLOSE_REQUEST_EVENT");
 
 	/**
 	 * Called when there is an external request to close this {@code Tab}.
@@ -730,7 +730,7 @@ public class DockTab implements EventTarget, Styleable {
 			onCloseRequest = new ObjectPropertyBase<EventHandler<Event>>() {
 				@Override
 				protected void invalidated() {
-					setEventHandler(TAB_CLOSE_REQUEST_EVENT, get());
+					setEventHandler(DOCK_TAB_CLOSE_REQUEST_EVENT, get());
 				}
 
 				@Override
@@ -979,9 +979,109 @@ public class DockTab implements EventTarget, Styleable {
 			}
 		}
 
+		private static void doAcceleratorInstall(final ObservableList<MenuItem> items, final Scene scene) {
+			// we're given an observable list of menu items, which we will add an observer to
+			// so that when menu items are added or removed we can properly handle
+			// the addition or removal of accelerators into the scene.
+			items.addListener((ListChangeListener<MenuItem>) c -> {
+				while (c.next()) {
+					if (c.wasRemoved()) {
+						// remove accelerators from the scene
+						removeAcceleratorsFromScene(c.getRemoved(), scene);
+					}
+
+					if (c.wasAdded()) {
+						doAcceleratorInstall(c.getAddedSubList(), scene);
+					}
+				}
+			});
+
+			doAcceleratorInstall((List<MenuItem>) items, scene);
+		}
+
+		private static void doAcceleratorInstall(final List<? extends MenuItem> items, final Scene scene) {
+			for (final MenuItem menuitem : items) {
+				if (menuitem instanceof Menu) {
+					// add accelerators for this Menu's menu items, by calling recursively.
+					doAcceleratorInstall(((Menu) menuitem).getItems(), scene);
+				} else {
+					// check if there is any accelerator on this menuitem right now.
+					// If there is, then we create a Runnable and set it into the
+					// scene straight away
+					if (menuitem.getAccelerator() != null) {
+						final Map<KeyCombination, Runnable> accelerators = scene.getAccelerators();
+
+						Runnable acceleratorRunnable = () -> {
+							if (menuitem.getOnMenuValidation() != null) {
+								Event.fireEvent(menuitem, new Event(MenuItem.MENU_VALIDATION_EVENT));
+							}
+							Menu target = menuitem.getParentMenu();
+							if (target != null && target.getOnMenuValidation() != null) {
+								Event.fireEvent(target, new Event(MenuItem.MENU_VALIDATION_EVENT));
+							}
+							if (!menuitem.isDisable()) {
+								if (menuitem instanceof RadioMenuItem) {
+									((RadioMenuItem) menuitem).setSelected(!((RadioMenuItem) menuitem).isSelected());
+								} else if (menuitem instanceof CheckMenuItem) {
+									((CheckMenuItem) menuitem).setSelected(!((CheckMenuItem) menuitem).isSelected());
+								}
+
+								menuitem.fire();
+							}
+						};
+						accelerators.put(menuitem.getAccelerator(), acceleratorRunnable);
+					}
+
+					// We also listen to the accelerator property for changes, such
+					// that we can update the scene when a menu item accelerator changes.
+					menuitem.acceleratorProperty().addListener((observable, oldValue, newValue) -> {
+						final Map<KeyCombination, Runnable> accelerators = scene.getAccelerators();
+
+						// remove the old KeyCombination from the accelerators map
+						Runnable _acceleratorRunnable = accelerators.remove(oldValue);
+
+						// and put in the new accelerator KeyCombination, if it is not null
+						if (newValue != null) {
+							accelerators.put(newValue, _acceleratorRunnable);
+						}
+					});
+				}
+			}
+		}
+
 		public static void addAcceleratorsIntoScene(ObservableList<MenuItem> items, DockTab anchor) {
 			// with Tab, we first need to wait until the Tab has a TabPane associated with it
 			addAcceleratorsIntoScene(items, (Object) anchor);
+		}
+
+		public static void addAcceleratorsIntoScene(ObservableList<MenuItem> items, Node anchor) {
+			// we allow an empty items list as we install listeners later on - if
+			// we return on empty, the listener is never installed (leading to RT-39249)
+			if (items == null/* || items.isEmpty()*/) {
+				return;
+			}
+
+			if (anchor == null) {
+				throw new IllegalArgumentException("Anchor cannot be null");
+			}
+
+			final Scene scene = anchor.getScene();
+			if (scene == null) {
+				// listen to the scene property on the anchor until it is set, and
+				// then install the accelerators
+				anchor.sceneProperty().addListener(new InvalidationListener() {
+					@Override
+					public void invalidated(Observable observable) {
+						Scene scene = anchor.getScene();
+						if (scene != null) {
+							anchor.sceneProperty().removeListener(this);
+							doAcceleratorInstall(items, scene);
+						}
+					}
+				});
+			} else {
+				doAcceleratorInstall(items, scene);
+			}
 		}
 
 		private static void addAcceleratorsIntoScene(ObservableList<MenuItem> items, Object anchor) {
@@ -991,21 +1091,24 @@ public class DockTab implements EventTarget, Styleable {
 			}
 
 			final ReadOnlyObjectProperty<? extends Control> controlProperty = getControlProperty(anchor);
-			final Control control = controlProperty.get();
-			if (control == null) {
-				controlProperty.addListener(new InvalidationListener() {
-					@Override
-					public void invalidated(Observable observable) {
-						final Control control = controlProperty.get();
-						if (control != null) {
-							controlProperty.removeListener(this);
-							addAcceleratorsIntoScene(items, control);
+			if (controlProperty == null) {
+				final Control control = controlProperty.get();
+				if (control == null) {
+					controlProperty.addListener(new InvalidationListener() {
+						@Override
+						public void invalidated(Observable observable) {
+							final Control control = controlProperty.get();
+							if (control != null) {
+								controlProperty.removeListener(this);
+								addAcceleratorsIntoScene(items, control);
+							}
 						}
-					}
-				});
-			} else {
-				addAcceleratorsIntoScene(items, control);
+					});
+				} else {
+					addAcceleratorsIntoScene(items, control);
+				}
 			}
+
 		}
 		// --- Utilities
 

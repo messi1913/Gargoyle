@@ -311,16 +311,17 @@ public class DockNode extends VBox implements EventHandler<MouseEvent> {
 			borderPane.applyCss();
 			Insets insetsDelta = borderPane.getInsets();
 
-			double insetsWidth = insetsDelta.getLeft() + insetsDelta.getRight();
-			double insetsHeight = insetsDelta.getTop() + insetsDelta.getBottom();
+//			double insetsWidth = insetsDelta.getLeft() + insetsDelta.getRight();
+//			double insetsHeight = insetsDelta.getTop() + insetsDelta.getBottom();
 
 			stage.setX(stagePosition.getX() - insetsDelta.getLeft());
 			stage.setY(stagePosition.getY() - insetsDelta.getTop());
 
-			stage.setMinWidth(borderPane.minWidth(this.getHeight()) + insetsWidth);
-			stage.setMinHeight(borderPane.minHeight(this.getWidth()) + insetsHeight);
+			//remove code
+//			stage.setMinWidth(borderPane.minWidth(this.getHeight()) + insetsWidth);
+//			stage.setMinHeight(borderPane.minHeight(this.getWidth()) + insetsHeight);
 
-			borderPane.setPrefSize(this.getWidth() + insetsWidth, this.getHeight() + insetsHeight);
+//			borderPane.setPrefSize(this.getWidth() + insetsWidth, this.getHeight() + insetsHeight);
 
 			stage.setScene(scene);
 

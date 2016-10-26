@@ -11,8 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import com.kyj.fx.voeditor.visual.component.dock.pane.DockEvent;
-import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
 import com.sun.javafx.collections.UnmodifiableListSet;
 import com.sun.javafx.css.converters.SizeConverter;

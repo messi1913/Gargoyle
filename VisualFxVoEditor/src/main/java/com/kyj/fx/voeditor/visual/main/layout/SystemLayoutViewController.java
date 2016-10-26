@@ -30,6 +30,8 @@ import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenComposite;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
 import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
+import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab;
+import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
 import com.kyj.fx.voeditor.visual.component.file.FilePropertiesComposite;
 import com.kyj.fx.voeditor.visual.component.pmd.DesignerFxComposite;
 import com.kyj.fx.voeditor.visual.component.pmd.PMDCheckedListComposite;
@@ -89,7 +91,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
@@ -178,7 +179,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	private TreeView<FileWrapper> treeProjectFile;
 
 	@FXML
-	private TabPane tabPanWorkspace;
+	private DockTabPane tabPanWorkspace;
 
 	@FXML
 	private VBox accordionItems;
@@ -221,7 +222,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			boolean isCloseALLtabKeyCode = event.isControlDown() && event.isShiftDown() && KeyCode.W == event.getCode();
 
 			boolean isTabMoveCode = event.isControlDown() && isNumberCode(event.getCode());
-			ObservableList<Tab> tabs = tabPanWorkspace.getTabs();
+			ObservableList<DockTab> tabs = tabPanWorkspace.getTabs();
 
 			// tab 전부 닫기
 			if (isCloseALLtabKeyCode) {
@@ -901,24 +902,24 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		MenuItem closeMenuItem = new MenuItem("Close");
 
 		closeMenuItem.setOnAction(hander -> {
-			Tab tab = tabPanWorkspace.getSelectionModel().getSelectedItem();
+			DockTab tab = tabPanWorkspace.getSelectionModel().getSelectedItem();
 			closeTab(tab);
 		});
 		MenuItem closeAllMenuItem = new MenuItem("Close All   CTRL + SHIFT + W");
 
 		closeAllMenuItem.setOnAction(handler -> {
 			for (int i = tabPanWorkspace.getTabs().size() - 1; i >= 1; i--) {
-				Tab tab = tabPanWorkspace.getTabs().get(i);
+				DockTab tab = tabPanWorkspace.getTabs().get(i);
 				closeTab(tab);
 			}
 		});
 
 		MenuItem closeOtherMenuItem = new MenuItem("Close Others");
 		closeOtherMenuItem.setOnAction(hander -> {
-			Tab tab = tabPanWorkspace.getSelectionModel().getSelectedItem();
+			DockTab tab = tabPanWorkspace.getSelectionModel().getSelectedItem();
 
 			for (int i = tabPanWorkspace.getTabs().size() - 1; i >= 1; i--) {
-				Tab otherTab = tabPanWorkspace.getTabs().get(i);
+				DockTab otherTab = tabPanWorkspace.getTabs().get(i);
 				if (tab != otherTab)
 					closeTab(otherTab);
 			}
@@ -937,7 +938,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @작성일 : 2015. 10. 8.
 	 * @param tab
 	 */
-	public void closeTab(Tab tab) {
+	public void closeTab(DockTab tab) {
 		if (tab != null) {
 
 			// 만들어진 closeRequest 이벤트 호출
@@ -1300,7 +1301,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @작성일 : 2015. 11. 2.
 	 * @param tab
 	 */
-	public void addTabItem(Tab tab) {
+	public void addTabItem(DockTab tab) {
+		tab.setClosable(true);
 		tabPanWorkspace.getTabs().add(tab);
 		tab.setContextMenu(closeContextMenu());
 	}
@@ -1330,7 +1332,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				}
 
-				Tab tab = new Tab(tabName, parent);
+				DockTab tab = new DockTab(tabName, parent);
 				addTabItem(tab);
 				tab.getTabPane().getSelectionModel().select(tab);
 
@@ -1365,7 +1367,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					}
 				}
 
-				Tab tab = new Tab(tableName, parent);
+				DockTab tab = new DockTab(tableName, parent);
 				addTabItem(tab);
 				tabPanWorkspace.getSelectionModel().select(tab);
 
@@ -1400,7 +1402,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					}
 				}
 
-				Tab tab = new Tab(tableName, _parent);
+				DockTab tab = new DockTab(tableName, _parent);
 				addTabItem(tab);
 				tabPanWorkspace.getSelectionModel().select(tab);
 				tab.setOnClosed(event -> {
@@ -1720,7 +1722,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 ********************************/
 	@FXML
 	public void menuPrintOnAction() {
-		Tab selectedItem = this.tabPanWorkspace.getSelectionModel().getSelectedItem();
+		DockTab selectedItem = this.tabPanWorkspace.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
 			FxUtil.printJob(SharedMemory.getPrimaryStage(), selectedItem.getContent());
 		}
@@ -1733,7 +1735,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 ********************************/
 	@FXML
 	public void lblCaptureOnAction() {
-		Tab selectedItem = this.tabPanWorkspace.getSelectionModel().getSelectedItem();
+		DockTab selectedItem = this.tabPanWorkspace.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
 			new CaptureScreenComposite(selectedItem.getContent(), System.err::println).show();
 		}

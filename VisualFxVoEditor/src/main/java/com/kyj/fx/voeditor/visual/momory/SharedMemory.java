@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
 import com.kyj.fx.voeditor.visual.loder.DynamicClassLoader;
 import com.kyj.fx.voeditor.visual.loder.ProjectInfo;
 import com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController;
@@ -47,7 +48,7 @@ public class SharedMemory {
 	 *
 	 * @최초생성일 2015. 11. 27.
 	 */
-	private static TabPane tabWorkspace;
+	private static DockTabPane tabWorkspace;
 	/**
 	 * 시스템 레이아웃뷰 컨트롤러
 	 *
@@ -220,11 +221,11 @@ public class SharedMemory {
 
 	}
 
-	public static void setWorkspaceTab(TabPane tabPanWorkspace) {
+	public static void setWorkspaceTab(DockTabPane tabPanWorkspace) {
 		tabWorkspace = tabPanWorkspace;
 	}
 
-	public static TabPane getWorkspaceTab() {
+	public static DockTabPane getWorkspaceTab() {
 		return tabWorkspace;
 	}
 

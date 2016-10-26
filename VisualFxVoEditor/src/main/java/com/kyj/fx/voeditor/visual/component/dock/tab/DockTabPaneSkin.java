@@ -21,11 +21,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockEvent;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPos;
-import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane.DockPosButton;
 import com.sun.javafx.css.converters.EnumConverter;
 import com.sun.javafx.scene.control.MultiplePropertyChangeListenerHandler;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
@@ -58,8 +60,8 @@ import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -73,12 +75,12 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
@@ -86,10 +88,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.SwipeEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -100,6 +98,8 @@ import javafx.stage.Popup;
 import javafx.util.Duration;
 
 public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBehavior> {
+	private static final Logger LOGGER = LoggerFactory.getLogger(DockTabPaneSkin.class);
+
 	private static enum TabAnimation {
 		NONE, GROW
 		// In future we could add FADE, ...
@@ -112,6 +112,7 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 	private ObjectProperty<TabAnimation> openTabAnimation = new StyleableObjectProperty<TabAnimation>(TabAnimation.GROW) {
 		@Override
 		public CssMetaData<DockTabPane, TabAnimation> getCssMetaData() {
+
 			return StyleableProperties.OPEN_TAB_ANIMATION;
 		}
 
@@ -807,10 +808,18 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 			headerBackground = new StackPane();
 			headerBackground.getStyleClass().setAll("tab-header-background");
 
-			int i = 0;
-			for (DockTab tab : tabPane.getTabs()) {
-				addTab(tab, i++);
+			//			ObservableList<DockTab> tabs = tabPane.getTabs();
+			//			int size = tabs.size();
+
+			for (DockTab dockTab : tabPane.getTabs()) {
+				addTab(dockTab);
 			}
+			//			for (int i = 0; i < size; i++) {
+			//
+			//				DockTab dockTab = tabs.get(i);
+			//				addTab(dockTab, i);
+			//
+			//			}
 
 			controlButtons = new TabControlButtons();
 			controlButtons.setVisible(false);
@@ -841,66 +850,138 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 			/*********************************************************************************************************************/
 			//도킹 기능을 구현하기 위한 처리.
 
-			headersRegion.addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
-				isMovingTarget.set(true);
-			});
-
-
-			headersRegion.addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
-				if (!headersRegion.contains(e.getX(), e.getY()) && isMovingTarget.get()) {
-
-					//창을 새로 만들고
-					Node content = selectedTab.getContent();
-					String text = selectedTab.getText();
-					DockNode dockNode = new DockNode(content, text);
-					dockNode.setOwner(getSkinnable().getScene().getWindow());
-					DockPane.initializeDefaultUserAgentStylesheet();
-					dockNode.setMaximized(false);
-					dockNode.setFloating(true, new Point2D(e.getScreenX(), e.getScreenY()));
-
-					//기존에 활성화된 탭은 삭제.
-					getSkinnable().getTabs().remove(selectedTab);
-				}
-			});
-
+			DockPane.initializeDefaultUserAgentStylesheet();
+			//팝업형태에서 놓을 위치를 지정.
 			Popup dockIndicatorOverlay = new Popup();
 			Rectangle dockAreaIndicator = new Rectangle();
+			dockAreaIndicator.setManaged(false);
+			dockAreaIndicator.setMouseTransparent(true);
 			dockAreaIndicator.widthProperty().bind(getSkinnable().widthProperty());
 			dockAreaIndicator.heightProperty().bind(getSkinnable().heightProperty());
-
 			dockAreaIndicator.setFill(Color.rgb(50, 50, 100, 0.4));
 			dockIndicatorOverlay.getContent().add(dockAreaIndicator);
 
+			//도킹된 상태에서 특정 마우스 위치로 놓을 위치를 지정.
+			Popup virtualIndicator = new Popup();
+			Rectangle r = new Rectangle();
+			r.setManaged(false);
+			r.setMouseTransparent(true);
+			r.widthProperty().bind(getSkinnable().widthProperty());
+			r.heightProperty().bind(getSkinnable().heightProperty());
+			r.setFill(Color.rgb(100, 100, 100, 0.4));
+			virtualIndicator.getContent().add(r);
+
+			headersRegion.addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
+				LOGGER.debug("dragged");
+				if (MouseButton.PRIMARY == e.getButton() && e.getClickCount() == 1) {
+					if (isPickOnBounds() && selectedTab.isClosable()) {
+						isMovingTarget.set(true);
+
+						if (!virtualIndicator.isShowing()) {
+							virtualIndicator.show(this.getScene().getWindow());
+						}
+
+						if (virtualIndicator.isShowing()) {
+							virtualIndicator.setX(e.getScreenX());
+							virtualIndicator.setY(e.getScreenY());
+						}
+					}
+				}
+
+			});
+
+			headersRegion.addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
+
+				if (MouseButton.PRIMARY == e.getButton() && e.getClickCount() == 1) {
+
+
+					//마우스가 놓아지면 가상 팝업은 닫혀야한다.
+					if (virtualIndicator.isShowing()) {
+						virtualIndicator.hide();
+					}
+					if (!headersRegion.contains(e.getX(), e.getY()) && isMovingTarget.get()) {
+						LOGGER.debug("action");
+
+
+						if (dockIndicatorOverlay.isShowing()) {
+							dockIndicatorOverlay.hide();
+						}
+
+						SingleSelectionModel<DockTab> selectionModel = getSkinnable().getSelectionModel();
+						int selectIdx = selectionModel.getSelectedIndex();
+						DockTab selectedItem = getSkinnable().getTabs().get(selectIdx);
+
+						//기존에 활성화된 탭은 삭제.
+						if (null != getSkinnable().getTabs().remove(selectIdx)) {
+							LOGGER.debug("remove  tab success!");
+							//창을 새로 만들고
+							Node content = selectedItem.getContent();
+							String text = selectedItem.getText();
+
+							DockNode dockNode = new DockNode(content, text);
+							//userData에 DockTab삽입
+							dockNode.setUserData(selectedItem);
+
+							Bounds boundsInParent = content.getBoundsInParent();
+							dockNode.setPrefSize(boundsInParent.getWidth(), boundsInParent.getHeight());
+							dockNode.setOwner(getSkinnable().getScene().getWindow());
+
+							dockNode.setFloating(true, new Point2D(e.getScreenX(), e.getScreenY()));
+						} else {
+							LOGGER.error("remove  tab fail ");
+						}
+
+					}
+				}
+
+			});
+
 			getSkinnable().addEventHandler(DockEvent.DOCK_OVER, ev -> {
+
 				if (!dockIndicatorOverlay.isShowing()) {
 					Point2D topLeft = this.getParent().localToScreen(0, 0);
 					dockIndicatorOverlay.show(this.getScene().getWindow(), topLeft.getX(), topLeft.getY());
 				}
+
 			});
 
 			getSkinnable().addEventHandler(DockEvent.DOCK_EXIT, ev -> {
+
 				if (dockIndicatorOverlay.isShowing()) {
 					dockIndicatorOverlay.hide();
 				}
+
+				LOGGER.debug("dock exit");
+			});
+
+			getSkinnable().addEventHandler(DockEvent.DOCK_ENTER, ev -> {
+				LOGGER.debug("dock enter");
 			});
 
 			getSkinnable().addEventHandler(DockEvent.DOCK_RELEASED, ev -> {
+				LOGGER.debug("dock released");
+				if (isMovingTarget.get()) {
+					Node contents = ev.getContents();
 
-				Node contents = ev.getContents();
-				if (contents != null && contents instanceof DockNode) {
-					if (dockIndicatorOverlay.isShowing()) {
-						dockIndicatorOverlay.hide();
+					if (contents != null && contents instanceof DockNode) {
+						if (dockIndicatorOverlay.isShowing()) {
+							dockIndicatorOverlay.hide();
+						}
+						DockNode n = (DockNode) contents;
+						DockTab e = (DockTab) n.getUserData();
+						e.setClosable(n.isClosable());
+
+						//탭추가.
+						if (getSkinnable().getTabs().add(e)) {
+							getSkinnable().getSelectionModel().selectLast();
+							LOGGER.debug("add tab success!");
+						} else {
+							LOGGER.error("add tab fail");
+						}
+						n.close();
 					}
-					DockNode n = (DockNode) contents;
-
-					String title = n.getTitle();
-					Node dnc = n.getContents();
-					DockTab e = new DockTab(title, dnc);
-					e.setClosable(n.isClosable());
-					getSkinnable().getTabs().add(e);
-					n.close();
-
 				}
+
 			});
 
 			/*********************************************************************************************************************/
@@ -959,6 +1040,16 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 		private void addTab(DockTab tab, int addToIndex) {
 			TabHeaderSkin tabHeaderSkin = new TabHeaderSkin(tab);
 			headersRegion.getChildren().add(addToIndex, tabHeaderSkin);
+		}
+
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 10. 26.
+		 * @param tab
+		 */
+		private void addTab(DockTab tab) {
+			TabHeaderSkin tabHeaderSkin = new TabHeaderSkin(tab);
+			headersRegion.getChildren().add(tabHeaderSkin);
 		}
 
 		private List<TabHeaderSkin> removeTab = new ArrayList<>();

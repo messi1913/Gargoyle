@@ -40,8 +40,6 @@ import com.sun.javafx.scene.control.behavior.KeyBinding;
 import javafx.event.Event;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.SelectionModel;
-
-
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 
@@ -127,7 +125,7 @@ public class DockTabPaneBehavior extends BehaviorBase<DockTabPane> {
 	}
 
 	public boolean canCloseTab(DockTab tab) {
-		Event event = new Event(tab, tab, DockTab.TAB_CLOSE_REQUEST_EVENT);
+		Event event = new Event(tab, tab, DockTab.DOCK_TAB_CLOSE_REQUEST_EVENT);
 		Event.fireEvent(tab, event);
 		return !event.isConsumed();
 	}
@@ -140,7 +138,7 @@ public class DockTabPaneBehavior extends BehaviorBase<DockTabPane> {
 			tabPane.getTabs().remove(index);
 		}
 		if (tab.getOnClosed() != null) {
-			Event.fireEvent(tab, new Event(DockTab.CLOSED_EVENT));
+			Event.fireEvent(tab, new Event(DockTab.DOCK_CLOSED_EVENT));
 		}
 	}
 

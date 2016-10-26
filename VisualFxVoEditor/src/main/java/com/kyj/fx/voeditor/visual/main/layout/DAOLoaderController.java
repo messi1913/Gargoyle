@@ -341,9 +341,14 @@ public class DAOLoaderController {
 					DaoWizardViewController controller = loader.getController();
 					controller.setTbmSysDaoProperty(tbmSysDAO);
 
-					Tab tab = new Tab("DaoWizard", pane);
-					this.systemRoot.addTabItem(tab);
-					tab.getTabPane().getSelectionModel().select(tab);
+
+
+					/*2016-10-26 by kyj change code  tab handling -> loadNewSystem api */
+//					Tab tab = new Tab("DaoWizard", pane);
+//					this.systemRoot.addTabItem(tab);
+//					tab.getTabPane().getSelectionModel().select(tab);
+					SharedMemory.getSystemLayoutViewController().loadNewSystemTab("DaoWizard", pane);
+
 
 					//2016-09-23 굳히 재조회 할 필요없으므로 주석.
 					//					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());

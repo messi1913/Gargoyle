@@ -49,7 +49,7 @@ import com.sun.javafx.stage.StageHelper;
 /**
  * Base class for a dock node title bar that provides the mouse dragging
  * functionality, captioning, docking, and state manipulation.
- * 
+ *
  * @since DockFX 0.1
  */
 public class DockTitleBar extends HBox implements EventHandler<MouseEvent> {
@@ -70,7 +70,7 @@ public class DockTitleBar extends HBox implements EventHandler<MouseEvent> {
 
 	/**
 	 * Creates a default DockTitleBar with captions and dragging behavior.
-	 * 
+	 *
 	 * @param dockNode
 	 *            The docking node that requires a title bar.
 	 */
@@ -206,7 +206,7 @@ public class DockTitleBar extends HBox implements EventHandler<MouseEvent> {
 	 * The task that is to be executed when the dock event target is picked.
 	 * This provides context for what specific events and what order the events
 	 * should be fired.
-	 * 
+	 *
 	 * @since DockFX 0.1
 	 */
 	private abstract class EventTask {
@@ -217,7 +217,7 @@ public class DockTitleBar extends HBox implements EventHandler<MouseEvent> {
 
 		/**
 		 * Creates a default DockTitleBar with captions and dragging behavior.
-		 * 
+		 *
 		 * @param node
 		 *            The node that was chosen as the event target.
 		 * @param dragNode
@@ -248,7 +248,7 @@ public class DockTitleBar extends HBox implements EventHandler<MouseEvent> {
 	 * the event task with the target and the previous target of the last dock
 	 * event if one is cached. If an event target is not found fire the explicit
 	 * dock event on the stage root if one is provided.
-	 * 
+	 *
 	 * @param location
 	 *            The location of the dock event in screen coordinates.
 	 * @param eventTask
@@ -318,7 +318,11 @@ public class DockTitleBar extends HBox implements EventHandler<MouseEvent> {
 
 	@Override
 	public void handle(MouseEvent event) {
-		if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
+		//이벤트 관련 코드 추가. 마우스 메인키클릭의 경우에만 적용.
+		if(MouseButton.PRIMARY != event.getButton())
+			return ;
+
+		if (event.getEventType() == MouseEvent.MOUSE_PRESSED ) {
 			if (dockNode.isFloating() && event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
 				dockNode.setMaximized(!dockNode.isMaximized());
 			} else {
