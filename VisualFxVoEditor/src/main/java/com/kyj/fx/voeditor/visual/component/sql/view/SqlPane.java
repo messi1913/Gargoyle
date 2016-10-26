@@ -29,13 +29,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockPos;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableViewComposite;
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
 import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockNode;
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockPane;
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockPos;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SQLPaneMotionable;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;

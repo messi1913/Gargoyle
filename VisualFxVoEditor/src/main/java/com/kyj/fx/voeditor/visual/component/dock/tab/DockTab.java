@@ -42,8 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockEvent;
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockNode;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockEvent;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.sun.javafx.beans.IDProperty;
 import com.sun.javafx.event.EventHandlerManager;
 

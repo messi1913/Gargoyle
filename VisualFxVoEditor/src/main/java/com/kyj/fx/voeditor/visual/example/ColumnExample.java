@@ -19,7 +19,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import com.kyj.fx.voeditor.visual.component.ComboBoxTableColumn;
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockPane;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
 import com.kyj.fx.voeditor.visual.main.model.vo.ClassTypeCodeDVO;
 
 /**

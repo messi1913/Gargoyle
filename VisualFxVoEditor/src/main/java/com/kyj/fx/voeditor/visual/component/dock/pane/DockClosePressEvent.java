@@ -1,4 +1,4 @@
-package com.kyj.fx.voeditor.visual.component.sql.dock;
+package com.kyj.fx.voeditor.visual.component.dock.pane;
 
 import javafx.event.Event;
 import javafx.event.EventType;

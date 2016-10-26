@@ -6,9 +6,9 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockPane;
 
 import javafx.application.Application;
 import javafx.geometry.Side;

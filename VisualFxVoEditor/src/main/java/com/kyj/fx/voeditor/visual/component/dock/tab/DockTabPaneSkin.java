@@ -21,11 +21,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockEvent;
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockNode;
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockPane;
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockPos;
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockPane.DockPosButton;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockEvent;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockPos;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane.DockPosButton;
 import com.sun.javafx.css.converters.EnumConverter;
 import com.sun.javafx.scene.control.MultiplePropertyChangeListenerHandler;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;

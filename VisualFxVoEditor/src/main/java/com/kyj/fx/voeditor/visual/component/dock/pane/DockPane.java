@@ -18,7 +18,7 @@
  *          program. If not, see <http://www.gnu.org/licenses/>.
  **/
 
-package com.kyj.fx.voeditor.visual.component.sql.dock;
+package com.kyj.fx.voeditor.visual.component.dock.pane;
 
 import java.util.Stack;
 

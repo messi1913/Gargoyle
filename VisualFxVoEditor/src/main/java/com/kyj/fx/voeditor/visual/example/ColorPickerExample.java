@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.kyj.fx.voeditor.visual.component.ColorPickerTableColumn;
-import com.kyj.fx.voeditor.visual.component.sql.dock.DockPane;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
