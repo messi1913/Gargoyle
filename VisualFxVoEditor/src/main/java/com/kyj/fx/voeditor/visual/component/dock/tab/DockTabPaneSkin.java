@@ -710,7 +710,7 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 
 			headerClip = new Rectangle();
 			//드래그 드롭으로 이동된 상태인지 체크.
-			BooleanProperty isMovingTarget = new SimpleBooleanProperty();
+			//			BooleanProperty isMovingTarget = new SimpleBooleanProperty();
 
 			headersRegion = new StackPane() {
 				@Override
@@ -876,7 +876,7 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 				LOGGER.debug("dragged");
 				if (MouseButton.PRIMARY == e.getButton() && e.getClickCount() == 1) {
 					if (isPickOnBounds() && selectedTab.isClosable()) {
-						isMovingTarget.set(true);
+						//						isMovingTarget.set(true);
 
 						if (!virtualIndicator.isShowing()) {
 							virtualIndicator.show(this.getScene().getWindow());
@@ -899,9 +899,9 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 					if (virtualIndicator.isShowing()) {
 						virtualIndicator.hide();
 					}
-					if (!headersRegion.contains(e.getX(), e.getY()) && isMovingTarget.get()) {
+					if (!headersRegion.contains(e.getX(), e.getY()) /*&& isMovingTarget.get()*/) {
 						LOGGER.debug("action");
-						isMovingTarget.set(false);
+						//						isMovingTarget.set(false);
 						if (dockIndicatorOverlay.isShowing()) {
 							dockIndicatorOverlay.hide();
 						}
@@ -917,6 +917,7 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 							Node content = selectedItem.getContent();
 							String text = selectedItem.getText();
 
+							DockPane dockPane = new DockPane();
 							DockNode dockNode = new DockNode(content, text);
 							//userData에 DockTab삽입
 							dockNode.setUserData(selectedItem);
@@ -925,11 +926,13 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 							dockNode.setPrefSize(boundsInParent.getWidth(), boundsInParent.getHeight());
 							dockNode.setOwner(getSkinnable().getScene().getWindow());
 
+							dockNode.dock(dockPane, DockPos.CENTER);
 							dockNode.setFloating(true, new Point2D(e.getScreenX(), e.getScreenY()));
+
 						} else {
 							LOGGER.error("remove  tab fail ");
 						}
-
+						e.consume();
 					}
 				}
 
@@ -959,32 +962,36 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 
 			getSkinnable().addEventHandler(DockEvent.DOCK_RELEASED, ev -> {
 				LOGGER.debug("dock released");
-				if (isMovingTarget.get()) {
-					Node contents = ev.getContents();
 
-					if (contents != null && contents instanceof DockNode) {
-						if (dockIndicatorOverlay.isShowing()) {
-							dockIndicatorOverlay.hide();
-						}
-						DockNode n = (DockNode) contents;
-						DockTab e = (DockTab) n.getUserData();
-						if (e == null) {
-							String title = n.getTitle();
-							e = new DockTab(title, n.getContents());
-							e.setContextMenu(SharedMemory.getSystemLayoutViewController().closeContextMenu());
-						}
-						e.setClosable(n.isClosable());
-
-						//탭추가.
-						if (getSkinnable().getTabs().add(e)) {
-							getSkinnable().getSelectionModel().selectLast();
-							LOGGER.debug("add tab success!");
-						} else {
-							LOGGER.error("add tab fail");
-						}
-						n.close();
-					}
+				if (dockIndicatorOverlay.isShowing()) {
+					dockIndicatorOverlay.hide();
 				}
+
+				//				if (isMovingTarget.get()) {
+				Node contents = ev.getContents();
+
+				if (contents != null && contents instanceof DockNode) {
+
+					DockNode n = (DockNode) contents;
+					DockTab e = (DockTab) n.getUserData();
+					if (e == null) {
+						String title = n.getTitle();
+						e = new DockTab(title, n.getContents());
+						e.setContextMenu(SharedMemory.getSystemLayoutViewController().closeContextMenu());
+					}
+					e.setClosable(n.isClosable());
+
+					//탭추가.
+					if (getSkinnable().getTabs().add(e)) {
+						getSkinnable().getSelectionModel().selectLast();
+						LOGGER.debug("add tab success!");
+					} else {
+						LOGGER.error("add tab fail");
+					}
+					n.close();
+					ev.consume();
+				}
+				//				}
 
 			});
 

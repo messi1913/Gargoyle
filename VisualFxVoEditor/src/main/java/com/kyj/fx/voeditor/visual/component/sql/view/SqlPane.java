@@ -374,7 +374,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 
 		sqlEditPane = createDefaultDockNode(sqlEditLayout, "Sql"); //new DockNode(sqlEditLayout, "Sql");
 		sqlEditPane.setPrefSize(100, 100);
-		sqlEditPane.setClosable(false);
+//		sqlEditPane.setClosable(false);
 		/* [끝] SQL 입력영역 */
 
 		tbResult = new TableView<>();
@@ -420,7 +420,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		borDataResult.setBottom(lblStatus);
 		DockNode sqlResultPane = createDefaultDockNode(borDataResult, "Result");//  new DockNode(borDataResult, "Result");
 		sqlResultPane.setMinHeight(200);
-		sqlResultPane.setClosable(false);
+//		sqlResultPane.setClosable(false);
 		/* 도킹처리 */
 		// sqlEditPane.setPrefHeight(500);
 		// consoleDock.setPrefHeight(200);
