@@ -897,7 +897,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @작성일 : 2015. 10. 8.
 	 * @return
 	 */
-	private ContextMenu closeContextMenu() {
+	public ContextMenu closeContextMenu() {
 
 		MenuItem closeMenuItem = new MenuItem("Close");
 

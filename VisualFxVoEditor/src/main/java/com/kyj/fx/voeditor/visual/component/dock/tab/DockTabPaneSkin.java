@@ -28,6 +28,7 @@ import com.kyj.fx.voeditor.visual.component.dock.pane.DockEvent;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPos;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.sun.javafx.css.converters.EnumConverter;
 import com.sun.javafx.scene.control.MultiplePropertyChangeListenerHandler;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
@@ -894,14 +895,12 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 
 				if (MouseButton.PRIMARY == e.getButton() && e.getClickCount() == 1) {
 
-
 					//마우스가 놓아지면 가상 팝업은 닫혀야한다.
 					if (virtualIndicator.isShowing()) {
 						virtualIndicator.hide();
 					}
 					if (!headersRegion.contains(e.getX(), e.getY()) && isMovingTarget.get()) {
 						LOGGER.debug("action");
-
 
 						if (dockIndicatorOverlay.isShowing()) {
 							dockIndicatorOverlay.hide();
@@ -969,6 +968,11 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 						}
 						DockNode n = (DockNode) contents;
 						DockTab e = (DockTab) n.getUserData();
+						if (e == null) {
+							String title = n.getTitle();
+							e = new DockTab(title, n.getContents());
+							e.setContextMenu(SharedMemory.getSystemLayoutViewController().closeContextMenu());
+						}
 						e.setClosable(n.isClosable());
 
 						//탭추가.
