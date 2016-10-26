@@ -512,6 +512,10 @@ public class FxUtil {
 		createStageAndShow(title, new Scene(new BorderPane(parent)), isModal);
 	}
 
+	public static void createStageAndShow(String title, Node parent, Consumer<Stage> option) {
+		createStageAndShow(title, new Scene(new BorderPane(parent)), option);
+	}
+
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 23.
@@ -561,6 +565,14 @@ public class FxUtil {
 	 * @param scene
 	 * @param isModal
 	 */
+	public static void createStageAndShow(String title, Scene scene, Consumer<Stage> option) {
+		Stage stage = new Stage();
+		stage.setScene(scene);
+		stage.setTitle(title);
+		option.accept(stage);
+		stage.show();
+	}
+
 	public static void createStageAndShow(String title, Scene scene, boolean isModal) {
 		Consumer<Stage> option = null;
 		if (isModal) {
