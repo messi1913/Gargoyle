@@ -79,7 +79,12 @@ public class Main extends Application {
 			if ("Y".equals(pair.getValue())) {
 
 				for (PrimaryStageCloseable c : listeners) {
-					c.closeRequest();
+					try {
+						c.closeRequest();
+					} catch (Exception e) {
+						LOGGER.error(ValueUtil.toString(e));
+					}
+
 				}
 
 			} else {

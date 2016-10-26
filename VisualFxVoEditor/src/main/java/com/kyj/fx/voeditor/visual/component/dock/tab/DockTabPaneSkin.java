@@ -901,7 +901,7 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 					}
 					if (!headersRegion.contains(e.getX(), e.getY()) && isMovingTarget.get()) {
 						LOGGER.debug("action");
-
+						isMovingTarget.set(false);
 						if (dockIndicatorOverlay.isShowing()) {
 							dockIndicatorOverlay.hide();
 						}

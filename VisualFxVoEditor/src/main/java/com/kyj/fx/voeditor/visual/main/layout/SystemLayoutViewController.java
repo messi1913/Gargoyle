@@ -1507,31 +1507,16 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		try {
 			CommonsSqllPan sqlPane = CommonsSqllPan.getSqlPane();
 
-			Stage stage = new Stage();
-			sqlPane.setStage(stage);
-			Scene scene = new Scene(new BorderPane(sqlPane), 1100, 900);
-			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-			stage.setScene(scene);
-			// stage.setAlwaysOnTop(true);
-			// stage.initModality(Modality.APPLICATION_MODAL);
-			// stage.initOwner(SharedMemory.getPrimaryStage());
 
-			// stage.initOwner(SharedMemory.getPrimaryStage());
-			//			double x = SharedMemory.getPrimaryStage().getX();
-			//			double y = SharedMemory.getPrimaryStage().getY();
-			stage.setTitle("Database");
-			//			stage.setX(x);
-			//			stage.setY(y);
-			//			stage.initOwner(SharedMemory.getPrimaryStage());
-			stage.setAlwaysOnTop(false);
-			//			stage.centerOnScreen();
-			//			stage.initOwner(SharedMemory.getPrimaryStage());
-			stage.show();
-			// stage.showAndWait();
-
-			// 다른 레이아웃에 끼어넣을경우 도킹이 제대로 작동하지않아 처리하지않음
-			// loadNewSystemTab("Database", new BorderPane(new
-			// PostgreSqlPane("sample")));
+			loadNewSystemTab("Database", sqlPane);
+//			Stage stage = new Stage();
+//			sqlPane.setStage(stage);
+//			Scene scene = new Scene(new BorderPane(sqlPane), 1100, 900);
+//			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+//			stage.setScene(scene);
+//			stage.setAlwaysOnTop(false);
+//			stage.initOwner(SharedMemory.getPrimaryStage());
+//			stage.show();
 		} catch (Exception ex) {
 			LOGGER.error(ValueUtil.toString(ex));
 			DialogUtil.showExceptionDailog(ex);

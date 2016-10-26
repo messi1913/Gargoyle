@@ -43,7 +43,9 @@ import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTabPane;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.framework.BigDataDVO;
+import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
+import com.kyj.fx.voeditor.visual.main.Main;
 import com.kyj.fx.voeditor.visual.main.layout.GagoyleTabProxy;
 import com.kyj.fx.voeditor.visual.main.layout.SchoolMgrerSpreadSheetView;
 import com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController;
@@ -65,6 +67,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -309,7 +312,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		// this.getStylesheets().add(externalForm);
 		schemaTree = new TreeView<>();
 
-		DockNode treeView = new DockNode(schemaTree, "Schema");
+		DockNode treeView = createDefaultDockNode(schemaTree, "Schema"); //new DockNode(schemaTree, "Schema");
 		treeView.setMinWidth(300);
 		// treeView.setClosable(false);
 
@@ -369,7 +372,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		sqlTabPane = new SqlTabPane(sqlTab);
 		sqlEditLayout.setCenter(sqlTabPane);
 
-		sqlEditPane = new DockNode(sqlEditLayout, "Sql");
+		sqlEditPane = createDefaultDockNode(sqlEditLayout, "Sql"); //new DockNode(sqlEditLayout, "Sql");
 		sqlEditPane.setPrefSize(100, 100);
 		sqlEditPane.setClosable(false);
 		/* [끝] SQL 입력영역 */
@@ -415,7 +418,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		tabPaneResult = new TabPane(tabResult, tabEdit);
 		BorderPane borDataResult = new BorderPane(tabPaneResult);
 		borDataResult.setBottom(lblStatus);
-		DockNode sqlResultPane = new DockNode(borDataResult, "Result");
+		DockNode sqlResultPane = createDefaultDockNode(borDataResult, "Result");//  new DockNode(borDataResult, "Result");
 		sqlResultPane.setMinHeight(200);
 		sqlResultPane.setClosable(false);
 		/* 도킹처리 */
@@ -437,7 +440,17 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
 		DockPane.initializeDefaultUserAgentStylesheet();
 
-		SharedMemory.getPrimaryStage().setOnCloseRequest(this::onPrimaryCloseRequest);
+		Main.addPrimaryStageCloseListener(() -> onPrimaryCloseRequest(null));
+
+		//bugfix. 아래처럼 primarystage set을 하게되면 등록된 모든 리스너가 사라짐.
+		//		SharedMemory.getPrimaryStage().setOnCloseRequest();
+	}
+
+	private DockNode createDefaultDockNode(Node node, String title) {
+		DockNode dockNode = new DockNode(node, title);
+		dockNode.setOwner(SharedMemory.getPrimaryStage());
+		return dockNode;
+
 	}
 
 	/********************************
@@ -578,7 +591,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		MenuItem menuExportJson = new MenuItem("Export Json");
 		menuExportJson.setOnAction(this::menuExportJsonOnAction);
 
-		Menu menuExportExcelFile = new Menu("Export", null, menuExportExcel, menuExportSpreadSheet, menuExportInsertScript, menuExportMergeScript, menuExportJson);
+		Menu menuExportExcelFile = new Menu("Export", null, menuExportExcel, menuExportSpreadSheet, menuExportInsertScript,
+				menuExportMergeScript, menuExportJson);
 
 		ContextMenu contextMenu = new ContextMenu(menuExportExcelFile);
 		tbResult.setContextMenu(contextMenu);
@@ -608,7 +622,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		// MenuItem menuPrimaryKeys = new MenuItem("Primary Keys");
 
 		MenuItem menuShowData = new MenuItem("Show 100 rows");
-		menuShowData.setAccelerator(new KeyCodeCombination(KeyCode.F1));;
+		menuShowData.setAccelerator(new KeyCodeCombination(KeyCode.F1));
+		;
 		menuShowData.setOnAction(this::show100RowAction);
 
 		MenuItem menuFindTable = new MenuItem("Find Table");
@@ -1289,8 +1304,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 * @작성일 : 2016. 10. 21.
 	 * @param e
 	 */
-	public abstract void menuExportMergeScriptOnAction(ActionEvent e) ;
-
+	public abstract void menuExportMergeScriptOnAction(ActionEvent e);
 
 	public TableView<Map<String, Object>> getTbResult() {
 		return tbResult;

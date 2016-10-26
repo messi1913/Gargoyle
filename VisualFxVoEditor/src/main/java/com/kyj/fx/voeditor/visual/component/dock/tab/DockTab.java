@@ -44,7 +44,6 @@ import java.util.Set;
 
 import com.sun.javafx.beans.IDProperty;
 import com.sun.javafx.event.EventHandlerManager;
-import com.sun.javafx.scene.control.ControlAcceleratorSupport;
 
 import javafx.beans.DefaultProperty;
 import javafx.beans.InvalidationListener;
