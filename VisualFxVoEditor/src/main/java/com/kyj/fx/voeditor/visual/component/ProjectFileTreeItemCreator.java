@@ -35,7 +35,7 @@ public class ProjectFileTreeItemCreator {
 
 	/**
 	 * 열어본 파일 트리(Workspace)에 대한 정보가 Serialize되는 파일 .
-	 * 
+	 *
 	 * @최초생성일 2016. 7. 18.
 	 */
 	private static final String OPEND_HISTORY_FILE_NAME = "opendInfo.dat";
@@ -49,7 +49,7 @@ public class ProjectFileTreeItemCreator {
 
 	/**
 	 * SQLite DbFile. SVN에 대한 메타정보가 담긴 파일.
-	 * 
+	 *
 	 * @최초생성일 2016. 7. 18.
 	 */
 	private static final String WCDB_FILE_NAME = "wc.db";
@@ -138,7 +138,7 @@ public class ProjectFileTreeItemCreator {
 	}
 
 	public TreeItem<FileWrapper> createJavaProjectMemberNode(final FileWrapper f) {
-		return new JavaProjectMemberFileTreeItem(f) {
+		TreeItem<FileWrapper> treeItem =  new JavaProjectMemberFileTreeItem(f) {
 			private boolean isLeaf;
 			private boolean isFirstTimeChildren = true;
 			private boolean isFirstTimeLeaf = true;
@@ -162,6 +162,23 @@ public class ProjectFileTreeItemCreator {
 				return isLeaf;
 			}
 		};
+
+		treeItem.expandedProperty().addListener((oba, oldval, newval) -> {
+			FileWrapper value = f;
+			File file = value.getFile();
+
+			if (newval) {
+				cacheExpaned.add(file);
+			} else {
+				cacheExpaned.remove(file);
+			}
+
+		});
+
+		if (cacheExpaned.contains(f.getFile())) {
+			treeItem.setExpanded(true);
+		}
+		return treeItem;
 	}
 
 	public TreeItem<FileWrapper> createFileNode(final FileWrapper f) {
@@ -330,7 +347,7 @@ public class ProjectFileTreeItemCreator {
 	 * 작성일 : 2016. 7. 10. 작성자 : KYJ
 	 *
 	 * 자바 프로젝트 메타정보를 처리함.
-	 * 
+	 *
 	 * 현재 처리내용은 svn이 Connected되었는지, javaProject파일인지 여부를 확인함.
 	 *
 	 * @param fileWrapper
