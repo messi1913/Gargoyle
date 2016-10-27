@@ -183,6 +183,17 @@ public class SqlTab extends Tab {
 			// 저장키를 누른경우 * 탭명에 *을 지우기 위한 작업처리
 			String text2 = getText();
 
+			if (keyE != null) {
+				if (KeyCode.O == keyE.getCode() && keyE.isControlDown() && !keyE.isAltDown() && !keyE.isShiftDown()) {
+					miOenOnAction(new ActionEvent());
+					keyE.consume();
+				}
+				if (KeyCode.S == keyE.getCode() && keyE.isControlDown() && !keyE.isAltDown() && !keyE.isShiftDown()) {
+					muSaveOnAction(new ActionEvent());
+					keyE.consume();
+				}
+			}
+
 			//			boolean isControlDown = keyE.isControlDown();
 			//			if (isControlDown && keyE.getCode() == KeyCode.S) {
 			//				int lastIndexOf = text2.lastIndexOf('*');

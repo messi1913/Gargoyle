@@ -44,6 +44,8 @@ import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
+import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabContent;
+import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabTitleContentBar;
 import com.sun.javafx.stage.StageHelper;
 
 /**
@@ -319,10 +321,10 @@ public class DockTitleBar extends HBox implements EventHandler<MouseEvent> {
 	@Override
 	public void handle(MouseEvent event) {
 		//이벤트 관련 코드 추가. 마우스 메인키클릭의 경우에만 적용.
-		if(MouseButton.PRIMARY != event.getButton())
-			return ;
+		if (MouseButton.PRIMARY != event.getButton())
+			return;
 
-		if (event.getEventType() == MouseEvent.MOUSE_PRESSED ) {
+		if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
 			if (dockNode.isFloating() && event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
 				dockNode.setMaximized(!dockNode.isMaximized());
 			} else {
@@ -411,12 +413,12 @@ public class DockTitleBar extends HBox implements EventHandler<MouseEvent> {
 			stage.setY(event.getScreenY() - dragStart.getY() - insetsDelta.getTop());
 
 			// TODO: change the pick result by adding a copyForPick()
-			DockEvent dockEnterEvent = new DockEvent(this, DockEvent.NULL_SOURCE_TARGET, DockEvent.DOCK_ENTER, event.getX(),
-					event.getY(), event.getScreenX(), event.getScreenY(), null);
-			DockEvent dockOverEvent = new DockEvent(this, DockEvent.NULL_SOURCE_TARGET, DockEvent.DOCK_OVER, event.getX(),
-					event.getY(), event.getScreenX(), event.getScreenY(), null);
-			DockEvent dockExitEvent = new DockEvent(this, DockEvent.NULL_SOURCE_TARGET, DockEvent.DOCK_EXIT, event.getX(),
-					event.getY(), event.getScreenX(), event.getScreenY(), null);
+			DockEvent dockEnterEvent = new DockEvent(this, DockEvent.NULL_SOURCE_TARGET, DockEvent.DOCK_ENTER, event.getX(), event.getY(),
+					event.getScreenX(), event.getScreenY(), null, this.getDockNode());
+			DockEvent dockOverEvent = new DockEvent(this, DockEvent.NULL_SOURCE_TARGET, DockEvent.DOCK_OVER, event.getX(), event.getY(),
+					event.getScreenX(), event.getScreenY(), null , this.getDockNode());
+			DockEvent dockExitEvent = new DockEvent(this, DockEvent.NULL_SOURCE_TARGET, DockEvent.DOCK_EXIT, event.getX(), event.getY(),
+					event.getScreenX(), event.getScreenY(), null , this.getDockNode());
 
 			EventTask eventTask = new EventTask() {
 				@Override
@@ -437,7 +439,8 @@ public class DockTitleBar extends HBox implements EventHandler<MouseEvent> {
 
 						dragNodes.put(node.getScene().getWindow(), node);
 					}
-					Event.fireEvent(node, dockOverEvent.copyFor(DockTitleBar.this, node));
+
+						Event.fireEvent(node, dockOverEvent.copyFor(DockTitleBar.this, node));
 				}
 			};
 
@@ -445,16 +448,17 @@ public class DockTitleBar extends HBox implements EventHandler<MouseEvent> {
 		} else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
 			dragging = false;
 
-			DockEvent dockReleasedEvent = new DockEvent(this, DockEvent.NULL_SOURCE_TARGET, DockEvent.DOCK_RELEASED,
-					event.getX(), event.getY(), event.getScreenX(), event.getScreenY(), null, this.getDockNode());
+			DockEvent dockReleasedEvent = new DockEvent(this, DockEvent.NULL_SOURCE_TARGET, DockEvent.DOCK_RELEASED, event.getX(),
+					event.getY(), event.getScreenX(), event.getScreenY(), null, this.getDockNode());
 
 			EventTask eventTask = new EventTask() {
 				@Override
 				public void run(Node node, Node dragNode) {
 					executions++;
-					if (dragNode != node) {
-						Event.fireEvent(node, dockReleasedEvent.copyFor(DockTitleBar.this, node));
-					}
+
+					//					if (dragNode != node) {
+					//						Event.fireEvent(node, dockReleasedEvent.copyFor(DockTitleBar.this, node));
+					//					}
 					Event.fireEvent(node, dockReleasedEvent.copyFor(DockTitleBar.this, node));
 				}
 			};

@@ -27,15 +27,16 @@ import com.kyj.fx.voeditor.visual.component.ButtonTableColumn;
 import com.kyj.fx.voeditor.visual.component.ColorPickerTableColumn;
 import com.kyj.fx.voeditor.visual.component.ComboBoxTableColumn;
 import com.kyj.fx.voeditor.visual.component.PasswordTextFieldTableCell;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.exceptions.NotYetSupportException;
 import com.kyj.fx.voeditor.visual.main.model.vo.Code;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
-import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.star.uno.RuntimeException;
 
@@ -45,7 +46,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -54,7 +55,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -385,7 +385,8 @@ public class DatabaseUrlManagementView extends BorderPane {
 			String url = map.get(ResourceLoader.BASE_KEY_JDBC_URL).toString();
 
 			String username = map.get(ResourceLoader.BASE_KEY_JDBC_ID) != null ? map.get(ResourceLoader.BASE_KEY_JDBC_ID).toString() : "";
-			String password = map.get(ResourceLoader.BASE_KEY_JDBC_PASS)!=null? map.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString() : "";
+			String password = map.get(ResourceLoader.BASE_KEY_JDBC_PASS) != null ? map.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString()
+					: "";
 
 			password = decryp(password);
 			PoolProperties poolProperties = new PoolProperties();
@@ -395,16 +396,16 @@ public class DatabaseUrlManagementView extends BorderPane {
 			poolProperties.setPassword(password);
 
 			return poolProperties;
-		}, (bool) -> {
+		} , (bool) -> {
 			String msg = "fail!";
 			if (bool)
 				msg = "success!";
 			DialogUtil.showMessageDialog(msg);
-		}, ex -> {
+		} , ex -> {
 			LOGGER.info(ValueUtil.toString("ping test", ex));
 		});
 
-//		LOGGER.debug(map.toString());
+		//		LOGGER.debug(map.toString());
 
 	}
 
@@ -426,13 +427,33 @@ public class DatabaseUrlManagementView extends BorderPane {
 		CommonsSqllPan sqlPane = CommonsSqllPan.getSqlPane(dbms);
 		sqlPane.initialize(map);
 
-		Stage stage = new Stage();
-		sqlPane.setStage(stage);
-		Scene scene = new Scene(new BorderPane(sqlPane), 1100, 700);
-		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-		stage.setScene(scene);
-		stage.setTitle(dbms);
-		
-		stage.show();
+		//		Scene scene = new Scene(root, 1100, 700);
+		sqlPane.setPrefSize(1100, 900);
+		String title = String.format("Database[%s]", sqlPane.getClass().getSimpleName());
+
+		DockNode dockNode = new DockNode(sqlPane, title);
+		//				dockNode.setFloating(true, new Point2D(0,0));
+		//				dockNode.getStage().centerOnScreen();
+
+		FxUtil.createDockStageAndShow(null, dockNode);
+
+		//		FxUtil.createStageAndShow(title, dockNode, stage -> {
+		//			stage.getScene().getStylesheets().add(SkinManager.getInstance().getSkin());
+		//			dockNode.floatingProperty().addListener((oba, o, n) -> {
+		//				if (n)
+		//					stage.close();
+		//			});
+		//		});
+
+		//		Stage stage = new Stage();
+		//		sqlPane.setStage(stage);
+
+		//		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+		//		stage.setScene(scene);
+		//		stage.setTitle(dbms);
+		//
+		//
+		//
+		//		stage.show();
 	}
 }

@@ -1508,7 +1508,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			CommonsSqllPan sqlPane = CommonsSqllPan.getSqlPane();
 
 
-			loadNewSystemTab("Database", sqlPane);
+			loadNewSystemTab(String.format("Database[%s]", sqlPane.getClass().getSimpleName()), sqlPane);
 //			Stage stage = new Stage();
 //			sqlPane.setStage(stage);
 //			Scene scene = new Scene(new BorderPane(sqlPane), 1100, 900);

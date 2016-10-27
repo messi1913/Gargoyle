@@ -111,11 +111,18 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			// 클립보드에 텍스트 복사.
 			FxClipboardUtil.putString(clipTarget);
 		}
-
 		//테이블을 찾는 리소스 뷰를 오픈한다.
 		else if (KeyCode.R == e.getCode() && e.isControlDown() && e.isShiftDown()) {
 			showTableResourceView();
 			e.consume();
+		}
+
+		else if (KeyCode.F1 == e.getCode() && (!e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
+			show100RowAction();
+		}
+
+		else if (KeyCode.F5 == e.getCode() && (!e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
+			menuRefleshOnAction(null);
 		}
 	}
 
@@ -251,7 +258,16 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 		 * 2016-09-03 by kyj.
 		 * SqlPane에서 기본 기능이 되도록 재구현.
 		 * FxUtil.installClipboardKeyEvent(tb);API를 사용.
+		 *
+		 * 	 2016-10-27 키 이벤트를  setAccelerator를 사용하지않고 이벤트 방식으로 변경
+		 *	이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
 		 */
+		if(KeyCode.F == e.getCode() && e.isControlDown() && e.isShiftDown())
+		{
+			menuFormatterOnAction(null);
+			e.consume();
+		}
+
 
 		//		int type = -1;
 		//		if (e.isControlDown() && e.getCode() == KeyCode.C) {

@@ -75,7 +75,8 @@ public class DockTabPane extends Control {
 		getStyleClass().setAll("tab-pane");
 		setAccessibleRole(AccessibleRole.TAB_PANE);
 		setSelectionModel(new TabPaneSelectionModel(this));
-
+		// No cache
+		setCache(false);
 		this.tabs.addListener((ListChangeListener<DockTab>) c -> {
 			while (c.next()) {
 				for (DockTab tab : c.getRemoved()) {

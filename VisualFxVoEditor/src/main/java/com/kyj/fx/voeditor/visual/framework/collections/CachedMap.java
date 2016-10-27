@@ -75,9 +75,9 @@ public class CachedMap<K, V> implements Map<K, V>, PrimaryStageCloseable {
 
 		//timer클래스가 종료되는 시점에 종료처리하기위해 리스너에 등록.
 		Main.addPrimaryStageCloseListener(this);
-//		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-//			closeRequest();
-//		}));
+		//		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+		//			closeRequest();
+		//		}));
 	}
 
 	/* (non-Javadoc)
@@ -276,6 +276,10 @@ public class CachedMap<K, V> implements Map<K, V>, PrimaryStageCloseable {
 		//반드시 호출할것.
 		if (timer != null)
 			timer.cancel();
+		else
+			LOGGER.debug("CachedMap timer is empty.");
+
+		LOGGER.debug("CachedMap cancel finish.");
 	}
 
 }

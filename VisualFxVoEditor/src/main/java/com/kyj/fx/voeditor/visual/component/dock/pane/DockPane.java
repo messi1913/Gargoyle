@@ -22,6 +22,7 @@ package com.kyj.fx.voeditor.visual.component.dock.pane;
 
 import java.util.Stack;
 
+import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabContent;
 import com.sun.javafx.css.StyleManager;
 
 import javafx.animation.KeyFrame;
@@ -532,7 +533,11 @@ public class DockPane extends StackPane implements EventHandler<DockEvent> {
 	@Override
 	public void handle(DockEvent event) {
 
-		System.out.println(event.getEventType() + " {{}}" + event.getContents());
+
+
+//		if(this.dockNode instanceof DockTabContent)
+//			return;
+
 		if (event.getEventType() == DockEvent.DOCK_ENTER) {
 			if (!dockIndicatorOverlay.isShowing()) {
 				Point2D topLeft = DockPane.this.localToScreen(0, 0);
@@ -546,7 +551,7 @@ public class DockPane extends StackPane implements EventHandler<DockEvent> {
 
 			for (DockPosButton dockIndicatorButton : dockPosButtons) {
 
-//				if (dockIndicatorButton.contains(dockIndicatorButton.parentToLocal(event.getScreenX(), event.getScreenY()))) {
+				//				if (dockIndicatorButton.contains(dockIndicatorButton.parentToLocal(event.getScreenX(), event.getScreenY()))) {
 				if (dockIndicatorButton.contains(dockIndicatorButton.screenToLocal(event.getScreenX(), event.getScreenY()))) {
 					dockPosDrag = dockIndicatorButton.getDockPos();
 					if (dockIndicatorButton.isDockRoot()) {
@@ -594,7 +599,7 @@ public class DockPane extends StackPane implements EventHandler<DockEvent> {
 
 				Point2D originToScreen = dockNodeDrag.localToScreen(0, 0);
 
-				double posX = originToScreen.getX() +dockNodeDrag.getLayoutBounds().getWidth() / 2 - dockPosIndicator.getWidth() / 2;
+				double posX = originToScreen.getX() + dockNodeDrag.getLayoutBounds().getWidth() / 2 - dockPosIndicator.getWidth() / 2;
 				double posY = originToScreen.getY() + dockNodeDrag.getLayoutBounds().getHeight() / 2 - dockPosIndicator.getHeight() / 2;
 
 				if (!dockIndicatorPopup.isShowing()) {

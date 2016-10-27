@@ -33,6 +33,7 @@ import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
 import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
@@ -78,6 +79,7 @@ import javafx.scene.transform.Scale;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 
 /**
@@ -549,13 +551,18 @@ public class FxUtil {
 	public static void createStageAndShow(CloseableParent<? extends Parent> cloableParent, Consumer<Stage> option) {
 
 		Stage stage = craeteStage(cloableParent.getParent(), option);
-		stage.setOnCloseRequest(ev -> {
+		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, ev -> {
 			try {
 				cloableParent.close();
 			} catch (Exception e) {
 				LOGGER.error(ValueUtil.toString(e));
 			}
 		});
+
+		//remove setOnCloseRequest   and then, addEventHandler
+		//		stage.setOnCloseRequest(ev -> {
+		//
+		//		});
 		stage.show();
 	}
 
@@ -1008,4 +1015,108 @@ public class FxUtil {
 		autoCompletionTextFieldBinding.setVisibleRowCount(10);
 
 	}
+
+	/**
+	 * Parent에서 filter의 조건에 맞는 노드들을 찾은후 리턴.
+	 *
+	 * visible true인 대상만 찾음.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 9. 20.
+	 * @param p
+	 * @param filter
+	 * @return
+	 */
+
+	public static List<Node> findAllByNodes(Parent p, Predicate<Node> filter) {
+		return findAllByNodes(p, true, filter);
+	}
+
+	/**
+	 * Parent에서 filter의 조건에 맞는 노드들을 찾은후 리턴.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 11.
+	 * @param p
+	 * @param onlyVisible visible 속성에 맞는 노드들 리턴
+	 * @param filter
+	 * @return
+	 */
+	public static List<Node> findAllByNodes(Parent p, boolean onlyVisible, Predicate<Node> filter) {
+		return p.getChildrenUnmodifiable().stream().flatMap(v -> {
+
+			//화면에 visible true인 대상만.
+			if (onlyVisible) {
+
+				if (v.isVisible()) {
+
+					if (filter.test(v)) {
+						return Stream.of(v);
+					}
+
+					else if (v instanceof Parent) {
+						return findAllByNodes((Parent) v, onlyVisible, filter).stream();
+					}
+				}
+
+			}
+			// visible 상관없이 모두 찾음.
+			else {
+
+				if (filter.test(v)) {
+					return Stream.of(v);
+				}
+
+				else if (v instanceof Parent) {
+					return findAllByNodes((Parent) v, onlyVisible, filter).stream();
+				}
+			}
+
+			return Stream.empty();
+		}).collect(Collectors.toList());
+	}
+
+
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 27.
+	 * @param owner
+	 * @param dockNode
+	 */
+	public static void createDockStageAndShow(Window owner, DockNode dockNode) {
+		createDockStageAndShow(owner, dockNode, null, true);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 27.
+	 * @param owner
+	 * @param dockNode
+	 * @param center
+	 */
+	public static void createDockStageAndShow(Window owner, DockNode dockNode, boolean center) {
+		createDockStageAndShow(owner, dockNode, null, center);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 27.
+	 * @param dockNode
+	 */
+	public static void createDockStageAndShow(Window owner, DockNode dockNode, Point2D initLocation) {
+		createDockStageAndShow(owner , dockNode, initLocation, false);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 27.
+	 * @param dockNode
+	 */
+	public static void createDockStageAndShow(Window owner, DockNode dockNode, Point2D initLocation, boolean center) {
+		dockNode.setOwner(owner);
+		dockNode.setFloating(true, initLocation);
+		if (center)
+			dockNode.getStage().centerOnScreen();
+	}
+
 }

@@ -19,6 +19,7 @@ import com.kyj.fx.voeditor.visual.util.SqlFormatter;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
@@ -71,6 +72,14 @@ public class CodeAreaHelper<T extends CodeArea> {
 		createMenus();
 	}
 
+	/**
+	 *
+	 *  2016-10-27 키 이벤트를  setAccelerator를 사용하지않고 이벤트 방식으로 변경
+		이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
+
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 27.
+	 */
 	public void createMenus() {
 		menuSearch = new Menu("Search");
 		miFindReplace = new MenuItem("Find/Replace");
@@ -79,13 +88,13 @@ public class CodeAreaHelper<T extends CodeArea> {
 		miToLowercase = new MenuItem("To Lowercase");
 
 		miFindReplace.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN));
-		miFindReplace.setOnAction(this::findReplaceEvent);
+		//		miFindReplace.setOnAction(this::findReplaceEvent);
 		menuMoveToLine.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
-		menuMoveToLine.setOnAction(this::moveToLineEvent);
+		//		menuMoveToLine.setOnAction(this::moveToLineEvent);
 		miToUppercase.setAccelerator(new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
-		miToUppercase.setOnAction(this::toUppercaseEvent);
+		//		miToUppercase.setOnAction(this::toUppercaseEvent);
 		miToLowercase.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
-		miToLowercase.setOnAction(this::toLowercaseEvent);
+		//		miToLowercase.setOnAction(this::toLowercaseEvent);
 
 		menuSearch.getItems().add(miFindReplace);
 		codeArea.getContextMenu().getItems().addAll(menuSearch, menuMoveToLine, miToUppercase, miToLowercase);
@@ -318,6 +327,30 @@ public class CodeAreaHelper<T extends CodeArea> {
 	 * @param e
 	 */
 	public void codeAreaKeyClick(KeyEvent e) {
+
+		if (KeyCode.F == e.getCode() && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
+			if (!e.isConsumed()) {
+				findReplaceEvent(new ActionEvent());
+				e.consume();
+			}
+
+		} else if (KeyCode.L == e.getCode() && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
+			if (!e.isConsumed()) {
+				moveToLineEvent(new ActionEvent());
+				e.consume();
+			}
+		} else if (KeyCode.U == e.getCode() && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
+			if (!e.isConsumed()) {
+				toUppercaseEvent(new ActionEvent());
+				e.consume();
+			}
+		} else if (KeyCode.L == e.getCode() && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
+			if (!e.isConsumed()) {
+				toLowercaseEvent(new ActionEvent());
+				e.consume();
+			}
+		}
+
 		// System.out.println("sqlKeywords");
 		// System.out.println(e.getCode());
 		// CTRL + F 찾기

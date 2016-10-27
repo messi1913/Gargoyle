@@ -29,6 +29,7 @@ import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPos;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.sun.javafx.css.converters.EnumConverter;
 import com.sun.javafx.scene.control.MultiplePropertyChangeListenerHandler;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
@@ -44,10 +45,8 @@ import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.WritableValue;
 import javafx.collections.FXCollections;
@@ -848,6 +847,17 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 
 			});
 
+			//도킹기능을 구현하기 위한 처리.
+			installDocking();
+
+		}
+
+		/**
+		 * 도킹처리
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 10. 27.
+		 */
+		private void installDocking() {
 			/*********************************************************************************************************************/
 			//도킹 기능을 구현하기 위한 처리.
 
@@ -873,22 +883,22 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 			virtualIndicator.getContent().add(r);
 
 			headersRegion.addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
-				LOGGER.debug("dragged");
 				if (MouseButton.PRIMARY == e.getButton() && e.getClickCount() == 1) {
 					if (isPickOnBounds() && selectedTab.isClosable()) {
 						//						isMovingTarget.set(true);
 
 						if (!virtualIndicator.isShowing()) {
 							virtualIndicator.show(this.getScene().getWindow());
+
 						}
 
 						if (virtualIndicator.isShowing()) {
 							virtualIndicator.setX(e.getScreenX());
 							virtualIndicator.setY(e.getScreenY());
 						}
+						e.consume();
 					}
 				}
-
 			});
 
 			headersRegion.addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
@@ -910,27 +920,35 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 						int selectIdx = selectionModel.getSelectedIndex();
 						DockTab selectedItem = getSkinnable().getTabs().get(selectIdx);
 
-						//기존에 활성화된 탭은 삭제.
+						//						DockTab dockTab = getSkinnable().getTabs().get(selectIdx);
+
 						if (null != getSkinnable().getTabs().remove(selectIdx)) {
+
+							//							Platform.runLater(() -> {
+
 							LOGGER.debug("remove  tab success!");
 							//창을 새로 만들고
 							Node content = selectedItem.getContent();
 							String text = selectedItem.getText();
 
-							DockPane dockPane = new DockPane();
-							DockNode dockNode = new DockNode(content, text);
+							DockNode dockNode = new DockTabContent(content, text);
+
 							//userData에 DockTab삽입
 							dockNode.setUserData(selectedItem);
 
 							Bounds boundsInParent = content.getBoundsInParent();
 							dockNode.setPrefSize(boundsInParent.getWidth(), boundsInParent.getHeight());
-							dockNode.setOwner(getSkinnable().getScene().getWindow());
 
-							dockNode.dock(dockPane, DockPos.CENTER);
-							dockNode.setFloating(true, new Point2D(e.getScreenX(), e.getScreenY()));
+							FxUtil.createDockStageAndShow(getSkinnable().getScene().getWindow(), dockNode,
+									new Point2D(e.getScreenX(), e.getScreenY()), false);
 
 						} else {
 							LOGGER.error("remove  tab fail ");
+						}
+						try {
+							Thread.sleep(100L);
+						} catch (Exception e1) {
+							e1.printStackTrace();
 						}
 						e.consume();
 					}
@@ -939,8 +957,9 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 			});
 
 			getSkinnable().addEventHandler(DockEvent.DOCK_OVER, ev -> {
-
+				LOGGER.debug("source : {} , ev {} , content : {} ", ev.getSource(), ev, ev.getContents());
 				if (!dockIndicatorOverlay.isShowing()) {
+
 					Point2D topLeft = this.getParent().localToScreen(0, 0);
 					dockIndicatorOverlay.show(this.getScene().getWindow(), topLeft.getX(), topLeft.getY());
 				}
@@ -958,13 +977,21 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 
 			getSkinnable().addEventHandler(DockEvent.DOCK_ENTER, ev -> {
 				LOGGER.debug("dock enter");
+
 			});
 
 			getSkinnable().addEventHandler(DockEvent.DOCK_RELEASED, ev -> {
 				LOGGER.debug("dock released");
+				LOGGER.debug("getsource : {} ", ev.getSource().toString());
+				LOGGER.debug("intersect node : {}", ev.getPickResult().getIntersectedNode());
+				//				System.out.println(ev.getPickResult().getIntersectedNode());
 
 				if (dockIndicatorOverlay.isShowing()) {
 					dockIndicatorOverlay.hide();
+				} else {
+					if (null == ev.getPickResult().getIntersectedNode())
+						return;
+
 				}
 
 				//				if (isMovingTarget.get()) {
@@ -1050,7 +1077,9 @@ public class DockTabPaneSkin extends BehaviorSkinBase<DockTabPane, DockTabPaneBe
 
 		private void addTab(DockTab tab, int addToIndex) {
 			TabHeaderSkin tabHeaderSkin = new TabHeaderSkin(tab);
-			headersRegion.getChildren().add(addToIndex, tabHeaderSkin);
+			ObservableList<Node> children = headersRegion.getChildren();
+
+			children.add(addToIndex, tabHeaderSkin);
 		}
 
 		/**

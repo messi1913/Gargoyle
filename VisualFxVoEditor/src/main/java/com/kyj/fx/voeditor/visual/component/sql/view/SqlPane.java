@@ -29,9 +29,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
-import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
+import com.kyj.fx.voeditor.visual.component.TitledBorderPane;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
-import com.kyj.fx.voeditor.visual.component.dock.pane.DockPos;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableViewComposite;
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
 import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
@@ -43,7 +42,6 @@ import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTabPane;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.framework.BigDataDVO;
-import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
 import com.kyj.fx.voeditor.visual.main.Main;
 import com.kyj.fx.voeditor.visual.main.layout.GagoyleTabProxy;
@@ -67,6 +65,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
@@ -75,6 +74,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -86,7 +86,6 @@ import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -103,10 +102,12 @@ import javafx.util.StringConverter;
 /**
  * 전체적인 뷰 레이아웃 및 레이아웃과 관련된 행위들을 정의함.
  *
+ *
+ * 2016-10-27 구성되는 컴포넌트가 DockNode에서 BorderPane + SplitPane 기반으로 바꿈.
  * @author KYJ
  *
  */
-public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<T, K>, SQLPaneMotionable<K> {
+public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeItem<T, K>, SQLPaneMotionable<K> {
 
 	/**
 	 * MSG
@@ -133,7 +134,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	 * 상태메세지를 보여본다.
 	 */
 	private Label lblStatus;
-	private DockNode sqlEditPane;
+	private TitledBorderPane sqlEditPane;
 	private SqlTabPane sqlTabPane;
 	private SqlTab sqlTab;
 
@@ -165,6 +166,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	IntegerProperty endColIndexProperty = new SimpleIntegerProperty();
 
 	public void setTitle(String title) {
+		//		sqlEditPane.setTitle(title);
 		sqlEditPane.setTitle(title);
 	}
 
@@ -312,7 +314,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		// this.getStylesheets().add(externalForm);
 		schemaTree = new TreeView<>();
 
-		DockNode treeView = createDefaultDockNode(schemaTree, "Schema"); //new DockNode(schemaTree, "Schema");
+		TitledBorderPane treeView = createDefaultDockNode(schemaTree, "Schema"); //new DockNode(schemaTree, "Schema");
 		treeView.setMinWidth(300);
 		// treeView.setClosable(false);
 
@@ -374,7 +376,7 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 
 		sqlEditPane = createDefaultDockNode(sqlEditLayout, "Sql"); //new DockNode(sqlEditLayout, "Sql");
 		sqlEditPane.setPrefSize(100, 100);
-//		sqlEditPane.setClosable(false);
+		//		sqlEditPane.setClosable(false);
 		/* [끝] SQL 입력영역 */
 
 		tbResult = new TableView<>();
@@ -418,16 +420,18 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		tabPaneResult = new TabPane(tabResult, tabEdit);
 		BorderPane borDataResult = new BorderPane(tabPaneResult);
 		borDataResult.setBottom(lblStatus);
-		DockNode sqlResultPane = createDefaultDockNode(borDataResult, "Result");//  new DockNode(borDataResult, "Result");
+		TitledBorderPane sqlResultPane = createDefaultDockNode(borDataResult, "Result");//  new DockNode(borDataResult, "Result");
 		sqlResultPane.setMinHeight(200);
-//		sqlResultPane.setClosable(false);
-		/* 도킹처리 */
-		// sqlEditPane.setPrefHeight(500);
-		// consoleDock.setPrefHeight(200);
-		// sqlResultPane.setPrefHeight(200);
-		sqlEditPane.dock(this, DockPos.CENTER);
-		sqlResultPane.dock(this, DockPos.BOTTOM);
-		treeView.dock(this, DockPos.LEFT);
+
+		SplitPane spCenter = new SplitPane(treeView, sqlEditPane);
+		spCenter.setOrientation(Orientation.HORIZONTAL);
+
+		SplitPane spRoot = new SplitPane(spCenter, sqlResultPane);
+		spRoot.setOrientation(Orientation.VERTICAL);
+
+		this.setCenter(spRoot);
+//		this.setBottom(sqlResultPane);
+//		this.setLeft(treeView);
 
 		schemaTree.setRoot(apply(t, this.connectionSupplier));
 		schemaTree.setOnMouseClicked(this::schemaTreeOnMouseClick);
@@ -446,10 +450,10 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		//		SharedMemory.getPrimaryStage().setOnCloseRequest();
 	}
 
-	private DockNode createDefaultDockNode(Node node, String title) {
-		DockNode dockNode = new DockNode(node, title);
-		dockNode.setOwner(SharedMemory.getPrimaryStage());
-		return dockNode;
+	private TitledBorderPane createDefaultDockNode(Node node, String title) {
+		TitledBorderPane n = new TitledBorderPane(title, node);
+		//		dockNode.setOwner(SharedMemory.getPrimaryStage());
+		return n;
 
 	}
 
@@ -565,8 +569,11 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 						(int) (userColor.getGreen() * 255), (int) (userColor.getBlue() * 255));
 				String textColor = String.format("#%02X%02X%02X", 255 - (int) (userColor.getRed() * 255),
 						255 - (int) (userColor.getGreen() * 255), 255 - (int) (userColor.getBlue() * 255));
-				sqlEditPane.getDockTitleBar().getLabel().setStyle("-fx-text-fill:" + textColor);
-				sqlEditPane.getDockTitleBar().setStyle("-fx-background-color:" + backGroundColor);
+
+
+				sqlEditPane.getTitleLabel().setStyle("-fx-text-fill:" + textColor);
+				sqlEditPane.getTitleLabel().setStyle("-fx-background-color:" + backGroundColor);
+
 			}
 		} catch (Exception e) {
 			DialogUtil.showExceptionDailog(this, e, "초기화 실패....");
@@ -601,6 +608,9 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	/**
 	 * 컨텍스트 메뉴 생성 및 기능 적용
 	 *
+	 *
+	 *	2016-10-27 키 이벤트를  setAccelerator를 사용하지않고 이벤트 방식으로 변경
+	 *  이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
 	 * @param schemaTree2
 	 */
 	private void createTreeContextMenu(TreeView<K> schemaTree) {
@@ -621,20 +631,19 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 
 		// MenuItem menuPrimaryKeys = new MenuItem("Primary Keys");
 
-		MenuItem menuShowData = new MenuItem("Show 100 rows");
-		menuShowData.setAccelerator(new KeyCodeCombination(KeyCode.F1));
-		;
+		MenuItem menuShowData = new MenuItem("Show 100 rows [F1]");
+		//		menuShowData.setAccelerator(new KeyCodeCombination(KeyCode.F1));
 		menuShowData.setOnAction(this::show100RowAction);
 
-		MenuItem menuFindTable = new MenuItem("Find Table");
-		menuFindTable.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN));
+		MenuItem menuFindTable = new MenuItem("Find Table [CTRL + SHIFT + R]");
+		//		menuFindTable.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN));
 		menuFindTable.setOnAction(this::showFileTableOnAction);
 
 		MenuItem menuProperties = new MenuItem("Properties");
 		menuProperties.setOnAction(this::showProperties);
 
-		MenuItem menuReflesh = new MenuItem("Reflesh");
-		menuReflesh.setOnAction(this::menuRefleshOnAction);
+		MenuItem menuReflesh = new MenuItem("Reflesh [F5]");
+		//		menuReflesh.setOnAction(this::menuRefleshOnAction);
 		menuReflesh.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
 		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuFindTable, menuProperties, new SeparatorMenuItem(), menuReflesh);
@@ -787,6 +796,8 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 	/**
 	 * 탭추가.
 	 *
+	 *	 2016-10-27 키 이벤트를  setAccelerator를 사용하지않고 이벤트 방식으로 변경
+	 *  이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
 	 * @return
 	 */
 	SqlTab createTabItem() {
@@ -797,8 +808,9 @@ public abstract class SqlPane<T, K> extends DockPane implements ISchemaTreeItem<
 		MenuItem menuQueryMacro = new MenuItem("Query-Macro");
 		menuQueryMacro.setOnAction(this::menuQueryMacroOnAction);
 
-		MenuItem menuFormatter = new MenuItem("SQL Formatter");
-		menuFormatter.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN));
+		MenuItem menuFormatter = new MenuItem("SQL Formatter [F + CTRL + SHIFT] ");
+		//2016-10-27 주석
+		//		menuFormatter.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN));
 		menuFormatter.setOnAction(this::menuFormatterOnAction);
 
 		MenuItem menuShowApplicationCode = new MenuItem("Show Application Code");
