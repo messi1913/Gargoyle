@@ -51,6 +51,7 @@ public class EditableTableViewComposite extends BorderPane {
 	private Button btnAdd;
 	private Button btnRemove;
 	private Button btnSave;
+	private Label lblStatus;
 
 	public EditableTableViewComposite(Supplier<Connection> connectionSupplier) {
 
@@ -61,6 +62,7 @@ public class EditableTableViewComposite extends BorderPane {
 		btnSave = new Button("저장");
 
 		txtTableName = new Label();
+		lblStatus = new Label("Status - Ready");
 
 		HBox hBox = new HBox(5, txtTableName, btnExec, btnAdd, btnRemove, btnSave);
 		hBox.setAlignment(Pos.CENTER_RIGHT);
@@ -93,20 +95,21 @@ public class EditableTableViewComposite extends BorderPane {
 			}
 		});
 
-//		editableTableView.setOnMouseClicked(ev -> {
-//			Map<ColumnExpression, ObjectProperty<ValueExpression>> selectedItem = editableTableView.getSelectionModel().getSelectedItem();
-//			System.out.println(selectedItem);
-//
-//		});
+		editableTableView.setOnTransactionSucessListener(lblStatus::setText);
+		editableTableView.setOnFailListener(lblStatus::setText);
+
+		//		editableTableView.setOnMouseClicked(ev -> {
+		//			Map<ColumnExpression, ObjectProperty<ValueExpression>> selectedItem = editableTableView.getSelectionModel().getSelectedItem();
+		//			System.out.println(selectedItem);
+		//
+		//		});
 
 		FxUtil.installClipboardKeyEvent(editableTableView);
-//		editableTableView.addEventHandler(KeyEvent.KEY_RELEASED, this::editableTableViewOnKeyReleased);
+		//		editableTableView.addEventHandler(KeyEvent.KEY_RELEASED, this::editableTableViewOnKeyReleased);
 		setTop(hBox);
 		setCenter(editableTableView);
-
+		setBottom(lblStatus);
 	}
-
-
 
 	private EventHandler<ActionEvent> defaultExecOnAction = e -> {
 		try {

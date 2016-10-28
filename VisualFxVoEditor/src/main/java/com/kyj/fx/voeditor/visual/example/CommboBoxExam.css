@@ -1,0 +1,24 @@
+.root{
+	-fx-background-color : forestgreen ;
+}
+
+.combo-box-table-cell :selected
+{
+   -fx-padding: 0.0,0.0,0.0,0.0;
+}
+
+.combo-box{
+	-fx-background-color:transparent;
+	-fx-border-width : 0.0px;
+	-fx-border-color : transparent;
+}
+
+.combo-box :selected{
+	-fx-border-width : 0.0px;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-padding: 4.0 0.0 4.0 5.0;
+}
+
+

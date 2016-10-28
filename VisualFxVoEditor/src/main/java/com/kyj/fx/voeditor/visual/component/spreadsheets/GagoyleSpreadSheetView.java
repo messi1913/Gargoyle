@@ -70,16 +70,17 @@ public class GagoyleSpreadSheetView extends StackPane {
 			status.textProperty().set(String.format(" x: %s y : %s", event.getX(), event.getY()));
 		});
 
-//		{
-//			Node node = new ImageView(new Image(GagoyleSpreadSheetView.class.getResourceAsStream("testImage.jpg"), 500, 500, false, false));
-//			new DragDropWrapping(this, node);
-//			getChildren().add(node);
-//		}
-//		{
-//			Node node = new ImageView(new Image(GagoyleSpreadSheetView.class.getResourceAsStream("testImage.jpg"), 500, 500, false, false));
-//			new DragDropWrapping(this, node);
-//			getChildren().add(node);
-//		}
+		this.addEventHandler(KeyEvent.KEY_PRESSED, this::spreadSheetKeyPress);
+		//		{
+		//			Node node = new ImageView(new Image(GagoyleSpreadSheetView.class.getResourceAsStream("testImage.jpg"), 500, 500, false, false));
+		//			new DragDropWrapping(this, node);
+		//			getChildren().add(node);
+		//		}
+		//		{
+		//			Node node = new ImageView(new Image(GagoyleSpreadSheetView.class.getResourceAsStream("testImage.jpg"), 500, 500, false, false));
+		//			new DragDropWrapping(this, node);
+		//			getChildren().add(node);
+		//		}
 
 	}
 
@@ -178,11 +179,15 @@ public class GagoyleSpreadSheetView extends StackPane {
 			case FxClipboardUtil.STRING:
 				paste();
 				break;
+
+			default:
+				paste();
+				break;
 			}
-
-			e.consume();
-
 		}
+
+		e.consume();
+
 	}
 
 	/**

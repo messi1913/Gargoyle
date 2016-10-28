@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Objects;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
-import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.sun.btrace.BTraceUtils.Strings;
 
@@ -158,6 +158,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 	}
 
 	private void readByTableName(String sql, String tableName, boolean appendHist) throws Exception {
+		LOGGER.debug(sql);
 		getColumns().clear();
 		getItems().clear();
 		removedList.clear();
@@ -290,24 +291,43 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 		});
 
 		if (statements1 == STATUS.OK && statements2 == STATUS.OK && statements3 == STATUS.OK) {
-			try (Connection con = connectionSupplier.get()) {
-				int transactionedScope = DbUtil.getTransactionedScope(con, saveList, (list) -> {
-					return list;
-				} , ex -> {
-					throw new RuntimeException(ex);
-				});
 
-				if (transactionedScope == -1) {
-					throw new GargoyleException("Execute Fail.");
+			try (Connection con = connectionSupplier.get()) {
+				if (!saveList.isEmpty()) {
+					int transactionedScope = DbUtil.getTransactionedScope(con, saveList, (list) -> {
+						return list;
+					} , ex -> {
+						throw new RuntimeException(ex);
+					});
+					if (transactionedScope == -1) {
+						sendFailMessage("트랜잭션 처리중 에러 발생");
+						//						throw new GargoyleException("Execute Fail.");
+					} else {
+						readByTableName(history.getLast(), tableName.getValue(), false);
+						sendTransactionSuccesslMessage("작업 성공 - " + saveList.size() + " 건");
+					}
 				} else {
-					readByTableName(history.getLast(), tableName.getValue(), false);
+					sendFailMessage("처리할 데이터가 없습니다.");
 				}
 			}
 
 		} else {
-			throw new GargoyleException("Primary Value is Empty.");
+			//throw new GargoyleException("Invalide status.");
+			sendFailMessage("데이터 처리중 에러 발생");
 		}
 
+	}
+
+	private void sendTransactionSuccesslMessage(String message) {
+		if (null != setOnTransactionSucessListener) {
+			setOnTransactionSucessListener.accept(message);
+		}
+	}
+
+	private void sendFailMessage(String message) {
+		if (null != onFailListener) {
+			onFailListener.accept(message);
+		}
 	}
 
 	private STATUS getStatements(DML dml, BiFunction<STATUS, List<String>, STATUS> function) {
@@ -337,6 +357,9 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			break;
 		}
 
+		if (items.isEmpty())
+			return STATUS.OK;
+
 		int modifiedCnt = 0;
 
 		//키값이 존재하지않는 테이블인경우 where조건은 수정되지않는 컬럼으로 사용.
@@ -347,13 +370,18 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		if (items != null && !items.isEmpty()) {
 			long count = items.get(0).values().stream().filter(vo -> vo.getValue().isPrimaryKey).count();
+
+			//키값 존재유무에 따른 플래그 update
 			if (count == 0)
 				isNotContainsPrimaryTable = true;
-			else {
+
+			//키값이 없는 상태에서 수정된 컬럼도 없는 경우 상태 update
+			if (count == 0) {
 				long modifiedCount = items.get(0).values().stream().filter(vo -> vo.getValue().isModified).count();
 				if (modifiedCount == 0)
 					isNotContainsModifiedTable = true;
 			}
+
 		}
 
 		for (Map<ColumnExpression, ObjectProperty<ValueExpression>> m : items) {
@@ -382,7 +410,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 				if (valueExp.isPrimaryKey) {
 
 					//기본키값이 빈 경우 메세지.
-					if (valueExp.getDisplayText() == null    /*|| valueExp.getDisplayText().isEmpty()*/) {
+					if (valueExp.getDisplayText() == null /*|| valueExp.getDisplayText().isEmpty()*/) {
 						return function.apply(STATUS.PK_VAL_IS_EMPTY, Collections.emptyList());
 					}
 					whereStatement.append(String.format("and %s  = '%s'", colummExp, valueExp.getRealValue()));
@@ -398,7 +426,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 				}
 
-				if (!valueExp.isPrimaryKey && !valueExp.isModified && (isNotContainsPrimaryTable | isNotContainsModifiedTable)) {
+				if ((!valueExp.isPrimaryKey && !valueExp.isModified) && (isNotContainsPrimaryTable || isNotContainsModifiedTable)) {
 					whereStatement.append(String.format("and %s  = '%s'", colummExp, valueExp.getRealValue()));
 				}
 
@@ -911,6 +939,29 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	public final void setTableName(final java.lang.String tableName) {
 		this.tableNameProperty().set(tableName);
+	}
+
+	private Consumer<String> setOnTransactionSucessListener;
+
+	private Consumer<String> onFailListener;
+
+	/**
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 28.
+	 * @param object
+	 */
+	public void setOnTransactionSucessListener(Consumer<String> setOnTransactionSucessListener) {
+		this.setOnTransactionSucessListener = setOnTransactionSucessListener;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 28.
+	 * @param onFailListener
+	 */
+	public void setOnFailListener(Consumer<String> onFailListener) {
+		this.onFailListener = onFailListener;
 	}
 
 }
