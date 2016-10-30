@@ -11,17 +11,17 @@ import javafx.stage.Window;
 
 /**
  *
- * 동기처리된 로딩바
+ * 비동기 기반 로딩바
  * @author KYJ
  *
  */
-public class GargoyleSynchLoadBar<V> extends GargoyleLoadBar<V> {
+public class GargoyleASynchLoadBar<V> extends GargoyleLoadBar<V> {
 
 	/**
 	 * @param owner
 	 * @param task
 	 */
-	public GargoyleSynchLoadBar(Window owner, Task<V> task) {
+	public GargoyleASynchLoadBar(Window owner, Task<V> task) {
 		super(owner, task);
 	}
 
@@ -30,6 +30,7 @@ public class GargoyleSynchLoadBar<V> extends GargoyleLoadBar<V> {
 	 */
 	@Override
 	public final com.kyj.fx.voeditor.visual.component.bar.GargoyleLoadBar.Type getType() {
-		return Type.synch;
+		return Type.asynch;
 	}
+
 }
