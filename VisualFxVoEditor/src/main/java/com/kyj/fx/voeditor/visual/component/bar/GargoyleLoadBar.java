@@ -145,7 +145,6 @@ public abstract class GargoyleLoadBar<V> extends Service<V> {
 	@Override
 	protected void executeTask(Task<V> task) {
 		super.executeTask(task);
-
 	}
 
 }
