@@ -33,6 +33,9 @@ import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.bar.GargoyleASynchLoadBar;
+import com.kyj.fx.voeditor.visual.component.bar.GargoyleLoadBar;
+import com.kyj.fx.voeditor.visual.component.bar.GargoyleSynchLoadBar;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
@@ -45,10 +48,12 @@ import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
@@ -1075,8 +1080,6 @@ public class FxUtil {
 		}).collect(Collectors.toList());
 	}
 
-
-
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
@@ -1104,7 +1107,7 @@ public class FxUtil {
 	 * @param dockNode
 	 */
 	public static void createDockStageAndShow(Window owner, DockNode dockNode, Point2D initLocation) {
-		createDockStageAndShow(owner , dockNode, initLocation, false);
+		createDockStageAndShow(owner, dockNode, initLocation, false);
 	}
 
 	/**
@@ -1117,6 +1120,37 @@ public class FxUtil {
 		dockNode.setFloating(true, initLocation);
 		if (center)
 			dockNode.getStage().centerOnScreen();
+	}
+
+	/**
+	 * 로딩바가 뜨면서 액션 처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 31.
+	 * @param action
+	 * @return
+	 */
+	public static <K> K showLoading(Task<K> action) {
+		return showLoading(SharedMemory.getPrimaryStage(), action);
+	}
+
+	/**
+	 * 로딩바가 뜨면서 액션 처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 31.
+	 * @param owner
+	 * @param action
+	 * @return
+	 */
+	public static <K> K showLoading(Window owner, Task<K> action) {
+		//비동기 로딩바
+		GargoyleLoadBar<K> gargoyleSynchProgessPopup = new GargoyleASynchLoadBar<>(owner, action);
+		//비동기 로딩바
+		//		gargoyleSynchProgessPopup = new GargoyleASynchLoadBar<>(stage, task);
+
+		gargoyleSynchProgessPopup.setExecutor(GargoyleSynchLoadBar.newSingleThreadExecutor);
+		gargoyleSynchProgessPopup.start();
+
+		return gargoyleSynchProgessPopup.getValue();
 	}
 
 }

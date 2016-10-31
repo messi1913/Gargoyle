@@ -10,7 +10,10 @@ import java.util.concurrent.ExecutorService;
 
 import com.jfoenix.controls.JFXSpinner;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
+import com.sun.javafx.stage.StageHelper;
 
+import javafx.beans.value.ChangeListener;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
@@ -41,14 +44,26 @@ public abstract class GargoyleLoadBar<V> extends Service<V> {
 
 	public abstract Type getType();
 
+	private ChangeListener<? super Number> xListener = (oba, o, n) -> {
+		stage.setX(n.doubleValue() + (owner.getWidth() / 2) - (stage.getScene().getWidth() / 2));
+	};
+	private ChangeListener<? super Number> yListener = (oba, o, n) -> {
+		stage.setY(n.doubleValue() + (owner.getHeight() / 2) - (stage.getScene().getHeight() / 2));
+	};
+
 	public GargoyleLoadBar(Window owner, Task<V> task) {
 		this.task = task;
 		this.owner = owner;
 
+		if (owner == null) {
+			ObservableList<Stage> stages = StageHelper.getStages();
+			this.owner = stages.stream().findFirst().get();
+		}
+
 		stage = new Stage();
 
 		StackPane stackPane = new StackPane();
-		double radius = owner.getWidth() / 10;
+		double radius = this.owner.getWidth() / 10;
 		for (double r = radius; r >= (radius - 40) && radius >= 0; r -= 10) {
 			JFXSpinner spinner = new JFXSpinner();
 			spinner.setRadius(r);
@@ -57,20 +72,16 @@ public abstract class GargoyleLoadBar<V> extends Service<V> {
 
 		stage.setScene(new Scene(stackPane, stackPane.prefWidth(0), stackPane.prefHeight(0), Color.TRANSPARENT));
 
-		stage.setX(owner.getX() + (owner.getWidth() / 2) - (stage.getScene().getWidth() / 2));
-		stage.setY(owner.getY() + (owner.getHeight() / 2) - (stage.getScene().getHeight() / 2));
+		stage.setX(this.owner.getX() + (this.owner.getWidth() / 2) - (stage.getScene().getWidth() / 2));
+		stage.setY(this.owner.getY() + (this.owner.getHeight() / 2) - (stage.getScene().getHeight() / 2));
 
-		owner.xProperty().addListener((oba, o, n) -> {
-			stage.setX(n.doubleValue() + (owner.getWidth() / 2) - (stage.getScene().getWidth() / 2));
-		});
-		owner.yProperty().addListener((oba, o, n) -> {
-			stage.setY(n.doubleValue() + (owner.getHeight() / 2) - (stage.getScene().getHeight() / 2));
-		});
+		this.owner.xProperty().addListener(xListener);
+		this.owner.yProperty().addListener(yListener);
 
 		//		stage.setScene(new Scene(root));
 		stage.initStyle(StageStyle.UNDECORATED);
-		stage.setAlwaysOnTop(true);
-		stage.initOwner(owner);
+		stage.setAlwaysOnTop(false);
+		stage.initOwner(this.owner);
 
 	}
 
@@ -110,6 +121,9 @@ public abstract class GargoyleLoadBar<V> extends Service<V> {
 	@Override
 	protected void cancelled() {
 		super.cancelled();
+		stage.xProperty().removeListener(xListener);
+		stage.yProperty().removeListener(yListener);
+		stage.close();
 	}
 
 	/* (non-Javadoc)
@@ -118,7 +132,10 @@ public abstract class GargoyleLoadBar<V> extends Service<V> {
 	@Override
 	protected void succeeded() {
 		super.succeeded();
+		stage.xProperty().removeListener(xListener);
+		stage.yProperty().removeListener(yListener);
 		stage.close();
+
 	}
 
 	/* (non-Javadoc)
@@ -136,6 +153,8 @@ public abstract class GargoyleLoadBar<V> extends Service<V> {
 	@Override
 	protected void failed() {
 		super.failed();
+		stage.xProperty().removeListener(xListener);
+		stage.yProperty().removeListener(yListener);
 		stage.close();
 	}
 
