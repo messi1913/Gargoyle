@@ -65,7 +65,7 @@ public final class PMDGargoyleThreadProcessor extends AbstractPMDProcessor {
 
 			try {
 				InputStream stream = new BufferedInputStream(dataSource.getInputStream());
-//				ctx.setLanguageVersion(null);
+				//				ctx.setLanguageVersion(null);
 				processor.processSourceCode(stream, rs, ctx);
 			} catch (PMDException pmde) {
 
@@ -83,6 +83,8 @@ public final class PMDGargoyleThreadProcessor extends AbstractPMDProcessor {
 				//				LOGGER.error(ValueUtil.toString(re));
 				// unexpected exception: log and stop executor service
 				addError(report, "RuntimeException while processing file", re, niceFileName);
+			} catch (Exception e) {
+				LOGGER.error(ValueUtil.toString(e));
 			}
 
 			rs.end(ctx);

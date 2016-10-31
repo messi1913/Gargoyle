@@ -258,7 +258,9 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	 * @작성일 : 2016. 10. 13.
 	 */
 	public void run() {
+
 		if (this.sourceFile.isDirectory()) {
+			splitPane.getItems().set(0, chartComposite);
 			dirFilePmd(this.sourceFile);
 		} else {
 			simpleFilePmd(this.sourceFile);
@@ -273,7 +275,9 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	 */
 	public void runAsynch() {
 
-		splitPane.getItems().set(0, chartComposite);
+		if (this.sourceFile.isDirectory()) {
+			splitPane.getItems().set(0, chartComposite);
+		}
 
 		new Thread(() -> {
 			if (this.sourceFile.isDirectory()) {
