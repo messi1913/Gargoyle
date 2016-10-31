@@ -33,6 +33,4 @@ public class GargoyleASynchLoadBar<V> extends GargoyleLoadBar<V> {
 		return Type.asynch;
 	}
 
-
-
 }

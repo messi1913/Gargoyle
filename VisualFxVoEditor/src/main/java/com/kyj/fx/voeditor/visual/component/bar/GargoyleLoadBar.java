@@ -10,6 +10,8 @@ import java.util.concurrent.ExecutorService;
 
 import com.jfoenix.controls.JFXSpinner;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
+import com.kyj.fx.voeditor.visual.momory.SkinManager;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.sun.javafx.stage.StageHelper;
 
 import javafx.beans.value.ChangeListener;
@@ -17,6 +19,9 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
@@ -66,11 +71,18 @@ public abstract class GargoyleLoadBar<V> extends Service<V> {
 		double radius = this.owner.getWidth() / 10;
 		for (double r = radius; r >= (radius - 40) && radius >= 0; r -= 10) {
 			JFXSpinner spinner = new JFXSpinner();
+			//			spinner.setStyle("-fx-background-color:transparent ; -fx-fill : transparent");
 			spinner.setRadius(r);
 			stackPane.getChildren().add(spinner);
 		}
+		//		stackPane.setBackground(Background.EMPTY);
+		stackPane.getStyleClass().add("loading-bar");
+		stackPane.setStyle("-fx-background-color: transparent ;");
+		//		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 
-		stage.setScene(new Scene(stackPane, stackPane.prefWidth(0), stackPane.prefHeight(0), Color.TRANSPARENT));
+		Scene scene = new Scene(stackPane, stackPane.prefWidth(0), stackPane.prefHeight(0));
+		scene.setFill(null);
+		stage.setScene(scene);
 
 		stage.setX(this.owner.getX() + (this.owner.getWidth() / 2) - (stage.getScene().getWidth() / 2));
 		stage.setY(this.owner.getY() + (this.owner.getHeight() / 2) - (stage.getScene().getHeight() / 2));
@@ -79,9 +91,19 @@ public abstract class GargoyleLoadBar<V> extends Service<V> {
 		this.owner.yProperty().addListener(yListener);
 
 		//		stage.setScene(new Scene(root));
-		stage.initStyle(StageStyle.UNDECORATED);
+		stage.initStyle(StageStyle.TRANSPARENT);
+
 		stage.setAlwaysOnTop(false);
 		stage.initOwner(this.owner);
+		stage.addEventHandler(KeyEvent.KEY_PRESSED, this::stageOnKeyPress);
+
+	}
+
+	public void stageOnKeyPress(KeyEvent e) {
+		if (KeyCode.ESCAPE == e.getCode()) {
+			this.task.cancel();
+			this.cancel();
+		}
 
 	}
 
@@ -116,14 +138,26 @@ public abstract class GargoyleLoadBar<V> extends Service<V> {
 	}
 
 	/* (non-Javadoc)
+	 * @see javafx.concurrent.Service#cancel()
+	 */
+	@Override
+	public boolean cancel() {
+		stage.xProperty().removeListener(xListener);
+		stage.yProperty().removeListener(yListener);
+		stage.close();
+		return super.cancel();
+	}
+
+	/* (non-Javadoc)
 	 * @see javafx.concurrent.Service#cancelled()
 	 */
 	@Override
 	protected void cancelled() {
-		super.cancelled();
 		stage.xProperty().removeListener(xListener);
 		stage.yProperty().removeListener(yListener);
 		stage.close();
+		super.cancelled();
+
 	}
 
 	/* (non-Javadoc)
@@ -131,10 +165,10 @@ public abstract class GargoyleLoadBar<V> extends Service<V> {
 	 */
 	@Override
 	protected void succeeded() {
-		super.succeeded();
 		stage.xProperty().removeListener(xListener);
 		stage.yProperty().removeListener(yListener);
 		stage.close();
+		super.succeeded();
 
 	}
 
@@ -152,10 +186,11 @@ public abstract class GargoyleLoadBar<V> extends Service<V> {
 	 */
 	@Override
 	protected void failed() {
-		super.failed();
 		stage.xProperty().removeListener(xListener);
 		stage.yProperty().removeListener(yListener);
 		stage.close();
+		super.failed();
+
 	}
 
 	/* (non-Javadoc)
