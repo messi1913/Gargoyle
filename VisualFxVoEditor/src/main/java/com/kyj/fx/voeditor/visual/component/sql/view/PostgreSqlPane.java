@@ -22,9 +22,11 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.postgre.PostgreDatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.postgre.PostgreTableItemTree;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
+import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -124,6 +126,15 @@ public class PostgreSqlPane extends CommonsSqllPan {
 						});
 						txtSchema.setText(_defaultSchema);
 
+						//Default TableName
+						TreeItem<DatabaseItemTree<String>> selectedItem = getSchemaTree().getSelectionModel().getSelectedItem();
+						if (null != selectedItem) {
+							DatabaseItemTree<String> value = selectedItem.getValue();
+							if (value instanceof TableItemTree) {
+								txtTable.setText(value.getName());
+							}
+						}
+
 						Label label = new Label("Schema : ");
 						Label label2 = new Label("Table : ");
 						gridPane.add(label, 0, 0);
@@ -215,7 +226,12 @@ public class PostgreSqlPane extends CommonsSqllPan {
 						if (str == null)
 							return null;
 						else {
+
+							if (null == v.get(str))
+								return null;
+
 							String dataValue = v.get(str).toString();
+
 							dataValue = dataValue.substring(1, dataValue.length() - 1);
 							if (dataValue.indexOf("'") >= 0) {
 								try {
@@ -224,9 +240,10 @@ public class PostgreSqlPane extends CommonsSqllPan {
 									e1.printStackTrace();
 								}
 							}
+
 							return str.concat(" = ").concat("'").concat(dataValue).concat("'");
 						}
-					}).collect(Collectors.joining(" and "));
+					}).filter(str -> str != null).collect(Collectors.joining(" and "));
 
 					String insertValueSql = columnList.stream().map(str -> {
 						if (str == null)
@@ -257,8 +274,13 @@ public class PostgreSqlPane extends CommonsSqllPan {
 					clip.append(str);
 				});
 
-				SimpleTextView parent = new SimpleTextView(clip.toString());
+
+
+				SqlKeywords parent = new SqlKeywords();
+				parent.setContent(clip.toString());
+//				SimpleTextView parent = new SimpleTextView(clip.toString());
 				parent.setWrapText(false);
+				parent.setPrefSize(1200d, 800d);
 				FxUtil.createStageAndShow(parent, stage -> {
 					stage.initOwner(tbResult.getScene().getWindow());
 					stage.setTitle(String.format("[Merge Script] Table : %s", tableName));
@@ -266,6 +288,8 @@ public class PostgreSqlPane extends CommonsSqllPan {
 
 			} catch (Exception e2) {
 				LOGGER.error(ValueUtil.toString(e2));
+				DialogUtil.showExceptionDailog(e2, "에러발생, 테이블을 잘못 선택하셨을 수 있습니다.");
+
 			}
 		});
 
@@ -306,29 +330,4 @@ public class PostgreSqlPane extends CommonsSqllPan {
 		}).collect(Collectors.toList());
 
 	}
-	/* (non-Javadoc)
-	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#search(java.lang.String, java.lang.String, java.lang.String)
-	 */
-
-	//	public List<TreeItem<DatabaseItemTree<String>>> searchPattern(String schema, String databaseName, String tableName) {
-	//
-	//		List<TreeItem<DatabaseItemTree<String>>> searchPattern = searchPattern(schema, databaseName);
-	//		if (searchPattern.isEmpty())
-	//			return Collections.emptyList();
-	//
-	//		return searchPattern.stream().flatMap(root -> {
-	//
-	//			List<TreeItem<DatabaseItemTree<String>>> subList = new ArrayList<>();
-	//			for (TreeItem<DatabaseItemTree<String>> w : root.getChildren()) {
-	//				String _schemaName = w.getValue().toString();
-	//
-	//				if (_schemaName.indexOf(schema) >= 0) {
-	//					subList.add(w);
-	//				}
-	//			}
-	//			return subList.stream();
-	//		}).collect(Collectors.toList());
-	//
-	//	}
-
 }

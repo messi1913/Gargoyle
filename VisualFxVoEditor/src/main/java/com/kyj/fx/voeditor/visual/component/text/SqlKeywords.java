@@ -1,7 +1,10 @@
 package com.kyj.fx.voeditor.visual.component.text;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,9 +16,10 @@ import org.fxmisc.richtext.StyleSpansBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
-import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -63,6 +67,14 @@ public class SqlKeywords extends BorderPane {
 		return codeArea;
 	}
 
+	/**
+	 * 인스턴스의 수와 상관없이 무조건 1개의 서비스로 사용.
+	 * 처음에 생성자에 생성했는데, 스레드수가 너무 많이 늘어남. 사실 이 클래스는 어플리케이션당 하나만 사용하여
+	 * 관리해도 상관없다고 판단.
+	 * @최초생성일 2016. 10. 18.
+	 */
+	private static final ExecutorService executor = ExecutorDemons.newFixedThreadExecutor(3);
+
 	public SqlKeywords() {
 
 		codeArea = new CodeArea();
@@ -72,12 +84,23 @@ public class SqlKeywords extends BorderPane {
 		codeArea.appendText("");
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
-		codeArea.richChanges().subscribe(change -> {
-			Platform.runLater(() -> {
-				codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
+		//		codeArea.richChanges().subscribe(change -> {
+		//			Platform.runLater(() -> {
+		//				codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
+		//
+		//			});
+		//		});
 
-			});
-		});
+		codeArea.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
+				.successionEnds(Duration.ofMillis(500)).supplyTask(this::computeHighlightingAsync).awaitLatest(codeArea.richChanges())
+				.filterMap(t -> {
+					if (t.isSuccess()) {
+						return Optional.of(t.get());
+					} else {
+						t.getFailure().printStackTrace();
+						return Optional.empty();
+					}
+				}).subscribe(this::applyHighlighting);
 
 		// 마우스 클릭이벤트 정의
 		codeArea.addEventHandler(KeyEvent.KEY_PRESSED, this::codeAreaKeyClick);
@@ -192,30 +215,25 @@ public class SqlKeywords extends BorderPane {
 			LOGGER.error(ValueUtil.toString(e));
 		}
 		return spansBuilder.create();
-		// Matcher matcher = PATTERN.matcher(text);
-		// int lastKwEnd = 0;
-		// StyleSpansBuilder<Collection<String>> spansBuilder = new
-		// StyleSpansBuilder<>();
-		// while (matcher.find()) {
-		// String styleClass = matcher.group("KEYWORD") != null ? "keyword"
-		// : matcher.group("PAREN") != null ? "paren"
-		// : matcher.group("BRACE") != null ? "brace"
-		// : matcher.group("BRACKET") != null ? "bracket"
-		// : matcher.group("SEMICOLON") != null ? "semicolon"
-		// : matcher.group("STRING") != null ? "string"
-		// : matcher.group("COMMENT") != null ? "comment" : null; /*
-		// * never
-		// * happens
-		// */
-		// assert styleClass != null;
-		// spansBuilder.add(Collections.emptyList(), matcher.start() -
-		// lastKwEnd);
-		// spansBuilder.add(Collections.singleton(styleClass), matcher.end() -
-		// matcher.start());
-		// lastKwEnd = matcher.end();
-		// }
-		// spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
-		// return spansBuilder.create();
+
+	}
+
+	private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
+		String text = codeArea.getText();
+		Task<StyleSpans<Collection<String>>> task = new Task<StyleSpans<Collection<String>>>() {
+			@Override
+			protected StyleSpans<Collection<String>> call() throws Exception {
+				return computeHighlighting(text);
+			}
+		};
+
+		executor.execute(task);
+
+		return task;
+	}
+
+	private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
+		codeArea.setStyleSpans(0, highlighting);
 	}
 
 	// TODO :: () 안에 문자들을 가식성이 좋도록 표시... StyleSpans이 중복되어 적용이 안됨..
@@ -275,5 +293,15 @@ public class SqlKeywords extends BorderPane {
 	 */
 	public void customMenuHandler(CodeAreaCustomMenusHandler appendable) {
 		codeHelperDeligator.customMenuHandler(appendable);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 31.
+	 * @param b
+	 */
+	public void setWrapText(boolean b) {
+		codeArea.setWrapText(b);
+
 	}
 }

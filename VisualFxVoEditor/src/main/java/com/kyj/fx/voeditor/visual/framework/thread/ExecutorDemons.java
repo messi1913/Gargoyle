@@ -37,4 +37,8 @@ public class ExecutorDemons {
 	public static ExecutorService newSingleThreadExecutor() {
 		return Executors.newSingleThreadExecutor(deamonThreadFactory);
 	}
+
+	public static ExecutorService newFixedThreadExecutor(int count) {
+		return Executors.newFixedThreadPool(count, deamonThreadFactory);
+	}
 }

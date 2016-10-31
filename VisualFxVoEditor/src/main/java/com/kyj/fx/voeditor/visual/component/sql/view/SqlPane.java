@@ -328,7 +328,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		btnExecAll.setTooltip(new Tooltip("[F5]"));
 		btnExecAll.setOnMouseClicked(this::btnExecAllOnClick);
 
-		Button btnAddTab = new Button("Add...");
+		Button btnAddTab = new Button("New Tab...");
 		btnAddTab.setOnMouseClicked(this::btnAddTabOnClick);
 
 		readTypeCheckComboBox = new CheckComboBox<ReadType>(defaultReadTypeItems());

@@ -1081,20 +1081,24 @@ public class FxUtil {
 	}
 
 	/**
+	 * 도킹기능이 제공되는 팝업을 로드함.
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param owner
 	 * @param dockNode
+	 *     메인화면이 되는 노드.
 	 */
 	public static void createDockStageAndShow(Window owner, DockNode dockNode) {
 		createDockStageAndShow(owner, dockNode, null, true);
 	}
 
 	/**
+	 * 도킹기능이 제공되는 팝업을 로드함.
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param owner
 	 * @param dockNode
+	 * 		메인화면이 되는 노드.
 	 * @param center
 	 */
 	public static void createDockStageAndShow(Window owner, DockNode dockNode, boolean center) {
@@ -1102,6 +1106,7 @@ public class FxUtil {
 	}
 
 	/**
+	 * 도킹기능이 제공되는 팝업을 로드함.
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param dockNode
@@ -1111,9 +1116,11 @@ public class FxUtil {
 	}
 
 	/**
+	 * 도킹기능이 제공되는 팝업을 로드함.
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param dockNode
+	 * 		메인화면이 되는 노드.
 	 */
 	public static void createDockStageAndShow(Window owner, DockNode dockNode, Point2D initLocation, boolean center) {
 		dockNode.setOwner(owner);
@@ -1126,7 +1133,7 @@ public class FxUtil {
 	 * 로딩바가 뜨면서 액션 처리.
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 31.
-	 * @param action
+	 * @param action 사용자 처리 작업에 대한 코드 로직이 입력됨
 	 * @return
 	 */
 	public static <K> K showLoading(Task<K> action) {
@@ -1138,12 +1145,16 @@ public class FxUtil {
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 31.
 	 * @param owner
+	 *   primaryStage에 대한 데이터가 입력되야함.
+	 *   (사이즈 및 너비, 높이 조절에 대한 메타데이터를 참조함)
 	 * @param action
+	 *   사용자 처리 작업에 대한 코드 로직이 입력됨
 	 * @return
 	 */
 	public static <K> K showLoading(Window owner, Task<K> action) {
+
 		//비동기 로딩바
-		GargoyleLoadBar<K> gargoyleSynchProgessPopup = new GargoyleASynchLoadBar<>(owner, action);
+		GargoyleLoadBar<K> gargoyleSynchProgessPopup = new GargoyleSynchLoadBar<>(owner, action);
 		//비동기 로딩바
 		//		gargoyleSynchProgessPopup = new GargoyleASynchLoadBar<>(stage, task);
 

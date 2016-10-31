@@ -10,8 +10,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,12 +19,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.kyj.fx.voeditor.visual.component.pmd.PMDGargoyleThreadProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.pmd.PMDGargoyleThreadProcessor;
+import com.kyj.fx.voeditor.visual.framework.pmd.DoPMD.RendererWriterFactory.WRITER_TYPE;
+
+import kyj.Fx.dao.wizard.core.util.ValueUtil;
 import net.sourceforge.pmd.ReportListener;
 import net.sourceforge.pmd.Rule;
 import net.sourceforge.pmd.RuleContext;
@@ -56,16 +58,31 @@ import net.sourceforge.pmd.util.datasource.ReaderDataSource;
  */
 public class DoPMD implements Closeable {
 
-	private StringWriter stringWriter = new StringWriter();
+	private static final Logger LOGGER = LoggerFactory.getLogger(DoPMD.class);
 
 	private PMDGargoyleThreadProcessor pmdGargoyleThreadProcessor;
 
-	private Writer getStringWriter() {
-		return stringWriter;
-	}
+	private RenderWriterable renerderWriter;
 
-	public String getResultString() {
-		return this.stringWriter.getBuffer().toString();
+	static class RendererWriterFactory {
+
+		private RendererWriterFactory() {
+		}
+
+		enum WRITER_TYPE {
+			StringWriter;
+		}
+
+		public static RenderWriterable get(WRITER_TYPE type) {
+			RenderWriterable renderer = null;
+			switch (type) {
+			case StringWriter:
+				renderer = new RendererStringWriter();
+				break;
+			}
+			return renderer;
+		}
+
 	}
 
 	/**
@@ -76,6 +93,7 @@ public class DoPMD implements Closeable {
 	 * @return number of violations found.
 	 */
 	public int doPMD(GargoylePMDConfiguration configuration) {
+
 		return doPMD(configuration, (ReportListener) null);
 	}
 
@@ -86,6 +104,7 @@ public class DoPMD implements Closeable {
 
 	public int doPMD(GargoylePMDConfiguration configuration, List<ReportListener> listeners) {
 
+		renerderWriter = RendererWriterFactory.get(WRITER_TYPE.StringWriter);
 		// Load the RuleSets
 		RuleSetFactory ruleSetFactory = RulesetsFactoryUtils.getRulesetFactory(configuration);
 		RuleSets ruleSets = RulesetsFactoryUtils.getRuleSetsWithBenchmark(configuration.getRuleSets(), ruleSetFactory);
@@ -98,13 +117,15 @@ public class DoPMD implements Closeable {
 
 		long reportStart = System.nanoTime();
 		try {
-			Renderer renderer = /*configuration.createRenderer();*/ new DatabaseXmlRenderer();
-			//RendererFactory.createRenderer(configuration.getReportFormat(), configuration.getReportProperties()); //configuration.createRenderer();//createDefaultRenderer();
-			List<Renderer> renderers = new LinkedList<>();
-			renderers.add(renderer);
 
-			renderer.setWriter(getStringWriter());
+			//			Renderer renderer = RendererFactory.createRenderer(configuration.getReportFormat(), configuration.getReportProperties()); //configuration.createRenderer();//createDefaultRenderer();
+			List<Renderer> renderers = new LinkedList<>();
+
+			Renderer renderer = new DatabaseXmlRenderer();//configuration.createRenderer();
+			renderer.setWriter(renerderWriter.getWriter());
 			renderer.start();
+
+			renderers.add(renderer);
 
 			Benchmarker.mark(Benchmark.Reporting, System.nanoTime() - reportStart, 0);
 
@@ -137,8 +158,7 @@ public class DoPMD implements Closeable {
 
 			return violations.get();
 		} catch (Exception e) {
-			e.printStackTrace();
-			String message = e.getMessage();
+			LOGGER.error(ValueUtil.toString(e));
 
 			return 0;
 		} finally {
@@ -146,7 +166,7 @@ public class DoPMD implements Closeable {
 			try {
 				close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOGGER.error(ValueUtil.toString(e));
 			}
 		}
 	}
@@ -207,7 +227,7 @@ public class DoPMD implements Closeable {
 				Reader reader = new StringReader(sourceText);
 				files.addAll(Arrays.asList(new ReaderDataSource(reader, filePaths)));
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error(ValueUtil.toString(e));
 			}
 
 		}
@@ -275,9 +295,16 @@ public class DoPMD implements Closeable {
 	 */
 	@Override
 	public void close() throws IOException {
-		if (this.stringWriter != null)
-			this.stringWriter.close();
+		this.renerderWriter.close();
+	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 31.
+	 * @return
+	 */
+	public String getResultString() {
+		return this.renerderWriter.getResultString();
 	}
 
 }

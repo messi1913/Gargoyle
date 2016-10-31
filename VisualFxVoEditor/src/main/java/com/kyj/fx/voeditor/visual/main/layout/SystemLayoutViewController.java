@@ -30,6 +30,7 @@ import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenComposite;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
 import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockClosePressEvent;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
 import com.kyj.fx.voeditor.visual.component.file.FilePropertiesComposite;
@@ -106,6 +107,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 
 /**
@@ -1405,8 +1407,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				DockTab tab = new DockTab(tableName, _parent);
 				addTabItem(tab);
 				tabPanWorkspace.getSelectionModel().select(tab);
-				tab.setOnClosed(event -> {
+
+				tab.setOnCloseRequest(ev ->{
 					try {
+						LOGGER.debug("closeable parent on close request");
 						parent.close();
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -1507,16 +1511,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		try {
 			CommonsSqllPan sqlPane = CommonsSqllPan.getSqlPane();
 
-
 			loadNewSystemTab(String.format("Database[%s]", sqlPane.getClass().getSimpleName()), sqlPane);
-//			Stage stage = new Stage();
-//			sqlPane.setStage(stage);
-//			Scene scene = new Scene(new BorderPane(sqlPane), 1100, 900);
-//			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-//			stage.setScene(scene);
-//			stage.setAlwaysOnTop(false);
-//			stage.initOwner(SharedMemory.getPrimaryStage());
-//			stage.show();
+			//			Stage stage = new Stage();
+			//			sqlPane.setStage(stage);
+			//			Scene scene = new Scene(new BorderPane(sqlPane), 1100, 900);
+			//			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+			//			stage.setScene(scene);
+			//			stage.setAlwaysOnTop(false);
+			//			stage.initOwner(SharedMemory.getPrimaryStage());
+			//			stage.show();
 		} catch (Exception ex) {
 			LOGGER.error(ValueUtil.toString(ex));
 			DialogUtil.showExceptionDailog(ex);

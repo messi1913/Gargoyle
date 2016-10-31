@@ -8,12 +8,10 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import com.kyj.fx.voeditor.visual.component.popup.BaseDialogComposite;
 import com.kyj.fx.voeditor.visual.component.popup.ExceptionDialogComposite;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
-import com.kyj.fx.voeditor.visual.util.DialogUtil.CustomInputDialogAction;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -38,7 +36,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -277,7 +274,7 @@ public class DialogUtil {
 	 * @param string
 	 */
 	public static void showExceptionDailog(Exception ex, String string) {
-		showExceptionDailog((Window) null, ex, "The exception stacktrace was:");
+		showExceptionDailog((Window) null, ex, string);
 	}
 
 	private static Window getWindow(Node owner) {

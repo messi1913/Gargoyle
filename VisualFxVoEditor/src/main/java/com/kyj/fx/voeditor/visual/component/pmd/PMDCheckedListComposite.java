@@ -43,6 +43,7 @@ import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ListExpresion;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -52,6 +53,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -279,14 +281,28 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			splitPane.getItems().set(0, chartComposite);
 		}
 
-		new Thread(() -> {
-			if (this.sourceFile.isDirectory()) {
-				dirFilePmd(this.sourceFile);
+		FxUtil.showLoading(new Task<Void>() {
 
-			} else {
-				simpleFilePmd(this.sourceFile);
+			@Override
+			protected Void call() throws Exception {
+				if (PMDCheckedListComposite.this.sourceFile.isDirectory()) {
+					dirFilePmd(PMDCheckedListComposite.this.sourceFile);
+
+				} else {
+					simpleFilePmd(PMDCheckedListComposite.this.sourceFile);
+				}
+				return null;
 			}
-		}).start();
+		});
+
+		//		new Thread(() -> {
+		//			if (this.sourceFile.isDirectory()) {
+		//				dirFilePmd(this.sourceFile);
+		//
+		//			} else {
+		//				simpleFilePmd(this.sourceFile);
+		//			}
+		//		}).start();
 
 	}
 
@@ -689,7 +705,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	 */
 	@Override
 	public void close() throws IOException {
-
+		LOGGER.debug("{} called close  method" , getClass());
 		ObservableList<RulePriority> checkedItems = checkComboBox.getCheckModel().getCheckedItems();
 		checkedItems.stream().map(v -> v.name()).reduce((t, u) -> t.concat(",").concat(u)).ifPresent(v -> {
 			ResourceLoader.getInstance().put(ResourceLoader.PMD_SELECTED_PRIORITY_VALUES, v);
