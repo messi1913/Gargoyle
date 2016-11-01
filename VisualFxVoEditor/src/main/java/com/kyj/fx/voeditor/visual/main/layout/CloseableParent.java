@@ -54,7 +54,7 @@ public abstract class CloseableParent<T extends Parent> implements Closeable {
 				LOGGER.error(ValueUtil.toString(e));
 				e.printStackTrace();
 			}
-		}, "CloseableParent");
+		} , "CloseableParent");
 		RuntimeClassUtil.addShutdownHook(hook);
 	}
 
@@ -64,6 +64,14 @@ public abstract class CloseableParent<T extends Parent> implements Closeable {
 
 	public void setParent(T parent) {
 		this.parent = parent;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.io.Closeable#close()
+	 */
+	@Override
+	public void close() throws IOException {
+		LOGGER.debug("close");
 	}
 
 }

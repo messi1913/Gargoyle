@@ -1,4 +1,5 @@
 package simple;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -7,7 +8,7 @@ import org.junit.Test;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
 /**
- * package : 
+ * package :
  *	fileName : StringTest.java
  *	date      : 2015. 11. 2.
  *	user      : KYJ
@@ -33,6 +34,12 @@ public class StringTest {
 
 	public static void main(String[] args) {
 		System.out.println(KEYWORD_PATTERN);
+	}
+
+
+	@Test
+	public void utf() throws UnsupportedEncodingException{
+		System.out.println(new String("<".getBytes("UTF-8")));
 	}
 
 	@Test

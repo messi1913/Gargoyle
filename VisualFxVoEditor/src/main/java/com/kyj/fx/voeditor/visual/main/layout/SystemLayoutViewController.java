@@ -457,8 +457,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				@Override
 				public void close() throws IOException {
+					LOGGER.debug("Close doc . reuqest ");
+					super.close();
 					getParent().close();
-					LOGGER.debug("Closed doc...");
 				}
 			};
 			loadNewSystemTab(file.getName(), pdfPane);

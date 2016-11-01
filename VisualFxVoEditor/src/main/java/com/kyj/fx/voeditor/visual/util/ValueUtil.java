@@ -10,9 +10,12 @@ package com.kyj.fx.voeditor.visual.util;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +37,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
@@ -205,10 +209,12 @@ public class ValueUtil {
 	 * @param paramMap
 	 * @param replaceNamedValue
 	 *            namedParameter값을 바인드 변수로 사용하여 보여줄지 유무
+	 * @param customReplaceFormat
+	 *  			변환할 문자열을 커스텀한 포멧으로 리턴받을 수 있는 기능을 제공하기 위한 파라미터
 	 * @return
 	 */
 	public static String getVelocityToText(String dynamicSql, Map<String, Object> paramMap, boolean replaceNamedValue,
-			Context velocityContext) {
+			Context velocityContext, Function<String, String> customReplaceFormat) {
 		StringWriter writer = new StringWriter();
 		VelocityContext context = new VelocityContext(paramMap, new ExtensionDateFormatVelocityContext(velocityContext));
 
@@ -217,26 +223,35 @@ public class ValueUtil {
 		Velocity.evaluate(context, writer, "DaoWizard", _dynamicSql);
 		String convetedString = writer.toString();
 		if (replaceNamedValue) {
-			convetedString = replace(convetedString, paramMap);
+			convetedString = replace(convetedString, paramMap, customReplaceFormat);
 		}
 		return convetedString.trim();
 	}
 
+	/**
+	 * Velocity문법의 텍스트를 맵핑된 텍스트결과값으로 반환
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 10. 22.
+	 * @param dynamicSql
+	 * @param paramMap
+	 * @param replaceNamedValue
+	 *            namedParameter값을 바인드 변수로 사용하여 보여줄지 유무
+	 * @return
+	 */
+	public static String getVelocityToText(String dynamicSql, Map<String, Object> paramMap, boolean replaceNamedValue,
+			Context velocityContext) {
+		return getVelocityToText(dynamicSql, paramMap, replaceNamedValue, velocityContext, str -> String.format("'%s'", str));
+	}
+
 	private static String replace(String sql, Map<String, Object> paramMap) {
+		return replace(sql, paramMap, str -> String.format("'%s'", str));
+	}
+
+	private static String replace(String sql, Map<String, Object> paramMap, Function<String, String> customFormat) {
 		if (sql == null || sql.trim().isEmpty())
 			return sql;
 
-		//		SqlParameterSource paramSource = new MapSqlParameterSource(paramMap);
-		//
-		//		ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(sql);
-		//		String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, paramSource);
-		//		Object[] params = NamedParameterUtils.buildValueArray(parsedSql, paramSource, null);
-		//		List<SqlParameter> declaredParameters = NamedParameterUtils.buildSqlParameterList(parsedSql, paramSource);
-		//		PreparedStatementCreatorFactory pscf = new PreparedStatementCreatorFactory(sqlToUse, declaredParameters);
-		//		PreparedStatementCreator newPreparedStatementCreator = pscf.newPreparedStatementCreator(params);
-
-		//		return _sql.toString();
-		//		String _sql = sql.replaceAll(STRING_PATTERN, "");
 		String _sql = sql.replaceAll(COMMENT_PATTERN, "");
 		String pattern = ":\\w+";
 		//		String pattern = ":";
@@ -258,8 +273,8 @@ public class ValueUtil {
 				}
 				return sb.toString();
 			}
-
-			return String.format("'%s'", string);
+			//2016-11-01 custom 포멧 제공
+			return customFormat.apply(string); //  String.format("'%s'", string);
 		});
 		//		Optional<String> reduce = regexMatchs.stream().reduce((a, b) -> a.concat(b));
 		//		if (reduce.isPresent())
@@ -330,12 +345,31 @@ public class ValueUtil {
 	 * @return
 	 */
 	public static String regexMatch(String regex, String value) {
+		return regexMatch(regex, value, str -> str);
+	}
+
+	/**
+	 * 정규식으로 일치하는 패턴하나 반환
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 1.
+	 * @param regex
+	 * @param value
+	 * @param convert
+	 * 	  정규식으로 찾아낸 문자열을 변환처리
+	 * @return
+	 */
+	public static String regexMatch(String regex, String value, Function<String, String> convert) {
 		Pattern compile = Pattern.compile(regex);
 		Matcher matcher = compile.matcher(value);
 		// 패턴에 일치하는 문자가 없을때까지 반복한다.
 		if (matcher.find()) {
-			return matcher.group();
+			String group = matcher.group();
+			if (convert != null)
+				return convert.apply(group);
+			return group;
 		}
+		if (convert != null)
+			return convert.apply(null);
 		return null;
 	}
 
@@ -1302,5 +1336,16 @@ public class ValueUtil {
 	 */
 	public static boolean equals(String str1, String str2) {
 		return StringUtils.equals(str1, str2);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 1.
+	 * @param inputStream
+	 * @return
+	 * @throws IOException
+	 */
+	public static String toString(InputStream inputStream) throws IOException {
+		return IOUtils.toString(inputStream , Charset.forName("UTF-8"));
 	}
 }
