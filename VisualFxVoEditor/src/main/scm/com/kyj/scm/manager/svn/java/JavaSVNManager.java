@@ -511,7 +511,8 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	 * @throws SVNException
 	 */
 	public long getRevision(Date date) throws SVNException {
-		return this.svnResource.getRevision(date) + 1;
+		long r = this.svnResource.getRevision(date);
+		return r < svnResource.getLatestRevision() ? r + 1 : r;
 	}
 
 	/**

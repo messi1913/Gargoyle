@@ -7,6 +7,8 @@
 package external;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -38,8 +40,18 @@ public class GoogleTrendParser {
 	public void test() throws ParseException {
 		//		new org.json.JSONObject(sample);
 		//		new JSONParser().parse(sample);
+
 		JSONObject jsonObject = ValueUtil.toJSONObject(sample);
 		System.out.println(jsonObject);
+
+		System.out.println("table #########################");
+		Map<String,Object> x = (Map<String, Object>) jsonObject.get("table");
+		List<Map<String,Object>> cols = (List<Map<String, Object>>) x.get("cols");
+		System.out.println(cols);
+		System.out.println("rows #########################");
+
+
+		System.out.println(x.get("rows"));
 		//		System.out.println(jsonObject);
 	}
 }

@@ -21,9 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.ISVNDirEntryHandler;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperties;
-import org.tmatesoft.svn.core.SVNPropertyValue;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
@@ -89,6 +89,19 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 		}
 		return resultList;
 	}
+
+	//커밋메세지 기능 추가.
+	private Consumer<SVNDirEntry> addMessage = v -> {
+		if (v.getKind() == SVNNodeKind.FILE) {
+			String svnPath = v.getURL().getPath();
+
+			List<SVNLogEntry> log = getJavaSVNManager().log(svnPath, v.getDate(), ex -> LOGGER.error(ValueUtil.toString(ex)));
+			if (!log.isEmpty()) {
+				SVNLogEntry svnLogEntry = log.get(log.size() - 1);
+				v.setCommitMessage(svnLogEntry.getMessage());
+			}
+		}
+	};
 
 	/********************************
 	 * 작성일 : 2016. 5. 9. 작성자 : KYJ

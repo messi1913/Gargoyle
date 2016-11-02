@@ -72,7 +72,7 @@ class SVNResource extends AbstractSVN {
 	 * @throws SVNException
 	 */
 	public long getRevision(Date date) throws SVNException {
-		return getRepository().getDatedRevision(date);
+		return getRepository().getDatedRevision(date) ;
 	}
 
 	/********************************
