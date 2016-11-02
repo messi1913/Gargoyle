@@ -6,8 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.chart.service;
 
-import org.json.simple.JSONObject;
-
 import com.kyj.fx.voeditor.visual.framework.adapter.IGargoyleChartAdapter;
 
 import javafx.application.Platform;
@@ -17,8 +15,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 
 /**
@@ -26,7 +24,7 @@ import javafx.scene.chart.NumberAxis;
  * @author KYJ
  *
  */
-public abstract class AbstractGoogleTrendChart<T, C> extends BarChart<String, Number> {
+public abstract class AbstractGoogleTrendChart<T, C> extends LineChart<String, Number> {
 
 	private StringProperty source = new SimpleStringProperty();
 	private ObjectProperty<T> json = new SimpleObjectProperty<>();
@@ -76,7 +74,7 @@ public abstract class AbstractGoogleTrendChart<T, C> extends BarChart<String, Nu
 
 		int columnCount = adapter.getColumnCount(this.getJson());
 
-		for (int i = 0; i < columnCount; i++) {
+		for (int i = 0; i <= columnCount; i++) {
 
 			String columnName = adapter.getColumnName(this.getJson(), i);
 
@@ -88,6 +86,9 @@ public abstract class AbstractGoogleTrendChart<T, C> extends BarChart<String, Nu
 
 			for (int v = 0; v < valueCount; v++) {
 				Data<String, Number> value = adapter.getValue(this.getJson(), i, columnName, v);
+				if(value == null)
+					continue;
+				
 				data.add(value);
 			}
 

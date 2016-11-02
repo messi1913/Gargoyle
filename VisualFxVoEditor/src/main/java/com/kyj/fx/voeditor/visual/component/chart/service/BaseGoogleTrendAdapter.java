@@ -83,11 +83,15 @@ public class BaseGoogleTrendAdapter implements IGargoyleChartAdapter<JSONObject,
 
 
 		Map<String, String> query = list.get(columnIndex + 1);
-
+		if(query == null)
+			return null;
+		
 		String colName = dateInfo.get("f");
 		String value = query.get("f");
-
-		return new Data<>(colName, Integer.valueOf(value,10));
+		if(colName == null || value == null )
+			return null;
+		Integer valueOf = Integer.valueOf(value,10);
+		return new Data<>(colName, valueOf);
 	}
 
 	/* (non-Javadoc)
