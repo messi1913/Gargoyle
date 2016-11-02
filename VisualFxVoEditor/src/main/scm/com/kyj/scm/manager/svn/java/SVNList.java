@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -17,10 +18,12 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tmatesoft.svn.core.ISVNDirEntryHandler;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperties;
+import org.tmatesoft.svn.core.SVNPropertyValue;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
@@ -99,17 +102,24 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 	 ********************************/
 
 	public List<SVNDirEntry> listEntry(String path, String revision, boolean isRecursive, Consumer<Exception> exceptionHandler) {
-		List<SVNDirEntry> resultList = new ArrayList<>();
+		List<SVNDirEntry> resultList = new LinkedList<>();
 		try {
 			SVNProperties fileProperties = new SVNProperties();
 			SVNRepository repository = getRepository();
 			long parseLong = Long.parseLong(revision);
 
-			ArrayList<SVNDirEntry> arrayList = new ArrayList<>();
-			repository.getDir(path, parseLong, fileProperties, arrayList);
+			List<SVNDirEntry> list = new ArrayList<>();
+
+			ISVNDirEntryHandler handler = new ISVNDirEntryHandler() {
+				public void handleDirEntry(SVNDirEntry dirEntry) {
+					list.add(dirEntry);
+				}
+			};
+
+			repository.getDir(path, parseLong, fileProperties, SVNDirEntry.DIRENT_ALL, handler);
 
 			if (isRecursive) {
-				Iterator<SVNDirEntry> iterator = arrayList.iterator();
+				Iterator<SVNDirEntry> iterator = list.iterator();
 				while (iterator.hasNext()) {
 					SVNDirEntry entry = iterator.next();
 					if (entry.getKind() == SVNNodeKind.DIR) {
@@ -120,7 +130,10 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 				}
 			}
 
-			resultList.addAll(arrayList);
+			if (parseLong != -1)
+				resultList.addAll(list.stream().filter(v -> parseLong <= v.getRevision()).collect(Collectors.toList()));
+			else
+				resultList.addAll(list);
 			return resultList;
 		} catch (SVNException e) {
 			LOGGER.error(ValueUtil.toString(e));

@@ -174,6 +174,14 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 		return listCommand.listEntry(path, "-1", false, null);
 	}
 
+	public List<SVNDirEntry> listEntry(String path, String revision, Consumer<Exception> exceptionHandler) {
+		return listCommand.listEntry(path, revision, false, exceptionHandler);
+	}
+
+	public List<SVNDirEntry> listEntry(String path, String revision, boolean recurive, Consumer<Exception> exceptionHandler) {
+		return listCommand.listEntry(path, revision, recurive, exceptionHandler);
+	}
+
 	public List<SVNDirEntry> listEntry(String path, Consumer<Exception> exceptionHandler) {
 		return listCommand.listEntry(path, "-1", false, exceptionHandler);
 	}
@@ -503,7 +511,7 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	 * @throws SVNException
 	 */
 	public long getRevision(Date date) throws SVNException {
-		return this.svnResource.getRevision(date);
+		return this.svnResource.getRevision(date) + 1;
 	}
 
 	/**
@@ -532,7 +540,7 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	 * 작성일 :  2016. 7. 31. 작성자 : KYJ
 	 *
 	 * SVN 서버 RepositoryUUID를 리턴.
-	 * 
+	 *
 	 * @return
 	 * @throws SVNException
 	 ********************************/
@@ -555,12 +563,12 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	public SVNURL getSvnUrlByFileSystem(File file) throws Exception {
 		return this.svnResource.getSvnUrlByFileSystem(file, SVNRevision.create(-1L));
 	}
-	
+
 	/**
 	 * 현재 객체에 설정된 Properties를 리턴한다.
-	 * 원본 데이터가 변경되자않게하기위해 
+	 * 원본 데이터가 변경되자않게하기위해
 	 * 객체를 새로 생성후 반환한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 9.
 	 * @param file

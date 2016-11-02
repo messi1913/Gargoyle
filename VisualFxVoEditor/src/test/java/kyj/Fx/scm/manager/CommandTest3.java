@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -74,7 +75,6 @@ public class CommandTest3 {
 
 			localServerManager2 = new JavaSVNManager(properties);
 		}
-
 
 	}
 
@@ -280,14 +280,38 @@ public class CommandTest3 {
 
 	/**
 	 * 메타정보를 포함하는 엔트리 조회
+	 * @throws ParseException
+	 * @throws SVNException
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 5. 13.
 	 */
 	@Test
-	public void listEntryTest() {
-		List<SVNDirEntry> list = testServerManager.listEntry("/sos/pass-batch-core");
-		list.forEach(System.out::println);
+	public void listEntryTest() throws SVNException, ParseException {
+
+		long revision = testServerManager.getRevision(DateUtil.toDate("2016-11-02", DateUtil.SYSTEM_DATEFORMAT_YYYY_MM_DD));
+
+		List<SVNDirEntry> listEntry = testServerManager.listEntry("sos/sos-client/", String.valueOf(revision), true, null);
+		List<SVNDirEntry> listEntry2 = testServerManager.listEntry("sos/sos-client/", "-1", true, null);
+
+		System.out.println(revision + "  ->  " + listEntry.size());
+		System.out.println("-1  -> " + listEntry2.size());
+		//			listEntry.forEach(v -> {
+		//
+		//				System.out.println("#######################################hello");
+		//				System.out.println(v);
+		//			});
+//
+//		listEntry.forEach(v ->{
+//
+//			System.out.printf("%s message : %s \n ", v.toString() , v.getCommitMessage());
+//
+//		});
+
+		//		SVNDirEntry svnDirEntry = listEntry.get(0);
+
+
+
 	}
 
 	/********************************
@@ -408,22 +432,21 @@ public class CommandTest3 {
 		});
 
 	}
-	
+
 	@Test
-	public void getRepositoryUUID(){
-		
-		
+	public void getRepositoryUUID() {
+
 		try {
 			localServerManager.ping();
-			
+
 			String repositoryUUID = localServerManager.getRepositoryUUID();
 			System.out.println(repositoryUUID);
-			
+
 		} catch (SVNException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	@Test
