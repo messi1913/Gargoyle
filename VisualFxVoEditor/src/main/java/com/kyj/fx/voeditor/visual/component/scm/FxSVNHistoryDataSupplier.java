@@ -7,16 +7,20 @@
 package com.kyj.fx.voeditor.visual.component.scm;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
+import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
+import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -31,6 +35,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -112,6 +117,8 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 				return listCell;
 			}
 		});
+		
+		
 		listView.setPrefSize(600, ListView.USE_COMPUTED_SIZE);
 		listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -171,9 +178,14 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 
 				MenuItem miHist = new MenuItem("History");
 				miHist.setUserData(selectedItem);
+				MenuItem miAllHist = new MenuItem("All History");
+
 				MenuItem miDiff = new MenuItem("Diff");
 				miDiff.setDisable(true);
+
 				menus.add(miHist);
+				menus.add(miAllHist);
+				menus.add(new SeparatorMenuItem());
 				menus.add(miDiff);
 
 				if (selectedItems.size() == 2) {
@@ -189,6 +201,24 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 					FxUtil.showPopOver(ev.getPickResult().getIntersectedNode(), createHistoryListView(userData.getPath()));
 				});
 
+				miAllHist.setOnAction(event -> {
+					GargoyleSVNLogEntryPath userData = (GargoyleSVNLogEntryPath) miHist.getUserData();
+					if (userData == null)
+						return;
+					String path = userData.getPath();
+
+					try {
+						Collection<SVNLogEntry> allLogs = getManager().getAllLogs(path);
+						ObservableList<GargoyleSVNLogEntryPath> collect = createStream(allLogs).filter(v ->{
+							return path.equals(v.getPath());
+						}).collect(FxCollectors.toObservableList());
+
+						FxUtil.showPopOver(ev.getPickResult().getIntersectedNode(), createHistoryListView(collect));
+					} catch (Exception e) {
+						LOGGER.error(ValueUtil.toString(e));
+					}
+
+				});
 				miDiff.setOnAction(event -> {
 
 					List<GargoyleSVNLogEntryPath> userData = (List<GargoyleSVNLogEntryPath>) miDiff.getUserData();
@@ -222,9 +252,9 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 		return listView;
 	}
 
-//	MenuItem createDiffMenu(){
-//
-//	}
+	//	MenuItem createDiffMenu(){
+	//
+	//	}
 
 	ListView<SVNLogEntry> createEntryListView(ObservableList<SVNLogEntry> list) {
 		ListView<SVNLogEntry> listView = new ListView<SVNLogEntry>(list);
@@ -292,9 +322,8 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 
 	public JavaTextArea createJavaTextArea(String content) {
 
-//		return new TextArea(content);
+		//		return new TextArea(content);
 		return FxUtil.createJavaTextArea(content);
-
 
 	}
 

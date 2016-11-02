@@ -28,6 +28,7 @@ import org.tmatesoft.svn.core.SVNNodeKind;
 
 import com.kyj.fx.voeditor.visual.framework.model.GagoyleDate;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
+import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
@@ -195,7 +196,10 @@ class SimpleSVNHistoryDataSupplier extends AbstracrtSVNHistoryDataSupplier {
 				return arrayList.stream();
 			}
 			return null;
-		}).filter(v -> v != null).distinct();
+		}).filter(v -> v != null).sorted((a1, a2) ->{
+			return ~Long.compare(a1.getDate().getTime(), a2.getDate().getTime());
+		}).distinct();
+
 		return filter;
 	}
 }
