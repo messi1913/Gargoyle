@@ -56,7 +56,7 @@ public class FxSVNHistoryDataSupplier extends SimpleSVNHistoryDataSupplier {
 	}
 
 	public FxSVNHistoryDataSupplier(JavaSVNManager manager) throws Exception {
-		this(manager, 3, 25);
+		this(manager, 6, 25);
 	}
 
 	public ListView<GargoyleSVNLogEntryPath> createHistoryListView(String relativePath) {
