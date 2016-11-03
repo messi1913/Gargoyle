@@ -67,7 +67,7 @@ public class BaseGoogleTrendAdapter implements IGargoyleChartAdapter<JSONObject,
 	public int getColumnCount(JSONObject t) {
 		return (int) cols.stream().filter(v -> {
 			String string = v.get("id");
-			return string.startsWith("query0");
+			return string.startsWith("query");
 		}).count();
 
 	}
@@ -85,7 +85,7 @@ public class BaseGoogleTrendAdapter implements IGargoyleChartAdapter<JSONObject,
 		Map<String, String> query = list.get(columnIndex + 1);
 		if(query == null)
 			return null;
-		
+
 		String colName = dateInfo.get("f");
 		String value = query.get("f");
 		if(colName == null || value == null )

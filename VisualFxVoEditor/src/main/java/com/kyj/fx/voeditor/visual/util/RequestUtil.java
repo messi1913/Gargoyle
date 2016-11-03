@@ -1,0 +1,160 @@
+/********************************
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.util
+ *	작성일   : 2016. 11. 3.
+ *	작성자   : KYJ
+ *******************************/
+package com.kyj.fx.voeditor.visual.util;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * @author KYJ
+ *
+ */
+public class RequestUtil {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtil.class);
+	private static HostnameVerifier hostnameVerifier = (arg0, arg1) -> {
+		System.out.println(arg0);
+		System.out.println(arg1);
+		return true;
+	};
+
+	/**
+	 *
+	 *  SSL 통신 인증
+	 *
+	 * @author KYJ
+	 *
+	 */
+	private static class DefaultTrustManager implements X509TrustManager {
+
+		@Override
+		public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+			System.out.println("######################");
+			System.out.println("checkClientTrusted");
+			System.out.println(arg1);
+			System.out.println("######################");
+		}
+
+		@Override
+		public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+			System.out.println("########################################################################################");
+			System.out.println("checkServerTrusted");
+			System.out.println(arg1);
+
+			Stream.of(arg0).forEach(System.out::println);
+
+			System.out.println("########################################################################################");
+		}
+
+		@Override
+		public X509Certificate[] getAcceptedIssuers() {
+			return null;
+		}
+	}
+
+	public static String reqeustSSL_JSONString(URL url, BiFunction<InputStream, Integer, String> response) throws Exception {
+		return reqeustSSL(url, (is, code) -> {
+			String dirtyConent = "";
+			if (200 == code) {
+				//버퍼로 그냥 읽어봐도 되지만 인코딩 변환을 추후 쉽게 처리하기 위해 ByteArrayOutputStream을 사용
+
+				try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+					int read = -1;
+					while ((read = is.read()) != -1) {
+						out.write(read);
+					}
+					out.flush();
+					dirtyConent = out.toString();
+				} catch (Exception e) {
+					LOGGER.error(ValueUtil.toString(e));
+				}
+			}
+			else
+			{
+				LOGGER.warn("not unnomal response code");
+			}
+			return dirtyConent;
+
+		});
+	}
+
+	public static <T> T reqeustSSL(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
+
+		SSLContext ctx = SSLContext.getInstance("TLS");
+
+		ctx.init(new KeyManager[0], new TrustManager[] { new DefaultTrustManager() }, new SecureRandom());
+		SSLContext.setDefault(ctx);
+
+		HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+		InputStream is = null;
+		T result = null;
+		try {
+			conn.setDefaultUseCaches(false);
+			conn.setUseCaches(false);
+
+			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
+			conn.setRequestProperty("Accept-Encoding", "UTF-8");
+			conn.setRequestProperty("Connection", "keep-alive");
+
+			conn.setRequestProperty("Accept", "text/html");
+			//			conn.setRequestProperty("Accept-Charset", "UTF-8");
+			//					conn.setRequestProperty("Accept-Encoding", "UTF-8");
+			//					conn.setRequestProperty("Accept-Language", "KR");
+			//		conn.setRequestProperty("Cache-Control", "no-store");
+			//					conn.setRequestProperty("Pragma", "no-cache");
+
+			conn.setHostnameVerifier(hostnameVerifier);
+
+			conn.getHeaderFields().forEach((str, li) -> {
+				System.out.printf("%s : %s \n", str, li);
+			});
+
+			conn.setConnectTimeout(6000);
+
+			conn.connect();
+
+			//Charset
+			//
+			//Description
+			//
+			//US-ASCII Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode character set
+			//ISO-8859-1   ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1
+			//UTF-8 Eight-bit UCS Transformation Format
+			//UTF-16BE Sixteen-bit UCS Transformation Format, big-endian byte order
+			//UTF-16LE Sixteen-bit UCS Transformation Format, little-endian byte order
+			//UTF-16 Sixteen-bit UCS Transformation Format, byte order identified by an optional byte-order mark
+
+			is = conn.getInputStream();
+			result = response.apply(is, conn.getResponseCode());
+
+		} finally {
+
+			if (is != null)
+				is.close();
+			conn.disconnect();
+
+		}
+
+		return result;
+	}
+}

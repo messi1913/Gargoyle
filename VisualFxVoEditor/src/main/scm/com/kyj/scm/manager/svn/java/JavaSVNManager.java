@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
@@ -85,11 +87,12 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	 * @param url
 	 * @return
 	 */
-	public static final JavaSVNManager createNewInstance(String url){
+	public static final JavaSVNManager createNewInstance(String url) {
 		Properties properties = new Properties();
 		properties.put(JavaSVNManager.SVN_URL, url);
 		return new JavaSVNManager(properties);
 	}
+
 	/**
 	 * URL정보가 존재하는지 체크함.
 	 *
@@ -170,20 +173,64 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 		return listCommand.list(path);
 	}
 
+	/**
+	 * 메타정보를 포함하는 SVN 엔트리 반환
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 3.
+	 * @param path
+	 * @return
+	 */
 	public List<SVNDirEntry> listEntry(String path) {
-		return listCommand.listEntry(path, "-1", false, null);
+		return listEntry(path, "-1", false, null);
 	}
 
-	public List<SVNDirEntry> listEntry(String path, String revision, Consumer<Exception> exceptionHandler) {
-		return listCommand.listEntry(path, revision, false, exceptionHandler);
-	}
-
-	public List<SVNDirEntry> listEntry(String path, String revision, boolean recurive, Consumer<Exception> exceptionHandler) {
-		return listCommand.listEntry(path, revision, recurive, exceptionHandler);
-	}
-
+	/**
+	 * 메타정보를 포함하는 SVN 엔트리 반환
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 3.
+	 * @param path
+	 * @param exceptionHandler
+	 * @return
+	 */
 	public List<SVNDirEntry> listEntry(String path, Consumer<Exception> exceptionHandler) {
-		return listCommand.listEntry(path, "-1", false, exceptionHandler);
+		return listEntry(path, "-1", false, exceptionHandler);
+	}
+
+	/**
+	 * 메타정보를 포함하는 SVN 엔트리 반환
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 3.
+	 * @param path
+	 * @param revision
+	 * @param exceptionHandler
+	 * @return
+	 */
+	public List<SVNDirEntry> listEntry(String path, String revision, Consumer<Exception> exceptionHandler) {
+		return listEntry(path, revision, false, exceptionHandler);
+	}
+
+	/**
+	 * 메타정보를 포함하는 SVN 엔트리 반환
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 3.
+	 * @param path
+	 * @param revision
+	 * @param recurive
+	 * @param exceptionHandler
+	 * @return
+	 */
+	public List<SVNDirEntry> listEntry(String path, String revision, boolean recurive, Consumer<Exception> exceptionHandler) {
+		long parseLong = Long.parseLong(revision, 10);
+		List<SVNDirEntry> listEntry = listCommand.listEntry(path, revision, recurive, exceptionHandler);
+		Predicate<? super SVNDirEntry> predicate = null;
+
+		if (parseLong == -1)
+			predicate = v -> true;
+		else
+			predicate = v -> parseLong <= v.getRevision();
+
+		return listEntry.stream().filter(predicate).collect(Collectors.toList());
 	}
 
 	/**
@@ -536,7 +583,6 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 		this.svnResource.ping();
 	}
 
-
 	/********************************
 	 * 작성일 :  2016. 7. 31. 작성자 : KYJ
 	 *
@@ -548,7 +594,6 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	public String getRepositoryUUID() throws SVNException {
 		return this.svnResource.getRepositoryUUID();
 	}
-
 
 	/**
 	 * SVN 서버에 연결된 루트 디렉토리에 속하는
@@ -575,7 +620,7 @@ public class JavaSVNManager implements SVNKeywords, SVNFormatter {
 	 * @param file
 	 * @return
 	 */
-	public Properties getProperties(){
+	public Properties getProperties() {
 		return (Properties) this.properties.clone();
 	}
 }

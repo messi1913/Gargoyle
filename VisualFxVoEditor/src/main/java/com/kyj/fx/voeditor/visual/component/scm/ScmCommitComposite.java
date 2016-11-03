@@ -33,9 +33,12 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
@@ -60,6 +63,7 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 		super();
 		this.supplier = supplier;
 		load();
+
 	}
 
 	/* (non-Javadoc)
@@ -67,7 +71,26 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 	 */
 	@Override
 	public void init() {
+		MenuItem miReflesh = new MenuItem("Reflesh");
+		miReflesh.setOnAction(ex -> {
 
+
+			getLineChartDayOfWeek().getData().clear();
+			getLineChartDayOfWeekCategory().getCategories().clear();
+			getBarChartDayOfMonth().getData().clear();
+			getBarChartDayOfMonthCategory().getCategories().clear();
+			load();
+		});
+
+		ContextMenu contextMenu = new ContextMenu(miReflesh);
+
+		this.addEventFilter(MouseEvent.MOUSE_CLICKED, ev -> {
+			contextMenu.hide();
+			if (ev.getButton() == MouseButton.SECONDARY) {
+
+				contextMenu.show(FxUtil.getWindow(this), ev.getScreenX(), ev.getScreenY());
+			}
+		});
 	}
 
 	public void load() {
@@ -91,8 +114,8 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 				for (Node n : barChartDayOfMonth.lookupAll(".default-color0.chart-bar")) {
 					n.setStyle(style);
 				}
-				barChartDayOfMonth.setStyle(
-						".chart-legend-item-syCmbol chart-bar series0 bar-legend-symbol default-color0{- fx-background-color:green;}");
+//				barChartDayOfMonth.setStyle(
+//						".chart-legend-item-syCmbol chart-bar series0 bar-legend-symbol default-color0{- fx-background-color:green;}");
 						/*end Desing css.*/
 
 				/*start Popover*/
@@ -113,6 +136,8 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 			}
 			{
 				LineChart<String, Long> lineChartDayOfWeek = getLineChartDayOfWeek();
+				lineChartDayOfWeek.setStyle(
+						 ".chart-series-line .series0 .default-color0{- fx-background-color:green;}");
 				Set<Node> lookupAll = lineChartDayOfWeek.lookupAll(".chart-line-symbol");
 				StringBuffer sb = new StringBuffer();
 				sb.append("-fx-background-color: " + FxUtil.toRGBCode(lineColor) + ", white;");
@@ -122,9 +147,12 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 				for (Node n : lookupAll) {
 					n.setStyle(sb.toString());
 				}
-				Node seriesLine = lineChartDayOfWeek.lookup(cssStyleClassName);
 				String style = "-fx-stroke: " + FxUtil.toRGBCode(lineColor) + "; -fx-stroke-width: " + strokeWidth + ";";
-				seriesLine.setStyle(style);
+				for(Node seriesLine : lineChartDayOfWeek.lookupAll(cssStyleClassName))
+				{
+					seriesLine.setStyle(style);
+				}
+
 			}
 
 		} catch (SVNException e) {

@@ -14,6 +14,7 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -42,7 +43,6 @@ public abstract class MasterSlaveChartComposite extends BorderPane {
 	@FXML
 	public void initialize() {
 		init();
-
 	}
 
 	public abstract void init();

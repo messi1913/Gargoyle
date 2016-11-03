@@ -14,11 +14,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tmatesoft.svn.core.ISVNDirEntryHandler;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
@@ -108,6 +108,8 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 	 *
 	 * 메타정보를 포함하는 SVN 엔트리 반환
 	 *
+	 * 2016-11-03 버그 수정
+	 *
 	 * @param path
 	 * @param revision
 	 * @param exceptionHandler
@@ -117,19 +119,12 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 	public List<SVNDirEntry> listEntry(String path, String revision, boolean isRecursive, Consumer<Exception> exceptionHandler) {
 		List<SVNDirEntry> resultList = new LinkedList<>();
 		try {
-			SVNProperties fileProperties = new SVNProperties();
 			SVNRepository repository = getRepository();
-			long parseLong = Long.parseLong(revision);
+			long parseLong = Long.parseLong(revision, 10);
 
 			List<SVNDirEntry> list = new ArrayList<>();
 
-			ISVNDirEntryHandler handler = new ISVNDirEntryHandler() {
-				public void handleDirEntry(SVNDirEntry dirEntry) {
-					list.add(dirEntry);
-				}
-			};
-
-			repository.getDir(path, parseLong, fileProperties, SVNDirEntry.DIRENT_ALL, handler);
+			repository.getDir(path, parseLong, true, list);
 
 			if (isRecursive) {
 				Iterator<SVNDirEntry> iterator = list.iterator();
@@ -139,15 +134,11 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 						SVNURL url = entry.getURL();
 						List<SVNDirEntry> listEntry = listEntry(url.getPath(), revision, isRecursive, exceptionHandler);
 						resultList.addAll(listEntry);
+					} else {
+						resultList.add(entry);
 					}
 				}
 			}
-
-			if (parseLong != -1)
-				resultList.addAll(list.stream().filter(v -> parseLong <= v.getRevision()).collect(Collectors.toList()));
-			else
-				resultList.addAll(list);
-			return resultList;
 		} catch (SVNException e) {
 			LOGGER.error(ValueUtil.toString(e));
 			if (exceptionHandler != null)

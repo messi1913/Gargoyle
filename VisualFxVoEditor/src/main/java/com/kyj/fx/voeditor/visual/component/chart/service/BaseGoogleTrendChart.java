@@ -11,6 +11,9 @@ import org.json.simple.JSONObject;
 import com.kyj.fx.voeditor.visual.framework.adapter.IGargoyleChartAdapter;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+
 /**
  * @author KYJ
  *
@@ -22,6 +25,10 @@ public class BaseGoogleTrendChart extends AbstractGoogleTrendChart<JSONObject, S
 	 */
 	public BaseGoogleTrendChart(String source) {
 		super(source);
+	}
+
+	public BaseGoogleTrendChart(String source, CategoryAxis x, NumberAxis y) {
+		super(source, x, y);
 	}
 
 	/* (non-Javadoc)
