@@ -30,10 +30,10 @@ import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenComposite;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
 import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
-import com.kyj.fx.voeditor.visual.component.dock.pane.DockClosePressEvent;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
 import com.kyj.fx.voeditor.visual.component.file.FilePropertiesComposite;
+import com.kyj.fx.voeditor.visual.component.google.trend.GoogleTrendComposite;
 import com.kyj.fx.voeditor.visual.component.pmd.DesignerFxComposite;
 import com.kyj.fx.voeditor.visual.component.pmd.PMDCheckedListComposite;
 import com.kyj.fx.voeditor.visual.component.popup.BigTextView;
@@ -107,7 +107,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 
 /**
@@ -1733,6 +1732,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	public void lblPmdDesignerOnAction() {
 		loadNewSystemTab("PMD Designer", new DesignerFxComposite());
+	}
+
+	/**
+	 * 구글 트랜드 OPEN
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 4.
+	 */
+	public void lblGoogleTrendOnAction(){
+		loadNewSystemTab("Google Trend", new GoogleTrendComposite());
 	}
 
 	/*

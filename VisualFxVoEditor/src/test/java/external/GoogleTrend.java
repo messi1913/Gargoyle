@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
@@ -29,8 +30,6 @@ import javax.net.ssl.X509TrustManager;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -46,6 +45,122 @@ public class GoogleTrend {
 
 		//프록시 관련 설정을  세팅함.
 		new ProxyInitializable().initialize();
+
+	}
+
+	@Test
+	public void urlEncode() throws Exception {
+		System.out.println(URLEncoder.encode(":", "UTF-8"));
+	}
+	@Test
+	public void urlDecode() throws Exception {
+
+
+
+		System.out.println(URLDecoder.decode("2016.+10.+31.%2Ccd_max%3A2016.+11.+2.&tbm=", "UTF-8"));
+
+		System.out.println(URLEncoder.encode("2016.+10.+31.%2Ccd_max%3A2016.+11.+2.&tbm=", "UTF-8"));
+
+		System.out.println(URLDecoder.decode(
+				"https://www.google.co.kr/search?q=%EB%B0%95%EA%B7%BC%ED%98%9C&biw=1920&bih=990&tbas=0&source=lnt&tbs=cdr%3A1%2Ccd_min%3A2016.+10.+31.%2Ccd_max%3A2016.+11.+2.&tbm=",
+				"UTF8"));
+	}
+
+	@Test
+	public void simpleSearch() throws Exception {
+
+		String keyWord = "%EB%B0%95%EA%B7%BC%ED%98%9C";
+		String startDate = "2016.10.30.";
+		String endDate = "2016.11.02.";
+
+		keyWord = URLEncoder.encode(keyWord, "UTF-8");
+		startDate = URLEncoder.encode(startDate, "UTF-8");
+		endDate = URLEncoder.encode(endDate, "UTF-8");
+
+		String URL_FORMAT = "https://www.google.co.kr/search?q=:keyWord&biw=1920&bih=990&source=lnt&tbs=cdr%3A1%2Ccd_min%3A:startDate.%2Ccd_max%3A:endDate&tbm=";
+
+		Map<String, Object> hashMap = new HashMap<>();
+		hashMap.put("keyWord", keyWord);
+		hashMap.put("startDate", startDate);
+		hashMap.put("endDate", endDate);
+
+		String formattedURL = ValueUtil.getVelocityToText(URL_FORMAT, hashMap, true, null, str -> str);
+		System.out.println(formattedURL);
+
+		SSLContext ctx = SSLContext.getInstance("TLS");
+
+		ctx.init(new KeyManager[0], new TrustManager[] { new DefaultTrustManager() }, new SecureRandom());
+		SSLContext.setDefault(ctx);
+
+		URL url = new URL(formattedURL);
+		HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+
+		try {
+			//			conn.setDoInput(true);
+			//			conn.setDoOutput(true);
+			conn.setDefaultUseCaches(false);
+			conn.setUseCaches(false);
+
+			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
+			//			conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+			//			conn.setRequestProperty("Accept-Language", "ko-KR,kr;q=0.5");
+			conn.setRequestProperty("Accept-Encoding", "UTF-8");
+			conn.setRequestProperty("Connection", "keep-alive");
+
+			//		conn.setIfModifiedSince(100L);
+
+			conn.setRequestProperty("Accept", "text/html");
+			//			conn.setRequestProperty("Accept-Charset", "UTF-8");
+			//					conn.setRequestProperty("Accept-Encoding", "UTF-8");
+			//					conn.setRequestProperty("Accept-Language", "KR");
+			//		conn.setRequestProperty("Cache-Control", "no-store");
+			//					conn.setRequestProperty("Pragma", "no-cache");
+
+			conn.setHostnameVerifier(hostnameVerifier);
+
+			//		System.out.println(conn.getContentEncoding());
+
+			conn.getHeaderFields().forEach((str, li) -> {
+				System.out.printf("%s : %s \n", str, li);
+			});
+
+			conn.setConnectTimeout(6000);
+
+			conn.connect();
+
+			//Charset
+			//
+			//Description
+			//
+			//US-ASCII Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode character set
+			//ISO-8859-1   ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1
+			//UTF-8 Eight-bit UCS Transformation Format
+			//UTF-16BE Sixteen-bit UCS Transformation Format, big-endian byte order
+			//UTF-16LE Sixteen-bit UCS Transformation Format, little-endian byte order
+			//UTF-16 Sixteen-bit UCS Transformation Format, byte order identified by an optional byte-order mark
+
+			//필터링해야할 텍스트가 모두 포함된 원본 데이터
+			String dirtyConent = null;
+
+			//버퍼로 그냥 읽어봐도 되지만 인코딩 변환을 추후 쉽게 처리하기 위해 ByteArrayOutputStream을 사용
+			try (InputStream is = conn.getInputStream()) {
+				try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+					int read = -1;
+					while ((read = is.read()) != -1) {
+						out.write(read);
+					}
+					out.flush();
+					dirtyConent = out.toString();
+				}
+			}
+
+			if (200 == conn.getResponseCode()) {
+				System.out.printf("dirty content %s \n", dirtyConent);
+			}
+
+		} finally {
+			conn.disconnect();
+		}
 
 	}
 

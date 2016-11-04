@@ -38,6 +38,19 @@ public class RequestUtil {
 		return true;
 	};
 
+	static SSLContext ctx;
+
+	static {
+		try {
+			ctx = SSLContext.getInstance("TLS");
+			ctx.init(new KeyManager[0], new TrustManager[] { new DefaultTrustManager() }, new SecureRandom());
+			SSLContext.setDefault(ctx);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	/**
 	 *
 	 *  SSL 통신 인증
@@ -88,9 +101,7 @@ public class RequestUtil {
 				} catch (Exception e) {
 					LOGGER.error(ValueUtil.toString(e));
 				}
-			}
-			else
-			{
+			} else {
 				LOGGER.warn("not unnomal response code");
 			}
 			return dirtyConent;
@@ -100,21 +111,18 @@ public class RequestUtil {
 
 	public static <T> T reqeustSSL(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
 
-		SSLContext ctx = SSLContext.getInstance("TLS");
-
-		ctx.init(new KeyManager[0], new TrustManager[] { new DefaultTrustManager() }, new SecureRandom());
-		SSLContext.setDefault(ctx);
+		//		SSLContext ctx = SSLContext.getInstance("TLS");
 
 		HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 		InputStream is = null;
 		T result = null;
 		try {
-			conn.setDefaultUseCaches(false);
-			conn.setUseCaches(false);
+			conn.setDefaultUseCaches(true);
+			conn.setUseCaches(true);
 
 			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
 			conn.setRequestProperty("Accept-Encoding", "UTF-8");
-			conn.setRequestProperty("Connection", "keep-alive");
+//			conn.setRequestProperty("Connection", "keep-alive");
 
 			conn.setRequestProperty("Accept", "text/html");
 			//			conn.setRequestProperty("Accept-Charset", "UTF-8");
@@ -125,6 +133,8 @@ public class RequestUtil {
 
 			conn.setHostnameVerifier(hostnameVerifier);
 
+
+
 			conn.getHeaderFields().forEach((str, li) -> {
 				System.out.printf("%s : %s \n", str, li);
 			});
@@ -132,7 +142,7 @@ public class RequestUtil {
 			conn.setConnectTimeout(6000);
 
 			conn.connect();
-
+			LOGGER.debug("{}",conn.getCipherSuite());
 			//Charset
 			//
 			//Description
@@ -145,6 +155,10 @@ public class RequestUtil {
 			//UTF-16 Sixteen-bit UCS Transformation Format, byte order identified by an optional byte-order mark
 
 			is = conn.getInputStream();
+
+			LOGGER.debug("res code : {} res message : {}" , conn.getResponseCode(), conn.getResponseMessage());
+
+			System.out.println(conn.getPermission());
 			result = response.apply(is, conn.getResponseCode());
 
 		} finally {

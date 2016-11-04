@@ -35,6 +35,8 @@ public class GoogleTrendParser {
 		System.out.println(sample);
 		System.out.println("######################################################");
 	}
+	
+	
 
 	@Test
 	public void test() throws ParseException {

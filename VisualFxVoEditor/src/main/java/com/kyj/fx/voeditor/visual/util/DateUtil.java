@@ -197,6 +197,36 @@ public class DateUtil {
 				instance.get(GregorianCalendar.DAY_OF_MONTH) + 6);
 	}
 
+	/**
+	 *  속하는 해당 월의 마지막 첫번째 일자를 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 4.
+	 * @param date
+	 * @return
+	 */
+	public static Date getFirstDateOfMonth(Date date) {
+		Calendar instance = GregorianCalendar.getInstance();
+		instance.setTime(date);
+		int maximum = instance.getMinimum(Calendar.DAY_OF_MONTH);
+		instance.set(Calendar.DAY_OF_MONTH, maximum);
+		return instance.getTime();
+	}
+
+	/**
+	 * 속하는 해당 월의 마지막 일자를 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 4.
+	 * @param date
+	 * @return
+	 */
+	public static Date getLastDateOfMonth(Date date) {
+		Calendar instance = GregorianCalendar.getInstance();
+		instance.setTime(date);
+		int maximum = instance.getMaximum(Calendar.DAY_OF_MONTH);
+		instance.set(Calendar.DAY_OF_MONTH, maximum);
+		return instance.getTime();
+	}
+
 	public static String getCurrentDateString(String format) {
 		Date time = GregorianCalendar.getInstance().getTime();
 		return new SimpleDateFormat(format).format(time);
@@ -330,4 +360,6 @@ public class DateUtil {
 		return result;
 
 	}
+
+
 }

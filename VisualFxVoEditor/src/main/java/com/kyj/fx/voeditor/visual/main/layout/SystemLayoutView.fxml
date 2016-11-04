@@ -201,6 +201,13 @@
 									</items>
 								</Menu>
 
+								<Menu mnemonicParsing="false" text="Google">
+									<items>
+										<MenuItem mnemonicParsing="false" onAction="#lblGoogleTrendOnAction" text="Google Trend">
+										</MenuItem>
+									</items>
+								</Menu>
+
 							</items>
 						</Menu>
 						<Menu fx:id="menuPlugins" mnemonicParsing="false" text="Plugins" />

@@ -34,7 +34,7 @@ public interface IGargoyleChartAdapter<T, C> {
 	 * @param seq
 	 * @return
 	 */
-	public String getColumnName(T t, int seq);
+	public String getColumnName(int seq);
 
 	/**
 	 * 컬럼부의 갯수를 리턴함.
@@ -43,7 +43,7 @@ public interface IGargoyleChartAdapter<T, C> {
 	 * @param t
 	 * @return
 	 */
-	public int getColumnCount(T t);
+	public int getColumnCount();
 
 	/**
 	 * @작성자 : KYJ
@@ -53,7 +53,7 @@ public interface IGargoyleChartAdapter<T, C> {
 	 * @param row
 	 * @return
 	 */
-	public Data<String, Number> getValue(T t, int columnIndex, String columnName, int row);
+	public Data<String, Number> getValue( int columnIndex, String columnName, int row);
 
 	/**
 	 * @작성자 : KYJ
@@ -62,5 +62,5 @@ public interface IGargoyleChartAdapter<T, C> {
 	 * @param columnName
 	 * @return
 	 */
-	public int getValueCount(T t, String columnName);
+	public int getValueCount(String columnName);
 }

@@ -20,11 +20,18 @@ import javafx.scene.chart.NumberAxis;
  */
 public class BaseGoogleTrendChart extends AbstractGoogleTrendChart<JSONObject, String> {
 
+	public BaseGoogleTrendChart() {
+		super();
+	}
 	/**
 	 * @param source
 	 */
 	public BaseGoogleTrendChart(String source) {
 		super(source);
+	}
+
+	public BaseGoogleTrendChart(CategoryAxis x, NumberAxis y) {
+		super("", x, y);
 	}
 
 	public BaseGoogleTrendChart(String source, CategoryAxis x, NumberAxis y) {
@@ -44,7 +51,7 @@ public class BaseGoogleTrendChart extends AbstractGoogleTrendChart<JSONObject, S
 	 */
 	@Override
 	public IGargoyleChartAdapter<JSONObject, String> adapter() {
-		return new BaseGoogleTrendAdapter(getJson());
+		return new BaseGoogleTrendAdapter(jsonProperty());
 	}
 
 }

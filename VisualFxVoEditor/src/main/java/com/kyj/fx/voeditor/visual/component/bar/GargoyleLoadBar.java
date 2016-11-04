@@ -10,8 +10,6 @@ import java.util.concurrent.ExecutorService;
 
 import com.jfoenix.controls.JFXSpinner;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
-import com.kyj.fx.voeditor.visual.momory.SkinManager;
-import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.sun.javafx.stage.StageHelper;
 
 import javafx.beans.value.ChangeListener;
@@ -21,9 +19,7 @@ import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;

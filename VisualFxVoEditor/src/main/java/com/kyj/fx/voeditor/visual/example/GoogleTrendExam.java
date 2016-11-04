@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.chart.service.BaseGoogleTrendChart;
+import com.kyj.fx.voeditor.visual.component.chart.service.GoogleTrendChartEvent;
 import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
 import com.kyj.fx.voeditor.visual.util.RequestUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -28,6 +29,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.stage.Stage;
 
 /**
+ * 샘플1
  * @author KYJ
  *
  */
@@ -92,13 +94,13 @@ public class GoogleTrendExam extends Application {
 					//					jsonObject = ValueUtil.toJSONObject(regexMatch);
 
 				} catch (Exception e) {
-
+					e.printStackTrace();
 				}
 
 			} else {
 				LOGGER.warn("not unnomal response code");
 				try {
-					result  = ValueUtil.toString(GoogleTrendExam.class.getResourceAsStream("GoogleTrendSample.json"));
+					result = ValueUtil.toString(GoogleTrendExam.class.getResourceAsStream("GoogleTrendSample.json"));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -111,6 +113,13 @@ public class GoogleTrendExam extends Application {
 		//		String source = ValueUtil.toString(GoogleTrendExam.class.getResourceAsStream("GoogleTrendSample.json"));
 		BaseGoogleTrendChart root = new BaseGoogleTrendChart(jsonString, new CategoryAxis(), new NumberAxis(0, 100, 10));
 		root.setVerticalGridLinesVisible(false);
+		root.addEventFilter(GoogleTrendChartEvent.GOOGLE_CHART_INTERSECT_NODE_CLICK, ev -> {
+			System.out.println(ev.getContents());
+		});
+
+		root.addEventHandler(GoogleTrendChartEvent.GOOGLE_CHART_INTERSECT_NODE_CLICK, ev -> {
+			System.out.println(ev.getContents());
+		});
 		primaryStage.setScene(new Scene(root));
 		primaryStage.show();
 	}
@@ -126,7 +135,7 @@ public class GoogleTrendExam extends Application {
 		String URL_FORMAT = "https://www.google.com/trends/fetchComponent?cid=TIMESERIES_GRAPH_0&export=3&q=:keywords #if($geo)&geo=:geo#end";
 
 		Map<String, Object> hashMap = new HashMap<>();
-//		hashMap.put("geo", geo);
+		//		hashMap.put("geo", geo);
 		hashMap.put("date", date);
 		hashMap.put("keywords", converted_keywords);
 

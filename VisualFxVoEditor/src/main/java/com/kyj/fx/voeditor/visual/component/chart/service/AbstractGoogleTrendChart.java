@@ -6,9 +6,12 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.chart.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.kyj.fx.voeditor.visual.framework.adapter.IGargoyleChartAdapter;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -17,10 +20,13 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -47,6 +53,10 @@ public abstract class AbstractGoogleTrendChart<T, C> extends LineChart<String, N
 	private ObjectProperty<T> json = new SimpleObjectProperty<>();
 	private IGargoyleChartAdapter<T, C> adapter;
 
+	public AbstractGoogleTrendChart() {
+		this("");
+	}
+
 	public AbstractGoogleTrendChart(String source) {
 		this(source, new CategoryAxis(), new NumberAxis());
 	}
@@ -55,11 +65,21 @@ public abstract class AbstractGoogleTrendChart<T, C> extends LineChart<String, N
 		super(x, y);
 
 		this.source.set(source);
-		this.json.set(convert(source));
 		this.adapter = adapter();
 
 		Platform.runLater(() -> {
-			createChart();
+			fillChartData();
+			action();
+		});
+
+		this.source.addListener((oba, o, n) -> {
+
+			if (ValueUtil.isNotEmpty(n)) {
+				this.json.set(convert(n));
+				clearChartData();
+				fillChartData();
+			}
+
 		});
 	}
 
@@ -80,42 +100,57 @@ public abstract class AbstractGoogleTrendChart<T, C> extends LineChart<String, N
 	 */
 	public abstract IGargoyleChartAdapter<T, C> adapter();
 
+	protected void clearChartData() {
+		getData().clear();
+	}
+
 	/**
 	 * 차트 그리는 작업 처리
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 2.
 	 */
-	protected void createChart() {
+	protected void fillChartData() {
 		IGargoyleChartAdapter<T, C> adapter = this.adapter;
 
-		String title = adapter.getTitle(this.getJson());
+		String title = adapter.getTitle(this.json.get());
 		setTitle(title);
 
-		int columnCount = adapter.getColumnCount(this.getJson());
+		T json = this.json.get(); //this.getJson();
 
-		for (int i = 0; i < columnCount; i++) {
-			String columnName = adapter.getColumnName(this.getJson(), i);
+		if (ValueUtil.isNotEmpty(json)) {
+			int columnCount = adapter.getColumnCount();
 
-			ObservableList<Data<String, Number>> data = FXCollections.observableArrayList();
-			javafx.scene.chart.XYChart.Series<String, Number> series = new Series<>(columnName, data);
-			getData().add(series);
+			for (int i = 0; i < columnCount; i++) {
+				String columnName = adapter.getColumnName(i);
 
-			int valueCount = adapter.getValueCount(this.getJson(), columnName);
+				ObservableList<Data<String, Number>> data = FXCollections.observableArrayList();
+				javafx.scene.chart.XYChart.Series<String, Number> series = new Series<>(columnName, data);
+				getData().add(series);
 
-			for (int v = 0; v < valueCount; v++) {
-				Data<String, Number> value = adapter.getValue(this.getJson(), i, columnName, v);
+				int valueCount = adapter.getValueCount(columnName);
 
-				if (value == null)
-					continue;
-				StackPane s = new StackPane(new Rectangle());
-				value.setNode(s);
-				s.setUserData(String.format("%s %s %s", value.getXValue(), columnName, value.getYValue().intValue()));
+				for (int v = 0; v < valueCount; v++) {
+					Data<String, Number> value = adapter.getValue(i, columnName, v);
 
-				data.add(value);
+					if (value == null)
+						continue;
+					StackPane s = new StackPane(new Rectangle());
+					value.setNode(s);
+
+					s.setUserData(new ChartOverTooltip(i, columnName, value));
+
+					data.add(value);
+				}
 			}
-
 		}
 
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 4.
+	 */
+	private void action() {
 		Line e = new Line();
 		e.getStyleClass().add("google-chart-flow-line");
 		e.setStyle("-fx-fill:gray");
@@ -135,6 +170,35 @@ public abstract class AbstractGoogleTrendChart<T, C> extends LineChart<String, N
 		s.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, new Insets(5))));
 		getPlotChildren().add(s);
 
+		this.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
+
+			if (ev.getButton() == MouseButton.PRIMARY ) {
+				List<Node> collect = lookupAll(".chart-line-symbol").stream() /*.peek(System.out::println)*/.filter(v -> v != null)
+						.filter(n -> {
+
+					if (n instanceof StackPane) {
+						StackPane sp = (StackPane) n;
+						sp.setStyle(null);
+						if (e.intersects(n.getBoundsInParent())) {
+							sp.setStyle("-fx-background-color:green");
+							return true;
+						}
+					}
+
+					return false;
+				}).filter(v -> v.getUserData() != null).collect(Collectors.toList());
+
+				if (!collect.isEmpty()) {
+					GoogleTrendChartEvent intersectNodeClickEvent = new GoogleTrendChartEvent(this,
+							GoogleTrendChartEvent.NULL_SOURCE_TARGET, GoogleTrendChartEvent.GOOGLE_CHART_INTERSECT_NODE_CLICK, ev.getX(),
+							ev.getY(), ev.getScreenX(), ev.getScreenY(), null, ev.getClickCount(), collect);
+
+					Event.fireEvent(this, intersectNodeClickEvent);
+				}
+			}
+
+		});
+
 		this.addEventHandler(MouseEvent.MOUSE_MOVED, ev -> {
 
 			double sceneX = Math.abs(getYAxis().getLayoutX() + getYAxis().getWidth() - ev.getX() - getYAxis().getPadding().getLeft()
@@ -148,7 +212,17 @@ public abstract class AbstractGoogleTrendChart<T, C> extends LineChart<String, N
 
 			Optional<String> reduce = lookupAll(".chart-line-symbol").stream() /*.peek(System.out::println)*/.filter(v -> v != null)
 					.filter(n -> {
-				return e.intersects(n.getBoundsInParent());
+
+				if (n instanceof StackPane) {
+					StackPane sp = (StackPane) n;
+					sp.setStyle(null);
+					if (e.intersects(n.getBoundsInParent())) {
+						sp.setStyle("-fx-background-color:green");
+						return true;
+					}
+				}
+
+				return false;
 			}).filter(v -> v.getUserData() != null).map(v -> v.getUserData().toString()).reduce((a, b) -> {
 				return a + "\n" + b;
 			});
@@ -161,13 +235,18 @@ public abstract class AbstractGoogleTrendChart<T, C> extends LineChart<String, N
 				} else {
 					s.setLayoutX(sceneX);
 				}
+				if ((label.getBoundsInParent().getMaxY() + label.getBoundsInLocal().getHeight() + ev.getSceneY()) > getYAxis()
+						.getBoundsInParent().getMaxY()) {
+					s.setLayoutY(getYAxis().getBoundsInParent().getMaxY() - label.getBoundsInLocal().getHeight()
+							- label.getBoundsInParent().getMaxY());
+				} else {
 
-				s.setLayoutY(ev.getSceneY());
+					s.setLayoutY( /*ev.getSceneY()*/ ev.getY());
+				}
 			} else
 				s.setOpacity(0.3d);
 
 		});
-
 	}
 
 	/* (non-Javadoc)

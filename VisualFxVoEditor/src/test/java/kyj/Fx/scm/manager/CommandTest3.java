@@ -301,16 +301,14 @@ public class CommandTest3 {
 		//				System.out.println("#######################################hello");
 		//				System.out.println(v);
 		//			});
-//
-//		listEntry.forEach(v ->{
-//
-//			System.out.printf("%s message : %s \n ", v.toString() , v.getCommitMessage());
-//
-//		});
+		//
+		//		listEntry.forEach(v ->{
+		//
+		//			System.out.printf("%s message : %s \n ", v.toString() , v.getCommitMessage());
+		//
+		//		});
 
 		//		SVNDirEntry svnDirEntry = listEntry.get(0);
-
-
 
 	}
 
