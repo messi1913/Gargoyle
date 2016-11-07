@@ -56,6 +56,7 @@ import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.sun.btrace.BTraceUtils.Strings;
 
 import javafx.application.Application;
 import javafx.beans.property.IntegerProperty;
@@ -1099,6 +1100,27 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			e.setCellValueFactory(arg -> {
 				Object value = arg.getValue().get(column);
 				return new SimpleObjectProperty<>(value);
+			});
+			e.setComparator((a,b) ->{
+
+				if(a == null && b == null)
+					return 0;
+
+				if(a == null )
+					return -1;
+
+				if(b == null )
+					return -1;
+
+				if(ValueUtil.isNumber(a.toString()) && ValueUtil.isNumber(b.toString()))
+				{
+					return Double.compare(Double.parseDouble(a.toString()) , Double.parseDouble(b.toString()));
+				}
+				else
+				{
+					return Strings.compareTo(a.toString(), b.toString());
+				}
+
 			});
 			tbResult.getColumns().add(e);
 		}
