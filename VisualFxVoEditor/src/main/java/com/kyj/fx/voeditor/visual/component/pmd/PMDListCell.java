@@ -126,8 +126,8 @@ public class PMDListCell extends ListCell<RuleViolation> {
 			//						message.setStyle("-fx-font-style:italic;-fx-font-smoothing-type: lcd;");
 
 			title.setText(String.format("룰셋명 : %s   위반사항이름 : %s", item.getRule().getRuleSetName(), item.getRule().getName()));
-			message.setText(String.format("관련 메세지 : %s", item.getRule().getMessage()));
-
+			message.setText(String.format("관련 메세지 : %s", /*item.getRule().getMessage()*/ item.getDescription()));
+//			item.getRule().
 			//			message.setFont(Font.font(default1.getFamily(), FontWeight.BOLD, default1.getSize()));
 			line.setText(String.format("Line : %d", item.getBeginLine()));
 			setGraphic(hBox);
