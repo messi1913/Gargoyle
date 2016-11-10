@@ -748,6 +748,9 @@ public class DbUtil extends ConnectionManager {
 
 	/********************************
 	 * 작성일 : 2016. 8. 11. 작성자 : KYJ
+	 *
+	 * 2016-11-10
+	 * 모든 테이블탐색후 대소문자무시 검색으로 수정
 	 *</br>
 	 *</br>
 	 		1.TABLE_CAT String => table catalog (may be null)  </br>
@@ -773,16 +776,22 @@ public class DbUtil extends ConnectionManager {
 		try (Connection connection = getConnection()) {
 
 			DatabaseMetaData metaData = connection.getMetaData();
-			ResultSet rs = metaData.getTables(null, null, "%" + tableNamePattern + "%", null);
+			ResultSet rs = metaData.getTables(null, null, "%"/* + tableNamePattern + "%"*/, new String[] { "TABLE" });
 
+			String tableNamePatternUpperCase = tableNamePattern.toUpperCase();
 			while (rs.next()) {
 
 				// 2016-08-18 특정데이터베이스(sqlite)에서는 인덱스 트리거정보도 동시에 출력된다.
 				String tableType = rs.getString(4);
 				if ("TABLE".equals(tableType)) {
-					T apply = converter.apply(rs);
-					if (apply != null)
-						tables.add(apply);
+
+					String tableName = rs.getString(3);
+					if (tableName.toUpperCase().indexOf(tableNamePatternUpperCase) != -1) {
+						T apply = converter.apply(rs);
+						if (apply != null)
+							tables.add(apply);
+					}
+
 				}
 
 			}
