@@ -16,12 +16,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +36,7 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationFrameView;
 import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationUserMetadataVO;
+import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.exceptions.NotYetSupportException;
@@ -42,6 +46,7 @@ import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.collections.ObservableList;
@@ -53,6 +58,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 /**
  * 공통 데이터 조회 전용 패널
@@ -262,12 +268,10 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 		 * 	 2016-10-27 키 이벤트를  setAccelerator를 사용하지않고 이벤트 방식으로 변경
 		 *	이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
 		 */
-		if(KeyCode.F == e.getCode() && e.isControlDown() && e.isShiftDown())
-		{
+		if (KeyCode.F == e.getCode() && e.isControlDown() && e.isShiftDown()) {
 			menuFormatterOnAction(null);
 			e.consume();
 		}
-
 
 		//		int type = -1;
 		//		if (e.isControlDown() && e.getCode() == KeyCode.C) {
@@ -915,6 +919,78 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 		}
 
 		return primaryKeys;
+	}
+
+	@Override
+	public void menuExportInsertScriptOnAction(ActionEvent e) {
+		Optional<Pair<String, String[]>> showTableInputDialog = showTableInputDialog(f -> f.getName());
+
+		//		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
+
+		showTableInputDialog.ifPresent(op -> {
+
+			String schemaName = op.getValue()[0];
+			String _tableName = op.getValue()[1];
+			String tableName = "";
+			if (ValueUtil.isNotEmpty(schemaName)) {
+				tableName = String.format("%s.%s", schemaName, _tableName);
+			}
+
+			ObservableList<Map<String, Object>> items = getTbResult().getItems();
+			Map<String, Object> map = items.get(0);
+			final Set<String> keySet = map.keySet();
+			// 클립보드 복사
+			StringBuilder clip = new StringBuilder();
+
+			String insertPreffix = "insert into " + tableName;
+			String collect = keySet.stream()/* .map(str -> str) */.collect(Collectors.joining(",", "(", ")"));
+			String insertMiddle = " values ";
+
+			List<String> valueList = items.stream().map(v -> {
+				return ValueUtil.toJSONObject(v);
+			}).map(v -> {
+				Iterator<String> iterator = keySet.iterator();
+				List<Object> values = new ArrayList<>();
+				while (iterator.hasNext()) {
+					String columnName = iterator.next();
+					Object value = v.get(columnName);
+					values.add(value);
+				}
+				return values;
+			}).map(list -> {
+
+				return list.stream().map(str -> {
+					if (str == null)
+						return null;
+					else {
+						String convert = str.toString();
+						convert = convert.substring(1, convert.length() - 1);
+						if (convert.indexOf("'") >= 0) {
+							try {
+								convert = StringUtils.replace(convert, "'", "''");
+							} catch (Exception e1) {
+								e1.printStackTrace();
+							}
+						}
+						return "'".concat(convert).concat("'");
+					}
+				}).collect(Collectors.joining(",", "(", ")"));
+
+			}).map(str -> {
+				/* SQL문 완성처리 */
+				return new StringBuilder().append(insertPreffix).append(collect).append(insertMiddle).append(str).append(";\n").toString();
+			}).collect(Collectors.toList());
+
+			valueList.forEach(str -> {
+				clip.append(str);
+			});
+
+			SimpleTextView parent = new SimpleTextView(clip.toString());
+			parent.setWrapText(false);
+			FxUtil.createStageAndShow(String.format("[InsertScript] Table : %s", tableName), parent, stage -> {
+			});
+		});
+
 	}
 
 }

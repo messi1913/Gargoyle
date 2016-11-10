@@ -16,12 +16,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.controlsfx.control.CheckComboBox;
 import org.slf4j.Logger;
@@ -35,6 +34,7 @@ import com.kyj.fx.voeditor.visual.component.grid.EditableTableViewComposite;
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
 import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SQLPaneMotionable;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
@@ -53,6 +53,7 @@ import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.DialogUtil.CustomInputDialogAction;
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -81,6 +82,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -99,6 +101,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
+import jfxtras.scene.layout.GridPane;
 
 /**
  * 전체적인 뷰 레이아웃 및 레이아웃과 관련된 행위들을 정의함.
@@ -431,16 +434,19 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		spRoot.setOrientation(Orientation.VERTICAL);
 
 		this.setCenter(spRoot);
-//		this.setBottom(sqlResultPane);
-//		this.setLeft(treeView);
+		//		this.setBottom(sqlResultPane);
+		//		this.setLeft(treeView);
 
 		schemaTree.setRoot(apply(t, this.connectionSupplier));
 		schemaTree.setOnMouseClicked(this::schemaTreeOnMouseClick);
 		schemaTree.setOnKeyPressed(this::schemaTreeOnKeyClick);
 
 		tbResult.setOnKeyPressed(this::tbResultOnKeyClick);
+
 		createTreeContextMenu(schemaTree);
 		createResultTableContextMenu(tbResult);
+		//2016-11-10 editableView에서도 컨텍스트 메뉴 추가.
+		createResultTableContextMenu(editableComposite.getEditableTableView());
 
 		Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
 		DockPane.initializeDefaultUserAgentStylesheet();
@@ -571,7 +577,6 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				String textColor = String.format("#%02X%02X%02X", 255 - (int) (userColor.getRed() * 255),
 						255 - (int) (userColor.getGreen() * 255), 255 - (int) (userColor.getBlue() * 255));
 
-
 				sqlEditPane.getTitleLabel().setStyle("-fx-text-fill:" + textColor);
 				sqlEditPane.getTitleLabel().setStyle("-fx-background-color:" + backGroundColor);
 
@@ -582,7 +587,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	}
 
-	private void createResultTableContextMenu(TableView<Map<String, Object>> tbResult) {
+	private void createResultTableContextMenu(TableView<?> tableView) {
 
 		MenuItem menuExportExcel = new MenuItem("Export Excel File");
 		menuExportExcel.setOnAction(this::menuExportExcelOnAction);
@@ -603,7 +608,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				menuExportMergeScript, menuExportJson);
 
 		ContextMenu contextMenu = new ContextMenu(menuExportExcelFile);
-		tbResult.setContextMenu(contextMenu);
+		tableView.setContextMenu(contextMenu);
 	}
 
 	/**
@@ -1101,23 +1106,20 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				Object value = arg.getValue().get(column);
 				return new SimpleObjectProperty<>(value);
 			});
-			e.setComparator((a,b) ->{
+			e.setComparator((a, b) -> {
 
-				if(a == null && b == null)
+				if (a == null && b == null)
 					return 0;
 
-				if(a == null )
+				if (a == null)
 					return -1;
 
-				if(b == null )
+				if (b == null)
 					return -1;
 
-				if(ValueUtil.isNumber(a.toString()) && ValueUtil.isNumber(b.toString()))
-				{
-					return Double.compare(Double.parseDouble(a.toString()) , Double.parseDouble(b.toString()));
-				}
-				else
-				{
+				if (ValueUtil.isNumber(a.toString()) && ValueUtil.isNumber(b.toString())) {
+					return Double.compare(Double.parseDouble(a.toString()), Double.parseDouble(b.toString()));
+				} else {
 					return Strings.compareTo(a.toString(), b.toString());
 				}
 
@@ -1218,6 +1220,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	}
 
+	public abstract void menuExportInsertScriptOnAction(ActionEvent e);
 	/**
 	 * Export Insert Script.
 	 *
@@ -1225,71 +1228,72 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * @작성일 : 2016. 6. 10.
 	 * @param e
 	 */
-	public void menuExportInsertScriptOnAction(ActionEvent e) {
-		ObservableList<Map<String, Object>> items = tbResult.getItems();
-		if (items.isEmpty())
-			return;
-
-		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
-
-		showInputDialog.ifPresent(op -> {
-			String tableName = showInputDialog.get().getValue();
-			Map<String, Object> map = items.get(0);
-			final Set<String> keySet = map.keySet();
-			// 클립보드 복사
-			StringBuilder clip = new StringBuilder();
-
-			String insertPreffix = "insert into " + tableName;
-			String collect = keySet.stream()/* .map(str -> str) */.collect(Collectors.joining(",", "(", ")"));
-			String insertMiddle = " values ";
-
-			List<String> valueList = items.stream().map(v -> {
-				return ValueUtil.toJSONObject(v);
-			}).map(v -> {
-				Iterator<String> iterator = keySet.iterator();
-				List<Object> values = new ArrayList<>();
-				while (iterator.hasNext()) {
-					String columnName = iterator.next();
-					Object value = v.get(columnName);
-					values.add(value);
-				}
-				return values;
-			}).map(list -> {
-
-				return list.stream().map(str -> {
-					if (str == null)
-						return null;
-					else {
-						String convert = str.toString();
-						convert = convert.substring(1, convert.length() - 1);
-						if (convert.indexOf("'") >= 0) {
-							try {
-								convert = StringUtils.replace(convert, "'", "''");
-							} catch (Exception e1) {
-								e1.printStackTrace();
-							}
-						}
-						return "'".concat(convert).concat("'");
-					}
-				}).collect(Collectors.joining(",", "(", ")"));
-
-			}).map(str -> {
-				/* SQL문 완성처리 */
-				return new StringBuilder().append(insertPreffix).append(collect).append(insertMiddle).append(str).append(";\n").toString();
-			}).collect(Collectors.toList());
-
-			valueList.forEach(str -> {
-				clip.append(str);
-			});
-
-			SimpleTextView parent = new SimpleTextView(clip.toString());
-			parent.setWrapText(false);
-			FxUtil.createStageAndShow(parent, stage -> {
-				stage.setTitle(String.format("[InsertScript] Table : %s", tableName));
-			});
-		});
-
-	}
+//	public void menuExportInsertScriptOnAction(ActionEvent e) {
+//
+//		ObservableList<Map<String, Object>> items = tbResult.getItems();
+//		if (items.isEmpty())
+//			return;
+//
+//		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
+//
+//		showInputDialog.ifPresent(op -> {
+//			String tableName = showInputDialog.get().getValue();
+//			Map<String, Object> map = items.get(0);
+//			final Set<String> keySet = map.keySet();
+//			// 클립보드 복사
+//			StringBuilder clip = new StringBuilder();
+//
+//			String insertPreffix = "insert into " + tableName;
+//			String collect = keySet.stream()/* .map(str -> str) */.collect(Collectors.joining(",", "(", ")"));
+//			String insertMiddle = " values ";
+//
+//			List<String> valueList = items.stream().map(v -> {
+//				return ValueUtil.toJSONObject(v);
+//			}).map(v -> {
+//				Iterator<String> iterator = keySet.iterator();
+//				List<Object> values = new ArrayList<>();
+//				while (iterator.hasNext()) {
+//					String columnName = iterator.next();
+//					Object value = v.get(columnName);
+//					values.add(value);
+//				}
+//				return values;
+//			}).map(list -> {
+//
+//				return list.stream().map(str -> {
+//					if (str == null)
+//						return null;
+//					else {
+//						String convert = str.toString();
+//						convert = convert.substring(1, convert.length() - 1);
+//						if (convert.indexOf("'") >= 0) {
+//							try {
+//								convert = StringUtils.replace(convert, "'", "''");
+//							} catch (Exception e1) {
+//								e1.printStackTrace();
+//							}
+//						}
+//						return "'".concat(convert).concat("'");
+//					}
+//				}).collect(Collectors.joining(",", "(", ")"));
+//
+//			}).map(str -> {
+//				/* SQL문 완성처리 */
+//				return new StringBuilder().append(insertPreffix).append(collect).append(insertMiddle).append(str).append(";\n").toString();
+//			}).collect(Collectors.toList());
+//
+//			valueList.forEach(str -> {
+//				clip.append(str);
+//			});
+//
+//			SimpleTextView parent = new SimpleTextView(clip.toString());
+//			parent.setWrapText(false);
+//			FxUtil.createStageAndShow(parent, stage -> {
+//				stage.setTitle(String.format("[InsertScript] Table : %s", tableName));
+//			});
+//		});
+//
+//	}
 
 	/**
 	 * export spreadSheet event
@@ -1419,6 +1423,120 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		} catch (Exception e1) {
 			LOGGER.error(ValueUtil.toString(e1));
 		}
+	}
+
+	public List<TreeItem<K>> searchSchemaTreeItemPattern(String schema) {
+		TreeItem<K> root = getSchemaTree().getRoot();
+		List<TreeItem<K>> treeItem = new ArrayList<>();
+		for (TreeItem<K> w : root.getChildren()) {
+			String _schemaName = w.getValue().toString();
+
+			if (_schemaName.indexOf(schema) >= 0) {
+				treeItem.add(w);
+			}
+		}
+		return treeItem;
+	}
+
+	public List<TreeItem<K>> searchPattern(String schema, String tableName) {
+		List<TreeItem<K>> searchPattern = searchSchemaTreeItemPattern(schema);
+		if (searchPattern.isEmpty())
+			return Collections.emptyList();
+
+		return searchPattern.stream().flatMap(root -> {
+
+			List<TreeItem<K>> subList = new ArrayList<>();
+			for (TreeItem<K> w : root.getChildren()) {
+				String _schemaName = w.getValue().toString();
+
+				if (_schemaName.indexOf(tableName) >= 0) {
+					subList.add(w);
+				}
+			}
+			return subList.stream();
+		}).collect(Collectors.toList());
+
+	}
+
+	public Optional<Pair<String, String[]>> showTableInputDialog(Function<K, String> stringConverter) {
+
+		final List<String> schemaList = getSchemaTree().getRoot().getChildren().stream().map(v -> {
+			return   stringConverter.apply(v.getValue()) ;    //v.getValue().getName().toString();
+		}).collect(Collectors.toList());
+
+		String defaultSchema = "";
+		try {
+			Map<String, Object> findOne = DbUtil.findOne(connectionSupplier.get(), "select current_schema() as currentschema");
+			if (findOne != null && !findOne.isEmpty()) {
+				defaultSchema = ValueUtil.decode(findOne.get("currentschema"), "").toString();
+			}
+		} catch (Exception e4) {
+			e4.printStackTrace();
+		}
+
+		final String _defaultSchema = defaultSchema;
+
+		if (tbResult.getItems().isEmpty())
+			return Optional.empty();
+
+		return DialogUtil.showInputCustomDialog(tbResult.getScene().getWindow(), "table Name", "테이블명을 입력하세요.",
+				new CustomInputDialogAction<GridPane, String[]>() {
+
+					TextField txtSchema;
+					TextField txtTable;
+
+					@Override
+					public GridPane getNode() {
+						GridPane gridPane = new GridPane();
+						txtSchema = new TextField();
+						txtTable = new TextField();
+
+						FxUtil.installAutoTextFieldBinding(txtSchema, () -> {
+							return schemaList;
+						});
+
+						FxUtil.installAutoTextFieldBinding(txtTable, () -> {
+							return searchPattern(txtSchema.getText(), txtTable.getText()).stream().map(v -> stringConverter.apply(v.getValue())/*v.getValue().getName()*/)
+									.collect(Collectors.toList());
+						});
+						txtSchema.setText(_defaultSchema);
+
+						//Default TableName
+						TreeItem<K> selectedItem = getSchemaTree().getSelectionModel().getSelectedItem();
+						if (null != selectedItem) {
+							K value = selectedItem.getValue();
+							if (value instanceof TableItemTree) {
+								txtTable.setText(stringConverter.apply(value) /*value.getName()*/);
+							}
+						}
+
+						Label label = new Label("Schema : ");
+						Label label2 = new Label("Table : ");
+						gridPane.add(label, 0, 0);
+						gridPane.add(label2, 1, 0);
+						gridPane.add(txtSchema, 0, 1);
+						gridPane.add(txtTable, 1, 1);
+						return gridPane;
+					}
+
+					@Override
+					public String[] okClickValue() {
+
+						String schema = txtSchema.getText().trim();
+						String table = txtTable.getText().trim();
+
+						String[] okValue = new String[2];
+						okValue[0] = schema;
+						okValue[1] = table;
+						return okValue;
+					}
+
+					@Override
+					public String[] cancelClickValue() {
+						return null;
+					}
+
+				});
 	}
 
 }

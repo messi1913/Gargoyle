@@ -83,10 +83,10 @@ public class PostgreSqlPane extends CommonsSqllPan {
 
 		TableView<Map<String, Object>> tbResult = getTbResult();
 		ObservableList<Map<String, Object>> items = tbResult.getItems();
-		TreeView<DatabaseItemTree<String>> schemaTree = getSchemaTree();
-
-		List<String> schemaList = schemaTree.getRoot().getChildren().stream().map(v -> v.getValue().getName()).collect(Collectors.toList());
-
+//		TreeView<DatabaseItemTree<String>> schemaTree = getSchemaTree();
+//
+//		List<String> schemaList = schemaTree.getRoot().getChildren().stream().map(v -> v.getValue().getName()).collect(Collectors.toList());
+//
 		String defaultSchema = "";
 		try {
 			Map<String, Object> findOne = DbUtil.findOne(connectionSupplier.get(), "select current_schema() as currentschema");
@@ -96,74 +96,75 @@ public class PostgreSqlPane extends CommonsSqllPan {
 		} catch (Exception e4) {
 			e4.printStackTrace();
 		}
-
+//
 		final String _defaultSchema = defaultSchema;
+//
+//		if (items.isEmpty())
+//			return;
+//
+//		// TODO :: DBMS에 따라 Merge문 생성 로직 분기 처리 필요.
+//
+//		Optional<Pair<String, String[]>> showInputDialog = DialogUtil.showInputCustomDialog(tbResult.getScene().getWindow(), "table Name",
+//				"테이블명을 입력하세요.", new CustomInputDialogAction<GridPane, String[]>() {
+//
+//					TextField txtSchema;
+//					TextField txtTable;
+//
+//					@Override
+//					public GridPane getNode() {
+//						GridPane gridPane = new GridPane();
+//						txtSchema = new TextField();
+//						txtTable = new TextField();
+//
+//						FxUtil.installAutoTextFieldBinding(txtSchema, () -> {
+//							return schemaList;
+//						});
+//
+//						FxUtil.installAutoTextFieldBinding(txtTable, () -> {
+//							return searchPattern(txtSchema.getText(), txtTable.getText()).stream().map(v -> v.getValue().getName())
+//									.collect(Collectors.toList());
+//						});
+//						txtSchema.setText(_defaultSchema);
+//
+//						//Default TableName
+//						TreeItem<DatabaseItemTree<String>> selectedItem = getSchemaTree().getSelectionModel().getSelectedItem();
+//						if (null != selectedItem) {
+//							DatabaseItemTree<String> value = selectedItem.getValue();
+//							if (value instanceof TableItemTree) {
+//								txtTable.setText(value.getName());
+//							}
+//						}
+//
+//						Label label = new Label("Schema : ");
+//						Label label2 = new Label("Table : ");
+//						gridPane.add(label, 0, 0);
+//						gridPane.add(label2, 1, 0);
+//						gridPane.add(txtSchema, 0, 1);
+//						gridPane.add(txtTable, 1, 1);
+//						return gridPane;
+//					}
+//
+//					@Override
+//					public String[] okClickValue() {
+//
+//						String schema = txtSchema.getText().trim();
+//						String table = txtTable.getText().trim();
+//
+//						String[] okValue = new String[2];
+//						okValue[0] = schema;
+//						okValue[1] = table;
+//						return okValue;
+//					}
+//
+//					@Override
+//					public String[] cancelClickValue() {
+//						return null;
+//					}
+//
+//				});
 
-		if (items.isEmpty())
-			return;
-
-		// TODO :: DBMS에 따라 Merge문 생성 로직 분기 처리 필요.
-
-		Optional<Pair<String, String[]>> showInputDialog = DialogUtil.showInputCustomDialog(tbResult.getScene().getWindow(), "table Name",
-				"테이블명을 입력하세요.", new CustomInputDialogAction<GridPane, String[]>() {
-
-					TextField txtSchema;
-					TextField txtTable;
-
-					@Override
-					public GridPane getNode() {
-						GridPane gridPane = new GridPane();
-						txtSchema = new TextField();
-						txtTable = new TextField();
-
-						FxUtil.installAutoTextFieldBinding(txtSchema, () -> {
-							return schemaList;
-						});
-
-						FxUtil.installAutoTextFieldBinding(txtTable, () -> {
-							return searchPattern(txtSchema.getText(), txtTable.getText()).stream().map(v -> v.getValue().getName())
-									.collect(Collectors.toList());
-						});
-						txtSchema.setText(_defaultSchema);
-
-						//Default TableName
-						TreeItem<DatabaseItemTree<String>> selectedItem = getSchemaTree().getSelectionModel().getSelectedItem();
-						if (null != selectedItem) {
-							DatabaseItemTree<String> value = selectedItem.getValue();
-							if (value instanceof TableItemTree) {
-								txtTable.setText(value.getName());
-							}
-						}
-
-						Label label = new Label("Schema : ");
-						Label label2 = new Label("Table : ");
-						gridPane.add(label, 0, 0);
-						gridPane.add(label2, 1, 0);
-						gridPane.add(txtSchema, 0, 1);
-						gridPane.add(txtTable, 1, 1);
-						return gridPane;
-					}
-
-					@Override
-					public String[] okClickValue() {
-
-						String schema = txtSchema.getText().trim();
-						String table = txtTable.getText().trim();
-
-						String[] okValue = new String[2];
-						okValue[0] = schema;
-						okValue[1] = table;
-						return okValue;
-					}
-
-					@Override
-					public String[] cancelClickValue() {
-						return null;
-					}
-
-				});
-
-		showInputDialog.ifPresent(op -> {
+		Optional<Pair<String, String[]>> showTableInputDialog = showTableInputDialog(v -> v.getName());
+		showTableInputDialog.ifPresent(op -> {
 			if (!"OK".equals(op.getKey()))
 				return;
 			String[] resultValue = op.getValue();
@@ -295,39 +296,39 @@ public class PostgreSqlPane extends CommonsSqllPan {
 
 	}
 
-	public List<TreeItem<DatabaseItemTree<String>>> searchPattern(String schema) {
-		TreeItem<DatabaseItemTree<String>> root = getSchemaTree().getRoot();
-		List<TreeItem<DatabaseItemTree<String>>> treeItem = new ArrayList<>();
-		// schema
-		//		if (ValueUtil.isNotEmpty(schema)) {
-		for (TreeItem<DatabaseItemTree<String>> w : root.getChildren()) {
-			String _schemaName = w.getValue().toString();
-
-			if (_schemaName.indexOf(schema) >= 0) {
-				treeItem.add(w);
-			}
-		}
-		//		}
-		return treeItem;
-	}
-
-	public List<TreeItem<DatabaseItemTree<String>>> searchPattern(String schema, String tableName) {
-		List<TreeItem<DatabaseItemTree<String>>> searchPattern = searchPattern(schema);
-		if (searchPattern.isEmpty())
-			return Collections.emptyList();
-
-		return searchPattern.stream().flatMap(root -> {
-
-			List<TreeItem<DatabaseItemTree<String>>> subList = new ArrayList<>();
-			for (TreeItem<DatabaseItemTree<String>> w : root.getChildren()) {
-				String _schemaName = w.getValue().toString();
-
-				if (_schemaName.indexOf(tableName) >= 0) {
-					subList.add(w);
-				}
-			}
-			return subList.stream();
-		}).collect(Collectors.toList());
-
-	}
+//	public List<TreeItem<DatabaseItemTree<String>>> searchSchemaTreeItemPattern(String schema) {
+//		TreeItem<DatabaseItemTree<String>> root = getSchemaTree().getRoot();
+//		List<TreeItem<DatabaseItemTree<String>>> treeItem = new ArrayList<>();
+//		// schema
+//		//		if (ValueUtil.isNotEmpty(schema)) {
+//		for (TreeItem<DatabaseItemTree<String>> w : root.getChildren()) {
+//			String _schemaName = w.getValue().toString();
+//
+//			if (_schemaName.indexOf(schema) >= 0) {
+//				treeItem.add(w);
+//			}
+//		}
+//		//		}
+//		return treeItem;
+//	}
+//
+//	public List<TreeItem<DatabaseItemTree<String>>> searchPattern(String schema, String tableName) {
+//		List<TreeItem<DatabaseItemTree<String>>> searchPattern = searchSchemaTreeItemPattern(schema);
+//		if (searchPattern.isEmpty())
+//			return Collections.emptyList();
+//
+//		return searchPattern.stream().flatMap(root -> {
+//
+//			List<TreeItem<DatabaseItemTree<String>>> subList = new ArrayList<>();
+//			for (TreeItem<DatabaseItemTree<String>> w : root.getChildren()) {
+//				String _schemaName = w.getValue().toString();
+//
+//				if (_schemaName.indexOf(tableName) >= 0) {
+//					subList.add(w);
+//				}
+//			}
+//			return subList.stream();
+//		}).collect(Collectors.toList());
+//
+//	}
 }
