@@ -61,24 +61,45 @@ public class VoWizardUtil {
 	 * @throws Exception
 	 */
 	public static List<TableMasterDVO> listTable(String tableName) throws Exception {
-		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLES);
+//		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLES);
 
-		Map<String, Object> hashMap = new HashMap<String, Object>();
-		hashMap.put("tableName", tableName);
+//		Map<String, Object> hashMap = new HashMap<String, Object>();
+//		hashMap.put("tableName", tableName);
 
-		return DbUtil.select(ValueUtil.getVelocityToText(sql, hashMap, true), hashMap, new RowMapper<TableMasterDVO>() {
+//		return DbUtil.select(ValueUtil.getVelocityToText(sql, hashMap, true), hashMap, new RowMapper<TableMasterDVO>() {
+//
+//			@Override
+//			public TableMasterDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
+//				TableMasterDVO tableMasterDVO = new TableMasterDVO();
+//				String tableName = rs.getString(TABLE_NAME);
+//				tableMasterDVO.setTableName(tableName);
+//				String className = ValueUtil.toDVOName(tableName);
+//				tableMasterDVO.setClassName(className);
+//				tableMasterDVO.setDescription(rs.getString(COMMENTS));
+//				return tableMasterDVO;
+//			}
+//		});
 
-			@Override
-			public TableMasterDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
-				TableMasterDVO tableMasterDVO = new TableMasterDVO();
-				String tableName = rs.getString(TABLE_NAME);
-				tableMasterDVO.setTableName(tableName);
-				String className = ValueUtil.toDVOName(tableName);
+		return DbUtil.tables(tableName, rs -> {
+
+			TableMasterDVO tableMasterDVO = new TableMasterDVO();
+			try {
+				String _schemaName = rs.getString("TABLE_SCHEM");
+				tableMasterDVO.setSchemaName(_schemaName);
+				String _tableName = rs.getString("TABLE_NAME");
+				tableMasterDVO.setTableName(_tableName);
+				String className = ValueUtil.toDVOName(_tableName);
 				tableMasterDVO.setClassName(className);
-				tableMasterDVO.setDescription(rs.getString(COMMENTS));
-				return tableMasterDVO;
+				tableMasterDVO.setDescription(rs.getString("REMARKS"));
+
+			} catch (Exception e) {
+				LOGGER.error(ValueUtil.toString(e));
+				tableMasterDVO = null;
 			}
+			return tableMasterDVO;
 		});
+
+
 	}
 
 	/**
@@ -92,82 +113,120 @@ public class VoWizardUtil {
 		DatabaseTypeMappingFunction databaseTypeMappingFunction = new DatabaseTypeMappingFunction();
 
 		String tableName = selectedItem.getTableName();
-		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_COLUMN);
+
+		List<String> pks = DbUtil.pks(tableName, rs -> {
+
+			try {
+				return rs.getString(4).toLowerCase();
+			} catch (SQLException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+			return "";
+		});
+
+		return DbUtil.columns(tableName, rs -> {
+
+			TableModelDVO dvo = new TableModelDVO();
+			try {
+
+				String columnName = rs.getString(4);
+				String dataType = rs.getString(5);
+				String typeName = rs.getString(6);
+				String size = rs.getString(7);
+				String remark = rs.getString(12);
+				dvo.setName(ValueUtil.getPrefixLowerTextMyEdit(columnName));
+				dvo.setDatabaseColumnName(columnName);
+				dvo.setDabaseTypeName(typeName);
+				dvo.setType(databaseTypeMappingFunction.apply(typeName));
+				dvo.setPk(pks.contains(columnName.toLowerCase()) ? "Y" : "N");
+				dvo.setDesc(remark);
+				dvo.setSize(size);
+
+			} catch (Exception e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+
+			return dvo;
+		});
 
 
-		/*
-		 * 2016-08-11 by kyj.
-		 *
-		 * 설정에 대한 sql항목이 없는경우 순수 jdbc 라이브러리를 이용하는 방안으로 구성.
-		 */
-		if (sql == null || sql.isEmpty()) {
-
-			List<String> pks = DbUtil.pks(tableName, rs -> {
-
-				try {
-					return rs.getString(4).toLowerCase();
-				} catch (SQLException e) {
-					LOGGER.error(ValueUtil.toString(e));
-				}
-				return "";
-			});
-
-			return DbUtil.columns(tableName, rs -> {
-
-				TableModelDVO dvo = new TableModelDVO();
-				try {
-
-					String columnName = rs.getString(4);
-					String dataType = rs.getString(5);
-					String typeName = rs.getString(6);
-					String size = rs.getString(7);
-					String remark = rs.getString(12);
-					dvo.setName(ValueUtil.getPrefixLowerTextMyEdit(columnName));
-					dvo.setDatabaseColumnName(columnName);
-					dvo.setDabaseTypeName(typeName);
-
-					dvo.setType(databaseTypeMappingFunction.apply(typeName));
-
-					dvo.setPk(pks.contains(columnName.toLowerCase()) ? "Y" : "N");
-					dvo.setDesc(remark);
-					dvo.setSize(size);
-
-				} catch (Exception e) {
-					LOGGER.error(ValueUtil.toString(e));
-				}
-
-				return dvo;
-			});
-
-		} else {
-
-			Map<String, Object> hashMap = new HashMap<String, Object>();
-			hashMap.put("tableName", tableName);
-
-			String convertedSql = ValueUtil.getVelocityToText(sql, hashMap);
-			return DbUtil.select(convertedSql, hashMap, new RowMapper<TableModelDVO>() {
-
-				@Override
-				public TableModelDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
-					TableModelDVO dvo = new TableModelDVO();
-
-					String columnName = rs.getString(COLUMN_NAME);
-					dvo.setName(ValueUtil.getPrefixLowerTextMyEdit(columnName));
-					dvo.setDatabaseColumnName(columnName);
-
-					String typeName = rs.getString(TYPE);
-					dvo.setDabaseTypeName(typeName);
-
-					//				rs.getInt(columnLabel)
-					//				rs.getMetaData().getColumnTypeName()
-					dvo.setType(databaseTypeMappingFunction.apply(typeName));
-					dvo.setPk(rs.getString(PK));
-					dvo.setDesc(rs.getString(COMMENTS));
-					dvo.setSize(rs.getString(DATA_LENGTH));
-					return dvo;
-				}
-			});
-		}
+//
+//		String tableName = selectedItem.getTableName();
+//		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_COLUMN);
+//
+//		/*
+//		 * 2016-08-11 by kyj.
+//		 *
+//		 * 설정에 대한 sql항목이 없는경우 순수 jdbc 라이브러리를 이용하는 방안으로 구성.
+//		 */
+//		if (sql == null || sql.isEmpty()) {
+//
+//			List<String> pks = DbUtil.pks(tableName, rs -> {
+//
+//				try {
+//					return rs.getString(4).toLowerCase();
+//				} catch (SQLException e) {
+//					LOGGER.error(ValueUtil.toString(e));
+//				}
+//				return "";
+//			});
+//
+//			return DbUtil.columns(tableName, rs -> {
+//
+//				TableModelDVO dvo = new TableModelDVO();
+//				try {
+//
+//					String columnName = rs.getString(4);
+//					String dataType = rs.getString(5);
+//					String typeName = rs.getString(6);
+//					String size = rs.getString(7);
+//					String remark = rs.getString(12);
+//					dvo.setName(ValueUtil.getPrefixLowerTextMyEdit(columnName));
+//					dvo.setDatabaseColumnName(columnName);
+//					dvo.setDabaseTypeName(typeName);
+//
+//					dvo.setType(databaseTypeMappingFunction.apply(typeName));
+//
+//					dvo.setPk(pks.contains(columnName.toLowerCase()) ? "Y" : "N");
+//					dvo.setDesc(remark);
+//					dvo.setSize(size);
+//
+//				} catch (Exception e) {
+//					LOGGER.error(ValueUtil.toString(e));
+//				}
+//
+//				return dvo;
+//			});
+//
+//		} else {
+//
+//			Map<String, Object> hashMap = new HashMap<String, Object>();
+//			hashMap.put("tableName", tableName);
+//
+//			String convertedSql = ValueUtil.getVelocityToText(sql, hashMap);
+//			return DbUtil.select(convertedSql, hashMap, new RowMapper<TableModelDVO>() {
+//
+//				@Override
+//				public TableModelDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
+//					TableModelDVO dvo = new TableModelDVO();
+//
+//					String columnName = rs.getString(COLUMN_NAME);
+//					dvo.setName(ValueUtil.getPrefixLowerTextMyEdit(columnName));
+//					dvo.setDatabaseColumnName(columnName);
+//
+//					String typeName = rs.getString(TYPE);
+//					dvo.setDabaseTypeName(typeName);
+//
+//					//				rs.getInt(columnLabel)
+//					//				rs.getMetaData().getColumnTypeName()
+//					dvo.setType(databaseTypeMappingFunction.apply(typeName));
+//					dvo.setPk(rs.getString(PK));
+//					dvo.setDesc(rs.getString(COMMENTS));
+//					dvo.setSize(rs.getString(DATA_LENGTH));
+//					return dvo;
+//				}
+//			});
+//		}
 
 	}
 
@@ -251,7 +310,7 @@ public class VoWizardUtil {
 			arrayList.add(new ExcelDataDVO(1, 2, VoWizardUtil.DATA_LENGTH/* "데이터사이즈" */, Color.GREEN));
 			arrayList.add(new ExcelDataDVO(1, 3, VoWizardUtil.COMMENTS/* "설명" */, Color.GREEN));
 			return arrayList;
-		}, (t, u) -> t.addAll(u), (t, u) -> t.addAll(u));
+		} , (t, u) -> t.addAll(u), (t, u) -> t.addAll(u));
 
 		ExcelSVO svo = new ExcelSVO();
 		svo.addSheetExcelDVO(SHEET_NAME, collect);

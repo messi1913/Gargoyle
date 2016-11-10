@@ -15,12 +15,14 @@ import javafx.beans.property.StringProperty;
  *
  */
 public class TableMasterDVO {
+	private StringProperty schemaName;;
 	private StringProperty tableName;
 	private StringProperty className;
 	private StringProperty location;
 	private StringProperty description;
 
 	public TableMasterDVO() {
+		this.schemaName = new SimpleStringProperty();
 		this.tableName = new SimpleStringProperty();
 		this.className = new SimpleStringProperty();
 		this.location = new SimpleStringProperty();
@@ -70,4 +72,17 @@ public class TableMasterDVO {
 	public StringProperty descriptionProperty() {
 		return description;
 	}
+
+	public final StringProperty schemaNameProperty() {
+		return this.schemaName;
+	}
+
+	public final java.lang.String getSchemaName() {
+		return this.schemaNameProperty().get();
+	}
+
+	public final void setSchemaName(final java.lang.String schemaName) {
+		this.schemaNameProperty().set(schemaName);
+	}
+
 }
