@@ -1093,18 +1093,8 @@ public class DbUtil extends ConnectionManager {
 	 * @return
 	 */
 	public static String getTableNames(String sql) {
-
-		String concatedTables = sql.toUpperCase().replaceAll("Ｆ|Ｗ|Ｃ", " ").replaceAll("(\\r\\n|\\r|\\n)", " ").replaceAll("/[^/]*/", " ")
-				.replaceAll("'[^']*'", " ").replaceAll("\\(", " (").replaceAll("\\)", ") ").replaceAll(" FROM ", " Ｆ ")
-				.replaceAll("INSERT.*INTO", " Ｆ ").replaceAll("SELECT", " Ｗ ") //
-				.replaceAll("UPDATE ", " Ｆ ").replaceAll(" TABLE", " Ｃ ")
-				.replaceAll(
-						" SET | UNION | WHERE |GROUP BY | HAVING | CONNECT BY | START WITH | MODEL | SAMPLE( )*\\(|USING( )*\\(| ON|\\)|$",
-						" Ｗ ")
-				.replaceAll("Ｆ([^Ｆ|Ｗ]+)Ｗ|.", "Ｃ$1").replaceAll("( FULL| LEFT| RIGHT| CROSS| NATURAL| INNER)?( OUTER)? JOIN ", "Ｃ")
-				.replaceAll("Ｃ{1,}", "Ｃ").replaceAll("\\([^Ｃ]+Ｃ", "").replaceAll("Ｃ", ",");
-
-		return concatedTables;
+		//2016-11-10 문자열 관련된 처리므로 ValueUtil로 이동.
+		return ValueUtil.getTableNames(sql);
 	}
 
 	/********************************

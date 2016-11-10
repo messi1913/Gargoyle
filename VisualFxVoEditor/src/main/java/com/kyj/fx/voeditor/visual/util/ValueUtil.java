@@ -1348,4 +1348,26 @@ public class ValueUtil {
 	public static String toString(InputStream inputStream) throws IOException {
 		return IOUtils.toString(inputStream , Charset.forName("UTF-8"));
 	}
+
+	/**
+	 *
+	 * // 16.09.01 >> 쿼리로 부터 테이블을 찾아옴 퍼옴 by Hong
+	 *
+	 * @param sql
+	 * @return
+	 */
+	public static String getTableNames(String sql) {
+
+		String concatedTables = sql.toUpperCase().replaceAll("Ｆ|Ｗ|Ｃ", " ").replaceAll("(\\r\\n|\\r|\\n)", " ").replaceAll("/[^/]*/", " ")
+				.replaceAll("'[^']*'", " ").replaceAll("\\(", " (").replaceAll("\\)", ") ").replaceAll(" FROM ", " Ｆ ")
+				.replaceAll("INSERT.*INTO", " Ｆ ").replaceAll("SELECT", " Ｗ ") //
+				.replaceAll("UPDATE ", " Ｆ ").replaceAll(" TABLE", " Ｃ ")
+				.replaceAll(
+						" SET | UNION | WHERE |GROUP BY | HAVING | CONNECT BY | START WITH | MODEL | SAMPLE( )*\\(|USING( )*\\(| ON|\\)|$",
+						" Ｗ ")
+				.replaceAll("Ｆ([^Ｆ|Ｗ]+)Ｗ|.", "Ｃ$1").replaceAll("( FULL| LEFT| RIGHT| CROSS| NATURAL| INNER)?( OUTER)? JOIN ", "Ｃ")
+				.replaceAll("Ｃ{1,}", "Ｃ").replaceAll("\\([^Ｃ]+Ｃ", "").replaceAll("Ｃ", ",");
+
+		return concatedTables;
+	}
 }
