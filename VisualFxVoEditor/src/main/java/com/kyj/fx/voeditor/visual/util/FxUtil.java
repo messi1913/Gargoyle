@@ -15,11 +15,13 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -33,7 +35,6 @@ import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.component.bar.GargoyleASynchLoadBar;
 import com.kyj.fx.voeditor.visual.component.bar.GargoyleLoadBar;
 import com.kyj.fx.voeditor.visual.component.bar.GargoyleSynchLoadBar;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
@@ -964,19 +965,13 @@ public class FxUtil {
 	 */
 	public static class EasyFxUtils {
 
-		/**
-		 * 어플리케이션 코드를 만들어주는 팝업을 보여준다.
-		 * @작성자 : KYJ
-		 * @작성일 : 2016. 9. 23.
-		 * @param sql
-		 * @throws IOException
-		 */
-		public static void showApplicationCode(String sql) {
+		public static void showApplicationCode(String sql, Function<String, String> convert) {
+
 			String[] split = sql.split("\n");
 			StringBuilder sb = new StringBuilder();
 			sb.append("StringBuffer sb = new StringBuffer();\n");
 			for (String str : split) {
-				sb.append("sb.append(\"").append(str).append("\\n").append("\");\n");
+				sb.append("sb.append(\"").append(convert.apply(str)).append("\\n").append("\");\n");
 			}
 			sb.append("sb.toString();");
 
@@ -987,6 +982,92 @@ public class FxUtil {
 			} catch (IOException e) {
 				LOGGER.error(ValueUtil.toString(e));
 			}
+
+		}
+
+		/**
+		 * 본문에 double dot(")로 인해 발생되는 이슈를 해결함.
+		 * @최초생성일 2016. 11. 10.
+		 */
+		private static final Function<String, String> smartDoubleDotConvert = str -> {
+
+			if (str.indexOf("\"") != -1) {
+				List<Integer> doubleDots = new ArrayList<>();
+				int idx = 0;
+
+				while (idx != -1) {
+
+					int nextIdx = str.indexOf("\"", idx);
+
+					if (nextIdx != -1) {
+
+						/*
+						 * ignore index check. character.
+						 *
+						 * 실제 텍스트 \ 기호가 포함되는 경우는 변환처리대상에서 제외.
+						 *
+						 * 텍스트에 \" 없이 단순히 "(double dot) 만 포함되는경우는
+						 *
+						 * \를 포함시킴.
+						 */
+						if (str.charAt(nextIdx - 1) != '\\') {
+							doubleDots.add(nextIdx);
+						}
+					}
+
+					if (nextIdx == -1)
+						break;
+
+					idx = nextIdx + 1;
+
+				}
+
+				if (!doubleDots.isEmpty()) {
+					//찾아낸 문자열들을 다시 재조합한후 리턴.
+					StringBuffer sb = new StringBuffer();
+					int arrayIdx = doubleDots.size();
+					int stringIdx = 0;
+
+					for (int i = 0; i < arrayIdx; i++) {
+						int splitIndex = doubleDots.get(i).intValue();
+						sb.append(str.substring(stringIdx, splitIndex)).append("\\\"");
+						stringIdx = splitIndex + 1;
+					}
+					sb.append(str.substring(stringIdx));
+
+					str = sb.toString();
+				}
+
+			}
+
+			return str;
+		};
+
+		/**
+		 * 어플리케이션 코드를 만들어주는 팝업을 보여준다.
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 9. 23.
+		 * @param sql
+		 * @throws IOException
+		 */
+		public static void showApplicationCode(String sql) {
+
+			showApplicationCode(sql, smartDoubleDotConvert);
+			//			String[] split = sql.split("\n");
+			//			StringBuilder sb = new StringBuilder();
+			//			sb.append("StringBuffer sb = new StringBuffer();\n");
+			//			for (String str : split) {
+			//				sb.append("sb.append(\"").append(str).append("\\n").append("\");\n");
+			//			}
+			//			sb.append("sb.toString();");
+			//
+			//			LOGGER.debug(sb.toString());
+			//
+			//			try {
+			//				new JavaTextView(sb.toString()).show(800, 500);
+			//			} catch (IOException e) {
+			//				LOGGER.error(ValueUtil.toString(e));
+			//			}
 		}
 
 	}
