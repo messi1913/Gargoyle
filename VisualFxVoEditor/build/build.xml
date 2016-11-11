@@ -5,7 +5,8 @@
 	<property file="build.properties">
 	</property>
 
-
+	<echo message="basedir : ${basedir}"></echo>
+	
 	<!-- Inno Setup 파일 스크립트 생성 여기선 버젼 스크립트 자동화 처리내용이 포함됨 -->
 	<target name="create-iss-script" description="Create InnoScript.">
 		<copy tofile="../Gargoyle.iss" overwrite="true">
@@ -50,480 +51,481 @@
 		<mkdir dir="pmdLibs" />
 
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\openoffice\ridl\2.3.0">
+			<fileset dir="${m2.dir}\org\openoffice\ridl\2.3.0">
 				<filename name="ridl-2.3.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\springframework\spring-tx\3.2.3.RELEASE">
+			<fileset dir="${m2.dir}\org\springframework\spring-tx\3.2.3.RELEASE">
 				<filename name="spring-tx-3.2.3.RELEASE.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor\lib\tools">
+<!-- 			<fileset dir="${basedir}\..\lib\tools"> -->
+			<fileset dir="${basedir}\..\lib\tools">    
 				<filename name="tools.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\ch\qos\logback\logback-classic\1.1.2">
+			<fileset dir="${m2.dir}\ch\qos\logback\logback-classic\1.1.2">
 				<filename name="logback-classic-1.1.2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\xml-apis\xml-apis\1.0.b2">
+			<fileset dir="${m2.dir}\xml-apis\xml-apis\1.0.b2">
 				<filename name="xml-apis-1.0.b2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\xmlbeans\xmlbeans\2.6.0">
+			<fileset dir="${m2.dir}\org\apache\xmlbeans\xmlbeans\2.6.0">
 				<filename name="xmlbeans-2.6.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\junit\junit\4.11">
+			<fileset dir="${m2.dir}\junit\junit\4.11">
 				<filename name="junit-4.11.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\springframework\spring-expression\3.2.8.RELEASE">
+			<fileset dir="${m2.dir}\org\springframework\spring-expression\3.2.8.RELEASE">
 				<filename name="spring-expression-3.2.8.RELEASE.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\jcraft\jsch.agentproxy.usocket-nc\0.0.7">
+			<fileset dir="${m2.dir}\com\jcraft\jsch.agentproxy.usocket-nc\0.0.7">
 				<filename name="jsch.agentproxy.usocket-nc-0.0.7.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor\btrace\build">
+			<fileset dir="${basedir}\..\btrace\build">
 				<filename name="btrace-boot.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\aopalliance\aopalliance\1.0">
+			<fileset dir="${m2.dir}\aopalliance\aopalliance\1.0">
 				<filename name="aopalliance-1.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi-ooxml\3.14">
+			<fileset dir="${m2.dir}\org\apache\poi\poi-ooxml\3.14">
 				<filename name="poi-ooxml-3.14.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor\lib\db\maria">
+			<fileset dir="${basedir}\..\lib\db\maria">
 				<filename name="mariadb-java-client-1.2.2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\postgresql\postgresql\9.1-901-1.jdbc4">
+			<fileset dir="${m2.dir}\postgresql\postgresql\9.1-901-1.jdbc4">
 				<filename name="postgresql-9.1-901-1.jdbc4.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\jcraft\jsch.agentproxy.core\0.0.7">
+			<fileset dir="${m2.dir}\com\jcraft\jsch.agentproxy.core\0.0.7">
 				<filename name="jsch.agentproxy.core-0.0.7.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\springframework\spring-context-support\3.2.3.RELEASE">
+			<fileset dir="${m2.dir}\org\springframework\spring-context-support\3.2.3.RELEASE">
 				<filename name="spring-context-support-3.2.3.RELEASE.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\h2database\h2\1.4.181">
+			<fileset dir="${m2.dir}\com\h2database\h2\1.4.181">
 				<filename name="h2-1.4.181.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\pdfbox\pdfbox-tools\2.0.0">
+			<fileset dir="${m2.dir}\org\apache\pdfbox\pdfbox-tools\2.0.0">
 				<filename name="pdfbox-tools-2.0.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\googlecode\java-diff-utils\diffutils\1.2.1">
+			<fileset dir="${m2.dir}\com\googlecode\java-diff-utils\diffutils\1.2.1">
 				<filename name="diffutils-1.2.1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\commons-io\commons-io\2.4">
+			<fileset dir="${m2.dir}\commons-io\commons-io\2.4">
 				<filename name="commons-io-2.4.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\google\guava\guava\11.0.2">
+			<fileset dir="${m2.dir}\com\google\guava\guava\11.0.2">
 				<filename name="guava-11.0.2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\google\code\gson\gson\2.4">
+			<fileset dir="${m2.dir}\com\google\code\gson\gson\2.4">
 				<filename name="gson-2.4.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\springframework\spring-beans\3.2.3.RELEASE">
+			<fileset dir="${m2.dir}\org\springframework\spring-beans\3.2.3.RELEASE">
 				<filename name="spring-beans-3.2.3.RELEASE.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\tmatesoft\svnkit\svnkit\1.8.12">
+			<fileset dir="${m2.dir}\org\tmatesoft\svnkit\svnkit\1.8.12">
 				<filename name="svnkit-1.8.12.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\googlecode\json-simple\json-simple\1.1">
+			<fileset dir="${m2.dir}\com\googlecode\json-simple\json-simple\1.1">
 				<filename name="json-simple-1.1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\httpcomponents\httpclient\4.3.6">
+			<fileset dir="${m2.dir}\org\apache\httpcomponents\httpclient\4.3.6">
 				<filename name="httpclient-4.3.6.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\commons-pool\commons-pool\1.5.4">
+			<fileset dir="${m2.dir}\commons-pool\commons-pool\1.5.4">
 				<filename name="commons-pool-1.5.4.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\hamcrest\hamcrest-core\1.3">
+			<fileset dir="${m2.dir}\org\hamcrest\hamcrest-core\1.3">
 				<filename name="hamcrest-core-1.3.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\bouncycastle\bcprov-jdk16\1.46">
+			<fileset dir="${m2.dir}\org\bouncycastle\bcprov-jdk16\1.46">
 				<filename name="bcprov-jdk16-1.46.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor\btrace\build">
+			<fileset dir="${basedir}\..\btrace\build">
 				<filename name="btrace-client.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\openoffice\juh\2.3.0">
+			<fileset dir="${m2.dir}\org\openoffice\juh\2.3.0">
 				<filename name="juh-2.3.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\tomcat\tomcat-jdbc\8.0.9">
+			<fileset dir="${m2.dir}\org\apache\tomcat\tomcat-jdbc\8.0.9">
 				<filename name="tomcat-jdbc-8.0.9.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor\btrace\build">
+			<fileset dir="${basedir}\..\btrace\build">
 				<filename name="btrace-agent.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\springframework\spring-aop\3.2.8.RELEASE">
+			<fileset dir="${m2.dir}\org\springframework\spring-aop\3.2.8.RELEASE">
 				<filename name="spring-aop-3.2.8.RELEASE.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\velocity\velocity\1.7">
+			<fileset dir="${m2.dir}\org\apache\velocity\velocity\1.7">
 				<filename name="velocity-1.7.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\jidesoft\jidefx-common\0.9.1">
+			<fileset dir="${m2.dir}\com\jidesoft\jidefx-common\0.9.1">
 				<filename name="jidefx-common-0.9.1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi-ooxml-schemas\3.14">
+			<fileset dir="${m2.dir}\org\apache\poi\poi-ooxml-schemas\3.14">
 				<filename name="poi-ooxml-schemas-3.14.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.4.2">
+			<fileset dir="${m2.dir}\com\fasterxml\jackson\core\jackson-databind\2.4.2">
 				<filename name="jackson-databind-2.4.2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\openoffice\unoil\2.3.0">
+			<fileset dir="${m2.dir}\org\openoffice\unoil\2.3.0">
 				<filename name="unoil-2.3.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\dom4j\dom4j\1.6.1">
+			<fileset dir="${m2.dir}\dom4j\dom4j\1.6.1">
 				<filename name="dom4j-1.6.1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\fxmisc\flowless\flowless\0.4.5">
+			<fileset dir="${m2.dir}\org\fxmisc\flowless\flowless\0.4.5">
 				<filename name="flowless-0.4.5.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\json\json\20141113">
+			<fileset dir="${m2.dir}\org\json\json\20141113">
 				<filename name="json-20141113.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\pdfbox\fontbox\2.0.0">
+			<fileset dir="${m2.dir}\org\apache\pdfbox\fontbox\2.0.0">
 				<filename name="fontbox-2.0.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\fxmisc\wellbehaved\wellbehavedfx\0.1.1">
+			<fileset dir="${m2.dir}\org\fxmisc\wellbehaved\wellbehavedfx\0.1.1">
 				<filename name="wellbehavedfx-0.1.1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\antlr\antlr-runtime\3.4">
+			<fileset dir="${m2.dir}\org\antlr\antlr-runtime\3.4">
 				<filename name="antlr-runtime-3.4.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi\3.14">
+			<fileset dir="${m2.dir}\org\apache\poi\poi\3.14">
 				<filename name="poi-3.14.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\jcraft\jsch.agentproxy.svnkit-trilead-ssh2\0.0.7">
+			<fileset dir="${m2.dir}\com\jcraft\jsch.agentproxy.svnkit-trilead-ssh2\0.0.7">
 				<filename name="jsch.agentproxy.svnkit-trilead-ssh2-0.0.7.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\net\java\dev\jna\jna-platform\4.1.0">
+			<fileset dir="${m2.dir}\net\java\dev\jna\jna-platform\4.1.0">
 				<filename name="jna-platform-4.1.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\jcraft\jsch.agentproxy.usocket-jna\0.0.7">
+			<fileset dir="${m2.dir}\com\jcraft\jsch.agentproxy.usocket-jna\0.0.7">
 				<filename name="jsch.agentproxy.usocket-jna-0.0.7.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\pdfbox\pdfbox-debugger\2.0.0">
+			<fileset dir="${m2.dir}\org\apache\pdfbox\pdfbox-debugger\2.0.0">
 				<filename name="pdfbox-debugger-2.0.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\controlsfx\controlsfx\8.40.12">
+			<fileset dir="${m2.dir}\org\controlsfx\controlsfx\8.40.12">
 				<filename name="controlsfx-8.40.12.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\poi\ooxml-schemas\1.3">
+			<fileset dir="${m2.dir}\org\apache\poi\ooxml-schemas\1.3">
 				<filename name="ooxml-schemas-1.3.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\net\java\dev\jna\platform\3.4.0">
+			<fileset dir="${m2.dir}\net\java\dev\jna\platform\3.4.0">
 				<filename name="platform-3.4.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\openoffice\jurt\2.3.0">
+			<fileset dir="${m2.dir}\org\openoffice\jurt\2.3.0">
 				<filename name="jurt-2.3.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\jcraft\jsch.agentproxy.sshagent\0.0.7">
+			<fileset dir="${m2.dir}\com\jcraft\jsch.agentproxy.sshagent\0.0.7">
 				<filename name="jsch.agentproxy.sshagent-0.0.7.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\jcraft\jsch.agentproxy.connector-factory\0.0.7">
+			<fileset dir="${m2.dir}\com\jcraft\jsch.agentproxy.connector-factory\0.0.7">
 				<filename name="jsch.agentproxy.connector-factory-0.0.7.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\commons-collections\commons-collections\3.2.1">
+			<fileset dir="${m2.dir}\commons-collections\commons-collections\3.2.1">
 				<filename name="commons-collections-3.2.1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\fxmisc\richtext\richtextfx\0.6.10">
+			<fileset dir="${m2.dir}\org\fxmisc\richtext\richtextfx\0.6.10">
 				<filename name="richtextfx-0.6.10.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.4.2">
+			<fileset dir="${m2.dir}\com\fasterxml\jackson\core\jackson-annotations\2.4.2">
 				<filename name="jackson-annotations-2.4.2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\stax\stax-api\1.0.1">
+			<fileset dir="${m2.dir}\stax\stax-api\1.0.1">
 				<filename name="stax-api-1.0.1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\de\regnis\q\sequence\sequence-library\1.0.3">
+			<fileset dir="${m2.dir}\de\regnis\q\sequence\sequence-library\1.0.3">
 				<filename name="sequence-library-1.0.3.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\tomcat\tomcat-juli\8.0.9">
+			<fileset dir="${m2.dir}\org\apache\tomcat\tomcat-juli\8.0.9">
 				<filename name="tomcat-juli-8.0.9.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\commons-dbcp\commons-dbcp\1.4">
+			<fileset dir="${m2.dir}\commons-dbcp\commons-dbcp\1.4">
 				<filename name="commons-dbcp-1.4.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\javax\mail\mail\1.4.7">
+			<fileset dir="${m2.dir}\javax\mail\mail\1.4.7">
 				<filename name="mail-1.4.7.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\pdfbox\pdfbox\2.0.0">
+			<fileset dir="${m2.dir}\org\apache\pdfbox\pdfbox\2.0.0">
 				<filename name="pdfbox-2.0.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor\lib\db\oracle">
+			<fileset dir="${basedir}\..\lib\db\oracle">
 				<filename name="ojdbc14.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\reactfx\reactfx\2.0-M4u1">
+			<fileset dir="${m2.dir}\org\reactfx\reactfx\2.0-M4u1">
 				<filename name="reactfx-2.0-M4u1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\httpcomponents\httpcore\4.3.3">
+			<fileset dir="${m2.dir}\org\apache\httpcomponents\httpcore\4.3.3">
 				<filename name="httpcore-4.3.3.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\artofsolving\jodconverter\2.2.1">
+			<fileset dir="${m2.dir}\com\artofsolving\jodconverter\2.2.1">
 				<filename name="jodconverter-2.2.1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\jcraft\jsch.agentproxy.pageant\0.0.7">
+			<fileset dir="${m2.dir}\com\jcraft\jsch.agentproxy.pageant\0.0.7">
 				<filename name="jsch.agentproxy.pageant-0.0.7.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\google\code\findbugs\jsr305\1.3.9">
+			<fileset dir="${m2.dir}\com\google\code\findbugs\jsr305\1.3.9">
 				<filename name="jsr305-1.3.9.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\springframework\spring-context\3.2.3.RELEASE">
+			<fileset dir="${m2.dir}\org\springframework\spring-context\3.2.3.RELEASE">
 				<filename name="spring-context-3.2.3.RELEASE.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\fxmisc\undo\undofx\1.2">
+			<fileset dir="${m2.dir}\org\fxmisc\undo\undofx\1.2">
 				<filename name="undofx-1.2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\javassist\javassist\3.16.1-GA">
+			<fileset dir="${m2.dir}\org\javassist\javassist\3.16.1-GA">
 				<filename name="javassist-3.16.1-GA.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\tmatesoft\sqljet\sqljet\1.1.10">
+			<fileset dir="${m2.dir}\org\tmatesoft\sqljet\sqljet\1.1.10">
 				<filename name="sqljet-1.1.10.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\springframework\security\spring-security-core\3.2.3.RELEASE">
+			<fileset dir="${m2.dir}\org\springframework\security\spring-security-core\3.2.3.RELEASE">
 				<filename name="spring-security-core-3.2.3.RELEASE.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\slf4j\jcl-over-slf4j\1.7.7">
+			<fileset dir="${m2.dir}\org\slf4j\jcl-over-slf4j\1.7.7">
 				<filename name="jcl-over-slf4j-1.7.7.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor\lib\richtext">
+			<fileset dir="${basedir}\..\lib\richtext">
 				<filename name="richtextfx-fat-0.6.10.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\slf4j\slf4j-api\1.7.20">
+			<fileset dir="${m2.dir}\org\slf4j\slf4j-api\1.7.20">
 				<filename name="slf4j-api-1.7.20.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\springframework\spring-core\3.2.3.RELEASE">
+			<fileset dir="${m2.dir}\org\springframework\spring-core\3.2.3.RELEASE">
 				<filename name="spring-core-3.2.3.RELEASE.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\reflections\reflections\0.9.9-RC1">
+			<fileset dir="${m2.dir}\org\reflections\reflections\0.9.9-RC1">
 				<filename name="reflections-0.9.9-RC1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\httpcomponents\httpmime\4.3.6">
+			<fileset dir="${m2.dir}\org\apache\httpcomponents\httpmime\4.3.6">
 				<filename name="httpmime-4.3.6.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\commons-lang\commons-lang\2.4">
+			<fileset dir="${m2.dir}\commons-lang\commons-lang\2.4">
 				<filename name="commons-lang-2.4.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\javax\activation\activation\1.1">
+			<fileset dir="${m2.dir}\javax\activation\activation\1.1">
 				<filename name="activation-1.1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\net\java\dev\jna\jna\4.1.0">
+			<fileset dir="${m2.dir}\net\java\dev\jna\jna\4.1.0">
 				<filename name="jna-4.1.0.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\springframework\spring-jdbc\3.2.3.RELEASE">
+			<fileset dir="${m2.dir}\org\springframework\spring-jdbc\3.2.3.RELEASE">
 				<filename name="spring-jdbc-3.2.3.RELEASE.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\trilead\trilead-ssh2\1.0.0-build220">
+			<fileset dir="${m2.dir}\com\trilead\trilead-ssh2\1.0.0-build220">
 				<filename name="trilead-ssh2-1.0.0-build220.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.4.2">
+			<fileset dir="${m2.dir}\com\fasterxml\jackson\core\jackson-core\2.4.2">
 				<filename name="jackson-core-2.4.2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\ch\qos\logback\logback-core\1.1.2">
+			<fileset dir="${m2.dir}\ch\qos\logback\logback-core\1.1.2">
 				<filename name="logback-core-1.1.2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\apache\poi\poi-scratchpad\3.14">
+			<fileset dir="${m2.dir}\org\apache\poi\poi-scratchpad\3.14">
 				<filename name="poi-scratchpad-3.14.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\xerial\sqlite-jdbc\3.8.11.2">
+			<fileset dir="${m2.dir}\org\xerial\sqlite-jdbc\3.8.11.2">
 				<filename name="sqlite-jdbc-3.8.11.2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\github\javaparser\javaparser-core\2.4.0">
+			<fileset dir="${m2.dir}\com\github\javaparser\javaparser-core\2.4.0">
 				<filename name="javaparser-core-2.4.0.jar" />
 			</fileset>
 		</copy>
 
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\kyj\Fx\dao\wizard\kyj.Fx.dao.wizard\0.0.3-SNAPSHOT">
+			<fileset dir="${m2.dir}\kyj\Fx\dao\wizard\kyj.Fx.dao.wizard\0.0.3-SNAPSHOT">
 				<filename name="kyj.Fx.dao.wizard-0.0.3-SNAPSHOT.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\kyj\FxVoEditor\kyj.FxVoEditor\0.0.1-SNAPSHOT">
+			<fileset dir="${m2.dir}\kyj\FxVoEditor\kyj.FxVoEditor\0.0.1-SNAPSHOT">
 				<filename name="kyj.FxVoEditor-0.0.1-SNAPSHOT.jar" />
 			</fileset>
 		</copy>
 
 
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\kyj\pmd\pmd.core\0.0.1-SNAPSHOT">
+			<fileset dir="${m2.dir}\kyj\pmd\pmd.core\0.0.1-SNAPSHOT">
 				<filename name="pmd.core-0.0.1-SNAPSHOT.jar" />
 			</fileset>
 		</copy>
@@ -531,25 +533,25 @@
 
 		<!-- [start] jfxtras -->
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\jfxtras\jfxtras-agenda\8.0-r5">
+			<fileset dir="${m2.dir}\org\jfxtras\jfxtras-agenda\8.0-r5">
 				<filename name="jfxtras-agenda-8.0-r5.jar" />
 			</fileset>
 		</copy>
 
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\jfxtras\jfxtras-common\8.0-r5">
+			<fileset dir="${m2.dir}\org\jfxtras\jfxtras-common\8.0-r5">
 				<filename name="jfxtras-common-8.0-r5.jar" />
 			</fileset>
 		</copy>
 
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\jfxtras\jfxtras-controls\8.0-r5">
+			<fileset dir="${m2.dir}\org\jfxtras\jfxtras-controls\8.0-r5">
 				<filename name="jfxtras-controls-8.0-r5.jar" />
 			</fileset>
 		</copy>
 
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\org\jfxtras\jfxtras-fxml\8.0-r5">
+			<fileset dir="${m2.dir}\org\jfxtras\jfxtras-fxml\8.0-r5">
 				<filename name="jfxtras-fxml-8.0-r5.jar" />
 			</fileset>
 		</copy>
@@ -558,7 +560,7 @@
 		<!-- [start] jfoenix -->
 
 		<copy todir="externalLibs">
-			<fileset dir="${user.home}\.m2\repository\com\jfoenix\jfoenix\1.0.0">
+			<fileset dir="${m2.dir}\com\jfoenix\jfoenix\1.0.0">
 				<filename name="jfoenix-1.0.0.jar" />
 			</fileset>
 		</copy>
@@ -575,29 +577,29 @@
 
 
 		<mkdir dir="project" />
-		<!-- <copy todir="project"> <fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor">
+		<!-- <copy todir="project"> <fileset dir="${basedir}\..">
 			<include name="src\test\resources/**" /> </fileset> </copy> -->
 		<copy todir="project">
-			<fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor">
+			<fileset dir="${basedir}\..">
 				<include name="src\main\scm/**" />
 			</fileset>
 		</copy>
 		<copy todir="project">
-			<fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor">
+			<fileset dir="${basedir}\..">
 				<include name="src\main\resources/**" />
 			</fileset>
 		</copy>
-		<!-- <copy todir="project"> <fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor">
+		<!-- <copy todir="project"> <fileset dir="${basedir}\..">
 			<include name="src\main\projmagt/**" /> </fileset> </copy> -->
 
 		<copy todir="project">
-			<fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor">
+			<fileset dir="${basedir}\..">
 				<include name="src\main\compiler/**" />
 			</fileset>
 		</copy>
 
 		<copy todir="project">
-			<fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor">
+			<fileset dir="${basedir}\..">
 				<include name="src\main\java/**" />
 			</fileset>
 		</copy>
@@ -608,7 +610,7 @@
 		<!-- 			</fileset> -->
 		<!-- 		</copy> -->
 
-		<!-- <copy todir="project"> <fileset dir="${user.home}\.git\Gargoyle\VisualFxVoEditor">
+		<!-- <copy todir="project"> <fileset dir="${basedir}\..">
 			<include name="src\test\java/**" /> </fileset> </copy> -->
 
 		<mkdir dir="projectRefs" />
