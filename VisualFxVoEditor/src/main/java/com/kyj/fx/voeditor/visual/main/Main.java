@@ -98,7 +98,7 @@ public class Main extends Application {
 	private static String version = "";
 	public static void main(String[] args) {
 
-		if(args!=null)
+		if(args!=null && args.length > 0)
 		{
 			LOGGER.debug("#### print argus ######");
 			Stream.of(args).forEach(LOGGER::debug);
