@@ -17,6 +17,7 @@ AppCopyright=Copyright (C) 2016
 ;AppSupportURL=http://java.com/
 ;AppUpdatesURL=http://java.com/
 DefaultDirName={localappdata}\{#ApplicationName}
+;DefaultDirName={pf}\{#ApplicationName}
 DisableStartupPrompt=Yes
 DisableDirPage=No
 DisableProgramGroupPage=Yes
@@ -48,6 +49,8 @@ Name: "dutch"; MessagesFile: "compiler:Languages/Dutch.isl"
 Name: "french"; MessagesFile: "compiler:Languages/French.isl"
 Name: "italian"; MessagesFile: "compiler:Languages/Italian.isl"
 
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}";
 
 [Files]
 Source: "Gargoyle\Gargoyle.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -55,8 +58,10 @@ Source: "Gargoyle\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs crea
 
 [Icons]
 Name: "{group}\Gargoyle"; Filename: "{app}\Gargoyle.exe"; IconFilename: "{app}\Gargoyle.ico"; Check: returnTrue()
-Name: "{commondesktop}\Gargoyle"; Filename: "{app}\Gargoyle.exe";  IconFilename: "{app}\Gargoyle.ico"; Check: returnFalse()
+Name: "{commondesktop}\Gargoyle"; Filename: "{app}\Gargoyle.exe";  IconFilename: "{app}\Gargoyle.ico"; Check: returnTrue()
+Name: "{commondesktop}\Gargoyle"; Filename: "{app}\Gargoyle.exe";  Tasks: desktopicon
 
+;Name: "{userdesktop}\Gargoyle"; Filename: "{app}\Gargoyle.exe";  IconFilename: "{app}\Gargoyle.ico"; WorkingDir:"{app}" ;Check: returnFalse()
 
 [Run]
 Filename: "{app}\Gargoyle.exe"; Parameters: "-Xappcds:generatecache"; Check: returnFalse()

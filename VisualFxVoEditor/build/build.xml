@@ -868,7 +868,7 @@
 
 		</fx:resources>
 
-		<fx:application id="Gagoyle" name="Gargoyle" mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx" version="${product.version}">
+		<fx:application id="Gargoyle" name="Gargoyle" mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx" version="${product.version}">
 			<fx:argument>${product.version}</fx:argument>
 			<fx:param name="-Dfile.encoding" value="UTF-8"></fx:param>
 		</fx:application>
@@ -878,7 +878,7 @@
 
 
 		<fx:jar destfile="dist/VisualFxVoEditor.jar">
-			<fx:application refid="Gagoyle" />
+			<fx:application refid="Gargoyle" />
 			<fileset dir="build/classes">
 			</fileset>
 			<fx:resources refid="appRes" />
@@ -912,11 +912,13 @@
 
 		<fx:deploy verbose="true" embedJNLP="false" extension="true" includeDT="false" offlineAllowed="true" outdir="${basedir}/deploy" outfile="Gargoyle" placeholderid="Gargoyle" nativeBundles="exe" updatemode="background">
 
-			<fx:platform basedir="${java.home}" />
+			<fx:platform basedir="${java.home}" >
+				<property name="file.encoding" value="UTF-8"></property>    
+			</fx:platform>
 			<fx:info title="Gargoyle" vendor="${vendor}" />
-
-			<fx:application refId="Gagoyle" />
+			<fx:application refId="Gargoyle" />
 			<fx:resources refid="appRes" />
+<!-- 			<fx:preferences id="Gargoyle" install="true" shortcut="true"></fx:preferences> -->
 
 		</fx:deploy>
 		<echo message="end install package" />
@@ -953,7 +955,7 @@
 	         ================================= -->
 	<target name="fx-deploy" depends="create-iss-script, init-fx-tasks">
 
-		<fx:application id="Gagoyle" name="Gargoyle" mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx" version="${product.version}">
+		<fx:application id="Gargoyle" name="Gargoyle" mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx" version="${product.version}">
 			<fx:argument>${product.version}</fx:argument>
 			<fx:param name="-Dfile.encoding" value="UTF-8"></fx:param>
 		</fx:application>
@@ -982,18 +984,34 @@
 			</fileset>
 		</copy>
 
-
-		<fx:deploy verbose="true" embedJNLP="false" extension="true" includeDT="false" offlineAllowed="true" outdir="${basedir}/deploy" outfile="Gargoyle" placeholderid="Gargoyle" nativeBundles="exe" updatemode="background">
+		<fx:deploy
+		    verbose="true" 
+		    embedJNLP="false" 
+		    extension="true" 
+		    includeDT="false" 
+		    offlineAllowed="true" 
+		    outdir="${basedir}/deploy" 
+		    outfile="Gargoyle" 
+		    placeholderid="Gargoyle" 
+		    nativeBundles="exe" 
+		    updatemode="background">
 
 			<fx:platform basedir="${java.home}" >
 				<property name="file.encoding" value="UTF-8"></property>    
 			</fx:platform>
+			
 			<fx:info title="Gargoyle" vendor="${vendor}" />
-			<fx:application refId="Gagoyle" />
+			
+			<fx:application refId="Gargoyle" />
+			
 			<fx:resources refid="appRes" />
-		
+			
+<!-- 			<fx:preferences id="Gargoyle" install="true" shortcut="true"></fx:preferences> -->
+			
 		</fx:deploy>
+		
 		<echo message="end install package" />
+		
 	</target>
 
 

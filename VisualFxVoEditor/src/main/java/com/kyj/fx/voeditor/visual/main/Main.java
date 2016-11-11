@@ -19,7 +19,9 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.component.popup.SelectWorkspaceView;
+import com.kyj.fx.voeditor.visual.exceptions.GargoyleDuplicatedRunException;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
+import com.kyj.fx.voeditor.visual.main.initalize.AppDuplDepenceInitializer;
 import com.kyj.fx.voeditor.visual.main.initalize.Initializable;
 import com.kyj.fx.voeditor.visual.main.scanning.ResourceScanner;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
@@ -96,10 +98,14 @@ public class Main extends Application {
 	};
 
 	private static String version = "eclipse-run";
-	public static void main(String[] args) {
 
-		if(args!=null && args.length > 0)
-		{
+	public static void main(String[] args) throws Exception {
+
+		//어플리케이션 중복 실행 방지처리 로직 구현
+
+		new AppDuplDepenceInitializer().initialize();
+
+		if (args != null && args.length > 0) {
 			LOGGER.debug("#### print argus ######");
 			Stream.of(args).forEach(LOGGER::debug);
 
@@ -107,21 +113,7 @@ public class Main extends Application {
 			version = args[0];
 		}
 
-		launch(args);
-	}
-
-	/**
-	 * app version을 리턴함. app version은 설치패키지를 만들때 주입된 번호.
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 11. 11.
-	 * @return
-	 */
-	public static String getVersion(){
-		return new String(version);
-	}
-
-	public Main() {
-
+		
 		/* 2016.2.6 프록시 설정 내용을 ProxyInitializable 구현. */
 		try {
 
@@ -131,7 +123,8 @@ public class Main extends Application {
 			ResourceScanner.getInstance().initialize(str -> {
 				try {
 					Initializable newInstance = (Initializable) str.newInstance();
-					LOGGER.debug("initialize!!!!");
+
+					LOGGER.debug("initialize!!!! : {} ", newInstance.getClass().getName());
 					if (newInstance != null) {
 						newInstance.initialize();
 					}
@@ -143,7 +136,26 @@ public class Main extends Application {
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}
+		
+		
+		launch(args);
 	}
+
+	/**
+	 * app version을 리턴함. app version은 설치패키지를 만들때 주입된 번호.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 11.
+	 * @return
+	 */
+	public static String getVersion() {
+		return new String(version);
+	}
+
+//	public Main() {
+//
+//		
+//	}
 
 	@Override
 	public void start(Stage primaryStage) throws IOException {

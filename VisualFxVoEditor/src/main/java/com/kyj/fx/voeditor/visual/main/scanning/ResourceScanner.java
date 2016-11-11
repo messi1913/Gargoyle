@@ -63,7 +63,7 @@ public class ResourceScanner {
 
 	private void initialize(Class<? extends Annotation> annotation, Consumer<Class<?>> consumer) {
 		Set<Class<?>> types = reflections.getTypesAnnotatedWith(annotation, true);
-		types.stream().forEach(consumer);
+		types.parallelStream().forEach(consumer);
 	}
 
 	/**
@@ -73,6 +73,6 @@ public class ResourceScanner {
 	 */
 	public void initialize(Annotation annotation, Consumer<Class<?>> consume) {
 		Set<Class<?>> types = reflections.getTypesAnnotatedWith(annotation);
-		types.stream().forEach(consume);
+		types.parallelStream().forEach(consume);
 	}
 }
