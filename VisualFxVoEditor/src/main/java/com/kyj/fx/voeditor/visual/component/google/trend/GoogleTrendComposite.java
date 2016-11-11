@@ -56,12 +56,25 @@ import jfxtras.scene.layout.HBox;
 
 /**
  * 구글 트랜드를 표현하기 위한 컴포넌트
+ * 
  * @author KYJ
  *
  */
 public class GoogleTrendComposite extends BorderPane {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GoogleTrendExam2.class);
+	/**
+	 * 검색 URL
+	 * 
+	 * @최초생성일 2016. 11. 6.
+	 */
+	final String GOOGLE_SEARCH_URL_TEMPLATE = "https://www.google.co.kr/search?q=:keyword&biw=1920&bih=990&tbas=0&source=lnt&tbs=cdr%3A1,cd_min%3A:startDate,cd_max%3A:endDate&tbm=";
+	/**
+	 * 구글 트랜드 차트 URL
+	 * 
+	 * @최초생성일 2016. 11. 6.
+	 */
+	final String GOOGLE_TREND_URL_TEMPLATE = "https://www.google.com/trends/fetchComponent?cid=TIMESERIES_GRAPH_0&export=3&q=:keywords#if($gprop)&gprop=:gprop#end#if($geo)&geo=:geo#end";
 
 	//	private BorderPane borRoot;
 	private SplitPane spMainContent;
@@ -116,16 +129,16 @@ public class GoogleTrendComposite extends BorderPane {
 
 				List<ChartOverTooltip> collect = contents.stream().map(v -> v.getUserData()).filter(v -> v != null)
 						.map(v -> (ChartOverTooltip) v).sorted((a1, a2) -> {
-					try {
-						String xValue = a1.getData().getXValue();
-						Date date = DateUtil.toDate(xValue, "yyyy년 MM월");
-						String xValue2 = a2.getData().getXValue();
-						Date date2 = DateUtil.toDate(xValue2, "yyyy년 MM월");
-						return date.compareTo(date2);
-					} catch (Exception e) {
-					}
-					return 0;
-				}).limit(4).collect(Collectors.toList());
+							try {
+								String xValue = a1.getData().getXValue();
+								Date date = DateUtil.toDate(xValue, "yyyy년 MM월");
+								String xValue2 = a2.getData().getXValue();
+								Date date2 = DateUtil.toDate(xValue2, "yyyy년 MM월");
+								return date.compareTo(date2);
+							} catch (Exception e) {
+							}
+							return 0;
+						}).limit(4).collect(Collectors.toList());
 
 				browserParent.getChildren().clear();
 
@@ -145,35 +158,40 @@ public class GoogleTrendComposite extends BorderPane {
 						GargoyleSynchLoadBar<Integer> gargoyleSynchLoadBar = new GargoyleSynchLoadBar<>(FxUtil.getWindow(this),
 								new Task<Integer>() {
 
-							@Override
-							protected Integer call() throws Exception {
-								try {
-									try {
-										String xValue = tip.getData().getXValue();
-										Date date = DateUtil.toDate(xValue, "yyyy년 MM월");
-										Date start = DateUtil.getFirstDateOfMonth(date);
-										Date end = DateUtil.getLastDateOfMonth(date);
-										//											googoleSearchUrl =
-										String content = loadContent(new URL(getGoogoleSearchUrl(tip.getColumnName(), start, end)));
-										updateValue(i);
-										updateMessage(content);
-									} catch (Exception e) {
-										e.printStackTrace();
+									@Override
+									protected Integer call() throws Exception {
+										try {
+											try {
+												String xValue = tip.getData().getXValue();
+												Date date = DateUtil.toDate(xValue, "yyyy년 MM월");
+												Date start = DateUtil.getFirstDateOfMonth(date);
+												Date end = DateUtil.getLastDateOfMonth(date);
+												//											googoleSearchUrl =
+												String googoleSearchUrl2 = getGoogoleSearchUrl(tip.getColumnName(), start, end);
+												String content = loadContent(new URL(googoleSearchUrl2));
+												updateValue(i);
+												updateMessage(content);
+												//										updateMessage(googoleSearchUrl2);
+
+											} catch (Exception e) {
+												e.printStackTrace();
+											}
+
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+										return i;
 									}
 
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-								return i;
-							}
-
-						});
+								});
 
 						gargoyleSynchLoadBar.setOnSucceeded(work -> {
-							work.getSource().getWorkDone();
+
 							String message = work.getSource().getMessage();
 							Integer value = gargoyleSynchLoadBar.getValue();
 							webViews[value].getEngine().loadContent(message, "text/html");
+							//							webViews[value].getEngine().load(message);
+							work.getSource().getWorkDone();
 						});
 						gargoyleSynchLoadBar.start();
 						//						}
@@ -219,6 +237,7 @@ public class GoogleTrendComposite extends BorderPane {
 
 	/**
 	 * 검색 버튼 클릭 이벤트
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 4.
 	 * @param e
@@ -230,6 +249,7 @@ public class GoogleTrendComposite extends BorderPane {
 
 	/**
 	 * 텍스트필드 키 이벤트
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 4.
 	 * @param e
@@ -245,7 +265,7 @@ public class GoogleTrendComposite extends BorderPane {
 					String jsonString = request(t);
 					chart.setSource(jsonString);
 				} catch (Exception e1) {
-					e1.printStackTrace();
+					LOGGER.error(ValueUtil.toString(e1));
 				}
 
 			});
@@ -259,7 +279,7 @@ public class GoogleTrendComposite extends BorderPane {
 				try {
 					return ValueUtil.toString(is);
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.error(ValueUtil.toString(e));
 				}
 			}
 			return "";
@@ -277,25 +297,28 @@ public class GoogleTrendComposite extends BorderPane {
 		endDate = URLEncoder.encode(endDate, "UTF-8");
 
 		//%3A -> :
-		String URL_FORMAT = "https://www.google.co.kr/search?q=:keyword&biw=1920&bih=990&tbas=0&source=lnt&tbs=cdr%3A1,cd_min%3A:startDate,cd_max%3A:endDate&tbm=";
 
 		Map<String, Object> hashMap = new HashMap<>();
 		hashMap.put("keyword", keyword);
 		hashMap.put("startDate", startDate);
 		hashMap.put("endDate", endDate);
 
-		String formattedURL = ValueUtil.getVelocityToText(URL_FORMAT, hashMap, true, null, str -> str);
+		String formattedURL = ValueUtil.getVelocityToText(GOOGLE_SEARCH_URL_TEMPLATE, hashMap, true, null, str -> str);
 
 		LOGGER.debug("decode : {}", URLDecoder.decode(formattedURL, "UTF8"));
 		return formattedURL;
 
 	}
 
-	private String request(String keywords) throws MalformedURLException, UnsupportedEncodingException, Exception {
+	private String request(String keywords) throws Exception {
 		URL url = new URL(createUrl(keywords));
 		String jsonString = RequestUtil.reqeustSSL(url, (is, code) -> {
 			String result = "";
-			if (200 == code) {
+			if (200 == code || 203 == code) {
+
+				if (code == 203) {
+					LOGGER.warn("not unnomal response code {}", code);
+				}
 
 				try {
 
@@ -310,7 +333,7 @@ public class GoogleTrendComposite extends BorderPane {
 					out.flush();
 					dirtyConent = out.toString();
 
-					System.out.printf("dirty content %s \n", dirtyConent);
+					LOGGER.debug("dirty content {} \n", dirtyConent);
 
 					//원본 데이터에서 불필요한 부분 삭제
 					String regexMatch = ValueUtil.regexMatch("\\(.*\\)", dirtyConent, str -> {
@@ -331,23 +354,24 @@ public class GoogleTrendComposite extends BorderPane {
 
 					result = regexMatch;
 					//결과출력
-					System.out.printf("result string : %s \n", result);
+					LOGGER.debug("result string : {} \n", result);
 					//					jsonObject = ValueUtil.toJSONObject(regexMatch);
 
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.error(ValueUtil.toString(e));
 				}
 
 			} else {
-
-				LOGGER.warn("not unnomal response code {}", code);
-				try {
-					result = ValueUtil.toString(GoogleTrendExam2.class.getResourceAsStream("GoogleTrendSample.json"));
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				throw new RuntimeException("Connect Fail.");
 			}
+			//			else {
+			//
+			//				try {
+			//					result = ValueUtil.toString(GoogleTrendExam2.class.getResourceAsStream("GoogleTrendSample.json"));
+			//				} catch (Exception e) {
+			//					LOGGER.error(ValueUtil.toString(e));
+			//				}
+			//			}
 
 			return result;
 		});
@@ -362,7 +386,6 @@ public class GoogleTrendComposite extends BorderPane {
 		String converted_keywords = URLEncoder.encode(keywords, "UTF-8");
 
 		//핫 트랜드 https://www.google.com/trends/hottrends/atom
-		String URL_FORMAT = "https://www.google.com/trends/fetchComponent?cid=TIMESERIES_GRAPH_0&export=3&q=:keywords#if($gprop)&gprop=:gprop#end#if($geo)&geo=:geo#end";
 
 		Map<String, Object> hashMap = new HashMap<>();
 		hashMap.put("geo", geo);
@@ -370,8 +393,7 @@ public class GoogleTrendComposite extends BorderPane {
 		hashMap.put("gprop", gprop);
 		hashMap.put("keywords", converted_keywords);
 
-		String formattedURL = ValueUtil.getVelocityToText(URL_FORMAT, hashMap, true, null, str -> str);
-		System.out.println(formattedURL);
+		String formattedURL = ValueUtil.getVelocityToText(GOOGLE_TREND_URL_TEMPLATE, hashMap, true, null, str -> str);
 		return formattedURL;
 	}
 

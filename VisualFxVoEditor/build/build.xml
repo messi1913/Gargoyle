@@ -870,6 +870,7 @@
 
 		<fx:application id="Gagoyle" name="Gargoyle" mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx" version="${product.version}">
 			<fx:argument>${product.version}</fx:argument>
+			<fx:param name="-Dfile.encoding" value="UTF-8"></fx:param>
 		</fx:application>
 
 		<mkdir dir="build/classes/META-INF" />
@@ -954,6 +955,7 @@
 
 		<fx:application id="Gagoyle" name="Gargoyle" mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx" version="${product.version}">
 			<fx:argument>${product.version}</fx:argument>
+			<fx:param name="-Dfile.encoding" value="UTF-8"></fx:param>
 		</fx:application>
 
 		<fx:resources id="appRes">
@@ -983,11 +985,13 @@
 
 		<fx:deploy verbose="true" embedJNLP="false" extension="true" includeDT="false" offlineAllowed="true" outdir="${basedir}/deploy" outfile="Gargoyle" placeholderid="Gargoyle" nativeBundles="exe" updatemode="background">
 
-			<fx:platform basedir="${java.home}" />
+			<fx:platform basedir="${java.home}" >
+				<property name="file.encoding" value="UTF-8"></property>    
+			</fx:platform>
 			<fx:info title="Gargoyle" vendor="${vendor}" />
 			<fx:application refId="Gagoyle" />
 			<fx:resources refid="appRes" />
-
+		
 		</fx:deploy>
 		<echo message="end install package" />
 	</target>

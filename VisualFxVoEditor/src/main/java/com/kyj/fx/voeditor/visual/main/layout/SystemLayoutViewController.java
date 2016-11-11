@@ -51,6 +51,7 @@ import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentOnLoaded;
 import com.kyj.fx.voeditor.visual.loder.JarWrapper;
 import com.kyj.fx.voeditor.visual.loder.PluginLoader;
+import com.kyj.fx.voeditor.visual.main.Main;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
@@ -889,7 +890,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	@FXML
 	public void miAboutOnAction(ActionEvent e) {
 		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
-		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s", url));
+		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s\nVersion : %s", url, Main.getVersion()));
 	}
 
 	/**

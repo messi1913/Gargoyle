@@ -95,7 +95,7 @@ public class Main extends Application {
 
 	};
 
-	private static String version = "";
+	private static String version = "eclipse-run";
 	public static void main(String[] args) {
 
 		if(args!=null && args.length > 0)

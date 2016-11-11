@@ -47,6 +47,8 @@ public class SystemPropertyInitializable implements Initializable {
 		String jnu_encoding = ConfigResourceLoader.getInstance().getOrDefault(ConfigResourceLoader.SUN_JNU_ENCODING, "UTF-8");
 		System.setProperty(ConfigResourceLoader.FILE_ENCODING, file_encoding);
 		System.setProperty(ConfigResourceLoader.SUN_JNU_ENCODING, jnu_encoding);
+		
+		
 		// System.setProperty("client.encoding.override", "UTF-8");
 
 	}

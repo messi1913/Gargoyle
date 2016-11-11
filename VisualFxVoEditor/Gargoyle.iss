@@ -1,7 +1,7 @@
 ;This file will be executed next to the application bundle image
 ;I.e. current directory will contain folder batch-scheduler with application files
 
-#define AppVersion "1.3.3"
+#define AppVersion "1.3.9"
 #define ApplicationName "Gargoyle"
 #define GroupName "Gargoyle"
 
@@ -44,6 +44,10 @@ ArchitecturesInstallIn64BitMode=x64
 Name: "korean"; MessagesFile: "compiler:Languages/Korean.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "japanese"; MessagesFile: "compiler:Languages/Japanese.isl"
+Name: "dutch"; MessagesFile: "compiler:Languages/Dutch.isl"
+Name: "french"; MessagesFile: "compiler:Languages/French.isl"
+Name: "italian"; MessagesFile: "compiler:Languages/Italian.isl"
+
 
 [Files]
 Source: "Gargoyle\Gargoyle.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -81,3 +85,4 @@ begin
 //   Add pack200/unpack200 support?
   Result := True;
 end;
+

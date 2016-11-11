@@ -13,7 +13,6 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.function.BiFunction;
-import java.util.stream.Stream;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -33,8 +32,7 @@ public class RequestUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtil.class);
 	private static HostnameVerifier hostnameVerifier = (arg0, arg1) -> {
-		System.out.println(arg0);
-		System.out.println(arg1);
+		LOGGER.debug(arg0);
 		return true;
 	};
 
@@ -62,21 +60,21 @@ public class RequestUtil {
 
 		@Override
 		public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-			System.out.println("######################");
-			System.out.println("checkClientTrusted");
-			System.out.println(arg1);
-			System.out.println("######################");
+			LOGGER.debug("######################");
+			LOGGER.debug("checkClientTrusted");
+			LOGGER.debug(arg1);
+			LOGGER.debug("######################");
 		}
 
 		@Override
 		public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-			System.out.println("########################################################################################");
-			System.out.println("checkServerTrusted");
-			System.out.println(arg1);
+			LOGGER.debug("########################################################################################");
+			LOGGER.debug("checkServerTrusted");
+			LOGGER.debug(arg1);
 
-			Stream.of(arg0).forEach(System.out::println);
+//			Stream.of(arg0).forEach(System.out::println);
 
-			System.out.println("########################################################################################");
+			LOGGER.debug("########################################################################################");
 		}
 
 		@Override
@@ -92,12 +90,13 @@ public class RequestUtil {
 				//버퍼로 그냥 읽어봐도 되지만 인코딩 변환을 추후 쉽게 처리하기 위해 ByteArrayOutputStream을 사용
 
 				try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-					int read = -1;
-					while ((read = is.read()) != -1) {
-						out.write(read);
+//					int read = -1;
+					byte[] b = new byte[4096];
+					while (is.read(b) !=-1) {
+						out.write(b);
 					}
 					out.flush();
-					dirtyConent = out.toString();
+					dirtyConent = out.toString("UTF-8");
 				} catch (Exception e) {
 					LOGGER.error(ValueUtil.toString(e));
 				}
@@ -125,9 +124,9 @@ public class RequestUtil {
 //			conn.setRequestProperty("Connection", "keep-alive");
 
 			conn.setRequestProperty("Accept", "text/html");
-			//			conn.setRequestProperty("Accept-Charset", "UTF-8");
-			//					conn.setRequestProperty("Accept-Encoding", "UTF-8");
-			//					conn.setRequestProperty("Accept-Language", "KR");
+			conn.setRequestProperty("Accept-Charset", "UTF-8");
+			conn.setRequestProperty("Accept-Encoding", "UTF-8");
+			conn.setRequestProperty("Accept-Language", "KR");
 			//		conn.setRequestProperty("Cache-Control", "no-store");
 			//					conn.setRequestProperty("Pragma", "no-cache");
 
@@ -136,7 +135,7 @@ public class RequestUtil {
 
 
 			conn.getHeaderFields().forEach((str, li) -> {
-				System.out.printf("%s : %s \n", str, li);
+				LOGGER.debug("{} : {} " ,str, li);
 			});
 
 			conn.setConnectTimeout(6000);
@@ -158,7 +157,7 @@ public class RequestUtil {
 
 			LOGGER.debug("res code : {} res message : {}" , conn.getResponseCode(), conn.getResponseMessage());
 
-			System.out.println(conn.getPermission());
+//			LOGGER.debug(conn.getPermission().toString());
 			result = response.apply(is, conn.getResponseCode());
 
 		} finally {
