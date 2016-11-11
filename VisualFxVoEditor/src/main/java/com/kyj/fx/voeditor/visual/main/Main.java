@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class Main extends Application {
 	 * 작성일 : 2016. 7. 26. 작성자 : KYJ
 	 *
 	 * 프로그램 종료시 처리할 내용을 구현할 이벤트를 등록하는 함수.
-	 * 
+	 *
 	 * @param listener
 	 ********************************/
 	public static void addPrimaryStageCloseListener(PrimaryStageCloseable listener) {
@@ -63,11 +64,11 @@ public class Main extends Application {
 
 	/**
 	 * 어플리케이션이 종료될때 처리할 이벤트를 구현한다.
-	 * 
+	 *
 	 * PrimaryStageCloseable을 구현하고 addPrimaryStageCloseListener(PrimaryStageCloseable) 함수에 리스너를 등록한 함수는 프로그램 종료시 처리할 이벤트가 실행되게 된다.
-	 * 
+	 *
 	 * 주로 화면에 대한 Resource 해제등의 로직이 대상이됨.
-	 * 
+	 *
 	 * @최초생성일 2016. 7. 26.
 	 */
 	private static EventHandler<WindowEvent> onPrimaryStageCloseRequest = event -> {
@@ -94,8 +95,29 @@ public class Main extends Application {
 
 	};
 
+	private static String version = "";
 	public static void main(String[] args) {
+
+		if(args!=null)
+		{
+			LOGGER.debug("#### print argus ######");
+			Stream.of(args).forEach(LOGGER::debug);
+
+			//first param is version
+			version = args[0];
+		}
+
 		launch(args);
+	}
+
+	/**
+	 * app version을 리턴함. app version은 설치패키지를 만들때 주입된 번호.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 11.
+	 * @return
+	 */
+	public static String getVersion(){
+		return new String(version);
 	}
 
 	public Main() {
@@ -154,13 +176,13 @@ public class Main extends Application {
 
 		try {
 
-			//예상치 못한 에외에 대한 대비 로직구현. 
+			//예상치 못한 에외에 대한 대비 로직구현.
 			setApplicationUncaughtExceptionHandler();
 
 			//클래스 로딩같은 어플리케이션이 메모리에 로딩됨과 동기에 무거운 처리를 비동기로 로딩하는 로직이 구현되있음.
 			SharedMemory.init();
 
-			//PrimaryStage를 공유변수로 지정하기 위한 로직 처리. 
+			//PrimaryStage를 공유변수로 지정하기 위한 로직 처리.
 			SharedMemory.setPrimaryStage(primaryStage);
 
 			//Main Application을 로드
@@ -182,7 +204,7 @@ public class Main extends Application {
 	 * 작성일 : 2016. 7. 26. 작성자 : KYJ
 	 *
 	 * 예측되지 못한 예외처리에 대한 로직처리가 입력된다.
-	 * 
+	 *
 	 * ex) 정규식 무한루프등(StackOverflow)
 	 ********************************/
 	private void setApplicationUncaughtExceptionHandler() {
@@ -195,7 +217,7 @@ public class Main extends Application {
 	/***************************
 	 *
 	 * 예측하지 못한 예외에 대한 실제 로직이 구현됨.
-	 * 
+	 *
 	 * @author KYJ
 	 *
 	 ***************************/
@@ -223,7 +245,7 @@ public class Main extends Application {
 	 * 작성일 : 2016. 7. 26. 작성자 : KYJ
 	 *
 	 * Appplication 메인 로직
-	 * 
+	 *
 	 * @return
 	 * @throws IOException
 	 ********************************/
@@ -237,7 +259,7 @@ public class Main extends Application {
 	 * 작성일 : 2016. 7. 26. 작성자 : KYJ
 	 *
 	 * Appliucation 메인로직.
-	 * 
+	 *
 	 * @return
 	 * @throws IOException
 	 ********************************/
