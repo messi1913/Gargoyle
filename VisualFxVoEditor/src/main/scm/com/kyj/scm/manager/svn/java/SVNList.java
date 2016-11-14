@@ -138,6 +138,8 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 						resultList.add(entry);
 					}
 				}
+			} else {
+				resultList.addAll(list);
 			}
 		} catch (SVNException e) {
 			LOGGER.error(ValueUtil.toString(e));
