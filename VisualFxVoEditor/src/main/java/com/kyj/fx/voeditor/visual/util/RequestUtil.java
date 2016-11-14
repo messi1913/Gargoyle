@@ -72,7 +72,7 @@ public class RequestUtil {
 			LOGGER.debug("checkServerTrusted");
 			LOGGER.debug(arg1);
 
-//			Stream.of(arg0).forEach(System.out::println);
+			//			Stream.of(arg0).forEach(System.out::println);
 
 			LOGGER.debug("########################################################################################");
 		}
@@ -90,9 +90,9 @@ public class RequestUtil {
 				//버퍼로 그냥 읽어봐도 되지만 인코딩 변환을 추후 쉽게 처리하기 위해 ByteArrayOutputStream을 사용
 
 				try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-//					int read = -1;
+					//					int read = -1;
 					byte[] b = new byte[4096];
-					while (is.read(b) !=-1) {
+					while (is.read(b) != -1) {
 						out.write(b);
 					}
 					out.flush();
@@ -121,7 +121,7 @@ public class RequestUtil {
 
 			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
 			conn.setRequestProperty("Accept-Encoding", "UTF-8");
-//			conn.setRequestProperty("Connection", "keep-alive");
+			//			conn.setRequestProperty("Connection", "keep-alive");
 
 			conn.setRequestProperty("Accept", "text/html");
 			conn.setRequestProperty("Accept-Charset", "UTF-8");
@@ -132,16 +132,14 @@ public class RequestUtil {
 
 			conn.setHostnameVerifier(hostnameVerifier);
 
-
-
 			conn.getHeaderFields().forEach((str, li) -> {
-				LOGGER.debug("{} : {} " ,str, li);
+				LOGGER.debug("{} : {} ", str, li);
 			});
 
 			conn.setConnectTimeout(6000);
 
 			conn.connect();
-			LOGGER.debug("{}",conn.getCipherSuite());
+//			LOGGER.debug("{}", conn.getCipherSuite());
 			//Charset
 			//
 			//Description
@@ -155,16 +153,18 @@ public class RequestUtil {
 
 			is = conn.getInputStream();
 
-			LOGGER.debug("res code : {} res message : {}" , conn.getResponseCode(), conn.getResponseMessage());
+			LOGGER.debug("res code : {} res message : {}", conn.getResponseCode(), conn.getResponseMessage());
 
-//			LOGGER.debug(conn.getPermission().toString());
+			//			LOGGER.debug(conn.getPermission().toString());
 			result = response.apply(is, conn.getResponseCode());
 
 		} finally {
 
 			if (is != null)
 				is.close();
-			conn.disconnect();
+
+			if (conn != null)
+				conn.disconnect();
 
 		}
 
