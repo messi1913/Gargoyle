@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
@@ -51,7 +52,7 @@ public class RequestUtil {
 
 	/**
 	 *
-	 *  SSL 통신 인증
+	 * SSL 통신 인증
 	 *
 	 * @author KYJ
 	 *
@@ -72,7 +73,7 @@ public class RequestUtil {
 			LOGGER.debug("checkServerTrusted");
 			LOGGER.debug(arg1);
 
-			//			Stream.of(arg0).forEach(System.out::println);
+			// Stream.of(arg0).forEach(System.out::println);
 
 			LOGGER.debug("########################################################################################");
 		}
@@ -83,14 +84,16 @@ public class RequestUtil {
 		}
 	}
 
-	public static String reqeustSSL_JSONString(URL url, BiFunction<InputStream, Integer, String> response) throws Exception {
+	public static String reqeustSSL_JSONString(URL url, BiFunction<InputStream, Integer, String> response)
+			throws Exception {
 		return reqeustSSL(url, (is, code) -> {
 			String dirtyConent = "";
 			if (200 == code) {
-				//버퍼로 그냥 읽어봐도 되지만 인코딩 변환을 추후 쉽게 처리하기 위해 ByteArrayOutputStream을 사용
+				// 버퍼로 그냥 읽어봐도 되지만 인코딩 변환을 추후 쉽게 처리하기 위해 ByteArrayOutputStream을
+				// 사용
 
 				try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-					//					int read = -1;
+					// int read = -1;
 					byte[] b = new byte[4096];
 					while (is.read(b) != -1) {
 						out.write(b);
@@ -110,7 +113,7 @@ public class RequestUtil {
 
 	public static <T> T reqeustSSL(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
 
-		//		SSLContext ctx = SSLContext.getInstance("TLS");
+		// SSLContext ctx = SSLContext.getInstance("TLS");
 
 		HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 		InputStream is = null;
@@ -119,16 +122,17 @@ public class RequestUtil {
 			conn.setDefaultUseCaches(true);
 			conn.setUseCaches(true);
 
-			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
+			conn.setRequestProperty("User-Agent",
+					"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
 			conn.setRequestProperty("Accept-Encoding", "UTF-8");
-			//			conn.setRequestProperty("Connection", "keep-alive");
+			// conn.setRequestProperty("Connection", "keep-alive");
 
 			conn.setRequestProperty("Accept", "text/html");
 			conn.setRequestProperty("Accept-Charset", "UTF-8");
 			conn.setRequestProperty("Accept-Encoding", "UTF-8");
 			conn.setRequestProperty("Accept-Language", "KR");
-			//		conn.setRequestProperty("Cache-Control", "no-store");
-			//					conn.setRequestProperty("Pragma", "no-cache");
+			// conn.setRequestProperty("Cache-Control", "no-store");
+			// conn.setRequestProperty("Pragma", "no-cache");
 
 			conn.setHostnameVerifier(hostnameVerifier);
 
@@ -139,23 +143,27 @@ public class RequestUtil {
 			conn.setConnectTimeout(6000);
 
 			conn.connect();
-//			LOGGER.debug("{}", conn.getCipherSuite());
-			//Charset
+			// LOGGER.debug("{}", conn.getCipherSuite());
+			// Charset
 			//
-			//Description
+			// Description
 			//
-			//US-ASCII Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode character set
-			//ISO-8859-1   ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1
-			//UTF-8 Eight-bit UCS Transformation Format
-			//UTF-16BE Sixteen-bit UCS Transformation Format, big-endian byte order
-			//UTF-16LE Sixteen-bit UCS Transformation Format, little-endian byte order
-			//UTF-16 Sixteen-bit UCS Transformation Format, byte order identified by an optional byte-order mark
+			// US-ASCII Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic
+			// Latin block of the Unicode character set
+			// ISO-8859-1 ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1
+			// UTF-8 Eight-bit UCS Transformation Format
+			// UTF-16BE Sixteen-bit UCS Transformation Format, big-endian byte
+			// order
+			// UTF-16LE Sixteen-bit UCS Transformation Format, little-endian
+			// byte order
+			// UTF-16 Sixteen-bit UCS Transformation Format, byte order
+			// identified by an optional byte-order mark
 
 			is = conn.getInputStream();
 
 			LOGGER.debug("res code : {} res message : {}", conn.getResponseCode(), conn.getResponseMessage());
 
-			//			LOGGER.debug(conn.getPermission().toString());
+			// LOGGER.debug(conn.getPermission().toString());
 			result = response.apply(is, conn.getResponseCode());
 
 		} finally {
@@ -170,4 +178,49 @@ public class RequestUtil {
 
 		return result;
 	}
+
+	public static <T> T request(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
+
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		InputStream is = null;
+		T result = null;
+		try {
+
+			conn.setDefaultUseCaches(true);
+			conn.setUseCaches(true);
+
+			conn.setRequestProperty("User-Agent",
+					"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
+			conn.setRequestProperty("Accept-Encoding", "UTF-8");
+			// conn.setRequestProperty("Connection", "keep-alive");
+
+			conn.setRequestProperty("Accept", "text/html");
+			conn.setRequestProperty("Accept-Charset", "UTF-8");
+			conn.setRequestProperty("Accept-Encoding", "UTF-8");
+			conn.setRequestProperty("Accept-Language", "KR");
+
+			conn.setConnectTimeout(6000);
+			conn.setReadTimeout(6000);
+
+			conn.connect();
+
+			is = conn.getInputStream();
+
+			LOGGER.debug("res code : {} res message : {}", conn.getResponseCode(), conn.getResponseMessage());
+
+			// LOGGER.debug(conn.getPermission().toString());
+			result = response.apply(is, conn.getResponseCode());
+
+		} finally {
+
+			if (is != null)
+				is.close();
+
+			if (conn != null)
+				conn.disconnect();
+
+		}
+		return result;
+	}
+
 }

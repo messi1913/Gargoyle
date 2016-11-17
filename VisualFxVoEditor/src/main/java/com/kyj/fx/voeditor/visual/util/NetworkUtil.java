@@ -1,9 +1,8 @@
 /********************************
- *	프로젝트 : sos-server
- *	패키지    : com.samsung.sds.sos.server.util
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.suppliers
  *	작성일    : 2016. 6. 10.
- *	프로젝트 : O-PERA 프로젝트
- *	작성자    : KYJ
+  *	작성자   : KYJ
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
@@ -13,11 +12,22 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.function.Function;
 
+import org.apache.http.HttpHost;
+
+import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+
 /**
+ * 
+ * 네트워크 처리와 관련된 유틸리티 클래스 <br/>
+ * 
  * @author KYJ
  *
  */
-public class NetworkUtil {
+public final class NetworkUtil {
+
+	private NetworkUtil() {
+	}
 
 	/**
 	 * host address정보로 변환해주는 펑션인터페이스
@@ -33,8 +43,8 @@ public class NetworkUtil {
 	};
 
 	/**
-	 * InetAddress클래스로부터 조건에 일치하는 정보를 리턴.
-	 *
+	 * InetAddress클래스로부터 조건에 일치하는 정보를 리턴. </br>
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 10.
 	 * @param convertValue
@@ -75,8 +85,7 @@ public class NetworkUtil {
 	}
 
 	/**
-	 * 장비 IP 주소리턴.
-	 *
+	 * 장비 IP 주소리턴. </br>
 	 * 127.0 으로 시작하거나 192.168로 시작하는 IP주소 대상아님.
 	 *
 	 * @작성자 : KYJ
@@ -86,5 +95,70 @@ public class NetworkUtil {
 	 */
 	public static String getRealAddress() throws SocketException {
 		return getAddressInfo(hostAddressConverter);
+	}
+
+	/**
+	 * Proxy port 리턴
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 17.
+	 * @return
+	 */
+	public static final String getHttpProxyPort() {
+		return ResourceLoader.getInstance().get(ResourceLoader.HTTP_PROXY_PORT);
+	}
+
+	/**
+	 * Proxy Host 리턴
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 17.
+	 * @return
+	 */
+	public static final String getHttpHost() {
+		return ResourceLoader.getInstance().get(ResourceLoader.HTTP_PROXY_HOST);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 17.
+	 * @return
+	 */
+	public static final HttpHost getProxyHost() {
+		HttpHost proxy = new HttpHost(getHttpHost(), Integer.parseInt(getHttpProxyPort(), 10), "http");
+		return proxy;
+	}
+
+	/**
+	 * htpps 프록시 포트 리턴
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 17.
+	 * @return
+	 */
+	public static final String getHttpsProxyPort() {
+		return ResourceLoader.getInstance().get(ResourceLoader.HTTPS_PROXY_PORT);
+	}
+
+	/**
+	 * https 프록시 호스트 리턴
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 17.
+	 * @return
+	 */
+	public static final String getHttpsProxyHost() {
+		return ResourceLoader.getInstance().get(ResourceLoader.HTTPS_PROXY_HOST);
+	}
+
+	/**
+	 * 프록시 사용 여부를 리턴
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 17.
+	 * @return
+	 */
+	public static final boolean isUseProxy() {
+		return "Y".equals(ConfigResourceLoader.getInstance().get(ConfigResourceLoader.USE_PROXY_YN));
 	}
 }
