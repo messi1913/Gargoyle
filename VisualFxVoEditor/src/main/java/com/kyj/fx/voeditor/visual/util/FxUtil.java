@@ -81,6 +81,9 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.transform.Scale;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -107,6 +110,24 @@ public class FxUtil {
 	public static final String FONTS_NANUMBARUNGOTHIC_TTF = "fonts/NANUMBARUNGOTHIC.TTF";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FxUtil.class);
+
+	static {
+
+		try {
+			Font.loadFont(ClassLoader.getSystemResource(FONTS_NANUMBARUNGOTHIC_TTF).openStream(), 12);
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	public static Font getBoldFont() {
+		return getBoldFont(12d);
+	}
+	public static Font getBoldFont(double fontSize) {
+		return Font.font("NANUMBARUNGOTHIC", FontWeight.BOLD, FontPosture.ITALIC, fontSize);
+	}
 
 	/**
 	 * 에러 콜백.

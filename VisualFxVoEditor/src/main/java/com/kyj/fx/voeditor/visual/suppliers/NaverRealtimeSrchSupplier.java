@@ -6,31 +6,29 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.suppliers;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.util.NetworkUtil;
+import com.kyj.fx.voeditor.visual.framework.RealtimeSearchItemVO;
+import com.kyj.fx.voeditor.visual.framework.RealtimeSearchVO;
+import com.kyj.fx.voeditor.visual.util.RequestUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 /**
  * 네이버 실시간 검색에 데이터를 리턴.
- * 
+ *
  * @author KYJ
  *
  */
@@ -52,7 +50,7 @@ public final class NaverRealtimeSrchSupplier implements Supplier<List<String>> {
 
 	/*
 	 * 실시간 검색 결과를 리턴
-	 * 
+	 *
 	 */
 	public List<String> get() {
 		List<String> rsltDVOList = Collections.emptyList();
@@ -62,7 +60,16 @@ public final class NaverRealtimeSrchSupplier implements Supplier<List<String>> {
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}
+		return rsltDVOList;
+	}
 
+	public List<RealtimeSearchVO> getMeta() {
+		List<RealtimeSearchVO> rsltDVOList = Collections.emptyList();
+		try {
+			rsltDVOList = NaverRealtimeSearchFactory.getInstance().getRealtimeSearchMeta();
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
 		return rsltDVOList;
 	}
 
@@ -74,6 +81,7 @@ public final class NaverRealtimeSrchSupplier implements Supplier<List<String>> {
  */
 final class NaverRealtimeSearchFactory {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(NaverRealtimeSearchFactory.class);
 	/* URL에서 얻어온 String중 가져오는 실시간 검색어 시작부분 */
 	/* 주석사유 : 2014.09.11 네이버 검색어 HTML 변경 */
 	// private static final String STRONG_CLASS_TEXT =
@@ -96,110 +104,83 @@ final class NaverRealtimeSearchFactory {
 
 	public static int SEARCH_CONTANT_END_LENGTH = SEARCH_CONTANT_END.length();
 
-	private static String NAVER_REALTIME_URL = "http://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&ie=utf8&query=%EC%97%90%EB%84%A4%EC%8A%A4&x=0&y=0";
+	private static String NAVER_REALTIME_URL = "https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&ie=utf8&query=%EC%97%90%EB%84%A4%EC%8A%A4&x=0&y=0";
 
 	private static NaverRealtimeSearchFactory nb;
-	private static CloseableHttpResponse response;
-	private static CloseableHttpClient httpclient;
-	private static HttpGet httpGet;
 
 	public static NaverRealtimeSearchFactory getInstance() {
 		if (nb == null) {
-			httpGet = new HttpGet(NAVER_REALTIME_URL);
-			System.out.println(NAVER_REALTIME_URL);
-			httpclient = HttpClients.createDefault();
 			nb = new NaverRealtimeSearchFactory();
-
-			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-
-					try {
-						if (httpclient != null) {
-							httpclient.close();
-						}
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-				}
-			}));
 		}
 		return nb;
 	}
 
 	/**
 	 * 네이버 실시간 검색어 호출 </br>
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 17.
 	 * @return
 	 * @throws Exception
 	 */
 	public List<String> getRealtimeSearch() throws Exception {
-		BufferedReader br = null;
-		StringBuffer sb = new StringBuffer();
 
 		/* 검색어 결과 List */
 		List<String> rsltDVOList = null;
 
-		try {
-			int statusCode = -1;
-			int cnt = 0;
+		String realtimeSearch = getDrityString();
 
-			while (statusCode != 200) {
+		parse(realtimeSearch);
+
+		/* 텍스트의 내용을 기존 네이버 OPEN API처럼 가공 */
+		realtimeSearch = makePrettyFormat(realtimeSearch);
+
+		/* 검색결과 임시파일 저장 */
+
+		/* 저장에 성공한경우 realtimeSearch 이용 */
+		// if (BaseUtil.isNotEmpty(createFileNm))
+		// {
+		rsltDVOList = parsingOnlyName(realtimeSearch);
+
+		return rsltDVOList;
+
+	}
+
+	public List<RealtimeSearchVO> getRealtimeSearchMeta() throws Exception {
+		String realtimeSearch = getDrityString();
+		return parse(realtimeSearch);
+	}
+
+	private String getDrityString() throws Exception, MalformedURLException {
+		String realtimeSearch = RequestUtil.reqeustSSL(new URL(NAVER_REALTIME_URL), (is, code) -> {
+			int cnt = 0;
+			do {
 				if (cnt == 5) {
 					break;
 				}
 
-				if (NetworkUtil.isUseProxy()) {
-					HttpHost proxy = NetworkUtil.getProxyHost();
-					response = httpclient.execute(proxy, httpGet);
-				} else {
-					response = httpclient.execute(httpGet);
+				try {
+					return ValueUtil.toString(is);
+				} catch (Exception e) {
+					LOGGER.error(ValueUtil.toString(e));
 				}
 
-				StatusLine statusLine = response.getStatusLine();
-				statusCode = statusLine.getStatusCode();
-				Thread.sleep(100);
+				try {
+					Thread.sleep(100);
+				} catch (Exception e) {
+				}
+
 				cnt++;
-			}
-			HttpEntity entity = response.getEntity();
+			} while ((code != 200));
 
-			br = new BufferedReader(new InputStreamReader(entity.getContent(), "UTF-8"));
-
-			String temp = null;
-			while ((temp = br.readLine()) != null) {
-				sb.append(temp).append("\n");
-			}
-
-			EntityUtils.consume(response.getEntity());
-
-			String realtimeSearch = sb.toString();
-
-			// createFile(realtimeSearch);
-
-			/* 텍스트의 내용을 기존 네이버 OPEN API처럼 가공 */
-			realtimeSearch = makePrettyFormat(realtimeSearch);
-
-			/* 검색결과 임시파일 저장 */
-
-			/* 저장에 성공한경우 realtimeSearch 이용 */
-			// if (BaseUtil.isNotEmpty(createFileNm))
-			// {
-			rsltDVOList = parsingOnlyName(realtimeSearch);
-
-		} finally {
-
-		}
-		return rsltDVOList;
+			return "";
+		});
+		return realtimeSearch;
 	}
 
 	/**
 	 * 2014. 6. 10. Administrator </br>
-	 * 
+	 *
 	 * @param content
 	 * @return
 	 * @throws Exception
@@ -231,6 +212,49 @@ final class NaverRealtimeSearchFactory {
 
 	}
 
+	public List<RealtimeSearchVO> parse(String htmlBody) {
+		Document doc = Jsoup.parse(htmlBody);
+
+		Elements r = doc.select("[class*='realtime_srch']");
+
+		Elements select = r.select(".lst_realtime_srch");
+
+		List<RealtimeSearchVO> realtimeSearchItems = select.stream().map(e -> {
+
+			RealtimeSearchVO realtimeSearchVO = null;
+			Element previousElementSibling = e.previousElementSibling();
+			if (previousElementSibling != null) {
+				realtimeSearchVO = new RealtimeSearchVO();
+				realtimeSearchVO.setTitle(previousElementSibling.text());
+
+				Elements liTags = e.getElementsByTag("li");
+				List<RealtimeSearchItemVO> items = liTags.stream().map(li -> {
+					RealtimeSearchItemVO item = new RealtimeSearchItemVO();
+
+					Element aTag = li.getElementsByTag("a").first();
+					Elements elementsByAttribute = aTag.getElementsByAttribute("href");
+					String url = elementsByAttribute.attr("href");
+
+					Element numElement = li.getElementsByClass("num").first();
+					String num = numElement.text();
+					Element titElement = li.getElementsByClass("tit").first();
+					String title = titElement.text();
+
+					item.setRank(Integer.parseInt(num, 10));
+					item.setKeyword(title);
+					item.setLink(url);
+					LOGGER.debug("title [{}] num [{}]  url : [{}] , toString : {}", title, num, url, li.toString());
+					return item;
+				}).collect(Collectors.toList());
+
+				realtimeSearchVO.setItems(items);
+			}
+
+			return realtimeSearchVO;
+		}).filter(v -> v != null).collect(Collectors.toList());
+		return realtimeSearchItems;
+	}
+
 	/**
 	 * URL파싱결과 필요한부분만 GET
 	 *
@@ -238,6 +262,7 @@ final class NaverRealtimeSearchFactory {
 	 * @return
 	 */
 	public String makePrettyFormat(String content) {
+
 		int indexOf = content.indexOf(STRONG_CLASS_TEXT); /* 검색어 시작부 */
 		int lastIndexOf = content.indexOf(P_CLASS_RTRANK_DATE); /* 검색어 종료부 */
 		return content.substring(indexOf, lastIndexOf);

@@ -7,27 +7,16 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.io.File;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 
 /**
  *
@@ -143,4 +132,15 @@ public class FxClipboardUtil {
 	public static void installCopyPasteHandler(TableView<?> table) {
 		FxTableClipboardUtil.installCopyPasteHandler(table);
 	}
+
+	/**
+	 * 트리뷰  copy & paste 기능을 추가한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 16.
+	 * @param table
+	 */
+	public static void installCopyPasteHandler(TreeView<?> table) {
+		FxTreeViewClipboardUtil.installCopyPasteHandler(table);
+	}
+
 }

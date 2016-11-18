@@ -296,6 +296,11 @@ public class CommandTest3 {
 
 		System.out.println(revision + "  ->  " + listEntry.size());
 		System.out.println("-1  -> " + listEntry2.size());
+
+
+		listEntry2.forEach(System.out::println);
+
+		testServerManager.listEntry("", "-1", false, null).forEach(System.err::println);;
 		//			listEntry.forEach(v -> {
 		//
 		//				System.out.println("#######################################hello");
