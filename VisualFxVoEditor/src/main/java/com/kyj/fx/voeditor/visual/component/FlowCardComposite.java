@@ -10,7 +10,6 @@ import com.jfoenix.controls.JFXMasonryPane;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -25,6 +24,7 @@ public class FlowCardComposite extends BorderPane {
 	private ScrollPane scrollPane;
 
 	private JFXMasonryPane masonryPane;
+	
 
 	/**
 	 * @param nodeConverter
@@ -39,11 +39,12 @@ public class FlowCardComposite extends BorderPane {
 		masonryPane = new JFXMasonryPane();
 
 		scrollPane.setContent(masonryPane);
-
+	
 		setCenter(stackPane);
 
 		initialize();
 
+		setStyle("-fx-background-color : #292929");
 	}
 
 	public void setLimitColumn(int limitColumn) {

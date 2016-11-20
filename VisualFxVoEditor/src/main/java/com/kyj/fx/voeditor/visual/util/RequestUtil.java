@@ -14,6 +14,7 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -61,21 +62,39 @@ public class RequestUtil {
 
 		@Override
 		public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-			LOGGER.debug("######################");
-			LOGGER.debug("checkClientTrusted");
+//			LOGGER.debug("######################");
+//			LOGGER.debug("checkClientTrusted");
 			LOGGER.debug(arg1);
-			LOGGER.debug("######################");
+//			LOGGER.debug("######################");
 		}
 
 		@Override
 		public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-			LOGGER.debug("########################################################################################");
-			LOGGER.debug("checkServerTrusted");
-			LOGGER.debug(arg1);
+//			LOGGER.debug("########################################################################################");
+//			LOGGER.debug("checkServerTrusted");
+//			LOGGER.debug(arg1);
 
-			// Stream.of(arg0).forEach(System.out::println);
+			boolean present = Stream.of(arg0).filter(v -> {
 
-			LOGGER.debug("########################################################################################");
+				switch (v.getSigAlgName()) {
+				case "SHA256withRSA":
+					return true;
+				case "SHA384withECDSA":
+					return true;
+				case "SHA384withRSA":
+					return true;
+				}
+
+				return false;
+			}).findFirst().isPresent();
+
+			if (!present) {
+				LOGGER.debug("Can't not found Truested Algorisms ");
+				Stream.of(arg0).forEach(v -> LOGGER.warn(v.getSigAlgName()));
+				throw new CertificateException();
+			}
+
+//			LOGGER.debug("########################################################################################");
 		}
 
 		@Override
@@ -84,8 +103,7 @@ public class RequestUtil {
 		}
 	}
 
-	public static String reqeustSSL_JSONString(URL url, BiFunction<InputStream, Integer, String> response)
-			throws Exception {
+	public static String reqeustSSL_JSONString(URL url, BiFunction<InputStream, Integer, String> response) throws Exception {
 		return reqeustSSL(url, (is, code) -> {
 			String dirtyConent = "";
 			if (200 == code) {
@@ -122,8 +140,7 @@ public class RequestUtil {
 			conn.setDefaultUseCaches(true);
 			conn.setUseCaches(true);
 
-			conn.setRequestProperty("User-Agent",
-					"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
+			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
 			conn.setRequestProperty("Accept-Encoding", "UTF-8");
 			// conn.setRequestProperty("Connection", "keep-alive");
 
@@ -189,8 +206,7 @@ public class RequestUtil {
 			conn.setDefaultUseCaches(true);
 			conn.setUseCaches(true);
 
-			conn.setRequestProperty("User-Agent",
-					"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
+			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
 			conn.setRequestProperty("Accept-Encoding", "UTF-8");
 			// conn.setRequestProperty("Connection", "keep-alive");
 

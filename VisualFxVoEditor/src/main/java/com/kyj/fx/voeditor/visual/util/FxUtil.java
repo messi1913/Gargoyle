@@ -85,11 +85,17 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.transform.Scale;
+import javafx.scene.web.PopupFeatures;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebEvent;
+import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
+import javafx.util.Pair;
 
 /**
  * Javafx UI 관련 유틸리티 클래스
@@ -117,14 +123,15 @@ public class FxUtil {
 			Font.loadFont(ClassLoader.getSystemResource(FONTS_NANUMBARUNGOTHIC_TTF).openStream(), 12);
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
+
 	public static Font getBoldFont() {
 		return getBoldFont(12d);
 	}
+
 	public static Font getBoldFont(double fontSize) {
 		return Font.font("NANUMBARUNGOTHIC", FontWeight.BOLD, FontPosture.ITALIC, fontSize);
 	}
@@ -561,9 +568,10 @@ public class FxUtil {
 	 * @param parent
 	 * @param option
 	 */
-	//	public static void createStageAndShow(String title, Node parent, Consumer<Stage> option) {
-	//		createStageAndShow(title, new Scene(new BorderPane(parent)), option);
-	//	}
+	// public static void createStageAndShow(String title, Node parent,
+	// Consumer<Stage> option) {
+	// createStageAndShow(title, new Scene(new BorderPane(parent)), option);
+	// }
 
 	/**
 	 * @작성자 : KYJ
@@ -586,10 +594,10 @@ public class FxUtil {
 			}
 		});
 
-		//remove setOnCloseRequest   and then, addEventHandler
-		//		stage.setOnCloseRequest(ev -> {
+		// remove setOnCloseRequest and then, addEventHandler
+		// stage.setOnCloseRequest(ev -> {
 		//
-		//		});
+		// });
 		stage.show();
 	}
 
@@ -619,9 +627,9 @@ public class FxUtil {
 		} else {
 			option = stage -> {
 				stage.setTitle(title);
-				//				stage.setAlwaysOnTop(true);
-				//				stage.initModality(Modality.APPLICATION_MODAL);
-				//				stage.initOwner(stage);
+				// stage.setAlwaysOnTop(true);
+				// stage.initModality(Modality.APPLICATION_MODAL);
+				// stage.initOwner(stage);
 			};
 		}
 
@@ -726,7 +734,7 @@ public class FxUtil {
 
 		SnapshotParameters params = new SnapshotParameters();
 		params.setDepthBuffer(true);
-		//		params.setFill(Color.CORNSILK);
+		// params.setFill(Color.CORNSILK);
 
 		WritableImage wi = null;
 		if (requestWidth >= 0 || requestHeight >= 0) {
@@ -754,8 +762,8 @@ public class FxUtil {
 	 ********************************/
 	private static boolean snapShot(OutputStream out, WritableImage image) throws IOException {
 		return ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", out);
-		//		if (out != null)
-		//			out.close();
+		// if (out != null)
+		// out.close();
 	}
 
 	/********************************
@@ -768,19 +776,20 @@ public class FxUtil {
 	 ********************************/
 	public static void printJob(Window window, Node target) {
 		Printer printer = Printer.getDefaultPrinter();
-		//		PrinterAttributes printerAttributes = printer.getPrinterAttributes();
+		// PrinterAttributes printerAttributes = printer.getPrinterAttributes();
 		//
 		Paper a4 = Paper.A4;
 
-		//		Paper a4 = PrintHelper.createPaper("Rotate A4", Paper.A4.getHeight(), Paper.A4.getWidth(), Units.MM);
+		// Paper a4 = PrintHelper.createPaper("Rotate A4", Paper.A4.getHeight(),
+		// Paper.A4.getWidth(), Units.MM);
 		PageLayout pageLayout = printer.createPageLayout(a4, PageOrientation.REVERSE_PORTRAIT, MarginType.DEFAULT);
 
 		PrinterJob printerJob = PrinterJob.createPrinterJob();
 
-		//		JobSettings jobSettings = printerJob.getJobSettings();
-		//		jobSettings.setPrintSides(PrintSides.TUMBLE);
+		// JobSettings jobSettings = printerJob.getJobSettings();
+		// jobSettings.setPrintSides(PrintSides.TUMBLE);
 		ImageView imageView = new ImageView();
-		//화면 사이즈에 맞게 크기 조절.
+		// 화면 사이즈에 맞게 크기 조절.
 		Callback<SnapshotResult, Void> callback = param -> {
 			final WritableImage image = param.getImage();
 			imageView.setImage(image);
@@ -981,6 +990,7 @@ public class FxUtil {
 
 	/**
 	 * 편의성 처리를 위해 완성코드 리턴.
+	 * 
 	 * @author KYJ
 	 *
 	 */
@@ -1008,6 +1018,7 @@ public class FxUtil {
 
 		/**
 		 * 본문에 double dot(")로 인해 발생되는 이슈를 해결함.
+		 * 
 		 * @최초생성일 2016. 11. 10.
 		 */
 		private static final Function<String, String> smartDoubleDotConvert = str -> {
@@ -1044,7 +1055,7 @@ public class FxUtil {
 				}
 
 				if (!doubleDots.isEmpty()) {
-					//찾아낸 문자열들을 다시 재조합한후 리턴.
+					// 찾아낸 문자열들을 다시 재조합한후 리턴.
 					StringBuffer sb = new StringBuffer();
 					int arrayIdx = doubleDots.size();
 					int stringIdx = 0;
@@ -1066,6 +1077,7 @@ public class FxUtil {
 
 		/**
 		 * 어플리케이션 코드를 만들어주는 팝업을 보여준다.
+		 * 
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 9. 23.
 		 * @param sql
@@ -1074,27 +1086,28 @@ public class FxUtil {
 		public static void showApplicationCode(String sql) {
 
 			showApplicationCode(sql, smartDoubleDotConvert);
-			//			String[] split = sql.split("\n");
-			//			StringBuilder sb = new StringBuilder();
-			//			sb.append("StringBuffer sb = new StringBuffer();\n");
-			//			for (String str : split) {
-			//				sb.append("sb.append(\"").append(str).append("\\n").append("\");\n");
-			//			}
-			//			sb.append("sb.toString();");
+			// String[] split = sql.split("\n");
+			// StringBuilder sb = new StringBuilder();
+			// sb.append("StringBuffer sb = new StringBuffer();\n");
+			// for (String str : split) {
+			// sb.append("sb.append(\"").append(str).append("\\n").append("\");\n");
+			// }
+			// sb.append("sb.toString();");
 			//
-			//			LOGGER.debug(sb.toString());
+			// LOGGER.debug(sb.toString());
 			//
-			//			try {
-			//				new JavaTextView(sb.toString()).show(800, 500);
-			//			} catch (IOException e) {
-			//				LOGGER.error(ValueUtil.toString(e));
-			//			}
+			// try {
+			// new JavaTextView(sb.toString()).show(800, 500);
+			// } catch (IOException e) {
+			// LOGGER.error(ValueUtil.toString(e));
+			// }
 		}
 
 	}
 
 	/**
 	 * 툴팁 처리.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param v
@@ -1106,6 +1119,7 @@ public class FxUtil {
 
 	/**
 	 * TextField에 텍스트Auto Binding 설치
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 21.
 	 * @param textField
@@ -1127,6 +1141,7 @@ public class FxUtil {
 	 * Parent에서 filter의 조건에 맞는 노드들을 찾은후 리턴.
 	 *
 	 * visible true인 대상만 찾음.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 9. 20.
 	 * @param p
@@ -1144,14 +1159,15 @@ public class FxUtil {
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 11.
 	 * @param p
-	 * @param onlyVisible visible 속성에 맞는 노드들 리턴
+	 * @param onlyVisible
+	 *            visible 속성에 맞는 노드들 리턴
 	 * @param filter
 	 * @return
 	 */
 	public static List<Node> findAllByNodes(Parent p, boolean onlyVisible, Predicate<Node> filter) {
 		return p.getChildrenUnmodifiable().stream().flatMap(v -> {
 
-			//화면에 visible true인 대상만.
+			// 화면에 visible true인 대상만.
 			if (onlyVisible) {
 
 				if (v.isVisible()) {
@@ -1184,11 +1200,12 @@ public class FxUtil {
 
 	/**
 	 * 도킹기능이 제공되는 팝업을 로드함.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param owner
 	 * @param dockNode
-	 *     메인화면이 되는 노드.
+	 *            메인화면이 되는 노드.
 	 */
 	public static void createDockStageAndShow(Window owner, DockNode dockNode) {
 		createDockStageAndShow(owner, dockNode, null, true);
@@ -1196,11 +1213,12 @@ public class FxUtil {
 
 	/**
 	 * 도킹기능이 제공되는 팝업을 로드함.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param owner
 	 * @param dockNode
-	 * 		메인화면이 되는 노드.
+	 *            메인화면이 되는 노드.
 	 * @param center
 	 */
 	public static void createDockStageAndShow(Window owner, DockNode dockNode, boolean center) {
@@ -1209,6 +1227,7 @@ public class FxUtil {
 
 	/**
 	 * 도킹기능이 제공되는 팝업을 로드함.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param dockNode
@@ -1219,10 +1238,11 @@ public class FxUtil {
 
 	/**
 	 * 도킹기능이 제공되는 팝업을 로드함.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param dockNode
-	 * 		메인화면이 되는 노드.
+	 *            메인화면이 되는 노드.
 	 */
 	public static void createDockStageAndShow(Window owner, DockNode dockNode, Point2D initLocation, boolean center) {
 		dockNode.setOwner(owner);
@@ -1233,9 +1253,11 @@ public class FxUtil {
 
 	/**
 	 * 로딩바가 뜨면서 액션 처리.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 31.
-	 * @param action 사용자 처리 작업에 대한 코드 로직이 입력됨
+	 * @param action
+	 *            사용자 처리 작업에 대한 코드 로직이 입력됨
 	 * @return
 	 */
 	public static <K> K showLoading(Task<K> action) {
@@ -1244,26 +1266,97 @@ public class FxUtil {
 
 	/**
 	 * 로딩바가 뜨면서 액션 처리.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 31.
 	 * @param owner
-	 *   primaryStage에 대한 데이터가 입력되야함.
-	 *   (사이즈 및 너비, 높이 조절에 대한 메타데이터를 참조함)
+	 *            primaryStage에 대한 데이터가 입력되야함. (사이즈 및 너비, 높이 조절에 대한 메타데이터를 참조함)
 	 * @param action
-	 *   사용자 처리 작업에 대한 코드 로직이 입력됨
+	 *            사용자 처리 작업에 대한 코드 로직이 입력됨
 	 * @return
 	 */
 	public static <K> K showLoading(Window owner, Task<K> action) {
 
-		//비동기 로딩바
+		// 비동기 로딩바
 		GargoyleLoadBar<K> gargoyleSynchProgessPopup = new GargoyleSynchLoadBar<>(owner, action);
-		//비동기 로딩바
-		//		gargoyleSynchProgessPopup = new GargoyleASynchLoadBar<>(stage, task);
+		// 비동기 로딩바
+		// gargoyleSynchProgessPopup = new GargoyleASynchLoadBar<>(stage, task);
 
 		gargoyleSynchProgessPopup.setExecutor(GargoyleSynchLoadBar.newSingleThreadExecutor);
 		gargoyleSynchProgessPopup.start();
 
 		return gargoyleSynchProgessPopup.getValue();
+	}
+
+	/**
+	 * 브라우저 창 오픈
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 18.
+	 * @param link
+	 */
+	public static void openBrowser(String link) {
+
+		WebView view = new WebView();
+		WebEngine engine = view.getEngine();
+
+		engine.setJavaScriptEnabled(true);
+		engine.setCreatePopupHandler(new Callback<PopupFeatures, WebEngine>() {
+
+			@Override
+			public WebEngine call(PopupFeatures p) {
+
+				Stage stage = new Stage(StageStyle.UTILITY);
+				WebView wv2 = new WebView();
+
+				wv2.getEngine().setJavaScriptEnabled(true);
+
+				stage.setScene(new Scene(wv2, 1600, 1200));
+				stage.show();
+				return wv2.getEngine();
+			}
+		});
+
+		engine.setOnAlert(ev -> {
+			DialogUtil.showMessageDialog(ev.getData());
+		});
+		// engine.getLoadWorker().stateProperty().addListener(new
+		// ChangeListener<State>() {
+		// @Override
+		// public void changed(ObservableValue ov, State oldState, State
+		// newState) {
+		// if (newState == Worker.State.SUCCEEDED) {
+		// primaryStage.setTitle(engine.getLocation());
+		// }
+		// }
+		// });
+
+		engine.setConfirmHandler(new Callback<String, Boolean>() {
+
+			@Override
+			public Boolean call(String param) {
+				Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Confirm.", param);
+				if (showYesOrNoDialog.isPresent()) {
+					Pair<String, String> pair = showYesOrNoDialog.get();
+					if (pair == null)
+						return false;
+					return "Y".equals(pair.getValue());
+				}
+				return false;
+			}
+		});
+
+		engine.setOnAlert((WebEvent<String> wEvent) -> {
+			System.out.println("Alert Event  -  Message:  " + wEvent.getData());
+		});
+		engine.load(link);
+
+		FxUtil.createStageAndShow(new Scene(new BorderPane(view), 1200, 700), stage -> {
+
+		});
+		// primaryStage.setScene(new Scene(new BorderPane(view), 1200, 700));
+		// primaryStage.show();
+
 	}
 
 }

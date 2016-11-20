@@ -38,7 +38,15 @@ public class SystemPropertyInitializable implements Initializable {
 			Object value = properties.get(key);
 			LOGGER.debug(String.format("Key : %s Value : %s", key.toString(), value.toString()));
 		}
+		
+		networkSettings();
 
+	}
+
+	private void networkSettings() {
+		//1.7 부터는 SNI support의 부분이 기본적으로 enable 되어 있다
+		System.setProperty("jsse.enableSNIExtension", "false") ;
+		
 	}
 
 	void setFileEncoingInit() {

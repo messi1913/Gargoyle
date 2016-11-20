@@ -24,13 +24,14 @@ public class NrchRealtimeSearchExam extends Application {
 		launch(args);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see javafx.application.Application#start(javafx.stage.Stage)
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		NrchRealtimeSrchFlowComposite root = new NrchRealtimeSrchFlowComposite();
-		root.setPrefSize(NrchRealtimeSrchFlowComposite.USE_COMPUTED_SIZE, NrchRealtimeSrchFlowComposite.USE_COMPUTED_SIZE);
 		primaryStage.setScene(new Scene(root, 1200, 800));
 
 		primaryStage.show();

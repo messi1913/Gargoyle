@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component;
 
-import java.awt.Font;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -19,11 +18,13 @@ import com.kyj.fx.voeditor.visual.suppliers.NaverRealtimeSrchSupplier;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Priority;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextFlow;
 
 /**
  * @author KYJ
@@ -32,6 +33,7 @@ import javafx.scene.text.TextFlow;
 public class NrchRealtimeSrchFlowComposite extends FlowCardComposite {
 
 	private AtomicInteger atomicInteger = new AtomicInteger(0);
+	private ChoiceBox<Integer> choWaitItems;
 
 	private Function<RealtimeSearchVO, List<VBox>> nodeConverter = v -> {
 
@@ -44,28 +46,35 @@ public class NrchRealtimeSrchFlowComposite extends FlowCardComposite {
 			lblCont.setMaxWidth(Double.MAX_VALUE);
 			lblCont.setMaxHeight(Double.MAX_VALUE);
 			lblCont.setAlignment(Pos.CENTER);
-//			lblCont.setStyle("-fx-background-color : green");
 			lblCont.setFont(FxUtil.getBoldFont());
-			VBox.setVgrow(lblCont, Priority.ALWAYS);
+			VBox.setVgrow(lblCont, javafx.scene.layout.Priority.ALWAYS);
 			Label lblTitle = new Label(String.format("[%s]\n", v.getTitle()));
 			lblTitle.setStyle("-fx-background-color : #E9E9E9 ; -fx-font-fill : white;");
-//			lblTitle.setMaxWidth(Double.MAX_VALUE);
 			VBox vBox = new VBox(lblTitle, lblCont);
 
-//
-			//			TextFlow textFlow = new TextFlow(vBox);
-
-			//						Label label = new Label(String.format("주제 : [%s]\n%d. - %s", v.getTitle(), obj.getRank(), obj.getKeyword()));
-			//						label.setWrapText(true);
-			//						label.setAlignment(Pos.CENTER);
 			vBox.setStyle("-fx-background-color: " + getDefaultColor(andIncrement % 12));
-			//			label.setUserData(obj);
-			//				label.setMinWidth(120d);
 			vBox.setMaxWidth(500d);
-			//				label.setPrefWidth(150d);C
-			//				label.setMinHeight(70d);
+
 			vBox.setMaxHeight(100d);
-			//				label.setPrefHeight(80d);
+
+			vBox.setOnMouseClicked(ev -> {
+
+				if (ev.getClickCount() == 1 && MouseButton.PRIMARY == ev.getButton()) {
+					if (ev.isConsumed())
+						return;
+
+					String link = obj.getLink();
+					FxUtil.openBrowser("https:" + link);
+					ev.consume();
+				}
+
+			});
+			vBox.setOnMouseEntered(ev -> {
+				vBox.setCursor(Cursor.HAND);
+			});
+			vBox.setOnMouseExited(ev -> {
+				vBox.setCursor(Cursor.DEFAULT);
+			});
 
 			return vBox;
 		}).collect(Collectors.toList());
@@ -82,6 +91,19 @@ public class NrchRealtimeSrchFlowComposite extends FlowCardComposite {
 	}
 
 	protected void init() {
+
+		choWaitItems = new ChoiceBox<>(FXCollections.observableArrayList(5, 10, 15, 20, 25, 30));
+		setTop(choWaitItems);
+		choWaitItems.setOnAction(ev -> {
+			Integer selectedItem = choWaitItems.getSelectionModel().getSelectedItem();
+
+			
+			
+		});
+		reload();
+	}
+
+	private void reload() {
 		Platform.runLater(() -> {
 			setLimitColumn(20);
 			List<RealtimeSearchVO> meta = NaverRealtimeSrchSupplier.getInstance().getMeta();
@@ -94,7 +116,7 @@ public class NrchRealtimeSrchFlowComposite extends FlowCardComposite {
 		String color = "#B5E61D";
 		switch (i) {
 		case 0:
-			color = "#EBCA2F"; //"#8F3F7E";
+			color = "#EBCA2F"; // "#8F3F7E";
 			break;
 		case 1:
 			color = "#B5305F";
