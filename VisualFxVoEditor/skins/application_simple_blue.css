@@ -15,6 +15,12 @@ HBox Label
 	-fx-fill:#FFFFFF;
 }
 
+HBox CheckBox
+{
+	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
+}
+
 HBox > .radio-button > .text
 {
 	-fx-text-fill:#FFFFFF;
