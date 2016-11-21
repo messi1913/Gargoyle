@@ -23,6 +23,7 @@ import com.kyj.fx.voeditor.visual.component.FileWrapper;
 import com.kyj.fx.voeditor.visual.component.ImageViewPane;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.component.JavaProjectMemberFileTreeItem;
+import com.kyj.fx.voeditor.visual.component.NrchRealtimeSrchFlowComposite;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
 import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
@@ -1409,7 +1410,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				addTabItem(tab);
 				tabPanWorkspace.getSelectionModel().select(tab);
 
-				tab.setOnCloseRequest(ev ->{
+				tab.setOnCloseRequest(ev -> {
 					try {
 						LOGGER.debug("closeable parent on close request");
 						parent.close();
@@ -1740,8 +1741,12 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 4.
 	 */
-	public void lblGoogleTrendOnAction(){
+	public void lblGoogleTrendOnAction() {
 		loadNewSystemTab("Google Trend", new GoogleTrendComposite());
+	}
+
+	public void lblNaverRschOnAction() {
+		loadNewSystemTab("네이버 실시간 검색어", new NrchRealtimeSrchFlowComposite());
 	}
 
 	/*

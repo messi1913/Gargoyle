@@ -24,7 +24,7 @@ public class FlowCardComposite extends BorderPane {
 	private ScrollPane scrollPane;
 
 	private JFXMasonryPane masonryPane;
-	
+
 
 	/**
 	 * @param nodeConverter
@@ -34,16 +34,18 @@ public class FlowCardComposite extends BorderPane {
 		scrollPane = new ScrollPane();
 		scrollPane.setFitToHeight(true);
 		scrollPane.setFitToWidth(true);
+		scrollPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		StackPane stackPane = new StackPane(scrollPane);
-
+		stackPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		masonryPane = new JFXMasonryPane();
 
 		scrollPane.setContent(masonryPane);
-	
+
 		setCenter(stackPane);
 
 		initialize();
 
+		masonryPane.setCache(false);
 		setStyle("-fx-background-color : #292929");
 	}
 

@@ -68,7 +68,8 @@ public class TFIDF {
 					return "";
 				});
 
-//				File file = new File("C:\\Users\\KYJ\\.git\\Gargoyle\\VisualFxVoEditor\\log\\fxeditor-2016-11-07.log");
+
+		//				File file = new File("C:\\Users\\KYJ\\.git\\Gargoyle\\VisualFxVoEditor\\log\\fxeditor-2016-11-07.log");
 		//		String str1 = sb.toString();//FileUtil.readFile(file, null);
 		TF_IDF tf_IDF = new TF_IDF(new String[] { reqeustSSL });
 		String[] words = tf_IDF.getWordVector();
@@ -94,9 +95,9 @@ public class TFIDF {
 				}
 			}
 
-			//			for (int i = 0; i < tfIdf.length; i++) {
-			//				System.out.printf("%s - %f\n", words[i], tfIdf[i]);
-			//			}
+			for (int i = 0; i < tfIdf.length; i++) {
+				System.out.printf("%s - %f\n", words[i], tfIdf[i]);
+			}
 		}
 
 	}

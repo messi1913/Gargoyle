@@ -990,7 +990,7 @@ public class FxUtil {
 
 	/**
 	 * 편의성 처리를 위해 완성코드 리턴.
-	 * 
+	 *
 	 * @author KYJ
 	 *
 	 */
@@ -1018,7 +1018,7 @@ public class FxUtil {
 
 		/**
 		 * 본문에 double dot(")로 인해 발생되는 이슈를 해결함.
-		 * 
+		 *
 		 * @최초생성일 2016. 11. 10.
 		 */
 		private static final Function<String, String> smartDoubleDotConvert = str -> {
@@ -1077,7 +1077,7 @@ public class FxUtil {
 
 		/**
 		 * 어플리케이션 코드를 만들어주는 팝업을 보여준다.
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 9. 23.
 		 * @param sql
@@ -1107,7 +1107,7 @@ public class FxUtil {
 
 	/**
 	 * 툴팁 처리.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param v
@@ -1119,7 +1119,7 @@ public class FxUtil {
 
 	/**
 	 * TextField에 텍스트Auto Binding 설치
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 21.
 	 * @param textField
@@ -1141,7 +1141,7 @@ public class FxUtil {
 	 * Parent에서 filter의 조건에 맞는 노드들을 찾은후 리턴.
 	 *
 	 * visible true인 대상만 찾음.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 9. 20.
 	 * @param p
@@ -1200,7 +1200,7 @@ public class FxUtil {
 
 	/**
 	 * 도킹기능이 제공되는 팝업을 로드함.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param owner
@@ -1213,7 +1213,7 @@ public class FxUtil {
 
 	/**
 	 * 도킹기능이 제공되는 팝업을 로드함.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param owner
@@ -1227,7 +1227,7 @@ public class FxUtil {
 
 	/**
 	 * 도킹기능이 제공되는 팝업을 로드함.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param dockNode
@@ -1238,7 +1238,7 @@ public class FxUtil {
 
 	/**
 	 * 도킹기능이 제공되는 팝업을 로드함.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 * @param dockNode
@@ -1253,7 +1253,7 @@ public class FxUtil {
 
 	/**
 	 * 로딩바가 뜨면서 액션 처리.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 31.
 	 * @param action
@@ -1266,7 +1266,7 @@ public class FxUtil {
 
 	/**
 	 * 로딩바가 뜨면서 액션 처리.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 31.
 	 * @param owner
@@ -1288,14 +1288,17 @@ public class FxUtil {
 		return gargoyleSynchProgessPopup.getValue();
 	}
 
+	private static final double BROWSER_WIDTH = 1400d;
+	private static final double BROWSER_HEIGHT = 900d;
+
 	/**
 	 * 브라우저 창 오픈
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 18.
 	 * @param link
 	 */
-	public static void openBrowser(String link) {
+	public static void openBrowser(Node parent, String link) {
 
 		WebView view = new WebView();
 		WebEngine engine = view.getEngine();
@@ -1306,12 +1309,13 @@ public class FxUtil {
 			@Override
 			public WebEngine call(PopupFeatures p) {
 
-				Stage stage = new Stage(StageStyle.UTILITY);
+				Stage stage = new Stage();
 				WebView wv2 = new WebView();
 
 				wv2.getEngine().setJavaScriptEnabled(true);
 
-				stage.setScene(new Scene(wv2, 1600, 1200));
+				stage.setScene(new Scene(wv2, BROWSER_WIDTH, BROWSER_HEIGHT));
+				stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
 				stage.show();
 				return wv2.getEngine();
 			}
@@ -1320,16 +1324,6 @@ public class FxUtil {
 		engine.setOnAlert(ev -> {
 			DialogUtil.showMessageDialog(ev.getData());
 		});
-		// engine.getLoadWorker().stateProperty().addListener(new
-		// ChangeListener<State>() {
-		// @Override
-		// public void changed(ObservableValue ov, State oldState, State
-		// newState) {
-		// if (newState == Worker.State.SUCCEEDED) {
-		// primaryStage.setTitle(engine.getLocation());
-		// }
-		// }
-		// });
 
 		engine.setConfirmHandler(new Callback<String, Boolean>() {
 
@@ -1351,11 +1345,9 @@ public class FxUtil {
 		});
 		engine.load(link);
 
-		FxUtil.createStageAndShow(new Scene(new BorderPane(view), 1200, 700), stage -> {
-
+		FxUtil.createStageAndShow(new Scene(new BorderPane(view), BROWSER_WIDTH, BROWSER_HEIGHT), stage -> {
+			stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
 		});
-		// primaryStage.setScene(new Scene(new BorderPane(view), 1200, 700));
-		// primaryStage.show();
 
 	}
 
