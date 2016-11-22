@@ -53,8 +53,11 @@ import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker.State;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
@@ -78,6 +81,8 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -91,7 +96,6 @@ import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -1297,8 +1301,9 @@ public class FxUtil {
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 18.
 	 * @param link
+	 * @return
 	 */
-	public static void openBrowser(Node parent, String link) {
+	public static WebView openBrowser(Node parent, String link) {
 
 		WebView view = new WebView();
 		WebEngine engine = view.getEngine();
@@ -1309,15 +1314,18 @@ public class FxUtil {
 			@Override
 			public WebEngine call(PopupFeatures p) {
 
-				Stage stage = new Stage();
-				WebView wv2 = new WebView();
-
-				wv2.getEngine().setJavaScriptEnabled(true);
-
-				stage.setScene(new Scene(wv2, BROWSER_WIDTH, BROWSER_HEIGHT));
-				stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
-				stage.show();
-				return wv2.getEngine();
+//				Stage stage = new Stage();
+//				WebView wv2 = new WebView();
+//
+//				wv2.getEngine().setJavaScriptEnabled(true);
+//
+//				stage.setScene(new Scene(wv2, BROWSER_WIDTH, BROWSER_HEIGHT));
+//				stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
+//				stage.show();
+				
+				WebView openBrowser = openBrowser(view, "");
+				
+				return openBrowser.getEngine();
 			}
 		});
 
@@ -1345,10 +1353,30 @@ public class FxUtil {
 		});
 		engine.load(link);
 
-		FxUtil.createStageAndShow(new Scene(new BorderPane(view), BROWSER_WIDTH, BROWSER_HEIGHT), stage -> {
+		BorderPane root = new BorderPane(view);
+		TextField txtLink = new TextField(link);
+		txtLink.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
+			if (KeyCode.ENTER == ev.getCode())
+				engine.load(txtLink.getText());
+		});
+		root.setTop(txtLink);
+
+		engine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
+
+			@Override
+			public void changed(ObservableValue<? extends State> observable, State oldValue, State newValue) {
+//				if (newValue == State.SUCCEEDED) {
+					String location = engine.getLocation();
+					txtLink.setText(location);
+//				}
+			}
+		});
+
+		FxUtil.createStageAndShow(new Scene(root, BROWSER_WIDTH, BROWSER_HEIGHT), stage -> {
 			stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
 		});
 
+		return view;
 	}
 
 }
