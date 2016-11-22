@@ -459,7 +459,6 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				@Override
 				public void close() throws IOException {
 					LOGGER.debug("Close doc . reuqest ");
-					super.close();
 					getParent().close();
 				}
 			};
@@ -1746,7 +1745,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	}
 
 	public void lblNaverRschOnAction() {
-		loadNewSystemTab("네이버 실시간 검색어", new NrchRealtimeSrchFlowComposite());
+		loadNewSystemTab(NrchRealtimeSrchFlowComposite.TITLE , new NrchRealtimeSrchFlowComposite());
 	}
 
 	/*

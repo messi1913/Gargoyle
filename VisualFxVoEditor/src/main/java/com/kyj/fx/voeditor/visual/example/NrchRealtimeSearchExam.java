@@ -32,7 +32,7 @@ public class NrchRealtimeSearchExam extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		NrchRealtimeSrchFlowComposite root = new NrchRealtimeSrchFlowComposite();
-		primaryStage.setScene(new Scene(root, 1200, 800));
+		primaryStage.setScene(new Scene(root.getParent(), 1200, 800));
 		primaryStage.show();
 
 	}

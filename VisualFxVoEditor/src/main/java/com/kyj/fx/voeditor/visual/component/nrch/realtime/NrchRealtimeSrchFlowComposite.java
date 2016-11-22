@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.nrch.realtime;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,17 +14,25 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.kyj.fx.voeditor.visual.component.FlowCardComposite;
 import com.kyj.fx.voeditor.visual.component.google.trend.GoogleTrendComposite;
 import com.kyj.fx.voeditor.visual.framework.RealtimeSearchItemVO;
 import com.kyj.fx.voeditor.visual.framework.RealtimeSearchVO;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
+import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.suppliers.NaverRealtimeSrchSupplier;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -35,9 +44,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -47,11 +58,56 @@ import javafx.scene.layout.VBox;
  * @author KYJ
  *
  */
-public class NrchRealtimeSrchFlowComposite extends BorderPane {
+public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
+	public static final String TITLE = "네이버 실시간 검색어";
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(NrchRealtimeSrchFlowComposite.class);
+	/**
+	 * 네이버 실시간 검색어간에 데이터 그룹별ㄹ 색상을 입힘.
+	 * @최초생성일 2016. 11. 22.
+	 */
 	private AtomicInteger atomicInteger = new AtomicInteger(0);
-	//	private ChoiceBox<String> choWaitItems;
+	/**
+	 * @최초생성일 2016. 11. 22.
+	 */
+	private ChoiceBox<String> choWaitItems;
+	/**
+	 * 검색어 요청 처리 시간이 입력되는 라벨.
+	 * @최초생성일 2016. 11. 22.
+	 */
+	private Label lblRequestTime = new Label();;
 
+	/**
+	 * UI에 인기검색어 카드가 배치되는 Composite의 주소값을 담고있는 property 객체.
+	 * @최초생성일 2016. 11. 22.
+	 */
+	private ObjectProperty<FlowCardComposite> flowCardComposite = new SimpleObjectProperty<>();
+
+	/**
+	 * Network 연결처리와 UI간의 비동기 처리를 적용하기위한 Executor클래스.
+	 * @최초생성일 2016. 11. 22.
+	 */
+	private static final ExecutorService gargoyleThreadExecutors = ExecutorDemons.newFixedThreadExecutor(1);
+
+	/**
+	 * 실시간 검색어 처리에 대한 코드 구현부
+	 * @최초생성일 2016. 11. 22.
+	 */
+	private Service<List<RealtimeSearchVO>> service;
+
+	/**
+	 * 실시간 검색어 결과의 임시 데이터 보관소.
+	 * @최초생성일 2016. 11. 22.
+	 */
+	private ObservableList<RealtimeSearchVO> data = FXCollections.observableArrayList();
+
+	private BooleanProperty isRecycle = new SimpleBooleanProperty(false);
+	/**
+	 * FlowCardComposite 에 데이터가 입력되면 UI로 컨버팅 처리할
+	 * Node를 구현하는 부분.
+	 * @최초생성일 2016. 11. 22.
+	 */
 	private Function<RealtimeSearchVO, List<VBox>> nodeConverter = v -> {
 
 		final int andIncrement = atomicInteger.getAndIncrement();
@@ -81,7 +137,7 @@ public class NrchRealtimeSrchFlowComposite extends BorderPane {
 						return;
 
 					String link = obj.getLink();
-					FxUtil.openBrowser(this, "https:" + link);
+					FxUtil.openBrowser(this.getParent(), "https:" + link);
 					ev.consume();
 				}
 
@@ -113,7 +169,7 @@ public class NrchRealtimeSrchFlowComposite extends BorderPane {
 	 * @param nodeConverter
 	 */
 	public NrchRealtimeSrchFlowComposite() {
-		super();
+		super(new BorderPane());
 		init();
 
 	}
@@ -141,7 +197,7 @@ public class NrchRealtimeSrchFlowComposite extends BorderPane {
 							googleChartSearch((RealtimeSearchItemVO) userData);
 						});
 						contextMenu.getItems().add(menuGoogleTrend);
-						contextMenu.show(this.getScene().getWindow(), ev.getScreenX(), ev.getScreenY());
+						contextMenu.show(this.getParent().getScene().getWindow(), ev.getScreenX(), ev.getScreenY());
 					}
 				}
 
@@ -166,37 +222,71 @@ public class NrchRealtimeSrchFlowComposite extends BorderPane {
 
 	}
 
-	private ObjectProperty<FlowCardComposite> flowCardComposite = new SimpleObjectProperty<>();
-
-	private static final ExecutorService newFixedThreadExecutor = ExecutorDemons.newFixedThreadExecutor(1);
-
-	private Service<List<RealtimeSearchVO>> service;
-
-	private ObservableList<RealtimeSearchVO> data = FXCollections.observableArrayList();
-
 	protected void init() {
 
-		Label lblRequestTime = new Label();
 		lblRequestTime.setMaxHeight(Double.MAX_VALUE);
-		//		choWaitItems = new ChoiceBox<>(FXCollections.observableArrayList("", "5", "10", "15", "20", "25", "30"));
+		choWaitItems = new ChoiceBox<>(FXCollections.observableArrayList("", "5", "10", "15", "20", "25", "30"));
 
 		Button btnReload = new Button("Reload");
-
-		//		CheckBox chkTimer = new CheckBox("타이머 사용");
-		//		chkTimer.selectedProperty().addListener((oba, o, n) -> {
-		//			btnReload.setDisable(n.booleanValue());
-		//		});
-		//		chkTimer.setDisable(true);
 
 		HBox hboxItems = new HBox(5, /*choWaitItems, new Label("단위 (초)"), chkTimer, */btnReload, lblRequestTime);
 		hboxItems.setAlignment(Pos.CENTER_LEFT);
 		hboxItems.setPadding(new Insets(5));
-		setTop(hboxItems);
+
+		BorderPane borTop = new BorderPane();
+		Button btnStart = new Button("시작");
+		Button btnStop = new Button("중지");
+		btnStart.setDisable(true);
+		btnStop.setDisable(true);
+		borTop.setTop(new TitledPane("Timer", new HBox(5, choWaitItems, btnStart, btnStop)));
+		borTop.setCenter(hboxItems);
+		this.getParent().setTop(borTop);
 
 		btnReload.setOnAction(ev -> {
 			reload();
 		});
 
+		choWaitItems.valueProperty().addListener((oba, o, n) -> {
+
+			if (ValueUtil.isNotEmpty(n) && !isRecycle.get()) {
+				btnStart.setDisable(false);
+			} else {
+				btnStart.setDisable(true);
+			}
+		});
+
+		btnStart.setOnAction(e -> {
+			isRecycle.set(true);
+			service.restart();
+			btnStart.setDisable(true);
+			btnStop.setDisable(false);
+		});
+		btnStop.setOnAction(e -> {
+			isRecycle.set(false);
+			service.cancel();
+			btnStart.setDisable(false);
+			btnStop.setDisable(true);
+		});
+
+		isRecycle.addListener((oba, o, n) -> {
+			if (n) {
+				choWaitItems.setDisable(true);
+			} else {
+				choWaitItems.setDisable(false);
+			}
+
+		});
+		defineService();
+		service.start();
+
+		//		reload();
+	}
+
+	private void defineService() {
+
+		/*
+		 * 비동기 실시간 검색어 조회 처리가 기술.
+		 */
 		service = new Service<List<RealtimeSearchVO>>() {
 
 			@Override
@@ -213,13 +303,18 @@ public class NrchRealtimeSrchFlowComposite extends BorderPane {
 
 		};
 
-		service.setOnSucceeded(stat -> {
+		service.setOnCancelled(stat -> {
 
-			lblRequestTime.setText(String.format("조회 완료 시간 : %s", DateUtil.getCurrentDateString()));
+			if (State.CANCELLED == stat.getSource().getState()) {
+				LOGGER.debug("Cancel Requested");
+			}
+		});
+		service.setOnSucceeded(stat -> {
+			applyResponseTime(DateUtil.getCurrentDateString());
 			FlowCardComposite value = new FlowCardComposite();
 
 			flowCardComposite.set(value);
-			setCenter(flowCardComposite.get());
+			this.getParent().setCenter(flowCardComposite.get());
 			FlowCardComposite tmp = flowCardComposite.get();
 			ObservableList<Node> flowChildrens = tmp.getFlowChildrens();
 			tmp.setLimitColumn(20);
@@ -229,40 +324,86 @@ public class NrchRealtimeSrchFlowComposite extends BorderPane {
 			List<VBox> collect = data.stream().map(nodeConverter::apply).flatMap(v -> v.stream()).collect(Collectors.toList());
 			flowChildrens.setAll(collect);
 
-			//			if (chkTimer.isSelected()) {
-			//				String selectedItem = choWaitItems.getSelectionModel().getSelectedItem();
-			//				if (ValueUtil.isNotEmpty(selectedItem)) {
-			//					int waitMills = Integer.parseInt(selectedItem);
-			//					int waitSecond = waitMills * 1000;
-			//					if (waitSecond >= 1000) {
-			//
-			//						try {
-			//							Thread.sleep(waitSecond);
-			//							System.out.println("Reload");
-			//							service.restart();
-			//						} catch (Exception e) {
-			//							e.printStackTrace();
-			//						}
-			//					}
-			//
-			//				}
-			//			}
+			if (isRecycle.get()) {
+
+				WaitThread waitThread = new WaitThread(choWaitItems.getValue()) {
+
+					@Override
+					public boolean isContinue() {
+						return isRecycle.get();
+					}
+
+					@Override
+					public void execute() {
+						Platform.runLater(() -> {
+							if (isContinue())
+								service.restart();
+						});
+
+					}
+
+					@Override
+					public boolean isRecycle() {
+						return isRecycle.get();
+					}
+
+				};
+
+				waitThread.start();
+			}
+
 		});
 
-		service.setExecutor(newFixedThreadExecutor);
-		service.start();
+		service.setExecutor(gargoyleThreadExecutors);
+	}
 
-		//		choWaitItems.setOnAction(ev -> {
-		//			String selectedItem = choWaitItems.getSelectionModel().getSelectedItem();
-		//			if (ValueUtil.isNotEmpty(selectedItem)) {
-		//				chkTimer.setDisable(false);
-		//			} else {
-		//				chkTimer.setDisable(true);
-		//				chkTimer.setSelected(false);
-		//			}
-		//		});
+	abstract class WaitThread extends Thread {
 
-		reload();
+		private String waitSecond;
+
+		public WaitThread(String waitSecond) {
+			this.waitSecond = waitSecond;
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Thread#run()
+		 */
+		@Override
+		public void run() {
+
+			if (ValueUtil.isEmpty(waitSecond))
+				return;
+
+			//			while (isRecycle()) {
+			int ws = Integer.parseInt(waitSecond, 10);
+			for (int i = 0; i < ws; i++) {
+				if (isContinue()) {
+					try {
+						Thread.sleep(1000);
+					} catch (Exception e) {
+					}
+				}
+
+			}
+			execute();
+			//			}
+
+		}
+
+		public abstract boolean isContinue();
+
+		public abstract boolean isRecycle();
+
+		public abstract void execute();
+	}
+
+	/**
+	 * 실시간검색어 조회 완료된 시각이 라벨에 입력됨.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 22.
+	 */
+	private void applyResponseTime(String dateTimeString) {
+		lblRequestTime.setText(String.format("조회 완료 시간 : %s", dateTimeString));
 	}
 
 	/**
@@ -338,5 +479,17 @@ public class NrchRealtimeSrchFlowComposite extends BorderPane {
 			break;
 		}
 		return color;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.main.layout.CloseableParent#close()
+	 */
+	@Override
+	public void close() throws IOException {
+		if (service != null) {
+			isRecycle.set(false);
+			gargoyleThreadExecutors.shutdown();
+		}
+
 	}
 }

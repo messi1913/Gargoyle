@@ -70,8 +70,6 @@ public abstract class CloseableParent<T extends Parent> implements Closeable {
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
-	public void close() throws IOException {
-		LOGGER.debug("close");
-	}
+	public abstract void close() throws IOException;
 
 }
