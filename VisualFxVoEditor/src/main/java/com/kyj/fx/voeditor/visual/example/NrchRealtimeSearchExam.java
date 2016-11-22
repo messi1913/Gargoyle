@@ -6,7 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
-import com.kyj.fx.voeditor.visual.component.NrchRealtimeSrchFlowComposite;
+import com.kyj.fx.voeditor.visual.component.nrch.realtime.NrchRealtimeSrchFlowComposite;
 import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
 
 import javafx.application.Application;

@@ -23,7 +23,6 @@ import com.kyj.fx.voeditor.visual.component.FileWrapper;
 import com.kyj.fx.voeditor.visual.component.ImageViewPane;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.component.JavaProjectMemberFileTreeItem;
-import com.kyj.fx.voeditor.visual.component.NrchRealtimeSrchFlowComposite;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
 import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
@@ -35,6 +34,7 @@ import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
 import com.kyj.fx.voeditor.visual.component.file.FilePropertiesComposite;
 import com.kyj.fx.voeditor.visual.component.google.trend.GoogleTrendComposite;
+import com.kyj.fx.voeditor.visual.component.nrch.realtime.NrchRealtimeSrchFlowComposite;
 import com.kyj.fx.voeditor.visual.component.pmd.DesignerFxComposite;
 import com.kyj.fx.voeditor.visual.component.pmd.PMDCheckedListComposite;
 import com.kyj.fx.voeditor.visual.component.popup.BigTextView;
@@ -1742,7 +1742,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @작성일 : 2016. 11. 4.
 	 */
 	public void lblGoogleTrendOnAction() {
-		loadNewSystemTab("Google Trend", new GoogleTrendComposite());
+		loadNewSystemTab(GoogleTrendComposite.TITLE, new GoogleTrendComposite());
 	}
 
 	public void lblNaverRschOnAction() {

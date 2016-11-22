@@ -9,10 +9,10 @@ package com.kyj.fx.voeditor.visual.component.google.trend;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +35,7 @@ import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.RequestUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -56,22 +57,24 @@ import jfxtras.scene.layout.HBox;
 
 /**
  * 구글 트랜드를 표현하기 위한 컴포넌트
- * 
+ *
  * @author KYJ
  *
  */
 public class GoogleTrendComposite extends BorderPane {
 
+	public static final String TITLE = "Google Trend";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(GoogleTrendExam2.class);
 	/**
 	 * 검색 URL
-	 * 
+	 *
 	 * @최초생성일 2016. 11. 6.
 	 */
 	final String GOOGLE_SEARCH_URL_TEMPLATE = "https://www.google.co.kr/search?q=:keyword&biw=1920&bih=990&tbas=0&source=lnt&tbs=cdr%3A1,cd_min%3A:startDate,cd_max%3A:endDate&tbm=";
 	/**
 	 * 구글 트랜드 차트 URL
-	 * 
+	 *
 	 * @최초생성일 2016. 11. 6.
 	 */
 	final String GOOGLE_TREND_URL_TEMPLATE = "https://www.google.com/trends/fetchComponent?cid=TIMESERIES_GRAPH_0&export=3&q=:keywords#if($gprop)&gprop=:gprop#end#if($geo)&geo=:geo#end";
@@ -85,9 +88,15 @@ public class GoogleTrendComposite extends BorderPane {
 	private TilePane browserParent;
 	private WebView[] webViews = new WebView[] { new WebView(), new WebView(), new WebView(), new WebView() };
 
+	private TextField txtSrch1 = new TextField();
+	private TextField txtSrch2 = new TextField();
+	private TextField txtSrch3 = new TextField();
+	private TextField txtSrch4 = new TextField();
+
 	public GoogleTrendComposite() {
 		//텍스트 필드 정의
-		srchItems = new TextField[] { new TextField(), new TextField(), new TextField(), new TextField() };
+
+		srchItems = new TextField[] { txtSrch1, txtSrch2, txtSrch3, txtSrch4 };
 		//텍스트 필드 이벤트 정의
 		Stream.of(srchItems).forEach(t -> {
 			t.addEventHandler(KeyEvent.KEY_PRESSED, this::txtSrchItemOnKeyPress);
@@ -129,16 +138,16 @@ public class GoogleTrendComposite extends BorderPane {
 
 				List<ChartOverTooltip> collect = contents.stream().map(v -> v.getUserData()).filter(v -> v != null)
 						.map(v -> (ChartOverTooltip) v).sorted((a1, a2) -> {
-							try {
-								String xValue = a1.getData().getXValue();
-								Date date = DateUtil.toDate(xValue, "yyyy년 MM월");
-								String xValue2 = a2.getData().getXValue();
-								Date date2 = DateUtil.toDate(xValue2, "yyyy년 MM월");
-								return date.compareTo(date2);
-							} catch (Exception e) {
-							}
-							return 0;
-						}).limit(4).collect(Collectors.toList());
+					try {
+						String xValue = a1.getData().getXValue();
+						Date date = DateUtil.toDate(xValue, "yyyy년 MM월");
+						String xValue2 = a2.getData().getXValue();
+						Date date2 = DateUtil.toDate(xValue2, "yyyy년 MM월");
+						return date.compareTo(date2);
+					} catch (Exception e) {
+					}
+					return 0;
+				}).limit(4).collect(Collectors.toList());
 
 				browserParent.getChildren().clear();
 
@@ -158,32 +167,32 @@ public class GoogleTrendComposite extends BorderPane {
 						GargoyleSynchLoadBar<Integer> gargoyleSynchLoadBar = new GargoyleSynchLoadBar<>(FxUtil.getWindow(this),
 								new Task<Integer>() {
 
-									@Override
-									protected Integer call() throws Exception {
-										try {
-											try {
-												String xValue = tip.getData().getXValue();
-												Date date = DateUtil.toDate(xValue, "yyyy년 MM월");
-												Date start = DateUtil.getFirstDateOfMonth(date);
-												Date end = DateUtil.getLastDateOfMonth(date);
-												//											googoleSearchUrl =
-												String googoleSearchUrl2 = getGoogoleSearchUrl(tip.getColumnName(), start, end);
-												String content = loadContent(new URL(googoleSearchUrl2));
-												updateValue(i);
-												updateMessage(content);
-												//										updateMessage(googoleSearchUrl2);
+							@Override
+							protected Integer call() throws Exception {
+								try {
+									try {
+										String xValue = tip.getData().getXValue();
+										Date date = DateUtil.toDate(xValue, "yyyy년 MM월");
+										Date start = DateUtil.getFirstDateOfMonth(date);
+										Date end = DateUtil.getLastDateOfMonth(date);
+										//											googoleSearchUrl =
+										String googoleSearchUrl2 = getGoogoleSearchUrl(tip.getColumnName(), start, end);
+										String content = loadContent(new URL(googoleSearchUrl2));
+										updateValue(i);
+										updateMessage(content);
+										//										updateMessage(googoleSearchUrl2);
 
-											} catch (Exception e) {
-												e.printStackTrace();
-											}
-
-										} catch (Exception e) {
-											e.printStackTrace();
-										}
-										return i;
+									} catch (Exception e) {
+										e.printStackTrace();
 									}
 
-								});
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+								return i;
+							}
+
+						});
 
 						gargoyleSynchLoadBar.setOnSucceeded(work -> {
 
@@ -212,6 +221,44 @@ public class GoogleTrendComposite extends BorderPane {
 		setCenter(spMainContent);
 	}
 
+	public void searchKeywords(String keyword1) {
+		searchKeywords(keyword1, null);
+	}
+
+	public void searchKeywords(String keyword1, String keyword2) {
+		searchKeywords(keyword1, keyword2, null);
+	}
+
+	public void searchKeywords(String keyword1, String keyword2, String keyword3) {
+		searchKeywords(keyword1, keyword2, keyword3, null);
+	}
+
+	public void searchKeywords(String keyword1, String keyword2, String keyword3, String keyword4) {
+		List<String> keywords = new ArrayList<>();
+		if (ValueUtil.isNotEmpty(keyword1)) {
+			keywords.add(keyword1);
+		}
+		if (ValueUtil.isNotEmpty(keyword2)) {
+			keywords.add(keyword2);
+		}
+		if (ValueUtil.isNotEmpty(keyword3)) {
+			keywords.add(keyword3);
+		}
+		if (ValueUtil.isNotEmpty(keyword4)) {
+			keywords.add(keyword4);
+		}
+
+		IntStream.iterate(0, v -> v + 1).limit(keywords.size()).forEach(idx -> {
+			srchItems[idx].setText(keywords.get(idx));
+		});
+
+		Platform.runLater(() -> {
+			btnSrchOnAction(new ActionEvent());
+		});
+		//		btnSrchOnAction(new ActionEvent());
+
+	}
+
 	public void chkShowBrowserOnAction(ActionEvent e) {
 
 		//		if (chkShowBrowser.isSelected()) {
@@ -237,7 +284,7 @@ public class GoogleTrendComposite extends BorderPane {
 
 	/**
 	 * 검색 버튼 클릭 이벤트
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 4.
 	 * @param e
@@ -249,7 +296,7 @@ public class GoogleTrendComposite extends BorderPane {
 
 	/**
 	 * 텍스트필드 키 이벤트
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 4.
 	 * @param e

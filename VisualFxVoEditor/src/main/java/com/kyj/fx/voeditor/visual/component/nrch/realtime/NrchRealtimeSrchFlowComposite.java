@@ -4,7 +4,7 @@
  *	작성일   : 2016. 11. 18.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.component;
+package com.kyj.fx.voeditor.visual.component.nrch.realtime;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -13,9 +13,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.kyj.fx.voeditor.visual.component.FlowCardComposite;
+import com.kyj.fx.voeditor.visual.component.google.trend.GoogleTrendComposite;
 import com.kyj.fx.voeditor.visual.framework.RealtimeSearchItemVO;
 import com.kyj.fx.voeditor.visual.framework.RealtimeSearchVO;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.suppliers.NaverRealtimeSrchSupplier;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
@@ -32,9 +35,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -92,6 +96,13 @@ public class NrchRealtimeSrchFlowComposite extends BorderPane {
 				vBox.setCursor(Cursor.DEFAULT);
 			});
 
+			vBox.getChildren().forEach(n -> {
+				n.setMouseTransparent(true);
+				n.setFocusTraversable(false);
+			});
+
+			contextMenu(vBox);
+
 			return vBox;
 		}).collect(Collectors.toList());
 
@@ -104,19 +115,54 @@ public class NrchRealtimeSrchFlowComposite extends BorderPane {
 	public NrchRealtimeSrchFlowComposite() {
 		super();
 		init();
-		contextMenu();
+
 	}
 
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 21.
 	 */
-	private void contextMenu() {
-		this.addEventHandler(MouseEvent.MOUSE_PRESSED, ev -> {
+	private void contextMenu(Node target) {
+
+		target.setOnMousePressed(ev -> {
 			if (MouseButton.SECONDARY == ev.getButton()) {
+				if (ev.getClickCount() != 1) {
+					return;
+				}
+
+				if (ev.getSource() instanceof VBox) {
+					VBox tmp = (VBox) ev.getSource();
+					Object userData = tmp.getUserData();
+					if (userData != null) {
+						ContextMenu contextMenu = new ContextMenu();
+						MenuItem menuGoogleTrend = new MenuItem("구글 트랜드로 조회");
+
+						menuGoogleTrend.setOnAction(e -> {
+							googleChartSearch((RealtimeSearchItemVO) userData);
+						});
+						contextMenu.getItems().add(menuGoogleTrend);
+						contextMenu.show(this.getScene().getWindow(), ev.getScreenX(), ev.getScreenY());
+					}
+				}
 
 			}
 		});
+
+	}
+
+	/**
+	 * 구글 트랜드로 조회
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 22.
+	 * @param vo
+	 */
+	public void googleChartSearch(RealtimeSearchItemVO vo) {
+
+		if (vo != null) {
+			GoogleTrendComposite googleTrendComposite = new GoogleTrendComposite();
+			googleTrendComposite.searchKeywords(vo.getKeyword());
+			SharedMemory.getSystemLayoutViewController().loadNewSystemTab(GoogleTrendComposite.TITLE, googleTrendComposite);
+		}
 
 	}
 
@@ -170,7 +216,9 @@ public class NrchRealtimeSrchFlowComposite extends BorderPane {
 		service.setOnSucceeded(stat -> {
 
 			lblRequestTime.setText(String.format("조회 완료 시간 : %s", DateUtil.getCurrentDateString()));
-			flowCardComposite.set(new FlowCardComposite());
+			FlowCardComposite value = new FlowCardComposite();
+
+			flowCardComposite.set(value);
 			setCenter(flowCardComposite.get());
 			FlowCardComposite tmp = flowCardComposite.get();
 			ObservableList<Node> flowChildrens = tmp.getFlowChildrens();

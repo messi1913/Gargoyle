@@ -5,8 +5,9 @@
 	<property file="build.properties">
 	</property>
 
-	<echo message="basedir : ${basedir}"></echo>
-	
+	<echo message="basedir : ${basedir}">
+	</echo>
+
 	<!-- Inno Setup 파일 스크립트 생성 여기선 버젼 스크립트 자동화 처리내용이 포함됨 -->
 	<target name="create-iss-script" description="Create InnoScript.">
 		<copy tofile="../Gargoyle.iss" overwrite="true">
@@ -61,9 +62,14 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-<!-- 			<fileset dir="${basedir}\..\lib\tools"> -->
-			<fileset dir="${basedir}\..\lib\tools">    
+			<!-- 			<fileset dir="${basedir}\..\lib\tools"> -->
+			<fileset dir="${basedir}\..\lib\tools">
 				<filename name="tools.jar" />
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="${basedir}\..\lib\">
+				<filename name="customjfoenix.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
@@ -564,9 +570,12 @@
 				<filename name="jfoenix-1.0.0.jar" />
 			</fileset>
 		</copy>
-
 		<!-- [end] jfoenix -->
-
+		<copy todir="externalLibs">
+			<fileset dir="${m2.dir}\org\jsoup\jsoup\1.10.1">
+				<filename name="jsoup-1.10.1.jar" />
+			</fileset>
+		</copy>
 
 
 
@@ -658,6 +667,7 @@
 				<include name="spring-security-core-3.2.3.RELEASE.jar" />
 				<include name="jackson-core-2.4.2.jar" />
 				<include name="tools.jar" />
+				<include name="customjfoenix.jar" />
 				<include name="commons-collections-3.2.1.jar" />
 				<include name="spring-context-support-3.2.3.RELEASE.jar" />
 				<include name="logback-classic-1.1.2.jar" />
@@ -732,6 +742,7 @@
 				<include name="jfxtras-fxml-8.0-r5.jar" />
 
 				<include name="jfoenix-1.0.0.jar" />
+				<include name="jsoup-1.10.1.jar" />
 
 
 			</fileset>
@@ -806,7 +817,9 @@
 
 	<target name="do-deploy" depends="create-iss-script,setup-staging-area, do-compile, init-fx-tasks, fx-deploy">
 		<delete file="dist" />
-		<delete file="deploy" />
+		<delete dir="dist/libs" />
+		<delete dir="deploy" />
+
 
 		<mkdir dir="dist" />
 		<mkdir dir="dist/libs" />
@@ -870,7 +883,8 @@
 
 		<fx:application id="Gargoyle" name="Gargoyle" mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx" version="${product.version}">
 			<fx:argument>${product.version}</fx:argument>
-			<fx:param name="-Dfile.encoding" value="UTF-8"></fx:param>
+			<fx:param name="-Dfile.encoding" value="UTF-8">
+			</fx:param>
 		</fx:application>
 
 		<mkdir dir="build/classes/META-INF" />
@@ -912,13 +926,14 @@
 
 		<fx:deploy verbose="true" embedJNLP="false" extension="true" includeDT="false" offlineAllowed="true" outdir="${basedir}/deploy" outfile="Gargoyle" placeholderid="Gargoyle" nativeBundles="exe" updatemode="background">
 
-			<fx:platform basedir="${java.home}" >
-				<property name="file.encoding" value="UTF-8"></property>    
+			<fx:platform basedir="${java.home}">
+				<property name="file.encoding" value="UTF-8">
+				</property>
 			</fx:platform>
 			<fx:info title="Gargoyle" vendor="${vendor}" />
 			<fx:application refId="Gargoyle" />
 			<fx:resources refid="appRes" />
-<!-- 			<fx:preferences id="Gargoyle" install="true" shortcut="true"></fx:preferences> -->
+			<!-- 			<fx:preferences id="Gargoyle" install="true" shortcut="true"></fx:preferences> -->
 
 		</fx:deploy>
 		<echo message="end install package" />
@@ -950,14 +965,15 @@
 	<!-- =================================
 	          target: fx-deploy
 	          Simple create a new Gargoyle installer
-	          
+
 	         설치패키지 테스팅을 위한 속성
 	         ================================= -->
 	<target name="fx-deploy" depends="create-iss-script, init-fx-tasks">
 
 		<fx:application id="Gargoyle" name="Gargoyle" mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx" version="${product.version}">
 			<fx:argument>${product.version}</fx:argument>
-			<fx:param name="-Dfile.encoding" value="UTF-8"></fx:param>
+			<fx:param name="-Dfile.encoding" value="UTF-8">
+			</fx:param>
 		</fx:application>
 
 		<fx:resources id="appRes">
@@ -984,34 +1000,25 @@
 			</fileset>
 		</copy>
 
-		<fx:deploy
-		    verbose="true" 
-		    embedJNLP="false" 
-		    extension="true" 
-		    includeDT="false" 
-		    offlineAllowed="true" 
-		    outdir="${basedir}/deploy" 
-		    outfile="Gargoyle" 
-		    placeholderid="Gargoyle" 
-		    nativeBundles="exe" 
-		    updatemode="background">
+		<fx:deploy verbose="true" embedJNLP="false" extension="true" includeDT="false" offlineAllowed="true" outdir="${basedir}/deploy" outfile="Gargoyle" placeholderid="Gargoyle" nativeBundles="exe" updatemode="background">
 
-			<fx:platform basedir="${java.home}" >
-				<property name="file.encoding" value="UTF-8"></property>    
+			<fx:platform basedir="${java.home}">
+				<property name="file.encoding" value="UTF-8">
+				</property>
 			</fx:platform>
-			
+
 			<fx:info title="Gargoyle" vendor="${vendor}" />
-			
+
 			<fx:application refId="Gargoyle" />
-			
+
 			<fx:resources refid="appRes" />
-			
-<!-- 			<fx:preferences id="Gargoyle" install="true" shortcut="true"></fx:preferences> -->
-			
+
+			<!-- 			<fx:preferences id="Gargoyle" install="true" shortcut="true"></fx:preferences> -->
+
 		</fx:deploy>
-		
+
 		<echo message="end install package" />
-		
+
 	</target>
 
 
