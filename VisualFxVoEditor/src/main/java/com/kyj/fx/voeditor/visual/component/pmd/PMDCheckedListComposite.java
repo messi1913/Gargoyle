@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.IndexedCheckModel;
@@ -90,7 +91,8 @@ import net.sourceforge.pmd.stat.Metric;
 public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/**
-	 * @Deprecated RULESETS_PROPERTIES_FILE_FORMAT 상수에 있는 rulesets.properties파일의 기술내용을 참조하여 기술할것.
+	 * @Deprecated RULESETS_PROPERTIES_FILE_FORMAT 상수에 있는 rulesets.properties파일의
+	 *             기술내용을 참조하여 기술할것.
 	 * @최초생성일 2016. 10. 6.
 	 */
 	@Deprecated
@@ -101,9 +103,9 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	/**
 	 * @param parent
 	 */
-	//	public PMDCheckedListComposite(BorderPane parent) {
-	//		super(parent);
-	//	}
+	// public PMDCheckedListComposite(BorderPane parent) {
+	// super(parent);
+	// }
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PMDCheckedListComposite.class);
 
@@ -155,14 +157,17 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 		javaTextArea = new JavaTextAreaForAutoComment() {
 
-			/* (non-Javadoc)
-			 * @see com.kyj.fx.voeditor.visual.component.text.JavaTextAreaForAutoComment#getLineFactory()
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see com.kyj.fx.voeditor.visual.component.text.
+			 * JavaTextAreaForAutoComment#getLineFactory()
 			 */
 			@Override
 			public IntFunction<Node> getLineFactory() {
 				MarkedLineNumberFactory lineFactory = (MarkedLineNumberFactory) super.getLineFactory();
 
-				//PMD에서 오류라고 측정한 값을 마킹하기 위해 값의 속성값을 리턴
+				// PMD에서 오류라고 측정한 값을 마킹하기 위해 값의 속성값을 리턴
 				lineFactory.setLineMarkFactory(new LineMapper<Integer>() {
 
 					@Override
@@ -173,7 +178,8 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 							RuleViolation ruleViolation = findFirst.get();
 
 							RulePriority priority = ruleViolation.getRule().getPriority();
-							//							LOGGER.debug("violation toString : {} ", priority.toString());
+							// LOGGER.debug("violation toString : {} ",
+							// priority.toString());
 							return priority.getPriority();
 						}
 						return 0;
@@ -181,16 +187,16 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 				});
 
-				//PMD에서 오류라고 측정한 값을 UI에 마킹하기 위해 체크.
+				// PMD에서 오류라고 측정한 값을 UI에 마킹하기 위해 체크.
 				lineFactory.setGraphicsMapperFactory(new GraphicsMapper<Node>() {
 
 					@Override
 					public Node map(int row, Paragraph<?> pra, int typeValue) {
 
 						Circle g = new Circle(5d);
-						//						Rectangle rectangle = new Rectangle();
-						//						rectangle.setWidth(10d);
-						//						rectangle.setHeight(10d);
+						// Rectangle rectangle = new Rectangle();
+						// rectangle.setWidth(10d);
+						// rectangle.setHeight(10d);
 						g.setStyle("-fx-fill:transparent");
 						if (typeValue >= 1) {
 
@@ -198,7 +204,8 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 							checkedItems.stream().filter(c -> {
 								return c.getPriority() == typeValue;
 							}).findFirst().ifPresent(v -> {
-								//								LOGGER.debug("priority value : {} ", typeValue);
+								// LOGGER.debug("priority value : {} ",
+								// typeValue);
 								g.setStyle(PMDListCell.getPriorityStyle(typeValue));
 							});
 						}
@@ -224,14 +231,14 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 		IndexedCheckModel<RulePriority> checkModel = checkComboBox.getCheckModel();
 
-		//초기값 선택.
+		// 초기값 선택.
 		initSelectedRulePriorityValues(v -> checkModel.check(v));
 		checkComboBox.getCheckModel().getCheckedItems().addListener(chkPriorityChangeListener);
 
-		//		checkComboBox.
+		// checkComboBox.
 		HBox value = new HBox(5, new Label("위험도 : "), checkComboBox);
 		value.setAlignment(Pos.CENTER_RIGHT);
-		//		value.setStyle("-fx-background-color:transparent;");
+		// value.setStyle("-fx-background-color:transparent;");
 		value.setPadding(new Insets(5));
 		borLvViolationRoot.setTop(value);
 		root.setCenter(splitPane);
@@ -243,7 +250,16 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	private void initSelectedRulePriorityValues(Consumer<RulePriority> action) {
 		List<String> values = ResourceLoader.getInstance().getValues(ResourceLoader.PMD_SELECTED_PRIORITY_VALUES, ",");
-		ListExpresion.of(values).map(v -> RulePriority.valueOf(v)).forEach(action);
+		/*
+		 * 2016-11-23  by kyj.
+		 * default values set.
+		 */
+		if (ValueUtil.isEmpty(values)) {
+			Stream.of(RulePriority.values()).forEach(action);
+		} else {
+			ListExpresion.of(values).map(v -> RulePriority.valueOf(v)).forEach(action);
+		}
+
 	}
 
 	/**
@@ -295,14 +311,14 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			}
 		});
 
-		//		new Thread(() -> {
-		//			if (this.sourceFile.isDirectory()) {
-		//				dirFilePmd(this.sourceFile);
+		// new Thread(() -> {
+		// if (this.sourceFile.isDirectory()) {
+		// dirFilePmd(this.sourceFile);
 		//
-		//			} else {
-		//				simpleFilePmd(this.sourceFile);
-		//			}
-		//		}).start();
+		// } else {
+		// simpleFilePmd(this.sourceFile);
+		// }
+		// }).start();
 
 	}
 
@@ -333,7 +349,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 				}
 			}
 
-			//			transformParametersIntoConfiguration(params);
+			// transformParametersIntoConfiguration(params);
 			long start = System.nanoTime();
 
 			doPMD.doPMD(transformParametersIntoConfiguration(params), reportListenerProperty.get(), violationCountingListener.get());
@@ -392,8 +408,9 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		medium.setStyle(PMDListCell.getPriorityStyle(RulePriority.MEDIUM));
 		Text etc = new Text(String.format(VIOLATION_TEXT_FORMAT_ETC, priorEtc.get()));
 
-		//		Text element = new Text(String.format(VIOLATION_TEXT_FORMAT, priorTotal.get(), priorHigh.get(), priorMediumHigh.get(),
-		//				priorMedium.get(), priorEtc.get()));
+		// Text element = new Text(String.format(VIOLATION_TEXT_FORMAT,
+		// priorTotal.get(), priorHigh.get(), priorMediumHigh.get(),
+		// priorMedium.get(), priorEtc.get()));
 
 		violationLabel.getChildren().add(priffix);
 		violationLabel.getChildren().add(total);
@@ -473,40 +490,44 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	}
 
 	public GargoylePMDConfiguration transformParametersIntoConfiguration(GargoylePMDParameters params) {
-		//		if (null == params.getSourceDir() && null == params.getUri() && null == params.getFileListPath()
-		//				&& null == params.getSourceText()) {
-		//			throw new IllegalArgumentException(
-		//					"Please provide a parameter for source root directory (-dir or -d), database URI (-uri or -u), or file list path (-filelist).");
-		//		}
+		// if (null == params.getSourceDir() && null == params.getUri() && null
+		// == params.getFileListPath()
+		// && null == params.getSourceText()) {
+		// throw new IllegalArgumentException(
+		// "Please provide a parameter for source root directory (-dir or -d),
+		// database URI (-uri or -u), or file list path (-filelist).");
+		// }
 		GargoylePMDConfiguration configuration = new GargoylePMDConfiguration();
 		configuration.setInputPaths(params.getSourceDir());
-		//		configuration.setInputFilePath(params.getFileListPath());
-		//		configuration.setInputUri(params.getUri());
+		// configuration.setInputFilePath(params.getFileListPath());
+		// configuration.setInputUri(params.getUri());
 		configuration.setReportFormat(REPORT_FILE_FORMAT);
 		configuration.setSourceFileName(params.getSourceFileName());
 		configuration.setSourceText(params.getSourceText());
-		//		configuration.setBenchmark(params.isBenchmark());
+		// configuration.setBenchmark(params.isBenchmark());
 		configuration.setDebug(params.isDebug());
-		//		configuration.setMinimumPriority(params.getMinimumPriority());
+		// configuration.setMinimumPriority(params.getMinimumPriority());
 
 		configuration.setReportFile(params.getReportfile());
 		configuration.setReportProperties(params.getProperties());
-		//		configuration.setReportShortNames(params.isShortnames());
+		// configuration.setReportShortNames(params.isShortnames());
 
 		String language = params.getLanguage();
-		//		String RESULTSET = new File(String.format(RULESETS_FILE_FORMAT, "java")).getAbsolutePath();
-		//		if (null != language) {
-		//			RESULTSET = new File(String.format(RULESETS_FILE_FORMAT, language)).getAbsolutePath();
-		//		}
+		// String RESULTSET = new File(String.format(RULESETS_FILE_FORMAT,
+		// "java")).getAbsolutePath();
+		// if (null != language) {
+		// RESULTSET = new File(String.format(RULESETS_FILE_FORMAT,
+		// language)).getAbsolutePath();
+		// }
 
 		configuration.setRuleSets(getRuleSets(language));
-		//		configuration.setRuleSetFactoryCompatibilityEnabled(true);
+		// configuration.setRuleSetFactoryCompatibilityEnabled(true);
 		configuration.setShowSuppressedViolations(params.isShowsuppressed());
 		configuration.setSourceEncoding("UTF-8");
-		//	        configuration.setStressTest(params.isStress());
-		//		configuration.setSuppressMarker(params.getSuppressmarker());
+		// configuration.setStressTest(params.isStress());
+		// configuration.setSuppressMarker(params.getSuppressmarker());
 		configuration.setThreads(1);
-		//		configuration.setFailOnViolation(params.isFailOnViolation());
+		// configuration.setFailOnViolation(params.isFailOnViolation());
 
 		LanguageVersion languageVersion = LanguageRegistry.findLanguageVersionByTerseName(language + " " + params.getVersion());
 		if (languageVersion != null) {
@@ -524,7 +545,9 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	private SimpleObjectProperty<File> lastSelectedFileProperty = new SimpleObjectProperty<>();
 
 	private Callback<ListView<RuleViolation>, ListCell<RuleViolation>> ruleCheckListener = new Callback<ListView<RuleViolation>, ListCell<RuleViolation>>() {
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see javafx.util.Callback#call(java.lang.Object)
 		 */
 		@Override
@@ -541,25 +564,26 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 					LOGGER.debug("pmd meta violation index : begineLine : {} , endLine : {} , begine col : {} , end col : {}", beginLine,
 							endLine, beginColumn, endColumn);
 
-					//					if (PMDCheckedListComposite.this.sourceFile.isFile()) {
-					//					javaTextArea.moveToLine(beginLine);
-					//					}
-					//디렉토리 선택의 경우만..
+					// if (PMDCheckedListComposite.this.sourceFile.isFile()) {
+					// javaTextArea.moveToLine(beginLine);
+					// }
+					// 디렉토리 선택의 경우만..
 					if (sourceFile != null && sourceFile.isDirectory()) {
 						JavaTextArea javaTextArea = new JavaTextArea();
 						String filename = item.getFilename();
 						File file = new File(filename);
 
-						//						File lastReadFile = lastSelectedFileProperty.get();
+						// File lastReadFile = lastSelectedFileProperty.get();
 
 						String readFile = FileUtil.readFile(file, true, null);
 
-						//						if ((lastReadFile == null && file.exists()) || !(lastReadFile.equals(file))) {
+						// if ((lastReadFile == null && file.exists()) ||
+						// !(lastReadFile.equals(file))) {
 
 						javaTextArea.setContent(readFile);
-						//							javaTextArea.moveToLine(beginLine);
+						// javaTextArea.moveToLine(beginLine);
 						lastSelectedFileProperty.set(file);
-						//						}
+						// }
 
 						SharedMemory.getSystemLayoutViewController().loadNewSystemTab(file.getName(), javaTextArea);
 						javaTextArea.moveToLine(beginLine);
@@ -588,8 +612,9 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 			ObservableList<RulePriority> checkedItems = checkComboBox.getCheckModel().getCheckedItems();
 			checkedItems.stream().filter(c -> c == priority).findFirst().ifPresent(v -> {
-				//				LOGGER.debug("{}\n rulesetName : {}\nruleName :{}\nLang:{}", ruleViolation.toString(), ruleSetName, name,
-				//						language.toString());
+				// LOGGER.debug("{}\n rulesetName : {}\nruleName :{}\nLang:{}",
+				// ruleViolation.toString(), ruleSetName, name,
+				// language.toString());
 
 				Platform.runLater(() -> lvViolation.getItems().add(ruleViolation));
 
@@ -672,7 +697,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 		if (c.next()) {
 			lvViolation.getItems().clear();
 
-			//선택된 필터정보
+			// 선택된 필터정보
 			ObservableList<? extends RulePriority> list = c.getList();
 
 			chartComposite.clean();
@@ -682,13 +707,14 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 				chartComposite.violationAdapter().ruleViolationAdded(v2);
 			});
 
-			//			Integer currentLine = javaTextArea.getCurrentLine() + 1;
+			// Integer currentLine = javaTextArea.getCurrentLine() + 1;
 
-			//			javaTextArea.lineStart(SelectionPolicy.CLEAR);
-			//			javaTextArea.getCodeArea();
+			// javaTextArea.lineStart(SelectionPolicy.CLEAR);
+			// javaTextArea.getCodeArea();
 
-			//			javaTextArea.appendContent("");
-			//			javaTextArea.getCodeArea().getParagraphs().forEach(s -> javaTextArea.getCodeArea().clearStyle(s));
+			// javaTextArea.appendContent("");
+			// javaTextArea.getCodeArea().getParagraphs().forEach(s ->
+			// javaTextArea.getCodeArea().clearStyle(s));
 			ObservableList<Paragraph<Collection<String>>> paragraphs = javaTextArea.getCodeArea().getParagraphs();
 			int t = paragraphs.size();
 			IntStream.range(0, t).forEach(v -> {
@@ -696,16 +722,18 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			});
 
 			chartComposite.build();
-			//			javaTextArea.moveToLine(currentLine);
+			// javaTextArea.moveToLine(currentLine);
 		}
 	};
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
 	public void close() throws IOException {
-		LOGGER.debug("{} called close  method" , getClass());
+		LOGGER.debug("{} called close  method", getClass());
 		ObservableList<RulePriority> checkedItems = checkComboBox.getCheckModel().getCheckedItems();
 		checkedItems.stream().map(v -> v.name()).reduce((t, u) -> t.concat(",").concat(u)).ifPresent(v -> {
 			ResourceLoader.getInstance().put(ResourceLoader.PMD_SELECTED_PRIORITY_VALUES, v);

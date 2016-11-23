@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.pmd.chart;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -122,15 +123,20 @@ public class PMDViolationbyPieChartComposite extends AbstractPMDViolationChartCo
 	 */
 	@Override
 	public void build() {
-		Integer size = observableHashMap.values().stream().reduce((a, b) -> a + b).get();
-		total.set(size);
-		//Summary
-		observableHashMap.entrySet().forEach(v -> {
-			String name = v.getKey().toString();
+		Optional<Integer> reduce = observableHashMap.values().stream().reduce((a, b) -> a + b);
+		reduce.ifPresent(size ->{
+			total.set(size);
+			//Summary
+			observableHashMap.entrySet().forEach(v -> {
+				String name = v.getKey().toString();
 
-			Integer value = v.getValue();
-			dataList.add(new Data(name, value));
+				Integer value = v.getValue();
+				dataList.add(new Data(name, value));
+			});	
+			
 		});
+//		Integer size = reduce.get();
+		
 
 	}
 
