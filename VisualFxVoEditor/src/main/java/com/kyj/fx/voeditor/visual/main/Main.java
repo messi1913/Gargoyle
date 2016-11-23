@@ -98,11 +98,9 @@ public class Main extends Application {
 
 	private static String version = "eclipse-run";
 
+	private static final int EXIT_CODE_APPLICATION_DUPLICATION = 1;
+
 	public static void main(String[] args) throws Exception {
-
-		//어플리케이션 중복 실행 방지처리 로직 구현
-
-		new AppDuplDepenceInitializer().initialize();
 
 		if (args != null && args.length > 0) {
 			LOGGER.debug("#### print argus ######");
@@ -112,27 +110,18 @@ public class Main extends Application {
 			version = args[0];
 		}
 
-		/* 2016.2.6 프록시 설정 내용을 ProxyInitializable 구현. */
+		//어플리케이션 중복 실행 방지처리 로직 구현
 		try {
+			new AppDuplDepenceInitializer() {
 
-			// Initialable databaseInitializer = new DatabaseInitializer();
-			// databaseInitializer.initialize();
-			// 2016.2.5 위 코드가 아래로 바뀜. 어노테이션 기반 스캔처리. 어노테이션이 붙은항목은 초기화 처리를 한다.
-			ResourceScanner.getInstance().initialize(str -> {
-				try {
-					Initializable newInstance = (Initializable) str.newInstance();
-
-					LOGGER.debug("initialize!!!! : {} ", newInstance.getClass().getName());
-					if (newInstance != null) {
-						newInstance.initialize();
-					}
-				} catch (Exception e) {
-					LOGGER.error(ValueUtil.toString(e));
+				@Override
+				public void handle(Exception e) {
+					LOGGER.debug("어플리케이션이 중복 실행되어 프로그램을 종료합니다.");
+					System.exit(EXIT_CODE_APPLICATION_DUPLICATION);
 				}
-			});
-
+			}.initialize();
 		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(e));
+			System.exit(EXIT_CODE_APPLICATION_DUPLICATION);
 		}
 
 		launch(args);
@@ -156,6 +145,9 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws IOException {
+
+		//초기화 처리
+		callInitializers();
 
 		// setApplicationUncaughtExceptionHandler();
 
@@ -203,6 +195,36 @@ public class Main extends Application {
 			primaryStage.setScene(scene);
 
 			primaryStage.show();
+
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
+	}
+
+	/**
+	 * App 초기화 처리 로직 구현.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 23.
+	 */
+	private void callInitializers() {
+		/* 2016.2.6 프록시 설정 내용을 ProxyInitializable 구현. */
+		try {
+
+			// Initialable databaseInitializer = new DatabaseInitializer();
+			// databaseInitializer.initialize();
+			// 2016.2.5 위 코드가 아래로 바뀜. 어노테이션 기반 스캔처리. 어노테이션이 붙은항목은 초기화 처리를 한다.
+			ResourceScanner.getInstance().initialize(str -> {
+				try {
+					Initializable newInstance = (Initializable) str.newInstance();
+
+					LOGGER.debug("initialize!!!! : {} ", newInstance.getClass().getName());
+					if (newInstance != null) {
+						newInstance.initialize();
+					}
+				} catch (Exception e) {
+					LOGGER.error(ValueUtil.toString(e));
+				}
+			});
 
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));

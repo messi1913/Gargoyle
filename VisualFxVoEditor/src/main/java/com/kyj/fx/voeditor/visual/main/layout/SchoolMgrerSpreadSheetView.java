@@ -1,9 +1,10 @@
 /**
- * 
+ *
  */
 package com.kyj.fx.voeditor.visual.main.layout;
 
 import java.util.List;
+import java.util.Map;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -59,5 +60,17 @@ public class SchoolMgrerSpreadSheetView extends BorderPane {
 
 	public void paste(final String pastString, final int startRowIndex, final int startColumnIndex) {
 		gagoyleSpreadSheetView.paste(pastString, startRowIndex, startColumnIndex);
+	}
+
+	/**
+	 * 특수문자에대한 문자열 paste에 대한 버그를 수정하기 위한 함수.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 23.
+	 * @param items
+	 * @param startRowIndex
+	 * @param startColumnIndex
+	 */
+	public void paste(List<Map<String, Object>> items, int startRowIndex, int startColumnIndex) {
+		gagoyleSpreadSheetView.paste(items, startRowIndex, startColumnIndex);
 	}
 }

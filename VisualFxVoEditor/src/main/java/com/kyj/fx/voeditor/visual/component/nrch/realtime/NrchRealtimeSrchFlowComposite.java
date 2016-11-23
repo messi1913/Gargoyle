@@ -85,10 +85,14 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 	private ObjectProperty<FlowCardComposite> flowCardComposite = new SimpleObjectProperty<>();
 
 	/**
+	 * @최초생성일 2016. 11. 23.
+	 */
+	private static final String REALTIME_SRCH_THREAD_POOL_NAME = "RealtimeSrch-Thread-Pool";
+	/**
 	 * Network 연결처리와 UI간의 비동기 처리를 적용하기위한 Executor클래스.
 	 * @최초생성일 2016. 11. 22.
 	 */
-	private static final ExecutorService gargoyleThreadExecutors = ExecutorDemons.newFixedThreadExecutor(1);
+	private static final ExecutorService gargoyleThreadExecutors = ExecutorDemons.newFixedThreadExecutor(REALTIME_SRCH_THREAD_POOL_NAME, 1);
 
 	/**
 	 * 실시간 검색어 처리에 대한 코드 구현부
@@ -326,7 +330,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 			if (isRecycle.get()) {
 
-				WaitThread waitThread = new WaitThread(choWaitItems.getValue()) {
+				WaitThread waitThread = new WaitThread(THREAD_RUNNER_GROUP, choWaitItems.getValue()) {
 
 					@Override
 					public boolean isContinue() {
@@ -349,6 +353,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 				};
 
+				waitThread.setDaemon(true);
 				waitThread.start();
 			}
 
@@ -357,11 +362,18 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 		service.setExecutor(gargoyleThreadExecutors);
 	}
 
+	private final static ThreadGroup THREAD_RUNNER_GROUP = new ThreadGroup("nrch-wait-thread-group");
+
 	abstract class WaitThread extends Thread {
 
 		private String waitSecond;
 
+		public WaitThread(ThreadGroup group, String name) {
+			super(group, name);
+		}
+
 		public WaitThread(String waitSecond) {
+			super(THREAD_RUNNER_GROUP, "Nrch-Wait-Thread");
 			this.waitSecond = waitSecond;
 		}
 

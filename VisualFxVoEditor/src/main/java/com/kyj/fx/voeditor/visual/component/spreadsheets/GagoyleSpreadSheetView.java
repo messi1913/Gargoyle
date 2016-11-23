@@ -4,7 +4,9 @@
 package com.kyj.fx.voeditor.visual.component.spreadsheets;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -210,6 +212,49 @@ public class GagoyleSpreadSheetView extends StackPane {
 	}
 
 	/**
+	 * 특수문자에대한 문자열 paste에 대한 버그를 수정하기 위한 함수.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 23.
+	 * @param items
+	 * @param startRowIndex
+	 * @param startColumnIndex
+	 */
+	public void paste(List<Map<String, Object>> items, int startRowIndex, int startColumnIndex) {
+		int row = startRowIndex;
+		int column = startColumnIndex;
+
+		int _column = column;
+//		String[] split = pastString.split("\n");
+
+		Grid grid = ssv.getGrid();
+		ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
+
+		for (Map<String, Object> str : items) {
+//			String[] split2 = str.split("\t");
+			_column = column;
+			Iterator<String> iterator = str.keySet().iterator();
+			while(iterator.hasNext()) {
+				String strCol = iterator.next();
+				Object value = str.get(strCol);
+				SpreadsheetCell spreadsheetCell = null;
+
+				if (rows.size() > row)
+					spreadsheetCell = rows.get(row).get(_column);
+				/* 새로운 로우를 생성함. */
+				else {
+					ObservableList<SpreadsheetCell> newCells = createNewRow();
+					spreadsheetCell = newCells.get(_column);
+				}
+
+				spreadsheetCell.setItem(value);
+				_column++;
+			}
+			row++;
+		}
+
+	}
+
+	/**
 	 * 붙여넣기
 	 *
 	 * @param pastString
@@ -219,7 +264,7 @@ public class GagoyleSpreadSheetView extends StackPane {
 		int column = startColumnIndex;
 
 		int _column = column;
-		String[] split = pastString.split("\\n");
+		String[] split = pastString.split("\n");
 
 		Grid grid = ssv.getGrid();
 		ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();

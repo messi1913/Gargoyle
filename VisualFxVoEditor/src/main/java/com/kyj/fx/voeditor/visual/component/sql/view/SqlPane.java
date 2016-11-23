@@ -102,6 +102,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import jfxtras.scene.layout.GridPane;
+import scala.Char;
 
 /**
  * 전체적인 뷰 레이아웃 및 레이아웃과 관련된 행위들을 정의함.
@@ -1310,7 +1311,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		StringBuffer columnBuf = new StringBuffer();
 		StringBuffer dataBuf = new StringBuffer();
-		ObservableList<Map<String, Object>> items = getTbResult().getItems();
+		List<Map<String, Object>> items = getTbResult().getItems();
 		boolean isFirst = true;
 		for (Map<String, Object> map : items) {
 
@@ -1318,21 +1319,23 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			while (iterator.hasNext()) {
 				String column = iterator.next();
 				if (isFirst)
-					columnBuf.append(column).append("\t");
+					columnBuf.append(column).append('\t');
 
-				dataBuf.append(map.get(column)).append("\t");
+				dataBuf.append(map.get(column)).append('\t');
 			}
-			dataBuf.append("\n");
+
+			dataBuf.append('\n');
 			if (isFirst) {
 				isFirst = false;
-				columnBuf.append("\n");
+				columnBuf.append('\n');
 			}
 
 		}
 
 		String putString = new StringBuffer().append(columnBuf).append(dataBuf).toString();
 		SchoolMgrerSpreadSheetView parent = new SchoolMgrerSpreadSheetView();
-		parent.paste(putString, 0, 0);
+//		parent.paste(putString, 0, 0);
+		parent.paste(items, 0, 0);
 		tabProxy.loadNewSystemTab(SystemLayoutViewController.TAB_TITLE_SPREAD_SHEET, parent);
 	}
 

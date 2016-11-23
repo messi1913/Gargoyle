@@ -39,35 +39,18 @@ public class TFIDF {
 	public void simple() throws MalformedURLException, Exception {
 
 		String reqeustSSL = RequestUtil.reqeustSSL(
-				new URL("https://www.google.co.kr/search?q=%EA%B3%BC%ED%95%99&oq=%EA%B3%BC%ED%95%99&aqs=chrome..69i57j69i65j69i60j69i61l2.1579j0j4&sourceid=chrome&ie=UTF-8#q=%EA%B3%BC%ED%95%99%EC%9E%A1%EC%A7%80"),
+				new URL("https://search.naver.com/search.naver?where=nexearch&sm=tab_htf&ie=utf8&query=%EA%B9%80%EB%AC%B4%EC%84%B1+%EB%8C%80%EC%84%A0+%EB%B6%88%EC%B6%9C%EB%A7%88"),
 				(is, resCode) -> {
 
 					try {
-						Document parse = Jsoup.parse(ValueUtil.toString(is));
-						Elements select = parse.select("#center_col");
-						LOGGER.debug("########################################");
-						select.forEach(ele -> {
-							LOGGER.debug(ele.toString());
-						});
-
-						LOGGER.debug("########################################");
-
+						return ValueUtil.toString(is);
 					} catch (Exception e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					//					if (resCode == 200) {
-					//
-					//						try {
-					//							return ValueUtil.toString(is);
-					//						} catch (Exception e) {
-					//							e.printStackTrace();
-					//						}
-					//					}
-
 					return "";
 				});
 
+		System.out.println(reqeustSSL);
 
 		//				File file = new File("C:\\Users\\KYJ\\.git\\Gargoyle\\VisualFxVoEditor\\log\\fxeditor-2016-11-07.log");
 		//		String str1 = sb.toString();//FileUtil.readFile(file, null);
