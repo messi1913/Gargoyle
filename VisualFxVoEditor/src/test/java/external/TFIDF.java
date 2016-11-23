@@ -52,6 +52,7 @@ public class TFIDF {
 
 		System.out.println(reqeustSSL);
 
+		
 		//				File file = new File("C:\\Users\\KYJ\\.git\\Gargoyle\\VisualFxVoEditor\\log\\fxeditor-2016-11-07.log");
 		//		String str1 = sb.toString();//FileUtil.readFile(file, null);
 		TF_IDF tf_IDF = new TF_IDF(new String[] { reqeustSSL });
