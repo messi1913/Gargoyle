@@ -620,7 +620,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 
 			// Velocity텍스트이면 변수맵핑 처리를한다.
 			if (ValueUtil.isVelocityContext(sql)) {
-				sql = getDynmicSQL(sql, param);
+				sql = getDynmicSQL(sql, param, false);
 			}
 
 			// 큰사이즈 컬럼은 간단한 형식으로 표시할지 유무.
