@@ -27,6 +27,7 @@ public interface SQLPaneMotionable<K> {
 
 	abstract List<Map<String, Object>> show100RowAction();
 
+//	abstract void showEditableDataAction();
 	/**
 	 * 트리에서 우클릭 reflesh를 클릭한경우 이벤트 정의
 	 *

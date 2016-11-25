@@ -127,6 +127,10 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			show100RowAction();
 		}
 
+		else if(KeyCode.F1 == e.getCode() && (e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
+			showEditableDataAction();
+		}
+		
 		else if (KeyCode.F5 == e.getCode() && (!e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
 			menuRefleshOnAction(null);
 		}

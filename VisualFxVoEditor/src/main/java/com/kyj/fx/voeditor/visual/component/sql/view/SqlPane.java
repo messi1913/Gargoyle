@@ -102,7 +102,6 @@ import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import jfxtras.scene.layout.GridPane;
-import scala.Char;
 
 /**
  * 전체적인 뷰 레이아웃 및 레이아웃과 관련된 행위들을 정의함.
@@ -639,8 +638,10 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		// MenuItem menuPrimaryKeys = new MenuItem("Primary Keys");
 
 		MenuItem menuShowData = new MenuItem("Show 100 rows [F1]");
-		//		menuShowData.setAccelerator(new KeyCodeCombination(KeyCode.F1));
 		menuShowData.setOnAction(this::show100RowAction);
+
+		MenuItem menuEditShowData = new MenuItem("Show Editable View  [CTRL + F1]");
+		menuEditShowData.setOnAction(this::menuEditShowDataAction);
 
 		MenuItem menuFindTable = new MenuItem("Find Table [CTRL + SHIFT + R]");
 		//		menuFindTable.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN));
@@ -653,7 +654,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		//		menuReflesh.setOnAction(this::menuRefleshOnAction);
 		menuReflesh.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
-		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuFindTable, menuProperties, new SeparatorMenuItem(), menuReflesh);
+		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuEditShowData, menuFindTable, menuProperties,
+				new SeparatorMenuItem(), menuReflesh);
 		schemaTree.setContextMenu(contextMenu);
 
 	}
@@ -1055,19 +1057,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	protected void execute(String sql, Map<String, Object> param) {
 
 		if (ValueUtil.isEditScript(sql)) {
-
-			editableComposite.getColumns().clear();
-			editableComposite.getItems().clear();
-
-			editableComposite.setSql(sql);
-
-			try {
-				lblStatus.setText(editableComposite.execute() + " row");
-				tabPaneResult.getSelectionModel().select(this.tabEdit);
-			} catch (Exception e) {
-				DialogUtil.showExceptionDailog(this, e);
-			}
-
+			execiteEdit(sql);
 		} else {
 			tbResult.getColumns().clear();
 			tbResult.getItems().clear();
@@ -1085,6 +1075,20 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			binding(query);
 			tbResult.getItems().addAll(query);
 			tabPaneResult.getSelectionModel().select(this.tabResult);
+		}
+	}
+
+	private void execiteEdit(String sql) {
+		editableComposite.getColumns().clear();
+		editableComposite.getItems().clear();
+
+		editableComposite.setSql(sql);
+
+		try {
+			lblStatus.setText(editableComposite.execute() + " row");
+			tabPaneResult.getSelectionModel().select(this.tabEdit);
+		} catch (Exception e) {
+			DialogUtil.showExceptionDailog(this, e);
 		}
 	}
 
@@ -1229,72 +1233,72 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * @작성일 : 2016. 6. 10.
 	 * @param e
 	 */
-//	public void menuExportInsertScriptOnAction(ActionEvent e) {
-//
-//		ObservableList<Map<String, Object>> items = tbResult.getItems();
-//		if (items.isEmpty())
-//			return;
-//
-//		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
-//
-//		showInputDialog.ifPresent(op -> {
-//			String tableName = showInputDialog.get().getValue();
-//			Map<String, Object> map = items.get(0);
-//			final Set<String> keySet = map.keySet();
-//			// 클립보드 복사
-//			StringBuilder clip = new StringBuilder();
-//
-//			String insertPreffix = "insert into " + tableName;
-//			String collect = keySet.stream()/* .map(str -> str) */.collect(Collectors.joining(",", "(", ")"));
-//			String insertMiddle = " values ";
-//
-//			List<String> valueList = items.stream().map(v -> {
-//				return ValueUtil.toJSONObject(v);
-//			}).map(v -> {
-//				Iterator<String> iterator = keySet.iterator();
-//				List<Object> values = new ArrayList<>();
-//				while (iterator.hasNext()) {
-//					String columnName = iterator.next();
-//					Object value = v.get(columnName);
-//					values.add(value);
-//				}
-//				return values;
-//			}).map(list -> {
-//
-//				return list.stream().map(str -> {
-//					if (str == null)
-//						return null;
-//					else {
-//						String convert = str.toString();
-//						convert = convert.substring(1, convert.length() - 1);
-//						if (convert.indexOf("'") >= 0) {
-//							try {
-//								convert = StringUtils.replace(convert, "'", "''");
-//							} catch (Exception e1) {
-//								e1.printStackTrace();
-//							}
-//						}
-//						return "'".concat(convert).concat("'");
-//					}
-//				}).collect(Collectors.joining(",", "(", ")"));
-//
-//			}).map(str -> {
-//				/* SQL문 완성처리 */
-//				return new StringBuilder().append(insertPreffix).append(collect).append(insertMiddle).append(str).append(";\n").toString();
-//			}).collect(Collectors.toList());
-//
-//			valueList.forEach(str -> {
-//				clip.append(str);
-//			});
-//
-//			SimpleTextView parent = new SimpleTextView(clip.toString());
-//			parent.setWrapText(false);
-//			FxUtil.createStageAndShow(parent, stage -> {
-//				stage.setTitle(String.format("[InsertScript] Table : %s", tableName));
-//			});
-//		});
-//
-//	}
+	//	public void menuExportInsertScriptOnAction(ActionEvent e) {
+	//
+	//		ObservableList<Map<String, Object>> items = tbResult.getItems();
+	//		if (items.isEmpty())
+	//			return;
+	//
+	//		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
+	//
+	//		showInputDialog.ifPresent(op -> {
+	//			String tableName = showInputDialog.get().getValue();
+	//			Map<String, Object> map = items.get(0);
+	//			final Set<String> keySet = map.keySet();
+	//			// 클립보드 복사
+	//			StringBuilder clip = new StringBuilder();
+	//
+	//			String insertPreffix = "insert into " + tableName;
+	//			String collect = keySet.stream()/* .map(str -> str) */.collect(Collectors.joining(",", "(", ")"));
+	//			String insertMiddle = " values ";
+	//
+	//			List<String> valueList = items.stream().map(v -> {
+	//				return ValueUtil.toJSONObject(v);
+	//			}).map(v -> {
+	//				Iterator<String> iterator = keySet.iterator();
+	//				List<Object> values = new ArrayList<>();
+	//				while (iterator.hasNext()) {
+	//					String columnName = iterator.next();
+	//					Object value = v.get(columnName);
+	//					values.add(value);
+	//				}
+	//				return values;
+	//			}).map(list -> {
+	//
+	//				return list.stream().map(str -> {
+	//					if (str == null)
+	//						return null;
+	//					else {
+	//						String convert = str.toString();
+	//						convert = convert.substring(1, convert.length() - 1);
+	//						if (convert.indexOf("'") >= 0) {
+	//							try {
+	//								convert = StringUtils.replace(convert, "'", "''");
+	//							} catch (Exception e1) {
+	//								e1.printStackTrace();
+	//							}
+	//						}
+	//						return "'".concat(convert).concat("'");
+	//					}
+	//				}).collect(Collectors.joining(",", "(", ")"));
+	//
+	//			}).map(str -> {
+	//				/* SQL문 완성처리 */
+	//				return new StringBuilder().append(insertPreffix).append(collect).append(insertMiddle).append(str).append(";\n").toString();
+	//			}).collect(Collectors.toList());
+	//
+	//			valueList.forEach(str -> {
+	//				clip.append(str);
+	//			});
+	//
+	//			SimpleTextView parent = new SimpleTextView(clip.toString());
+	//			parent.setWrapText(false);
+	//			FxUtil.createStageAndShow(parent, stage -> {
+	//				stage.setTitle(String.format("[InsertScript] Table : %s", tableName));
+	//			});
+	//		});
+	//
+	//	}
 
 	/**
 	 * export spreadSheet event
@@ -1334,7 +1338,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		String putString = new StringBuffer().append(columnBuf).append(dataBuf).toString();
 		SchoolMgrerSpreadSheetView parent = new SchoolMgrerSpreadSheetView();
-//		parent.paste(putString, 0, 0);
+		//		parent.paste(putString, 0, 0);
 		parent.paste(items, 0, 0);
 		tabProxy.loadNewSystemTab(SystemLayoutViewController.TAB_TITLE_SPREAD_SHEET, parent);
 	}
@@ -1362,8 +1366,29 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		show100RowAction();
 	}
 
+	public void menuEditShowDataAction(ActionEvent e) {
+		showEditableDataAction();
+	}
+
 	public void showFileTableOnAction(ActionEvent e) {
 		showTableResourceView();
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 25.
+	 */
+	public void showEditableDataAction() {
+		//Default TableName
+		TreeItem<K> selectedItem = getSchemaTree().getSelectionModel().getSelectedItem();
+		if (null != selectedItem) {
+			K value = selectedItem.getValue();
+			if (value instanceof TableItemTree) {
+				String tableName = ((TableItemTree) value).getName();
+				String sql = "edit " + tableName;
+				execiteEdit(sql);
+			}
+		}
 	}
 
 	/**
@@ -1464,7 +1489,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	public Optional<Pair<String, String[]>> showTableInputDialog(Function<K, String> stringConverter) {
 
 		final List<String> schemaList = getSchemaTree().getRoot().getChildren().stream().map(v -> {
-			return   stringConverter.apply(v.getValue()) ;    //v.getValue().getName().toString();
+			return stringConverter.apply(v.getValue()); //v.getValue().getName().toString();
 		}).collect(Collectors.toList());
 
 		String defaultSchema = "";
@@ -1499,8 +1524,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						});
 
 						FxUtil.installAutoTextFieldBinding(txtTable, () -> {
-							return searchPattern(txtSchema.getText(), txtTable.getText()).stream().map(v -> stringConverter.apply(v.getValue())/*v.getValue().getName()*/)
-									.collect(Collectors.toList());
+							return searchPattern(txtSchema.getText(), txtTable.getText()).stream()
+									.map(v -> stringConverter.apply(v.getValue())/*v.getValue().getName()*/).collect(Collectors.toList());
 						});
 						txtSchema.setText(_defaultSchema);
 
