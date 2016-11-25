@@ -88,13 +88,13 @@ public class CodeAreaHelper<T extends CodeArea> {
 		miToLowercase = new MenuItem("To Lowercase");
 
 		miFindReplace.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN));
-		//		miFindReplace.setOnAction(this::findReplaceEvent);
+		miFindReplace.setOnAction(this::findReplaceEvent);
 		menuMoveToLine.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
-		//		menuMoveToLine.setOnAction(this::moveToLineEvent);
+		menuMoveToLine.setOnAction(this::moveToLineEvent);
 		miToUppercase.setAccelerator(new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
-		//		miToUppercase.setOnAction(this::toUppercaseEvent);
+		miToUppercase.setOnAction(this::toUppercaseEvent);
 		miToLowercase.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
-		//		miToLowercase.setOnAction(this::toLowercaseEvent);
+		miToLowercase.setOnAction(this::toLowercaseEvent);
 
 		menuSearch.getItems().add(miFindReplace);
 		codeArea.getContextMenu().getItems().addAll(menuSearch, menuMoveToLine, miToUppercase, miToLowercase);
