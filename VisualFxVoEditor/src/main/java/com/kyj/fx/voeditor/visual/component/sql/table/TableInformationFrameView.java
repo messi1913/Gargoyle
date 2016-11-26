@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.component.sql.table;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -195,7 +197,7 @@ public class TableInformationFrameView extends BorderPane {
 				createCodePane.init();
 			} catch (Exception e) {
 				LOGGER.error(ValueUtil.toString(e));
-				
+
 			}
 			itemManager.add(createCodePane);
 			Tab e = new Tab("CREATE 코드", createCodePane);
@@ -301,6 +303,15 @@ public class TableInformationFrameView extends BorderPane {
 		List<Map<String, Object>> query = Collections.emptyList();
 		try (Connection connection = this.getConnection()) {
 			query = manager.query(connection, sql, converter);
+		}
+		return query;
+	}
+
+	public <T> T queryForMeta(Function<DatabaseMetaData, T> converter) throws Exception {
+		T query = null;
+		try (Connection connection = this.getConnection()) {
+			DatabaseMetaData metaData = connection.getMetaData();
+			query = manager.queryForMeta(metaData, converter);
 		}
 		return query;
 	}

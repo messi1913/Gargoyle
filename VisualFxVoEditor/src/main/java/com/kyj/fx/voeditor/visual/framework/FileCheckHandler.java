@@ -14,7 +14,7 @@ import java.io.FileNotFoundException;
  * @author KYJ
  *
  ***************************/
-public interface FileCheckConverter<R> {
+public interface FileCheckHandler<R> {
 
 	/********************************
 	 * 작성일 : 2016. 7. 14. 작성자 : KYJ

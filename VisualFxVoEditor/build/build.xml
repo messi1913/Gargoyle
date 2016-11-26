@@ -119,7 +119,7 @@
 		</copy>
 		<copy todir="externalLibs">
 			<fileset dir="${basedir}\..\lib\db\maria">
-				<filename name="mariadb-java-client-1.2.2.jar" />
+				<filename name="mariadb-java-client-1.5.5.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
@@ -657,7 +657,7 @@
 				<include name="mail-1.4.7.jar" />
 				<include name="xmlbeans-2.6.0.jar" />
 				<include name="dom4j-1.6.1.jar" />
-				<include name="mariadb-java-client-1.2.2.jar" />
+				<include name="mariadb-java-client-1.5.5.jar" />
 				<include name="btrace-client.jar" />
 				<include name="ooxml-schemas-1.3.jar" />
 				<include name="httpclient-4.3.6.jar" />

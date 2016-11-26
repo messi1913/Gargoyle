@@ -66,7 +66,9 @@ public class Main extends Application {
 	/**
 	 * 어플리케이션이 종료될때 처리할 이벤트를 구현한다.
 	 *
-	 * PrimaryStageCloseable을 구현하고 addPrimaryStageCloseListener(PrimaryStageCloseable) 함수에 리스너를 등록한 함수는 프로그램 종료시 처리할 이벤트가 실행되게 된다.
+	 * PrimaryStageCloseable을 구현하고
+	 * addPrimaryStageCloseListener(PrimaryStageCloseable) 함수에 리스너를 등록한 함수는 프로그램
+	 * 종료시 처리할 이벤트가 실행되게 된다.
 	 *
 	 * 주로 화면에 대한 Resource 해제등의 로직이 대상이됨.
 	 *
@@ -106,21 +108,30 @@ public class Main extends Application {
 			LOGGER.debug("#### print argus ######");
 			Stream.of(args).forEach(LOGGER::debug);
 
-			//first param is version
+			// first param is version
 			version = args[0];
 		}
 
-		//어플리케이션 중복 실행 방지처리 로직 구현
+		// 어플리케이션 중복 실행 방지처리 로직 구현
 		try {
 			new AppDuplDepenceInitializer() {
 
 				@Override
 				public void handle(Exception e) {
+					
 					LOGGER.debug("어플리케이션이 중복 실행되어 프로그램을 종료합니다.");
+					
+					if (Platform.isFxApplicationThread()) {
+						Platform.exit();
+						return;
+					}
+
+
 					System.exit(EXIT_CODE_APPLICATION_DUPLICATION);
 				}
 			}.initialize();
 		} catch (Exception e) {
+			LOGGER.debug("어플리케이션이 중복 실행되어 프로그램을 종료합니다.");
 			System.exit(EXIT_CODE_APPLICATION_DUPLICATION);
 		}
 
@@ -138,29 +149,29 @@ public class Main extends Application {
 		return new String(version);
 	}
 
-	//	public Main() {
+	// public Main() {
 	//
 	//
-	//	}
+	// }
 
 	@Override
 	public void start(Stage primaryStage) throws IOException {
 
-		//초기화 처리
+		// 초기화 처리
 		callInitializers();
 
 		// setApplicationUncaughtExceptionHandler();
 
-		//어플리케이션 타이틀 지정
+		// 어플리케이션 타이틀 지정
 		primaryStage.setTitle(APPLICATION_TITLE);
 
-		//화면 중앙 위치.
+		// 화면 중앙 위치.
 		primaryStage.centerOnScreen();
 
-		//메인 스테이지 클로즈 이벤트 구현.
+		// 메인 스테이지 클로즈 이벤트 구현.
 		primaryStage.setOnCloseRequest(onPrimaryStageCloseRequest);
 
-		/*[시작 ]초기 워크스페이스 선택 지정. */
+		/* [시작 ]초기 워크스페이스 선택 지정. */
 		String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
 
 		if (baseDir == null || baseDir.isEmpty() || !new File(baseDir).exists()) {
@@ -173,20 +184,20 @@ public class Main extends Application {
 				return;
 			}
 		}
-		/*[끝 ]초기 워크스페이스 선택 지정. */
+		/* [끝 ]초기 워크스페이스 선택 지정. */
 
 		try {
 
-			//예상치 못한 에외에 대한 대비 로직구현.
+			// 예상치 못한 에외에 대한 대비 로직구현.
 			setApplicationUncaughtExceptionHandler();
 
-			//클래스 로딩같은 어플리케이션이 메모리에 로딩됨과 동기에 무거운 처리를 비동기로 로딩하는 로직이 구현되있음.
+			// 클래스 로딩같은 어플리케이션이 메모리에 로딩됨과 동기에 무거운 처리를 비동기로 로딩하는 로직이 구현되있음.
 			SharedMemory.init();
 
-			//PrimaryStage를 공유변수로 지정하기 위한 로직 처리.
+			// PrimaryStage를 공유변수로 지정하기 위한 로직 처리.
 			SharedMemory.setPrimaryStage(primaryStage);
 
-			//Main Application을 로드
+			// Main Application을 로드
 			BorderPane mainParent = setNewRootView();
 
 			Scene scene = new Scene(mainParent, 1280, 900);
@@ -203,6 +214,7 @@ public class Main extends Application {
 
 	/**
 	 * App 초기화 처리 로직 구현.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 23.
 	 */

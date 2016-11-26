@@ -7,10 +7,15 @@
 package com.kyj.fx.voeditor.visual.framework.handler;
 
 /**
+ * 
+ * 예외처리로직 구현.
+ * 
  * @author KYJ
  *
  */
+@FunctionalInterface
 public interface ExceptionHandler {
+
 	/**
 	 * 예외 발생시 처리할 내용
 	 *
@@ -19,4 +24,5 @@ public interface ExceptionHandler {
 	 * @User KYJ
 	 */
 	public void handle(Exception t);
+
 }

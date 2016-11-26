@@ -845,7 +845,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		MacroControl macroControl = new MacroControl(connectionSupplier, selectedSQLText);
 		FxUtil.createStageAndShow(macroControl, stage -> {
 			stage.setTitle("Query-Macro");
-
+			stage.initOwner(SqlPane.this.getScene().getWindow());
 			//팝업창을 닫는 요청이 들어온경우 stop()함수를 호출하고 종료
 			stage.setOnCloseRequest(ev -> {
 

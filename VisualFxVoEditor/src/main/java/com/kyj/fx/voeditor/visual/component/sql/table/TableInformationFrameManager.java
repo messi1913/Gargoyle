@@ -7,12 +7,14 @@
 package com.kyj.fx.voeditor.visual.component.sql.table;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.springframework.jdbc.core.RowMapper;
@@ -54,6 +56,10 @@ class TableInformationFrameManager {
 
 	public <T> List<T> query(Connection connection, String sql, RowMapper<T> mapper) throws Exception {
 		return DbUtil.select(connection, sql, 10, mapper);
+	}
+
+	public <T> T queryForMeta(DatabaseMetaData metaData, Function<DatabaseMetaData, T> converter) {
+		return converter.apply(metaData);
 	}
 
 	/**

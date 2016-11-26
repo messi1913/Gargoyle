@@ -6,10 +6,17 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.table;
 
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -30,6 +37,7 @@ import javafx.scene.layout.BorderPane;
  */
 public abstract class AbstractTableIndexInformationController extends BorderPane implements ItableInformation {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTableIndexInformationController.class);
 	private TableInformationFrameView parent;
 
 	@FXML
@@ -104,6 +112,176 @@ public abstract class AbstractTableIndexInformationController extends BorderPane
 		});
 	}
 
+	/**
+	 * @author KYJ
+	 *
+	 */
+	private class ConverterFunction implements Function<DatabaseMetaData, List<TableIndexNode>> {
+		private String databaseName, tableName;
+
+		public ConverterFunction(String databaseName, String tableName) {
+			this.databaseName = databaseName;
+			this.tableName = tableName;
+		}
+
+		/**
+		 * Retrieves a description of the given table's indices and statistics.
+		 * They are ordered by NON_UNIQUE, TYPE, INDEX_NAME, and
+		 * ORDINAL_POSITION.
+		 *
+		 * <P>
+		 * Each index column description has the following columns:
+		 * <OL>
+		 * <LI><B>TABLE_CAT</B> String {@code =>} table catalog (may be
+		 * <code>null</code>)
+		 * <LI><B>TABLE_SCHEM</B> String {@code =>} table schema (may be
+		 * <code>null</code>)
+		 * <LI><B>TABLE_NAME</B> String {@code =>} table name
+		 * <LI><B>NON_UNIQUE</B> boolean {@code =>} Can index values be
+		 * non-unique. false when TYPE is tableIndexStatistic
+		 * <LI><B>INDEX_QUALIFIER</B> String {@code =>} index catalog (may be
+		 * <code>null</code>); <code>null</code> when TYPE is
+		 * tableIndexStatistic
+		 * <LI><B>INDEX_NAME</B> String {@code =>} index name; <code>null</code>
+		 * when TYPE is tableIndexStatistic
+		 * <LI><B>TYPE</B> short {@code =>} index type:
+		 * <UL>
+		 * <LI>tableIndexStatistic - this identifies table statistics that are
+		 * returned in conjuction with a table's index descriptions
+		 * <LI>tableIndexClustered - this is a clustered index
+		 * <LI>tableIndexHashed - this is a hashed index
+		 * <LI>tableIndexOther - this is some other style of index
+		 * </UL>
+		 * <LI><B>ORDINAL_POSITION</B> short {@code =>} column sequence number
+		 * within index; zero when TYPE is tableIndexStatistic
+		 * <LI><B>COLUMN_NAME</B> String {@code =>} column name;
+		 * <code>null</code> when TYPE is tableIndexStatistic
+		 * <LI><B>ASC_OR_DESC</B> String {@code =>} column sort sequence, "A"
+		 * {@code =>} ascending, "D" {@code =>} descending, may be
+		 * <code>null</code> if sort sequence is not supported;
+		 * <code>null</code> when TYPE is tableIndexStatistic
+		 * <LI><B>CARDINALITY</B> long {@code =>} When TYPE is
+		 * tableIndexStatistic, then this is the number of rows in the table;
+		 * otherwise, it is the number of unique values in the index.
+		 * <LI><B>PAGES</B> long {@code =>} When TYPE is tableIndexStatisic then
+		 * this is the number of pages used for the table, otherwise it is the
+		 * number of pages used for the current index.
+		 * <LI><B>FILTER_CONDITION</B> String {@code =>} Filter condition, if
+		 * any. (may be <code>null</code>)
+		 * </OL>
+		 *
+		 * @param catalog
+		 *            a catalog name; must match the catalog name as it is
+		 *            stored in this database; "" retrieves those without a
+		 *            catalog; <code>null</code> means that the catalog name
+		 *            should not be used to narrow the search
+		 * @param schema
+		 *            a schema name; must match the schema name as it is stored
+		 *            in this database; "" retrieves those without a schema;
+		 *            <code>null</code> means that the schema name should not be
+		 *            used to narrow the search
+		 * @param table
+		 *            a table name; must match the table name as it is stored in
+		 *            this database
+		 * @param unique
+		 *            when true, return only indices for unique values; when
+		 *            false, return indices regardless of whether unique or not
+		 * @param approximate
+		 *            when true, result is allowed to reflect approximate or out
+		 *            of data values; when false, results are requested to be
+		 *            accurate
+		 * @return <code>ResultSet</code> - each row is an index column
+		 *         description
+		 * @exception SQLException
+		 *                if a database access error occurs
+		 */
+		@Override
+		public List<TableIndexNode> apply(DatabaseMetaData t) {
+
+			List<TableIndexNode> list = new ArrayList<>();
+			try {
+
+				// ResultSet pResult = t.getPrimaryKeys(this.databaseName, null,
+				// this.tableName);
+				// while (pResult.next()) {
+				//
+				//// String constraintName = pResult.getString("PK_NAME");
+				// String columnName = pResult.getString("COLUMN_NAME");
+				// TableIndexNode tableIndexNode = new TableIndexNode("Primary
+				// Key", columnName);
+				// tableIndexNode.setColumnNane(columnName);
+				// list.add(tableIndexNode);
+				// }
+
+				ResultSet resultSet = t.getIndexInfo(null, this.databaseName, this.tableName, false, false);
+				if (resultSet.getRow() <= 0)
+					resultSet = t.getIndexInfo(this.databaseName, null, this.tableName, false, false);
+
+				// int row = resultSet.getRow();
+				// System.out.println(row);
+
+				while (resultSet.next()) {
+
+					// test
+					{
+						// String dbCatalog = resultSet.getString("TABLE_CAT");
+						// String dbSchema = resultSet.getString("TABLE_SCHEM");
+						// String dbTableName =
+						// resultSet.getString("TABLE_NAME");
+						// boolean dbNoneUnique =
+						// resultSet.getBoolean("NON_UNIQUE");
+						// String dbIndexQualifier =
+						// resultSet.getString("INDEX_QUALIFIER");
+						// String dbIndexName =
+						// resultSet.getString("INDEX_NAME");
+						// short dbType = resultSet.getShort("TYPE");
+						// short dbOrdinalPosition =
+						// resultSet.getShort("ORDINAL_POSITION");
+						// String dbColumnName =
+						// resultSet.getString("COLUMN_NAME");
+						// String dbAscOrDesc =
+						// resultSet.getString("ASC_OR_DESC");
+						// int dbCardinality = resultSet.getInt("CARDINALITY");
+						// int dbPages = resultSet.getInt("PAGES");
+						// String dbFilterCondition =
+						// resultSet.getString("FILTER_CONDITION");
+
+						// System.out.println("index name=" + dbIndexName);
+						// System.out.println("table=" + dbTableName);
+						// System.out.println("column=" + dbColumnName);
+						// System.out.println("catalog=" + dbCatalog);
+						// System.out.println("schema=" + dbSchema);
+						// System.out.println("nonUnique=" + dbNoneUnique);
+						// System.out.println("indexQualifier=" +
+						// dbIndexQualifier);
+						// System.out.println("type=" + dbType);
+						// System.out.println("ordinalPosition=" +
+						// dbOrdinalPosition);
+						// System.out.println("ascendingOrDescending=" +
+						// dbAscOrDesc);
+						// System.out.println("cardinality=" + dbCardinality);
+						// System.out.println("pages=" + dbPages);
+						// System.out.println("filterCondition=" +
+						// dbFilterCondition);
+					}
+
+					String indexName = resultSet.getString(6);
+					String type = resultSet.getString(7);
+					String columnName = resultSet.getString(9);
+
+					TableIndexLeaf tableIndexNode = new TableIndexLeaf(type, indexName);
+					tableIndexNode.setColumnNane(columnName);
+
+					list.add(tableIndexNode);
+				}
+			} catch (SQLException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+
+			return list;
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 *
@@ -120,12 +298,21 @@ public abstract class AbstractTableIndexInformationController extends BorderPane
 			throw new NullPointerException("tableName이 비었습니다.");
 		}
 
-		String sql = getIndexSQL(databaseName, tableName);
-		List<TableIndexNode> query = this.parent.query(sql, mapper());
+		//2016-11-26 by kyj 일단 모든 데이터베이스에서 다 조회가능한 인덱스 조회법으로 수정
+		String sql =  "";/*getIndexSQL(databaseName, tableName);*/
+		List<TableIndexNode> result = Collections.emptyList();
 
-		TreeItem<TableIndexNode> convertTreeRoot = convertTreeRoot(query);
+		if (ValueUtil.isEmpty(sql)) {
+			result = this.parent.queryForMeta(new ConverterFunction(databaseName, tableName));
+		} else {
+			try {
+				result = this.parent.query(sql, mapper());
+			} catch (Exception e) {
+				result = this.parent.queryForMeta(new ConverterFunction(databaseName, tableName));
+			}
+		}
 
-		treeIndex.setRoot(convertTreeRoot);
+		treeIndex.setRoot(convertTreeRoot(result));
 
 	}
 
@@ -187,7 +374,7 @@ public abstract class AbstractTableIndexInformationController extends BorderPane
 				childrens.get(childrens.size() - 1).getChildrens().add(next);
 			}
 
-		} , (a, b) -> {
+		}, (a, b) -> {
 			/* 아래함수는 동작하지않는데 일단 지켜보자. */
 			a.addAll(b);
 		});

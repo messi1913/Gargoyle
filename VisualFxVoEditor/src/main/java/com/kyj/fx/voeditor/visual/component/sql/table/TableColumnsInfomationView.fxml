@@ -40,8 +40,8 @@
 								<PropertyValueFactory property="columnName" />
 							</cellValueFactory>
 						</TableColumn>
-						<TableColumn fx:id="colType" prefWidth="75.0" text="데이터 유형" >
-						<cellValueFactory>
+						<TableColumn fx:id="colType" prefWidth="75.0" text="데이터 유형">
+							<cellValueFactory>
 								<PropertyValueFactory property="dataType" />
 							</cellValueFactory>
 						</TableColumn>
@@ -59,9 +59,17 @@
 						</TableColumn>
 						<TableColumn fx:id="colZero" prefWidth="85.0" text="0으로 채움" />
 						<TableColumn fx:id="colDefault" prefWidth="134.0"
-							text="기본값" />
+							text="기본값">
+							<cellValueFactory>
+								<PropertyValueFactory property="defaultValue" />
+							</cellValueFactory>
+						</TableColumn>
 						<TableColumn fx:id="colComment" prefWidth="201.0"
-							text="코멘트" />
+							text="코멘트">
+							<cellValueFactory>
+								<PropertyValueFactory property="remark" />
+							</cellValueFactory>
+						</TableColumn>
 					</columns>
 					<padding>
 						<Insets bottom="5.0" left="5.0" right="5.0" />

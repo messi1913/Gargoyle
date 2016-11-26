@@ -16,7 +16,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
-import com.kyj.fx.voeditor.visual.framework.FileCheckConverter;
+import com.kyj.fx.voeditor.visual.framework.FileCheckHandler;
 
 /***************************
  * 
@@ -36,7 +36,7 @@ public class GargoyleJavaParser {
 	 * @throws IOException
 	 * @throws ParseException
 	 ********************************/
-	public static String getPackageName(File javaFile, FileCheckConverter<String> converter)
+	public static String getPackageName(File javaFile, FileCheckHandler<String> converter)
 			throws FileNotFoundException, IOException, ParseException {
 		String packageName = null;
 

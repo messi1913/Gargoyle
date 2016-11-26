@@ -32,8 +32,12 @@ public class TableColumnMetaVO {
 	private BooleanProperty isPrimaryKey;
 
 	private StringProperty dataLength;
-	
+
 	private StringProperty dataType;
+
+	private StringProperty defaultValue;
+
+	private StringProperty remark;
 
 	public TableColumnMetaVO() {
 		columnName = new SimpleStringProperty();
@@ -43,9 +47,9 @@ public class TableColumnMetaVO {
 		isPrimaryKey = new SimpleBooleanProperty();
 		dataLength = new SimpleStringProperty();
 		dataType = new SimpleStringProperty();
+		defaultValue = new SimpleStringProperty();
+		remark = new SimpleStringProperty();
 	}
-	
-	
 
 	public final StringProperty columnNameProperty() {
 		return this.columnName;
@@ -119,22 +123,40 @@ public class TableColumnMetaVO {
 		this.dataLengthProperty().set(dataLength);
 	}
 
-
-
 	public final StringProperty dataTypeProperty() {
 		return this.dataType;
 	}
-
-
 
 	public final java.lang.String getDataType() {
 		return this.dataTypeProperty().get();
 	}
 
-
-
 	public final void setDataType(final java.lang.String dataType) {
 		this.dataTypeProperty().set(dataType);
+	}
+
+	public final StringProperty defaultValueProperty() {
+		return this.defaultValue;
+	}
+
+	public final String getDefaultValue() {
+		return this.defaultValueProperty().get();
+	}
+
+	public final void setDefaultValue(final String defaultValue) {
+		this.defaultValueProperty().set(defaultValue);
+	}
+
+	public final StringProperty remarkProperty() {
+		return this.remark;
+	}
+
+	public final String getRemark() {
+		return this.remarkProperty().get();
+	}
+
+	public final void setRemark(final String remark) {
+		this.remarkProperty().set(remark);
 	}
 
 }

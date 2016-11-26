@@ -37,7 +37,7 @@ import com.google.common.base.Objects;
 import com.kyj.fx.voeditor.visual.component.FileWrapper;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
-import com.kyj.fx.voeditor.visual.framework.FileCheckConverter;
+import com.kyj.fx.voeditor.visual.framework.FileCheckHandler;
 import com.kyj.fx.voeditor.visual.framework.collections.CachedMap;
 import com.kyj.fx.voeditor.visual.framework.model.proj.ProjectDescription;
 import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
@@ -546,7 +546,7 @@ public class FileUtil {
 	 * @param errorHandler
 	 * @return
 	 ********************************/
-	public static Optional<String> getPackageName(File javaFile, FileCheckConverter<String> converter, Consumer<Exception> errorHandler) {
+	public static Optional<String> getPackageName(File javaFile, FileCheckHandler<String> converter, Consumer<Exception> errorHandler) {
 
 		try {
 			if (javaFile == null) {

@@ -52,13 +52,18 @@ public class TableIndexNode {
 	 * @최초생성일 2016. 1. 4.
 	 */
 	private IntegerProperty length;
-
-	public TableIndexNode(String type, String name) {
+	public TableIndexNode() {
 		childrens = FXCollections.observableArrayList();
 		this.columnNane = new SimpleStringProperty();
-		this.constraintName = new SimpleStringProperty(name);
-		this.type = new SimpleStringProperty(type);
-		length = new SimpleIntegerProperty();
+		this.constraintName = new SimpleStringProperty();
+		this.type = new SimpleStringProperty();
+		this.length = new SimpleIntegerProperty();
+	}
+	
+	public TableIndexNode(String type, String constraintName) {
+		this();
+		this.constraintName.set(constraintName);
+		this.type.set(type);
 	}
 
 	public StringProperty constraintNameProperty() {
