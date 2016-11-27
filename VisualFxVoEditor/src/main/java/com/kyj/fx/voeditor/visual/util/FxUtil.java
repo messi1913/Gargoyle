@@ -727,7 +727,35 @@ public class FxUtil {
 	public static void snapShot(Node target, OutputStream out, Consumer<Exception> errorCallback) {
 		snapShot(target, out, -1, -1, errorCallback);
 	}
+	
+	public static void snapShot(Scene target, OutputStream out, Consumer<Exception> errorCallback) {
+		snapShot(target, out, -1, -1, errorCallback);
+	}
+	public static void snapShot(Scene target, OutputStream out, int requestWidth, int requestHeight, Consumer<Exception> errorCallback) {
+		if (target == null)
+			throw new NullPointerException("target Node is empty.");
 
+		if (out == null)
+			throw new NullPointerException("target Stream is empty.");
+
+		SnapshotParameters params = new SnapshotParameters();
+		params.setDepthBuffer(true);
+		
+//		params.setFill(Color.TRANSPARENT);
+
+		WritableImage wi = null;
+		if (requestWidth >= 0 || requestHeight >= 0) {
+			wi = new WritableImage(requestWidth, requestHeight);
+		}
+		
+		WritableImage snapshot = target.snapshot(wi);
+		try {
+			boolean isSuccess = snapShot(out, snapshot);
+			LOGGER.debug("Write Image result {}", isSuccess);
+		} catch (IOException e) {
+			errorCallback.accept(e);
+		}
+	}
 	public static void snapShot(Node target, OutputStream out, int requestWidth, int requestHeight, Consumer<Exception> errorCallback) {
 
 		if (target == null)
@@ -738,7 +766,8 @@ public class FxUtil {
 
 		SnapshotParameters params = new SnapshotParameters();
 		params.setDepthBuffer(true);
-		// params.setFill(Color.CORNSILK);
+		
+//		params.setFill(Color.TRANSPARENT);
 
 		WritableImage wi = null;
 		if (requestWidth >= 0 || requestHeight >= 0) {
