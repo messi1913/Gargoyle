@@ -302,11 +302,13 @@
 				<filename name="jsch.agentproxy.usocket-jna-0.0.7.jar" />
 			</fileset>
 		</copy>
+		<!--
 		<copy todir="externalLibs">
 			<fileset dir="${m2.dir}\org\apache\pdfbox\pdfbox-debugger\2.0.0">
 				<filename name="pdfbox-debugger-2.0.0.jar" />
 			</fileset>
 		</copy>
+		-->
 		<copy todir="externalLibs">
 			<fileset dir="${m2.dir}\org\controlsfx\controlsfx\8.40.12">
 				<filename name="controlsfx-8.40.12.jar" />
@@ -508,8 +510,8 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${m2.dir}\org\xerial\sqlite-jdbc\3.8.11.2">
-				<filename name="sqlite-jdbc-3.8.11.2.jar" />
+			<fileset dir="${m2.dir}\org\xerial\sqlite-jdbc\3.7.2">
+				<filename name="sqlite-jdbc-3.7.2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
@@ -661,7 +663,7 @@
 				<include name="btrace-client.jar" />
 				<include name="ooxml-schemas-1.3.jar" />
 				<include name="httpclient-4.3.6.jar" />
-				<include name="pdfbox-debugger-2.0.0.jar" />
+				<!--<include name="pdfbox-debugger-2.0.0.jar" />-->
 				<include name="json-20141113.jar" />
 				<include name="ojdbc14.jar" />
 				<include name="spring-security-core-3.2.3.RELEASE.jar" />
@@ -728,7 +730,7 @@
 				<include name="commons-pool-1.5.4.jar" />
 				<include name="javassist-3.16.1-GA.jar" />
 				<include name="jackson-annotations-2.4.2.jar" />
-				<include name="sqlite-jdbc-3.8.11.2.jar" />
+				<include name="sqlite-jdbc-3.7.2.jar" />
 				<include name="javaparser-core-2.4.0.jar" />
 
 				<include name="kyj.Fx.dao.wizard-0.0.3-SNAPSHOT.jar" />
@@ -782,6 +784,7 @@
 		<copy todir="build/src">
 			<fileset dir="project/src/main/java">
 				<include name="**/*" />
+				<exclude name="com/kyj/fx/voeditor/visual/example/**"/>
 			</fileset>
 		</copy>
 
