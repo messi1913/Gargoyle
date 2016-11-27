@@ -29,7 +29,6 @@ import com.kyj.fx.voeditor.visual.component.bar.GargoyleSynchLoadBar;
 import com.kyj.fx.voeditor.visual.component.chart.service.BaseGoogleTrendChart;
 import com.kyj.fx.voeditor.visual.component.chart.service.ChartOverTooltip;
 import com.kyj.fx.voeditor.visual.component.chart.service.GoogleTrendChartEvent;
-import com.kyj.fx.voeditor.visual.example.GoogleTrendExam2;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.RequestUtil;
@@ -65,7 +64,7 @@ public class GoogleTrendComposite extends BorderPane {
 
 	public static final String TITLE = "Google Trend";
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(GoogleTrendExam2.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GoogleTrendComposite.class);
 	/**
 	 * 검색 URL
 	 *

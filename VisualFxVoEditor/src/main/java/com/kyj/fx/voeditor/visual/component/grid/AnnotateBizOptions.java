@@ -6,12 +6,12 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.grid;
 
+import com.kyj.fx.voeditor.visual.framework.CodeDVO;
+import com.kyj.fx.voeditor.visual.util.DateUtil;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.StringConverter;
-
-import com.kyj.fx.voeditor.visual.example.CodeDVO;
-import com.kyj.fx.voeditor.visual.util.DateUtil;
 
 /**
  * 어노테이션기반 텍스트헤더를 처리함.
