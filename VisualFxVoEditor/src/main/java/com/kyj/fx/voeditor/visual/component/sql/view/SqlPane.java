@@ -61,6 +61,7 @@ import com.sun.btrace.BTraceUtils.Strings;
 
 import javafx.application.Application;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -71,7 +72,10 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.IndexRange;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
@@ -86,6 +90,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -99,6 +104,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Callback;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import jfxtras.scene.layout.GridPane;
@@ -168,6 +174,12 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	IntegerProperty endRowIndexProperty = new SimpleIntegerProperty();
 	IntegerProperty startColIndexProperty = new SimpleIntegerProperty();
 	IntegerProperty endColIndexProperty = new SimpleIntegerProperty();
+
+	/**
+	 * 데이터베이스 sql 함수 리스트
+	 * @최초생성일 2016. 11. 28.
+	 */
+//	private ObjectProperty<List<String>> sqlFunctions = new SimpleObjectProperty<>(Collections.emptyList());
 
 	public void setTitle(String title) {
 		//		sqlEditPane.setTitle(title);
@@ -452,6 +464,13 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		DockPane.initializeDefaultUserAgentStylesheet();
 
 		Main.addPrimaryStageCloseListener(() -> onPrimaryCloseRequest(null));
+
+		//Sql 함수 로딩
+//		try {
+//			sqlFunctions.set(DbUtil.getSqlFunctions(connectionSupplier.get()));
+//		} catch (Exception e) {
+//			LOGGER.error(ValueUtil.toString(e));
+//		}
 
 		//bugfix. 아래처럼 primarystage set을 하게되면 등록된 모든 리스너가 사라짐.
 		//		SharedMemory.getPrimaryStage().setOnCloseRequest();
@@ -942,10 +961,61 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				e.consume();
 			}
 		}
-		// break;
-		// default:
-		// break;
-		// }
+		// 펑션 함수 호출. unuse -> jdbc vender에서 구현코드가 대부분없으므로 커스텀하게 구현할것.
+		//CTRL + SPACE
+		else if (KeyCode.SPACE == e.getCode() && e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
+//			ListView<String> listView = new ListView<String>();
+//			listView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+//
+//				@Override
+//				public ListCell<String> call(ListView<String> param) {
+//					return new TextFieldListCell<String>();
+//				}
+//			});
+//
+//			listView.getItems().addAll(this.sqlFunctions.get());
+//
+//			SqlKeywords sqlNode = sqlTabPane.getSelectedTab().getSqlNode();
+//
+//			Integer currentLine = sqlNode.getCurrentLine();
+//			IndexRange selection = sqlNode.getSelection();
+//
+//			FxUtil.showPopOver(this, listView, pop -> {
+//				pop.setAutoHide(true);
+//				pop.setAnimated(false);
+//				listView.getSelectionModel().select(0);
+//
+//				listView.setOnKeyPressed(ev -> {
+//					if (KeyCode.ENTER == ev.getCode()) {
+//						String selectedItem = listView.getSelectionModel().getSelectedItem();
+//						sqlNode.appendContent(selectedItem);
+//						pop.hide();
+//						ev.consume();
+//					} else if (KeyCode.ESCAPE == ev.getCode()) {
+//						pop.hide();
+//						ev.consume();
+//					}
+//				});
+//				listView.setOnMouseClicked(ev -> {
+//
+//					if (ev.getClickCount() == 2 && MouseButton.PRIMARY == ev.getButton()) {
+//						String selectedItem = listView.getSelectionModel().getSelectedItem();
+//						sqlNode.appendContent(selectedItem);
+//						pop.hide();
+//						ev.consume();
+//					}
+//
+//				});
+//
+//
+//				pop.focusedProperty().addListener((oba, o, n) -> {
+//					if (!n)
+//						pop.hide();
+//				});
+//				return pop;
+//			});
+
+		}
 
 	}
 
@@ -964,18 +1034,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		if (sql == null || sql.isEmpty())
 			return;
 
-		// final String _sql = sql;
-		// if (ValueUtil.isVelocityContext(_sql)) {
-		// VariableMappingView mappingView = new VariableMappingView(stage);
-		// mappingView.extractVariableFromSql(_sql);
-		// mappingView.showAndWait(dynamicParams -> {
-		// executeAll(_sql.split(";"), dynamicParams);
-		// });
-		// } else {
-
 		String[] split = sql.split(";\n");
 		executeAll(split);
-		// }
 
 	}
 
@@ -1211,14 +1271,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			SimpleTextView parent = new SimpleTextView(clip.toString());
 			parent.setWrapText(false);
 			FxUtil.createStageAndShow(parent, stage -> {
-				//				stage.setAlwaysOnTop(true);
-				//				stage.initModality(Modality.APPLICATION_MODAL);
-				//				stage.initOwner(SqlPane.this.getScene().getWindow());
 			});
-
-			//			SimpleTextView simpleTextView = new SimpleTextView(clip.toString());
-			//			simpleTextView.setWrapText(false);
-			//			simpleTextView.show(false);
 		} catch (Exception e1) {
 			LOGGER.error(ValueUtil.toString(e1));
 		}
@@ -1226,79 +1279,6 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	}
 
 	public abstract void menuExportInsertScriptOnAction(ActionEvent e);
-	/**
-	 * Export Insert Script.
-	 *
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 6. 10.
-	 * @param e
-	 */
-	//	public void menuExportInsertScriptOnAction(ActionEvent e) {
-	//
-	//		ObservableList<Map<String, Object>> items = tbResult.getItems();
-	//		if (items.isEmpty())
-	//			return;
-	//
-	//		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
-	//
-	//		showInputDialog.ifPresent(op -> {
-	//			String tableName = showInputDialog.get().getValue();
-	//			Map<String, Object> map = items.get(0);
-	//			final Set<String> keySet = map.keySet();
-	//			// 클립보드 복사
-	//			StringBuilder clip = new StringBuilder();
-	//
-	//			String insertPreffix = "insert into " + tableName;
-	//			String collect = keySet.stream()/* .map(str -> str) */.collect(Collectors.joining(",", "(", ")"));
-	//			String insertMiddle = " values ";
-	//
-	//			List<String> valueList = items.stream().map(v -> {
-	//				return ValueUtil.toJSONObject(v);
-	//			}).map(v -> {
-	//				Iterator<String> iterator = keySet.iterator();
-	//				List<Object> values = new ArrayList<>();
-	//				while (iterator.hasNext()) {
-	//					String columnName = iterator.next();
-	//					Object value = v.get(columnName);
-	//					values.add(value);
-	//				}
-	//				return values;
-	//			}).map(list -> {
-	//
-	//				return list.stream().map(str -> {
-	//					if (str == null)
-	//						return null;
-	//					else {
-	//						String convert = str.toString();
-	//						convert = convert.substring(1, convert.length() - 1);
-	//						if (convert.indexOf("'") >= 0) {
-	//							try {
-	//								convert = StringUtils.replace(convert, "'", "''");
-	//							} catch (Exception e1) {
-	//								e1.printStackTrace();
-	//							}
-	//						}
-	//						return "'".concat(convert).concat("'");
-	//					}
-	//				}).collect(Collectors.joining(",", "(", ")"));
-	//
-	//			}).map(str -> {
-	//				/* SQL문 완성처리 */
-	//				return new StringBuilder().append(insertPreffix).append(collect).append(insertMiddle).append(str).append(";\n").toString();
-	//			}).collect(Collectors.toList());
-	//
-	//			valueList.forEach(str -> {
-	//				clip.append(str);
-	//			});
-	//
-	//			SimpleTextView parent = new SimpleTextView(clip.toString());
-	//			parent.setWrapText(false);
-	//			FxUtil.createStageAndShow(parent, stage -> {
-	//				stage.setTitle(String.format("[InsertScript] Table : %s", tableName));
-	//			});
-	//		});
-	//
-	//	}
 
 	/**
 	 * export spreadSheet event

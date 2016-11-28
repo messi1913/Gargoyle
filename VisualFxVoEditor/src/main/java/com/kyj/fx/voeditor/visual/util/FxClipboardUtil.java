@@ -130,7 +130,7 @@ public class FxClipboardUtil {
 	 * @param table
 	 ********************************/
 	public static void installCopyPasteHandler(TableView<?> table) {
-		FxTableClipboardUtil.installCopyPasteHandler(table);
+		FxTableViewUtil.installCopyPasteHandler(table);
 	}
 
 	/**
@@ -139,8 +139,8 @@ public class FxClipboardUtil {
 	 * @작성일 : 2016. 11. 16.
 	 * @param table
 	 */
-	public static void installCopyPasteHandler(TreeView<?> table) {
-		FxTreeViewClipboardUtil.installCopyPasteHandler(table);
-	}
+//	public static void installCopyPasteHandler(TreeView<?> table) {
+//		FxTreeViewClipboardUtil.installCopyPasteHandler(table);
+//	}
 
 }

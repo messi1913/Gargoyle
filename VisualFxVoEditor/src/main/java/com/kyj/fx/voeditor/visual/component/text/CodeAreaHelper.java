@@ -388,4 +388,13 @@ public class CodeAreaHelper<T extends CodeArea> {
 		return codeMoveDeligator.getCurrentLine();
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 28.
+	 * @return
+	 */
+	public IndexRange getSelection() {
+		return codeArea.getSelection();
+	}
+
 }

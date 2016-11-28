@@ -20,6 +20,7 @@ import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.concurrent.Task;
+import javafx.scene.control.IndexRange;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -181,6 +182,14 @@ public class SqlKeywords extends BorderPane {
 
 	public String getText() {
 		return codeHelperDeligator.getText();
+	}
+
+	public IndexRange getSelection(){
+		return codeHelperDeligator.getSelection();
+	}
+
+	public Integer getCurrentLine(){
+		return codeHelperDeligator.getCurrentLine();
 	}
 
 	private static StyleSpans<Collection<String>> computeHighlighting(String _text) {

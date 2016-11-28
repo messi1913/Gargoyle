@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.table;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,8 +16,6 @@ import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.BorderPane;
 
 /**
  * 테이블 생성조회문을 보여주기 위한. 추상화 클래스
@@ -26,7 +23,7 @@ import javafx.scene.layout.BorderPane;
  * @author KYJ
  *
  */
-public abstract class AbstractTableCreateCodeInformationController<T> extends BorderPane implements ItableInformation {
+public abstract class AbstractTableCreateCodeInformationController<T> extends AbstractTableInfomation {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(AbstractTableCreateCodeInformationController.class);
 	private TableInformationFrameView parent;
@@ -40,15 +37,10 @@ public abstract class AbstractTableCreateCodeInformationController<T> extends Bo
 
 	/**
 	 * 생성자
-	 *
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public AbstractTableCreateCodeInformationController() throws IOException {
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(TableInformationFrameView.class.getResource(KEY_TABLE_CREATE_CODE_INFORMATION));
-		loader.setRoot(this);
-		loader.setController(this);
-		loader.load();
+	public AbstractTableCreateCodeInformationController() throws Exception {
+		super(KEY_TABLE_CREATE_CODE_INFORMATION);
 	}
 
 	@Override

@@ -40,6 +40,8 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Pair;
 
 /**
+ *
+ * 윈도우 기능성 키 이벤트처리.
  * @author KYJ
  *
  */
@@ -188,88 +190,11 @@ public class SqlTab extends Tab {
 					miOenOnAction(new ActionEvent());
 					keyE.consume();
 				}
-				if (KeyCode.S == keyE.getCode() && keyE.isControlDown() && !keyE.isAltDown() && !keyE.isShiftDown()) {
+				else if (KeyCode.S == keyE.getCode() && keyE.isControlDown() && !keyE.isAltDown() && !keyE.isShiftDown()) {
 					muSaveOnAction(new ActionEvent());
 					keyE.consume();
 				}
 			}
-
-			//			boolean isControlDown = keyE.isControlDown();
-			//			if (isControlDown && keyE.getCode() == KeyCode.S) {
-			//				int lastIndexOf = text2.lastIndexOf('*');
-			//				if (lastIndexOf >= 0) {
-			//
-			//					File selectedFile = DialogUtil.showFileSaveDialog(null, choser -> {
-			//
-			//						//경로를 지정하지않을시 마지막에 처리된 경로에 기본으로 로드되므로 주석.
-			//						//						String dir = System.getProperty("user.home");
-			//						//						choser.setInitialDirectory(new File(dir));
-			//
-			//						choser.getExtensionFilters()
-			//								.add(new ExtensionFilter(GargoyleExtensionFilters.SQL_NAME, GargoyleExtensionFilters.SQL));
-			//						choser.getExtensionFilters()
-			//								.add(new ExtensionFilter(GargoyleExtensionFilters.ALL_NAME, GargoyleExtensionFilters.ALL));
-			//
-			//					});
-			//
-			//					if (selectedFile != null) {
-			//
-			//						boolean isWritableStatus = true;
-			//						if (selectedFile.exists()) {
-			//							Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("File already exists",
-			//									"Overwrite ? ");
-			//							isWritableStatus = showYesOrNoDialog.isPresent();
-			//						}
-			//
-			//						if (isWritableStatus) {
-			//
-			//							// 파일에 실제 쓰는작업처리
-			//							Boolean apply = saveFileFunction.apply(selectedFile, getSqlText());
-			//
-			//							// 파일생성에 문제없는경우 탭이름 변경
-			//							if (apply) {
-			//								// tab title 변경
-			//								setText(selectedFile.getName());
-			//							}
-			//
-			//						}
-			//
-			//					}
-			//
-			//					event.consume();
-			//					return event;
-			//				}
-			//
-			//			}
-
-			//			else if (isControlDown && keyE.getCode() == KeyCode.O) {
-			//
-			//
-			//				File showFileDialog = DialogUtil.showFileDialog(/*SharedMemory.getPrimaryStage()*/ null, choser -> {
-			//					/*마지막에 선택한 경로를 자동선택하는 기능이 추가되었으므로 기본경로 선택 처리는 없앰.*/
-			//					//					String dir = System.getProperty("user.home");
-			//					//					choser.setInitialDirectory(new File(dir));
-			//					choser.getExtensionFilters().add(new ExtensionFilter("SQL files (*.sql)", "*.sql"));
-			//				});
-			//
-			//				//선택한 파일이 정상적으로 선택된 경우는 null이 아님.
-			//				if (showFileDialog != null) {
-			//
-			//					String fileContent = FileUtil.readFile(showFileDialog, new LoadFileOptionHandler());
-			//					if (fileContent != null /*공백여부는 체크안함. 파일 내용에 실제 공백이 포함될 수 있으므로...*/) {
-			//						setTxtSql(fileContent);
-			//						setText(showFileDialog.getName());
-			//
-			//					}
-			//				}
-			//
-			//				event.consume();
-			//			}
-
-			//			else {
-			// if (keyE.isAltDown() || isControlDown ||
-			// keyE.isShiftDown())
-			// return event;
 
 			if (!text2.contains("*"))
 				setText(text2 + "*");

@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +24,7 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
  */
 public class CommonTableCreateCodeInformationController extends AbstractTableCreateCodeInformationController<String> {
 
-	public CommonTableCreateCodeInformationController() throws IOException {
+	public CommonTableCreateCodeInformationController() throws Exception {
 		super();
 	}
 

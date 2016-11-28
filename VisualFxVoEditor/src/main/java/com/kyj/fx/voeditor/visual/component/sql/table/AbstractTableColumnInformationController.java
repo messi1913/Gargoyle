@@ -13,7 +13,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,23 +27,27 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.kyj.fx.voeditor.visual.component.NumberingCellValueFactory;
 import com.kyj.fx.voeditor.visual.component.sql.table.IKeyType.KEY_TYPE;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
+import javafx.util.Callback;
 
 /**
  * @author KYJ
  *
  */
-public abstract class AbstractTableColumnInformationController extends BorderPane implements ItableInformation {
+public abstract class AbstractTableColumnInformationController extends AbstractTableInfomation {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(AbstractTableColumnInformationController.class);;
 	private TableInformationFrameView parent;
@@ -50,6 +60,9 @@ public abstract class AbstractTableColumnInformationController extends BorderPan
 
 	@FXML
 	private TableColumn<TableColumnMetaVO, Integer> colNumber;
+
+	@FXML
+	private TableColumn<TableColumnMetaVO, String> colReference;
 
 	/**
 	 * 테이블의 컬럼 구성요소에 대한 정보를 보여주는 fxml이자 키값
@@ -81,11 +94,7 @@ public abstract class AbstractTableColumnInformationController extends BorderPan
 	 * @throws Exception
 	 */
 	public AbstractTableColumnInformationController() throws Exception {
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(TableInformationFrameView.class.getResource(KEY_TABLE_COLUMNS_INFORMATION));
-		loader.setRoot(this);
-		loader.setController(this);
-		loader.load();
+		super(KEY_TABLE_COLUMNS_INFORMATION);
 	}
 
 	@FXML
@@ -135,8 +144,30 @@ public abstract class AbstractTableColumnInformationController extends BorderPan
 
 		});
 
+		colReference.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<TableColumnMetaVO, String>, ObservableValue<String>>() {
+
+			@Override
+			public ObservableValue<String> call(CellDataFeatures<TableColumnMetaVO, String> param) {
+
+				TableColumnMetaVO value = param.getValue();
+				SimpleStringProperty stringProperty = new SimpleStringProperty();
+				if (value != null && value.getRefs() != null) {
+					Optional<String> reduce = value.getRefs().stream()
+							.map(v -> v.getPkColumnName() + " ->  [ " + v.getFkTableName() + "-" + v.getFkColumnName() + " ]")
+							.reduce((str1, str2) -> str1.concat("\n").concat(str2));
+					reduce.ifPresent(stringProperty::setValue);
+
+				}
+				return stringProperty;
+			}
+		});
+
 		colKeyType.setCellValueFactory(new PropertyValueFactory<>("keyType"));
 		colKeyType.setStyle("-fx-alignment:center");
+
+		this.tbColumns.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		FxUtil.installClipboardKeyEvent(this.tbColumns);
+
 
 	}
 
@@ -175,8 +206,7 @@ public abstract class AbstractTableColumnInformationController extends BorderPan
 		}
 
 		List<TableColumnMetaVO> result = Collections.emptyList();
-		
-		
+
 		//2016-11-26 by kyj 일단 모든 데이터베이스에서 다 조회가능한 인덱스 조회법으로 수정
 		String sql = "";/* getTableColumnsSQL(databaseName, tableName); */
 		if (ValueUtil.isEmpty(sql)) {
@@ -190,6 +220,9 @@ public abstract class AbstractTableColumnInformationController extends BorderPan
 		}
 
 		tbColumns.getItems().addAll(result);
+
+
+//		avaliableTypes();
 	}
 
 	/**
@@ -216,6 +249,26 @@ public abstract class AbstractTableColumnInformationController extends BorderPan
 	public String getDbmsDriver() {
 		return this.parent.getDbmsDriver();
 	}
+
+//	public void avaliableTypes() throws SQLException {
+//
+//
+//		DatabaseMetaData metaData = this.parent.getConnection().getMetaData();
+//		ResultSet attributes = metaData.getAttributes(null, null, null, null);
+//
+//		ResultSetMetaData rMeta = attributes.getMetaData();
+//		int columnCount = rMeta.getColumnCount();
+//
+//		while (attributes.next()) {
+//			for (int i = 1; i < columnCount; i++) {
+//				String value = attributes.getString(i);
+//				String columnName = rMeta.getColumnName(i);
+//				System.out.println(String.format("%s - %s", columnName, value));
+//			}
+//		}
+//
+//		//		this.parent.getConnection().getMetaData().
+//	}
 
 	/**
 	 * @author KYJ
@@ -354,7 +407,13 @@ public abstract class AbstractTableColumnInformationController extends BorderPan
 				if (resultSet.getRow() <= 0)
 					resultSet = t.getColumns(this.databaseName, null, this.tableName, null);
 
-				// System.out.println(row);
+				Map<String, String> primaryKey = getPrimaryKey(t);
+
+				Set<ReferenceKey> exportKey = getReferenceKey(t);
+				boolean existsReferenceKey = false;
+				if (exportKey != null && !exportKey.isEmpty()) {
+					existsReferenceKey = true;
+				}
 
 				while (resultSet.next()) {
 
@@ -384,8 +443,14 @@ public abstract class AbstractTableColumnInformationController extends BorderPan
 						break;
 					}
 
-					// vo.setKeyType(keyType);
-					// vo.setIsPrimaryKey(isPrimaryKey);
+					if (primaryKey.containsKey(columnName)) {
+						vo.setKeyType(KEY_TYPE.PRI);
+					}
+
+					if (existsReferenceKey) {
+						vo.setRefs(exportKey.stream().filter(r -> columnName.equals(r.getPkColumnName())).collect(Collectors.toList()));
+					}
+
 					vo.setDataLength(columSize);
 					vo.setDataType(dataType);
 					vo.setRemark(remark);
@@ -397,5 +462,44 @@ public abstract class AbstractTableColumnInformationController extends BorderPan
 
 			return list;
 		}
+
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 11. 28.
+		 * @param t
+		 * @return
+		 * @throws SQLException
+		 */
+		private Set<ReferenceKey> getReferenceKey(DatabaseMetaData t) throws SQLException {
+			ResultSet exportedKeys = t.getExportedKeys(null, this.databaseName, this.tableName);
+			if (exportedKeys.getRow() <= 0)
+				exportedKeys = t.getExportedKeys(this.databaseName, null, this.tableName);
+
+			Set<ReferenceKey> referenceSet = new TreeSet<ReferenceKey>();
+			while (exportedKeys.next()) {
+
+				ReferenceKey referenceKey = new ReferenceKey();
+				referenceKey.setPkColumnName(exportedKeys.getString("PKCOLUMN_NAME"));
+				referenceKey.setPkTableName(exportedKeys.getString("PKTABLE_NAME"));
+				referenceKey.setFkColumnName(exportedKeys.getString("FKCOLUMN_NAME"));
+				referenceKey.setFkTableName(exportedKeys.getString("FKTABLE_NAME"));
+				referenceSet.add(referenceKey);
+			}
+
+			return referenceSet;
+		}
+
+		private Map<String, String> getPrimaryKey(DatabaseMetaData t) throws SQLException {
+			ResultSet presult = t.getPrimaryKeys(null, this.databaseName, this.tableName);
+			if (presult.getRow() <= 0)
+				presult = t.getPrimaryKeys(this.databaseName, null, this.tableName);
+
+			Map<String, String> pkMap = new TreeMap<String, String>();
+			while (presult.next()) {
+				pkMap.put(presult.getString("COLUMN_NAME"), presult.getString("PK_NAME"));
+			}
+			return pkMap;
+		}
+
 	}
 }

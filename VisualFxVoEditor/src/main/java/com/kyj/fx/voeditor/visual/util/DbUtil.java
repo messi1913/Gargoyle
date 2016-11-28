@@ -31,6 +31,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -1147,6 +1148,28 @@ public class DbUtil extends ConnectionManager {
 			return !findFirst.isPresent();
 		}
 		return true;
+	}
+
+	public static List<String> getSqlFunctions(final Connection con, boolean autoClose) throws SQLException {
+		try {
+			DatabaseMetaData metaData = con.getMetaData();
+
+			String stringFunctions = metaData.getStringFunctions();
+			String numericFunctions = metaData.getNumericFunctions();
+			String timeDateFunctions = metaData.getTimeDateFunctions();
+
+			return Stream.of(stringFunctions.split(","), numericFunctions.split(","), timeDateFunctions.split(",")).flatMap(v -> {
+				return Stream.of(v);
+			}).collect(Collectors.toList());
+
+		} catch (Exception e) {
+
+		} finally {
+
+			if (autoClose)
+				con.close();
+		}
+		return Collections.emptyList();
 	}
 
 	// TODO 구현가능한부분인지 확인.

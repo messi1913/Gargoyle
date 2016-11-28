@@ -8,7 +8,9 @@ package com.kyj.fx.voeditor.visual.component.sql.table;
 
 import java.util.List;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -46,20 +48,24 @@ public class TableIndexNode {
 	 */
 	private StringProperty columnNane;
 
+	private BooleanProperty noneUnique;
+
 	/**
 	 * 인덱스 길이
 	 *
 	 * @최초생성일 2016. 1. 4.
 	 */
 	private IntegerProperty length;
+
 	public TableIndexNode() {
 		childrens = FXCollections.observableArrayList();
 		this.columnNane = new SimpleStringProperty();
 		this.constraintName = new SimpleStringProperty();
 		this.type = new SimpleStringProperty();
 		this.length = new SimpleIntegerProperty();
+		this.noneUnique = new SimpleBooleanProperty();
 	}
-	
+
 	public TableIndexNode(String type, String constraintName) {
 		this();
 		this.constraintName.set(constraintName);
@@ -137,6 +143,18 @@ public class TableIndexNode {
 	@Override
 	public String toString() {
 		return constraintName.get();
+	}
+
+	public final BooleanProperty noneUniqueProperty() {
+		return this.noneUnique;
+	}
+
+	public final boolean isNoneUnique() {
+		return this.noneUniqueProperty().get();
+	}
+
+	public final void setNoneUnique(final boolean noneUnique) {
+		this.noneUniqueProperty().set(noneUnique);
 	}
 
 }

@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.kyj.fx.voeditor.visual.component.sql.view.CommonDatabaseMetadataController;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableBaseInformationController;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableColumnInformationController;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableCreateCodeInformationController;
@@ -70,6 +72,12 @@ public class TableInformationFrameView extends BorderPane {
 	public static final String KEY_TABLE_COLUMNS_INFORMATION = "TableColumnsInfomationView.fxml";
 
 	/**
+	 * 데이터베이스에 대한 메타데이터를 조회하기 위한 뷰
+	 * @최초생성일 2016. 11. 28.
+	 */
+	public static final String KEY_DATABASE_MEATADATA = "DatabaseMetatadataView.fxml";
+
+	/**
 	 * 기능처리
 	 */
 	private TableInformationFrameManager manager;
@@ -98,7 +106,7 @@ public class TableInformationFrameView extends BorderPane {
 	@FXML
 	private BorderPane borTableColumnInformation;
 
-	private List<ItableInformation> itemManager;
+	private List<ItableInformation> graphicsItems;
 
 	/**
 	 * 사용된 jdbc Driver명
@@ -119,7 +127,7 @@ public class TableInformationFrameView extends BorderPane {
 		manager = new TableInformationFrameManager();
 		manager.setConnectionSupplier(connectionSupplier);
 		manager.setMetadata(metadata);
-		itemManager = new ArrayList<>();
+		graphicsItems = new ArrayList<>();
 
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(TableInformationFrameView.class.getResource(TABLE_INFORMATION_FRAME_VIEW_FXML));
@@ -142,7 +150,7 @@ public class TableInformationFrameView extends BorderPane {
 
 		// 테이블에 대한 이름 및 코멘트 정보
 		{
-			AbstractTableBaseInformationController informationPane = new CommonTableBaseInformationController();
+			AbstractTableInfomation informationPane = new CommonTableBaseInformationController();
 			informationPane.setParentFrame(this);
 			try {
 				informationPane.init();
@@ -150,7 +158,7 @@ public class TableInformationFrameView extends BorderPane {
 				LOGGER.error(ValueUtil.toString(e));
 			}
 
-			itemManager.add(informationPane);
+			graphicsItems.add(informationPane);
 			Tab e = new Tab("기본", informationPane);
 			e.setId(KEY_TABLE_BASE_INFORMATION);
 			tabInformations.getTabs().add(e);
@@ -158,7 +166,7 @@ public class TableInformationFrameView extends BorderPane {
 
 		// 테이블에 대한 컬럼정보
 		{
-			AbstractTableColumnInformationController columnPane = new CommonTableColumnInformationController();
+			AbstractTableInfomation columnPane = new CommonTableColumnInformationController();
 			columnPane.setParentFrame(this);
 
 			try {
@@ -166,7 +174,7 @@ public class TableInformationFrameView extends BorderPane {
 			} catch (Exception e) {
 				LOGGER.error(ValueUtil.toString(e));
 			}
-			itemManager.add(columnPane);
+			graphicsItems.add(columnPane);
 			columnPane.setId(KEY_TABLE_BASE_INFORMATION);
 			borTableColumnInformation.setCenter(columnPane);
 		}
@@ -174,7 +182,7 @@ public class TableInformationFrameView extends BorderPane {
 		// 테이블에 속한 인덱스에 대한 정보
 
 		{
-			AbstractTableIndexInformationController indexPane = new CommonTableIndexInformationController();
+			AbstractTableInfomation indexPane = new CommonTableIndexInformationController();
 			indexPane.setParentFrame(this);
 
 			try {
@@ -182,7 +190,7 @@ public class TableInformationFrameView extends BorderPane {
 			} catch (Exception e) {
 				LOGGER.error(ValueUtil.toString(e));
 			}
-			itemManager.add(indexPane);
+			graphicsItems.add(indexPane);
 			Tab e = new Tab("인덱스", indexPane);
 			e.setId(KEY_TABLE_INDEX_INFOMATION);
 			tabInformations.getTabs().add(e);
@@ -190,7 +198,7 @@ public class TableInformationFrameView extends BorderPane {
 
 		// 테이블에 대한 CREATE문에 대한 정보
 		{
-			AbstractTableCreateCodeInformationController<?> createCodePane = new CommonTableCreateCodeInformationController();
+			AbstractTableInfomation createCodePane = new CommonTableCreateCodeInformationController();
 			createCodePane.setParentFrame(this);
 
 			try {
@@ -199,9 +207,26 @@ public class TableInformationFrameView extends BorderPane {
 				LOGGER.error(ValueUtil.toString(e));
 
 			}
-			itemManager.add(createCodePane);
+			graphicsItems.add(createCodePane);
 			Tab e = new Tab("CREATE 코드", createCodePane);
 			e.setId(KEY_TABLE_CREATE_CODE_INFORMATION);
+			tabInformations.getTabs().add(e);
+		}
+
+		// 데이터베이스 메타데이터에 대한 정보
+		{
+			AbstractTableInfomation createCodePane = new CommonDatabaseMetadataController();
+			createCodePane.setParentFrame(this);
+
+			try {
+				createCodePane.init();
+			} catch (Exception e) {
+				LOGGER.error(ValueUtil.toString(e));
+
+			}
+			graphicsItems.add(createCodePane);
+			Tab e = new Tab("메타데이터", createCodePane);
+			e.setId(KEY_DATABASE_MEATADATA);
 			tabInformations.getTabs().add(e);
 		}
 
@@ -342,7 +367,7 @@ public class TableInformationFrameView extends BorderPane {
 	 */
 	@FXML
 	public void btnReloadOnMouseClick() {
-		itemManager.forEach(item -> {
+		graphicsItems.forEach(item -> {
 			try {
 				item.clear();
 				item.init();

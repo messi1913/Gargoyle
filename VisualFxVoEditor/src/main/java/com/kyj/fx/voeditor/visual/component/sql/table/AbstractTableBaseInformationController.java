@@ -12,10 +12,8 @@ import java.util.Map;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 
 /**
  * 테이블에 이름 및 코멘트에 대한 정보를 보여준다.
@@ -23,7 +21,7 @@ import javafx.scene.layout.BorderPane;
  * @author KYJ
  *
  */
-public abstract class AbstractTableBaseInformationController extends BorderPane implements ItableInformation {
+public abstract class AbstractTableBaseInformationController extends AbstractTableInfomation{
 
 	public static final String KEY_TABLE_BASE_INFORMATION = TableInformationFrameView.KEY_TABLE_BASE_INFORMATION;
 
@@ -41,11 +39,7 @@ public abstract class AbstractTableBaseInformationController extends BorderPane 
 	 * @throws Exception
 	 */
 	public AbstractTableBaseInformationController() throws Exception {
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(TableInformationFrameView.class.getResource(KEY_TABLE_BASE_INFORMATION));
-		loader.setRoot(this);
-		loader.setController(this);
-		loader.load();
+		super(KEY_TABLE_BASE_INFORMATION);
 	}
 
 	/*

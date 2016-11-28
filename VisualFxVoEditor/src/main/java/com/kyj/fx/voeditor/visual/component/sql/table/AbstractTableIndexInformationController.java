@@ -23,11 +23,9 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
-import javafx.scene.layout.BorderPane;
 
 /**
  * 테이블에 속한 인덱스 정보를 조회한다.
@@ -35,10 +33,10 @@ import javafx.scene.layout.BorderPane;
  * @author KYJ
  *
  */
-public abstract class AbstractTableIndexInformationController extends BorderPane implements ItableInformation {
+public abstract class AbstractTableIndexInformationController extends AbstractTableInfomation {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTableIndexInformationController.class);
-	private TableInformationFrameView parent;
+
 
 	@FXML
 	private TreeTableView<TableIndexNode> treeIndex;
@@ -49,6 +47,8 @@ public abstract class AbstractTableIndexInformationController extends BorderPane
 	@FXML
 	private TreeTableColumn<TableIndexNode, String> tcType;
 
+	@FXML
+	private TreeTableColumn<TableIndexNode, String> tcNoneUnique;
 	/**
 	 * 테이블 index에 대한 정보를 보여주는 fxml이자 키값
 	 */
@@ -60,24 +60,10 @@ public abstract class AbstractTableIndexInformationController extends BorderPane
 	 * @throws Exception
 	 */
 	public AbstractTableIndexInformationController() throws Exception {
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(TableInformationFrameView.class.getResource(KEY_TABLE_INDEX_INFOMATION));
-		loader.setRoot(this);
-		loader.setController(this);
-		loader.load();
+		super(KEY_TABLE_INDEX_INFOMATION);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see com.kyj.fx.voeditor.visual.component.sql.table.ItableInformation#
-	 * setParentFrame(com.kyj.fx.voeditor.visual.component.sql.table.
-	 * TableInformationFrameView)
-	 */
-	@Override
-	public void setParentFrame(TableInformationFrameView parent) {
-		this.parent = parent;
-	}
+
 
 	/**
 	 * UI 기능 초기화
@@ -107,6 +93,16 @@ public abstract class AbstractTableIndexInformationController extends BorderPane
 			if (!(value instanceof TableIndexLeaf)) {
 				String constraintType = value.getType();
 				str.setValue(constraintType);
+			}
+			return str;
+		});
+
+		tcNoneUnique.setCellValueFactory(param ->{
+			TableIndexNode value = param.getValue().getValue();
+			SimpleStringProperty str = new SimpleStringProperty();
+			if (!(value instanceof TableIndexLeaf)) {
+				boolean noneUnique = value.isNoneUnique();
+				str.setValue(noneUnique ? "yes" : "no");
 			}
 			return str;
 		});
@@ -213,6 +209,13 @@ public abstract class AbstractTableIndexInformationController extends BorderPane
 				// list.add(tableIndexNode);
 				// }
 
+				/*
+				* tableIndexStatistic - this identifies table statistics that are returned in conjuction with a table's index descriptions
+				◦ tableIndexClustered - this is a clustered index
+				◦ tableIndexHashed - this is a hashed index
+				◦ tableIndexOther - this is some other style of index
+				 */
+
 				ResultSet resultSet = t.getIndexInfo(null, this.databaseName, this.tableName, false, false);
 				if (resultSet.getRow() <= 0)
 					resultSet = t.getIndexInfo(this.databaseName, null, this.tableName, false, false);
@@ -224,53 +227,65 @@ public abstract class AbstractTableIndexInformationController extends BorderPane
 
 					// test
 					{
-						// String dbCatalog = resultSet.getString("TABLE_CAT");
-						// String dbSchema = resultSet.getString("TABLE_SCHEM");
-						// String dbTableName =
-						// resultSet.getString("TABLE_NAME");
-						// boolean dbNoneUnique =
-						// resultSet.getBoolean("NON_UNIQUE");
-						// String dbIndexQualifier =
-						// resultSet.getString("INDEX_QUALIFIER");
-						// String dbIndexName =
-						// resultSet.getString("INDEX_NAME");
-						// short dbType = resultSet.getShort("TYPE");
-						// short dbOrdinalPosition =
-						// resultSet.getShort("ORDINAL_POSITION");
-						// String dbColumnName =
-						// resultSet.getString("COLUMN_NAME");
-						// String dbAscOrDesc =
-						// resultSet.getString("ASC_OR_DESC");
-						// int dbCardinality = resultSet.getInt("CARDINALITY");
-						// int dbPages = resultSet.getInt("PAGES");
-						// String dbFilterCondition =
-						// resultSet.getString("FILTER_CONDITION");
-
-						// System.out.println("index name=" + dbIndexName);
-						// System.out.println("table=" + dbTableName);
-						// System.out.println("column=" + dbColumnName);
-						// System.out.println("catalog=" + dbCatalog);
-						// System.out.println("schema=" + dbSchema);
-						// System.out.println("nonUnique=" + dbNoneUnique);
-						// System.out.println("indexQualifier=" +
-						// dbIndexQualifier);
-						// System.out.println("type=" + dbType);
-						// System.out.println("ordinalPosition=" +
-						// dbOrdinalPosition);
-						// System.out.println("ascendingOrDescending=" +
-						// dbAscOrDesc);
-						// System.out.println("cardinality=" + dbCardinality);
-						// System.out.println("pages=" + dbPages);
-						// System.out.println("filterCondition=" +
-						// dbFilterCondition);
+//						String dbCatalog = resultSet.getString("TABLE_CAT");
+//						String dbSchema = resultSet.getString("TABLE_SCHEM");
+//						String dbTableName = resultSet.getString("TABLE_NAME");
+//						boolean dbNoneUnique = resultSet.getBoolean("NON_UNIQUE");
+//						String dbIndexQualifier = resultSet.getString("INDEX_QUALIFIER");
+//						String dbIndexName = resultSet.getString("INDEX_NAME");
+//						short dbType = resultSet.getShort("TYPE");
+//						short dbOrdinalPosition = resultSet.getShort("ORDINAL_POSITION");
+//						String dbColumnName = resultSet.getString("COLUMN_NAME");
+//						String dbAscOrDesc = resultSet.getString("ASC_OR_DESC");
+//						int dbCardinality = resultSet.getInt("CARDINALITY");
+//						int dbPages = resultSet.getInt("PAGES");
+//						String dbFilterCondition = resultSet.getString("FILTER_CONDITION");
+//
+//						System.out.println("index name=" + dbIndexName);
+//						System.out.println("table=" + dbTableName);
+//						System.out.println("column=" + dbColumnName);
+//						System.out.println("catalog=" + dbCatalog);
+//						System.out.println("schema=" + dbSchema);
+//						System.out.println("nonUnique=" + dbNoneUnique);
+//						System.out.println("indexQualifier=" + dbIndexQualifier);
+//						System.out.println("type=" + dbType);
+//						System.out.println("ordinalPosition=" + dbOrdinalPosition);
+//						System.out.println("ascendingOrDescending=" + dbAscOrDesc);
+//						System.out.println("cardinality=" + dbCardinality);
+//						System.out.println("pages=" + dbPages);
+//						System.out.println("filterCondition=" + dbFilterCondition);
 					}
 
-					String indexName = resultSet.getString(6);
-					String type = resultSet.getString(7);
+					/*
+					* tableIndexStatistic - this identifies table statistics that are returned in conjuction with a table's index descriptions
+					◦ tableIndexClustered - this is a clustered index
+					◦ tableIndexHashed - this is a hashed index
+					◦ tableIndexOther - this is some other style of index
+					 */
+					String indexName = resultSet.getString("INDEX_NAME");
+					int _type = resultSet.getInt(7);
+					String type = "";
+					switch(_type){
+					case 0:
+						type =  "tableIndexStatistic";
+						break;
+					case 1:
+						type =  "tableIndexClustered";
+						break;
+					case 2:
+						type =  "tableIndexHashed";
+						break;
+					case 3:
+						type =  "tableIndexOther";
+						break;
+
+					}
 					String columnName = resultSet.getString(9);
+					boolean dbNoneUnique = resultSet.getBoolean("NON_UNIQUE");
 
 					TableIndexLeaf tableIndexNode = new TableIndexLeaf(type, indexName);
 					tableIndexNode.setColumnNane(columnName);
+					tableIndexNode.setNoneUnique(dbNoneUnique);
 
 					list.add(tableIndexNode);
 				}
@@ -299,7 +314,7 @@ public abstract class AbstractTableIndexInformationController extends BorderPane
 		}
 
 		//2016-11-26 by kyj 일단 모든 데이터베이스에서 다 조회가능한 인덱스 조회법으로 수정
-		String sql =  "";/*getIndexSQL(databaseName, tableName);*/
+		String sql = "";/*getIndexSQL(databaseName, tableName);*/
 		List<TableIndexNode> result = Collections.emptyList();
 
 		if (ValueUtil.isEmpty(sql)) {
@@ -374,7 +389,7 @@ public abstract class AbstractTableIndexInformationController extends BorderPane
 				childrens.get(childrens.size() - 1).getChildrens().add(next);
 			}
 
-		}, (a, b) -> {
+		} , (a, b) -> {
 			/* 아래함수는 동작하지않는데 일단 지켜보자. */
 			a.addAll(b);
 		});

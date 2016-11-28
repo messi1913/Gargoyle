@@ -49,6 +49,11 @@
 					<!-- </TreeItemPropertyValueFactory> -->
 					<!-- </cellValueFactory> -->
 				</TreeTableColumn>
+				<TreeTableColumn fx:id="tcNoneUnique" prefWidth="80.0"
+					text="None Unique">
+
+				</TreeTableColumn>
+
 			</columns>
 		</TreeTableView>
 	</center>

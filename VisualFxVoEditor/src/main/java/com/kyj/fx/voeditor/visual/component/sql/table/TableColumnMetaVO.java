@@ -6,6 +6,8 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.table;
 
+import java.util.List;
+
 import com.kyj.fx.voeditor.visual.component.sql.table.IKeyType.KEY_TYPE;
 
 import javafx.beans.property.BooleanProperty;
@@ -39,6 +41,8 @@ public class TableColumnMetaVO {
 
 	private StringProperty remark;
 
+	private ObjectProperty<List<ReferenceKey>> refs = new SimpleObjectProperty<>();
+
 	public TableColumnMetaVO() {
 		columnName = new SimpleStringProperty();
 		sortOrder = new SimpleStringProperty();
@@ -49,6 +53,7 @@ public class TableColumnMetaVO {
 		dataType = new SimpleStringProperty();
 		defaultValue = new SimpleStringProperty();
 		remark = new SimpleStringProperty();
+		refs = new SimpleObjectProperty<>();
 	}
 
 	public final StringProperty columnNameProperty() {
@@ -157,6 +162,18 @@ public class TableColumnMetaVO {
 
 	public final void setRemark(final String remark) {
 		this.remarkProperty().set(remark);
+	}
+
+	public final ObjectProperty<List<ReferenceKey>> refsProperty() {
+		return this.refs;
+	}
+
+	public final java.util.List<com.kyj.fx.voeditor.visual.component.sql.table.ReferenceKey> getRefs() {
+		return this.refsProperty().get();
+	}
+
+	public final void setRefs(final java.util.List<com.kyj.fx.voeditor.visual.component.sql.table.ReferenceKey> refs) {
+		this.refsProperty().set(refs);
 	}
 
 }

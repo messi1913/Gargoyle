@@ -56,6 +56,7 @@ import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker.State;
 import javafx.embed.swing.SwingFXUtils;
@@ -74,7 +75,9 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.SnapshotResult;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
@@ -83,6 +86,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -96,6 +101,7 @@ import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -308,12 +314,12 @@ public class FxUtil {
 		N newInstance = null;
 		switch (type) {
 		case RequireNew:
-			newInstance = newInstance(controllerClass, rootInstance, option, controller, fxml, controllerAction);
+			newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, option, controllerAction);
 			break;
 		case Singleton:
 			Node node = FxMemory.get(fullClassName);
 			if (node == null) {
-				newInstance = newInstance(controllerClass, rootInstance, option, controller, fxml, controllerAction);
+				newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, option, controllerAction);
 				FxMemory.put(fullClassName, (Node) newInstance);
 			} else {
 				newInstance = (N) node;
@@ -325,13 +331,22 @@ public class FxUtil {
 		return newInstance;
 	}
 
-	private static <T, C> T newInstance(Class<?> controllerClass, Object rootInstance, Consumer<T> option, FXMLController controller,
-			String fxml, Consumer<C> controllerAction) throws Exception {
+	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml) throws Exception {
+		return newInstance(controllerClass, rootInstance, isSelfController, fxml, null, null);
+	}
+
+	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, Consumer<T> option,
+			Consumer<C> controllerAction) throws Exception {
+		return newInstance(controllerClass, rootInstance, isSelfController, fxml, option, controllerAction);
+	}
+
+	private static <T, C> T newInstance(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml,
+			Consumer<T> option, Consumer<C> controllerAction) throws Exception {
 		URL resource = controllerClass.getResource(fxml);
 
-		FXMLLoader loader = new FXMLLoader();
+		FXMLLoader loader = createNewFxmlLoader();
 		loader.setLocation(resource);
-		if (controller.isSelfController() && rootInstance != null) {
+		if (isSelfController && rootInstance != null) {
 			try {
 				loader.setRoot(rootInstance);
 				loader.setController(rootInstance);
@@ -370,6 +385,15 @@ public class FxUtil {
 			controllerAction.accept(instanceController);
 
 		return load;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 28.
+	 * @return
+	 */
+	private static FXMLLoader createNewFxmlLoader() {
+		return new FXMLLoader();
 	}
 
 	/**
@@ -727,10 +751,11 @@ public class FxUtil {
 	public static void snapShot(Node target, OutputStream out, Consumer<Exception> errorCallback) {
 		snapShot(target, out, -1, -1, errorCallback);
 	}
-	
+
 	public static void snapShot(Scene target, OutputStream out, Consumer<Exception> errorCallback) {
 		snapShot(target, out, -1, -1, errorCallback);
 	}
+
 	public static void snapShot(Scene target, OutputStream out, int requestWidth, int requestHeight, Consumer<Exception> errorCallback) {
 		if (target == null)
 			throw new NullPointerException("target Node is empty.");
@@ -740,14 +765,14 @@ public class FxUtil {
 
 		SnapshotParameters params = new SnapshotParameters();
 		params.setDepthBuffer(true);
-		
-//		params.setFill(Color.TRANSPARENT);
+
+		//		params.setFill(Color.TRANSPARENT);
 
 		WritableImage wi = null;
 		if (requestWidth >= 0 || requestHeight >= 0) {
 			wi = new WritableImage(requestWidth, requestHeight);
 		}
-		
+
 		WritableImage snapshot = target.snapshot(wi);
 		try {
 			boolean isSuccess = snapShot(out, snapshot);
@@ -756,6 +781,7 @@ public class FxUtil {
 			errorCallback.accept(e);
 		}
 	}
+
 	public static void snapShot(Node target, OutputStream out, int requestWidth, int requestHeight, Consumer<Exception> errorCallback) {
 
 		if (target == null)
@@ -766,8 +792,8 @@ public class FxUtil {
 
 		SnapshotParameters params = new SnapshotParameters();
 		params.setDepthBuffer(true);
-		
-//		params.setFill(Color.TRANSPARENT);
+
+		//		params.setFill(Color.TRANSPARENT);
 
 		WritableImage wi = null;
 		if (requestWidth >= 0 || requestHeight >= 0) {
@@ -905,11 +931,40 @@ public class FxUtil {
 	 * @param showingNode
 	 ********************************/
 	public static void showPopOver(Node root, Node showingNode) {
+		showPopOver(root, showingNode, null);
+	}
+
+	public static void showPopOver(Node root, Node showingNode, Function<PopOver, PopOver> callback) {
 		if (root == showingNode)
 			return;
 
-		PopOver popOver = new PopOver(showingNode);
+		PopOver popOver = null;
+		if (callback != null) {
+			popOver = callback.apply(new PopOver(showingNode));
+		} else
+			popOver = new PopOver(showingNode);
+
 		popOver.show(root);
+	}
+
+	/**
+	 * Show PopOver
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 28.
+	 * @param root
+	 * @param showingNode
+	 * @param locationX
+	 * @param locationY
+	 */
+	public static void showPopOver(Node root, Node showingNode, double locationX, double locationY) {
+		if (root == showingNode)
+			return;
+
+		showPopOver(root, showingNode, pop -> {
+			pop.setX(locationX);
+			pop.setY(locationY);
+			return pop;
+		});
 	}
 
 	/**
@@ -982,6 +1037,10 @@ public class FxUtil {
 
 	public static JavaTextArea createJavaTextArea(String content) {
 		return createJavaTextArea(content, 1200, 800);
+	}
+
+	public static void createSimpleTextAreaAndShow(String content, Consumer<Stage> option) {
+		createStageAndShow(new TextArea(content), option);
 	}
 
 	/********************************
@@ -1343,17 +1402,17 @@ public class FxUtil {
 			@Override
 			public WebEngine call(PopupFeatures p) {
 
-//				Stage stage = new Stage();
-//				WebView wv2 = new WebView();
-//
-//				wv2.getEngine().setJavaScriptEnabled(true);
-//
-//				stage.setScene(new Scene(wv2, BROWSER_WIDTH, BROWSER_HEIGHT));
-//				stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
-//				stage.show();
-				
+				//				Stage stage = new Stage();
+				//				WebView wv2 = new WebView();
+				//
+				//				wv2.getEngine().setJavaScriptEnabled(true);
+				//
+				//				stage.setScene(new Scene(wv2, BROWSER_WIDTH, BROWSER_HEIGHT));
+				//				stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
+				//				stage.show();
+
 				WebView openBrowser = openBrowser(view, "");
-				
+
 				return openBrowser.getEngine();
 			}
 		});
@@ -1394,10 +1453,10 @@ public class FxUtil {
 
 			@Override
 			public void changed(ObservableValue<? extends State> observable, State oldValue, State newValue) {
-//				if (newValue == State.SUCCEEDED) {
-					String location = engine.getLocation();
-					txtLink.setText(location);
-//				}
+				//				if (newValue == State.SUCCEEDED) {
+				String location = engine.getLocation();
+				txtLink.setText(location);
+				//				}
 			}
 		});
 
@@ -1408,4 +1467,87 @@ public class FxUtil {
 		return view;
 	}
 
+	public enum POPUP_STYLE {
+		POP_OVER, POPUP
+	}
+
+	/**
+	 * 테이블뷰에 더블클릭하면 팝업이 열리는 기능을 install 처리한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 28.
+	 * @param tbMetadata
+	 */
+	@SuppressWarnings("rawtypes")
+	public static <T> void installDoubleClickPopup(POPUP_STYLE style, TableView<T> tbMetadata) {
+		tbMetadata.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
+
+			if (MouseButton.PRIMARY == ev.getButton() && ev.getClickCount() == 2) {
+				ObservableList<TablePosition> selectedCells = tbMetadata.getSelectionModel().getSelectedCells();
+				TablePosition tablePosition = selectedCells.get(0);
+				int column = tablePosition.getColumn();
+				int row = tablePosition.getRow();
+
+				//				tablePosition.getTableColumn().
+				Object valueByConverter = FxTableViewUtil.getValueByConverter(tbMetadata, column, row);
+				String value = "";
+				if (ValueUtil.isNotEmpty(valueByConverter)) {
+					value = valueByConverter.toString();
+				}
+
+				/**
+				 * @최초생성일 2016. 11. 28.
+				 */
+				final double WIDTH = 500d;
+				final double HEIGHT = 400d;
+
+				JavaTextArea createJavaTextArea = createJavaTextArea(value);
+				createJavaTextArea.setPrefSize(WIDTH, HEIGHT);
+
+				switch (style) {
+				case POP_OVER:
+					FxUtil.showPopOver(tbMetadata, createJavaTextArea);
+					break;
+				case POPUP:
+
+					createSimpleTextAreaAndShow(value, stage -> {
+						stage.setTitle("Show Values");
+						stage.setWidth(WIDTH);
+						stage.setHeight(HEIGHT);
+						stage.initStyle(StageStyle.UTILITY);
+
+						stage.focusedProperty().addListener((oba, o, n) -> {
+							if (!n)
+								stage.close();
+						});
+						stage.getScene().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+							if (KeyCode.ESCAPE == event.getCode()) {
+								if (!event.isConsumed()) {
+									stage.close();
+								}
+							}
+						});
+					});
+					break;
+				}
+
+			}
+
+		});
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 28.
+	 * @param task
+	 * @return
+	 */
+	public static <V> Service<V> createFxService(final Task<V> task) {
+		return new Service<V>() {
+
+			@Override
+			protected Task<V> createTask() {
+				return task;
+			}
+		};
+	}
 }
