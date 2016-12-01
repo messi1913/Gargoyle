@@ -105,12 +105,14 @@ public class ConfigurationViewController {
 				ConfigurationGraphicsNodeItem children3 = new ConfigurationGraphicsNodeItem();
 				children3.setItemName("Skin Configuration");
 				children3.setContentNode(SkinConfigView.class);
-				{
-					ConfigurationLeafNodeItem customSkin = new ConfigurationLeafNodeItem();
-					customSkin.setItemName("Custom Skin Configuration");
-					customSkin.setContentNode(CustomSkinConfigView.class);
-					children3.setChildrens(Arrays.asList(customSkin));
-				}
+				
+				//TODO 신규기능 작업중
+//				{
+//					ConfigurationLeafNodeItem customSkin = new ConfigurationLeafNodeItem();
+//					customSkin.setItemName("Custom Skin Configuration");
+//					customSkin.setContentNode(CustomSkinConfigView.class);
+//					children3.setChildrens(Arrays.asList(customSkin));
+//				}
 
 				resourcesChildrens.add(children3);
 			}

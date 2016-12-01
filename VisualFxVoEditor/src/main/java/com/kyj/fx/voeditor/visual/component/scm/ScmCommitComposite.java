@@ -110,7 +110,7 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 			{
 				/*start Desing css.*/
 				BarChart<String, Long> barChartDayOfMonth = getBarChartDayOfMonth();
-				String style = "-fx-bar-fill: ".concat(FxUtil.toRGBCode(lineColor)).concat(";");
+				String style = "-fx-bar-fill: ".concat(FxUtil.toWebString(lineColor)).concat(";");
 				for (Node n : barChartDayOfMonth.lookupAll(".default-color0.chart-bar")) {
 					n.setStyle(style);
 				}
@@ -140,14 +140,14 @@ public class ScmCommitComposite extends MasterSlaveChartComposite {
 						 ".chart-series-line .series0 .default-color0{- fx-background-color:green;}");
 				Set<Node> lookupAll = lineChartDayOfWeek.lookupAll(".chart-line-symbol");
 				StringBuffer sb = new StringBuffer();
-				sb.append("-fx-background-color: " + FxUtil.toRGBCode(lineColor) + ", white;");
+				sb.append("-fx-background-color: " + FxUtil.toRgbString(lineColor) + ", white;");
 				sb.append(" -fx-background-insets: 0, 2;");
 				sb.append("-fx-background-radius: 5px;");
 				sb.append("-fx-padding: 5px;");
 				for (Node n : lookupAll) {
 					n.setStyle(sb.toString());
 				}
-				String style = "-fx-stroke: " + FxUtil.toRGBCode(lineColor) + "; -fx-stroke-width: " + strokeWidth + ";";
+				String style = "-fx-stroke: " + FxUtil.toRgbString(lineColor) + "; -fx-stroke-width: " + strokeWidth + ";";
 				for(Node seriesLine : lineChartDayOfWeek.lookupAll(cssStyleClassName))
 				{
 					seriesLine.setStyle(style);

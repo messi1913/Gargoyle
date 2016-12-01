@@ -1172,6 +1172,11 @@ public class DbUtil extends ConnectionManager {
 		return Collections.emptyList();
 	}
 
+	public static void getCurrentSchema(Connection con) {
+		
+		
+	}
+
 	// TODO 구현가능한부분인지 확인.
 	// public void cancel(Connection activeConnection) {
 	// try {

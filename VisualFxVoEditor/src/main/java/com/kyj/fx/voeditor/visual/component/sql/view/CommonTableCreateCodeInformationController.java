@@ -39,7 +39,9 @@ public class CommonTableCreateCodeInformationController extends AbstractTableCre
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("databaseName", databaseName);
 		map.put("tableName", tableName);
-		return ValueUtil.getVelocityToText(sql, map, true);
+		return ValueUtil.getVelocityToText(sql, map, true, null, str ->{
+			return "`" + str + "`"; 
+		});
 	}
 
 	@Override
