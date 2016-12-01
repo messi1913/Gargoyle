@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXSlider?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<fx:root type="BorderPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.60">
+   <center>
+      <HBox minWidth="80.0" BorderPane.alignment="CENTER">
+         <children>
+            <JFXComboBox maxWidth="1.7976931348623157E308" minWidth="30.0" prefWidth="200.0" promptText="Font Name" />
+            <JFXComboBox maxWidth="1.7976931348623157E308" minWidth="30.0" prefWidth="200.0" promptText="Font Style" />
+            <VBox>
+               <children>
+                  <Label text="Font Size" />
+                  <JFXSlider majorTickUnit="10.0" max="50.0" maxWidth="1.7976931348623157E308" minWidth="30.0" minorTickCount="1" prefHeight="0.0" prefWidth="200.0" showTickLabels="true" showTickMarks="true" value="11.0" />
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets bottom="5.0" top="5.0" />
+         </padding>
+      </HBox>
+   </center>
+   <top>
+      <Label text="Font Style" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="15.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Label>
+   </top>
+   <bottom>
+      <BorderPane prefHeight="100.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <center>
+            <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label text="Hello World! 123456789 헬로우 월드! 123456789" wrapText="true" />
+               </children>
+            </StackPane>
+         </center>
+         <top>
+            <Label text="PreView" BorderPane.alignment="CENTER_LEFT" />
+         </top>
+      </BorderPane>
+   </bottom>
+</fx:root>

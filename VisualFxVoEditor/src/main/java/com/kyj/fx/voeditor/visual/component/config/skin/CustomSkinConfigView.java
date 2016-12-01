@@ -14,17 +14,22 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.ConfigItemTreeItem;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationGraphicsNodeItem;
 import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationLeafNodeItem;
 import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationTreeItem;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 /**
@@ -83,4 +88,33 @@ public class CustomSkinConfigView extends BorderPane {
 
 	}
 
+	@FXML
+	public void btnEditOnAction() {
+
+		TreeItem<ConfigurationTreeItem> selectedItem = ttvIConfig.getSelectionModel().getSelectedItem();
+		if (selectedItem != null && selectedItem.getValue() != null) {
+			ConfigurationTreeItem value = selectedItem.getValue();
+			if (value instanceof ConfigurationGraphicsNodeItem) {
+				open((ConfigurationGraphicsNodeItem) value);
+			}
+		}
+
+	}
+
+	/**
+	 *  스킨 초기화
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 1.
+	 */
+	@FXML
+	public void btnResetOnAction() {
+		Stage primaryStage = SharedMemory.getPrimaryStage();
+		Scene scene = primaryStage.getScene();
+		scene.getStylesheets().clear();
+		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+	}
+
+	private void open(ConfigurationGraphicsNodeItem value) {
+		
+	}
 }
