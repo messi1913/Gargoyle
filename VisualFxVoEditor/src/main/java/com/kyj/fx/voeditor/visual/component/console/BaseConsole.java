@@ -6,9 +6,27 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.console;
 
-import com.kyj.fx.voeditor.visual.component.popup.TextSearchAndReplaceView;
-import com.kyj.fx.voeditor.visual.component.popup.TextSearchComposite;
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.kyj.fx.voeditor.visual.component.popup.TextSearchComposite;
+import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
+
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -30,7 +48,10 @@ import javafx.scene.layout.HBox;
  * @author KYJ
  *
  */
-class BaseConsole extends BorderPane {
+class BaseConsole extends BorderPane implements Closeable {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseConsole.class);
+
 	private static final String STYLE_CLASS_NAME = "console-skin";
 	/**
 	 * TextArea의 기본적인 기능을 사용하는게 아닌 특화된 기능적 처리를 지원
@@ -39,8 +60,80 @@ class BaseConsole extends BorderPane {
 
 	private TextArea textArea;
 
+	private StringBuffer buf = new StringBuffer();
 	private HBox buttonHbox;
 	private Button btnClear;
+	private BooleanProperty closeRequest = new SimpleBooleanProperty(false);
+	private ExecutorService newSingleThreadExecutor = ExecutorDemons.newFixedThreadExecutor("CONSOLE-SERVICE", 1);
+
+//	AtomicBoolean nextJobRequest = new AtomicBoolean(true);
+
+	public void init() {
+
+//		Thread thread = new Thread("CONSOLE-SERVICE-HELPER") {
+//
+//			@Override
+//			public void run() {
+//
+//				while (!closeRequest.get()) {
+//
+//					if (nextJobRequest.get()) {
+//
+//						if (buf.length() == 0) {
+//
+//							try {
+//								Thread.sleep(500L);
+//							} catch (InterruptedException e) {
+//								e.printStackTrace();
+//							}
+//							continue;
+//						}
+//						Service<String> createFxService = createService();
+//						createFxService.start();
+//					} else {
+//						try {
+//							Thread.sleep(500L);
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//						}
+//					}
+//
+//				}
+//
+//			}
+//
+//		};
+//		thread.setDaemon(true);
+//		thread.setPriority(3);
+//		thread.start();
+	}
+
+//	private Service<String> createService() {
+//		Service<String> createFxService = FxUtil.createFxService(new Task<String>() {
+//
+//			@Override
+//			protected String call() throws Exception {
+//				nextJobRequest.set(false);
+//
+//				synchronized (buf) {
+//					String string = buf.toString();
+//					buf.setLength(0);
+//					updateMessage(string);
+//				}
+//
+//				return null;
+//			}
+//		});
+//
+//		createFxService.setOnSucceeded(w -> {
+//			String message = w.getSource().getMessage();
+//			textArea.appendText(message);
+//			nextJobRequest.set(true);
+//		});
+//
+//		createFxService.setExecutor(newSingleThreadExecutor);
+//		return createFxService;
+//	}
 
 	public BaseConsole() {
 
@@ -55,11 +148,17 @@ class BaseConsole extends BorderPane {
 		textArea.setWrapText(true);
 		textArea.addEventHandler(KeyEvent.KEY_PRESSED, this::textAreaOnKeyEvent);
 		textArea.getStyleClass().add(STYLE_CLASS_NAME);
+
+		textArea.setCache(false);
+
 		manager = new ConsoleManager(this);
 		setCenter(textArea);
 		// this.getStyleClass().add(STYLE_CLASS_NAME);
 		this.getStylesheets().clear();
+
 		this.getStylesheets().add(getClass().getResource("Console.css").toExternalForm());
+
+		init();
 
 	}
 
@@ -127,7 +226,24 @@ class BaseConsole extends BorderPane {
 	 * @param e
 	 ********************************/
 	public void btnClearOnAction(ActionEvent e) {
-		this.textArea.clear();
+		synchronized (buf) {
+			this.textArea.clear();
+		}
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 29.
+	 * @param text
+	 */
+	public void appendText(char text) {
+//		synchronized (buf) {
+//			buf.append(manager.appendText(String.valueOf(text), false));
+//		}
+			Platform.runLater(()->{
+				textArea.appendText(manager.appendText(String.valueOf(text), false));
+
+			});
 	}
 
 	/********************************
@@ -137,7 +253,16 @@ class BaseConsole extends BorderPane {
 	 * @param text
 	 ********************************/
 	public void appendText(String text) {
-		textArea.appendText(manager.appendText(text));
+//		synchronized (buf) {
+//			buf.append(manager.appendText(text, true));
+//		}
+
+		//		textArea.appendText(manager.appendText(text));
+
+			Platform.runLater(()->{
+				textArea.appendText(manager.appendText(text, true));
+
+			});
 	}
 
 	/********************************
@@ -148,7 +273,13 @@ class BaseConsole extends BorderPane {
 	 * @param appendLine
 	 ********************************/
 	public void appendText(String text, boolean appendLine) {
-		textArea.appendText(manager.appendText(text, appendLine));
+//		synchronized (buf) {
+			buf.append(manager.appendText(text, appendLine));
+//		}
+		Platform.runLater(()->{
+			textArea.appendText(manager.appendText(text, appendLine));
+
+		});
 	}
 
 	/********************************
@@ -161,4 +292,13 @@ class BaseConsole extends BorderPane {
 	public void setEditable(boolean editable) {
 		textArea.setEditable(editable);
 	}
+
+	/* (non-Javadoc)
+	 * @see java.io.Closeable#close()
+	 */
+	@Override
+	public void close() throws IOException {
+		closeRequest.set(true);
+	}
+
 }
