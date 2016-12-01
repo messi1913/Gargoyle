@@ -7,22 +7,33 @@
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.mysql.MySQLDatabaseItemTree;
+import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 /**
  * MYSQL 조회 패널
@@ -114,7 +125,7 @@ public class MysqlPane extends CommonsSqllPan {
 				 * 보여주는 SQL에 적용할지 여부를 결정한다.
 				 */
 				if (value.isApplySchemaName(schemaName)) {
-					tableName = String.format("`%s`.%s", schemaName,value.getName()); // schemaName.concat(".").concat(value.getName());
+					tableName = String.format("`%s`.%s", schemaName, value.getName()); // schemaName.concat(".").concat(value.getName());
 				} else {
 					tableName = value.getName();
 				}
@@ -133,20 +144,97 @@ public class MysqlPane extends CommonsSqllPan {
 	 */
 	@Override
 	public void showEditableDataAction() {
-		//Default TableName
+		// Default TableName
 		TreeItem<DatabaseItemTree<String>> selectedItem = getSchemaTree().getSelectionModel().getSelectedItem();
 		if (null != selectedItem) {
 			DatabaseItemTree<String> value = selectedItem.getValue();
 			if (value instanceof TableItemTree) {
-				
+
 				@SuppressWarnings("rawtypes")
 				TableItemTree tableItemTree = (TableItemTree) value;
 				String schemaName = tableItemTree.getParent().getName();
 				String tableName = tableItemTree.getName();
-				String sql = String.format("edit `%s`.%s", schemaName , tableName);
+				String sql = String.format("edit `%s`.%s", schemaName, tableName);
 				execiteEdit(sql);
 			}
 		}
 	}
-	
+
+	@Override
+	public void menuExportInsertScriptOnAction(ActionEvent e) {
+		Optional<Pair<String, String[]>> showTableInputDialog = showTableInputDialog(f -> f.getName());
+
+		// Optional<Pair<String, String>> showInputDialog =
+		// DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
+		if (showTableInputDialog == null)
+			return;
+
+		showTableInputDialog.ifPresent(op -> {
+
+			if (op == null || op.getValue() == null)
+				return;
+
+			String schemaName = op.getValue()[0];
+			String _tableName = op.getValue()[1];
+			String tableName = "";
+			if (ValueUtil.isNotEmpty(schemaName)) {
+				tableName = String.format("`%s`.%s", schemaName, _tableName);
+			}
+
+			ObservableList<Map<String, Object>> items = getTbResult().getItems();
+			Map<String, Object> map = items.get(0);
+			final Set<String> keySet = map.keySet();
+			// 클립보드 복사
+			StringBuilder clip = new StringBuilder();
+
+			String insertPreffix = "insert into " + tableName;
+			String collect = keySet.stream()/* .map(str -> str) */.collect(Collectors.joining(",", "(", ")"));
+			String insertMiddle = " values ";
+
+			List<String> valueList = items.stream().map(v -> {
+				return ValueUtil.toJSONObject(v);
+			}).map(v -> {
+				Iterator<String> iterator = keySet.iterator();
+				List<Object> values = new ArrayList<>();
+				while (iterator.hasNext()) {
+					String columnName = iterator.next();
+					Object value = v.get(columnName);
+					values.add(value);
+				}
+				return values;
+			}).map(list -> {
+
+				return list.stream().map(str -> {
+					if (str == null)
+						return null;
+					else {
+						String convert = str.toString();
+						convert = convert.substring(1, convert.length() - 1);
+						if (convert.indexOf("'") >= 0) {
+							try {
+								convert = StringUtils.replace(convert, "'", "''");
+							} catch (Exception e1) {
+								e1.printStackTrace();
+							}
+						}
+						return "'".concat(convert).concat("'");
+					}
+				}).collect(Collectors.joining(",", "(", ")"));
+
+			}).map(str -> {
+				/* SQL문 완성처리 */
+				return new StringBuilder().append(insertPreffix).append(collect).append(insertMiddle).append(str).append(";\n").toString();
+			}).collect(Collectors.toList());
+
+			valueList.forEach(str -> {
+				clip.append(str);
+			});
+
+			SimpleTextView parent = new SimpleTextView(clip.toString());
+			parent.setWrapText(false);
+			FxUtil.createStageAndShow(String.format("[InsertScript] Table : %s", tableName), parent, stage -> {
+			});
+		});
+
+	}
 }
