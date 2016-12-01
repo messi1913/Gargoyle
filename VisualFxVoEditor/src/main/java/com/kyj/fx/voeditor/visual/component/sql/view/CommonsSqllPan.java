@@ -930,9 +930,14 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 		Optional<Pair<String, String[]>> showTableInputDialog = showTableInputDialog(f -> f.getName());
 
 		//		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
-
+		if(showTableInputDialog == null)
+			return;
+		
 		showTableInputDialog.ifPresent(op -> {
 
+			if(op == null || op.getValue() == null)
+				return;
+			
 			String schemaName = op.getValue()[0];
 			String _tableName = op.getValue()[1];
 			String tableName = "";
