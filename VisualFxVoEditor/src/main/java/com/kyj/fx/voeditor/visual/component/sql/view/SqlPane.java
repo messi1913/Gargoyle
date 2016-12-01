@@ -1364,8 +1364,12 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		if (null != selectedItem) {
 			K value = selectedItem.getValue();
 			if (value instanceof TableItemTree) {
-				String tableName = ((TableItemTree) value).getName();
-				String sql = "edit " + tableName;
+				
+				@SuppressWarnings("rawtypes")
+				TableItemTree tableItemTree = (TableItemTree) value;
+				String schemaName = tableItemTree.getParent().getName();
+				String tableName = tableItemTree.getName();
+				String sql = String.format("edit %s.%s", schemaName , tableName);
 				execiteEdit(sql);
 			}
 		}

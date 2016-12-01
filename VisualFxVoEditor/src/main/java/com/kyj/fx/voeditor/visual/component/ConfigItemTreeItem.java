@@ -63,7 +63,7 @@ public class ConfigItemTreeItem {
 				}
 
 				List<ConfigurationTreeItem> childrens = f.getChildrens();
-				if (childrens.isEmpty() || f instanceof ConfigurationLeafNodeItem) {
+				if (childrens == null || childrens.isEmpty() || f instanceof ConfigurationLeafNodeItem) {
 					return FXCollections.emptyObservableList();
 				}
 
