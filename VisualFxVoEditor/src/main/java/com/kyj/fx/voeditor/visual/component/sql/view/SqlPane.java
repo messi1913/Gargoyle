@@ -8,7 +8,6 @@ package com.kyj.fx.voeditor.visual.component.sql.view;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,7 +15,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -31,6 +32,8 @@ import org.springframework.jdbc.core.RowMapper;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.component.TitledBorderPane;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
+import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpression;
+import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableViewComposite;
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
 import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
@@ -56,6 +59,7 @@ import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil.CustomInputDialogAction;
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
+import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.btrace.BTraceUtils.Strings;
@@ -73,10 +77,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.IndexRange;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
@@ -91,7 +92,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -105,7 +105,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.Callback;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import jfxtras.scene.layout.GridPane;
@@ -115,7 +114,7 @@ import jfxtras.scene.layout.GridPane;
  *
  *
  * 2016-10-27 구성되는 컴포넌트가 DockNode에서 BorderPane + SplitPane 기반으로 바꿈.
- * 
+ *
  * @author KYJ
  *
  */
@@ -179,7 +178,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	/**
 	 * 데이터베이스 sql 함수 리스트
-	 * 
+	 *
 	 * @최초생성일 2016. 11. 28.
 	 */
 	// private ObjectProperty<List<String>> sqlFunctions = new
@@ -646,7 +645,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 *
 	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
 	 * setAccelerator에 등록된 이벤트가 호출안됨
-	 * 
+	 *
 	 * @param schemaTree2
 	 */
 	private void createTreeContextMenu(TreeView<K> schemaTree) {
@@ -838,7 +837,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 *
 	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
 	 * setAccelerator에 등록된 이벤트가 호출안됨
-	 * 
+	 *
 	 * @return
 	 */
 	SqlTab createTabItem() {
@@ -892,7 +891,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	/**
 	 * Sql 포멧처리.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 9. 23.
 	 * @param e
@@ -904,7 +903,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	/**
 	 * Application Code를 보여주는 팝업
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 9. 23.
 	 * @param e
@@ -1069,7 +1068,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		List<String> asList = Arrays.asList(split);
 		queryAll(asList, cnt -> {
 			DialogUtil.showMessageDialog(String.format("%d 건 success", cnt));
-		}, (e, bool) -> {
+		} , (e, bool) -> {
 			if (bool)
 				DialogUtil.showExceptionDailog(e);
 		});
@@ -1144,7 +1143,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 			List<Map<String, Object>> query = query(sql, param, success -> {
 				lblStatus.setText(success.size() + " row");
-			}, (exception, showDialog) -> {
+			} , (exception, showDialog) -> {
 				lblStatus.setText(exception.toString());
 				if (showDialog)
 					DialogUtil.showExceptionDailog(this, exception);
@@ -1345,7 +1344,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	/**
 	 * Merge문 스크립트 작성 추출.
-	 * 
+	 *
 	 * @작성자 : HJH
 	 * @작성일 : 2016. 10. 21.
 	 * @param e
@@ -1412,7 +1411,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	/**
 	 * 검색 추상함수
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 20.
 	 * @param schema
@@ -1424,7 +1423,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	/**
 	 * 테이블을 찾는 리소스 뷰를 오픈
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 20.
 	 */
@@ -1501,14 +1500,14 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		String defaultSchema = "";
 		try (Connection con = connectionSupplier.get()) {
-//
-//			String catalog = con.getCatalog();
-//			String schema = con.getSchema();
-//			ResultSet schemas = con.getMetaData().getCatalogs();
-//			if (schemas.next()) {
-//				String string = schemas.getString(1);
-//				System.out.println(string);
-//			}
+			//
+			//			String catalog = con.getCatalog();
+			//			String schema = con.getSchema();
+			//			ResultSet schemas = con.getMetaData().getCatalogs();
+			//			if (schemas.next()) {
+			//				String string = schemas.getString(1);
+			//				System.out.println(string);
+			//			}
 
 			Map<String, Object> findOne = DbUtil.findOne(con, "select current_schema() as currentschema");
 			if (findOne != null && !findOne.isEmpty()) {
@@ -1541,8 +1540,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						});
 
 						FxUtil.installAutoTextFieldBinding(txtTable, () -> {
-							return searchPattern(txtSchema.getText(), txtTable.getText()).stream().map(v -> stringConverter.apply(
-									v.getValue())/* v.getValue().getName() */).collect(Collectors.toList());
+							return searchPattern(txtSchema.getText(), txtTable.getText()).stream()
+									.map(v -> stringConverter.apply(v.getValue())/* v.getValue().getName() */).collect(Collectors.toList());
 						});
 						txtSchema.setText(_defaultSchema);
 
@@ -1551,8 +1550,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						if (null != selectedItem) {
 							K value = selectedItem.getValue();
 							if (value instanceof TableItemTree) {
-								txtTable.setText(stringConverter
-										.apply(value) /* value.getName() */);
+								txtTable.setText(stringConverter.apply(value) /* value.getName() */);
 							}
 						}
 
@@ -1585,4 +1583,33 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				});
 	}
 
+	/**
+	 * 선택된 ResultTab의 데이터리스트를 반환
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 1.
+	 * @return
+	 */
+	public List<Map<String, Object>> getSelectedTabResultItems() {
+		int tabIndex = tabPaneResult.getSelectionModel().getSelectedIndex();
+		List<Map<String, Object>> result = FXCollections.observableArrayList();
+		switch (tabIndex) {
+		case 0:
+			result = tbResult.getItems();
+			break;
+		case 1:
+			result = editableComposite.getItems().stream().map(m -> {
+				TreeMap<String, Object> treeMap = new TreeMap<>();
+				Iterator<Entry<ColumnExpression, ObjectProperty<ValueExpression>>> iterator = m.entrySet().iterator();
+				while (iterator.hasNext()) {
+					Entry<ColumnExpression, ObjectProperty<ValueExpression>> next = iterator.next();
+					treeMap.put(next.getKey().getColumnName(), next.getValue().getValue().getRealValue());
+				}
+				return treeMap;
+			}).collect(FxCollectors.toObservableList());
+			break;
+		default:
+		}
+
+		return result;
+	}
 }

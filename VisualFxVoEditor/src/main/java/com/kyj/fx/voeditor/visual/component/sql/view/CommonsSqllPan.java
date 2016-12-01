@@ -130,7 +130,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 		else if(KeyCode.F1 == e.getCode() && (e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
 			showEditableDataAction();
 		}
-		
+
 		else if (KeyCode.F5 == e.getCode() && (!e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
 			menuRefleshOnAction(null);
 		}
@@ -932,12 +932,12 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 		//		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
 		if(showTableInputDialog == null)
 			return;
-		
+
 		showTableInputDialog.ifPresent(op -> {
 
 			if(op == null || op.getValue() == null)
 				return;
-			
+
 			String schemaName = op.getValue()[0];
 			String _tableName = op.getValue()[1];
 			String tableName = "";
@@ -945,7 +945,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 				tableName = String.format("%s.%s", schemaName, _tableName);
 			}
 
-			ObservableList<Map<String, Object>> items = getTbResult().getItems();
+			List<Map<String, Object>> items = getSelectedTabResultItems();
 			Map<String, Object> map = items.get(0);
 			final Set<String> keySet = map.keySet();
 			// 클립보드 복사
