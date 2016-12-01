@@ -9,13 +9,13 @@
 	-fx-background-color: #19273B;
 }
 
-.hbox-gargoyle .text
+.hbox-gargoyle Label
 {
 	-fx-text-fill:#FFFFFF;
 	-fx-fill:#FFFFFF;
 }
 
-.hbox-gargoyle > Label > .text
+.hbox-gargoyle CheckBox
 {
 	-fx-text-fill:#FFFFFF;
 	-fx-fill:#FFFFFF;
