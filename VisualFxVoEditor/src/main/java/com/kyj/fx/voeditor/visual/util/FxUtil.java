@@ -766,7 +766,7 @@ public class FxUtil {
 		SnapshotParameters params = new SnapshotParameters();
 		params.setDepthBuffer(true);
 
-		//		params.setFill(Color.TRANSPARENT);
+		// params.setFill(Color.TRANSPARENT);
 
 		WritableImage wi = null;
 		if (requestWidth >= 0 || requestHeight >= 0) {
@@ -793,7 +793,7 @@ public class FxUtil {
 		SnapshotParameters params = new SnapshotParameters();
 		params.setDepthBuffer(true);
 
-		//		params.setFill(Color.TRANSPARENT);
+		// params.setFill(Color.TRANSPARENT);
 
 		WritableImage wi = null;
 		if (requestWidth >= 0 || requestHeight >= 0) {
@@ -909,17 +909,47 @@ public class FxUtil {
 	}
 
 	/**
-	 * RGB 색상 리턴.
+	 * WEB 색상 리턴.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 19.
 	 * @param color
 	 * @return
 	 */
-	public static String toRGBCode(Color color) {
+	public static String toWebString(Color color) {
 		if (color == null)
 			return "BLACK";
 		return String.format("#%02X%02X%02X", (int) (color.getRed() * 255), (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+	}
+
+	/**
+	 * RGB Color String
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 1.
+	 * @param color
+	 * @return
+	 */
+	public static String toRgbString(Color color) {
+		if (color == null)
+			return "BLACK";
+		return String.format("rgba(%d, %d, %d, 1)", (int) (color.getRed() * 255), (int) (color.getGreen() * 255),
+				(int) (color.getBlue() * 255));
+	}
+
+	/**
+	 * HSB Color String
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 1.
+	 * @param color
+	 * @return
+	 */
+	public static String toHsbString(Color color) {
+		if (color == null)
+			return "BLACK";
+		return String.format("hsl(%d, %d%%, %d%%)", (int) (color.getHue()), (int) (color.getSaturation() * 100),
+				(int) (color.getBrightness() * 100));
 	}
 
 	/********************************
@@ -949,6 +979,7 @@ public class FxUtil {
 
 	/**
 	 * Show PopOver
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 28.
 	 * @param root
@@ -1402,14 +1433,16 @@ public class FxUtil {
 			@Override
 			public WebEngine call(PopupFeatures p) {
 
-				//				Stage stage = new Stage();
-				//				WebView wv2 = new WebView();
+				// Stage stage = new Stage();
+				// WebView wv2 = new WebView();
 				//
-				//				wv2.getEngine().setJavaScriptEnabled(true);
+				// wv2.getEngine().setJavaScriptEnabled(true);
 				//
-				//				stage.setScene(new Scene(wv2, BROWSER_WIDTH, BROWSER_HEIGHT));
-				//				stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
-				//				stage.show();
+				// stage.setScene(new Scene(wv2, BROWSER_WIDTH,
+				// BROWSER_HEIGHT));
+				// stage.initOwner(parent == null ? (Window) null :
+				// parent.getScene().getWindow());
+				// stage.show();
 
 				WebView openBrowser = openBrowser(view, "");
 
@@ -1453,10 +1486,10 @@ public class FxUtil {
 
 			@Override
 			public void changed(ObservableValue<? extends State> observable, State oldValue, State newValue) {
-				//				if (newValue == State.SUCCEEDED) {
+				// if (newValue == State.SUCCEEDED) {
 				String location = engine.getLocation();
 				txtLink.setText(location);
-				//				}
+				// }
 			}
 		});
 
@@ -1473,6 +1506,7 @@ public class FxUtil {
 
 	/**
 	 * 테이블뷰에 더블클릭하면 팝업이 열리는 기능을 install 처리한다.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 28.
 	 * @param tbMetadata
@@ -1487,7 +1521,7 @@ public class FxUtil {
 				int column = tablePosition.getColumn();
 				int row = tablePosition.getRow();
 
-				//				tablePosition.getTableColumn().
+				// tablePosition.getTableColumn().
 				Object valueByConverter = FxTableViewUtil.getValueByConverter(tbMetadata, column, row);
 				String value = "";
 				if (ValueUtil.isNotEmpty(valueByConverter)) {

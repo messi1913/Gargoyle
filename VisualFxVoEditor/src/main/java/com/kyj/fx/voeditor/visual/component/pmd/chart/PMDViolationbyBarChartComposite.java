@@ -108,7 +108,7 @@ public class PMDViolationbyBarChartComposite extends AbstractPMDViolationChartCo
 	private void style(BarChart<String, Number> chart) {
 		Color lineColor = Color.web("#58AD58");
 		//		chart-bar series0 data2 default-color0
-		String style = "-fx-bar-fill: ".concat(FxUtil.toRGBCode(lineColor)).concat(";");
+		String style = "-fx-bar-fill: ".concat(FxUtil.toWebString(lineColor)).concat(";");
 		Set<Node> lookupAll = chart.lookupAll(".default-color0");
 		for (Node n : lookupAll) {
 			//				anotherStyleAction.accept(style);
