@@ -15,7 +15,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -30,6 +32,8 @@ import org.springframework.jdbc.core.RowMapper;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.component.TitledBorderPane;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
+import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpression;
+import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableViewComposite;
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
 import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
@@ -55,6 +59,7 @@ import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil.CustomInputDialogAction;
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
+import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.btrace.BTraceUtils.Strings;
@@ -179,7 +184,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * 데이터베이스 sql 함수 리스트
 	 * @최초생성일 2016. 11. 28.
 	 */
-//	private ObjectProperty<List<String>> sqlFunctions = new SimpleObjectProperty<>(Collections.emptyList());
+	//	private ObjectProperty<List<String>> sqlFunctions = new SimpleObjectProperty<>(Collections.emptyList());
 
 	public void setTitle(String title) {
 		//		sqlEditPane.setTitle(title);
@@ -466,11 +471,11 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		Main.addPrimaryStageCloseListener(() -> onPrimaryCloseRequest(null));
 
 		//Sql 함수 로딩
-//		try {
-//			sqlFunctions.set(DbUtil.getSqlFunctions(connectionSupplier.get()));
-//		} catch (Exception e) {
-//			LOGGER.error(ValueUtil.toString(e));
-//		}
+		//		try {
+		//			sqlFunctions.set(DbUtil.getSqlFunctions(connectionSupplier.get()));
+		//		} catch (Exception e) {
+		//			LOGGER.error(ValueUtil.toString(e));
+		//		}
 
 		//bugfix. 아래처럼 primarystage set을 하게되면 등록된 모든 리스너가 사라짐.
 		//		SharedMemory.getPrimaryStage().setOnCloseRequest();
@@ -964,56 +969,56 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		// 펑션 함수 호출. unuse -> jdbc vender에서 구현코드가 대부분없으므로 커스텀하게 구현할것.
 		//CTRL + SPACE
 		else if (KeyCode.SPACE == e.getCode() && e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
-//			ListView<String> listView = new ListView<String>();
-//			listView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
-//
-//				@Override
-//				public ListCell<String> call(ListView<String> param) {
-//					return new TextFieldListCell<String>();
-//				}
-//			});
-//
-//			listView.getItems().addAll(this.sqlFunctions.get());
-//
-//			SqlKeywords sqlNode = sqlTabPane.getSelectedTab().getSqlNode();
-//
-//			Integer currentLine = sqlNode.getCurrentLine();
-//			IndexRange selection = sqlNode.getSelection();
-//
-//			FxUtil.showPopOver(this, listView, pop -> {
-//				pop.setAutoHide(true);
-//				pop.setAnimated(false);
-//				listView.getSelectionModel().select(0);
-//
-//				listView.setOnKeyPressed(ev -> {
-//					if (KeyCode.ENTER == ev.getCode()) {
-//						String selectedItem = listView.getSelectionModel().getSelectedItem();
-//						sqlNode.appendContent(selectedItem);
-//						pop.hide();
-//						ev.consume();
-//					} else if (KeyCode.ESCAPE == ev.getCode()) {
-//						pop.hide();
-//						ev.consume();
-//					}
-//				});
-//				listView.setOnMouseClicked(ev -> {
-//
-//					if (ev.getClickCount() == 2 && MouseButton.PRIMARY == ev.getButton()) {
-//						String selectedItem = listView.getSelectionModel().getSelectedItem();
-//						sqlNode.appendContent(selectedItem);
-//						pop.hide();
-//						ev.consume();
-//					}
-//
-//				});
-//
-//
-//				pop.focusedProperty().addListener((oba, o, n) -> {
-//					if (!n)
-//						pop.hide();
-//				});
-//				return pop;
-//			});
+			//			ListView<String> listView = new ListView<String>();
+			//			listView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+			//
+			//				@Override
+			//				public ListCell<String> call(ListView<String> param) {
+			//					return new TextFieldListCell<String>();
+			//				}
+			//			});
+			//
+			//			listView.getItems().addAll(this.sqlFunctions.get());
+			//
+			//			SqlKeywords sqlNode = sqlTabPane.getSelectedTab().getSqlNode();
+			//
+			//			Integer currentLine = sqlNode.getCurrentLine();
+			//			IndexRange selection = sqlNode.getSelection();
+			//
+			//			FxUtil.showPopOver(this, listView, pop -> {
+			//				pop.setAutoHide(true);
+			//				pop.setAnimated(false);
+			//				listView.getSelectionModel().select(0);
+			//
+			//				listView.setOnKeyPressed(ev -> {
+			//					if (KeyCode.ENTER == ev.getCode()) {
+			//						String selectedItem = listView.getSelectionModel().getSelectedItem();
+			//						sqlNode.appendContent(selectedItem);
+			//						pop.hide();
+			//						ev.consume();
+			//					} else if (KeyCode.ESCAPE == ev.getCode()) {
+			//						pop.hide();
+			//						ev.consume();
+			//					}
+			//				});
+			//				listView.setOnMouseClicked(ev -> {
+			//
+			//					if (ev.getClickCount() == 2 && MouseButton.PRIMARY == ev.getButton()) {
+			//						String selectedItem = listView.getSelectionModel().getSelectedItem();
+			//						sqlNode.appendContent(selectedItem);
+			//						pop.hide();
+			//						ev.consume();
+			//					}
+			//
+			//				});
+			//
+			//
+			//				pop.focusedProperty().addListener((oba, o, n) -> {
+			//					if (!n)
+			//						pop.hide();
+			//				});
+			//				return pop;
+			//			});
 
 		}
 
@@ -1331,8 +1336,39 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 */
 	public abstract void menuExportMergeScriptOnAction(ActionEvent e);
 
+	//TODO
 	public TableView<Map<String, Object>> getTbResult() {
 		return tbResult;
+	}
+
+	/**
+	 * 선택된 ResultTab의 데이터리스트를 반환
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 1.
+	 * @return
+	 */
+	public List<Map<String, Object>> getSelectedTabResultItems() {
+		int tabIndex = tabPaneResult.getSelectionModel().getSelectedIndex();
+		List<Map<String, Object>> result = FXCollections.observableArrayList();
+		switch (tabIndex) {
+		case 0:
+			result = tbResult.getItems();
+			break;
+		case 1:
+			result = editableComposite.getItems().stream().map(m -> {
+				TreeMap<String, Object> treeMap = new TreeMap<>();
+				Iterator<Entry<ColumnExpression, ObjectProperty<ValueExpression>>> iterator = m.entrySet().iterator();
+				while (iterator.hasNext()) {
+					Entry<ColumnExpression, ObjectProperty<ValueExpression>> next = iterator.next();
+					treeMap.put(next.getKey().getColumnName(), next.getValue().getValue().getRealValue());
+				}
+				return treeMap;
+			}).collect(FxCollectors.toObservableList());
+			break;
+		default:
+		}
+
+		return result;
 	}
 
 	/* [시작][추상화 메소드 정의] */
@@ -1484,7 +1520,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		final String _defaultSchema = defaultSchema;
 
-		if (tbResult.getItems().isEmpty())
+
+		if (tbResult.getItems().isEmpty() && editableComposite.getItems().isEmpty())
 			return Optional.empty();
 
 		return DialogUtil.showInputCustomDialog(tbResult.getScene().getWindow(), "table Name", "테이블명을 입력하세요.",

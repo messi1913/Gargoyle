@@ -732,6 +732,15 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			return this.columnType;
 		}
 
+
+		/**
+		 * @return the columnName
+		 */
+		public final String getColumnName() {
+			return columnName;
+		}
+
+
 		private static ColumnExpression NEW_ROW_META;
 
 		/**

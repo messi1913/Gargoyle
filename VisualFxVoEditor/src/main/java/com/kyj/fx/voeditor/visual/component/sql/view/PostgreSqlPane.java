@@ -8,7 +8,6 @@ package com.kyj.fx.voeditor.visual.component.sql.view;
 
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,27 +21,18 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
-import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.postgre.PostgreDatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.postgre.PostgreTableItemTree;
-import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.DialogUtil.CustomInputDialogAction;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javafx.util.Pair;
-import jfxtras.scene.layout.GridPane;
 
 /**
  * 포스트그레 SQL 패널
@@ -81,8 +71,10 @@ public class PostgreSqlPane extends CommonsSqllPan {
 	@Override
 	public void menuExportMergeScriptOnAction(ActionEvent e) {
 
-		TableView<Map<String, Object>> tbResult = getTbResult();
-		ObservableList<Map<String, Object>> items = tbResult.getItems();
+//		TableView<Map<String, Object>> tbResult = getTbResult();
+
+
+		List<Map<String, Object>> items = getSelectedTabResultItems();
 //		TreeView<DatabaseItemTree<String>> schemaTree = getSchemaTree();
 //
 //		List<String> schemaList = schemaTree.getRoot().getChildren().stream().map(v -> v.getValue().getName()).collect(Collectors.toList());
@@ -283,7 +275,7 @@ public class PostgreSqlPane extends CommonsSqllPan {
 				parent.setWrapText(false);
 				parent.setPrefSize(1200d, 800d);
 				FxUtil.createStageAndShow(parent, stage -> {
-					stage.initOwner(tbResult.getScene().getWindow());
+					stage.initOwner(getScene().getWindow());
 					stage.setTitle(String.format("[Merge Script] Table : %s", tableName));
 				});
 
