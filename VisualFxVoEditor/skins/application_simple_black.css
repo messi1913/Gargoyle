@@ -1,26 +1,27 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
-
 .table-row-cell:empty {
     -fx-background-color: #FFFFFF;
 }
 
-HBox
+.hbox-gargoyle
 {
+	-fx-padding: 5px;
 	-fx-background-color: #19273B;
 }
 
-HBox > Label
-{
-	-fx-text-fill:#FFFFFF;
-	-fx-fill:#FFFFFF;
-}
-HBox CheckBox
+.hbox-gargoyle .text
 {
 	-fx-text-fill:#FFFFFF;
 	-fx-fill:#FFFFFF;
 }
 
-HBox > .radio-button > .text
+.hbox-gargoyle > Label > .text
+{
+	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
+}
+
+.hbox-gargoyle > .radio-button > .text
 {
 	-fx-text-fill:#FFFFFF;
 	-fx-fill:#FFFFFF;
@@ -77,7 +78,6 @@ DockTitleBar Label
 {
 	-fx-text-fill:black;
 }
-
 
 .console-skin
 {

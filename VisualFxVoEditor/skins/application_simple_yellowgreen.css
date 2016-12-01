@@ -3,23 +3,24 @@
     -fx-background-color: #FFFFFF;
 }
 
-HBox
+.hbox-gargoyle
 {
+	-fx-padding: 5px;
 	-fx-background-color: #5CA83C;
 }
 
-HBox Label
+.hbox-gargoyle > Label
 {
 	-fx-text-fill:#FFFFFF;
 	-fx-fill:#FFFFFF;
 }
-HBox CheckBox
+.hbox-gargoyle > CheckBox
 {
 	-fx-text-fill:#FFFFFF;
 	-fx-fill:#FFFFFF;
 }
 
-HBox > .radio-button > .text
+.hbox-gargoyle > .radio-button > .text
 {
 	-fx-text-fill:#FFFFFF;
 	-fx-fill:#FFFFFF;
@@ -74,6 +75,11 @@ DockTitleBar Label
 	-fx-text-fill:black ;
 }
 
+.choice-box .label
+{
+	-fx-text-fill:black;
+}
+
 .console-skin
 {
 	-fx-text-fill: white ;
@@ -104,7 +110,6 @@ DockTitleBar Label
  .tab:selected .tab-label{
 	-fx-text-fill: white ;
 }
-
 
 .column-header .label
 {
