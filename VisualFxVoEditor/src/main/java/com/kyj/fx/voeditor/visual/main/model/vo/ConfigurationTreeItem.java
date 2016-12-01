@@ -9,12 +9,16 @@ package com.kyj.fx.voeditor.visual.main.model.vo;
 import java.util.Arrays;
 import java.util.List;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 /**
+ *
  * @author KYJ
  *
  */
 public class ConfigurationTreeItem {
-	private String itemName;
+	private StringProperty itemName = new SimpleStringProperty();
 	private ConfigurationTreeItem parent;
 	private List<ConfigurationTreeItem> childrens;
 
@@ -33,25 +37,12 @@ public class ConfigurationTreeItem {
 	}
 
 	/**
-	 * @return the itemName
-	 */
-	public String getItemName() {
-		return itemName;
-	}
-	/**
-	 * @param itemName
-	 *            the itemName to set
-	 */
-	public void setItemName(String itemName) {
-		this.itemName = itemName;
-	}
-
-	/**
 	 * @return the parent
 	 */
 	public ConfigurationTreeItem getParent() {
 		return parent;
 	}
+
 	/**
 	 * @param parent
 	 *            the parent to set
@@ -59,12 +50,14 @@ public class ConfigurationTreeItem {
 	public void setParent(ConfigurationTreeItem parent) {
 		this.parent = parent;
 	}
+
 	/**
 	 * @return the childrens
 	 */
 	public List<ConfigurationTreeItem> getChildrens() {
 		return childrens;
 	}
+
 	/**
 	 * @param childrens
 	 *            the childrens to set
@@ -75,12 +68,24 @@ public class ConfigurationTreeItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return itemName;
+		return itemName.get();
+	}
+
+	public final StringProperty itemNameProperty() {
+		return this.itemName;
+	}
+
+	public final java.lang.String getItemName() {
+		return this.itemNameProperty().get();
+	}
+
+	public final void setItemName(final java.lang.String itemName) {
+		this.itemNameProperty().set(itemName);
 	}
 
 }

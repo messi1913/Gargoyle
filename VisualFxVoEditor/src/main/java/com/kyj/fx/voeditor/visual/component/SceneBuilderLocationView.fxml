@@ -10,14 +10,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane"
-	xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<bottom>
-		<HBox alignment="CENTER_RIGHT" spacing="5.0"
-			BorderPane.alignment="CENTER">
+		<HBox alignment="CENTER_RIGHT" spacing="5.0" BorderPane.alignment="CENTER">
 			<children>
-				<Button fx:id="btnSave" mnemonicParsing="false"
-					onMouseClicked="#btnSaveOnMouseClick" text="Save" />
+				<Button fx:id="btnSave" mnemonicParsing="false" onMouseClicked="#btnSaveOnMouseClick" text="Save" />
 			</children>
 			<padding>
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -27,7 +24,7 @@
 	<top>
 		<VBox BorderPane.alignment="CENTER">
 			<children>
-				<HBox alignment="CENTER" spacing="5.0">
+				<HBox alignment="CENTER" spacing="5.0" styleClass="hbox-gargoyle">
 					<padding>
 						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 					</padding>
@@ -46,15 +43,10 @@
 		</VBox>
 	</top>
 	<center>
-		<AnchorPane prefHeight="200.0" prefWidth="200.0"
-			BorderPane.alignment="CENTER">
+		<AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<children>
-				<TextField fx:id="txtLocation" layoutX="14.0" layoutY="14.0"
-					prefHeight="23.0" prefWidth="465.0" promptText="Full Path"
-					AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="70.0" />
-				<Button fx:id="btnBrowse" layoutX="481.0" layoutY="14.0"
-					onAction="#btnBrowseOnMouseClick" mnemonicParsing="false" text="Browse"
-					AnchorPane.rightAnchor="5.0" />
+				<TextField fx:id="txtLocation" layoutX="14.0" layoutY="14.0" prefHeight="23.0" prefWidth="465.0" promptText="Full Path" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="70.0" />
+				<Button fx:id="btnBrowse" layoutX="481.0" layoutY="14.0" mnemonicParsing="false" onAction="#btnBrowseOnMouseClick" text="Browse" AnchorPane.rightAnchor="5.0" />
 			</children>
 		</AnchorPane>
 	</center>

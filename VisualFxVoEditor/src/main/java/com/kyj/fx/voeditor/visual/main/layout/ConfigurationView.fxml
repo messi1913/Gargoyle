@@ -5,20 +5,24 @@
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane fx:id="borConfigMain" prefHeight="525.0" prefWidth="797.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.main.layout.ConfigurationViewController">
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
-   <center>
-      <SplitPane dividerPositions="0.2198" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-        <items>
-            <TreeView fx:id="tvItems" onMouseClicked="#tvItemsMouseClick" prefHeight="200.0" prefWidth="200.0" />
-            <BorderPane fx:id="borContent" prefHeight="200.0" prefWidth="200.0">
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-            </BorderPane>
-        </items>
-      </SplitPane>
-   </center>
+<BorderPane fx:id="borConfigMain" prefHeight="525.0"
+	prefWidth="797.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="com.kyj.fx.voeditor.visual.main.layout.ConfigurationViewController">
+	<padding>
+		<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+	</padding>
+	<center>
+		<SplitPane dividerPositions="0.2198" prefHeight="160.0"
+			prefWidth="200.0" BorderPane.alignment="CENTER">
+			<items>
+				<TreeView fx:id="tvItems" prefHeight="200.0" prefWidth="200.0" />
+				<BorderPane fx:id="borContent" prefHeight="200.0"
+					prefWidth="200.0">
+					<padding>
+						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+					</padding>
+				</BorderPane>
+			</items>
+		</SplitPane>
+	</center>
 </BorderPane>

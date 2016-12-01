@@ -196,4 +196,14 @@ public class SkinManager {
 
 		return "";
 	}
+
+	/**
+	 * return caspian.css
+	 * @return
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 11. 30.
+	 */
+	public String getJavafxDefaultSkin() {
+		return toURL(toFullPath("caspian.css")).toExternalForm();
+	}
 }

@@ -109,6 +109,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 
 /**
@@ -292,7 +293,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 							try {
 								Parent newInstance = (Parent) jar.getNodeClass().newInstance();
-								loadNewSystemTab(jar.getDisplayMenuName(), newInstance);
+
+								loadNewSystemTab(jar.getDisplayMenuName(), newInstance, SkinManager.getInstance().getJavafxDefaultSkin());
 							} catch (Exception e) {
 								LOGGER.error("regist fail plugin.");
 								LOGGER.error(ValueUtil.toString(e));
@@ -1358,8 +1360,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param tableName
 	 * @param fxmlName
 	 */
-	@Override
-	public void loadNewSystemTab(String tableName, Parent parent) {
+	public void loadNewSystemTab(String tableName, Parent parent, String skin) {
 		Platform.runLater(() -> {
 			try {
 				if (beforeParentLoad != null && beforeParentLoad.filter(parent)) {
@@ -1371,7 +1372,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				}
 
 				DockTab tab = new DockTab(tableName, parent);
+
+
 				addTabItem(tab);
+				if (skin != null)
+				{
+					parent.getStylesheets().clear();
+//					parent.getStylesheets().add(skin);
+//					tab.getstyle.add(skin);
+				}
 				tabPanWorkspace.getSelectionModel().select(tab);
 
 				// 리스너 호출.
@@ -1381,6 +1390,19 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				DialogUtil.showExceptionDailog(e1);
 			}
 		});
+	}
+
+	/**
+	 * 탭에 대해 로드함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 11. 4.
+	 * @param tableName
+	 * @param fxmlName
+	 */
+	@Override
+	public void loadNewSystemTab(String displayMenuName, Parent newInstance) {
+		loadNewSystemTab(displayMenuName, newInstance, null);
 	}
 
 	/********************************
@@ -1552,8 +1574,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	public void lblDBConsoleOnMouseClick(MouseEvent e) {
 		if (dbConsoleProperty.get() != null)
 			return;
+
 		try {
 			ReadOnlyConsole console = ReadOnlySingletonConsole.getInstance();
+			console.init();
 			dbConsoleProperty.set(console);
 			Stage stage = new Stage();
 			BorderPane root = new BorderPane(console);
@@ -1568,8 +1592,17 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			stage.setAlwaysOnTop(false);
 			stage.initOwner(SharedMemory.getPrimaryStage());
 			stage.centerOnScreen();
-			stage.showAndWait();
-			dbConsoleProperty.set(null);
+			stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, ev -> {
+				try {
+					dbConsoleProperty.set(null);
+					console.close();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			});
+
+			stage.show();
+			//			dbConsoleProperty.set(null);
 		} catch (Exception ex) {
 			DialogUtil.showExceptionDailog(ex);
 			LOGGER.error(ValueUtil.toString(ex));
@@ -1586,8 +1619,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		if (systemConsoleProperty.get() != null)
 			return;
+
+		ReadOnlyConsole console = null;
 		try {
-			ReadOnlyConsole console = SystemConsole.getInstance();
+			console = SystemConsole.getInstance();
+			console.init();
 			systemConsoleProperty.set(console);
 			Stage stage = new Stage();
 			BorderPane root = new BorderPane(console);
@@ -1604,16 +1640,23 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			stage.centerOnScreen();
 
 			stage.setOnCloseRequest(ev -> {
+
+				systemConsoleProperty.set(null);
 				// 스트림 복구.
-				SystemConsole.reset();
+
+				try {
+					SystemConsole.getInstance().close();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+
 			});
-			stage.showAndWait();
-			systemConsoleProperty.set(null);
+			stage.show();
+
 		} catch (Exception ex) {
 			DialogUtil.showExceptionDailog(ex);
 			LOGGER.error(ValueUtil.toString(ex));
 		}
-
 	}
 
 	/**
@@ -1745,7 +1788,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	}
 
 	public void lblNaverRschOnAction() {
-		loadNewSystemTab(NrchRealtimeSrchFlowComposite.TITLE , new NrchRealtimeSrchFlowComposite());
+		loadNewSystemTab(NrchRealtimeSrchFlowComposite.TITLE, new NrchRealtimeSrchFlowComposite());
 	}
 
 	/*

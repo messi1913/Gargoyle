@@ -278,7 +278,7 @@
 			<center>
 				<VBox BorderPane.alignment="CENTER">
 					<children>
-						<HBox spacing="20.0">
+						<HBox styleClass="hbox-gargoyle" spacing="20.0">
 							<children>
 								<Label fx:id="lblVoEditor" onMouseClicked="#lblVoEditorOnMouseClick"
 									text="VoEditor">
@@ -353,7 +353,7 @@
 		</BorderPane>
 	</top>
 	<bottom>
-		<HBox BorderPane.alignment="CENTER">
+		<HBox styleClass="hbox-gargoyle" BorderPane.alignment="CENTER">
 			<children>
 				<Label fx:id="lblClassLocation" />
 			</children>

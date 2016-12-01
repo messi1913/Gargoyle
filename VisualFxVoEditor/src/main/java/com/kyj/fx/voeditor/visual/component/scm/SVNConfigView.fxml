@@ -1,36 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import javafx.geometry.*?>
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.control.cell.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane"
-	xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
-		<TableView fx:id="tbDatabase" editable="true" prefHeight="200.0"
-			prefWidth="200.0" BorderPane.alignment="CENTER">
+		<TableView fx:id="tbDatabase" editable="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<columns>
-				<TableColumn fx:id="colKey" editable="false" prefWidth="192.0"
-					text="Key" />
-				<TableColumn fx:id="colValue" editable="true" minWidth="0.0"
-					prefWidth="343.0" text="Value">
+				<TableColumn fx:id="colKey" editable="false" prefWidth="192.0" text="Key" />
+				<TableColumn fx:id="colValue" editable="true" minWidth="0.0" prefWidth="343.0" text="Value">
 				</TableColumn>
 			</columns>
 		</TableView>
 	</center>
 	<bottom>
-		<HBox alignment="CENTER_RIGHT" spacing="5.0"
-			BorderPane.alignment="CENTER">
+		<HBox alignment="CENTER_RIGHT" spacing="5.0" BorderPane.alignment="CENTER">
 			<children>
-				<Button fx:id="btnSave" mnemonicParsing="false"
-					onMouseClicked="#btnSaveOnMouseClick" prefWidth="60.0" text="Save" />
-				<Button fx:id="btnPing" mnemonicParsing="false"
-					onMouseClicked="#btnPingOnMouseClick" prefWidth="60.0" text="Ping" />
+				<Button fx:id="btnSave" mnemonicParsing="false" onMouseClicked="#btnSaveOnMouseClick" prefWidth="60.0" text="Save" />
+				<Button fx:id="btnPing" mnemonicParsing="false" onMouseClicked="#btnPingOnMouseClick" prefWidth="60.0" text="Ping" />
 			</children>
 			<padding>
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -40,7 +34,7 @@
 	<top>
 		<VBox BorderPane.alignment="CENTER">
 			<children>
-				<HBox alignment="CENTER" spacing="5.0">
+				<HBox alignment="CENTER" spacing="5.0" styleClass="hbox-gargoyle">
 					<padding>
 						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 					</padding>

@@ -14,10 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
+import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
@@ -51,6 +53,7 @@ import javafx.util.StringConverter;
  * @author KYJ
  *
  ***************************/
+@FXMLController(value = "OpenClassResource.fxml", isSelfController = true)
 public abstract class ResourceView<R> extends BorderPane {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(ResourceView.class);
@@ -125,11 +128,13 @@ public abstract class ResourceView<R> extends BorderPane {
 	 */
 	public ResourceView(String data) throws Exception {
 		this.data = data;
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(ResourceView.class.getResource("OpenClassResource.fxml"));
-		loader.setRoot(this);
-		loader.setController(this);
-		loader.load();
+
+		FxUtil.loadRoot(ResourceView.class, this);
+//		FXMLLoader loader = new FXMLLoader();
+//		loader.setLocation(ResourceView.class.getResource("OpenClassResource.fxml"));
+//		loader.setRoot(this);
+//		loader.setController(this);
+//		loader.load();
 
 	}
 

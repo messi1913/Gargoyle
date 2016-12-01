@@ -6,33 +6,16 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.main.model.vo;
 
-
 /**
+ * 트리의 끝을 의미하는 Leaf 노드
  * @author KYJ
  *
  */
-public class ConfigurationLeafNodeItem extends ConfigurationTreeItem {
-
-	private Class<?> contentNode;
-
-	/**
-	 * @return the contentNode
-	 */
-	public Class<?> getContentNode() {
-		return contentNode;
-	}
-
-	/**
-	 * @param contentNode
-	 *            the contentNode to set
-	 */
-	public void setContentNode(Class<?> contentNode) {
-		this.contentNode = contentNode;
-	}
+public class ConfigurationLeafNodeItem extends ConfigurationGraphicsNodeItem {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

@@ -8,15 +8,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.kyj.fx.voeditor.visual.component.ConfigItemTreeItem;
 import com.kyj.fx.voeditor.visual.component.ResourcesConfigView;
 import com.kyj.fx.voeditor.visual.component.SceneBuilderLocationComposite;
 import com.kyj.fx.voeditor.visual.component.SkinConfigView;
+import com.kyj.fx.voeditor.visual.component.config.skin.CustomSkinConfigView;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseConfigView;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseUrlManagementView;
 import com.kyj.fx.voeditor.visual.component.scm.SVNConfigView;
+import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationGraphicsNodeItem;
 import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationLeafNodeItem;
 import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationTreeItem;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -30,6 +36,8 @@ import javafx.scene.layout.BorderPane;
  *
  */
 public class ConfigurationViewController {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationViewController.class);
 
 	@FXML
 	private TreeView<ConfigurationTreeItem> tvItems;
@@ -94,9 +102,16 @@ public class ConfigurationViewController {
 			}
 
 			{
-				ConfigurationLeafNodeItem children3 = new ConfigurationLeafNodeItem();
+				ConfigurationGraphicsNodeItem children3 = new ConfigurationGraphicsNodeItem();
 				children3.setItemName("Skin Configuration");
 				children3.setContentNode(SkinConfigView.class);
+				{
+					ConfigurationLeafNodeItem customSkin = new ConfigurationLeafNodeItem();
+					customSkin.setItemName("Custom Skin Configuration");
+					customSkin.setContentNode(CustomSkinConfigView.class);
+					children3.setChildrens(Arrays.asList(customSkin));
+				}
+
 				resourcesChildrens.add(children3);
 			}
 		}
@@ -123,6 +138,12 @@ public class ConfigurationViewController {
 		createNode.setExpanded(true);
 		tvItems.setShowRoot(true);
 
+		tvItems.getSelectionModel().selectedItemProperty().addListener((oba, o, n) -> {
+			if (o != n) {
+				change(n);
+			}
+		});
+
 	}
 
 	/**
@@ -135,57 +156,41 @@ public class ConfigurationViewController {
 	 * @작성일 : 2015. 11. 4.
 	 * @param e
 	 */
-	@FXML
-	public void tvItemsMouseClick(MouseEvent e) {
-		if (e.getClickCount() == 2) {
-			TreeItem<ConfigurationTreeItem> selectedItem = tvItems.getSelectionModel().getSelectedItem();
-			if (selectedItem == null) {
+	//	@FXML
+	//	public void tvItemsMouseClick(MouseEvent e) {
+	//		if (e.getClickCount() == 1) {
+	//			TreeItem<ConfigurationTreeItem> selectedItem = tvItems.getSelectionModel().getSelectedItem();
+	//			if (selectedItem == null) {
+	//				return;
+	//			}
+	//
+	//			change(selectedItem);
+	//		}
+	//	}
+
+	/**
+	 *  선택 아이템 변경시 처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 1.
+	 * @param selectedItem
+	 */
+	private void change(TreeItem<ConfigurationTreeItem> selectedItem) {
+		ConfigurationTreeItem value = selectedItem.getValue();
+		if (value == null) {
+			return;
+		}
+
+		if (value instanceof ConfigurationGraphicsNodeItem) {
+			ConfigurationGraphicsNodeItem node = (ConfigurationGraphicsNodeItem) value;
+			Class<?> contentNode = node.getContentNode();
+			if (contentNode == null)
 				return;
-			}
 
-			ConfigurationTreeItem value = selectedItem.getValue();
-			if (value == null)
-				return;
-
-			if (value instanceof ConfigurationLeafNodeItem) {
-				ConfigurationLeafNodeItem node = (ConfigurationLeafNodeItem) value;
-				Class<?> contentNode = node.getContentNode();
-				if (contentNode == null)
-					return;
-
-				try {
-					Node newInstance = (Node) contentNode.newInstance();
-					borContent.setCenter(newInstance);
-				} catch (InstantiationException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IllegalAccessException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
-				// if (contentNode == DatabaseConfigView.class) {
-				//
-				// try {
-				// DatabaseConfigView newInstance = (DatabaseConfigView)
-				// contentNode.newInstance();
-				// borContent.setCenter(newInstance);
-				// } catch (Exception e1) {
-				// e1.printStackTrace();
-				// }
-				//
-				// } else if (contentNode == DatabaseUrlManagementView.class) {
-				//
-				// try {
-				// DatabaseUrlManagementView newInstance =
-				// (DatabaseUrlManagementView) contentNode.newInstance();
-				// borContent.setCenter(newInstance);
-				// } catch (Exception e1) {
-				// e1.printStackTrace();
-				// }
-				//
-				// }
-
+			try {
+				Node newInstance = (Node) contentNode.newInstance();
+				borContent.setCenter(newInstance);
+			} catch (Exception e1) {
+				LOGGER.error(ValueUtil.toString(e1));
 			}
 		}
 	}
