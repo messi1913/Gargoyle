@@ -6,7 +6,7 @@
 .hbox-gargoyle
 {
 	-fx-padding: 5px;
-	-fx-background-color: #5CA83C;
+	-fx-background-color: #4E6A9C;
 }
 
 .hbox-gargoyle > Label
@@ -14,6 +14,7 @@
 	-fx-text-fill:#FFFFFF;
 	-fx-fill:#FFFFFF;
 }
+
 .hbox-gargoyle > CheckBox
 {
 	-fx-text-fill:#FFFFFF;
@@ -27,14 +28,14 @@
 }
 
 .menu-bar{
-    -fx-background-color: #92BF7F;
+    -fx-background-color: #CFD9E7;
 }
 .menu-bar HBox{
-    -fx-background-color: #92BF7F;
+    -fx-background-color: #CFD9E7;
 }
 
 .context-menu {
-    -fx-background-color: #92BF7F;
+    -fx-background-color: #CFD9E7;
 }
 
 .menu-bar .label {
@@ -42,31 +43,28 @@
     -fx-opacity: 1.0;
 }
 
-
-
 #tabPanWorkspace BorderPane
 {
-	-fx-background-color: #92BF7F;
+	-fx-background-color: #CFD9E7;
 }
 
 #tabPanWorkspace TableView
 {
-	-fx-background-color: #92BF7F;
+	-fx-background-color: #CFD9E7;
 }
 
 #borConfigMain BorderPane
 {
 	-fx-background-color: #F4F4F4;
 }
-
-.grid-pane
+BorderPane
 {
-	-fx-background-color: #F4F4F4;
+
 }
 
 DockTitleBar
 {
-	-fx-background-color: #92BF7F;
+	-fx-background-color: #CFD9E7;
 	-fx-opacity: 1.0;
 }
 
@@ -75,41 +73,34 @@ DockTitleBar Label
 	-fx-text-fill:black ;
 }
 
-.choice-box .label
-{
-	-fx-text-fill:black;
-}
-
 .console-skin
 {
 	-fx-text-fill: white ;
 	-fx-highlight-text-fill:black  ;
 	-fx-prompt-text-fill: yellow;
-	-fx-highlight-fill: #92BF7F;
+	-fx-highlight-fill: #CFD9E7;
 	-fx-font-size:15.0px;
 	-fx-wrap-text: true;
 }
 
 .console-skin .content
 {
-	-fx-background-color: #5CA83C;
+	-fx-background-color: #4E6A9C;
 	-fx-text-fill:white ;
 }
 
-
 .tab{
-	-fx-background-color: #5CA83C;
-	-fx-opacity: 0.6;
-	-fx-text-fill: white;
+	-fx-background-color: #4E6A9C;
 }
 
-.tab:selected{
-	-fx-text-fill: white ;
+.tab:top .tab-container .tab-label{
+	-fx-opacity: 0.5;
+	-fx-text-fill: whitesmoke ;
+}
+
+.tab:selected:top .tab-container .tab-label{
 	-fx-opacity: 1.0;
-}
-
-.tab:selected .tab-label{
-	-fx-text-fill: white ;
+	-fx-text-fill: white;
 }
 
 

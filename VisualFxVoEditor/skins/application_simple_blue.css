@@ -6,7 +6,7 @@
 
 .hbox-gargoyle
 {
-	-fx-padding: 5px;
+	-fx-padding: 5.0px;
 	-fx-background-color: #5B8ACE;
 }
 
@@ -90,17 +90,22 @@ DockTitleBar Label
 	-fx-text-fill:white ;
 }
 
+
 .tab{
 	-fx-background-color: #5B8ACE;
-	-fx-opacity: 0.6;
-	-fx-text-fill: whitesmoke  ;
 }
 
- .tab:selected{
-	-fx-background-color: #5B8ACE;
-	-fx-opacity: 1.0;
-	-fx-text-fill: white ;
+.tab:top .tab-container .tab-label{
+	-fx-opacity: 0.5;
+	-fx-text-fill: whitesmoke ;
 }
+
+.tab:selected:top .tab-container .tab-label{
+	-fx-opacity: 1.0;
+	-fx-text-fill: white;
+}
+
+
 
 .column-header .label
 {

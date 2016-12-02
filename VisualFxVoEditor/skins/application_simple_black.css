@@ -95,20 +95,22 @@ DockTitleBar Label
 	-fx-text-fill: white ;
 }
 
- .tab{
+
+.tab{
 	-fx-background-color: #19273B;
-	-fx-opacity: 0.6;
+}
+
+.tab:top .tab-container .tab-label{
+	-fx-opacity: 0.5;
+	-fx-text-fill: whitesmoke ;
+}
+
+.tab:selected:top .tab-container .tab-label{
+	-fx-opacity: 1.0;
 	-fx-text-fill: white;
 }
 
- .tab:selected{
-	-fx-background-color: #19273B;
-	-fx-opacity: 1.0;
-}
 
- .tab:selected .tab-label{
-	-fx-text-fill: white ;
-}
 
 .column-header .label
 {
