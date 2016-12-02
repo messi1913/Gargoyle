@@ -1,0 +1,122 @@
+/* JavaFX CSS - Generated Gargoyle Skin Template */
+
+.table-row-cell:empty {
+    -fx-background-color: #FFFFFF;
+}
+
+.hbox-gargoyle
+{
+	-fx-padding: 5.0px;
+	-fx-background-color: #880E4F;
+}
+
+.hbox-gargoyle Label
+{
+	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
+}
+
+.hbox-gargoyle CheckBox
+{
+	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
+}
+
+.hbox-gargoyle > .radio-button > .text
+{
+	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
+}
+
+.menu-bar{
+    -fx-background-color: #CFD9E7;
+}
+.menu-bar HBox{
+    -fx-background-color: #CFD9E7;
+}
+
+.context-menu {
+    -fx-background-color: #CFD9E7;
+}
+
+.menu-bar .label {
+    -fx-text-fill: black;
+    -fx-opacity: 1.0;
+}
+
+#tabPanWorkspace BorderPane
+{
+	-fx-background-color: #CFD9E7;
+}
+
+#tabPanWorkspace TableView
+{
+	-fx-background-color: #CFD9E7;
+}
+
+#borConfigMain BorderPane
+{
+	-fx-background-color: #F4F4F4;
+}
+BorderPane
+{
+
+}
+
+DockTitleBar
+{
+	-fx-background-color: #CFD9E7;
+	-fx-opacity: 1.0;
+}
+
+DockTitleBar Label
+{
+	-fx-text-fill:black ;
+}
+
+.console-skin
+{
+	-fx-text-fill: white ;
+	-fx-highlight-text-fill:black  ;
+	-fx-prompt-text-fill: yellow;
+	-fx-highlight-fill: #CFD9E7;
+	-fx-font-size:15.0px;
+	-fx-wrap-text: true;
+}
+
+.console-skin .content
+{
+	-fx-background-color: #880E4F;
+	-fx-text-fill:white ;
+}
+
+
+.tab{
+	-fx-background-color: #757575;
+}
+
+.tab:top .tab-container .tab-label{
+	-fx-opacity: 0.5;
+	-fx-text-fill: #FFF9C4 ;
+}
+
+.tab:selected:top .tab-container .tab-label{
+	-fx-opacity: 1.0;
+	-fx-text-fill: #FFF59D;
+}
+
+
+
+.column-header .label
+{
+	-fx-text-fill:black;
+}
+
+.fiile-tree-item{
+	-fx-background-color: transparent ;
+}
+
+.fiile-tree-item Label
+{
+	-fx-text-fill:black;
+}

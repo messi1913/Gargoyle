@@ -6,6 +6,8 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.main.model.vo;
 
+import java.util.function.Consumer;
+
 /**
  *
  * Leaf노드가 아니면서 그래픽 처리를 담당하는 트리 중간노드
@@ -15,6 +17,8 @@ package com.kyj.fx.voeditor.visual.main.model.vo;
 public class ConfigurationGraphicsNodeItem extends ConfigurationTreeItem {
 
 	private Class<?> contentNode;
+
+	private Consumer<Class<?>> customOpenStyle;
 
 	/**
 	 * @return the contentNode
@@ -30,4 +34,19 @@ public class ConfigurationGraphicsNodeItem extends ConfigurationTreeItem {
 	public void setContentNode(Class<?> contentNode) {
 		this.contentNode = contentNode;
 	}
+
+	/**
+	 * @return the customOpenStyle
+	 */
+	public final Consumer<Class<?>> getCustomOpenStyle() {
+		return customOpenStyle;
+	}
+
+	/**
+	 * @param customOpenStyle the customOpenStyle to set
+	 */
+	public final void setCustomOpenStyle(Consumer<Class<?>> customOpenStyle) {
+		this.customOpenStyle = customOpenStyle;
+	}
+
 }

@@ -8,25 +8,17 @@ package com.kyj.fx.voeditor.visual.component.console;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.popup.TextSearchComposite;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
-import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -140,6 +132,7 @@ class BaseConsole extends BorderPane implements Closeable {
 		btnClear = new Button("Clear");
 		btnClear.setOnAction(this::btnClearOnAction);
 		buttonHbox = new HBox(5, btnClear);
+		buttonHbox.getStyleClass().add("hbox-gargoyle");
 		buttonHbox.setAlignment(Pos.CENTER_RIGHT);
 		buttonHbox.setPadding(new Insets(5, 5, 5, 5));
 		setTop(buttonHbox);

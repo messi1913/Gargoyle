@@ -7,8 +7,10 @@
 package com.kyj.fx.voeditor.visual.momory;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -18,8 +20,13 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.PreferencesUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+
+import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 /**
  *
@@ -205,5 +212,49 @@ public class SkinManager {
 	 */
 	public String getJavafxDefaultSkin() {
 		return toURL(toFullPath("caspian.css")).toExternalForm();
+	}
+
+	/**
+	 * 사용자 정의 스킨 파일을 생성
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 2.
+	 * @param style
+	 * @param isRegist 사용스킨으로 등록할지 유무
+	 * @return 생성된 스킨 파일.
+	 * @throws IOException
+	 */
+	public File createUserCustomSkin(String style, boolean isRegist) throws IOException {
+
+		File templGagoyleCss = FileUtil.getTemplGagoyleCss();
+		File file = new File(templGagoyleCss, "UserCustom.css");
+		if (!file.exists()) {
+			file.createNewFile();
+		}
+		FileUtil.writeFile(file, style, Charset.forName("UTF-8"));
+
+		if (isRegist) {
+			registSkin(file.getAbsolutePath());
+		}
+
+		return file;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 2.
+	 * @param createUserCustomSkin
+	 * @throws MalformedURLException
+	 */
+	public void applySkin(File createUserCustomSkin) throws MalformedURLException {
+		ObservableList<String> stylesheets = SharedMemory.getPrimaryStage().getScene().getStylesheets();
+		stylesheets.clear();
+		stylesheets.add(createUserCustomSkin.toURI().toURL().toExternalForm());
+	}
+
+	public void resetSkin() {
+		Stage primaryStage = SharedMemory.getPrimaryStage();
+		Scene scene = primaryStage.getScene();
+		scene.getStylesheets().clear();
+		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 	}
 }

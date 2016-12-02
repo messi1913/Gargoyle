@@ -28,7 +28,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -105,14 +104,14 @@ public class ConfigurationViewController {
 				ConfigurationGraphicsNodeItem children3 = new ConfigurationGraphicsNodeItem();
 				children3.setItemName("Skin Configuration");
 				children3.setContentNode(SkinConfigView.class);
-				
+
 				//TODO 신규기능 작업중
-//				{
-//					ConfigurationLeafNodeItem customSkin = new ConfigurationLeafNodeItem();
-//					customSkin.setItemName("Custom Skin Configuration");
-//					customSkin.setContentNode(CustomSkinConfigView.class);
-//					children3.setChildrens(Arrays.asList(customSkin));
-//				}
+				{
+					ConfigurationLeafNodeItem customSkin = new ConfigurationLeafNodeItem();
+					customSkin.setItemName("Custom Skin Configuration");
+					customSkin.setContentNode(CustomSkinConfigView.class);
+					children3.setChildrens(Arrays.asList(customSkin));
+				}
 
 				resourcesChildrens.add(children3);
 			}

@@ -8,28 +8,31 @@ package com.kyj.fx.voeditor.visual.component.config.skin;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.ConfigItemTreeItem;
+import com.kyj.fx.voeditor.visual.component.font.FontViewComposite;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationGraphicsNodeItem;
 import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationLeafNodeItem;
 import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationTreeItem;
-import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 
 /**
@@ -48,6 +51,10 @@ public class CustomSkinConfigView extends BorderPane {
 
 	@FXML
 	private TreeTableColumn<ConfigurationTreeItem, String> ttcConfig;
+	@FXML
+	private Button btnEdit;
+
+	private ObjectProperty<ConfigurationTreeItem> selectedItem = new SimpleObjectProperty<ConfigurationTreeItem>();
 
 	/**
 	 * 생성자O
@@ -65,7 +72,13 @@ public class CustomSkinConfigView extends BorderPane {
 
 			@Override
 			public TreeTableRow<ConfigurationTreeItem> call(TreeTableView<ConfigurationTreeItem> param) {
-				return new TreeTableRow<>();
+				TreeTableRow<ConfigurationTreeItem> treeTableRow = new TreeTableRow<>();
+
+				treeTableRow.setOnMouseClicked(ev -> {
+					ConfigurationTreeItem item = treeTableRow.getItem();
+					selectedItem.set(item);
+				});
+				return treeTableRow;
 			}
 		});
 
@@ -76,26 +89,60 @@ public class CustomSkinConfigView extends BorderPane {
 		{
 			ConfigurationLeafNodeItem fontConfigItem = new ConfigurationLeafNodeItem();
 			fontConfigItem.setItemName("Font");
+			fontConfigItem.setContentNode(FontViewComposite.class);
 
 			ConfigurationLeafNodeItem backgroundConfigItem = new ConfigurationLeafNodeItem();
 			backgroundConfigItem.setItemName("Background");
-
+			backgroundConfigItem.setContentNode(SkinPreviewViewComposite.class);
 			root.setChildrens(Arrays.asList(fontConfigItem, backgroundConfigItem));
 		}
 
 		TreeItem<ConfigurationTreeItem> createNode = new ConfigItemTreeItem().createNode(root);
+		createNode.setExpanded(true);
 		ttvIConfig.setRoot(createNode);
 
+	}
+
+	/**
+	 * Load TreeItem
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 2.
+	 * @param item
+	 */
+	private void load(ConfigurationTreeItem item) {
+		if (item != null) {
+			if (item instanceof ConfigurationGraphicsNodeItem) {
+				ConfigurationGraphicsNodeItem node = (ConfigurationGraphicsNodeItem) item;
+				if (node.getCustomOpenStyle() != null) {
+					Consumer<Class<?>> customOpenStyle = node.getCustomOpenStyle();
+					customOpenStyle.accept(node.getContentNode());
+				} else if (node.getContentNode() != null) {
+
+					Class<?> cont = node.getContentNode();
+					try {
+						Object newInstance = cont.newInstance();
+						if (newInstance instanceof Parent) {
+							FxUtil.createStageAndShow((Parent) newInstance, stage -> {
+								stage.initOwner(CustomSkinConfigView.this.getScene().getWindow());
+								stage.setTitle(node.getItemName());
+							});
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+		}
 	}
 
 	@FXML
 	public void btnEditOnAction() {
 
-		TreeItem<ConfigurationTreeItem> selectedItem = ttvIConfig.getSelectionModel().getSelectedItem();
-		if (selectedItem != null && selectedItem.getValue() != null) {
-			ConfigurationTreeItem value = selectedItem.getValue();
+		ConfigurationTreeItem value = selectedItem.getValue();
+		if (value != null) {
 			if (value instanceof ConfigurationGraphicsNodeItem) {
-				open((ConfigurationGraphicsNodeItem) value);
+				load((ConfigurationGraphicsNodeItem) value);
 			}
 		}
 
@@ -108,13 +155,7 @@ public class CustomSkinConfigView extends BorderPane {
 	 */
 	@FXML
 	public void btnResetOnAction() {
-		Stage primaryStage = SharedMemory.getPrimaryStage();
-		Scene scene = primaryStage.getScene();
-		scene.getStylesheets().clear();
-		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+		SkinManager.getInstance().resetSkin();
 	}
 
-	private void open(ConfigurationGraphicsNodeItem value) {
-		
-	}
 }

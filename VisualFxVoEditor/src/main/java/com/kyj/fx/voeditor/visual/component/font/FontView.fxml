@@ -10,47 +10,99 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<fx:root type="BorderPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.60">
+<fx:root prefHeight="380.0" prefWidth="840.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
    <center>
-      <HBox minWidth="80.0" BorderPane.alignment="CENTER">
+      <VBox BorderPane.alignment="CENTER">
          <children>
-            <JFXComboBox maxWidth="1.7976931348623157E308" minWidth="30.0" prefWidth="200.0" promptText="Font Name" />
-            <JFXComboBox maxWidth="1.7976931348623157E308" minWidth="30.0" prefWidth="200.0" promptText="Font Style" />
-            <VBox>
+            <HBox maxWidth="1.7976931348623157E308" minWidth="80.0" prefHeight="96.0" prefWidth="840.0" spacing="10.0">
                <children>
-                  <Label text="Font Size" />
-                  <JFXSlider majorTickUnit="10.0" max="50.0" maxWidth="1.7976931348623157E308" minWidth="30.0" minorTickCount="1" prefHeight="0.0" prefWidth="200.0" showTickLabels="true" showTickMarks="true" value="11.0" />
+                  <VBox spacing="10.0">
+                     <children>
+                        <JFXComboBox fx:id="cbFontNames" editable="true" maxWidth="1.7976931348623157E308" minWidth="30.0" prefWidth="200.0" promptText="Font Name" />
+                     </children>
+                  </VBox>
+                  <JFXComboBox fx:id="cbFontStyles" editable="true" maxWidth="1.7976931348623157E308" minWidth="30.0" prefWidth="200.0" promptText="Font Style" />
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Font Size" VBox.vgrow="ALWAYS" />
+                        <JFXSlider fx:id="sliderFontSize" majorTickUnit="10.0" max="50.0" maxWidth="1.7976931348623157E308" minWidth="30.0" minorTickCount="1" prefHeight="0.0" prefWidth="200.0" showTickLabels="true" showTickMarks="true" value="11.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Font Weight" VBox.vgrow="ALWAYS" />
+                        <JFXSlider fx:id="sliderFontWeight" blockIncrement="100.0" majorTickUnit="100.0" max="900" maxWidth="1.7976931348623157E308" min="100.0" minWidth="30.0" minorTickCount="0" prefHeight="0.0" prefWidth="200.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="200.0" VBox.vgrow="ALWAYS" />
+                        <JFXComboBox fx:id="cbFontWeight" maxWidth="200.0" promptText="Font Weight" />
+                     </children>
+                  </VBox>
                </children>
-            </VBox>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="20.0" />
+               </padding>
+            </HBox>
+            <HBox spacing="5.0" VBox.vgrow="NEVER">
+               <children>
+                  <Label fx:id="lblFontInfo" text="Font Information ::: " wrapText="true" />
+                  <Label fx:id="lblInfoFontName" text="Font Name" wrapText="true" />
+                  <Label fx:id="lblFontName" textFill="#0f9d58" wrapText="true">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblInfoFontSize" text="Font Size : " wrapText="true" />
+                  <Label fx:id="lblFontSize" textFill="#0f9d58" wrapText="true">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblInfoFontStyle" text="Font Style : " wrapText="true" />
+                  <Label fx:id="lblFontStyle" textFill="#0f9d58" wrapText="true">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblInfoFontFamily" text="Font Family : " wrapText="true" />
+                  <Label fx:id="lblFontFamily" textFill="#0f9d58" wrapText="true">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+               <center>
+                  <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: gray;" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label fx:id="lblPreviewText" text="Hello World! 123456789 헬로우 월드! 123456789" wrapText="true">
+                           <padding>
+                              <Insets bottom="50.0" top="50.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <BorderPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </BorderPane.margin>
+                  </StackPane>
+               </center>
+               <top>
+                  <Label text="PreView" BorderPane.alignment="CENTER_LEFT" />
+               </top>
+            </BorderPane>
          </children>
-         <padding>
-            <Insets bottom="5.0" top="5.0" />
-         </padding>
-      </HBox>
+      </VBox>
    </center>
    <top>
-      <Label text="Font Style" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER" styleClass="hbox-gargoyle" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Font Style">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
          <padding>
-            <Insets bottom="15.0" left="5.0" right="5.0" top="5.0" />
+            <Insets bottom="10.0" top="10.0" />
          </padding>
-         <font>
-            <Font size="22.0" />
-         </font>
-      </Label>
+      </HBox>
    </top>
-   <bottom>
-      <BorderPane prefHeight="100.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-         <center>
-            <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Label text="Hello World! 123456789 헬로우 월드! 123456789" wrapText="true" />
-               </children>
-            </StackPane>
-         </center>
-         <top>
-            <Label text="PreView" BorderPane.alignment="CENTER_LEFT" />
-         </top>
-      </BorderPane>
-   </bottom>
 </fx:root>

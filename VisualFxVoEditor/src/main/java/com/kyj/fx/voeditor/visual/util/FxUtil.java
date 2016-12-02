@@ -50,9 +50,15 @@ import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -370,7 +376,16 @@ public class FxUtil {
 				.ifPresent((m -> {
 					if (m.getModifiers() == Modifier.PUBLIC) {
 						try {
-							m.invoke(instanceController);
+
+							//Lazy Run.
+							Platform.runLater(() -> {
+								try {
+									m.invoke(instanceController);
+								} catch (Exception e) {
+									LOGGER.error(ValueUtil.toString(e));
+								}
+							});
+
 						} catch (Exception e) {
 							LOGGER.error(ValueUtil.toString(e));
 						}
@@ -497,6 +512,8 @@ public class FxUtil {
 	public static Point2D getAbsolte2D(Region longRegion, Parent target) {
 
 		Point2D point2d = new Point2D(target.getLayoutX(), target.getLayoutY());
+		//		Point2D point2d = new Point2D(target.getBoundsInLocal().getMaxX(), target.getBoundsInLocal().getMaxY());
+		//		Point2D point2d = new Point2D(target.getScene().getX(), target.getScene().getY());
 		Parent parent2 = target.getParent();
 		if (longRegion == parent2) {
 			return point2d;
@@ -608,7 +625,9 @@ public class FxUtil {
 	 * @param option
 	 */
 	public static void createStageAndShow(Parent parent, Consumer<Stage> option) {
-		createStageAndShow(new Scene(parent), option);
+		Scene scene = new Scene(parent);
+		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+		createStageAndShow(scene, option);
 	}
 
 	public static void createStageAndShow(CloseableParent<? extends Parent> cloableParent, Consumer<Stage> option) {
@@ -924,7 +943,7 @@ public class FxUtil {
 
 	/**
 	 * RGB Color String
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 1.
 	 * @param color
@@ -939,7 +958,7 @@ public class FxUtil {
 
 	/**
 	 * HSB Color String
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 1.
 	 * @param color
@@ -979,7 +998,7 @@ public class FxUtil {
 
 	/**
 	 * Show PopOver
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 28.
 	 * @param root
@@ -1506,7 +1525,7 @@ public class FxUtil {
 
 	/**
 	 * 테이블뷰에 더블클릭하면 팝업이 열리는 기능을 install 처리한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 28.
 	 * @param tbMetadata
@@ -1569,19 +1588,52 @@ public class FxUtil {
 		});
 	}
 
-	/**
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 11. 28.
-	 * @param task
-	 * @return
-	 */
-	public static <V> Service<V> createFxService(final Task<V> task) {
-		return new Service<V>() {
+	public static class FONTUtil {
 
-			@Override
-			protected Task<V> createTask() {
-				return task;
-			}
-		};
+		/**
+		 * 디폴트 폰트 리턴
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 12. 2.
+		 * @return
+		 */
+		public static Font getDefaultFont() {
+			return Font.getDefault();
+		}
+
+		/**
+		 * 폰트명들을 리턴
+		 * @return
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 12. 2.
+		 */
+		public static List<String> getAvaliableFontNames() {
+			return Font.getFontNames();
+		}
+
+		public static List<String> getAvaliableFontFamilis() {
+			return Font.getFamilies();
+		}
+
+		/**
+		 * Font Styles 리턴
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 12. 2.
+		 * @return
+		 */
+		public static List<String> getFontStyles() {
+			return Stream.of(FontPosture.values()).map(s -> s.name()).collect(Collectors.toList());
+		}
+
+		/**
+		 * Font Weight 정보 리턴
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 12. 2.
+		 * @return
+		 */
+		public static List<String> getFontWeights() {
+			return Stream.of(FontWeight.values()).map(s -> s.name()).collect(Collectors.toList());
+		}
+
 	}
+
 }

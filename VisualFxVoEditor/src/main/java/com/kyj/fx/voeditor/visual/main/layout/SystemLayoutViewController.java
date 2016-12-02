@@ -1581,8 +1581,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			dbConsoleProperty.set(console);
 			Stage stage = new Stage();
 			BorderPane root = new BorderPane(console);
-			root.getStylesheets().add(SkinManager.getInstance().getSkin());
+
 			Scene scene = new Scene(root, 700, 300);
+			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 			stage.setScene(scene);
 			double x = SharedMemory.getPrimaryStage().getX();
 			double y = SharedMemory.getPrimaryStage().getY();
@@ -1627,8 +1628,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			systemConsoleProperty.set(console);
 			Stage stage = new Stage();
 			BorderPane root = new BorderPane(console);
-			root.getStylesheets().add(SkinManager.getInstance().getSkin());
+
 			Scene scene = new Scene(root, 700, 300);
+			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+
 			stage.setScene(scene);
 			double x = SharedMemory.getPrimaryStage().getX();
 			double y = SharedMemory.getPrimaryStage().getY();
