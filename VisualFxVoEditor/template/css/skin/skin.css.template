@@ -1,0 +1,129 @@
+/********************************************************************************************* 
+
+	JavaFX CSS - Generated Gargoyle Skin Template 
+   
+    Creator - callakrsos (KYJ)
+    Email    - callakrsos@naver.com
+    Date     - 2016-12-03 
+    
+*********************************************************************************************/
+
+
+
+.table-row-cell:empty {
+    -fx-background-color: #FFFFFF;
+}
+
+.hbox-gargoyle
+{
+	-fx-background-color: $hbox-gargoyle;
+}
+
+.hbox-gargoyle Label
+{
+	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
+}
+
+.hbox-gargoyle CheckBox
+{
+	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
+}
+
+.hbox-gargoyle > .radio-button > .text
+{
+	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
+}
+
+.menu-bar{
+    -fx-background-color: $menubar-gargoyle;
+}
+.menu-bar HBox{
+    -fx-background-color: $menubar-gargoyle;
+}
+
+.context-menu {
+    -fx-background-color: $menubar-gargoyle;
+}
+
+.menu-bar .label {
+    -fx-text-fill: $menubar-label-gargoyle;
+    -fx-opacity: 1.0;
+}
+
+#tabPanWorkspace BorderPane
+{
+	-fx-background-color: $menubar-gargoyle;
+}
+
+#tabPanWorkspace TableView
+{
+	-fx-background-color: $menubar-gargoyle;
+}
+
+#borConfigMain BorderPane
+{
+	-fx-background-color: #F4F4F4;
+}
+BorderPane
+{
+
+}
+
+DockTitleBar
+{
+	-fx-background-color: $menubar-gargoyle;
+	-fx-opacity: 1.0;
+}
+
+DockTitleBar Label
+{
+	-fx-text-fill:black ;
+}
+
+.console-skin
+{
+	-fx-text-fill: white ;
+	-fx-highlight-text-fill:black  ;
+	-fx-prompt-text-fill: yellow;
+	-fx-highlight-fill: $menubar-gargoyle;
+	-fx-font-size:15.0px;
+	-fx-wrap-text: true;
+}
+
+.console-skin .content
+{
+	-fx-background-color: $hbox-gargoyle;
+	-fx-text-fill:white ;
+}
+
+
+.tab{
+	-fx-background-color: $tab-gargoyle;
+}
+
+.tab:top .tab-container .tab-label{
+	-fx-opacity: 0.5;
+	-fx-text-fill: $tab-unselected-gargoyle ;
+}
+
+.tab:selected:top .tab-container .tab-label{
+	-fx-opacity: 1.0;
+	-fx-text-fill: $tab-selected-gargoyle;
+}
+
+.column-header .label
+{
+	-fx-text-fill:black;
+}
+
+.fiile-tree-item{
+	-fx-background-color: transparent ;
+}
+
+.fiile-tree-item Label
+{
+	-fx-text-fill:black;
+}
