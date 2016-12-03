@@ -784,7 +784,7 @@
 		<copy todir="build/src">
 			<fileset dir="project/src/main/java">
 				<include name="**/*" />
-				<exclude name="com/kyj/fx/voeditor/visual/example/**"/>
+				<exclude name="com/kyj/fx/voeditor/visual/example/**" />
 			</fileset>
 		</copy>
 
@@ -823,14 +823,13 @@
 		<delete dir="dist/libs" />
 		<delete dir="deploy" />
 
-
 		<mkdir dir="dist" />
 		<mkdir dir="dist/libs" />
 		<mkdir dir="dist/skins" />
 		<mkdir dir="dist/plugins" />
 		<mkdir dir="dist/btrace" />
 		<mkdir dir="dist/rulesets" />
-
+		<mkdir dir="dist/template" />
 
 		<copy todir="dist/libs">
 			<fileset dir="externalLibs">
@@ -868,6 +867,11 @@
 			</fileset>
 		</copy>
 
+		<copy todir="dist/template">
+			<fileset dir="../template">
+				<include name="**/*" />
+			</fileset>
+		</copy>
 
 		<copyfile src="../UserConf.properties" dest="dist/UserConf.properties" />
 
@@ -881,6 +885,7 @@
 			<fx:fileset dir="dist" includes="plugins/**" />
 			<fx:fileset dir="dist" includes="skins/**" />
 			<fx:fileset dir="dist" includes="rulesets/**" />
+			<fx:fileset dir="dist" includes="template/**" />
 
 		</fx:resources>
 
@@ -988,6 +993,7 @@
 			<fx:fileset dir="dist" includes="plugins/**" />
 			<fx:fileset dir="dist" includes="skins/**" />
 			<fx:fileset dir="dist" includes="rulesets/**" />
+			<fx:fileset dir="dist" includes="template/**" />
 		</fx:resources>
 
 		<delete dir="package" />
