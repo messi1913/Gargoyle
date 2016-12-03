@@ -105,6 +105,7 @@ final class NaverRealtimeSearchFactory {
 	public static int SEARCH_CONTANT_END_LENGTH = SEARCH_CONTANT_END.length();
 
 	private static String NAVER_REALTIME_URL = "https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&ie=utf8&query=%EC%97%90%EB%84%A4%EC%8A%A4&x=0&y=0";
+	private static String NAVER_REALTIME_URL2 = "http://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&ie=utf8&query=%EC%97%90%EB%84%A4%EC%8A%A4&x=0&y=0";
 
 	private static NaverRealtimeSearchFactory nb;
 
@@ -152,29 +153,35 @@ final class NaverRealtimeSearchFactory {
 	}
 
 	private String getDrityString() throws Exception, MalformedURLException {
-		String realtimeSearch = RequestUtil.reqeustSSL(new URL(NAVER_REALTIME_URL), (is, code) -> {
-			int cnt = 0;
-			do {
-				if (cnt == 5) {
-					break;
-				}
+		String realtimeSearch = RequestUtil.request(new URL(NAVER_REALTIME_URL2), (is, code) -> {
 
+			if (code == 200) {
 				try {
 					return ValueUtil.toString(is);
 				} catch (Exception e) {
 					LOGGER.error(ValueUtil.toString(e));
 				}
-
-				try {
-					Thread.sleep(100);
-				} catch (Exception e) {
-				}
-
-				cnt++;
-			} while ((code != 200));
+			}
 
 			return "";
 		});
+
+		if (ValueUtil.isEmpty(realtimeSearch)) {
+
+			realtimeSearch = RequestUtil.reqeustSSL(new URL(NAVER_REALTIME_URL), (is, code) -> {
+				if (code == 200) {
+					try {
+						return ValueUtil.toString(is);
+					} catch (Exception e) {
+						LOGGER.error(ValueUtil.toString(e));
+					}
+				}
+
+				return "";
+			});
+
+		}
+
 		return realtimeSearch;
 	}
 
