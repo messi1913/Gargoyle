@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -47,6 +48,8 @@ import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.InstanceTypes;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.voeditor.visual.framework.builder.GargoyleBuilderFactory;
+import com.kyj.fx.voeditor.visual.framework.builder.GargoyleButtonBuilder;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
@@ -55,14 +58,9 @@ import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker.State;
 import javafx.embed.swing.SwingFXUtils;
@@ -79,8 +77,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.SnapshotResult;
+import javafx.scene.control.Button;
+import javafx.scene.control.Cell;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -377,7 +378,7 @@ public class FxUtil {
 					if (m.getModifiers() == Modifier.PUBLIC) {
 						try {
 
-							//Lazy Run.
+							// Lazy Run.
 							Platform.runLater(() -> {
 								try {
 									m.invoke(instanceController);
@@ -399,6 +400,15 @@ public class FxUtil {
 		if (controllerAction != null)
 			controllerAction.accept(instanceController);
 
+		Platform.runLater(() -> {
+			Parent parent = (Parent) load;
+			List<Node> findAllByNodes = FxUtil.findAllByNodes(parent, v -> v instanceof Button);
+			findAllByNodes.forEach(v -> {
+				GargoyleButtonBuilder.applyStyleClass((Button) v, "button-gargoyle-rich-blue");
+				LOGGER.debug("Button :  {}", v);
+			});
+		});
+
 		return load;
 	}
 
@@ -407,8 +417,11 @@ public class FxUtil {
 	 * @작성일 : 2016. 11. 28.
 	 * @return
 	 */
-	private static FXMLLoader createNewFxmlLoader() {
-		return new FXMLLoader();
+	public static FXMLLoader createNewFxmlLoader() {
+
+		FXMLLoader loader = new FXMLLoader();
+		loader.setBuilderFactory(GargoyleBuilderFactory.getInstance());
+		return loader;
 	}
 
 	/**
@@ -512,8 +525,10 @@ public class FxUtil {
 	public static Point2D getAbsolte2D(Region longRegion, Parent target) {
 
 		Point2D point2d = new Point2D(target.getLayoutX(), target.getLayoutY());
-		//		Point2D point2d = new Point2D(target.getBoundsInLocal().getMaxX(), target.getBoundsInLocal().getMaxY());
-		//		Point2D point2d = new Point2D(target.getScene().getX(), target.getScene().getY());
+		// Point2D point2d = new Point2D(target.getBoundsInLocal().getMaxX(),
+		// target.getBoundsInLocal().getMaxY());
+		// Point2D point2d = new Point2D(target.getScene().getX(),
+		// target.getScene().getY());
 		Parent parent2 = target.getParent();
 		if (longRegion == parent2) {
 			return point2d;
@@ -1318,9 +1333,23 @@ public class FxUtil {
 						return Stream.of(v);
 					}
 
+					else if (v instanceof TableView) {
+
+						Set<Node> lookupAll = ((TableView) v).lookupAll(".table-cell");
+						return lookupAll.stream().map(n -> (TableCell) n).map(cell -> {
+							return cell.getGraphic();
+						}).filter(n -> filter.test(n));
+						// return lookupAll.stream();
+						// return Stream.empty();
+						// return visibleLeafColumns.stream();
+						// return findAllByNodes((Parent) v, onlyVisible,
+						// filter).stream();
+					}
+
 					else if (v instanceof Parent) {
 						return findAllByNodes((Parent) v, onlyVisible, filter).stream();
 					}
+
 				}
 
 			}
@@ -1592,6 +1621,7 @@ public class FxUtil {
 
 		/**
 		 * 디폴트 폰트 리턴
+		 * 
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 2.
 		 * @return
@@ -1602,6 +1632,7 @@ public class FxUtil {
 
 		/**
 		 * 폰트명들을 리턴
+		 * 
 		 * @return
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 2.
@@ -1616,6 +1647,7 @@ public class FxUtil {
 
 		/**
 		 * Font Styles 리턴
+		 * 
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 2.
 		 * @return
@@ -1626,6 +1658,7 @@ public class FxUtil {
 
 		/**
 		 * Font Weight 정보 리턴
+		 * 
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 2.
 		 * @return

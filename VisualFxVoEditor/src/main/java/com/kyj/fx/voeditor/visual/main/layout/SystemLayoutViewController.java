@@ -208,7 +208,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		DbUtil.registQuertyListener(this);
 		try {
-			FXMLLoader loader = new FXMLLoader();
+			FXMLLoader loader = FxUtil.createNewFxmlLoader();
 			loader.setLocation(SystemLayoutViewController.class.getResource("DAOLoaderView.fxml"));
 			TitledPane titledPane = loader.load();
 			VBox.setVgrow(titledPane, Priority.ALWAYS);
@@ -1324,7 +1324,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	public void loadNewSystemTab(String tabName, String fxmlName) {
 		Platform.runLater(() -> {
 			try {
-				FXMLLoader loader = new FXMLLoader();
+				FXMLLoader loader = FxUtil.createNewFxmlLoader();
 				loader.setLocation(getClass().getResource(fxmlName));
 				Parent parent = loader.load();
 

@@ -94,17 +94,31 @@ public class CustomSkinConfigView extends BorderPane {
 			ConfigurationLeafNodeItem backgroundConfigItem = new ConfigurationLeafNodeItem();
 			backgroundConfigItem.setItemName("Background");
 			backgroundConfigItem.setContentNode(SkinPreviewViewComposite.class);
+
 			root.setChildrens(Arrays.asList(fontConfigItem, backgroundConfigItem));
+
 		}
 
 		TreeItem<ConfigurationTreeItem> createNode = new ConfigItemTreeItem().createNode(root);
 		createNode.setExpanded(true);
 		ttvIConfig.setRoot(createNode);
 
+		selectedItem.addListener((oba, o, n) -> {
+
+			btnEdit.setDisable(true);
+			if (n instanceof ConfigurationLeafNodeItem) {
+				if (((ConfigurationLeafNodeItem) n).getContentNode() != null) {
+					btnEdit.setDisable(false);
+				}
+			}
+
+		});
+
 	}
 
 	/**
 	 * Load TreeItem
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 2.
 	 * @param item
@@ -149,13 +163,25 @@ public class CustomSkinConfigView extends BorderPane {
 	}
 
 	/**
-	 *  스킨 초기화
+	 * 스킨 초기화
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 1.
 	 */
 	@FXML
 	public void btnResetOnAction() {
 		SkinManager.getInstance().resetSkin();
+	}
+
+	/**
+	 * 디폴트 시스템 폰트 사용.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 3.
+	 */
+	@FXML
+	public void btnUseSystemFontOnAction() {
+
 	}
 
 }

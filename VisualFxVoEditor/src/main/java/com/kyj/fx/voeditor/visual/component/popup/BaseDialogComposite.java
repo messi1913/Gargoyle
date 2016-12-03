@@ -23,7 +23,6 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -154,11 +153,12 @@ public class BaseDialogComposite extends BorderPane {
 		scene.setOnKeyPressed(this::sceneOnKeyPressed);
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 		stage.setScene(scene);
-
+		
+		stage.initOwner(root);
 		if (action != null) {
 			action.accept(stage);
 		}
-		stage.initOwner(root);
+		
 		stage.showAndWait();
 	}
 

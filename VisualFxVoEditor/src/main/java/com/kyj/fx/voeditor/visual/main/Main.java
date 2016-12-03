@@ -31,8 +31,10 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -118,14 +120,13 @@ public class Main extends Application {
 
 				@Override
 				public void handle(Exception e) {
-					
+
 					LOGGER.debug("어플리케이션이 중복 실행되어 프로그램을 종료합니다.");
-					
+
 					if (Platform.isFxApplicationThread()) {
 						Platform.exit();
 						return;
 					}
-
 
 					System.exit(EXIT_CODE_APPLICATION_DUPLICATION);
 				}

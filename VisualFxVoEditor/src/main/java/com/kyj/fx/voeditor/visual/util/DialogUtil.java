@@ -41,6 +41,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Pair;
 
@@ -591,8 +592,9 @@ public class DialogUtil {
 
 		//Modal
 		composite.show(owner, stage -> {
-
+			
 			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initStyle(StageStyle.UTILITY);
 			node.requestFocus();
 
 			stage.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {

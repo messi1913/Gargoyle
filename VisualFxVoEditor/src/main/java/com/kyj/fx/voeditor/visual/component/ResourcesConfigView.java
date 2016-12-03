@@ -18,18 +18,19 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.main.model.vo.Code;
 import com.kyj.fx.voeditor.visual.momory.ClassTypeResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
-import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableCell;
@@ -51,6 +52,7 @@ import kyj.Fx.dao.wizard.memory.IFileBaseConfiguration;
  * @author KYJ
  *
  */
+@FXMLController(value = "ResourcesConfigView.fxml", isSelfController = true)
 public class ResourcesConfigView extends BorderPane {
 	private static Logger LOGGER = LoggerFactory.getLogger(ResourcesConfigView.class);
 	@FXML
@@ -75,16 +77,19 @@ public class ResourcesConfigView extends BorderPane {
 	 */
 	public ResourcesConfigView() {
 
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(getClass().getResource("ResourcesConfigView.fxml"));
-		loader.setController(this);
-		loader.setRoot(this);
-		this.getStylesheets().add(SkinManager.getInstance().getSkin());
-		try {
-			loader.load();
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
-		}
+		FxUtil.loadRoot(ResourcesConfigView.class, this, err-> LOGGER.error(ValueUtil.toString(err)));
+//		FXMLLoader loader = new FXMLLoader();
+//		loader.setLocation(getClass().getResource("ResourcesConfigView.fxml"));
+//		loader.setController(this);
+//		loader.setRoot(this);
+//		
+//		
+//		this.getStylesheets().add(SkinManager.getInstance().getSkin());
+//		try {
+//			loader.load();
+//		} catch (Exception e) {
+//			LOGGER.error(e.getMessage());
+//		}
 	}
 
 	@FXML

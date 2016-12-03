@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 
-<fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane"
-	xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
-		<TableView fx:id="tbDatabase" editable="true"
-			onMouseClicked="#tbDatabaseMouseClick" prefHeight="200.0" prefWidth="200.0"
-			BorderPane.alignment="CENTER">
+		<TableView fx:id="tbDatabase" editable="true" onMouseClicked="#tbDatabaseMouseClick" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<columns>
-				<TableColumn fx:id="colKey" editable="false" text="Key"
-					visible="false" />
+				<TableColumn fx:id="colKey" editable="false" text="Key" visible="false" />
 				<TableColumn fx:id="colUrl" text="Url" />
 				<TableColumn fx:id="colAlias" text="Alias" />
 				<TableColumn fx:id="colUserName" text="User Name" />
@@ -25,20 +24,30 @@
 		</TableView>
 	</center>
 	<bottom>
-		<HBox alignment="CENTER_RIGHT" spacing="5.0"
-			BorderPane.alignment="CENTER">
+		<HBox alignment="CENTER_RIGHT" spacing="5.0" BorderPane.alignment="CENTER">
 			<children>
 				<ColorPicker />
-				<Button fx:id="btnDelete" mnemonicParsing="false"
-					onMouseClicked="#btnDeleteOnMouseClick" text="Delete" />
-				<Button fx:id="btnAdd" mnemonicParsing="false"
-					onMouseClicked="#btnAddOnMouseClick" text="Add" />
-				<Button fx:id="btnSave" mnemonicParsing="false"
-					onMouseClicked="#btnSaveOnMouseClick" text="Save" />
+				<Button fx:id="btnDelete" mnemonicParsing="false" onMouseClicked="#btnDeleteOnMouseClick" text="Delete" />
+				<Button fx:id="btnAdd" mnemonicParsing="false" onMouseClicked="#btnAddOnMouseClick" text="Add" />
+				<Button fx:id="btnSave" mnemonicParsing="false" onMouseClicked="#btnSaveOnMouseClick" text="Save" />
 			</children>
 			<padding>
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 			</padding>
 		</HBox>
 	</bottom>
+   <top>
+      <HBox alignment="CENTER" styleClass="hbox-gargoyle" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" text="Database URL Management">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </HBox>
+   </top>
 </fx:root>

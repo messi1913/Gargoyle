@@ -23,8 +23,8 @@
 	<bottom>
 		<HBox alignment="CENTER_RIGHT" spacing="5.0" BorderPane.alignment="CENTER">
 			<children>
-				<Button fx:id="btnSave" mnemonicParsing="false" onMouseClicked="#btnSaveOnMouseClick" prefWidth="60.0" text="Save" />
-				<Button fx:id="btnPing" mnemonicParsing="false" onMouseClicked="#btnPingOnMouseClick" prefWidth="60.0" text="Ping" />
+				<Button fx:id="btnSave" disable="true" mnemonicParsing="false" onMouseClicked="#btnSaveOnMouseClick" prefWidth="60.0" text="Save" />
+				<Button fx:id="btnPing" disable="true" mnemonicParsing="false" onMouseClicked="#btnPingOnMouseClick" prefWidth="60.0" text="Ping" />
 			</children>
 			<padding>
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

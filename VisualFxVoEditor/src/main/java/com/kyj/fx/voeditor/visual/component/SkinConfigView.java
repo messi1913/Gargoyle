@@ -9,8 +9,17 @@ package com.kyj.fx.voeditor.visual.component;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.voeditor.visual.momory.SkinManager;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -20,15 +29,16 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import com.kyj.fx.voeditor.visual.momory.SkinManager;
-
 /**
  * Skin목록을 보여주는 뷰
  * 
  * @author KYJ
  *
  */
+@FXMLController(value = "SkinConfigView.fxml", isSelfController = true)
 public class SkinConfigView extends BorderPane {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(SkinConfigView.class);
 
 	/**
 	 * 생성자
@@ -36,7 +46,11 @@ public class SkinConfigView extends BorderPane {
 	 * @throws URISyntaxException
 	 */
 	public SkinConfigView() {
+		FxUtil.loadRoot(SkinConfigView.class, this, err -> LOGGER.error(ValueUtil.toString(err)));
+	}
 
+	@FXML
+	public void initialize() {
 		ListView<String> lvItems = getSkinView();
 		lvItems.setOnMouseClicked(event -> {
 			if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {

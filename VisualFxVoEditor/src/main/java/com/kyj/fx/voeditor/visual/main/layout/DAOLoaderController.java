@@ -19,10 +19,12 @@ import com.kyj.fx.voeditor.visual.component.TextBaseDiffAppController;
 import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.diff.TextBaseComparator;
+import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.main.model.vo.TbmSysDaoMethodsHDVO;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
@@ -39,7 +41,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewSelectionModel;
@@ -56,6 +57,7 @@ import kyj.Fx.dao.wizard.core.model.vo.TbmSysDaoDVO;
  * @author KYJ
  *
  */
+@FXMLController("DaoWizardView.fxml")
 public class DAOLoaderController {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(DAOLoaderController.class);
@@ -68,8 +70,6 @@ public class DAOLoaderController {
 	private TableColumn<Map<String, Object>, Object> colSrchClassName;
 	@FXML
 	private TableColumn<Map<String, Object>, Object> colSrchPackageName;
-
-	private SystemLayoutViewController systemRoot;
 
 	@FXML
 	public void initialize() {
@@ -313,7 +313,6 @@ public class DAOLoaderController {
 	}
 
 	public void setSystemLayoutViewController(SystemLayoutViewController systemLayoutViewController) {
-		this.systemRoot = systemLayoutViewController;
 	}
 
 	@FXML
@@ -335,7 +334,8 @@ public class DAOLoaderController {
 					if (object != null)
 						tbmSysDAO.setTableName(object.toString());
 
-					FXMLLoader loader = new FXMLLoader();
+					FxUtil.load(DAOLoaderController.class);
+					FXMLLoader loader =  FxUtil.createNewFxmlLoader();//new FXMLLoader();
 					loader.setLocation(getClass().getResource("DaoWizardView.fxml"));
 					BorderPane pane = loader.load();
 					DaoWizardViewController controller = loader.getController();

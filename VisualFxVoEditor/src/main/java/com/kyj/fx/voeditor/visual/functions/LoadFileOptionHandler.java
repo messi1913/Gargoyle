@@ -82,14 +82,14 @@ public class LoadFileOptionHandler {
 	/**
 	 * @return the fileNotFoundThan
 	 */
-	public final Function<File, String> getFileNotFoundThan() {
+	public Function<File, String> getFileNotFoundThan() {
 		return fileNotFoundThan;
 	}
 
 	/**
 	 * @param fileNotFoundThan the fileNotFoundThan to set
 	 */
-	public final void setFileNotFoundThan(Function<File, String> fileNotFoundThan) {
+	public void setFileNotFoundThan(Function<File, String> fileNotFoundThan) {
 		this.fileNotFoundThan = fileNotFoundThan;
 	}
 

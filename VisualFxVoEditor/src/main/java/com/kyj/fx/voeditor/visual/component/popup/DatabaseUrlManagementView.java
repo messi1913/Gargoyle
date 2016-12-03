@@ -30,6 +30,7 @@ import com.kyj.fx.voeditor.visual.component.PasswordTextFieldTableCell;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.exceptions.NotYetSupportException;
+import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.main.model.vo.Code;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
@@ -45,8 +46,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -60,8 +59,11 @@ import javafx.util.StringConverter;
 
 /**
  * @author Hong
+ * 
+ * 2016-12-03 FxUtil.loadRoot()함수를 이용한 로딩으로 수정 by kyj
  *
  */
+@FXMLController(value = "DatabaseUrlManagementView.fxml", isSelfController = true)
 public class DatabaseUrlManagementView extends BorderPane {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(DatabaseConfigView.class);
@@ -98,15 +100,17 @@ public class DatabaseUrlManagementView extends BorderPane {
 	 * 생성자
 	 */
 	public DatabaseUrlManagementView() {
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(getClass().getResource("DatabaseUrlManagementView.fxml"));
-		loader.setController(this);
-		loader.setRoot(this);
-		try {
-			loader.load();
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
-		}
+		FxUtil.loadRoot(DatabaseUrlManagementView.class, this, err -> LOGGER.error(ValueUtil.toString(err)));
+		
+//		FXMLLoader loader = new FXMLLoader();
+//		loader.setLocation(getClass().getResource("DatabaseUrlManagementView.fxml"));
+//		loader.setController(this);
+//		loader.setRoot(this);
+//		try {
+//			loader.load();
+//		} catch (Exception e) {
+//			LOGGER.error(e.getMessage());
+//		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -396,16 +400,16 @@ public class DatabaseUrlManagementView extends BorderPane {
 			poolProperties.setPassword(password);
 
 			return poolProperties;
-		} , (bool) -> {
+		}, (bool) -> {
 			String msg = "fail!";
 			if (bool)
 				msg = "success!";
 			DialogUtil.showMessageDialog(msg);
-		} , ex -> {
+		}, ex -> {
 			LOGGER.info(ValueUtil.toString("ping test", ex));
 		});
 
-		//		LOGGER.debug(map.toString());
+		// LOGGER.debug(map.toString());
 
 	}
 
@@ -427,33 +431,33 @@ public class DatabaseUrlManagementView extends BorderPane {
 		CommonsSqllPan sqlPane = CommonsSqllPan.getSqlPane(dbms);
 		sqlPane.initialize(map);
 
-		//		Scene scene = new Scene(root, 1100, 700);
+		// Scene scene = new Scene(root, 1100, 700);
 		sqlPane.setPrefSize(1100, 900);
 		String title = String.format("Database[%s]", sqlPane.getClass().getSimpleName());
 
 		DockNode dockNode = new DockNode(sqlPane, title);
-		//				dockNode.setFloating(true, new Point2D(0,0));
-		//				dockNode.getStage().centerOnScreen();
+		// dockNode.setFloating(true, new Point2D(0,0));
+		// dockNode.getStage().centerOnScreen();
 
 		FxUtil.createDockStageAndShow(null, dockNode);
 
-		//		FxUtil.createStageAndShow(title, dockNode, stage -> {
-		//			stage.getScene().getStylesheets().add(SkinManager.getInstance().getSkin());
-		//			dockNode.floatingProperty().addListener((oba, o, n) -> {
-		//				if (n)
-		//					stage.close();
-		//			});
-		//		});
+		// FxUtil.createStageAndShow(title, dockNode, stage -> {
+		// stage.getScene().getStylesheets().add(SkinManager.getInstance().getSkin());
+		// dockNode.floatingProperty().addListener((oba, o, n) -> {
+		// if (n)
+		// stage.close();
+		// });
+		// });
 
-		//		Stage stage = new Stage();
-		//		sqlPane.setStage(stage);
+		// Stage stage = new Stage();
+		// sqlPane.setStage(stage);
 
-		//		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-		//		stage.setScene(scene);
-		//		stage.setTitle(dbms);
+		// scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+		// stage.setScene(scene);
+		// stage.setTitle(dbms);
 		//
 		//
 		//
-		//		stage.show();
+		// stage.show();
 	}
 }

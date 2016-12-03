@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.config.skin;
 
-import java.awt.FileDialog;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -60,7 +59,7 @@ public class SkinPreviewViewComposite extends BorderPane {
 	private TabPane tabpaneSample;
 
 	@FXML
-	JFXColorPicker colorMbSample, colorHboxSample, colorTabSample1Selected, colorSelectedTabText, colorUnSelectedTabText;
+	JFXColorPicker colorMbSample, colorMbLabelSample, colorHboxSample, colorTabSample1Selected, colorSelectedTabText, colorUnSelectedTabText;
 
 	public SkinPreviewViewComposite() {
 		try {
@@ -89,9 +88,16 @@ public class SkinPreviewViewComposite extends BorderPane {
 						Background background = mbSample.getBackground();
 						Color fill = (Color) background.getFills().get(0).getFill();
 						colorMbSample.setValue(fill);
+						
+						//메뉴바 텍스트
+						{
+							Label lookup = (Label) mbSample.lookup(".label");
+							Color textFill = (Color) lookup.getTextFill();
+							colorMbLabelSample.setValue(textFill);
+						}
 					}
 
-					//메뉴바 배경.
+					//Hbox 배경.
 					{
 						Background background = hboxSample.getBackground();
 						Color fill = (Color) background.getFills().get(0).getFill();
@@ -183,6 +189,7 @@ public class SkinPreviewViewComposite extends BorderPane {
 		Map<String, Object> param = new HashMap<>();
 
 		param.put(SkinTemplate.MENU_BAR, FxUtil.toWebString(colorMbSample.getValue()));
+		param.put(SkinTemplate.MENU_BAR_LABEL, FxUtil.toWebString(colorMbLabelSample.getValue()));
 		param.put(SkinTemplate.KEY_HBOX, FxUtil.toWebString(colorHboxSample.getValue()));
 		param.put(SkinTemplate.KEY_TAB, FxUtil.toWebString(colorTabSample1Selected.getValue()));
 		param.put(SkinTemplate.MENU_TAB_SELECTED, FxUtil.toWebString(colorSelectedTabText.getValue()));
@@ -208,7 +215,7 @@ public class SkinPreviewViewComposite extends BorderPane {
 	 */
 	public void btnSaveOnAction() {
 
-		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Skin Name", "Input Your Skin Name");
+		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog(FxUtil.getWindow(this), "Skin Name", "Input Your Skin Name");
 		showInputDialog.ifPresent(v -> {
 			if ("OK".equalsIgnoreCase(v.getKey())) {
 

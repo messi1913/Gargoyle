@@ -19,102 +19,118 @@
 
 <fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
-		<BorderPane prefHeight="200.0" prefWidth="682.0" BorderPane.alignment="CENTER">
-			<center>
-				<GridPane prefHeight="333.0" prefWidth="682.0">
-					<columnConstraints>
-                  <ColumnConstraints hgrow="NEVER" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
-						<ColumnConstraints hgrow="SOMETIMES" maxWidth="207.0" minWidth="10.0" prefWidth="207.0" />
-						<ColumnConstraints hgrow="SOMETIMES" maxWidth="415.0" minWidth="10.0" prefWidth="150.0" />
-                  <ColumnConstraints hgrow="NEVER" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
-						<ColumnConstraints hgrow="SOMETIMES" maxWidth="325.0" minWidth="10.0" prefWidth="325.0" />
-						<ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" />
-					</columnConstraints>
-					<rowConstraints>
-						<RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
-						<RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
-						<RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
-						<RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
-						<RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
-					</rowConstraints>
-					<children>
-						<MenuBar fx:id="mbSample" mouseTransparent="true" GridPane.columnIndex="1" GridPane.columnSpan="2">
-							<menus>
-								<Menu mnemonicParsing="false" text="File">
-									<items>
-										<MenuItem mnemonicParsing="false" text="Close" />
-									</items>
-								</Menu>
-								<Menu mnemonicParsing="false" text="Edit">
-									<items>
-										<MenuItem mnemonicParsing="false" text="Delete" />
-									</items>
-								</Menu>
-								<Menu mnemonicParsing="false" text="Help">
-									<items>
-										<MenuItem mnemonicParsing="false" text="About" />
-									</items>
-								</Menu>
-							</menus>
-						</MenuBar>
-						<HBox fx:id="hboxSample" alignment="CENTER_LEFT" fillHeight="false" prefHeight="24.0" prefWidth="230.0" spacing="5.0" styleClass="hbox-gargoyle" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1">
-							<children>
-								<Label text="VOEditor" />
-								<Label text="DaoWizard" />
-								<Label text="Configuration" />
-							</children>
-							<padding>
-								<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-							</padding>
-						</HBox>
-						<HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="4">
-							<children>
-								<Label text="Menu-bar background color" />
-							</children>
-						</HBox>
-						<HBox alignment="CENTER_LEFT" GridPane.columnIndex="4" GridPane.rowIndex="2">
-							<children>
-								<Label text="Tab BackGround Color" />
-							</children>
-						</HBox>
-						<HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="4" GridPane.rowIndex="1">
-							<children>
-								<Label text="Sub Menu background Color" />
-							</children>
-						</HBox>
-						<JFXColorPicker fx:id="colorMbSample" GridPane.columnIndex="5" />
-						<JFXColorPicker fx:id="colorHboxSample" GridPane.columnIndex="5" GridPane.rowIndex="1" />
-						<JFXColorPicker fx:id="colorTabSample1Selected" GridPane.columnIndex="5" GridPane.rowIndex="2" />
-                  <TabPane fx:id="tabpaneSample" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2">
-                    <tabs>
-                      <Tab fx:id="tab1SelectedSample" text="Sample1">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                        </content>
-                      </Tab>
-                      <Tab text="Sample2">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                        </content>
-                      </Tab>
-                    </tabs>
-                  </TabPane>
-                  <HBox alignment="CENTER_LEFT" GridPane.columnIndex="4" GridPane.rowIndex="3">
-                     <children>
-                        <Label text="Tab Selected Text Color" />
-                     </children>
-                  </HBox>
-                  <JFXColorPicker fx:id="colorSelectedTabText" GridPane.columnIndex="5" GridPane.rowIndex="3" />
-                  <HBox alignment="CENTER_LEFT" GridPane.columnIndex="4" GridPane.rowIndex="4">
-                     <children>
-                        <Label text="Tab UnSelected Text Color" />
-                     </children>
-                  </HBox>
-                  <JFXColorPicker fx:id="colorUnSelectedTabText" GridPane.columnIndex="5" GridPane.rowIndex="4" />
-					</children>
-				</GridPane>
-			</center>
-		</BorderPane>
+      <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+         <tabs>
+            <Tab text="Basic">
+               <content>
+            		<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="700.0">
+            			<center>
+            				<GridPane prefHeight="333.0" prefWidth="682.0">
+            					<columnConstraints>
+                              <ColumnConstraints hgrow="NEVER" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
+            						<ColumnConstraints hgrow="SOMETIMES" maxWidth="207.0" minWidth="100.0" prefWidth="207.0" />
+            						<ColumnConstraints hgrow="SOMETIMES" maxWidth="415.0" minWidth="20.0" prefWidth="150.0" />
+                              <ColumnConstraints hgrow="NEVER" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
+            						<ColumnConstraints hgrow="SOMETIMES" maxWidth="325.0" minWidth="200.0" prefWidth="325.0" />
+            						<ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" />
+            					</columnConstraints>
+            					<rowConstraints>
+            						<RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+            						<RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+            						<RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="NEVER" />
+            						<RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            						<RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            					</rowConstraints>
+            					<children>
+            						<MenuBar fx:id="mbSample" mouseTransparent="true" GridPane.columnIndex="1" GridPane.columnSpan="2">
+            							<menus>
+            								<Menu mnemonicParsing="false" text="File">
+            									<items>
+            										<MenuItem mnemonicParsing="false" text="Close" />
+            									</items>
+            								</Menu>
+            								<Menu mnemonicParsing="false" text="Edit">
+            									<items>
+            										<MenuItem mnemonicParsing="false" text="Delete" />
+            									</items>
+            								</Menu>
+            								<Menu mnemonicParsing="false" text="Help">
+            									<items>
+            										<MenuItem mnemonicParsing="false" text="About" />
+            									</items>
+            								</Menu>
+            							</menus>
+            						</MenuBar>
+            						<HBox fx:id="hboxSample" alignment="CENTER_LEFT" fillHeight="false" prefHeight="24.0" prefWidth="230.0" spacing="5.0" styleClass="hbox-gargoyle" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2">
+            							<children>
+            								<Label text="VOEditor" />
+            								<Label text="DaoWizard" />
+            								<Label text="Configuration" />
+            							</children>
+            							<padding>
+            								<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            							</padding>
+            						</HBox>
+            						<HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="4">
+            							<children>
+            								<Label text="Menu-bar background color" />
+            							</children>
+            						</HBox>
+            						<HBox alignment="CENTER_LEFT" GridPane.columnIndex="4" GridPane.rowIndex="3">
+            							<children>
+            								<Label text="Tab BackGround Color" />
+            							</children>
+            						</HBox>
+            						<HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="4" GridPane.rowIndex="2">
+            							<children>
+            								<Label text="Sub Menu background Color" />
+            							</children>
+            						</HBox>
+            						<JFXColorPicker fx:id="colorMbSample" GridPane.columnIndex="5" />
+            						<JFXColorPicker fx:id="colorHboxSample" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+            						<JFXColorPicker fx:id="colorTabSample1Selected" GridPane.columnIndex="5" GridPane.rowIndex="3" />
+                              <TabPane fx:id="tabpaneSample" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                                <tabs>
+                                  <Tab fx:id="tab1SelectedSample" text="Sample1">
+                                    <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                    </content>
+                                  </Tab>
+                                  <Tab text="Sample2">
+                                    <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                    </content>
+                                  </Tab>
+                                </tabs>
+                              </TabPane>
+                              <HBox alignment="CENTER_LEFT" GridPane.columnIndex="4" GridPane.rowIndex="4">
+                                 <children>
+                                    <Label text="Tab Selected Text Color" />
+                                 </children>
+                              </HBox>
+                              <JFXColorPicker fx:id="colorSelectedTabText" GridPane.columnIndex="5" GridPane.rowIndex="4" />
+                              <HBox alignment="CENTER_LEFT" GridPane.columnIndex="4" GridPane.rowIndex="5">
+                                 <children>
+                                    <Label text="Tab UnSelected Text Color" />
+                                 </children>
+                              </HBox>
+                              <JFXColorPicker fx:id="colorUnSelectedTabText" GridPane.columnIndex="5" GridPane.rowIndex="5" />
+                              <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="4" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label text="Menu-bar Label color" />
+                                 </children>
+                              </HBox>
+                              <JFXColorPicker fx:id="colorMbLabelSample" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+            					</children>
+            				</GridPane>
+            			</center>
+            		</BorderPane>
+               </content>
+            </Tab>
+            <Tab text="Button" />
+         </tabs>
+      </TabPane>
 	</center>
 	<top>
 		<HBox alignment="CENTER" styleClass="hbox-gargoyle" BorderPane.alignment="CENTER">

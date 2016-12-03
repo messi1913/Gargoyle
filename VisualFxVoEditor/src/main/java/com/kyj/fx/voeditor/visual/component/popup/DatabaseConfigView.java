@@ -24,12 +24,14 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.kyj.fx.voeditor.visual.component.PasswordTextFieldTableCell;
+import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.main.initalize.DatabaseInitializer;
 import com.kyj.fx.voeditor.visual.main.model.vo.Code;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.star.uno.RuntimeException;
 
@@ -37,7 +39,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableCell;
@@ -56,6 +57,7 @@ import javafx.util.Callback;
  * @author KYJ
  *
  */
+@FXMLController(value = "DatabaseConfigView.fxml", isSelfController = true)
 public class DatabaseConfigView extends BorderPane {
 	private static Logger LOGGER = LoggerFactory.getLogger(DatabaseConfigView.class);
 	@FXML
@@ -76,16 +78,18 @@ public class DatabaseConfigView extends BorderPane {
 	 * 생성자
 	 */
 	public DatabaseConfigView() {
-
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(getClass().getResource("DatabaseConfigView.fxml"));
-		loader.setController(this);
-		loader.setRoot(this);
-		try {
-			loader.load();
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
-		}
+		
+		FxUtil.loadRoot(DatabaseConfigView.class, this, err-> LOGGER.error(ValueUtil.toString(err)));
+		
+//		FXMLLoader loader = new FXMLLoader();
+//		loader.setLocation(getClass().getResource("DatabaseConfigView.fxml"));
+//		loader.setController(this);
+//		loader.setRoot(this);
+//		try {
+//			loader.load();
+//		} catch (Exception e) {
+//			LOGGER.error(e.getMessage());
+//		}
 	}
 
 	@FXML
@@ -123,7 +127,7 @@ public class DatabaseConfigView extends BorderPane {
 						if (empty) {
 							setText("");
 						} else {
-							/* 2016.4.20 패스워드에 속하는 영역인경우 패스워드 형태로 변경.*/
+							/* 2016.4.20 패스워드에 속하는 영역인경우 패스워드 형태로 변경. */
 							int rowIndex = getTableRow().getIndex();
 
 							if (Objects.equal(ResourceLoader.BASE_KEY_JDBC_PASS, colKey.getCellData(rowIndex)))
@@ -283,12 +287,12 @@ public class DatabaseConfigView extends BorderPane {
 
 		DbUtil.ping(() -> {
 			return getPoolProperties();
-		} , (bool) -> {
+		}, (bool) -> {
 			String msg = "fail!";
 			if (bool)
 				msg = "success!";
 			DialogUtil.showMessageDialog(msg);
-		} , ex -> {
+		}, ex -> {
 			LOGGER.info(ValueUtil.toString("ping test", ex));
 		});
 
@@ -366,14 +370,16 @@ public class DatabaseConfigView extends BorderPane {
 	@FXML
 	public void btnGargoyleOnMouseClick() {
 
-		//생성전 뭔저 확인여부
-//		Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Create Database", "Gargoyle용 데이터베이스 생성 확인.");
-//
-//		showYesOrNoDialog.ifPresent(v -> {
-//			if ("Y".equals(v.getValue())) {
-//
-//			}
-//		});
+		// 생성전 뭔저 확인여부
+		// Optional<Pair<String, String>> showYesOrNoDialog =
+		// DialogUtil.showYesOrNoDialog("Create Database", "Gargoyle용 데이터베이스 생성
+		// 확인.");
+		//
+		// showYesOrNoDialog.ifPresent(v -> {
+		// if ("Y".equals(v.getValue())) {
+		//
+		// }
+		// });
 
 		try {
 			DatabaseInitializer databaseInitializer = new DatabaseInitializer(() -> {

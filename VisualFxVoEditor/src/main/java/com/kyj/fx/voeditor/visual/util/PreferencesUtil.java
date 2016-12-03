@@ -16,15 +16,28 @@ import java.util.prefs.Preferences;
  */
 public class PreferencesUtil {
 
+	/**
+	 * 스킨이 존재하는 위치
+	 * @최초생성일 2016. 12. 3.
+	 */
 	public static final String KEY_LAST_SELECTED_PATH = "last.selected.path";
 
+	/**
+	 * 사용자가 선택한 스킨명
+	 * @최초생성일 2016. 12. 3.
+	 */
 	public static final String KEY_USER_SKIN_NAME = "user.skin.name";
 
+	/**
+	 * 사용자가 선택한 버튼 스타일클래스명
+	 * @최초생성일 2016. 12. 3.
+	 */
+	public static final String KEY_USER_BUTTON_STYLECLASS_NAME = "user.button.syleclass.name";
+	
 	/**
 	 *
 	 */
 	private PreferencesUtil() {
-		// TODO Auto-generated constructor stub
 	}
 
 	/**

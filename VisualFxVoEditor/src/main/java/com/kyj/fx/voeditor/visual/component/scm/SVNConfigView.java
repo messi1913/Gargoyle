@@ -20,17 +20,18 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseConfigView;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseUrlManagementView;
+import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.main.model.vo.Code;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -47,6 +48,7 @@ import javafx.util.StringConverter;
  * @author KYJ
  *
  */
+@FXMLController(value = "SVNConfigView.fxml", isSelfController = true)
 public class SVNConfigView extends BorderPane {
 	private static Logger LOGGER = LoggerFactory.getLogger(DatabaseConfigView.class);
 	@FXML
@@ -67,16 +69,16 @@ public class SVNConfigView extends BorderPane {
 	 * 생성자
 	 */
 	public SVNConfigView() {
-
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(getClass().getResource("SVNConfigView.fxml"));
-		loader.setController(this);
-		loader.setRoot(this);
-		try {
-			loader.load();
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
-		}
+		FxUtil.loadRoot(SVNConfigView.class, this, err -> LOGGER.error(ValueUtil.toString(err)));
+//		FXMLLoader loader = new FXMLLoader();
+//		loader.setLocation(getClass().getResource("SVNConfigView.fxml"));
+//		loader.setController(this);
+//		loader.setRoot(this);
+//		try {
+//			loader.load();
+//		} catch (Exception e) {
+//			LOGGER.error(e.getMessage());
+//		}
 	}
 
 	@FXML

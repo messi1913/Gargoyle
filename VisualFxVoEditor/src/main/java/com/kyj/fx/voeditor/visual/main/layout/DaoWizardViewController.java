@@ -514,7 +514,7 @@ public class DaoWizardViewController {
 			return;
 		DatabaseTypeMappingFunction typeConverter = new DatabaseTypeMappingFunction();
 		try {
-			FXMLLoader loader = new FXMLLoader();
+			FXMLLoader loader = FxUtil.createNewFxmlLoader();
 			loader.setLocation(getClass().getResource("VoEditorView.fxml"));
 			BorderPane root = loader.load();
 			VoEditorController controller = loader.getController();
