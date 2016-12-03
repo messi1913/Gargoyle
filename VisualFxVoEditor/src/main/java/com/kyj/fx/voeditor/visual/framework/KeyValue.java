@@ -55,6 +55,11 @@ public class KeyValue {
 	}
 
 	@Override
+	public String toString() {
+		return key.get() + " , " + value.get();
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

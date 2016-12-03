@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.component.nrch.realtime;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,9 +16,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.reflections.Reflections;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
 import com.kyj.fx.voeditor.visual.component.FlowCardComposite;
 import com.kyj.fx.voeditor.visual.component.google.trend.GoogleTrendComposite;
 import com.kyj.fx.voeditor.visual.framework.RealtimeSearchItemVO;
@@ -207,7 +212,19 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 						menuGoogleTrend.setOnAction(e -> {
 							googleChartSearch((RealtimeSearchItemVO) userData);
 						});
-						contextMenu.getItems().add(menuGoogleTrend);
+
+						MenuItem menuArticleAnalyzer = new MenuItem("기사 분석기 - Preview ver.");
+
+						menuArticleAnalyzer.setOnAction(e -> {
+
+							FxUtil.createStageAndShow(new ArticleExtractorComposite((RealtimeSearchItemVO) userData), stage -> {
+								stage.initOwner(FxUtil.getWindow(getParent()));
+								stage.setTitle(ArticleExtractorComposite.TITLE);
+							});
+
+						});
+
+						contextMenu.getItems().addAll(menuGoogleTrend , menuArticleAnalyzer);
 						contextMenu.show(this.getParent().getScene().getWindow(), ev.getScreenX(), ev.getScreenY());
 					}
 				}
@@ -289,13 +306,13 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 			}
 
 		});
-		
+
 		defineService();
 
 		try {
 			service.start();
 		} catch (RejectedExecutionException e) {
-			//One more time.
+			// One more time.
 			defineService();
 			service.start();
 		}
@@ -527,4 +544,5 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 		}
 
 	}
+
 }

@@ -55,6 +55,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecSourceNullException;
+import com.kyj.fx.voeditor.visual.framework.KeyValue;
 import com.kyj.fx.voeditor.visual.framework.velocity.ExtensionDateFormatVelocityContext;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.sun.star.lang.IllegalArgumentException;
@@ -210,7 +211,7 @@ public class ValueUtil {
 	 * @param replaceNamedValue
 	 *            namedParameter값을 바인드 변수로 사용하여 보여줄지 유무
 	 * @param customReplaceFormat
-	 *  			변환할 문자열을 커스텀한 포멧으로 리턴받을 수 있는 기능을 제공하기 위한 파라미터
+	 *            변환할 문자열을 커스텀한 포멧으로 리턴받을 수 있는 기능을 제공하기 위한 파라미터
 	 * @return
 	 */
 	public static String getVelocityToText(String dynamicSql, Map<String, Object> paramMap, boolean replaceNamedValue,
@@ -254,7 +255,7 @@ public class ValueUtil {
 
 		String _sql = sql.replaceAll(COMMENT_PATTERN, "");
 		String pattern = ":\\w+";
-		//		String pattern = ":";
+		// String pattern = ":";
 		String result = regexReplaceMatchs(pattern, _sql, v -> {
 			String replace = v.replaceAll(":", "");
 			Object object = paramMap.get(replace);
@@ -273,15 +274,16 @@ public class ValueUtil {
 				}
 				return sb.toString();
 			}
-			//2016-11-01 custom 포멧 제공
-			return customFormat.apply(string); //  String.format("'%s'", string);
+			// 2016-11-01 custom 포멧 제공
+			return customFormat.apply(string); // String.format("'%s'", string);
 		});
-		//		Optional<String> reduce = regexMatchs.stream().reduce((a, b) -> a.concat(b));
-		//		if (reduce.isPresent())
-		//			return reduce.get();
-		//		return _sql;
+		// Optional<String> reduce = regexMatchs.stream().reduce((a, b) ->
+		// a.concat(b));
+		// if (reduce.isPresent())
+		// return reduce.get();
+		// return _sql;
 		return result;
-		//		return sql.replaceAll(pattern, "\\$");
+		// return sql.replaceAll(pattern, "\\$");
 	}
 
 	/**
@@ -295,12 +297,12 @@ public class ValueUtil {
 			return false;
 
 		String _sql = sql;
-		//주석에 대해당하는 문자들을 제거
+		// 주석에 대해당하는 문자들을 제거
 		_sql = _sql.replaceAll(STRING_PATTERN, "");
 		_sql = _sql.replaceAll(COMMENT_PATTERN, "");
-		//		String pattern = "\\$\\w+|:\\w+";
+		// String pattern = "\\$\\w+|:\\w+";
 		String pattern = "\\$\\w+";
-		//		String pattern = "[( ]+\\$\\w+|=[ ]{0,}:\\w+";
+		// String pattern = "[( ]+\\$\\w+|=[ ]{0,}:\\w+";
 
 		Pattern compile = Pattern.compile(pattern);
 		Matcher matcher = compile.matcher(_sql);
@@ -320,19 +322,19 @@ public class ValueUtil {
 	 */
 	public static List<String> getVelocityKeys(String _dynamicSql) {
 		String dynamicSql = _dynamicSql;
-		//주석에 대해당하는 문자들을 제거
-		//		dynamicSql = dynamicSql.replaceAll(STRING_PATTERN, "");
+		// 주석에 대해당하는 문자들을 제거
+		// dynamicSql = dynamicSql.replaceAll(STRING_PATTERN, "");
 		dynamicSql = dynamicSql.replaceAll(COMMENT_PATTERN, "");
 		String pattern = "\\$\\w+|:\\w+";
-		//		String pattern = "[( ]+\\$\\w+|=[ ]{0,}:\\w+";
+		// String pattern = "[( ]+\\$\\w+|=[ ]{0,}:\\w+";
 		// 맨앞의 특수문자는 제거.
 		return regexMatchs(pattern, dynamicSql, param -> {
-			//			String result = param.trim();
-			//			if (result.startsWith("($")) {
-			//				return result.substring(2);
-			//			}
-			//			else if(result.startsWith("="))
-			//				return result.substring(1).trim().substring(1);
+			// String result = param.trim();
+			// if (result.startsWith("($")) {
+			// return result.substring(2);
+			// }
+			// else if(result.startsWith("="))
+			// return result.substring(1).trim().substring(1);
 			return param.substring(1);
 		});
 	}
@@ -350,12 +352,13 @@ public class ValueUtil {
 
 	/**
 	 * 정규식으로 일치하는 패턴하나 반환
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 1.
 	 * @param regex
 	 * @param value
 	 * @param convert
-	 * 	  정규식으로 찾아낸 문자열을 변환처리
+	 *            정규식으로 찾아낸 문자열을 변환처리
 	 * @return
 	 */
 	public static String regexMatch(String regex, String value, Function<String, String> convert) {
@@ -699,7 +702,7 @@ public class ValueUtil {
 	}
 
 	public static String getDriverToDBMSName(org.apache.tomcat.jdbc.pool.DataSource dataSource) {
-		String dbms = dataSource.getDriverClassName();//ValueUtil.getDriverToDBMSName(driver);
+		String dbms = dataSource.getDriverClassName();// ValueUtil.getDriverToDBMSName(driver);
 		return getDriverToDBMSName(dbms);
 	}
 
@@ -796,13 +799,17 @@ public class ValueUtil {
 	 *
 	 * Tokenize the given String into a String array via a StringTokenizer.
 	 * Trims tokens and omits empty tokens.
-	 * <p>The given delimiters string is supposed to consist of any number of
+	 * <p>
+	 * The given delimiters string is supposed to consist of any number of
 	 * delimiter characters. Each of those characters can be used to separate
 	 * tokens. A delimiter is always a single character; for multi-character
 	 * delimiters, consider using {@code delimitedListToStringArray}
-	 * @param str the String to tokenize
-	 * @param delimiters the delimiter characters, assembled as String
-	 * (each of those characters is individually considered as delimiter).
+	 * 
+	 * @param str
+	 *            the String to tokenize
+	 * @param delimiters
+	 *            the delimiter characters, assembled as String (each of those
+	 *            characters is individually considered as delimiter).
 	 * @return an array of the tokens
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
@@ -814,22 +821,28 @@ public class ValueUtil {
 
 	/**
 	 *
-	 *from springframework.
+	 * from springframework.
 	 *
 	 * Tokenize the given String into a String array via a StringTokenizer.
-	 * <p>The given delimiters string is supposed to consist of any number of
+	 * <p>
+	 * The given delimiters string is supposed to consist of any number of
 	 * delimiter characters. Each of those characters can be used to separate
 	 * tokens. A delimiter is always a single character; for multi-character
 	 * delimiters, consider using {@code delimitedListToStringArray}
-	 * @param str the String to tokenize
-	 * @param delimiters the delimiter characters, assembled as String
-	 * (each of those characters is individually considered as delimiter)
-	 * @param trimTokens trim the tokens via String's {@code trim}
-	 * @param ignoreEmptyTokens omit empty tokens from the result array
-	 * (only applies to tokens that are empty after trimming; StringTokenizer
-	 * will not consider subsequent delimiters as token in the first place).
-	 * @return an array of the tokens ({@code null} if the input String
-	 * was {@code null})
+	 * 
+	 * @param str
+	 *            the String to tokenize
+	 * @param delimiters
+	 *            the delimiter characters, assembled as String (each of those
+	 *            characters is individually considered as delimiter)
+	 * @param trimTokens
+	 *            trim the tokens via String's {@code trim}
+	 * @param ignoreEmptyTokens
+	 *            omit empty tokens from the result array (only applies to
+	 *            tokens that are empty after trimming; StringTokenizer will not
+	 *            consider subsequent delimiters as token in the first place).
+	 * @return an array of the tokens ({@code null} if the input String was
+	 *         {@code null})
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
 	 * @see #delimitedListToStringArray
@@ -856,11 +869,13 @@ public class ValueUtil {
 	/**
 	 * from springframework.
 	 *
-	 * Copy the given Collection into a String array.
-	 * The Collection must contain String elements only.
-	 * @param collection the Collection to copy
-	 * @return the String array ({@code null} if the passed-in
-	 * Collection was {@code null})
+	 * Copy the given Collection into a String array. The Collection must
+	 * contain String elements only.
+	 * 
+	 * @param collection
+	 *            the Collection to copy
+	 * @return the String array ({@code null} if the passed-in Collection was
+	 *         {@code null})
 	 */
 	public static String[] toStringArray(Collection<String> collection) {
 		if (collection == null) {
@@ -1014,7 +1029,8 @@ public class ValueUtil {
 	 * 단 객체가 테이블명 규칙에 준해야한다.
 	 *
 	 *
-	 * ex) TbmUser ::: TBM_USER 테이블을 찾는다. TbpSx ::: Tbp_Sx 테이블을 찾는다. ex) TbmMsMdDVO ::: TBM_MS_MD 테이블을 찾는다.
+	 * ex) TbmUser ::: TBM_USER 테이블을 찾는다. TbpSx ::: Tbp_Sx 테이블을 찾는다. ex)
+	 * TbmMsMdDVO ::: TBM_MS_MD 테이블을 찾는다.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 3. 29.
@@ -1120,6 +1136,7 @@ public class ValueUtil {
 
 	/**
 	 * 인자로 받아온 path에 baseDir 디렉토리 경로를 붙여주어 절대경로로 바꾼다.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 18.
 	 * @param path
@@ -1135,6 +1152,7 @@ public class ValueUtil {
 
 	/**
 	 * 인자로 받아온 path에서 baseDir 절대경로가 있으면 제거한다.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 18.
 	 * @param path
@@ -1198,9 +1216,8 @@ public class ValueUtil {
 				if ("*".equals(t)) {
 
 					/*
-					 * 2016-10-13 NoSuchElementException 예외처리
-					 * by kyj. 주석에 해당하는 내용은 대소문자 처리안함에 관련된 로직인데
-					 * 예외에 걸림.
+					 * 2016-10-13 NoSuchElementException 예외처리 by kyj. 주석에 해당하는
+					 * 내용은 대소문자 처리안함에 관련된 로직인데 예외에 걸림.
 					 */
 					try {
 						do {
@@ -1272,6 +1289,7 @@ public class ValueUtil {
 
 	/**
 	 * 대소문자 무시 일치하는 문자열이 포함되면 true
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 5.
 	 * @param findText
@@ -1305,10 +1323,12 @@ public class ValueUtil {
 
 	/**
 	 * 주석 자동화 처리.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 12.
 	 * @param code
-	 * @param appendLineKeyword 코멘트가 추가되는 행의 첫번째줄에 키워드라고 표시할 문자 기입.
+	 * @param appendLineKeyword
+	 *            코멘트가 추가되는 행의 첫번째줄에 키워드라고 표시할 문자 기입.
 	 * @return
 	 */
 	public static List<String> toAutoCommentedList(String code, String appendLineKeyword) {
@@ -1317,6 +1337,7 @@ public class ValueUtil {
 
 	/**
 	 * 문자열로된 텍스트로부터 파일명만 추출하는 정규식 패턴을 적용한후 리턴받음.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 18.
 	 * @param fileName
@@ -1324,7 +1345,7 @@ public class ValueUtil {
 	 */
 	public static String getSimpleFileName(String fileName) {
 
-		//경로를 나타내는 특수문자만 제거한 모든 텍스트중 가장 마지막에 있는 텍스트 리턴.
+		// 경로를 나타내는 특수문자만 제거한 모든 텍스트중 가장 마지막에 있는 텍스트 리턴.
 		return ValueUtil.regexMatch("[^\\\\]{1,}$", fileName);
 	}
 
@@ -1346,7 +1367,7 @@ public class ValueUtil {
 	 * @throws IOException
 	 */
 	public static String toString(InputStream inputStream) throws IOException {
-		return IOUtils.toString(inputStream , Charset.forName("UTF-8"));
+		return IOUtils.toString(inputStream, Charset.forName("UTF-8"));
 	}
 
 	/**
@@ -1369,5 +1390,85 @@ public class ValueUtil {
 				.replaceAll("Ｃ{1,}", "Ｃ").replaceAll("\\([^Ｃ]+Ｃ", "").replaceAll("Ｃ", ",");
 
 		return concatedTables;
+	}
+
+	public static class HTML {
+
+		private HTML() {
+		}
+
+		public static String escapeHtml(CharSequence text) {
+			StringBuilder out = new StringBuilder();
+			withinStyle(out, text, 0, text.length());
+			return out.toString();
+		}
+
+		private static void withinStyle(StringBuilder out, CharSequence text, int start, int end) {
+			for (int i = start; i < end; i++) {
+				char c = text.charAt(i);
+
+				if (c == '<') {
+					out.append("&lt;");
+				} else if (c == '>') {
+					out.append("&gt;");
+				} else if (c == '&') {
+					out.append("&amp;");
+				} else if (c >= 0xD800 && c <= 0xDFFF) {
+					if (c < 0xDC00 && i + 1 < end) {
+						char d = text.charAt(i + 1);
+						if (d >= 0xDC00 && d <= 0xDFFF) {
+							i++;
+							int codepoint = 0x010000 | (int) c - 0xD800 << 10 | (int) d - 0xDC00;
+							out.append("&#").append(codepoint).append(";");
+						}
+					}
+				} else if (c > 0x7E || c < ' ') {
+					out.append("&#").append((int) c).append(";");
+				} else if (c == ' ') {
+					while (i + 1 < end && text.charAt(i + 1) == ' ') {
+						out.append("&nbsp;");
+						i++;
+					}
+
+					out.append(' ');
+				} else {
+					out.append(c);
+				}
+			}
+		}
+
+	}
+
+	public static List<KeyValue> toTF_IDF(String[] contents) {
+		TF_IDF tf_IDF = new TF_IDF(contents);
+		String[] words = tf_IDF.getWordVector();
+
+		double[][] tf_IDFMatrix = tf_IDF.getTF_IDFMatrix();
+		List<KeyValue> arrayList = new ArrayList<>();
+		for (double[] tfIdf : tf_IDFMatrix) {
+
+			// sort
+			double arraySize = tfIdf.length;
+			for (int i = 0; i < arraySize - 1; i++) {
+				for (int k = i + 1; k < arraySize; k++) {
+					if (tfIdf[i] < tfIdf[k]) {
+						String temp = words[i];
+						double dTemp = tfIdf[i];
+
+						words[i] = words[k];
+						tfIdf[i] = tfIdf[k];
+
+						words[k] = temp;
+						tfIdf[k] = dTemp;
+					}
+				}
+			}
+
+			for (int i = 0; i < tfIdf.length; i++) {
+
+				arrayList.add(new KeyValue(words[i], tfIdf[i]));
+			}
+		}
+		return arrayList;
 	}
 }

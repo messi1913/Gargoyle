@@ -62,17 +62,17 @@ public class RequestUtil {
 
 		@Override
 		public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-//			LOGGER.debug("######################");
-//			LOGGER.debug("checkClientTrusted");
+			// LOGGER.debug("######################");
+			// LOGGER.debug("checkClientTrusted");
 			LOGGER.debug(arg1);
-//			LOGGER.debug("######################");
+			// LOGGER.debug("######################");
 		}
 
 		@Override
 		public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-//			LOGGER.debug("########################################################################################");
-//			LOGGER.debug("checkServerTrusted");
-//			LOGGER.debug(arg1);
+			// LOGGER.debug("########################################################################################");
+			// LOGGER.debug("checkServerTrusted");
+			// LOGGER.debug(arg1);
 
 			boolean present = Stream.of(arg0).filter(v -> {
 
@@ -94,7 +94,7 @@ public class RequestUtil {
 				throw new CertificateException();
 			}
 
-//			LOGGER.debug("########################################################################################");
+			// LOGGER.debug("########################################################################################");
 		}
 
 		@Override
@@ -130,6 +130,10 @@ public class RequestUtil {
 	}
 
 	public static <T> T reqeustSSL(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
+		return reqeustSSL(url, response, true);
+	}
+
+	public static <T> T reqeustSSL(URL url, BiFunction<InputStream, Integer, T> response, boolean autoClose) throws Exception {
 
 		// SSLContext ctx = SSLContext.getInstance("TLS");
 
@@ -185,11 +189,13 @@ public class RequestUtil {
 
 		} finally {
 
-			if (is != null)
-				is.close();
+			if (autoClose) {
+				if (is != null)
+					is.close();
 
-			if (conn != null)
-				conn.disconnect();
+				if (conn != null)
+					conn.disconnect();
+			}
 
 		}
 
@@ -197,6 +203,10 @@ public class RequestUtil {
 	}
 
 	public static <T> T request(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
+		return request(url, response, true);
+	}
+
+	public static <T> T request(URL url, BiFunction<InputStream, Integer, T> response, boolean autoClose) throws Exception {
 
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		InputStream is = null;
@@ -229,11 +239,13 @@ public class RequestUtil {
 
 		} finally {
 
-			if (is != null)
-				is.close();
+			if (autoClose) {
+				if (is != null)
+					is.close();
 
-			if (conn != null)
-				conn.disconnect();
+				if (conn != null)
+					conn.disconnect();
+			}
 
 		}
 		return result;

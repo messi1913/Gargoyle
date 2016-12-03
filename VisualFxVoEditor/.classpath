@@ -25,7 +25,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
@@ -37,6 +36,10 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/db/maria/mariadb-java-client-1.4.6.jar"/>
+	<classpathentry kind="lib" path="lib/db/maria/mariadb-java-client-1.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/boilerpipe/boilerpipe-common-2.0-SNAPSHOT.jar" sourcepath="/boilerpipe-common"/>
+	<classpathentry kind="lib" path="lib/boilerpipe/boilerpipe-demo-2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/boilerpipe/nekohtml-1.9.13.jar"/>
+	<classpathentry kind="lib" path="lib/boilerpipe/nekohtml-relocated-1.9.13.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
