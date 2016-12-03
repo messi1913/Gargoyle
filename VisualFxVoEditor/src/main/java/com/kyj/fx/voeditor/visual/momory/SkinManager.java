@@ -309,6 +309,12 @@ public final class SkinManager {
 		scene.getStylesheets().clear();
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 	}
+	
+	public void resetSkin(Scene scene) {
+		scene.getStylesheets().clear();
+		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+	}
+	
 
 	/**
 	 * 스킨템플릿을 리턴.

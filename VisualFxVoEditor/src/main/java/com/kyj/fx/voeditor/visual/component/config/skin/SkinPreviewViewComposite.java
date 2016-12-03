@@ -16,7 +16,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jfoenix.controls.JFXColorPicker;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
@@ -30,6 +29,7 @@ import javafx.concurrent.Task;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TabPane;
@@ -59,7 +59,7 @@ public class SkinPreviewViewComposite extends BorderPane {
 	private TabPane tabpaneSample;
 
 	@FXML
-	JFXColorPicker colorMbSample, colorMbLabelSample, colorHboxSample, colorTabSample1Selected, colorSelectedTabText, colorUnSelectedTabText;
+	private ColorPicker colorMbSample, colorMbLabelSample, colorHboxSample, colorTabSample1Selected, colorSelectedTabText, colorUnSelectedTabText;
 
 	public SkinPreviewViewComposite() {
 		try {
@@ -187,13 +187,35 @@ public class SkinPreviewViewComposite extends BorderPane {
 		String skinTemplate = SkinTemplate.getSkinTemplate();
 		//		colorMbSample, colorHboxSample, colorTabSample1Selected, colorSelectedTabText, colorUnSelectedTabText;
 		Map<String, Object> param = new HashMap<>();
-
+		
+		
+//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().brighter()));
+//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().darker()));
+//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().desaturate()));
+//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().grayscale()));
+//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().invert()));
+//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().saturate()));
+		
+		
+		
 		param.put(SkinTemplate.MENU_BAR, FxUtil.toWebString(colorMbSample.getValue()));
+		param.put(SkinTemplate.MENU_BAR_OPACITY, colorMbSample.getValue().getOpacity());
+		
+		System.out.println(colorMbSample.getOpacity());
 		param.put(SkinTemplate.MENU_BAR_LABEL, FxUtil.toWebString(colorMbLabelSample.getValue()));
+		param.put(SkinTemplate.MENU_BAR_LABEL_OPACITY, colorMbLabelSample.getValue().getOpacity());
+		
 		param.put(SkinTemplate.KEY_HBOX, FxUtil.toWebString(colorHboxSample.getValue()));
+		param.put(SkinTemplate.KEY_HBOX_OPACITY, colorHboxSample.getValue().getOpacity());
+		
 		param.put(SkinTemplate.KEY_TAB, FxUtil.toWebString(colorTabSample1Selected.getValue()));
+		param.put(SkinTemplate.KEY_TAB_OPACITY, colorTabSample1Selected.getValue().getOpacity());
+		
 		param.put(SkinTemplate.MENU_TAB_SELECTED, FxUtil.toWebString(colorSelectedTabText.getValue()));
+		param.put(SkinTemplate.MENU_TAB_SELECTED_OPACITY, colorSelectedTabText.getValue().getOpacity());
+		
 		param.put(SkinTemplate.MENU_TAB_UNSELECTED, FxUtil.toWebString(colorUnSelectedTabText.getValue()));
+		param.put(SkinTemplate.MENU_TAB_UNSELECTED_OPACITY, colorUnSelectedTabText.getValue().getOpacity());
 
 		String complatedTemplate = ValueUtil.getVelocityToText(skinTemplate, param, false, null, str -> str);
 		return complatedTemplate;
@@ -206,7 +228,9 @@ public class SkinPreviewViewComposite extends BorderPane {
 	 */
 	@FXML
 	public void btnResetOnAction() {
+		SkinManager.getInstance().resetSkin(this.getScene());
 		SkinManager.getInstance().resetSkin();
+		afterInit();
 	}
 
 	/**

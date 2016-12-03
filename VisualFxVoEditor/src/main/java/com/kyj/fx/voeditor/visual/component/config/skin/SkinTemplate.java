@@ -17,17 +17,29 @@ import com.kyj.fx.voeditor.visual.momory.SkinManager;
  */
 final public class SkinTemplate {
 
-	private static String skinTemplate;
+//	private static String skinTemplate;
 
 	/*********************************************************************/
 	// 스킨템플릿이 사용되는 키를 리턴.
 	/*********************************************************************/
 	public static String KEY_TAB = "tab-gargoyle";
+	public static String KEY_TAB_OPACITY = "tab-opacity-gargoyle";
+	
 	public static String KEY_HBOX = "hbox-gargoyle";
+	public static String KEY_HBOX_OPACITY = "hbox-opacity-gargoyle";
+	
 	public static String MENU_BAR = "menubar-gargoyle";
+	public static String MENU_BAR_OPACITY = "menubar-opacity-gargoyle";
+	
 	public static final String MENU_BAR_LABEL = "menubar-label-gargoyle";
+	public static final String MENU_BAR_LABEL_OPACITY = "menubar-label-opacity-gargoyle";
+	
 	public static String MENU_TAB_SELECTED = "tab-selected-gargoyle";
+	public static String MENU_TAB_SELECTED_OPACITY = "tab-selected-opacity-gargoyle";
+	
+	
 	public static String MENU_TAB_UNSELECTED = "tab-unselected-gargoyle";
+	public static String MENU_TAB_UNSELECTED_OPACITY = "tab-unselected-opacity-gargoyle";
 
 	/**
 	 * 스킨 템플릿정보를 리턴.
@@ -37,11 +49,11 @@ final public class SkinTemplate {
 	 * @return
 	 */
 	public static final String getSkinTemplate() {
-		return skinTemplate;
+		return SkinManager.getInstance().getSkinTemplate();
 	}
 
-	static {
-		skinTemplate = SkinManager.getInstance().getSkinTemplate();
-	}
+//	static {
+//		skinTemplate = SkinManager.getInstance().getSkinTemplate();
+//	}
 
 }

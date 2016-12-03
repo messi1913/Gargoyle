@@ -17,6 +17,7 @@
 .hbox-gargoyle
 {
 	-fx-background-color: $hbox-gargoyle;
+	-fx-opacity:$hbox-opacity-gargoyle;
 }
 
 .hbox-gargoyle Label
@@ -39,28 +40,33 @@
 
 .menu-bar{
     -fx-background-color: $menubar-gargoyle;
+    -fx-opacity:$menubar-opacity-gargoyle;
 }
 .menu-bar HBox{
     -fx-background-color: $menubar-gargoyle;
+    -fx-opacity:$menubar-opacity-gargoyle;
 }
 
 .context-menu {
     -fx-background-color: $menubar-gargoyle;
+    -fx-opacity:$menubar-opacity-gargoyle;
 }
 
 .menu-bar .label {
     -fx-text-fill: $menubar-label-gargoyle;
-    -fx-opacity: 1.0;
+    -fx-opacity: $menubar-label-opacity-gargoyle;
 }
 
 #tabPanWorkspace BorderPane
 {
 	-fx-background-color: $menubar-gargoyle;
+	-fx-opacity:$menubar-opacity-gargoyle;
 }
 
 #tabPanWorkspace TableView
 {
 	-fx-background-color: $menubar-gargoyle;
+	-fx-opacity:$menubar-opacity-gargoyle;
 }
 
 #borConfigMain BorderPane
@@ -75,7 +81,7 @@ BorderPane
 DockTitleBar
 {
 	-fx-background-color: $menubar-gargoyle;
-	-fx-opacity: 1.0;
+	-fx-opacity:$menubar-opacity-gargoyle;
 }
 
 DockTitleBar Label
@@ -89,6 +95,7 @@ DockTitleBar Label
 	-fx-highlight-text-fill:black  ;
 	-fx-prompt-text-fill: yellow;
 	-fx-highlight-fill: $menubar-gargoyle;
+	-fx-opacity:$menubar-opacity-gargoyle;
 	-fx-font-size:15.0px;
 	-fx-wrap-text: true;
 }
@@ -96,6 +103,7 @@ DockTitleBar Label
 .console-skin .content
 {
 	-fx-background-color: $hbox-gargoyle;
+	-fx-opacity:$hbox-opacity-gargoyle;
 	-fx-text-fill:white ;
 }
 
@@ -105,12 +113,12 @@ DockTitleBar Label
 }
 
 .tab:top .tab-container .tab-label{
-	-fx-opacity: 0.5;
+	-fx-opacity: $tab-unselected-opacity-gargoyle;
 	-fx-text-fill: $tab-unselected-gargoyle ;
 }
 
 .tab:selected:top .tab-container .tab-label{
-	-fx-opacity: 1.0;
+	-fx-opacity: $tab-selected-opacity-gargoyle;
 	-fx-text-fill: $tab-selected-gargoyle;
 }
 
