@@ -78,7 +78,7 @@
 				</Label>
 			</top>
 			<center>
-				<StackPane BorderPane.alignment="TOP_LEFT">
+				<StackPane style="-fx-border-color: gray; -fx-border-radius: 30px;" BorderPane.alignment="TOP_LEFT">
 					<children>
 						<Label fx:id="lblPreview" text="Hello World! 123456789 헬로우 월드! 123456789" wrapText="true" />
 					</children>
