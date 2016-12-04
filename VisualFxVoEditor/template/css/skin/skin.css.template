@@ -32,11 +32,20 @@
 	-fx-fill:#FFFFFF;
 }
 
+.hbox-gargoyle .jfx-combo-box  .text
+{
+	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
+}
+
 .hbox-gargoyle > .radio-button > .text
 {
 	-fx-text-fill:#FFFFFF;
 	-fx-fill:#FFFFFF;
 }
+
+
+
 
 .menu-bar{
     -fx-background-color: $menubar-gargoyle;

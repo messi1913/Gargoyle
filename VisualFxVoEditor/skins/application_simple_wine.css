@@ -15,7 +15,13 @@
 	-fx-fill:#FFFFFF;
 }
 
-.hbox-gargoyle CheckBox
+.hbox-gargoyle CheckBox .text
+{
+	-fx-text-fill:#FFFFFF;
+	-fx-fill:#FFFFFF;
+}
+
+.hbox-gargoyle .jfx-combo-box  .text
 {
 	-fx-text-fill:#FFFFFF;
 	-fx-fill:#FFFFFF;
