@@ -102,6 +102,12 @@ public class CustomSkinConfigView extends BorderPane {
 		TreeItem<ConfigurationTreeItem> createNode = new ConfigItemTreeItem().createNode(root);
 		createNode.setExpanded(true);
 		ttvIConfig.setRoot(createNode);
+		ttvIConfig.setOnMouseClicked(ev -> {
+
+			if (ev.getClickCount() == 2) {
+				load(selectedItem.get());
+			}
+		});
 
 		selectedItem.addListener((oba, o, n) -> {
 
@@ -118,7 +124,7 @@ public class CustomSkinConfigView extends BorderPane {
 
 	/**
 	 * Load TreeItem
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 2.
 	 * @param item
@@ -164,7 +170,7 @@ public class CustomSkinConfigView extends BorderPane {
 
 	/**
 	 * 스킨 초기화
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 1.
 	 */
@@ -175,7 +181,7 @@ public class CustomSkinConfigView extends BorderPane {
 
 	/**
 	 * 디폴트 시스템 폰트 사용.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 3.
 	 */
