@@ -8,7 +8,6 @@ package com.kyj.fx.voeditor.visual.component.nrch.realtime;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,13 +15,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.reflections.Reflections;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
 import com.kyj.fx.voeditor.visual.component.FlowCardComposite;
 import com.kyj.fx.voeditor.visual.component.google.trend.GoogleTrendComposite;
 import com.kyj.fx.voeditor.visual.framework.RealtimeSearchItemVO;
@@ -84,7 +79,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 	 * 
 	 * @최초생성일 2016. 11. 22.
 	 */
-	private Label lblRequestTime = new Label();;
+	private Label lblRequestTime = new Label();
 
 	/**
 	 * UI에 인기검색어 카드가 배치되는 Composite의 주소값을 담고있는 property 객체.
@@ -217,9 +212,11 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 						menuArticleAnalyzer.setOnAction(e -> {
 
+							
 							FxUtil.createStageAndShow(new ArticleExtractorComposite((RealtimeSearchItemVO) userData), stage -> {
 								stage.initOwner(FxUtil.getWindow(getParent()));
 								stage.setTitle(ArticleExtractorComposite.TITLE);
+								stage.sizeToScene();
 							});
 
 						});

@@ -168,6 +168,9 @@
 			<BorderPane.margin>
 				<Insets bottom="15.0" top="10.0" />
 			</BorderPane.margin>
+         <padding>
+            <Insets bottom="5.0" top="5.0" />
+         </padding>
 		</HBox>
 	</top>
    <bottom>

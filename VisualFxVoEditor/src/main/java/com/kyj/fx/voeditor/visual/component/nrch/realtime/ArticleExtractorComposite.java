@@ -7,12 +7,10 @@
 package com.kyj.fx.voeditor.visual.component.nrch.realtime;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,6 +26,7 @@ import org.xml.sax.InputSource;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextArea;
 import com.kohlschutter.boilerpipe.document.TextDocument;
+import com.kohlschutter.boilerpipe.extractors.ArticleExtractor;
 import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
 import com.kohlschutter.boilerpipe.extractors.KeepEverythingWithMinKWordsExtractor;
 import com.kohlschutter.boilerpipe.sax.BoilerpipeSAXInput;
@@ -42,8 +41,15 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.web.WebView;
+import javafx.util.Callback;
+import javafx.util.StringConverter;
 
 /**
  * @author KYJ
@@ -59,6 +65,10 @@ public class ArticleExtractorComposite extends BorderPane {
 	private JFXComboBox<Class<? extends ExtractorBase>> cbAlgorisms;
 	@FXML
 	private JFXTextArea txtResult, txtTfIdf;
+	@FXML
+	private TextField txtUrl;
+	@FXML
+	private WebView webPreview;
 
 	private RealtimeSearchItemVO userData;
 
@@ -77,8 +87,39 @@ public class ArticleExtractorComposite extends BorderPane {
 	public void initialize() {
 
 		cbAlgorisms.getItems().addAll(AlgorismExtractor.getAvaliables());
-		cbAlgorisms.getSelectionModel().select(KeepEverythingWithMinKWordsExtractor.class);
+		cbAlgorisms.getSelectionModel().select(ArticleExtractor.class);
+		cbAlgorisms.setCellFactory(new Callback<ListView<Class<? extends ExtractorBase>>, ListCell<Class<? extends ExtractorBase>>>() {
 
+			@Override
+			public ListCell<Class<? extends ExtractorBase>> call(ListView<Class<? extends ExtractorBase>> param) {
+				return new TextFieldListCell<>(new StringConverter<Class<? extends ExtractorBase>>() {
+
+					@Override
+					public String toString(Class<? extends ExtractorBase> object) {
+						return object.getSimpleName();
+					}
+
+					@Override
+					public Class<? extends ExtractorBase> fromString(String string) {
+						// TODO Auto-generated method stub
+						return null;
+					}
+				});
+			}
+		});
+		cbAlgorisms.setConverter(new StringConverter<Class<? extends ExtractorBase>>() {
+
+					@Override
+					public String toString(Class<? extends ExtractorBase> object) {
+						return object.getSimpleName();
+					}
+
+					@Override
+					public Class<? extends ExtractorBase> fromString(String string) {
+						// TODO Auto-generated method stub
+						return null;
+					}
+				});
 		cbAlgorisms.valueProperty().addListener((oba, o, n) -> {
 
 			// TextDocument textDocument = cache.get();
@@ -128,7 +169,7 @@ public class ArticleExtractorComposite extends BorderPane {
 			return;
 		try {
 			URL url = new URL("https:" + userData.getLink());
-
+			txtUrl.setText(url.toString());
 			String str = RequestUtil.reqeustSSL(url, (st, code) -> {
 
 				try {
@@ -172,6 +213,7 @@ public class ArticleExtractorComposite extends BorderPane {
 				return "";
 			}, false);
 
+			webPreview.getEngine().load(url.toString());
 			txtResult.setText(str);
 
 			// Function<String> mapper = v -> String.format("%s : %s",
@@ -201,9 +243,10 @@ public class ArticleExtractorComposite extends BorderPane {
 			return Stream.of(reflections.getSubTypesOf(ExtractorBase.class)).filter(v -> {
 
 				if ((v.getClass().getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC) {
-					Optional<Constructor<?>> findAny = Stream.of(v.getClass().getConstructors()).filter(c -> c.getParameterCount() == 0)
-							.findFirst();
-					return findAny.isPresent();
+//					Optional<Constructor<?>> findAny = Stream.of(v.getClass().getConstructors()).filter(c -> c.getParameterCount() == 0)
+//							.findFirst();
+//					return findAny.isPresent();
+					return true;
 				}
 
 				return false;

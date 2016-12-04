@@ -6,10 +6,20 @@
  *******************************/
 package external;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -17,8 +27,11 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 import com.kohlschutter.boilerpipe.document.TextDocument;
+import com.kohlschutter.boilerpipe.extractors.ArticleExtractor;
+import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
 import com.kohlschutter.boilerpipe.extractors.KeepEverythingExtractor;
 import com.kohlschutter.boilerpipe.sax.BoilerpipeSAXInput;
+import com.kyj.fx.voeditor.visual.framework.KeyValue;
 import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
 import com.kyj.fx.voeditor.visual.util.RequestUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -34,6 +47,135 @@ public class TFIDF {
 	@Before
 	public void setting() throws Exception {
 		new ProxyInitializable().initialize();
+	}
+
+	@Test
+	public void findAllLinks() throws Exception {
+		URL url;
+		url = new URL("https://search.naver.com/search.naver?where=nexearch&sm=tab_lvf&ie=utf8&query=%EC%86%8C%EC%82%AC%EC%9D%B4%EC%96%B4%ED%8B%B0+%EA%B2%8C%EC%9E%84");
+
+		Set<String> reqeustSSL = RequestUtil.reqeustSSL(url, (is, code) -> {
+
+			Set<String> collect = Collections.emptySet();
+			try {
+				Document parse = Jsoup.parse(is, "UTF-8", "");
+
+				/*a 태그 만 추출.*/
+				Elements elementsByTag = parse.getElementsByTag("a");// parse.getElementsByTag("a");
+
+				collect = elementsByTag.stream().filter(e -> e.hasAttr("href")).map(e -> e.attr("href"))
+						/*http or https인 링크만 추출.*/
+						.filter(e -> e.startsWith("http") || e.startsWith("https"))
+
+						/* 검색에 불필요한 URL */
+						.filter(v -> {
+
+							if ("https://submit.naver.com/".equals(v))
+								return false;
+							
+							else if ("http://www.naver.com".equals(v))
+								return false;
+
+							else if (v.startsWith("https://nid.naver.com"))
+								return false;
+
+							else if (v.startsWith("http://searchad.naver.com"))
+								return false;
+
+							else if (v.contains("namu.wiki"))
+								return false;
+
+							else if (v.contains("wikipedia.org"))
+								return false;
+
+							else if (v.startsWith("http://music.naver.com"))
+								return false;
+
+							else if (v.startsWith("http://m.post.naver.com"))
+								return false;
+
+							else if (v.startsWith("http://tvcast.naver.com"))
+								return false;
+
+							else if (v.startsWith("http://shopping.naver.com"))
+								return false;
+
+							else if (v.startsWith("https://help.naver"))
+								return false;
+
+							return true;
+						}).collect(Collectors.toSet());
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			return collect;
+		});
+
+		// reqeustSSL.forEach(System.out::println);
+		getString(reqeustSSL);
+
+	}
+
+	public void getString(Collection<String> links) {
+
+		String[] array = links.stream().map(link -> {
+
+			try {
+
+				if (link.startsWith("https")) {
+					return RequestUtil.reqeustSSL(new URL(link), (is, code) -> {
+
+						if (code == 200) {
+							try {
+								return ValueUtil.toString(is);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+
+						return "";
+
+					});
+				} else {
+					return RequestUtil.request(new URL(link), (is, code) -> {
+
+						if (code == 200) {
+							try {
+								return ValueUtil.toString(is);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+
+						return "";
+
+					});
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return "";
+		}).filter(ValueUtil::isNotEmpty).map(v -> {
+			
+			ExtractorBase instance = ArticleExtractor.getInstance();
+			InputSource source = new InputSource(new StringReader(v));
+			source.setEncoding("UTF-8");
+			try {
+				return ValueUtil.HTML.getNewsContent(instance, source);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return "";
+		}).toArray(String[]::new);
+
+		List<KeyValue> tf_IDF = ValueUtil.toTF_IDF(array);
+		tf_IDF.forEach(v -> {
+			System.out.println(v.toString());
+		});
 	}
 
 	@Test

@@ -50,10 +50,15 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.kohlschutter.boilerpipe.document.TextDocument;
+import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
+import com.kohlschutter.boilerpipe.sax.BoilerpipeSAXInput;
 import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecSourceNullException;
 import com.kyj.fx.voeditor.visual.framework.KeyValue;
 import com.kyj.fx.voeditor.visual.framework.velocity.ExtensionDateFormatVelocityContext;
@@ -1397,6 +1402,22 @@ public class ValueUtil {
 		private HTML() {
 		}
 
+		/**
+		 * 뉴스컨텐츠를 리턴.
+		 * 
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 12. 4.
+		 * @param algorism
+		 * @param source
+		 * @return
+		 * @throws Exception
+		 */
+		public static String getNewsContent(ExtractorBase algorism, InputSource source) throws Exception {
+			final BoilerpipeSAXInput in = new BoilerpipeSAXInput(source);
+			final TextDocument doc = in.getTextDocument();
+			return algorism.getText(doc);
+		}
+
 		public static String escapeHtml(CharSequence text) {
 			StringBuilder out = new StringBuilder();
 			withinStyle(out, text, 0, text.length());
@@ -1440,35 +1461,37 @@ public class ValueUtil {
 	}
 
 	public static List<KeyValue> toTF_IDF(String[] contents) {
+		return toTF_IDF(contents, true);
+	}
+
+	public static List<KeyValue> toTF_IDF(String[] contents, boolean autoFilter) {
 		TF_IDF tf_IDF = new TF_IDF(contents);
 		String[] words = tf_IDF.getWordVector();
 
+		// 배열구조 docIndx - worIdx
 		double[][] tf_IDFMatrix = tf_IDF.getTF_IDFMatrix();
 		List<KeyValue> arrayList = new ArrayList<>();
-		for (double[] tfIdf : tf_IDFMatrix) {
 
-			// sort
-			double arraySize = tfIdf.length;
-			for (int i = 0; i < arraySize - 1; i++) {
-				for (int k = i + 1; k < arraySize; k++) {
-					if (tfIdf[i] < tfIdf[k]) {
-						String temp = words[i];
-						double dTemp = tfIdf[i];
+		for (int docIndex = 0; docIndex < tf_IDFMatrix.length; docIndex++) {
+			double[] wordIndexTable = tf_IDFMatrix[docIndex];
 
-						words[i] = words[k];
-						tfIdf[i] = tfIdf[k];
+			for (int wordIndex = 0; wordIndex < wordIndexTable.length; wordIndex++) {
 
-						words[k] = temp;
-						tfIdf[k] = dTemp;
-					}
-				}
-			}
-
-			for (int i = 0; i < tfIdf.length; i++) {
-
-				arrayList.add(new KeyValue(words[i], tfIdf[i]));
+				// 영향도가 없는것은 제거.
+				double important = wordIndexTable[wordIndex] * 10;
+				arrayList.add(new KeyValue(words[wordIndex], important));
 			}
 		}
+
+		Collections.sort(arrayList, new Comparator<KeyValue>() {
+
+			@Override
+			public int compare(KeyValue o1, KeyValue o2) {
+				Double d1 = (Double) o1.getValue();
+				Double d2 = (Double) o2.getValue();
+				return Double.compare(d1, d2);
+			}
+		});
 		return arrayList;
 	}
 }

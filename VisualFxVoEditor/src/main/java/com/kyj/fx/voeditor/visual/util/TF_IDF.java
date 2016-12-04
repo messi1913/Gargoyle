@@ -7,6 +7,8 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author KYJ
@@ -14,6 +16,47 @@ import java.util.HashMap;
  */
 
 class TF_IDF {
+
+	static class TextFilter {
+
+		static final Set<String> filtered = new HashSet<>();
+
+		static {
+			filtered.add(" ");
+			filtered.add("있다.");
+			filtered.add("를");
+			filtered.add("은");
+			filtered.add("는");
+			filtered.add("이");
+			filtered.add("가");
+			filtered.add("의");
+			filtered.add("에");
+			filtered.add("매우");
+			filtered.add("하지만");
+			filtered.add("나는");
+			filtered.add("아니라");
+			filtered.add("결국");
+			filtered.add("에서");
+			filtered.add("다양한");
+			filtered.add("대해");
+			filtered.add("아닌");
+			filtered.add("이에");
+			filtered.add("않는");
+			filtered.add("있습니다.");
+			
+		}
+
+		public static boolean isFiltering(String content) {
+			if (isSingleWord(content))
+				return true;
+			return filtered.contains(content);
+		}
+
+		public static boolean isSingleWord(String content) {
+			return content.length() == 1;
+		}
+
+	}
 
 	int numOfWords;
 	double[] idfVector;
@@ -30,6 +73,10 @@ class TF_IDF {
 		for (String doc : docs) {
 			// 공백분리를 정규식으로 바꿈. - 공백이 분석에 영향을 끼치는듯보이므로..
 			for (String word : doc.split("\\s+")) {
+
+				if (TextFilter.isFiltering(word))
+					continue;
+
 				// for (String word : doc.split(" ")) {
 				if (!mapWordToIdx.containsKey(word)) {
 					mapWordToIdx.put(word, nextIdx);
@@ -60,8 +107,13 @@ class TF_IDF {
 		}
 		for (int docIdx = 0; docIdx < docs.length; docIdx++) {
 			String doc = docs[docIdx];
-			String[] words = doc.split("\\s+");
+			String[] split = doc.split("\\s+");
+			String[] words = split;
 			for (String word : words) {
+
+				if (TextFilter.isFiltering(word))
+					continue;
+
 				docLength[docIdx] = words.length;
 				int wordIdx = mapWordToIdx.get(word);
 				if (lastDocWordVector[wordIdx] < docIdx) {
@@ -85,6 +137,9 @@ class TF_IDF {
 		for (int docIdx = 0; docIdx < docs.length; docIdx++) {
 			String doc = docs[docIdx];
 			for (String word : doc.split("\\s+")) {
+				if (TextFilter.isFiltering(word))
+					continue;
+
 				int wordIdx = mapWordToIdx.get(word);
 				tfMatrix[docIdx][wordIdx] = tfMatrix[docIdx][wordIdx] + 1;
 			}
