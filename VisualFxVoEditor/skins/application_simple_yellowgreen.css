@@ -19,7 +19,7 @@
 	-fx-fill:#FFFFFF;
 }
 
-.hbox-gargoyle .jfx-combo-box  .text
+.hbox-gargoyle .jfx-combo-box .list-cell:selected
 {
 	-fx-text-fill:#FFFFFF;
 	-fx-fill:#FFFFFF;
