@@ -10,6 +10,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -157,40 +159,72 @@ public class RequestUtil {
 
 			conn.setHostnameVerifier(hostnameVerifier);
 
-			//			conn.getHeaderFields().forEach((str, li) -> {
-			//				LOGGER.debug("{} : {} ", str, li);
-			//			});
+			conn.setConnectTimeout(6000);
+
+			conn.connect();
+
+			is = conn.getInputStream();
+
+			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), conn.getContentEncoding(), url.toString());
+
+			result = response.apply(is, conn.getResponseCode());
+
+		} finally {
+
+			if (autoClose) {
+				if (is != null)
+					is.close();
+
+				if (conn != null)
+					conn.disconnect();
+			}
+
+		}
+
+		return result;
+	}
+
+	public static <T> T reqeustSSL200(URL url, BiFunction<InputStream, Charset, T> response, boolean autoClose) throws Exception {
+
+		// SSLContext ctx = SSLContext.getInstance("TLS");
+
+		HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+		InputStream is = null;
+		T result = null;
+		try {
+			conn.setDefaultUseCaches(true);
+			conn.setUseCaches(true);
+
+			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
+			conn.setRequestProperty("Accept-Encoding", "UTF-8");
+			// conn.setRequestProperty("Connection", "keep-alive");
+
+			conn.setRequestProperty("Accept", "text/html");
+			conn.setRequestProperty("Accept-Charset", "UTF-8");
+			conn.setRequestProperty("Accept-Encoding", "UTF-8");
+			conn.setRequestProperty("Accept-Language", "KR");
+			// conn.setRequestProperty("Cache-Control", "no-store");
+			// conn.setRequestProperty("Pragma", "no-cache");
+
+			conn.setHostnameVerifier(hostnameVerifier);
 
 			conn.setConnectTimeout(6000);
 
 			conn.connect();
-			// LOGGER.debug("{}", conn.getCipherSuite());
-			// Charset
-			//
-			// Description
-			//
-			// US-ASCII Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic
-			// Latin block of the Unicode character set
-			// ISO-8859-1 ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1
-			// UTF-8 Eight-bit UCS Transformation Format
-			// UTF-16BE Sixteen-bit UCS Transformation Format, big-endian byte
-			// order
-			// UTF-16LE Sixteen-bit UCS Transformation Format, little-endian
-			// byte order
-			// UTF-16 Sixteen-bit UCS Transformation Format, byte order
-			// identified by an optional byte-order mark
 
 			is = conn.getInputStream();
 
-			LOGGER.debug("code : [{}] URL : {} ,  ", conn.getResponseCode(), url.toString());
+			String contentType = conn.getContentType();
 
-			// LOGGER.debug(conn.getPermission().toString());
-//			conn.getHeaderFields().entrySet().forEach(e ->{
-//				LOGGER.debug("header  key  {}  value : {},  ", e.getKey(), e.getValue() );
-//			});
+			String charset = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset")).findFirst().map(v -> {
+				return v.substring(v.indexOf("=") + 1);
+			}).get();
 
+			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), conn.getContentEncoding(), url.toString());
 
-			result = response.apply(is, conn.getResponseCode());
+			if (200 == conn.getResponseCode()) {
+				result = response.apply(is, Charset.forName(charset));
+			}
 
 		} finally {
 
@@ -211,9 +245,10 @@ public class RequestUtil {
 		return request(url, response, true);
 	}
 
-	public static <T> T request(URL url, BiFunction<InputStream, Integer, T> response, boolean autoClose) throws Exception {
+	public static <T> T request200(URL url, BiFunction<InputStream, Charset, T> response, boolean autoClose) throws Exception {
 
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		URLConnection openConnection = url.openConnection();
+		HttpURLConnection conn = (HttpURLConnection) openConnection;
 		InputStream is = null;
 		T result = null;
 		try {
@@ -237,7 +272,64 @@ public class RequestUtil {
 
 			is = conn.getInputStream();
 
-			LOGGER.debug("code : [{}] URL : {} ,  ", conn.getResponseCode(), url.toString());
+			String contentType = conn.getContentType();
+
+			String charset = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset")).findFirst().map(v -> {
+				return v.substring(v.indexOf("=") + 1);
+			}).get();
+
+			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), url.toString());
+
+			if (200 == conn.getResponseCode()) {
+				result = response.apply(is, Charset.forName(charset));
+			}
+
+		} finally {
+
+			if (autoClose) {
+				if (is != null)
+					is.close();
+
+				if (conn != null)
+					conn.disconnect();
+			}
+
+		}
+		return result;
+
+	}
+
+	public static <T> T request(URL url, BiFunction<InputStream, Integer, T> response, boolean autoClose) throws Exception {
+
+		URLConnection openConnection = url.openConnection();
+		HttpURLConnection conn = (HttpURLConnection) openConnection;
+		InputStream is = null;
+		T result = null;
+		try {
+
+			conn.setDefaultUseCaches(true);
+			conn.setUseCaches(true);
+
+			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0");
+			conn.setRequestProperty("Accept-Encoding", "UTF-8");
+			// conn.setRequestProperty("Connection", "keep-alive");
+
+			conn.setRequestProperty("Accept", "text/html");
+			conn.setRequestProperty("Accept-Charset", "UTF-8");
+			conn.setRequestProperty("Accept-Encoding", "UTF-8");
+			conn.setRequestProperty("Accept-Language", "KR");
+
+			conn.setConnectTimeout(6000);
+			conn.setReadTimeout(6000);
+
+			conn.connect();
+
+			is = conn.getInputStream();
+			// conn.getHeaderFields().entrySet().forEach(e -> {
+			// LOGGER.debug("k : {} , v : {}", e.getKey(), e.getValue());
+			// });
+
+			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), url.toString());
 
 			// LOGGER.debug(conn.getPermission().toString());
 			result = response.apply(is, conn.getResponseCode());

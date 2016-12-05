@@ -217,82 +217,82 @@ public class ArticleExtractorComposite extends BorderPane {
 
 				if (link.startsWith("https")) {
 
-					model = RequestUtil.reqeustSSL(new URL(link), (is, code) -> {
+					model = RequestUtil.reqeustSSL200(new URL(link), (is, charset) -> {
 
-						if (code == 200) {
+						URLModel urlModel = URLModel.empty();
+						try {
+
+							String content = ValueUtil.toString(is, charset);
+
+							Document parse = Jsoup.parse(content, "http");
+							Element head = parse.head();
+							Elements title = head.getElementsByTag("title");
+
+							urlModel = new URLModel(link, content);
+							urlModel.setTitle(title.text());
+						} catch (IOException e) {
+							urlModel = URLModel.empty();
+						} finally {
 							try {
-								String content = ValueUtil.toString(is);
-
-								Document parse = Jsoup.parse(new ByteArrayInputStream(content.getBytes()), "UTF-8", "https");
-								Element head = parse.head();
-								Elements title = head.getElementsByTag("title");
-
-								URLModel urlModel = new URLModel(link, content);
-								urlModel.setTitle(title.text());
-
-								return urlModel;
-							} catch (IOException e) {
-								return URLModel.empty();
-							} finally {
-								try {
-									is.close();
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
+								is.close();
+							} catch (Exception e) {
+								e.printStackTrace();
 							}
 						}
 
-						return URLModel.empty();
-					});
+						return urlModel;
+
+					}, false);
 				} else {
 
-					model = RequestUtil.request(new URL(link), (is, code) -> {
+					model = RequestUtil.request200(new URL(link), (is, charset) -> {
 
-						if (code == 200) {
+						URLModel urlModel = URLModel.empty();
+						try {
 
+							String content = ValueUtil.toString(is, charset);
+
+							Document parse = Jsoup.parse(content, "http");
+							Element head = parse.head();
+							Elements title = head.getElementsByTag("title");
+
+							urlModel = new URLModel(link, content);
+							urlModel.setTitle(title.text());
+						} catch (IOException e) {
+							return URLModel.empty();
+						} finally {
 							try {
-								String content = ValueUtil.toString(is);
-
-								Document parse = Jsoup.parse(new ByteArrayInputStream(content.getBytes()), "UTF-8", "http");
-								Element head = parse.head();
-								Elements title = head.getElementsByTag("title");
-
-								URLModel urlModel = new URLModel(link, content);
-								urlModel.setTitle(title.text());
-								return urlModel;
-							} catch (IOException e) {
-								return URLModel.empty();
-							} finally {
-								try {
-									is.close();
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
+								is.close();
+							} catch (Exception e) {
+								e.printStackTrace();
 							}
 						}
 
-						return URLModel.empty();
-					} , false);
+						return urlModel;
+
+					}, false);
 				}
 			} catch (Exception e) {
 				return URLModel.empty();
 			}
 
 			return model;
-		}).filter(v -> !v.isEmpty()).map(v -> {
+		}).filter(v -> !v.isEmpty()).map(v ->
+
+		{
 			String url = v.getUrl();
 
 			String content = v.getContent();
 
 			ExtractorBase instance = ArticleSentencesExtractor.getInstance();
-			//트위터의경우 특별한 알고리즘으로 텍스트 불러옴.
+			// 트위터의경우 특별한 알고리즘으로 텍스트 불러옴.
 			if (url.contains("twitter.com")) {
 				instance = KeepEverythingExtractor.INSTANCE;
 			} else {
-				instance = ArticleSentencesExtractor.getInstance();
+				instance = ArticleExtractor.getInstance();// ArticleSentencesExtractor.getInstance();
 			}
 
-			//ArticleExtractor.getInstance();
+			// ArticleExtractor.getInstance();
 
 			InputSource source = new InputSource(new StringReader(content));
 			source.setEncoding("UTF-8");
@@ -323,12 +323,12 @@ public class ArticleExtractorComposite extends BorderPane {
 		try (ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes())) {
 			Document parse = Jsoup.parse(in, "UTF-8", "https");
 
-			//Repository로 저장 관리할 필요성이 있음.
-			/*a 태그 만 추출.*/
+			// Repository로 저장 관리할 필요성이 있음.
+			/* a 태그 만 추출. */
 			Elements elementsByTag = parse.getElementsByTag("a");// parse.getElementsByTag("a");
 
 			collect = elementsByTag.stream().filter(e -> e.hasAttr("href")).map(e -> e.attr("href").trim())
-					/*http or https인 링크만 추출.*/
+					/* http or https인 링크만 추출. */
 					.filter(e -> e.startsWith("http") || e.startsWith("https"))
 
 					/* 검색에 불필요한 URL */
@@ -385,7 +385,10 @@ public class ArticleExtractorComposite extends BorderPane {
 						else if (v.startsWith("http://map.naver.com/"))
 							return false;
 
-						return true;
+						else if (v.startsWith("http://pay.naver.com"))
+							return false;
+
+						return v.contains("news");
 					}).collect(Collectors.toSet());
 		} catch (IOException e) {
 			e.printStackTrace();
