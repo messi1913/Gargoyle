@@ -1,3 +1,11 @@
 .button-gargoyle {
     -fx-background-color: linear-gradient(#98a8bd 0%, #8195af 25%, #6d86a4 100%);
 }
+
+.button-gargoyle:hover {
+    -fx-opacity : 0.75;
+}
+
+.button-gargoyle:pressed {
+   -fx-background-insets: 2 0 0 0,2 0 3 0, 2 0 4 0, 2 0 5 0;
+}
