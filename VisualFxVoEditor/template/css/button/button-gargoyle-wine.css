@@ -1,0 +1,15 @@
+.button-gargoyle {
+    -fx-background-color:
+        #880E4F,
+        linear-gradient(#A20458 0%, #AD005C 20%, #9f0055 100%),
+        linear-gradient(#aa1162 0%, #D8157C 5%, #a0095a 50%, #950351 51%, #a8015a 100%);
+    -fx-background-insets: 0 0 -1 0,0,1;
+    -fx-background-radius: 5,5,4;
+    -fx-text-fill:   #B11A6A;
+    -fx-font-family: "Helvetica";
+    -fx-text-fill: white;
+}
+
+.button-gargoyle Text {
+    -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.8) , 0, 0.0 , 0 , -1 );
+}
