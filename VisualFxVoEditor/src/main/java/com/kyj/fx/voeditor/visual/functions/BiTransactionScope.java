@@ -8,7 +8,7 @@ package com.kyj.fx.voeditor.visual.functions;
 
 /**
  * 트랜잭션 범위
- * 
+ *
  * @author KYJ
  *
  */
@@ -17,11 +17,14 @@ public interface BiTransactionScope<T, U> {
 
 	/**
 	 * 트랜잭션 범위 처리
-	 * 
+	 *
 	 * @작성자 : KYJ
-	 * @작성일 : 2015. 11. 2.
+	 * @작성일 : 2016. 12. 6.
 	 * @param t
 	 * @param u
+	 * @return 결과값
+	 * @throws Exception
 	 */
-	public void scope(T t, U u) throws Exception;
+	public int scope(T t, U u) throws Exception;
+
 }

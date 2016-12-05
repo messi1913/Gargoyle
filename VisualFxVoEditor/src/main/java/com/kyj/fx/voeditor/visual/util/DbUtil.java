@@ -434,42 +434,58 @@ public class DbUtil extends ConnectionManager {
 	}
 
 	public static <T> int update(String query, Map<String, Object> map) throws Exception {
-		DataSource dataSource = null;
-		try {
 
-			noticeQuery(query);
+		return getTransactionedScope(null, new BiTransactionScope<T, NamedParameterJdbcTemplate>() {
 
-			dataSource = getDataSource();
-
-			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			return jdbcTemplate.update(query, map);
-		} catch (Exception e) {
-			LOGGER.debug(ValueUtil.toString(e));
-			throw e;
-		} finally {
-			close(dataSource);
-		}
+			@Override
+			public int scope(T t, NamedParameterJdbcTemplate u) throws Exception {
+				return u.update(query, map);
+			}
+		});
 	}
 
-	public static <T> void updateList(String query, List<Map<String, Object>> maps) throws Exception {
-		DataSource dataSource = null;
-		Connection connection = null;
-		try {
+	/**
+	 * API 수정.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 6.
+	 * @param query
+	 * @param maps
+	 * @return
+	 * @throws Exception
+	 */
+	public static <T> int updateList(String query, List<Map<String, Object>> maps) throws Exception {
 
-			noticeQuery(query);
+		return getTransactionedScope(null, new BiTransactionScope<T, NamedParameterJdbcTemplate>() {
 
-			connection = getDataSource().getConnection();
-			connection.setAutoCommit(false);
-			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			Map<String, ?>[] array = maps.toArray(new HashMap[maps.size()]);
-			jdbcTemplate.batchUpdate(query, array);
-			connection.commit();
-		} catch (Exception e) {
-			connection.rollback();
-			e.printStackTrace();
-		} finally {
-			close(connection);
-		}
+			@Override
+			public int scope(T t, NamedParameterJdbcTemplate u) throws Exception {
+
+				@SuppressWarnings("unchecked")
+				Map<String, ?>[] array = maps.toArray(new HashMap[maps.size()]);
+				int[] batchUpdate = u.batchUpdate(query, array);
+				return IntStream.of(batchUpdate).sum();
+			}
+		});
+
+		//		DataSource dataSource = null;
+		//		Connection connection = null;
+		//		try {
+		//
+		//			noticeQuery(query);
+		//
+		//			connection = getDataSource().getConnection();
+		//			connection.setAutoCommit(false);
+		//			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+		//			Map<String, ?>[] array = maps.toArray(new HashMap[maps.size()]);
+		//			jdbcTemplate.batchUpdate(query, array);
+		//			connection.commit();
+		//		} catch (Exception e) {
+		//			connection.rollback();
+		//			e.printStackTrace();
+		//		} finally {
+		//			close(connection);
+		//		}
+
 	}
 
 	/**
@@ -508,17 +524,17 @@ public class DbUtil extends ConnectionManager {
 			template.setTransactionManager(transactionManager);
 
 			return template.execute(status -> {
+				int result = -1;
 				try {
-					consumer.scope(userObj, namedParameterJdbcTemplate);
-
+					result = consumer.scope(userObj, namedParameterJdbcTemplate);
 				} catch (Exception e) {
 					status.setRollbackOnly();
 					LOGGER.error(ValueUtil.toString(e));
 					if (exceptionHandler != null)
 						exceptionHandler.accept(e);
-					return -1;
+					result = -1;
 				}
-				return 1;
+				return result;
 			});
 
 		} catch (Exception e) {
@@ -1173,8 +1189,7 @@ public class DbUtil extends ConnectionManager {
 	}
 
 	public static void getCurrentSchema(Connection con) {
-		
-		
+
 	}
 
 	// TODO 구현가능한부분인지 확인.

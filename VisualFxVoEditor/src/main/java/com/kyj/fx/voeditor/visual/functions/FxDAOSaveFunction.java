@@ -66,11 +66,12 @@ public class FxDAOSaveFunction implements Function<TbmSysDaoDVO, Integer>, BiTra
 	}
 
 	@Override
-	public void scope(TbmSysDaoDVO t, NamedParameterJdbcTemplate u) throws Exception {
+	public int scope(TbmSysDaoDVO t, NamedParameterJdbcTemplate u) throws Exception {
 		try {
 			boolean existsSchemaDatabase = DbUtil.isExistsSchemaDatabase();
 			updateTbmSysDao(t, u, existsSchemaDatabase);
 			updateTbmSysDaoMethods(t, u, existsSchemaDatabase);
+			return 1;
 		} catch (Exception e) {
 			throw e;
 		}
