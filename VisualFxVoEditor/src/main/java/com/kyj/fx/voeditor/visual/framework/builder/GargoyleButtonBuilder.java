@@ -6,16 +6,15 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.framework.builder;
 
-import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.scene.control.Button;
 import javafx.util.Builder;
 
 /**
- * 
+ *
  * 전체 버튼에 대한 공통기능을 적용하기 위한 처리
- * 
+ *
  * @author KYJ
  *
  */
@@ -27,7 +26,7 @@ public class GargoyleButtonBuilder extends Button implements Builder<Button> {
 	@Override
 	public Button build() {
 
-		applyStyleClass(this, getButtonStyleClass());
+		applyStyleClass(this, "button-gargoyle");
 
 		return this;
 	}
@@ -48,14 +47,4 @@ public class GargoyleButtonBuilder extends Button implements Builder<Button> {
 
 	}
 
-	/**
-	 * SkinManager.getInstance().getButtonStyleClass() 함수 주석 참조.<br/>
-	 * 
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 12. 3.
-	 * @return
-	 */
-	public static String getButtonStyleClass() {
-		return SkinManager.getInstance().getButtonStyleClass();
-	}
 }

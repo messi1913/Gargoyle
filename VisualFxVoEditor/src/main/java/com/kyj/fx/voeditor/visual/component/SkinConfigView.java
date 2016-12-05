@@ -31,7 +31,7 @@ import javafx.stage.Stage;
 
 /**
  * Skin목록을 보여주는 뷰
- * 
+ *
  * @author KYJ
  *
  */
@@ -42,7 +42,7 @@ public class SkinConfigView extends BorderPane {
 
 	/**
 	 * 생성자
-	 * 
+	 *
 	 * @throws URISyntaxException
 	 */
 	public SkinConfigView() {
@@ -63,6 +63,7 @@ public class SkinConfigView extends BorderPane {
 		setCenter(lvItems);
 
 		Button button = new Button("적용");
+		button.getStyleClass().add(SkinManager.BUTTON_STYLE_CLASS_NAME);
 		button.setPrefWidth(150);
 		button.setOnMouseClicked(event -> {
 
@@ -96,7 +97,7 @@ public class SkinConfigView extends BorderPane {
 
 	/**
 	 * 스킨뷰리턴
-	 * 
+	 *
 	 * @return
 	 */
 	private ListView<String> getSkinView() {
@@ -106,7 +107,7 @@ public class SkinConfigView extends BorderPane {
 
 	/**
 	 * 스킨데이터리턴
-	 * 
+	 *
 	 * @return
 	 */
 	private ObservableList<String> getSkinList() {

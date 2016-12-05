@@ -373,25 +373,25 @@ public class FxUtil {
 		Method[] declaredMethods = controllerClass.getDeclaredMethods();
 
 		// findfirst로 수정. @FxPostInitialize가 여러건있는경우를 잘못된 로직 유도를 방지.
-		Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null).findFirst()
-				.ifPresent((m -> {
-					if (m.getModifiers() == Modifier.PUBLIC) {
+		Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null).forEach(m -> {
+			//				.ifPresent((m -> {
+			if (m.getModifiers() == Modifier.PUBLIC) {
+				try {
+
+					// Lazy Run.
+					Platform.runLater(() -> {
 						try {
-
-							// Lazy Run.
-							Platform.runLater(() -> {
-								try {
-									m.invoke(instanceController);
-								} catch (Exception e) {
-									LOGGER.error(ValueUtil.toString(e));
-								}
-							});
-
+							m.invoke(instanceController);
 						} catch (Exception e) {
 							LOGGER.error(ValueUtil.toString(e));
 						}
-					}
-				}));
+					});
+
+				} catch (Exception e) {
+					LOGGER.error(ValueUtil.toString(e));
+				}
+			}
+		});
 
 		if (option != null) {
 			option.accept(load);
@@ -404,7 +404,7 @@ public class FxUtil {
 			Parent parent = (Parent) load;
 			List<Node> findAllByNodes = FxUtil.findAllByNodes(parent, v -> v instanceof Button);
 			findAllByNodes.forEach(v -> {
-				GargoyleButtonBuilder.applyStyleClass((Button) v, "button-gargoyle-rich-blue");
+				GargoyleButtonBuilder.applyStyleClass((Button) v, SkinManager.BUTTON_STYLE_CLASS_NAME);
 				LOGGER.debug("Button :  {}", v);
 			});
 		});
@@ -954,8 +954,7 @@ public class FxUtil {
 		if (color == null)
 			return "BLACK";
 
-		return String.format("#%02X%02X%02X", (int) (color.getRed() * 255), (int) (color.getGreen() * 255),
-				(int) (color.getBlue() * 255));
+		return String.format("#%02X%02X%02X", (int) (color.getRed() * 255), (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
 	}
 
 	/**
@@ -1623,7 +1622,7 @@ public class FxUtil {
 
 		/**
 		 * 디폴트 폰트 리턴
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 2.
 		 * @return
@@ -1634,7 +1633,7 @@ public class FxUtil {
 
 		/**
 		 * 폰트명들을 리턴
-		 * 
+		 *
 		 * @return
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 2.
@@ -1649,7 +1648,7 @@ public class FxUtil {
 
 		/**
 		 * Font Styles 리턴
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 2.
 		 * @return
@@ -1660,7 +1659,7 @@ public class FxUtil {
 
 		/**
 		 * Font Weight 정보 리턴
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 2.
 		 * @return

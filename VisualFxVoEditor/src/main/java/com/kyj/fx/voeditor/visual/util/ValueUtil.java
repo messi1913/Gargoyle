@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,10 +49,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.reflections.Reflections;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -61,6 +64,7 @@ import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
 import com.kohlschutter.boilerpipe.sax.BoilerpipeSAXInput;
 import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecSourceNullException;
 import com.kyj.fx.voeditor.visual.framework.KeyValue;
+import com.kyj.fx.voeditor.visual.framework.URLModel;
 import com.kyj.fx.voeditor.visual.framework.velocity.ExtensionDateFormatVelocityContext;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.sun.star.lang.IllegalArgumentException;
@@ -357,7 +361,7 @@ public class ValueUtil {
 
 	/**
 	 * 정규식으로 일치하는 패턴하나 반환
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 1.
 	 * @param regex
@@ -809,7 +813,7 @@ public class ValueUtil {
 	 * delimiter characters. Each of those characters can be used to separate
 	 * tokens. A delimiter is always a single character; for multi-character
 	 * delimiters, consider using {@code delimitedListToStringArray}
-	 * 
+	 *
 	 * @param str
 	 *            the String to tokenize
 	 * @param delimiters
@@ -834,7 +838,7 @@ public class ValueUtil {
 	 * delimiter characters. Each of those characters can be used to separate
 	 * tokens. A delimiter is always a single character; for multi-character
 	 * delimiters, consider using {@code delimitedListToStringArray}
-	 * 
+	 *
 	 * @param str
 	 *            the String to tokenize
 	 * @param delimiters
@@ -876,7 +880,7 @@ public class ValueUtil {
 	 *
 	 * Copy the given Collection into a String array. The Collection must
 	 * contain String elements only.
-	 * 
+	 *
 	 * @param collection
 	 *            the Collection to copy
 	 * @return the String array ({@code null} if the passed-in Collection was
@@ -1141,7 +1145,7 @@ public class ValueUtil {
 
 	/**
 	 * 인자로 받아온 path에 baseDir 디렉토리 경로를 붙여주어 절대경로로 바꾼다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 18.
 	 * @param path
@@ -1157,7 +1161,7 @@ public class ValueUtil {
 
 	/**
 	 * 인자로 받아온 path에서 baseDir 절대경로가 있으면 제거한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 18.
 	 * @param path
@@ -1294,7 +1298,7 @@ public class ValueUtil {
 
 	/**
 	 * 대소문자 무시 일치하는 문자열이 포함되면 true
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 5.
 	 * @param findText
@@ -1328,7 +1332,7 @@ public class ValueUtil {
 
 	/**
 	 * 주석 자동화 처리.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 12.
 	 * @param code
@@ -1342,7 +1346,7 @@ public class ValueUtil {
 
 	/**
 	 * 문자열로된 텍스트로부터 파일명만 추출하는 정규식 패턴을 적용한후 리턴받음.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 18.
 	 * @param fileName
@@ -1368,11 +1372,18 @@ public class ValueUtil {
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 1.
 	 * @param inputStream
+	 * 		stream
+	 * @param charset
+	 * 		encoding
 	 * @return
 	 * @throws IOException
 	 */
+	public static String toString(InputStream inputStream, Charset charset) throws IOException {
+		return IOUtils.toString(inputStream, charset);
+	}
+
 	public static String toString(InputStream inputStream) throws IOException {
-		return IOUtils.toString(inputStream, Charset.forName("UTF-8"));
+		return toString(inputStream, Charset.forName("UTF-8"));
 	}
 
 	/**
@@ -1402,9 +1413,47 @@ public class ValueUtil {
 		private HTML() {
 		}
 
+		static class AlgorismExtractor {
+
+			private static Reflections reflections;
+			static final String PACKAGE_PREFIX = "com.kohlschutter.boilerpipe.extractors";
+
+			static {
+
+				reflections = new Reflections(
+						new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage(PACKAGE_PREFIX, ClassLoader.getSystemClassLoader())));
+
+			}
+
+			public static List<Class<? extends ExtractorBase>> getAvaliables() {
+				return Stream.of(reflections.getSubTypesOf(ExtractorBase.class)).filter(v -> {
+
+					if ((v.getClass().getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC) {
+						//					Optional<Constructor<?>> findAny = Stream.of(v.getClass().getConstructors()).filter(c -> c.getParameterCount() == 0)
+						//							.findFirst();
+						//					return findAny.isPresent();
+						return true;
+					}
+
+					return false;
+				}).flatMap(v -> v.stream()).collect(Collectors.toList());
+			}
+
+		}
+
+		/**
+		 * 사용가능한 뉴스분석 알고리즘 리턴.
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 12. 5.
+		 * @return
+		 */
+		public static List<Class<? extends ExtractorBase>> getAvaliablesExtractorBase() {
+			return AlgorismExtractor.getAvaliables();
+		}
+
 		/**
 		 * 뉴스컨텐츠를 리턴.
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 4.
 		 * @param algorism
@@ -1460,6 +1509,13 @@ public class ValueUtil {
 
 	}
 
+	public static List<KeyValue> toTF_IDF(URLModel[] models) {
+		String[] array = Stream.of(models).map(m -> {
+			return m.getContent();
+		}).toArray(String[]::new);
+		return toTF_IDF(array, true);
+	}
+
 	public static List<KeyValue> toTF_IDF(String[] contents) {
 		return toTF_IDF(contents, true);
 	}
@@ -1478,6 +1534,10 @@ public class ValueUtil {
 			for (int wordIndex = 0; wordIndex < wordIndexTable.length; wordIndex++) {
 
 				// 영향도가 없는것은 제거.
+
+				if (wordIndexTable[wordIndex] == 0.0d)
+					continue;
+
 				double important = wordIndexTable[wordIndex] * 10;
 				arrayList.add(new KeyValue(words[wordIndex], important));
 			}
@@ -1489,7 +1549,7 @@ public class ValueUtil {
 			public int compare(KeyValue o1, KeyValue o2) {
 				Double d1 = (Double) o1.getValue();
 				Double d2 = (Double) o2.getValue();
-				return Double.compare(d1, d2);
+				return ~Double.compare(d1, d2);
 			}
 		});
 		return arrayList;

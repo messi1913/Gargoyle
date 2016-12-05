@@ -9,6 +9,8 @@ package com.kyj.fx.voeditor.visual.component;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.kyj.fx.voeditor.visual.momory.SkinManager;
+
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -97,20 +99,7 @@ public class ButtonTableColumn<S extends Map<String, Object>> extends TableColum
 
 				}
 			});
-			// cellButton.styleProperty().bind(button.styleProperty());
-			// cellButton.visibleProperty().bind(button.visibleProperty());
-			// cellButton.disableProperty().bind(button.disableProperty());
-			// cellButton.fontProperty().bind(button.fontProperty());
-			// cellButton.alignmentProperty().bind(button.alignmentProperty());
-			// cellButton.textAlignmentProperty().bind(button.textAlignmentProperty());
-			// cellButton.textOverrunProperty().bind(button.textOverrunProperty());
-			// cellButton.ellipsisStringProperty().bind(button.ellipsisStringProperty());
-			// cellButton.wrapTextProperty().bind(button.wrapTextProperty());
-			// cellButton.graphicProperty().bind(button.graphicProperty());
-			// cellButton.underlineProperty().bind(button.underlineProperty());
-			// cellButton.contentDisplayProperty().bind(button.contentDisplayProperty());
-			// cellButton.lineSpacingProperty().bind(button.lineSpacingProperty());
-			// cellButton.graphicTextGapProperty().bind(button.graphicTextGapProperty());
+
 			cellButton.setOnAction(e -> parent.clickHandle(buttonCell.getRowIndex()));
 
 			return buttonCell;
@@ -124,6 +113,7 @@ public class ButtonTableColumn<S extends Map<String, Object>> extends TableColum
 
 		private ButtonCell(final String buttonText, TableColumn<S, Boolean> column) {
 			this.button = new Button(buttonText);
+			this.button.getStyleClass().add(SkinManager.BUTTON_STYLE_CLASS_NAME);
 		}
 
 		private Button getButtonObject() {

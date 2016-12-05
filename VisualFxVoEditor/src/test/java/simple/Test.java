@@ -1,5 +1,6 @@
 package simple;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Test {
 	public static void main(String[] args) {
@@ -17,6 +18,17 @@ public class Test {
 
 		System.out.println(", " + st4.countTokens());
 
+		ConcurrentLinkedQueue<String> concurrentLinkedQueue = new ConcurrentLinkedQueue<>();
+		concurrentLinkedQueue.add("1");
+		concurrentLinkedQueue.add("2");
+		concurrentLinkedQueue.add("3");
+
+
+
+		System.out.println(concurrentLinkedQueue.poll());
+		System.out.println(concurrentLinkedQueue.poll());
+		System.out.println(concurrentLinkedQueue.poll());
+		System.out.println(concurrentLinkedQueue.size());
 	}
 
 }

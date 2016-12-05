@@ -203,7 +203,10 @@ public class Main extends Application {
 
 			Scene scene = new Scene(mainParent, 1280, 900);
 
+//			SkinManager.getInstance().resetSkin();
 			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+			scene.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
+
 			primaryStage.setScene(scene);
 
 			primaryStage.show();
@@ -215,7 +218,7 @@ public class Main extends Application {
 
 	/**
 	 * App 초기화 처리 로직 구현.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 23.
 	 */

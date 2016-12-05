@@ -157,9 +157,9 @@ public class RequestUtil {
 
 			conn.setHostnameVerifier(hostnameVerifier);
 
-//			conn.getHeaderFields().forEach((str, li) -> {
-//				LOGGER.debug("{} : {} ", str, li);
-//			});
+			//			conn.getHeaderFields().forEach((str, li) -> {
+			//				LOGGER.debug("{} : {} ", str, li);
+			//			});
 
 			conn.setConnectTimeout(6000);
 
@@ -181,10 +181,15 @@ public class RequestUtil {
 			// identified by an optional byte-order mark
 
 			is = conn.getInputStream();
-			
-			LOGGER.debug("code : [{}] URL : {} ,  ", conn.getResponseCode(),url.toString() );
+
+			LOGGER.debug("code : [{}] URL : {} ,  ", conn.getResponseCode(), url.toString());
 
 			// LOGGER.debug(conn.getPermission().toString());
+//			conn.getHeaderFields().entrySet().forEach(e ->{
+//				LOGGER.debug("header  key  {}  value : {},  ", e.getKey(), e.getValue() );
+//			});
+
+
 			result = response.apply(is, conn.getResponseCode());
 
 		} finally {
@@ -232,7 +237,7 @@ public class RequestUtil {
 
 			is = conn.getInputStream();
 
-			LOGGER.debug("code : [{}] URL : {} ,  ", conn.getResponseCode(),url.toString() );
+			LOGGER.debug("code : [{}] URL : {} ,  ", conn.getResponseCode(), url.toString());
 
 			// LOGGER.debug(conn.getPermission().toString());
 			result = response.apply(is, conn.getResponseCode());

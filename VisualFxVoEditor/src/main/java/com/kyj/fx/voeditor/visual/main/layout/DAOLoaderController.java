@@ -7,9 +7,11 @@
 package com.kyj.fx.voeditor.visual.main.layout;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,8 +187,25 @@ public class DAOLoaderController {
 				if ("Y".equals(v.getValue())) {
 					try {
 
+						//Camel Case로 변경하는 작업이 필요함.
+						HashMap<String, Object> param = new HashMap<String, Object>();
+						Iterator<String> iterator = selectedItem.keySet().iterator();
+						while(iterator.hasNext())
+						{
+							String key = iterator.next();
+							param.put(ValueUtil.toCamelCase(key), selectedItem.get(key));
+						}
+//						Map<HashMap<String, Object>, HashMap<String, Object>> collect = selectedItem.entrySet().stream()
+//						.map(m -> {
+//							HashMap<String, Object> hashMap = new HashMap<String, Object>();
+//							hashMap.put(ValueUtil.toCamelCase(m.getKey()), m.getValue());
+//							return hashMap;
+//						})
+//						.collect(Collectors.toMap(k -> k, val -> val));
+
+
 						//삭제
-						int count = removDAO(selectedItem);
+						int count = removDAO(param);
 
 						if (count != -1) {
 							//삭제성공.
@@ -198,7 +217,6 @@ public class DAOLoaderController {
 							//삭제 실패.
 							DialogUtil.showMessageDialog(className + " 일치하는 조건이 없습니다. ");
 						}
-
 
 					} catch (Exception e1) {
 						LOGGER.error(ValueUtil.toString(e1));
@@ -335,20 +353,17 @@ public class DAOLoaderController {
 						tbmSysDAO.setTableName(object.toString());
 
 					FxUtil.load(DAOLoaderController.class);
-					FXMLLoader loader =  FxUtil.createNewFxmlLoader();//new FXMLLoader();
+					FXMLLoader loader = FxUtil.createNewFxmlLoader();//new FXMLLoader();
 					loader.setLocation(getClass().getResource("DaoWizardView.fxml"));
 					BorderPane pane = loader.load();
 					DaoWizardViewController controller = loader.getController();
 					controller.setTbmSysDaoProperty(tbmSysDAO);
 
-
-
 					/*2016-10-26 by kyj change code  tab handling -> loadNewSystem api */
-//					Tab tab = new Tab("DaoWizard", pane);
-//					this.systemRoot.addTabItem(tab);
-//					tab.getTabPane().getSelectionModel().select(tab);
+					//					Tab tab = new Tab("DaoWizard", pane);
+					//					this.systemRoot.addTabItem(tab);
+					//					tab.getTabPane().getSelectionModel().select(tab);
 					SharedMemory.getSystemLayoutViewController().loadNewSystemTab("DaoWizard", pane);
-
 
 					//2016-09-23 굳히 재조회 할 필요없으므로 주석.
 					//					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());

@@ -28,10 +28,12 @@ import org.xml.sax.InputSource;
 
 import com.kohlschutter.boilerpipe.document.TextDocument;
 import com.kohlschutter.boilerpipe.extractors.ArticleExtractor;
+import com.kohlschutter.boilerpipe.extractors.ArticleSentencesExtractor;
 import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
 import com.kohlschutter.boilerpipe.extractors.KeepEverythingExtractor;
 import com.kohlschutter.boilerpipe.sax.BoilerpipeSAXInput;
 import com.kyj.fx.voeditor.visual.framework.KeyValue;
+import com.kyj.fx.voeditor.visual.framework.URLModel;
 import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
 import com.kyj.fx.voeditor.visual.util.RequestUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -52,59 +54,71 @@ public class TFIDF {
 	@Test
 	public void findAllLinks() throws Exception {
 		URL url;
-		url = new URL("https://search.naver.com/search.naver?where=nexearch&sm=tab_lvf&ie=utf8&query=%EC%86%8C%EC%82%AC%EC%9D%B4%EC%96%B4%ED%8B%B0+%EA%B2%8C%EC%9E%84");
+		url = new URL("https://search.naver.com/search.naver?where=nexearch&query=%ED%91%9C%EC%B0%BD%EC%9B%90&sm=top_hty&fbm=1&ie=utf8");
 
 		Set<String> reqeustSSL = RequestUtil.reqeustSSL(url, (is, code) -> {
 
 			Set<String> collect = Collections.emptySet();
 			try {
-				Document parse = Jsoup.parse(is, "UTF-8", "");
+				Document parse = Jsoup.parse(is, "UTF-8", "http");
 
 				/*a 태그 만 추출.*/
 				Elements elementsByTag = parse.getElementsByTag("a");// parse.getElementsByTag("a");
 
-				collect = elementsByTag.stream().filter(e -> e.hasAttr("href")).map(e -> e.attr("href"))
+				collect = elementsByTag.stream().filter(e -> e.hasAttr("href")).map(e -> e.attr("href").trim())
 						/*http or https인 링크만 추출.*/
 						.filter(e -> e.startsWith("http") || e.startsWith("https"))
 
 						/* 검색에 불필요한 URL */
 						.filter(v -> {
 
-							if ("https://submit.naver.com/".equals(v))
-								return false;
-							
-							else if ("http://www.naver.com".equals(v))
-								return false;
+					if ("https://submit.naver.com/".equals(v))
+						return false;
 
-							else if (v.startsWith("https://nid.naver.com"))
-								return false;
+					else if ("http://www.naver.com".equals(v))
+						return false;
 
-							else if (v.startsWith("http://searchad.naver.com"))
-								return false;
+					else if (v.startsWith("https://nid.naver.com"))
+						return false;
 
-							else if (v.contains("namu.wiki"))
-								return false;
+					else if (v.startsWith("http://searchad.naver.com"))
+						return false;
 
-							else if (v.contains("wikipedia.org"))
-								return false;
+					else if (v.contains("namu.wiki"))
+						return false;
 
-							else if (v.startsWith("http://music.naver.com"))
-								return false;
+					else if (v.contains("wikipedia.org"))
+						return false;
 
-							else if (v.startsWith("http://m.post.naver.com"))
-								return false;
+					else if (v.startsWith("http://music.naver.com"))
+						return false;
 
-							else if (v.startsWith("http://tvcast.naver.com"))
-								return false;
+					else if (v.startsWith("http://m.post.naver.com"))
+						return false;
 
-							else if (v.startsWith("http://shopping.naver.com"))
-								return false;
+					else if (v.startsWith("http://tvcast.naver.com"))
+						return false;
 
-							else if (v.startsWith("https://help.naver"))
-								return false;
+					else if (v.startsWith("http://shopping.naver.com"))
+						return false;
 
-							return true;
-						}).collect(Collectors.toSet());
+					else if (v.startsWith("https://help.naver"))
+						return false;
+
+					else if (v.startsWith("http://www.navercorp.com"))
+						return false;
+
+					else if (v.startsWith("http://book.naver.com"))
+						return false;
+
+					else if (v.startsWith("http://www.cwpyo.com"))
+						return false;
+
+					else if (v.startsWith("http://navercast.naver.com"))
+						return false;
+
+					return true;
+				}).collect(Collectors.toSet());
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -120,57 +134,59 @@ public class TFIDF {
 
 	public void getString(Collection<String> links) {
 
-		String[] array = links.stream().map(link -> {
-
+		URLModel[] array = links.parallelStream().map(link -> {
+			URLModel model = URLModel.empty();
 			try {
 
 				if (link.startsWith("https")) {
-					return RequestUtil.reqeustSSL(new URL(link), (is, code) -> {
+					model = RequestUtil.reqeustSSL(new URL(link), (is, code) -> {
 
 						if (code == 200) {
 							try {
-								return ValueUtil.toString(is);
+								return new URLModel(link, ValueUtil.toString(is));
 							} catch (IOException e) {
-								e.printStackTrace();
+								return URLModel.empty();
 							}
 						}
 
-						return "";
+						return URLModel.empty();
 
 					});
-				} else {
-					return RequestUtil.request(new URL(link), (is, code) -> {
 
+				} else {
+					model = RequestUtil.request(new URL(link), (is, code) -> {
 						if (code == 200) {
 							try {
-								return ValueUtil.toString(is);
+								return new URLModel(link, ValueUtil.toString(is));
 							} catch (IOException e) {
-								e.printStackTrace();
+								return URLModel.empty();
 							}
 						}
 
-						return "";
+						return URLModel.empty();
 
 					});
 				}
-
 			} catch (Exception e) {
-				e.printStackTrace();
+				return URLModel.empty();
 			}
 
-			return "";
-		}).filter(ValueUtil::isNotEmpty).map(v -> {
-			
+			return model;
+		}).filter(v -> !v.isEmpty()).map(v -> {
+			String content = v.getContent();
 			ExtractorBase instance = ArticleExtractor.getInstance();
-			InputSource source = new InputSource(new StringReader(v));
+			InputSource source = new InputSource(new StringReader(content));
 			source.setEncoding("UTF-8");
 			try {
-				return ValueUtil.HTML.getNewsContent(instance, source);
+				content = ValueUtil.HTML.getNewsContent(instance, source);
+				v.setContent(content);
 			} catch (Exception e) {
+				v = URLModel.empty();
 				e.printStackTrace();
 			}
-			return "";
-		}).toArray(String[]::new);
+
+			return v;
+		}).filter(v -> !v.isEmpty()).toArray(URLModel[]::new);
 
 		List<KeyValue> tf_IDF = ValueUtil.toTF_IDF(array);
 		tf_IDF.forEach(v -> {
@@ -182,9 +198,9 @@ public class TFIDF {
 	public void boilerpipeTest() throws Exception {
 		URL url;
 		url = new URL(
-				"https://search.naver.com/search.naver?where=nexearch&sm=tab_lvf&ie=utf8&query=%EB%B0%95%EA%B7%BC%ED%95%B5%EB%8B%B7%EC%BB%B4");
+				"https://twitter.com/intent/favorite?tweet_id=805627131061374976");
 
-		String str = RequestUtil.reqeustSSL(url, (st, code) -> {
+		String str = RequestUtil.request(url, (st, code) -> {
 			try {
 
 				InputSource inputSource = new InputSource(st);
@@ -192,15 +208,23 @@ public class TFIDF {
 
 				final BoilerpipeSAXInput in = new BoilerpipeSAXInput(inputSource);
 				final TextDocument doc = in.getTextDocument();
-				return KeepEverythingExtractor.INSTANCE.getText(doc);
+
+				System.out.println("HH");
+				LOGGER.debug("HH");
+
+
+				System.out.println(KeepEverythingExtractor.INSTANCE.getText(doc));
+				return ArticleSentencesExtractor.INSTANCE.getText(doc);
+//				return ArticleExtractor.INSTANCE.getText(doc);
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
-			return "";
-		}, false);
+			return null;
+		} , true);
 
+		LOGGER.debug(str);
 		System.out.println(str);
 
 	}

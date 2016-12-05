@@ -29,11 +29,11 @@ public class PreferencesUtil {
 	public static final String KEY_USER_SKIN_NAME = "user.skin.name";
 
 	/**
-	 * 사용자가 선택한 버튼 스타일클래스명
+	 * 사용자가 선택한 버튼 스타일 클래스 파일 명
 	 * @최초생성일 2016. 12. 3.
 	 */
-	public static final String KEY_USER_BUTTON_STYLECLASS_NAME = "user.button.syleclass.name";
-	
+	public static final String KEY_USER_BUTTON_STYLECLASS_FILE_NAME = "user.button.syleclass.file.name";
+
 	/**
 	 *
 	 */

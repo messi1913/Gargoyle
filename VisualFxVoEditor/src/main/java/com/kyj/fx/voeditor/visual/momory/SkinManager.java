@@ -7,11 +7,13 @@
 package com.kyj.fx.voeditor.visual.momory;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
@@ -54,14 +56,25 @@ public final class SkinManager {
 
 	public static final String DEFAULT_SKIN_PATH_NAME = SKIN_BASE_DIR + "modena.css";
 
-	public static final String KEY_USER_BUTTON_STYLECLASS_NAME = PreferencesUtil.KEY_USER_BUTTON_STYLECLASS_NAME;
+	public static final String KEY_USER_BUTTON_STYLECLASS_FILE_NAME = PreferencesUtil.KEY_USER_BUTTON_STYLECLASS_FILE_NAME;
 
 	/**
 	 * 스킨 템플릿이 존재하는 위치.
-	 * 
+	 *
 	 * @최초생성일 2016. 12. 3.
 	 */
 	private static final String SKIN_TEPLATE_LOCATION = "template/css/skin/skin.css.template";
+
+	/**
+	 * @최초생성일 2016. 12. 5.
+	 */
+	private static final String SKIN_BUTTON_TEPLATE_LOCATION = "template/css/button";
+
+	/**
+	 * 버튼 스타일 클래스명
+	 * @최초생성일 2016. 12. 5.
+	 */
+	public static final String BUTTON_STYLE_CLASS_NAME = "button-gargoyle";
 
 	/**
 	 * 생성방지를 위해 private로선언
@@ -144,7 +157,7 @@ public final class SkinManager {
 
 	/**
 	 * 스킨이 존재하는지 확인한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 3.
 	 * @param simpleSkinPath
@@ -163,7 +176,7 @@ public final class SkinManager {
 
 	/**
 	 * 스킨이 존재하는지 확인한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 3.
 	 * @param skinFullPathName
@@ -210,7 +223,7 @@ public final class SkinManager {
 
 	/**
 	 * 디폴트 스킨위치를 알려주는 URL을 리턴한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 3.
 	 * @return
@@ -221,7 +234,7 @@ public final class SkinManager {
 
 	/**
 	 * 현재 적용된 스킨을 리턴한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 3.
 	 * @return
@@ -247,7 +260,7 @@ public final class SkinManager {
 
 	/**
 	 * return caspian.css
-	 * 
+	 *
 	 * @return
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 30.
@@ -258,7 +271,7 @@ public final class SkinManager {
 
 	/**
 	 * 사용자 정의 스킨 파일을 생성
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 2.
 	 * @param style
@@ -285,21 +298,60 @@ public final class SkinManager {
 
 	/**
 	 * 스킨을 적용해본다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 2.
 	 * @param createUserCustomSkin
 	 * @throws MalformedURLException
 	 */
-	public void applySkin(File createUserCustomSkin) throws MalformedURLException {
+	public void applySkin(File createUserCustomSkin) {
+		applySkin(createUserCustomSkin, null);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 5.
+	 * @param createUserCustomSkin
+	 * @param btnStyleClass
+	 * @throws MalformedURLException
+	 */
+	public void applySkin(File createUserCustomSkin, String btnStyleClass) {
 		ObservableList<String> stylesheets = SharedMemory.getPrimaryStage().getScene().getStylesheets();
 		stylesheets.clear();
-		stylesheets.add(createUserCustomSkin.toURI().toURL().toExternalForm());
+
+		try {
+			stylesheets.add(createUserCustomSkin.toURI().toURL().toExternalForm());
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
+
+		if (ValueUtil.isNotEmpty(btnStyleClass)) {
+			applyBtnSyleClass(btnStyleClass);
+		}
+	}
+
+	/**
+	 * 버튼 스타일 클래스를 적용.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 5.
+	 * @param btnStyleClass
+	 */
+	public void applyBtnSyleClass(String btnStyleClass) {
+		ObservableList<String> stylesheets = SharedMemory.getPrimaryStage().getScene().getStylesheets();
+		File file = new File(SKIN_BUTTON_TEPLATE_LOCATION, btnStyleClass + ".css");
+		if (file.exists()) {
+			try {
+				stylesheets.add(file.toURI().toURL().toExternalForm());
+			} catch (MalformedURLException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+		}
+
 	}
 
 	/**
 	 * 스킨을 초기화 시킨다. 디폴트 스킨이 적용된다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 3.
 	 */
@@ -308,17 +360,32 @@ public final class SkinManager {
 		Scene scene = primaryStage.getScene();
 		scene.getStylesheets().clear();
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+		scene.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
 	}
-	
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 5.
+	 * @return
+	 */
+	public String getButtonSkin() {
+		try {
+			return getButtonStyle().toURI().toURL().toExternalForm();
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
+		return "";
+
+	}
+
 	public void resetSkin(Scene scene) {
 		scene.getStylesheets().clear();
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 	}
-	
 
 	/**
 	 * 스킨템플릿을 리턴.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 3.
 	 * @return
@@ -336,24 +403,57 @@ public final class SkinManager {
 
 	/**
 	 * 버튼 스타일클래스를 리턴.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 3.
 	 * @return
 	 */
-	public String getButtonStyleClass() {
-		return getPreference().get(KEY_USER_BUTTON_STYLECLASS_NAME, "");
+	public File getButtonStyle() {
+		String string = getPreference().get(KEY_USER_BUTTON_STYLECLASS_FILE_NAME, "");
+		return new File(SKIN_BUTTON_TEPLATE_LOCATION, string);
 	}
 
 	/**
 	 * 사용자가 선택한 버튼 스타일 클래스를 등록.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 3.
 	 * @param styleClassName
 	 */
-	public void registButtonSyleClass(String styleClassName) {
+	public void registButtonSyleClass(String styleClassFileName) {
 		Preferences userRoot = getPreference();
-		userRoot.put(KEY_USER_BUTTON_STYLECLASS_NAME, styleClassName);
+		userRoot.put(KEY_USER_BUTTON_STYLECLASS_FILE_NAME, (styleClassFileName + ".css"));
 	}
+
+	/**
+	 * @return
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 5.
+	 */
+	public List<File> getButtonSkinFiles() {
+		File file = new File(SKIN_BUTTON_TEPLATE_LOCATION);
+		if (file.exists()) {
+			File[] listFiles = file.listFiles(new FilenameFilter() {
+
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.endsWith(".css");
+				}
+			});
+
+			return Stream.of(listFiles).collect(Collectors.toList());
+		}
+		return Collections.emptyList();
+
+	}
+
+	/**
+	 * @return
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 5.
+	 */
+	public boolean isUsedCustomButton() {
+		return getButtonStyle().exists();
+	}
+
 }

@@ -9,6 +9,7 @@ package com.kyj.fx.voeditor.visual.component.config.skin;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -16,23 +17,31 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jfoenix.controls.JFXToggleButton;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -50,6 +59,7 @@ import javafx.util.Pair;
 public class SkinPreviewViewComposite extends BorderPane {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SkinPreviewViewComposite.class);
+	/**********************************************************************************************/
 	@FXML
 	private MenuBar mbSample;
 	@FXML
@@ -59,7 +69,28 @@ public class SkinPreviewViewComposite extends BorderPane {
 	private TabPane tabpaneSample;
 
 	@FXML
-	private ColorPicker colorMbSample, colorMbLabelSample, colorHboxSample, colorTabSample1Selected, colorSelectedTabText, colorUnSelectedTabText;
+	private ColorPicker colorMbSample, colorMbLabelSample, colorHboxSample, colorTabSample1Selected, colorSelectedTabText,
+			colorUnSelectedTabText;
+	/**********************************************************************************************/
+
+	/**********************************************************************************************/
+	//Button Tab
+
+	@FXML
+	private TableView<File> tbBtnSkins;
+	@FXML
+	private TableColumn<File, String> colSkinName;
+	@FXML
+	private TableColumn<File, String> colPreview;
+	@FXML
+	private BorderPane borPreview;
+	@FXML
+	private JFXToggleButton tgbUseBtnDefault;
+
+	@FXML
+	private TextArea txtStyle;
+
+	/**********************************************************************************************/
 
 	public SkinPreviewViewComposite() {
 		try {
@@ -74,8 +105,18 @@ public class SkinPreviewViewComposite extends BorderPane {
 
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 5.
+	 */
+	private void loadButtonStyles() {
+		tbBtnSkins.getItems().addAll(SkinManager.getInstance().getButtonSkinFiles());
+	}
+
+	private StringProperty selectedBtnStyleClassName = new SimpleStringProperty();
+
 	@FxPostInitialize
-	public void afterInit() {
+	public void previewTabInit() {
 		Task<Void> task = new Task<Void>() {
 
 			@Override
@@ -88,7 +129,7 @@ public class SkinPreviewViewComposite extends BorderPane {
 						Background background = mbSample.getBackground();
 						Color fill = (Color) background.getFills().get(0).getFill();
 						colorMbSample.setValue(fill);
-						
+
 						//메뉴바 텍스트
 						{
 							Label lookup = (Label) mbSample.lookup(".label");
@@ -152,6 +193,61 @@ public class SkinPreviewViewComposite extends BorderPane {
 			FxUtil.showLoading(task);
 	}
 
+	@FxPostInitialize
+	public void buttonTabInit() {
+		loadButtonStyles();
+
+		if (SkinManager.getInstance().isUsedCustomButton()) {
+			tgbUseBtnDefault.setSelected(false);
+			tbBtnSkins.setOpacity(1.0d);
+		} else {
+			tbBtnSkins.setOpacity(0.5d);
+		}
+
+		tgbUseBtnDefault.selectedProperty().addListener((oba, o, n) -> {
+			if (n) {
+				tbBtnSkins.setOpacity(0.5d);
+			} else
+				tbBtnSkins.setOpacity(1.0d);
+		});
+
+		colSkinName.setCellValueFactory(param -> {
+			return new SimpleStringProperty(param.getValue().getName());
+		});
+
+		tbBtnSkins.getSelectionModel().selectedItemProperty().addListener((oba, o, n) -> {
+			File selectedItem = n;
+
+			if (selectedItem != null && selectedItem.exists()) {
+
+				String readFile = FileUtil.readFile(selectedItem, true, null);
+				txtStyle.setText(readFile);
+
+				try {
+					List<Node> findAllByNodes = FxUtil.findAllByNodes(borPreview, node -> node instanceof Button);
+					String className = String.format("%s", selectedItem.getName().replaceAll(".css", ""));
+
+					findAllByNodes.forEach(btn -> {
+						btn.getStyleClass().add("button");
+						btn.getStyleClass().add(className);
+					});
+
+					borPreview.getStylesheets().clear();
+					borPreview.getStylesheets().add(selectedItem.toURI().toURL().toExternalForm());
+					selectedBtnStyleClassName.set(className);
+					borPreview.applyCss();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			} else {
+				txtStyle.setText("");
+				selectedBtnStyleClassName.set(null);
+			}
+
+		});
+	}
+
 	/**
 	 * 스킨 적용 처리.
 	 * @작성자 : KYJ
@@ -168,8 +264,23 @@ public class SkinPreviewViewComposite extends BorderPane {
 
 				ObservableList<String> stylesheets = this.getScene().getStylesheets();
 				stylesheets.clear();
+
+				//기본 스킨
 				stylesheets.add(createUserCustomSkin.toURI().toURL().toExternalForm());
-				SkinManager.getInstance().applySkin(createUserCustomSkin);
+				
+				String btnStyleClass = null;
+				//버튼스킨
+				if (!tgbUseBtnDefault.isSelected()) {
+					
+					if (ValueUtil.isNotEmpty(selectedBtnStyleClassName.get())) {
+						btnStyleClass = selectedBtnStyleClassName.get();
+//						SkinManager.getInstance().registButtonSyleClass(btnStyleClass);
+						SkinManager.getInstance().applyBtnSyleClass(btnStyleClass);
+					}
+				}
+				
+				SkinManager.getInstance().applySkin(createUserCustomSkin , btnStyleClass);
+
 			}
 		} catch (IOException e) {
 			LOGGER.error(ValueUtil.toString(e));
@@ -187,33 +298,30 @@ public class SkinPreviewViewComposite extends BorderPane {
 		String skinTemplate = SkinTemplate.getSkinTemplate();
 		//		colorMbSample, colorHboxSample, colorTabSample1Selected, colorSelectedTabText, colorUnSelectedTabText;
 		Map<String, Object> param = new HashMap<>();
-		
-		
-//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().brighter()));
-//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().darker()));
-//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().desaturate()));
-//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().grayscale()));
-//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().invert()));
-//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().saturate()));
-		
-		
-		
+
+		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().brighter()));
+		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().darker()));
+		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().desaturate()));
+		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().grayscale()));
+		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().invert()));
+		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().saturate()));
+
 		param.put(SkinTemplate.MENU_BAR, FxUtil.toWebString(colorMbSample.getValue()));
 		param.put(SkinTemplate.MENU_BAR_OPACITY, colorMbSample.getValue().getOpacity());
-		
+
 		System.out.println(colorMbSample.getOpacity());
 		param.put(SkinTemplate.MENU_BAR_LABEL, FxUtil.toWebString(colorMbLabelSample.getValue()));
 		param.put(SkinTemplate.MENU_BAR_LABEL_OPACITY, colorMbLabelSample.getValue().getOpacity());
-		
+
 		param.put(SkinTemplate.KEY_HBOX, FxUtil.toWebString(colorHboxSample.getValue()));
 		param.put(SkinTemplate.KEY_HBOX_OPACITY, colorHboxSample.getValue().getOpacity());
-		
+
 		param.put(SkinTemplate.KEY_TAB, FxUtil.toWebString(colorTabSample1Selected.getValue()));
 		param.put(SkinTemplate.KEY_TAB_OPACITY, colorTabSample1Selected.getValue().getOpacity());
-		
+
 		param.put(SkinTemplate.MENU_TAB_SELECTED, FxUtil.toWebString(colorSelectedTabText.getValue()));
 		param.put(SkinTemplate.MENU_TAB_SELECTED_OPACITY, colorSelectedTabText.getValue().getOpacity());
-		
+
 		param.put(SkinTemplate.MENU_TAB_UNSELECTED, FxUtil.toWebString(colorUnSelectedTabText.getValue()));
 		param.put(SkinTemplate.MENU_TAB_UNSELECTED_OPACITY, colorUnSelectedTabText.getValue().getOpacity());
 
@@ -230,7 +338,7 @@ public class SkinPreviewViewComposite extends BorderPane {
 	public void btnResetOnAction() {
 		SkinManager.getInstance().resetSkin(this.getScene());
 		SkinManager.getInstance().resetSkin();
-		afterInit();
+		previewTabInit();
 	}
 
 	/**
@@ -239,7 +347,8 @@ public class SkinPreviewViewComposite extends BorderPane {
 	 */
 	public void btnSaveOnAction() {
 
-		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog(FxUtil.getWindow(this), "Skin Name", "Input Your Skin Name");
+		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog(FxUtil.getWindow(this), "Skin Name",
+				"Input Your Skin Name");
 		showInputDialog.ifPresent(v -> {
 			if ("OK".equalsIgnoreCase(v.getKey())) {
 
@@ -259,6 +368,17 @@ public class SkinPreviewViewComposite extends BorderPane {
 					if (createUserCustomSkin.renameTo(dest)) {
 						SkinManager.getInstance().applySkin(dest);
 						SkinManager.getInstance().registSkin(dest.getAbsolutePath());
+
+						//버튼스킨
+						if (!tgbUseBtnDefault.isSelected()) {
+
+							String btnStyleClass = selectedBtnStyleClassName.get();
+							if (ValueUtil.isNotEmpty(btnStyleClass)) {
+								//SkinManager.getInstance().applyBtnSyleClass(btnStyleClass);
+								SkinManager.getInstance().registButtonSyleClass(btnStyleClass);
+							}
+						}
+
 					} else {
 						DialogUtil.showMessageDialog("저장에 실패하였습니다.");
 						return;

@@ -56,7 +56,7 @@ public class KeyValue {
 
 	@Override
 	public String toString() {
-		return key.get() + " , " + value.get();
+		return "[" + key.get() + "] , [" + value.get() + "]";
 	}
 
 	@Override

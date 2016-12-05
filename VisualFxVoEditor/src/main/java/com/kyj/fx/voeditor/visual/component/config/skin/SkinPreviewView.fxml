@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ColorPicker?>
@@ -7,17 +8,22 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<fx:root prefHeight="454.0" prefWidth="666.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="657.0" prefWidth="666.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
       <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
          <tabs>
@@ -152,7 +158,85 @@
             		</BorderPane>
                </content>
             </Tab>
-            <Tab text="Button" />
+            <Tab fx:id="tabButton" text="Button">
+               <content>
+                  <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                     <top>
+                        <HBox BorderPane.alignment="CENTER">
+                           <children>
+                              <JFXToggleButton fx:id="tgbUseBtnDefault" selected="true" text="Use Default Button Skin" />
+                           </children>
+                        </HBox>
+                     </top>
+                     <bottom>
+                        <BorderPane fx:id="borPreview" BorderPane.alignment="CENTER">
+                           <center>
+                              <VBox spacing="5.0" style="-fx-border-color: gray; -fx-border-radius: 15px;">
+                                 <children>
+                                    <HBox alignment="CENTER">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Button" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" spacing="10.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Button in Hbox" />
+                                          <Button mnemonicParsing="false" text="Button in Hbox" />
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                       <padding>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </padding>
+                                    </HBox>
+                                    <HBox alignment="CENTER">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Long Text Button 123456789" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </padding>
+                              </VBox>
+                           </center>
+                           <top>
+                              <HBox BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Label text="Preview" />
+                                 </children>
+                              </HBox>
+                           </top>
+                           <BorderPane.margin>
+                              <Insets bottom="5.0" />
+                           </BorderPane.margin>
+                        </BorderPane>
+                     </bottom>
+                     <center>
+                        <BorderPane BorderPane.alignment="CENTER">
+                           <BorderPane.margin>
+                              <Insets />
+                           </BorderPane.margin>
+                           <center>
+                              <SplitPane dividerPositions="0.5" orientation="VERTICAL" BorderPane.alignment="CENTER">
+                                 <items>
+                                    <TableView fx:id="tbBtnSkins" prefHeight="200.0" prefWidth="200.0">
+                                      <columns>
+                                        <TableColumn fx:id="colSkinName" prefWidth="473.0" text="Style Name" />
+                                      </columns>
+                                    </TableView>
+                                    <TextArea fx:id="txtStyle" editable="false" promptText="Style css" />
+                                 </items>
+                              </SplitPane>
+                           </center>
+                        </BorderPane>
+                     </center>
+                     <padding>
+                        <Insets left="5.0" right="5.0" />
+                     </padding>
+                  </BorderPane>
+               </content></Tab>
          </tabs>
       </TabPane>
 	</center>
@@ -178,7 +262,7 @@
          <children>
             <Button fx:id="btnApply" mnemonicParsing="false" onAction="#btnApplyOnAction" prefWidth="80.0" text="Apply" />
             <Button fx:id="btnReset" mnemonicParsing="false" onAction="#btnResetOnAction" prefWidth="80.0" text="Reset" />
-            <Button fx:id="btnSave" mnemonicParsing="false" onAction="#btnSaveOnAction" prefWidth="120.0" text="Save And Close" />
+            <Button fx:id="btnSave" mnemonicParsing="false" onAction="#btnSaveOnAction" prefWidth="120.0" text="Savs as" />
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
