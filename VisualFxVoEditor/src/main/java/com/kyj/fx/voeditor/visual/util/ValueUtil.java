@@ -1072,7 +1072,7 @@ public class ValueUtil {
 						Method declaredMethod = dvo.getClass().getDeclaredMethod("get".concat(prefixUpperText));
 
 						if (declaredMethod != null) {
-//							Object value = declaredMethod.invoke(dvo);
+							//							Object value = declaredMethod.invoke(dvo);
 
 							// if (ObjectUtil.isNotEmpty(value)) {
 							columnsBuffer.append(column).append(",\n");
@@ -1582,6 +1582,7 @@ public class ValueUtil {
 		int docCount = tf_IDFMatrix.length;
 		int wordCount = tf_IDFMatrix[0].length;
 
+		//평균계산.
 		double[] average = new double[wordCount];
 		for (int docIndex = 0; docIndex < tf_IDFMatrix.length; docIndex++) {
 			double[] wordIndexTable = tf_IDFMatrix[docIndex];
@@ -1734,6 +1735,9 @@ public class ValueUtil {
 				isMatch = true;
 				break;
 			case '‘':
+				isMatch = true;
+				break;
+			case ' ':
 				isMatch = true;
 				break;
 			}
