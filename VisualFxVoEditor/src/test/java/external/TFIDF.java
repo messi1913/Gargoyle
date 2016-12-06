@@ -56,7 +56,7 @@ public class TFIDF {
 		URL url;
 		url = new URL("https://search.naver.com/search.naver?where=nexearch&query=%ED%91%9C%EC%B0%BD%EC%9B%90&sm=top_hty&fbm=1&ie=utf8");
 
-		Set<String> reqeustSSL = RequestUtil.reqeustSSL(url, (is, code) -> {
+		Set<String> reqeustSSL = RequestUtil.requestSSL(url, (is, code) -> {
 
 			Set<String> collect = Collections.emptySet();
 			try {
@@ -139,7 +139,7 @@ public class TFIDF {
 			try {
 
 				if (link.startsWith("https")) {
-					model = RequestUtil.reqeustSSL(new URL(link), (is, code) -> {
+					model = RequestUtil.requestSSL(new URL(link), (is, code) -> {
 
 						if (code == 200) {
 							try {
@@ -249,7 +249,7 @@ public class TFIDF {
 	@Test
 	public void simple() throws MalformedURLException, Exception {
 
-		String reqeustSSL = RequestUtil.reqeustSSL(
+		String reqeustSSL = RequestUtil.requestSSL(
 				new URL("https://search.naver.com/search.naver?where=nexearch&sm=tab_htf&ie=utf8&query=%EA%B9%80%EB%AC%B4%EC%84%B1+%EB%8C%80%EC%84%A0+%EB%B6%88%EC%B6%9C%EB%A7%88"),
 				(is, resCode) -> {
 

@@ -1072,7 +1072,7 @@ public class ValueUtil {
 						Method declaredMethod = dvo.getClass().getDeclaredMethod("get".concat(prefixUpperText));
 
 						if (declaredMethod != null) {
-							Object value = declaredMethod.invoke(dvo);
+//							Object value = declaredMethod.invoke(dvo);
 
 							// if (ObjectUtil.isNotEmpty(value)) {
 							columnsBuffer.append(column).append(",\n");
@@ -1579,19 +1579,30 @@ public class ValueUtil {
 		double[][] tf_IDFMatrix = tf_IDF.getTF_IDFMatrix();
 		List<KeyValue> arrayList = new ArrayList<>();
 
+		int docCount = tf_IDFMatrix.length;
+		int wordCount = tf_IDFMatrix[0].length;
+
+		double[] average = new double[wordCount];
 		for (int docIndex = 0; docIndex < tf_IDFMatrix.length; docIndex++) {
 			double[] wordIndexTable = tf_IDFMatrix[docIndex];
 
 			for (int wordIndex = 0; wordIndex < wordIndexTable.length; wordIndex++) {
 
-				// 영향도가 없는것은 제거.
+				//				// 영향도가 없는것은 제거.
+				//
+				//				if (wordIndexTable[wordIndex] == 0.0d)
+				//					continue;
 
-				if (wordIndexTable[wordIndex] == 0.0d)
-					continue;
-
-				double important = wordIndexTable[wordIndex] * 10;
-				arrayList.add(new KeyValue(words[wordIndex], important));
+				//				double important = wordIndexTable[wordIndex] * 10;
+				//				arrayList.add(new KeyValue(words[wordIndex], important));
+				average[wordIndex] = wordIndexTable[wordIndex] + average[wordIndex];
 			}
+		}
+
+		for (int i = 0; i < average.length; i++) {
+			String keyword = words[i];
+			average[i] = average[i] / docCount;
+			arrayList.add(new KeyValue(keyword, average[i]));
 		}
 
 		Collections.sort(arrayList, new Comparator<KeyValue>() {
@@ -1604,5 +1615,135 @@ public class ValueUtil {
 			}
 		});
 		return arrayList;
+	}
+
+	/**
+	 * 단어에서 '특수문자'만을 제거한 텍스트를 리턴한다. <br/>
+	 *
+	 * 공백 \t \n 등과같은 기호는 제외,
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 6.
+	 * @param word
+	 */
+	public static String removeSpecialCharacter(String word) {
+		if (word == null)
+			return word;
+
+		int length = word.length();
+		if (length == 0)
+			return "";
+
+		char[] charArray = word.toCharArray();
+		int index = 0;
+		char[] newChars = new char[length];
+		for (char c : charArray) {
+			boolean isMatch = false;
+
+			switch (c) {
+			case '`':
+				isMatch = true;
+				break;
+			case '!':
+				isMatch = true;
+				break;
+			case '@':
+				isMatch = true;
+				break;
+			case '#':
+				isMatch = true;
+				break;
+			case '$':
+				isMatch = true;
+				break;
+			case '%':
+				isMatch = true;
+				break;
+			case '^':
+				isMatch = true;
+				break;
+			case '&':
+				isMatch = true;
+				break;
+			case '*':
+				isMatch = true;
+				break;
+			case '(':
+				isMatch = true;
+				break;
+			case ')':
+				isMatch = true;
+				break;
+			case '_':
+				isMatch = true;
+				break;
+			case '-':
+				isMatch = true;
+				break;
+			case '|':
+				isMatch = true;
+				break;
+			case '+':
+				isMatch = true;
+				break;
+			case '=':
+				isMatch = true;
+				break;
+			case '\\':
+				isMatch = true;
+				break;
+			case '/':
+				isMatch = true;
+				break;
+			case '"':
+				isMatch = true;
+				break;
+			case ',':
+				isMatch = true;
+				break;
+			case '\'':
+				isMatch = true;
+				break;
+			case '[':
+				isMatch = true;
+				break;
+			case ']':
+				isMatch = true;
+				break;
+			case ':':
+				isMatch = true;
+				break;
+			case ';':
+				isMatch = true;
+				break;
+			case '?':
+				isMatch = true;
+				break;
+			case '<':
+				isMatch = true;
+				break;
+			case '>':
+				isMatch = true;
+				break;
+			case '.':
+				isMatch = true;
+				break;
+			case '”':
+				isMatch = true;
+				break;
+			case '“':
+				isMatch = true;
+				break;
+			case '‘':
+				isMatch = true;
+				break;
+			}
+
+			if (!isMatch) {
+				newChars[index++] = c;
+			}
+
+		}
+
+		return new String(newChars, 0, index);
 	}
 }

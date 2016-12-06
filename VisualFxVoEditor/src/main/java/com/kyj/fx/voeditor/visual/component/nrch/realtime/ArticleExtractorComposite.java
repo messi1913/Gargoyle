@@ -284,7 +284,7 @@ public class ArticleExtractorComposite extends BorderPane {
 	BinaryOperator<String> accumulator = (v1, v2) -> {
 		return String.format("%s\n%s", v1.toString(), v2.toString());
 	};
-	Function<? super KeyValue, String> mapper = v -> String.format("%s : %s", v.getKey(), v.getValue().toString());
+	Function<? super KeyValue, String> mapper = v -> String.format("[%s] : [%1.5f]", v.getKey(), v.getValue());
 
 	public void request(Class<? extends ExtractorBase> algorism, RealtimeSearchItemVO userData) {
 		request(algorism, userData.getLink());

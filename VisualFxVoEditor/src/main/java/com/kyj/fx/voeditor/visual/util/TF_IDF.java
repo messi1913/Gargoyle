@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.tools.ant.util.regexp.RegexpUtil;
+
 /**
  * @author KYJ
  *
@@ -43,7 +45,7 @@ class TF_IDF {
 			filtered.add("이에");
 			filtered.add("않는");
 			filtered.add("있습니다.");
-			
+
 		}
 
 		public static boolean isFiltering(String content) {
@@ -72,10 +74,13 @@ class TF_IDF {
 		int nextIdx = 0;
 		for (String doc : docs) {
 			// 공백분리를 정규식으로 바꿈. - 공백이 분석에 영향을 끼치는듯보이므로..
-			for (String word : doc.split("\\s+")) {
+			String[] split = docSplit(doc);
+			for (String word : split) {
 
 				if (TextFilter.isFiltering(word))
 					continue;
+
+				word = ValueUtil.removeSpecialCharacter(word);
 
 				// for (String word : doc.split(" ")) {
 				if (!mapWordToIdx.containsKey(word)) {
@@ -107,12 +112,14 @@ class TF_IDF {
 		}
 		for (int docIdx = 0; docIdx < docs.length; docIdx++) {
 			String doc = docs[docIdx];
-			String[] split = doc.split("\\s+");
+			String[] split = docSplit(doc);
 			String[] words = split;
 			for (String word : words) {
 
 				if (TextFilter.isFiltering(word))
 					continue;
+
+				word = ValueUtil.removeSpecialCharacter(word);
 
 				docLength[docIdx] = words.length;
 				int wordIdx = mapWordToIdx.get(word);
@@ -136,9 +143,11 @@ class TF_IDF {
 		}
 		for (int docIdx = 0; docIdx < docs.length; docIdx++) {
 			String doc = docs[docIdx];
-			for (String word : doc.split("\\s+")) {
+			for (String word : docSplit(doc)) {
 				if (TextFilter.isFiltering(word))
 					continue;
+
+				word = ValueUtil.removeSpecialCharacter(word);
 
 				int wordIdx = mapWordToIdx.get(word);
 				tfMatrix[docIdx][wordIdx] = tfMatrix[docIdx][wordIdx] + 1;
@@ -165,6 +174,11 @@ class TF_IDF {
 			}
 		}
 
+	}
+
+	private String[] docSplit(String doc) {
+		String[] split = doc.split("\\s+");
+		return split;
 	}
 
 	public double[][] getTF_IDFMatrix() {
