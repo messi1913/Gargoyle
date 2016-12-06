@@ -7,17 +7,28 @@
 package com.kyj.fx.voeditor.visual.component.nrch.realtime;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -47,6 +58,9 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Worker;
+import javafx.concurrent.Worker.State;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -54,6 +68,7 @@ import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -166,6 +181,38 @@ public class ArticleExtractorComposite extends BorderPane {
 			request(userData);
 		});
 
+		WebEngine engine = webPreview.getEngine();
+		engine.getLoadWorker().messageProperty().addListener((oba, o, n) -> {
+			LOGGER.debug("Browser Message : {}", n);
+		});
+
+		//HTML 코드를 engine에서 얻기위한 처리가 필요함.
+		engine.getLoadWorker().stateProperty().addListener((ChangeListener<State>) (ov, oldState, newState) -> {
+			if (newState == Worker.State.SUCCEEDED) {
+				org.w3c.dom.Document doc = engine.getDocument();
+				try {
+					Transformer transformer = TransformerFactory.newInstance().newTransformer();
+					transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+					transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+					transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+					transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+					transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+					try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+						try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8")) {
+							transformer.transform(new DOMSource(doc), new StreamResult(writer));
+							Class<? extends ExtractorBase> algorism = cbAlgorisms.getValue();
+							String boilderPipe = boilderPipe(algorism, outputStream.toString("UTF-8"));
+							txtResult.setText(boilderPipe);
+						}
+					}
+
+				} catch (Exception ex) {
+					LOGGER.error(ValueUtil.toString(ex));
+				}
+			}
+		});
 	}
 
 	public void request(RealtimeSearchItemVO userData) {
@@ -194,7 +241,7 @@ public class ArticleExtractorComposite extends BorderPane {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error(ValueUtil.toString(e));
 		}
 	}
 
@@ -215,62 +262,37 @@ public class ArticleExtractorComposite extends BorderPane {
 			URLModel model = URLModel.empty();
 			try {
 
+				BiFunction<InputStream, Charset, URLModel> response = (is, charset) -> {
+
+					URLModel urlModel = URLModel.empty();
+					try {
+
+						String content = ValueUtil.toString(is, charset);
+
+						Document parse = Jsoup.parse(content, "http");
+						Element head = parse.head();
+						Elements title = head.getElementsByTag("title");
+
+						urlModel = new URLModel(link, content);
+						urlModel.setTitle(title.text());
+					} catch (IOException e) {
+						return URLModel.empty();
+					} finally {
+						try {
+							is.close();
+						} catch (Exception e) {
+							LOGGER.error(ValueUtil.toString(e));
+						}
+					}
+
+					return urlModel;
+
+				};
+
 				if (link.startsWith("https")) {
-
-					model = RequestUtil.reqeustSSL200(new URL(link), (is, charset) -> {
-
-						URLModel urlModel = URLModel.empty();
-						try {
-
-							String content = ValueUtil.toString(is, charset);
-
-							Document parse = Jsoup.parse(content, "http");
-							Element head = parse.head();
-							Elements title = head.getElementsByTag("title");
-
-							urlModel = new URLModel(link, content);
-							urlModel.setTitle(title.text());
-						} catch (IOException e) {
-							urlModel = URLModel.empty();
-						} finally {
-							try {
-								is.close();
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-
-						return urlModel;
-
-					}, false);
+					model = RequestUtil.reqeustSSL200(new URL(link), response, false);
 				} else {
-
-					model = RequestUtil.request200(new URL(link), (is, charset) -> {
-
-						URLModel urlModel = URLModel.empty();
-						try {
-
-							String content = ValueUtil.toString(is, charset);
-
-							Document parse = Jsoup.parse(content, "http");
-							Element head = parse.head();
-							Elements title = head.getElementsByTag("title");
-
-							urlModel = new URLModel(link, content);
-							urlModel.setTitle(title.text());
-						} catch (IOException e) {
-							return URLModel.empty();
-						} finally {
-							try {
-								is.close();
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-
-						return urlModel;
-
-					}, false);
+					model = RequestUtil.request200(new URL(link), response, false);
 				}
 			} catch (Exception e) {
 				return URLModel.empty();
@@ -309,6 +331,8 @@ public class ArticleExtractorComposite extends BorderPane {
 
 		cbURLSmmy.getItems().clear();
 		cbURLSmmy.getItems().addAll(array);
+
+		ValueUtil.toTF_IDF(array).stream().map(mapper).reduce(accumulator).ifPresent(txtTfIdf::setText);
 	}
 
 	/**
@@ -429,14 +453,7 @@ public class ArticleExtractorComposite extends BorderPane {
 		try {
 
 			txtUrl.setText(toURL(userData).toString());
-
-			String content = userData.getContent();
-			content = boilderPipe(algorism, content);
-
 			webPreview.getEngine().load(txtUrl.getText());
-			txtResult.setText(content);
-
-			ValueUtil.toTF_IDF(new String[] { content }).stream().map(mapper).reduce(accumulator).ifPresent(txtTfIdf::setText);
 
 		} catch (Exception e) {
 			txtResult.setText(ValueUtil.toString(e));
