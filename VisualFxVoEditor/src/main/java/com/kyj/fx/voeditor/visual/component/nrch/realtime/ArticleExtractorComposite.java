@@ -7,12 +7,9 @@
 package com.kyj.fx.voeditor.visual.component.nrch.realtime;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -23,12 +20,6 @@ import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -42,10 +33,8 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextArea;
 import com.kohlschutter.boilerpipe.document.TextDocument;
 import com.kohlschutter.boilerpipe.extractors.ArticleExtractor;
-import com.kohlschutter.boilerpipe.extractors.ArticleSentencesExtractor;
 import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
 import com.kohlschutter.boilerpipe.extractors.KeepEverythingExtractor;
-import com.kohlschutter.boilerpipe.extractors.KeepEverythingWithMinKWordsExtractor;
 import com.kohlschutter.boilerpipe.sax.BoilerpipeSAXInput;
 import com.kyj.fx.voeditor.visual.framework.KeyValue;
 import com.kyj.fx.voeditor.visual.framework.RealtimeSearchItemVO;
@@ -58,9 +47,6 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.concurrent.Worker;
-import javafx.concurrent.Worker.State;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -68,7 +54,6 @@ import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -86,7 +71,7 @@ public class ArticleExtractorComposite extends BorderPane {
 	@FXML
 	private JFXComboBox<Class<? extends ExtractorBase>> cbAlgorisms;
 	@FXML
-	private JFXComboBox<URLModel> cbURLSmmy;
+	private JFXComboBox<URLModel> cbSmmy;
 
 	@FXML
 	private JFXTextArea txtResult, txtTfIdf, txtSummary;
@@ -97,7 +82,14 @@ public class ArticleExtractorComposite extends BorderPane {
 
 	private RealtimeSearchItemVO userData;
 
+	/**
+	 * 불필요한 URL을 제거하기 위해 URL정보를 저장관리하는 클래스.
+	 * @최초생성일 2016. 12. 6.
+	 */
+	private URLFilterRepository filterRepository;
+
 	public ArticleExtractorComposite() {
+		filterRepository = new URLFilterRepository();
 		FxUtil.loadRoot(ArticleExtractorComposite.class, this, e -> LOGGER.error(ValueUtil.toString(e)));
 	}
 
@@ -145,11 +137,32 @@ public class ArticleExtractorComposite extends BorderPane {
 				return null;
 			}
 		});
+
 		cbAlgorisms.valueProperty().addListener((oba, o, n) -> {
-			request(userData);
+
+			Class<? extends ExtractorBase> algorism = n;
+			String baseURI = txtUrl.getText(); //webPreview.getEngine().getDocument().getBaseURI();
+
+			if (ValueUtil.isEmpty(baseURI))
+				return;
+
+			RealtimeSearchItemVO vo = new RealtimeSearchItemVO();
+			vo.setLink(baseURI);
+
+			try {
+				URLModel htmlContent = getHTMLContent(vo);
+				if (!htmlContent.isEmpty()) {
+
+					String boilderPipe = boilderPipe(algorism, htmlContent.getContent());
+					txtResult.setText(boilderPipe);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 		});
 
-		cbURLSmmy.valueProperty().addListener((oba, o, n) -> {
+		cbSmmy.valueProperty().addListener((oba, o, n) -> {
 			txtSummary.setText(n.getUrl());
 			txtSummary.nextWord();
 			txtSummary.appendText(n.getContent());
@@ -167,7 +180,7 @@ public class ArticleExtractorComposite extends BorderPane {
 			}
 		};
 
-		cbURLSmmy.setCellFactory(param -> {
+		cbSmmy.setCellFactory(param -> {
 			TextFieldListCell<URLModel> textFieldListCell = new TextFieldListCell<>(converter);
 			textFieldListCell.setMaxWidth(600d);
 			textFieldListCell.setPrefWidth(600d);
@@ -176,50 +189,95 @@ public class ArticleExtractorComposite extends BorderPane {
 
 		/** Size the combo-box drop down list. */
 
-		cbURLSmmy.setConverter(converter);
+		cbSmmy.setConverter(converter);
 		Platform.runLater(() -> {
 			request(userData);
+
+			//			Platform.runLater(() -> {
+			//				WebEngine engine = webPreview.getEngine();
+			//				engine.getLoadWorker().stateProperty().addListener((ChangeListener<State>) (ov, oldState, newState) -> {
+			//					LOGGER.debug("{} - {}", newState.name(), engine.getLocation());
+			//
+			//					if (newState == Worker.State.RUNNING) {
+			//						String location = engine.getLocation();
+			//						if (ValueUtil.isNotEmpty(location)) {
+			//
+			//							Class<? extends ExtractorBase> algorism = cbAlgorisms.getValue();
+			//							RealtimeSearchItemVO vo = new RealtimeSearchItemVO();
+			//							vo.setLink(location);
+			//							try {
+			//								updateMainContent(algorism, getHTMLContent(vo));
+			//							} catch (Exception e) {
+			//								e.printStackTrace();
+			//							}
+			//						}
+			//
+			//					}
+			//				});
+
+			//			txtUrl.textProperty().addListener((oba, o, n) -> {
+			//
+			//				if (ValueUtil.isNotEmpty(n)) {
+			//					RealtimeSearchItemVO realtimeSearchItemVO = new RealtimeSearchItemVO();
+			//					realtimeSearchItemVO.setLink(n);
+			//					request(userData);
+			//				}
+			//
+			//			});
+
 		});
 
-		WebEngine engine = webPreview.getEngine();
-		engine.getLoadWorker().messageProperty().addListener((oba, o, n) -> {
-			LOGGER.debug("Browser Message : {}", n);
-		});
+		//		engine.load(url);
+		//		engine.getLoadWorker().messageProperty().addListener((oba, o, n) -> {
+		//			LOGGER.debug("Browser Message : {}", n);
+		//		});
+
+		//		engine.setJavaScriptEnabled(true);
 
 		//HTML 코드를 engine에서 얻기위한 처리가 필요함.
-		engine.getLoadWorker().stateProperty().addListener((ChangeListener<State>) (ov, oldState, newState) -> {
-			if (newState == Worker.State.SUCCEEDED) {
-				org.w3c.dom.Document doc = engine.getDocument();
-				try {
-					Transformer transformer = TransformerFactory.newInstance().newTransformer();
-					transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-					transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-					transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-					transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-					transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-					try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-
-						try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8")) {
-							transformer.transform(new DOMSource(doc), new StreamResult(writer));
-							Class<? extends ExtractorBase> algorism = cbAlgorisms.getValue();
-							String boilderPipe = boilderPipe(algorism, outputStream.toString("UTF-8"));
-							txtResult.setText(boilderPipe);
-						}
-					}
-
-				} catch (Exception ex) {
-					LOGGER.error(ValueUtil.toString(ex));
-				}
-			}
-		});
+		//				org.w3c.dom.Document doc = engine.getDocument();
+		//				try {
+		//					Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		//					transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+		//					transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+		//					transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		//					transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+		//					transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+		//
+		//					try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+		//
+		//						try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8")) {
+		//							transformer.transform(new DOMSource(doc), new StreamResult(writer));
+		//							Class<? extends ExtractorBase> algorism = cbAlgorisms.getValue();
+		//							String boilderPipe = boilderPipe(algorism, outputStream.toString("UTF-8"));
+		//							txtResult.setText(boilderPipe);
+		//						}
+		//					}
+		//
+		//				} catch (Exception ex) {
+		//					txtResult.setText(
+		//							String.format("[%s] Something Problems Occured. \n\nStackTrace : {}", newState.name(), ValueUtil.toString(ex)));
+		//				}
+		//			} else {
+		//				txtResult.setText("Waitings.... " + newState.name());
+		//			}
+		//		});
 	}
 
 	public void request(RealtimeSearchItemVO userData) {
 		SingleSelectionModel<Class<? extends ExtractorBase>> selectionModel = cbAlgorisms.getSelectionModel();
-		Class<? extends ExtractorBase> selectedItem = selectionModel.getSelectedItem();
-		if (selectedItem != null) {
-			request(selectedItem, userData);
+		Class<? extends ExtractorBase> selectAlgorism = selectionModel.getSelectedItem();
+		if (selectAlgorism != null) {
+			request(selectAlgorism, userData);
+		}
+	}
+
+	public void request(String url) {
+		SingleSelectionModel<Class<? extends ExtractorBase>> selectionModel = cbAlgorisms.getSelectionModel();
+		Class<? extends ExtractorBase> selectAlgorism = selectionModel.getSelectedItem();
+		if (selectAlgorism != null) {
+			request(selectAlgorism, url);
 		}
 	}
 
@@ -229,11 +287,21 @@ public class ArticleExtractorComposite extends BorderPane {
 	Function<? super KeyValue, String> mapper = v -> String.format("%s : %s", v.getKey(), v.getValue().toString());
 
 	public void request(Class<? extends ExtractorBase> algorism, RealtimeSearchItemVO userData) {
-		if (userData == null)
+		request(algorism, userData.getLink());
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 6.
+	 * @param selectAlgorism
+	 * @param url
+	 */
+	private void request(Class<? extends ExtractorBase> algorism, String url) {
+		if (ValueUtil.isEmpty(url))
 			return;
 
 		try {
-			URLModel model = getHTMLContent(userData);
+			URLModel model = getHTMLContent(url);
 
 			if (!model.isEmpty()) {
 				updateMainContent(algorism, model);
@@ -289,11 +357,8 @@ public class ArticleExtractorComposite extends BorderPane {
 
 				};
 
-				if (link.startsWith("https")) {
-					model = RequestUtil.reqeustSSL200(new URL(link), response, false);
-				} else {
-					model = RequestUtil.request200(new URL(link), response, false);
-				}
+				model = RequestUtil.req200(new URL(link), response, false);
+
 			} catch (Exception e) {
 				return URLModel.empty();
 			}
@@ -306,7 +371,7 @@ public class ArticleExtractorComposite extends BorderPane {
 
 			String content = v.getContent();
 
-			ExtractorBase instance = ArticleSentencesExtractor.getInstance();
+			ExtractorBase instance = null;
 			// 트위터의경우 특별한 알고리즘으로 텍스트 불러옴.
 			if (url.contains("twitter.com")) {
 				instance = KeepEverythingExtractor.INSTANCE;
@@ -329,10 +394,10 @@ public class ArticleExtractorComposite extends BorderPane {
 			return v;
 		}).filter(v -> !v.isEmpty()).toArray(URLModel[]::new);
 
-		cbURLSmmy.getItems().clear();
-		cbURLSmmy.getItems().addAll(array);
-
+		cbSmmy.getItems().clear();
+		cbSmmy.getItems().addAll(array);
 		ValueUtil.toTF_IDF(array).stream().map(mapper).reduce(accumulator).ifPresent(txtTfIdf::setText);
+		cbSmmy.getSelectionModel().select(0);
 	}
 
 	/**
@@ -354,66 +419,8 @@ public class ArticleExtractorComposite extends BorderPane {
 			collect = elementsByTag.stream().filter(e -> e.hasAttr("href")).map(e -> e.attr("href").trim())
 					/* http or https인 링크만 추출. */
 					.filter(e -> e.startsWith("http") || e.startsWith("https"))
-
 					/* 검색에 불필요한 URL */
-					.filter(v -> {
-
-						if ("https://submit.naver.com/".equals(v))
-							return false;
-
-						else if ("http://www.naver.com".equals(v))
-							return false;
-
-						else if (v.startsWith("https://nid.naver.com"))
-							return false;
-
-						else if (v.startsWith("http://searchad.naver.com"))
-							return false;
-
-						else if (v.contains("namu.wiki"))
-							return false;
-
-						else if (v.contains("wikipedia.org"))
-							return false;
-
-						else if (v.startsWith("http://music.naver.com"))
-							return false;
-
-						else if (v.startsWith("http://m.post.naver.com"))
-							return false;
-
-						else if (v.startsWith("http://tvcast.naver.com"))
-							return false;
-
-						else if (v.startsWith("http://shopping.naver.com"))
-							return false;
-
-						else if (v.startsWith("https://help.naver"))
-							return false;
-
-						else if (v.startsWith("http://www.navercorp.com"))
-							return false;
-
-						else if (v.startsWith("http://book.naver.com"))
-							return false;
-
-						else if (v.startsWith("http://www.cwpyo.com"))
-							return false;
-
-						else if (v.startsWith("http://navercast.naver.com"))
-							return false;
-
-						else if (v.startsWith("http://localad.naver.com"))
-							return false;
-
-						else if (v.startsWith("http://map.naver.com/"))
-							return false;
-
-						else if (v.startsWith("http://pay.naver.com"))
-							return false;
-
-						return v.contains("news");
-					}).collect(Collectors.toSet());
+					.filter(filterRepository.getFilter()).collect(Collectors.toSet());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -425,7 +432,8 @@ public class ArticleExtractorComposite extends BorderPane {
 		if (userData == null || ValueUtil.isEmpty(userData.getLink()))
 			return null;
 		URL url = toURL(userData);
-		String str = RequestUtil.reqeustSSL(url, (st, code) -> {
+
+		String str = RequestUtil.requestSSL(url, (st, code) -> {
 			if (code == 200) {
 				try {
 					return ValueUtil.toString(st);
@@ -441,20 +449,49 @@ public class ArticleExtractorComposite extends BorderPane {
 		return new URLModel(userData.getLink(), str);
 	}
 
+	private URLModel getHTMLContent(String url) throws Exception {
+		if (ValueUtil.isEmpty(url))
+			return null;
+		URL url2 = toURL(url);
+		String str = RequestUtil.req(url2, (st, code) -> {
+			if (code == 200) {
+				try {
+					return ValueUtil.toString(st);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			return null;
+		});
+
+		if (str == null)
+			return URLModel.empty();
+
+		return new URLModel(url2.toString(), str);
+	}
+
 	private URL toURL(RealtimeSearchItemVO userData) throws MalformedURLException {
-		return new URL("https:" + userData.getLink());
+		return toURL(userData.getLink());
 	}
 
 	private URL toURL(URLModel userData) throws MalformedURLException {
-		return new URL("https:" + userData.getUrl());
+		return toURL(userData.getUrl());
+	}
+
+	private URL toURL(String url) throws MalformedURLException {
+		if (url.startsWith("https:") || url.startsWith("http:"))
+			return new URL(url);
+		return new URL("https:" + url);
 	}
 
 	private void updateMainContent(Class<? extends ExtractorBase> algorism, URLModel userData) {
 		try {
 
-			txtUrl.setText(toURL(userData).toString());
+			URL url = toURL(userData);
+			txtUrl.setText(url.toString());
 			webPreview.getEngine().load(txtUrl.getText());
-
+			String content = userData.getContent();
+			txtResult.setText(boilderPipe(algorism, content));
 		} catch (Exception e) {
 			txtResult.setText(ValueUtil.toString(e));
 			txtTfIdf.setText("");
@@ -469,17 +506,7 @@ public class ArticleExtractorComposite extends BorderPane {
 			final BoilerpipeSAXInput in = new BoilerpipeSAXInput(inputSource);
 			final TextDocument doc = in.getTextDocument();
 
-			if (algorism == KeepEverythingWithMinKWordsExtractor.class) {
-				content = new KeepEverythingWithMinKWordsExtractor(10).getText(doc);
-			}
-
-			try {
-				content = algorism.newInstance().getText(doc);
-			} catch (IllegalAccessException e) {
-				Field declaredField = algorism.getDeclaredField("INSTANCE");
-				ExtractorBase instance = (ExtractorBase) declaredField.get(null);
-				content = instance.getText(doc);
-			}
+			content = ValueUtil.HTML.newInsntance(algorism).getText(doc);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

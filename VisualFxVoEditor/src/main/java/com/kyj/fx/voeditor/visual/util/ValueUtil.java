@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.charset.Charset;
@@ -61,6 +62,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kohlschutter.boilerpipe.document.TextDocument;
 import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
+import com.kohlschutter.boilerpipe.extractors.KeepEverythingWithMinKWordsExtractor;
 import com.kohlschutter.boilerpipe.sax.BoilerpipeSAXInput;
 import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecSourceNullException;
 import com.kyj.fx.voeditor.visual.framework.KeyValue;
@@ -1449,6 +1451,55 @@ public class ValueUtil {
 		 */
 		public static List<Class<? extends ExtractorBase>> getAvaliablesExtractorBase() {
 			return AlgorismExtractor.getAvaliables();
+		}
+
+		/**
+		 * 알고리즘 인스턴스 생성.
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 12. 6.
+		 * @param algorism
+		 * @return
+		 * @throws Exception
+		 */
+		public static <K extends ExtractorBase> ExtractorBase newInsntance(Class<? extends ExtractorBase> algorism) throws Exception {
+			return newInsntance(algorism, null);
+		}
+
+		public static <K extends ExtractorBase> ExtractorBase newInsntance(Class<K> algorism,
+				Function<Class<K>, ExtractorBase> customInstance) throws Exception {
+			ExtractorBase instance = null;
+			if (algorism == KeepEverythingWithMinKWordsExtractor.class) {
+				//Custom Instance
+				if (customInstance != null)
+					instance = customInstance.apply(algorism);
+				//Default Instace
+				else
+					instance = new KeepEverythingWithMinKWordsExtractor(10);
+			} else {
+
+				//Custom Instance
+				if (customInstance != null) {
+					instance = customInstance.apply(algorism);
+				}
+
+				//Default Instace
+				else {
+					//Default Instace
+					try {
+						Field declaredField = algorism.getDeclaredField("INSTANCE");
+						instance = (ExtractorBase) declaredField.get(null);
+					} catch (NoSuchFieldException | IllegalAccessException | SecurityException e) {
+						try {
+							instance = algorism.newInstance();
+						} catch (ReflectiveOperationException e1) {
+							throw e1;
+						}
+					}
+				}
+
+			}
+
+			return instance;
 		}
 
 		/**

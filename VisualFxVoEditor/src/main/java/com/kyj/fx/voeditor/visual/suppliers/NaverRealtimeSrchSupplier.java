@@ -168,7 +168,7 @@ final class NaverRealtimeSearchFactory {
 
 		if (ValueUtil.isEmpty(realtimeSearch)) {
 
-			realtimeSearch = RequestUtil.reqeustSSL(new URL(NAVER_REALTIME_URL), (is, code) -> {
+			realtimeSearch = RequestUtil.requestSSL(new URL(NAVER_REALTIME_URL), (is, code) -> {
 				if (code == 200) {
 					try {
 						return ValueUtil.toString(is);

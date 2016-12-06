@@ -28,6 +28,8 @@ import javax.net.ssl.X509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.framework.URLModel;
+
 /**
  * @author KYJ
  *
@@ -106,7 +108,7 @@ public class RequestUtil {
 	}
 
 	public static String reqeustSSL_JSONString(URL url, BiFunction<InputStream, Integer, String> response) throws Exception {
-		return reqeustSSL(url, (is, code) -> {
+		return requestSSL(url, (is, code) -> {
 			String dirtyConent = "";
 			if (200 == code) {
 				// 버퍼로 그냥 읽어봐도 되지만 인코딩 변환을 추후 쉽게 처리하기 위해 ByteArrayOutputStream을
@@ -131,7 +133,39 @@ public class RequestUtil {
 		});
 	}
 
-	public static <T> T reqeustSSL(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 6.
+	 * @param url
+	 * @param response
+	 * @param b
+	 * @throws Exception
+	 */
+	public static <T> T req200(URL url, BiFunction<InputStream, Charset, T> response, boolean autoClose) throws Exception {
+		String protocol = url.getProtocol();
+
+		if ("http".equals(protocol))
+			return request200(url, response, autoClose);
+		else if ("https".equals(protocol)) {
+			return reqeustSSL200(url, response, autoClose);
+		}
+
+		return reqeustSSL200(url, response, autoClose);
+	}
+
+	public static <T> T req(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
+		String protocol = url.getProtocol();
+
+		if ("http".equals(protocol))
+			return request(url, response);
+		else if ("https".equals(protocol)) {
+			return requestSSL(url, response);
+		}
+
+		return reqeustSSL(url, response, true);
+	}
+
+	public static <T> T requestSSL(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
 		return reqeustSSL(url, response, true);
 	}
 

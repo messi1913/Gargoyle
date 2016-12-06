@@ -52,7 +52,7 @@ public class GoogleTrendExam extends Application {
 	public void start(Stage primaryStage) throws Exception {
 
 		URL url = new URL(createUrl());
-		String jsonString = RequestUtil.reqeustSSL(url, (is, code) -> {
+		String jsonString = RequestUtil.requestSSL(url, (is, code) -> {
 			String result = "";
 			if (200 == code) {
 

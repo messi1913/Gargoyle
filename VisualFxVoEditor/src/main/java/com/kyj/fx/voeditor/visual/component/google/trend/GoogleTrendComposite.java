@@ -320,7 +320,7 @@ public class GoogleTrendComposite extends BorderPane {
 	}
 
 	private String loadContent(URL url) throws IOException, Exception {
-		return RequestUtil.reqeustSSL(url, (is, code) -> {
+		return RequestUtil.requestSSL(url, (is, code) -> {
 			if (code == 200) {
 				try {
 					return ValueUtil.toString(is);
@@ -358,7 +358,7 @@ public class GoogleTrendComposite extends BorderPane {
 
 	private String request(String keywords) throws Exception {
 		URL url = new URL(createUrl(keywords));
-		String jsonString = RequestUtil.reqeustSSL(url, (is, code) -> {
+		String jsonString = RequestUtil.requestSSL(url, (is, code) -> {
 			String result = "";
 			if (200 == code || 203 == code) {
 
