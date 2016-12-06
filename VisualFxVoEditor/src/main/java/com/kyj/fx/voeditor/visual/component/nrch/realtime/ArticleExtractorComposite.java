@@ -84,6 +84,7 @@ public class ArticleExtractorComposite extends BorderPane {
 
 	/**
 	 * 불필요한 URL을 제거하기 위해 URL정보를 저장관리하는 클래스.
+	 * 
 	 * @최초생성일 2016. 12. 6.
 	 */
 	private URLFilterRepository filterRepository;
@@ -141,7 +142,7 @@ public class ArticleExtractorComposite extends BorderPane {
 		cbAlgorisms.valueProperty().addListener((oba, o, n) -> {
 
 			Class<? extends ExtractorBase> algorism = n;
-			String baseURI = txtUrl.getText(); //webPreview.getEngine().getDocument().getBaseURI();
+			String baseURI = txtUrl.getText(); // webPreview.getEngine().getDocument().getBaseURI();
 
 			if (ValueUtil.isEmpty(baseURI))
 				return;
@@ -193,76 +194,84 @@ public class ArticleExtractorComposite extends BorderPane {
 		Platform.runLater(() -> {
 			request(userData);
 
-			//			Platform.runLater(() -> {
-			//				WebEngine engine = webPreview.getEngine();
-			//				engine.getLoadWorker().stateProperty().addListener((ChangeListener<State>) (ov, oldState, newState) -> {
-			//					LOGGER.debug("{} - {}", newState.name(), engine.getLocation());
+			// Platform.runLater(() -> {
+			// WebEngine engine = webPreview.getEngine();
+			// engine.getLoadWorker().stateProperty().addListener((ChangeListener<State>)
+			// (ov, oldState, newState) -> {
+			// LOGGER.debug("{} - {}", newState.name(), engine.getLocation());
 			//
-			//					if (newState == Worker.State.RUNNING) {
-			//						String location = engine.getLocation();
-			//						if (ValueUtil.isNotEmpty(location)) {
+			// if (newState == Worker.State.RUNNING) {
+			// String location = engine.getLocation();
+			// if (ValueUtil.isNotEmpty(location)) {
 			//
-			//							Class<? extends ExtractorBase> algorism = cbAlgorisms.getValue();
-			//							RealtimeSearchItemVO vo = new RealtimeSearchItemVO();
-			//							vo.setLink(location);
-			//							try {
-			//								updateMainContent(algorism, getHTMLContent(vo));
-			//							} catch (Exception e) {
-			//								e.printStackTrace();
-			//							}
-			//						}
+			// Class<? extends ExtractorBase> algorism = cbAlgorisms.getValue();
+			// RealtimeSearchItemVO vo = new RealtimeSearchItemVO();
+			// vo.setLink(location);
+			// try {
+			// updateMainContent(algorism, getHTMLContent(vo));
+			// } catch (Exception e) {
+			// e.printStackTrace();
+			// }
+			// }
 			//
-			//					}
-			//				});
+			// }
+			// });
 
-			//			txtUrl.textProperty().addListener((oba, o, n) -> {
+			// txtUrl.textProperty().addListener((oba, o, n) -> {
 			//
-			//				if (ValueUtil.isNotEmpty(n)) {
-			//					RealtimeSearchItemVO realtimeSearchItemVO = new RealtimeSearchItemVO();
-			//					realtimeSearchItemVO.setLink(n);
-			//					request(userData);
-			//				}
+			// if (ValueUtil.isNotEmpty(n)) {
+			// RealtimeSearchItemVO realtimeSearchItemVO = new
+			// RealtimeSearchItemVO();
+			// realtimeSearchItemVO.setLink(n);
+			// request(userData);
+			// }
 			//
-			//			});
+			// });
 
 		});
 
-		//		engine.load(url);
-		//		engine.getLoadWorker().messageProperty().addListener((oba, o, n) -> {
-		//			LOGGER.debug("Browser Message : {}", n);
-		//		});
+		// engine.load(url);
+		// engine.getLoadWorker().messageProperty().addListener((oba, o, n) -> {
+		// LOGGER.debug("Browser Message : {}", n);
+		// });
 
-		//		engine.setJavaScriptEnabled(true);
+		// engine.setJavaScriptEnabled(true);
 
-		//HTML 코드를 engine에서 얻기위한 처리가 필요함.
+		// HTML 코드를 engine에서 얻기위한 처리가 필요함.
 
-		//				org.w3c.dom.Document doc = engine.getDocument();
-		//				try {
-		//					Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		//					transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-		//					transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-		//					transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		//					transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-		//					transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+		// org.w3c.dom.Document doc = engine.getDocument();
+		// try {
+		// Transformer transformer =
+		// TransformerFactory.newInstance().newTransformer();
+		// transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+		// transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+		// transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		// transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+		// transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount",
+		// "4");
 		//
-		//					try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+		// try (ByteArrayOutputStream outputStream = new
+		// ByteArrayOutputStream()) {
 		//
-		//						try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8")) {
-		//							transformer.transform(new DOMSource(doc), new StreamResult(writer));
-		//							Class<? extends ExtractorBase> algorism = cbAlgorisms.getValue();
-		//							String boilderPipe = boilderPipe(algorism, outputStream.toString("UTF-8"));
-		//							txtResult.setText(boilderPipe);
-		//						}
-		//					}
+		// try (OutputStreamWriter writer = new OutputStreamWriter(outputStream,
+		// "UTF-8")) {
+		// transformer.transform(new DOMSource(doc), new StreamResult(writer));
+		// Class<? extends ExtractorBase> algorism = cbAlgorisms.getValue();
+		// String boilderPipe = boilderPipe(algorism,
+		// outputStream.toString("UTF-8"));
+		// txtResult.setText(boilderPipe);
+		// }
+		// }
 		//
-		//				} catch (Exception ex) {
-		//					txtResult.setText(
-		//							String.format("[%s] Something Problems Occured. \n\nStackTrace : {}", newState.name(), ValueUtil.toString(ex)));
-		//				}
-		//			} else {
-		//				txtResult.setText("Waitings.... " + newState.name());
-		//			}
-		//		});
+		// } catch (Exception ex) {
+		// txtResult.setText(
+		// String.format("[%s] Something Problems Occured. \n\nStackTrace : {}",
+		// newState.name(), ValueUtil.toString(ex)));
+		// }
+		// } else {
+		// txtResult.setText("Waitings.... " + newState.name());
+		// }
+		// });
 	}
 
 	public void request(RealtimeSearchItemVO userData) {
@@ -281,10 +290,10 @@ public class ArticleExtractorComposite extends BorderPane {
 		}
 	}
 
-	BinaryOperator<String> accumulator = (v1, v2) -> {
+	private BinaryOperator<String> accumulator = (v1, v2) -> {
 		return String.format("%s\n%s", v1.toString(), v2.toString());
 	};
-	Function<? super KeyValue, String> mapper = v -> String.format("[%s] : [%1.5f]", v.getKey(), v.getValue());
+	private Function<? super KeyValue, String> mapper = v -> String.format("[%s] : [%1.5f]", v.getKey(), v.getValue());
 
 	public void request(Class<? extends ExtractorBase> algorism, RealtimeSearchItemVO userData) {
 		request(algorism, userData.getLink());
@@ -367,12 +376,15 @@ public class ArticleExtractorComposite extends BorderPane {
 		}).filter(v -> !v.isEmpty()).map(v ->
 
 		{
+			URLModel model = URLModel.empty();
+
 			String url = v.getUrl();
 
 			String content = v.getContent();
 
 			ExtractorBase instance = null;
 			// 트위터의경우 특별한 알고리즘으로 텍스트 불러옴.
+
 			if (url.contains("twitter.com")) {
 				instance = KeepEverythingExtractor.INSTANCE;
 			} else {
@@ -385,13 +397,18 @@ public class ArticleExtractorComposite extends BorderPane {
 			source.setEncoding("UTF-8");
 			try {
 				content = ValueUtil.HTML.getNewsContent(instance, source);
-				v.setContent(content);
+				// v.setContent(content);
+
+				model.setUrl(v.getUrl());
+				model.setContent(content);
+				model.setTitle(v.getTitle());
+
 			} catch (Exception e) {
-				v = URLModel.empty();
+				model = URLModel.empty();
 				e.printStackTrace();
 			}
 
-			return v;
+			return model;
 		}).filter(v -> !v.isEmpty()).toArray(URLModel[]::new);
 
 		cbSmmy.getItems().clear();

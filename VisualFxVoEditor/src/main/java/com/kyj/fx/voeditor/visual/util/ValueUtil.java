@@ -1072,7 +1072,7 @@ public class ValueUtil {
 						Method declaredMethod = dvo.getClass().getDeclaredMethod("get".concat(prefixUpperText));
 
 						if (declaredMethod != null) {
-							//							Object value = declaredMethod.invoke(dvo);
+							// Object value = declaredMethod.invoke(dvo);
 
 							// if (ObjectUtil.isNotEmpty(value)) {
 							columnsBuffer.append(column).append(",\n");
@@ -1374,9 +1374,9 @@ public class ValueUtil {
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 1.
 	 * @param inputStream
-	 * 		stream
+	 *            stream
 	 * @param charset
-	 * 		encoding
+	 *            encoding
 	 * @return
 	 * @throws IOException
 	 */
@@ -1431,9 +1431,11 @@ public class ValueUtil {
 				return Stream.of(reflections.getSubTypesOf(ExtractorBase.class)).filter(v -> {
 
 					if ((v.getClass().getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC) {
-						//					Optional<Constructor<?>> findAny = Stream.of(v.getClass().getConstructors()).filter(c -> c.getParameterCount() == 0)
-						//							.findFirst();
-						//					return findAny.isPresent();
+						// Optional<Constructor<?>> findAny =
+						// Stream.of(v.getClass().getConstructors()).filter(c ->
+						// c.getParameterCount() == 0)
+						// .findFirst();
+						// return findAny.isPresent();
 						return true;
 					}
 
@@ -1445,6 +1447,7 @@ public class ValueUtil {
 
 		/**
 		 * 사용가능한 뉴스분석 알고리즘 리턴.
+		 * 
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 5.
 		 * @return
@@ -1455,6 +1458,7 @@ public class ValueUtil {
 
 		/**
 		 * 알고리즘 인스턴스 생성.
+		 * 
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 6.
 		 * @param algorism
@@ -1469,22 +1473,22 @@ public class ValueUtil {
 				Function<Class<K>, ExtractorBase> customInstance) throws Exception {
 			ExtractorBase instance = null;
 			if (algorism == KeepEverythingWithMinKWordsExtractor.class) {
-				//Custom Instance
+				// Custom Instance
 				if (customInstance != null)
 					instance = customInstance.apply(algorism);
-				//Default Instace
+				// Default Instace
 				else
 					instance = new KeepEverythingWithMinKWordsExtractor(10);
 			} else {
 
-				//Custom Instance
+				// Custom Instance
 				if (customInstance != null) {
 					instance = customInstance.apply(algorism);
 				}
 
-				//Default Instace
+				// Default Instace
 				else {
-					//Default Instace
+					// Default Instace
 					try {
 						Field declaredField = algorism.getDeclaredField("INSTANCE");
 						instance = (ExtractorBase) declaredField.get(null);
@@ -1561,9 +1565,7 @@ public class ValueUtil {
 	}
 
 	public static List<KeyValue> toTF_IDF(URLModel[] models) {
-		String[] array = Stream.of(models).map(m -> {
-			return m.getContent();
-		}).toArray(String[]::new);
+		String[] array = Stream.of(models).map(m -> m.getContent()).filter(ValueUtil::isNotEmpty).toArray(String[]::new);
 		return toTF_IDF(array, true);
 	}
 
@@ -1582,20 +1584,12 @@ public class ValueUtil {
 		int docCount = tf_IDFMatrix.length;
 		int wordCount = tf_IDFMatrix[0].length;
 
-		//평균계산.
+		// 평균계산.
 		double[] average = new double[wordCount];
 		for (int docIndex = 0; docIndex < tf_IDFMatrix.length; docIndex++) {
 			double[] wordIndexTable = tf_IDFMatrix[docIndex];
 
 			for (int wordIndex = 0; wordIndex < wordIndexTable.length; wordIndex++) {
-
-				//				// 영향도가 없는것은 제거.
-				//
-				//				if (wordIndexTable[wordIndex] == 0.0d)
-				//					continue;
-
-				//				double important = wordIndexTable[wordIndex] * 10;
-				//				arrayList.add(new KeyValue(words[wordIndex], important));
 				average[wordIndex] = wordIndexTable[wordIndex] + average[wordIndex];
 			}
 		}
@@ -1622,6 +1616,7 @@ public class ValueUtil {
 	 * 단어에서 '특수문자'만을 제거한 텍스트를 리턴한다. <br/>
 	 *
 	 * 공백 \t \n 등과같은 기호는 제외,
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 6.
 	 * @param word

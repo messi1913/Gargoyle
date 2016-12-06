@@ -25,14 +25,7 @@ class TF_IDF {
 
 		static {
 			filtered.add(" ");
-			filtered.add("있다.");
-			filtered.add("를");
-			filtered.add("은");
-			filtered.add("는");
-			filtered.add("이");
-			filtered.add("가");
-			filtered.add("의");
-			filtered.add("에");
+			filtered.add("있다");
 			filtered.add("매우");
 			filtered.add("하지만");
 			filtered.add("나는");
@@ -46,6 +39,12 @@ class TF_IDF {
 			filtered.add("않는");
 			filtered.add("있습니다");
 			filtered.add("여러");
+			filtered.add("많이");
+			filtered.add("있을");
+			filtered.add("보는");
+			filtered.add("확인해");
+			filtered.add("주세요");
+			filtered.add("보세요");
 
 		}
 
@@ -56,7 +55,7 @@ class TF_IDF {
 		}
 
 		public static boolean isSingleWord(String content) {
-			return content.length() == 1;
+			return content.length() <= 1;
 		}
 
 	}
