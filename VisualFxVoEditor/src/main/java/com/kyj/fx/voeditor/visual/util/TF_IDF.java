@@ -44,7 +44,8 @@ class TF_IDF {
 			filtered.add("아닌");
 			filtered.add("이에");
 			filtered.add("않는");
-			filtered.add("있습니다.");
+			filtered.add("있습니다");
+			filtered.add("여러");
 
 		}
 
