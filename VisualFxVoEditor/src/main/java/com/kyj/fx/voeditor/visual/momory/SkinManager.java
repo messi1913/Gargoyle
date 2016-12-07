@@ -222,6 +222,25 @@ public final class SkinManager {
 	}
 
 	/**
+	 * return Button Skin URL
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 7.
+	 * @param btnStyleClass
+	 * @return
+	 */
+	public URL toButtonURL(String btnStyleClass) {
+		File file = new File(SKIN_BUTTON_TEPLATE_LOCATION, btnStyleClass + ".css");
+		if (file.exists()) {
+			try {
+				return file.toURI().toURL();
+			} catch (MalformedURLException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * 디폴트 스킨위치를 알려주는 URL을 리턴한다.
 	 *
 	 * @작성자 : KYJ
@@ -338,13 +357,10 @@ public final class SkinManager {
 	 */
 	public void applyBtnSyleClass(String btnStyleClass) {
 		ObservableList<String> stylesheets = SharedMemory.getPrimaryStage().getScene().getStylesheets();
-		File file = new File(SKIN_BUTTON_TEPLATE_LOCATION, btnStyleClass + ".css");
-		if (file.exists()) {
-			try {
-				stylesheets.add(file.toURI().toURL().toExternalForm());
-			} catch (MalformedURLException e) {
-				LOGGER.error(ValueUtil.toString(e));
-			}
+
+		URL buttonURL = toButtonURL(btnStyleClass);
+		if (buttonURL != null) {
+			stylesheets.add(buttonURL.toExternalForm());
 		}
 
 	}

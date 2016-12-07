@@ -86,6 +86,7 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
@@ -320,10 +321,9 @@ public class FxUtil {
 		InstanceTypes type = controller.instanceType();
 		N newInstance = null;
 		switch (type) {
-		case RequireNew:
-			newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, option, controllerAction);
-			break;
+
 		case Singleton:
+
 			Node node = FxMemory.get(fullClassName);
 			if (node == null) {
 				newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, option, controllerAction);
@@ -332,6 +332,10 @@ public class FxUtil {
 				newInstance = (N) node;
 			}
 
+			break;
+
+		case RequireNew:
+			newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, option, controllerAction);
 			break;
 		}
 
@@ -641,7 +645,6 @@ public class FxUtil {
 	 */
 	public static void createStageAndShow(Parent parent, Consumer<Stage> option) {
 		Scene scene = new Scene(parent);
-		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 		createStageAndShow(scene, option);
 	}
 
@@ -731,6 +734,10 @@ public class FxUtil {
 	public static Stage craeteStage(Scene scene, Consumer<Stage> option) {
 		Stage stage = new Stage();
 		stage.setScene(scene);
+
+		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+		scene.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
+
 		if (option != null)
 			option.accept(stage);
 		return stage;
@@ -1345,9 +1352,14 @@ public class FxUtil {
 						// return visibleLeafColumns.stream();
 						// return findAllByNodes((Parent) v, onlyVisible,
 						// filter).stream();
-					}
+					} else if (v instanceof TitledPane) {
 
-					else if (v instanceof Parent) {
+						Stream<Node> stream = findAllByNodes((Parent) v, onlyVisible, filter).stream();
+						Node content = ((TitledPane) v).getContent();
+						Stream<Node> stream2 = findAllByNodes((Parent) content, onlyVisible, filter).stream();
+						return Stream.concat(stream, stream2);
+
+					} else if (v instanceof Parent) {
 						return findAllByNodes((Parent) v, onlyVisible, filter).stream();
 					}
 
@@ -1417,6 +1429,9 @@ public class FxUtil {
 	 *            메인화면이 되는 노드.
 	 */
 	public static void createDockStageAndShow(Window owner, DockNode dockNode, Point2D initLocation, boolean center) {
+		Parent p = (Parent) dockNode.getContents();
+		p.getStylesheets().add(SkinManager.getInstance().getSkin());
+		p.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
 		dockNode.setOwner(owner);
 		dockNode.setFloating(true, initLocation);
 		if (center)

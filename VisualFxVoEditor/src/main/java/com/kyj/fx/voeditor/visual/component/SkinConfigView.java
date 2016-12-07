@@ -86,12 +86,8 @@ public class SkinConfigView extends BorderPane {
 			ObservableList<String> stylesheets = stage.getScene().getStylesheets();
 			stylesheets.clear();
 
-			URL skinPahURL = instance.toURL(selectedItem);
-			stylesheets.add(skinPahURL.toExternalForm());
-			this.getStylesheets().clear();
-			this.getStylesheets().add(skinPahURL.toExternalForm());
-
 			instance.registSkinFullPathn(selectedItem);
+			instance.resetSkin();
 		}
 	}
 

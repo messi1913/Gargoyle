@@ -6,9 +6,12 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 
 /**
  *
@@ -23,6 +26,7 @@ public class TitledBorderPane extends BorderPane {
 	 * Title,  it located in borderpane of top
 	 * @최초생성일 2016. 10. 27.
 	 */
+	private Pane paneColor = new Pane();
 	private Label lblTitle = new Label();
 
 	/**
@@ -32,6 +36,11 @@ public class TitledBorderPane extends BorderPane {
 	 */
 	public TitledBorderPane(String title, Node content) {
 		this.setCenter(content);
+		lblTitle.setPrefWidth(Double.MAX_VALUE);
+		lblTitle.setMaxWidth(Double.MAX_VALUE);
+		lblTitle.setPadding(new Insets(3d));
+		paneColor.setPrefSize(10d, 10d);
+		lblTitle.setGraphic(paneColor);
 		this.setTop(lblTitle);
 		setTitle(title);
 	}
@@ -55,4 +64,5 @@ public class TitledBorderPane extends BorderPane {
 	public Label getTitleLabel() {
 		return lblTitle;
 	}
+
 }

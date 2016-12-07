@@ -452,6 +452,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 
 			throw new NotYetSupportException(msg);
 		}
+
 		return sqlPane;
 	}
 

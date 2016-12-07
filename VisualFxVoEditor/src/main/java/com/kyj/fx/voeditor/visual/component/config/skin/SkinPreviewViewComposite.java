@@ -267,18 +267,19 @@ public class SkinPreviewViewComposite extends BorderPane {
 
 				//기본 스킨
 				stylesheets.add(createUserCustomSkin.toURI().toURL().toExternalForm());
-				
+
 				String btnStyleClass = null;
 				//버튼스킨
 				if (!tgbUseBtnDefault.isSelected()) {
-					
+
 					if (ValueUtil.isNotEmpty(selectedBtnStyleClassName.get())) {
 						btnStyleClass = selectedBtnStyleClassName.get();
 //						SkinManager.getInstance().registButtonSyleClass(btnStyleClass);
-						SkinManager.getInstance().applyBtnSyleClass(btnStyleClass);
+//						SkinManager.getInstance().applyBtnSyleClass(btnStyleClass);
+						stylesheets.add(SkinManager.getInstance().toButtonURL(btnStyleClass).toExternalForm());
 					}
 				}
-				
+
 				SkinManager.getInstance().applySkin(createUserCustomSkin , btnStyleClass);
 
 			}
@@ -299,17 +300,9 @@ public class SkinPreviewViewComposite extends BorderPane {
 		//		colorMbSample, colorHboxSample, colorTabSample1Selected, colorSelectedTabText, colorUnSelectedTabText;
 		Map<String, Object> param = new HashMap<>();
 
-		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().brighter()));
-		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().darker()));
-		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().desaturate()));
-		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().grayscale()));
-		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().invert()));
-		//		System.out.println(FxUtil.toWebString(colorMbLabelSample.getValue().saturate()));
-
 		param.put(SkinTemplate.MENU_BAR, FxUtil.toWebString(colorMbSample.getValue()));
 		param.put(SkinTemplate.MENU_BAR_OPACITY, colorMbSample.getValue().getOpacity());
 
-		System.out.println(colorMbSample.getOpacity());
 		param.put(SkinTemplate.MENU_BAR_LABEL, FxUtil.toWebString(colorMbLabelSample.getValue()));
 		param.put(SkinTemplate.MENU_BAR_LABEL_OPACITY, colorMbLabelSample.getValue().getOpacity());
 

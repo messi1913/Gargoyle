@@ -1436,7 +1436,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						LOGGER.debug("closeable parent on close request");
 						parent.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.error(ValueUtil.toString(e));
 					}
 				});
 
@@ -1445,6 +1445,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				// tab.getTabPane().getSelectionModel().select(tab);
 				// _parent.getScene().getStylesheets().clear();
 
+				List<Node> findAllByNodes = FxUtil.findAllByNodes(_parent, n -> n instanceof Button);
+				findAllByNodes.forEach(btn ->{
+					btn.getStyleClass().add("button-gargoyle");
+				});
 			} catch (Exception e1) {
 				DialogUtil.showExceptionDailog(e1);
 			}

@@ -29,7 +29,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
@@ -47,10 +46,7 @@ public class EditableTableViewComposite extends BorderPane {
 	private EditableTableView editableTableView;
 	private StringProperty sql = new SimpleStringProperty();
 	private Label txtTableName;
-	private Button btnExec;
-	private Button btnAdd;
-	private Button btnRemove;
-	private Button btnSave;
+	private Button btnExec, btnAdd, btnRemove, btnSave;
 	private Label lblStatus;
 
 	public EditableTableViewComposite(Supplier<Connection> connectionSupplier) {
@@ -109,6 +105,22 @@ public class EditableTableViewComposite extends BorderPane {
 		setTop(hBox);
 		setCenter(editableTableView);
 		setBottom(lblStatus);
+
+		addStyle();
+
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 7.
+	 * @param buttons2
+	 */
+	private void addStyle() {
+		Button[] buttons = new Button[] { btnExec, btnAdd, btnRemove, btnSave };;
+		for (Button btn : buttons) {
+			btn.getStyleClass().add("button-gargoyle");
+		}
+
 	}
 
 	private EventHandler<ActionEvent> defaultExecOnAction = e -> {

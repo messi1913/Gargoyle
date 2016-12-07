@@ -88,11 +88,11 @@ public class CustomSkinConfigView extends BorderPane {
 		root.setItemName("Basic");
 		{
 			ConfigurationLeafNodeItem fontConfigItem = new ConfigurationLeafNodeItem();
-			fontConfigItem.setItemName("Font");
+			fontConfigItem.setItemName("Font Management");
 			fontConfigItem.setContentNode(FontViewComposite.class);
 
 			ConfigurationLeafNodeItem backgroundConfigItem = new ConfigurationLeafNodeItem();
-			backgroundConfigItem.setItemName("Background");
+			backgroundConfigItem.setItemName("Color Management");
 			backgroundConfigItem.setContentNode(SkinPreviewViewComposite.class);
 
 			root.setChildrens(Arrays.asList(fontConfigItem, backgroundConfigItem));

@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.tools.ant.util.regexp.RegexpUtil;
-
 /**
  * @author KYJ
  *
@@ -181,10 +179,22 @@ class TF_IDF {
 		return split;
 	}
 
+	/**
+	 *   [키워드 인덱스테이블][가중치] 배열.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 7.
+	 * @return
+	 */
 	public double[][] getTF_IDFMatrix() {
 		return tfIdfMatrix;
 	}
 
+	/**
+	 * 키워드 인덱스 테이블
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 7.
+	 * @return
+	 */
 	public String[] getWordVector() {
 		return wordVector;
 	}

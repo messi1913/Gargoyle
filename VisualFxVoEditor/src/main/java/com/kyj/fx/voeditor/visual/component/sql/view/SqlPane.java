@@ -73,6 +73,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -387,7 +388,16 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			}
 		});
 
-		sqlEditLayout.setTop(new HBox(5, btnExec, btnExecAll, btnAddTab, readTypeCheckComboBox));
+		HBox btnBox = new HBox(5, btnExec, btnExecAll, btnAddTab, readTypeCheckComboBox);
+		btnBox.setPrefWidth(Double.MAX_VALUE);
+		btnBox.setMaxWidth(Double.MAX_VALUE);
+		btnExec.getStyleClass().add("button-gargoyle");
+		btnExecAll.getStyleClass().add("button-gargoyle");
+		btnAddTab.getStyleClass().add("button-gargoyle");
+		btnBox.getStyleClass().add("hbox-gargoyle");
+
+		btnBox.setPadding(new Insets(5));
+		sqlEditLayout.setTop(btnBox);
 
 		defaultSelectedItems();
 
@@ -600,13 +610,15 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			}
 
 			if (ValueUtil.isNotEmpty(userColor)) {
-				String backGroundColor = String.format("#%02X%02X%02X", (int) (userColor.getRed() * 255),
-						(int) (userColor.getGreen() * 255), (int) (userColor.getBlue() * 255));
-				String textColor = String.format("#%02X%02X%02X", 255 - (int) (userColor.getRed() * 255),
-						255 - (int) (userColor.getGreen() * 255), 255 - (int) (userColor.getBlue() * 255));
+//				String backGroundColor = String.format("#%02X%02X%02X", (int) (userColor.getRed() * 255),
+//						(int) (userColor.getGreen() * 255), (int) (userColor.getBlue() * 255));
+//				String textColor = String.format("#%02X%02X%02X", 255 - (int) (userColor.getRed() * 255),
+//						255 - (int) (userColor.getGreen() * 255), 255 - (int) (userColor.getBlue() * 255));
+				String textColor = FxUtil.toWebString(userColor);
+				String backGroundColor = FxUtil.toWebString(userColor);
 
 				sqlEditPane.getTitleLabel().setStyle("-fx-text-fill:" + textColor);
-				sqlEditPane.getTitleLabel().setStyle("-fx-background-color:" + backGroundColor);
+				sqlEditPane.getTitleLabel().getGraphic().setStyle("-fx-background-color:" + backGroundColor);
 
 			}
 		} catch (Exception e) {
