@@ -8,6 +8,7 @@
 package kyj.Fx.dao.wizard.memory;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -38,10 +39,21 @@ public class DatabaseTypeMappingResourceLoader implements IFileBaseConfiguration
 	}
 
 	private void initialize() {
+		Properties tmp = new Properties();
 		properties = new Properties();
 		try {
 			ClassLoader classLoader = getClass().getClassLoader();
-			properties.load(classLoader.getResourceAsStream(FILE_NAME));
+			tmp.load(classLoader.getResourceAsStream(FILE_NAME));
+			
+			//전부 대문자로 치환.
+			Iterator<Object> iterator = tmp.keySet().iterator();
+			while(iterator.hasNext())
+			{
+				Object key = iterator.next();
+				Object value = tmp.get(key);
+				properties.put(key.toString().toUpperCase(), value);
+			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -49,7 +61,7 @@ public class DatabaseTypeMappingResourceLoader implements IFileBaseConfiguration
 	}
 
 	public String get(String key) {
-		return properties.getProperty(key);
+		return properties.getProperty(key.toUpperCase());
 	}
 
 	@Override
