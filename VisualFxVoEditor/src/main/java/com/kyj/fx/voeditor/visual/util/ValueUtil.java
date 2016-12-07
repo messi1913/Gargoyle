@@ -1447,7 +1447,7 @@ public class ValueUtil {
 
 		/**
 		 * 사용가능한 뉴스분석 알고리즘 리턴.
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 5.
 		 * @return
@@ -1458,7 +1458,7 @@ public class ValueUtil {
 
 		/**
 		 * 알고리즘 인스턴스 생성.
-		 * 
+		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 6.
 		 * @param algorism
@@ -1584,7 +1584,7 @@ public class ValueUtil {
 		int docCount = tf_IDFMatrix.length;
 		int wordCount = tf_IDFMatrix[0].length;
 
-		// 평균계산.
+		//평균을 위한 합.
 		double[] average = new double[wordCount];
 		for (int docIndex = 0; docIndex < tf_IDFMatrix.length; docIndex++) {
 			double[] wordIndexTable = tf_IDFMatrix[docIndex];
@@ -1594,12 +1594,14 @@ public class ValueUtil {
 			}
 		}
 
+		//평균값 도출.
 		for (int i = 0; i < average.length; i++) {
 			String keyword = words[i];
 			average[i] = average[i] / docCount;
 			arrayList.add(new KeyValue(keyword, average[i]));
 		}
 
+		//정렬. - 내림차순.
 		Collections.sort(arrayList, new Comparator<KeyValue>() {
 
 			@Override
@@ -1616,7 +1618,7 @@ public class ValueUtil {
 	 * 단어에서 '특수문자'만을 제거한 텍스트를 리턴한다. <br/>
 	 *
 	 * 공백 \t \n 등과같은 기호는 제외,
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 6.
 	 * @param word
@@ -1733,6 +1735,9 @@ public class ValueUtil {
 				isMatch = true;
 				break;
 			case ' ':
+				isMatch = true;
+				break;
+			case '…':
 				isMatch = true;
 				break;
 			}
