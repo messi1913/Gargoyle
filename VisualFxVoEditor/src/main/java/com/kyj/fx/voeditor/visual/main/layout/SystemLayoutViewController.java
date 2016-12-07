@@ -766,10 +766,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			if (lookup != null && tmpSelectFileWrapper != null) {
 				TextField txtLocation = (TextField) lookup;
 				File file = tmpSelectFileWrapper.getFile();
-				if (file.isDirectory()) {
-					String absolutePath = file.getAbsolutePath();
-					ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH, absolutePath);
-					txtLocation.setText(absolutePath);
+				if (file.exists() && file.isDirectory()) {
+					ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH,  file.getAbsolutePath());
+					
+					// 경로를 생대경로화 시킨다.
+					Path relativize = FileUtil.toRelativizeForGagoyle(file);
+					
+					txtLocation.setText(relativize.toString());
 				} else {
 					DialogUtil.showMessageDialog("Only Directory.");
 				}
