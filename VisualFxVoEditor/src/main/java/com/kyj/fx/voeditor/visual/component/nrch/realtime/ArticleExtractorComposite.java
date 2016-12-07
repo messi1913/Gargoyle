@@ -13,8 +13,10 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -286,7 +288,10 @@ public class ArticleExtractorComposite extends BorderPane {
 		SingleSelectionModel<Class<? extends ExtractorBase>> selectionModel = cbAlgorisms.getSelectionModel();
 		Class<? extends ExtractorBase> selectAlgorism = selectionModel.getSelectedItem();
 		if (selectAlgorism != null) {
-			request(selectAlgorism, url);
+
+			RealtimeSearchItemVO vo = new RealtimeSearchItemVO();
+			vo.setLink(url);
+			request(selectAlgorism, vo);
 		}
 	}
 
@@ -295,9 +300,10 @@ public class ArticleExtractorComposite extends BorderPane {
 	};
 	private Function<? super KeyValue, String> mapper = v -> String.format("[%s] : [%1.5f]", v.getKey(), v.getValue());
 
-	public void request(Class<? extends ExtractorBase> algorism, RealtimeSearchItemVO userData) {
-		request(algorism, userData.getLink());
-	}
+	// public void request(Class<? extends ExtractorBase> algorism,
+	// RealtimeSearchItemVO userData) {
+	// request(algorism, userData.getLink());
+	// }
 
 	/**
 	 * @작성자 : KYJ
@@ -305,16 +311,24 @@ public class ArticleExtractorComposite extends BorderPane {
 	 * @param selectAlgorism
 	 * @param url
 	 */
-	private void request(Class<? extends ExtractorBase> algorism, String url) {
-		if (ValueUtil.isEmpty(url))
+	private void request(Class<? extends ExtractorBase> algorism, RealtimeSearchItemVO vo) {
+
+		String link = vo.getLink();
+		if (ValueUtil.isEmpty(link))
 			return;
 
 		try {
-			URLModel model = getHTMLContent(url);
+			URLModel model = getHTMLContent(link);
 
 			if (!model.isEmpty()) {
 				updateMainContent(algorism, model);
-				updateNewRealContent(algorism, model);
+
+				String keyword = vo.getKeyword();
+				if (ValueUtil.isNotEmpty(keyword)) {
+					updateNewRealContent(algorism, model, OtherNews.getOtherNewsPages(keyword));
+				} else {
+					updateNewRealContent(algorism, model, Collections.emptyList());
+				}
 			}
 
 		} catch (Exception e) {
@@ -328,9 +342,12 @@ public class ArticleExtractorComposite extends BorderPane {
 	 * @param algorism
 	 * @param userData2
 	 */
-	private void updateNewRealContent(Class<? extends ExtractorBase> algorism, URLModel model) {
+	private void updateNewRealContent(Class<? extends ExtractorBase> algorism, URLModel model, List<String> otherLinks) {
 		Collection<String> findAllLink = findAllLink(model.getContent());
-		updateNewRealContent(findAllLink);
+		List<String> arrayList = new ArrayList<>();
+		arrayList.addAll(findAllLink);
+		arrayList.addAll(otherLinks);
+		updateNewRealContent(arrayList);
 	}
 
 	private void updateNewRealContent(Collection<String> links) {

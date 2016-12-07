@@ -272,7 +272,7 @@ public class DaoWizardViewController {
 
 					try {
 						BaseOpenClassResourceView view = null;
-						if (clazz != null) {
+						if (ValueUtil.isNotEmpty(clazz)) {
 							view = new MeerketAbstractVoOpenClassResourceView(clazz);
 						} else {
 							view = new MeerketAbstractVoOpenClassResourceView();
@@ -715,16 +715,21 @@ public class DaoWizardViewController {
 
 	@SuppressWarnings("unchecked")
 	private List<String> getTableColumns(String tableName) {
-		String sqlColumns = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_COLUMN);
-		List<String> columns = Collections.EMPTY_LIST;
-		Map<String, Object> hashMap = new HashMap<String, Object>();
-		hashMap.put("tableName", tableName);
 		try {
-			columns = DbUtil.select(sqlColumns, hashMap, (rs, row) -> rs.getString("COLUMN_NAME"));
-		} catch (Exception e) {
-			e.printStackTrace();
+			return  DbUtil.columns(tableName);
+		} catch (Exception e1) {
+			return Collections.emptyList();
 		}
-		return columns;
+//		String sqlColumns = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_COLUMN);
+//		List<String> columns = Collections.EMPTY_LIST;
+//		Map<String, Object> hashMap = new HashMap<String, Object>();
+//		hashMap.put("tableName", tableName);
+//		try {
+//			columns = DbUtil.select(sqlColumns, hashMap, (rs, row) -> rs.getString("COLUMN_NAME"));
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return columns;
 	}
 
 	/**
@@ -811,6 +816,7 @@ public class DaoWizardViewController {
 
 		} catch (IOException e1) {
 			LOGGER.error(ValueUtil.toString(e1));
+			DialogUtil.showExceptionDailog(e1);
 		}
 
 	}

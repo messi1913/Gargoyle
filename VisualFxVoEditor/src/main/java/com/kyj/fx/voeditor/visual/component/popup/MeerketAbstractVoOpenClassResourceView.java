@@ -35,7 +35,7 @@ public class MeerketAbstractVoOpenClassResourceView extends BaseOpenClassResourc
 	static {
 		String VO_RESOURCE_FILTERING_NAME = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.VO_RESOURCE_FILTERING_NAME);
 		fileNameFilter = Arrays
-				.asList(ValueUtil.decode(VO_RESOURCE_FILTERING_NAME, VO_RESOURCE_FILTERING_NAME, "DVO;SVO").toString().split(";"));
+				.asList(ValueUtil.decode(VO_RESOURCE_FILTERING_NAME, VO_RESOURCE_FILTERING_NAME, "DVO;SVO;VO;Vo").toString().split(";"));
 	}
 
 	/**

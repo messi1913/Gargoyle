@@ -43,6 +43,15 @@ class TF_IDF {
 			filtered.add("확인해");
 			filtered.add("주세요");
 			filtered.add("보세요");
+			filtered.add("영문");
+			filtered.add("뉴스");
+			filtered.add("음성지원");
+			filtered.add("서비스");
+			filtered.add("본문듣기");
+			filtered.add("듣기");
+			
+			     
+			
 
 		}
 

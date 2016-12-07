@@ -139,15 +139,16 @@ public class SimpleSQLResultView extends BorderPane {
 		columns = new ArrayList<>();
 		try {
 
-			//Iterator<Entry<String, Object>> iterator = param.entrySet().iterator();
+			// Iterator<Entry<String, Object>> iterator =
+			// param.entrySet().iterator();
 			MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource(param);
-			//			while (iterator.hasNext()) {
-			//				Entry<String, Object> next = iterator.next();
-			//				Object value = null;
-			//				if (next.getValue() != null)
-			//					value = "'".concat(next.getValue().toString()).concat("'");
-			//				mapSqlParameterSource.addValue(next.getKey(), value);
-			//			}
+			// while (iterator.hasNext()) {
+			// Entry<String, Object> next = iterator.next();
+			// Object value = null;
+			// if (next.getValue() != null)
+			// value = "'".concat(next.getValue().toString()).concat("'");
+			// mapSqlParameterSource.addValue(next.getKey(), value);
+			// }
 
 			List<Map<String, Object>> select = DbUtil.select(sql, mapSqlParameterSource, (rs, row) -> {
 				Map<String, Object> hashMap = new HashMap<String, Object>();
@@ -190,9 +191,10 @@ public class SimpleSQLResultView extends BorderPane {
 			}
 
 		} catch (Exception e) {
-//			DialogUtil.showConfirmDialog();
-			//에러 다이얼로그 수정.
-			DialogUtil.showExceptionDailog(SharedMemory.getPrimaryStage(), e, "User SQL Error");
+			LOGGER.error(ValueUtil.toString(e));
+			// DialogUtil.showConfirmDialog();
+			// 에러 다이얼로그 수정.
+			DialogUtil.showExceptionDailog(SharedMemory.getPrimaryStage(), e);
 		}
 
 		Iterator<String> iterator = param.keySet().iterator();
@@ -203,13 +205,14 @@ public class SimpleSQLResultView extends BorderPane {
 				param.put(key, null);
 			else if (value instanceof List) {
 				List<Object> items = (List<Object>) value;
-//				StringBuffer sb = new StringBuffer();
-//				for (Object obj : items) {
-//					sb.append(obj).append(",");
-//				}
+				// StringBuffer sb = new StringBuffer();
+				// for (Object obj : items) {
+				// sb.append(obj).append(",");
+				// }
 
-//				if (items != null && !items.isEmpty()) //bug fix. sb가 빈 경우 에러발생.
-//					sb.setLength(sb.length() - 1);
+				// if (items != null && !items.isEmpty()) //bug fix. sb가 빈 경우
+				// 에러발생.
+				// sb.setLength(sb.length() - 1);
 				param.put(key, items);
 			} else
 				param.put(key, value);
@@ -237,8 +240,8 @@ public class SimpleSQLResultView extends BorderPane {
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 		stage.setScene(scene);
 		stage.setAlwaysOnTop(false);
-		//		stage.initModality(Modality.APPLICATION_MODAL);
-				stage.initOwner(SharedMemory.getPrimaryStage());
+		// stage.initModality(Modality.APPLICATION_MODAL);
+		stage.initOwner(SharedMemory.getPrimaryStage());
 		stage.showAndWait();
 
 		// 재사용금지 1회성 뷰

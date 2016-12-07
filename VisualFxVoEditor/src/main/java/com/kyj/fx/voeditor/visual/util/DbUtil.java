@@ -344,7 +344,7 @@ public class DbUtil extends ConnectionManager {
 
 			// cleanDataSource();
 			// close(dataSource);
-			LOGGER.debug(ValueUtil.toString(e));
+			LOGGER.error(ValueUtil.toString(e));
 			throw e;
 		} finally {
 			cleanDataSource();
