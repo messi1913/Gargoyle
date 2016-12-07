@@ -201,10 +201,11 @@ public class DaoWizardViewController {
 
 		tbParams.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-		//		this.colProgramTypeLock.setCellValueFactory(v -> v.getValue().lockYnProperty());
-		//		this.colProgramTypeLock.setCellFactory(v ->{
-		//			return
-		//		});
+		// this.colProgramTypeLock.setCellValueFactory(v ->
+		// v.getValue().lockYnProperty());
+		// this.colProgramTypeLock.setCellFactory(v ->{
+		// return
+		// });
 
 		tbmSysDaoDVOProperty = new SimpleObjectProperty<>(new TbmSysDaoDVO());
 		colParamTestValue.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -319,7 +320,7 @@ public class DaoWizardViewController {
 
 		});
 
-		//2016-08-27 custom 항목 추가. 이 항목추가시 typeMapping.properties 파일의 항목도 추가야함.
+		// 2016-08-27 custom 항목 추가. 이 항목추가시 typeMapping.properties 파일의 항목도 추가야함.
 		ObservableList<String> collect = DatabaseTypeMappingResourceLoader.getInstance().getEntry().stream()
 				.map(v -> v.getValue().toString()).distinct().collect(FxCollectors.toObservableList());
 		collect.addAll(Arrays.asList("Integer", "Long", "Double"));
@@ -455,7 +456,7 @@ public class DaoWizardViewController {
 		ObservableList<TbpSysDaoFieldsDVO> fields = FXCollections.observableArrayList();
 		Set<String> keys = new LinkedHashSet<String>(velocityKeys);
 
-		//기존에 존재했던 값이 있으면 먼저 바인드.
+		// 기존에 존재했던 값이 있으면 먼저 바인드.
 		ObservableList<TbpSysDaoFieldsDVO> oldFieldList = tbParams.getItems();
 		for (TbpSysDaoFieldsDVO vo : oldFieldList) {
 			String fieldName = vo.getFieldName();
@@ -465,22 +466,24 @@ public class DaoWizardViewController {
 			}
 		}
 
-		/*구버젼*/
+		/* 구버젼 */
 		Iterator<String> iterator = keys.iterator();
 		while (iterator.hasNext()) {
 			String key = iterator.next();
 
 			/* 2016.4.7 이미 존재하는 데이터는 유지한다. */
-			//			Optional<TbpSysDaoFieldsDVO> findAny = tbParams.getItems().stream().filter(v -> key.equals(v.getFieldName())).findAny();
-			//			if (findAny.isPresent()) {
-			//				continue;
-			//			}
+			// Optional<TbpSysDaoFieldsDVO> findAny =
+			// tbParams.getItems().stream().filter(v ->
+			// key.equals(v.getFieldName())).findAny();
+			// if (findAny.isPresent()) {
+			// continue;
+			// }
 
 			TbpSysDaoFieldsDVO dvo = new TbpSysDaoFieldsDVO();
 			dvo.setFieldName(key);
 			fields.add(dvo);
 		}
-		/*구버젼*/
+		/* 구버젼 */
 
 		/* 메소드항목에 생성된 다이나픽 필드변수를 메모리에 저장한다. */
 		TbpSysDaoMethodsDVO tbpSysDaoMethodsDVO = getSelectedMethodItem();
@@ -559,14 +562,15 @@ public class DaoWizardViewController {
 	 * @return
 	 */
 	public TbpSysDaoMethodsDVO getSelectedMethodItem() {
-		//		int selectedMethodIndex = getSelectedMethodIndex();
-		//		if (selectedMethodIndex == -1)
-		//			return null;
+		// int selectedMethodIndex = getSelectedMethodIndex();
+		// if (selectedMethodIndex == -1)
+		// return null;
 
-		//bugfix
-		//		TbpSysDaoMethodsDVO tbpSysDaoMethodsDVO = tbmSysDaoDVOProperty.get().getTbpSysDaoMethodsDVOList().get(selectedMethodIndex);
+		// bugfix
+		// TbpSysDaoMethodsDVO tbpSysDaoMethodsDVO =
+		// tbmSysDaoDVOProperty.get().getTbpSysDaoMethodsDVOList().get(selectedMethodIndex);
 		return tbMethods.getSelectionModel().getSelectedItem();
-		//		return tbpSysDaoMethodsDVO;
+		// return tbpSysDaoMethodsDVO;
 	}
 
 	/**
@@ -716,20 +720,22 @@ public class DaoWizardViewController {
 	@SuppressWarnings("unchecked")
 	private List<String> getTableColumns(String tableName) {
 		try {
-			return  DbUtil.columns(tableName);
+			return DbUtil.columns(tableName);
 		} catch (Exception e1) {
 			return Collections.emptyList();
 		}
-//		String sqlColumns = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_COLUMN);
-//		List<String> columns = Collections.EMPTY_LIST;
-//		Map<String, Object> hashMap = new HashMap<String, Object>();
-//		hashMap.put("tableName", tableName);
-//		try {
-//			columns = DbUtil.select(sqlColumns, hashMap, (rs, row) -> rs.getString("COLUMN_NAME"));
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		return columns;
+		// String sqlColumns =
+		// ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_COLUMN);
+		// List<String> columns = Collections.EMPTY_LIST;
+		// Map<String, Object> hashMap = new HashMap<String, Object>();
+		// hashMap.put("tableName", tableName);
+		// try {
+		// columns = DbUtil.select(sqlColumns, hashMap, (rs, row) ->
+		// rs.getString("COLUMN_NAME"));
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		// return columns;
 	}
 
 	/**
@@ -792,7 +798,8 @@ public class DaoWizardViewController {
 					dvo.setProgramType(tmp.getProgramType());
 					dvo.setLockYn(tmp.getLockYn());
 				} else {
-					//2016-08-26 새로 추가된 어플리케이션 프로그램 타입. 데이터베이스 -> 프로그램으로 변환되는 데이터 타입
+					// 2016-08-26 새로 추가된 어플리케이션 프로그램 타입. 데이터베이스 -> 프로그램으로 변환되는
+					// 데이터 타입
 					String programType = DatabaseTypeMappingResourceLoader.getInstance().get(databaseTypeName);
 					dvo.setProgramType(programType);
 				}
@@ -840,10 +847,12 @@ public class DaoWizardViewController {
 	public void btnBrowseMouseClick() {
 		String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
 		File _baseDir = new File(baseDir);
+		
+		//2016.12.7 경로가 이미 존재하는경우 열리는 폴도 위치를 맞는경로에서 열릴수 있게 코드 수정 by kyj.
 		File selectedDir = DialogUtil.showDirectoryDialog(SharedMemory.getPrimaryStage(), chooser -> {
 
 			String initDir = txtDaoLocation.getText();
-			File _initDir = new File(initDir);
+			File _initDir = new File(_baseDir, initDir);
 			if (ValueUtil.isEmpty(initDir) || !_initDir.exists())
 				chooser.setInitialDirectory(_baseDir);
 			else
@@ -878,13 +887,12 @@ public class DaoWizardViewController {
 	public void btnShowAppCodeOnMouseClick() throws IOException {
 		String sql = txtSql.getText();
 		/*
-		 * 2016-09-23
-		 * 어플리케이션을 만들어주는 로직을 API로 수정.
+		 * 2016-09-23 어플리케이션을 만들어주는 로직을 API로 수정.
 		 */
 		FxUtil.EasyFxUtils.showApplicationCode(sql);
 
-
 	}
+
 	/**
 	 * DAO Wizard 생성 버튼 이벤트
 	 *
