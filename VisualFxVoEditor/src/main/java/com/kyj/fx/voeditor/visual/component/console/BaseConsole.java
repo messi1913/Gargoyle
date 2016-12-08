@@ -8,13 +8,12 @@ package com.kyj.fx.voeditor.visual.component.console;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.popup.TextSearchComposite;
-import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
+import com.kyj.fx.voeditor.visual.momory.SkinManager;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -56,7 +55,7 @@ class BaseConsole extends BorderPane implements Closeable {
 	private HBox buttonHbox;
 	private Button btnClear;
 	private BooleanProperty closeRequest = new SimpleBooleanProperty(false);
-	private ExecutorService newSingleThreadExecutor = ExecutorDemons.newFixedThreadExecutor("CONSOLE-SERVICE", 1);
+//	private ExecutorService newSingleThreadExecutor = ExecutorDemons.newFixedThreadExecutor("CONSOLE-SERVICE", 1);
 
 //	AtomicBoolean nextJobRequest = new AtomicBoolean(true);
 
@@ -130,6 +129,7 @@ class BaseConsole extends BorderPane implements Closeable {
 	public BaseConsole() {
 
 		btnClear = new Button("Clear");
+		btnClear.getStyleClass().add("button-gargoyle");
 		btnClear.setOnAction(this::btnClearOnAction);
 		buttonHbox = new HBox(5, btnClear);
 		buttonHbox.getStyleClass().add("hbox-gargoyle");
@@ -150,7 +150,8 @@ class BaseConsole extends BorderPane implements Closeable {
 		this.getStylesheets().clear();
 
 		this.getStylesheets().add(getClass().getResource("Console.css").toExternalForm());
-
+		this.getStylesheets().add(SkinManager.getInstance().getSkin());
+		this.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
 		init();
 
 	}
