@@ -49,9 +49,9 @@ class TF_IDF {
 			filtered.add("서비스");
 			filtered.add("본문듣기");
 			filtered.add("듣기");
-			
-			     
-			
+
+
+
 
 		}
 
@@ -84,10 +84,12 @@ class TF_IDF {
 			String[] split = docSplit(doc);
 			for (String word : split) {
 
+				word = ValueUtil.removeSpecialCharacter(word);
+
 				if (TextFilter.isFiltering(word))
 					continue;
 
-				word = ValueUtil.removeSpecialCharacter(word);
+
 
 				// for (String word : doc.split(" ")) {
 				if (!mapWordToIdx.containsKey(word)) {
@@ -123,10 +125,12 @@ class TF_IDF {
 			String[] words = split;
 			for (String word : words) {
 
+				word = ValueUtil.removeSpecialCharacter(word);
+
 				if (TextFilter.isFiltering(word))
 					continue;
 
-				word = ValueUtil.removeSpecialCharacter(word);
+
 
 				docLength[docIdx] = words.length;
 				int wordIdx = mapWordToIdx.get(word);
@@ -151,10 +155,13 @@ class TF_IDF {
 		for (int docIdx = 0; docIdx < docs.length; docIdx++) {
 			String doc = docs[docIdx];
 			for (String word : docSplit(doc)) {
+
+
+				word = ValueUtil.removeSpecialCharacter(word);
+
 				if (TextFilter.isFiltering(word))
 					continue;
 
-				word = ValueUtil.removeSpecialCharacter(word);
 
 				int wordIdx = mapWordToIdx.get(word);
 				tfMatrix[docIdx][wordIdx] = tfMatrix[docIdx][wordIdx] + 1;
