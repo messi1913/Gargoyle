@@ -52,11 +52,11 @@ public class SqlTab extends Tab {
 	 */
 	private static final String NEW_TAB = "new Tab*";
 
-	private ObjectProperty<SqlKeywords> txtSql;
+	private ObjectProperty<SqlKeywords> sqlPane = new SimpleObjectProperty<>();
 
 	private SaveSQLFunction<File> saveFileFunction;
 	//	private LoadSQLFunction<File> loadFileFunction;
-	private SqlKeywords content;
+	//	private SqlKeywords content;
 
 	public SqlTab() {
 		saveFileFunction = new SaveSQLFileFunction();
@@ -69,16 +69,17 @@ public class SqlTab extends Tab {
 	public SqlTab(EventHandler<KeyEvent> excutable) {
 		this();
 		setText(NEW_TAB);
-		content = new SqlKeywords();
 
-		txtSql = new SimpleObjectProperty<>(content);
-		setContent(content);
+		SqlKeywords createNewSqlPane = createNewSqlPane();
+		sqlPane.set(createNewSqlPane);
+
+		setContent(createNewSqlPane);
 		//		content.setOnKeyPressed(excutable);
-		content.addEventHandler(KeyEvent.KEY_RELEASED, excutable);
+		createNewSqlPane.addEventHandler(KeyEvent.KEY_RELEASED, excutable);
 
-		EventDispatcher eventDispatcher = content.getEventDispatcher();
+		EventDispatcher eventDispatcher = createNewSqlPane.getEventDispatcher();
 
-		content.setEventDispatcher((event, tail) -> {
+		createNewSqlPane.setEventDispatcher((event, tail) -> {
 
 			EventType<? extends Event> eventType = event.getEventType();
 			if (eventType == KeyEvent.KEY_PRESSED) {
@@ -95,7 +96,7 @@ public class SqlTab extends Tab {
 
 		/***************************************************************************************************************************/
 		/* 컨텍스트 메뉴 추가. */
-		ContextMenu contextMenu = content.getCodeArea().getContextMenu();
+		ContextMenu contextMenu = createNewSqlPane.getCodeArea().getContextMenu();
 		ObservableList<MenuItem> items = contextMenu.getItems();
 		MenuItem muOpen = new MenuItem("Open");
 		muOpen.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
@@ -189,8 +190,7 @@ public class SqlTab extends Tab {
 				if (KeyCode.O == keyE.getCode() && keyE.isControlDown() && !keyE.isAltDown() && !keyE.isShiftDown()) {
 					miOenOnAction(new ActionEvent());
 					keyE.consume();
-				}
-				else if (KeyCode.S == keyE.getCode() && keyE.isControlDown() && !keyE.isAltDown() && !keyE.isShiftDown()) {
+				} else if (KeyCode.S == keyE.getCode() && keyE.isControlDown() && !keyE.isAltDown() && !keyE.isShiftDown()) {
 					muSaveOnAction(new ActionEvent());
 					keyE.consume();
 				}
@@ -218,39 +218,49 @@ public class SqlTab extends Tab {
 		}
 	}
 
+	/**
+	 * SQL처리하는 패널을 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 9.
+	 * @return
+	 */
+	protected SqlKeywords createNewSqlPane() {
+		return new SqlKeywords();
+	}
+
 	public SqlKeywords getSqlNode() {
-		return txtSql.get();
+		return sqlPane.get();
 	}
 
 	public void setSqlNode(SqlKeywords txtSql) {
-		this.txtSql.set(txtSql);
+		this.sqlPane.set(txtSql);
 	}
 
 	public void setTxtSql(String txtSql) {
-		this.txtSql.get().setContent(txtSql);
+		this.sqlPane.get().setContent(txtSql);
 	}
 
 	public void appendTextSql(String txtSql) {
-		this.txtSql.get().appendContent(txtSql);
+		this.sqlPane.get().appendContent(txtSql);
 	}
 
 	public ObjectProperty<SqlKeywords> txtSqlProperty() {
-		return this.txtSql;
+		return this.sqlPane;
 	}
 
 	public String getSelectedSQLText() {
-		return txtSql.get().getSelectedText();
+		return sqlPane.get().getSelectedText();
 	}
 
 	public String getSqlText() {
-		return txtSql.get().getText();
+		return sqlPane.get().getText();
 	}
 
 	public ContextMenu getTxtSqlPaneContextMenu() {
-		return txtSql.get().getCodeArea().getContextMenu();
+		return sqlPane.get().getCodeArea().getContextMenu();
 	}
 
 	public void setTxtSqlPaneContextMenu(ContextMenu menu) {
-		txtSql.get().getCodeArea().setContextMenu(menu);
+		sqlPane.get().getCodeArea().setContextMenu(menu);
 	}
 }

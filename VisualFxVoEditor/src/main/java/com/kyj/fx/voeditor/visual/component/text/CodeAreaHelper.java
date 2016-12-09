@@ -61,6 +61,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 
 	public CodeAreaHelper(T codeArea) {
 		this.codeArea = codeArea;
+
 		this.codeArea.setOnMouseClicked(defaultSelectionHandler);
 		codeMoveDeligator = new CodeAreaMoveLineHelper(codeArea);
 
@@ -349,6 +350,8 @@ public class CodeAreaHelper<T extends CodeArea> {
 				toLowercaseEvent(new ActionEvent());
 				e.consume();
 			}
+		} else {
+			codeArea.getUndoManager().mark();
 		}
 
 		// System.out.println("sqlKeywords");

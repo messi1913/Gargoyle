@@ -29,8 +29,8 @@ public abstract class AbstractOpenClassResourceView<R> extends ResourceView<R> {
 
 	public AbstractOpenClassResourceView(String data) throws Exception {
 		this(RESOURCE_TYPE.CLASS);
-		this.data = data;
-	}
+		this.data.set(data);
+		}
 
 	public AbstractOpenClassResourceView() throws Exception {
 		this(RESOURCE_TYPE.CLASS);

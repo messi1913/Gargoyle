@@ -53,11 +53,15 @@ public class TableOpenResourceView {
 	 */
 	private String driver;
 
-	public TableOpenResourceView(Supplier<Connection> conSupplier) throws Exception {
+	public TableOpenResourceView(Supplier<Connection> conSupplier) {
 		this.conSupplier = conSupplier;
-		this.delegator = new TableResourceView();
+		this.delegator = new TableResourceView(this);
 		this.delegator.setTitle("TableResourceView");
 
+	}
+
+	public ResourceView<Map<String, Object>> getView() {
+		return this.delegator;
 	}
 
 	/********************************
@@ -191,11 +195,23 @@ public class TableOpenResourceView {
 		return value.get(databaseName) == null ? "" : value.get(databaseName).toString();
 	}
 
+	public void close() {
+
+	}
+
 	class TableResourceView extends ResourceView<Map<String, Object>> {
 
-		public TableResourceView() throws Exception {
-			super();
+		private TableOpenResourceView parent;
 
+		public TableResourceView(TableOpenResourceView parent) {
+			super();
+			this.parent = parent;
+		}
+
+		@Override
+		public void close() {
+			super.close();
+			parent.close();
 		}
 
 		/*
@@ -293,6 +309,15 @@ public class TableOpenResourceView {
 			boolean equals = getTableName(value).toUpperCase().indexOf(text.toUpperCase()) >= 0;
 			return equals;
 		}
+	}
+
+	/**
+	 * @return
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 9.
+	 */
+	public ResultDialog<Map<String, Object>> getResult() {
+		return delegator.getResult();
 	}
 
 }

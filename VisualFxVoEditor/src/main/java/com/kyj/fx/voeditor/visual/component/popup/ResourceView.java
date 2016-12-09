@@ -31,7 +31,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -113,11 +112,11 @@ public abstract class ResourceView<R> extends BorderPane {
 	 *
 	 * @throws Exception
 	 */
-	public ResourceView() throws Exception {
+	public ResourceView() {
 		this("");
 	}
 
-	protected String data;
+	protected StringProperty data;
 
 	/**
 	 * 리소스 다이얼로그를 오픈한다.
@@ -126,16 +125,9 @@ public abstract class ResourceView<R> extends BorderPane {
 	 *            다이얼로그를 오픈할때 텍스트필드에 기본값으로 셋팅할 텍스트
 	 * @throws Exception
 	 */
-	public ResourceView(String data) throws Exception {
-		this.data = data;
-
-		FxUtil.loadRoot(ResourceView.class, this);
-//		FXMLLoader loader = new FXMLLoader();
-//		loader.setLocation(ResourceView.class.getResource("OpenClassResource.fxml"));
-//		loader.setRoot(this);
-//		loader.setController(this);
-//		loader.load();
-
+	public ResourceView(String data) {
+		this.data = new SimpleStringProperty(data);
+		FxUtil.loadRoot(ResourceView.class, this, err -> LOGGER.error(ValueUtil.toString(err)));
 	}
 
 	/********************************
@@ -162,7 +154,7 @@ public abstract class ResourceView<R> extends BorderPane {
 	public void initialize() {
 
 		if (data != null)
-			txtFilter.setText(data);
+			txtFilter.setText(data.get());
 
 		consumer = new SimpleObjectProperty<>();
 
@@ -200,8 +192,9 @@ public abstract class ResourceView<R> extends BorderPane {
 	protected void onInited() {
 		txtFilter.requestFocus();
 
-		Scene scene = getScene();
-		scene.addEventHandler(KeyEvent.KEY_PRESSED, sceneKeyEvent);
+		//		Scene scene = getScene();
+
+		this.addEventHandler(KeyEvent.KEY_PRESSED, sceneKeyEvent);
 
 	}
 
@@ -269,6 +262,7 @@ public abstract class ResourceView<R> extends BorderPane {
 	 * @User KYJ
 	 */
 	public void close() {
+
 		this.stage.close();
 	}
 
@@ -401,8 +395,9 @@ public abstract class ResourceView<R> extends BorderPane {
 			}
 		} else if (ev.getCode() == KeyCode.ENTER && !ev.isControlDown() && !ev.isShiftDown() && !ev.isAltDown()) {
 			btnSelectOnMouseClick(null);
+		} else if (KeyCode.ESCAPE == ev.getCode()) {
+			sceneKeyEvent.handle(ev);
 		}
-
 	}
 
 	/**
@@ -413,9 +408,15 @@ public abstract class ResourceView<R> extends BorderPane {
 		if (ev.getCode() == KeyCode.ESCAPE && !ev.isControlDown() && !ev.isShiftDown() && !ev.isAltDown()) {
 			Scene scene = getScene();
 			if (scene != null) {
-				Stage window = (Stage) scene.getWindow();
-				if (window != null)
-					window.close();
+				Window window = scene.getWindow();
+				if (window instanceof Stage) {
+					((Stage) window).close();
+				} else {
+					window.hide();
+				}
+				//				Stage window = (Stage) scene.getWindow();
+				//				if (window != null)
+				//					window.close();
 			}
 		}
 	};
@@ -471,6 +472,15 @@ public abstract class ResourceView<R> extends BorderPane {
 
 	public Button getSelectButton() {
 		return btnSelect;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 9.
+	 * @return
+	 */
+	public ResultDialog<R> getResult() {
+		return result;
 	}
 
 }

@@ -43,6 +43,7 @@ import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SQLPaneMotionable;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTabPane;
+import com.kyj.fx.voeditor.visual.component.text.ASTSqlCodeAreaHelper;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.framework.BigDataDVO;
@@ -847,6 +848,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	/**
 	 * 탭추가.
 	 *
+	 * 2016-12-09 CodeAssistHelper 기능 추가.
+	 *
 	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
 	 * setAccelerator에 등록된 이벤트가 호출안됨
 	 *
@@ -854,6 +857,12 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 */
 	SqlTab createTabItem() {
 		SqlTab sqlTab = new SqlTab(this::txtSqlOnKeyEvent);
+
+		SqlKeywords sqlNode = sqlTab.getSqlNode();
+
+		//코드 AreaHelper 설치.
+		new ASTSqlCodeAreaHelper(sqlNode.getCodeArea(), connectionSupplier);
+
 		ContextMenu contextMenu = sqlTab.getTxtSqlPaneContextMenu();
 		Menu menuFunc = new Menu("Functions");
 
