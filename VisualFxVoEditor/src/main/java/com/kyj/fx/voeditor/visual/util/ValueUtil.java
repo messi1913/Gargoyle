@@ -1584,7 +1584,7 @@ public class ValueUtil {
 		int docCount = tf_IDFMatrix.length;
 		int wordCount = tf_IDFMatrix[0].length;
 
-		//평균을 위한 합.
+		// 평균을 위한 합.
 		double[] average = new double[wordCount];
 		for (int docIndex = 0; docIndex < tf_IDFMatrix.length; docIndex++) {
 			double[] wordIndexTable = tf_IDFMatrix[docIndex];
@@ -1594,14 +1594,14 @@ public class ValueUtil {
 			}
 		}
 
-		//평균값 도출.
+		// 평균값 도출.
 		for (int i = 0; i < average.length; i++) {
 			String keyword = words[i];
 			average[i] = average[i] / docCount;
 			arrayList.add(new KeyValue(keyword, average[i]));
 		}
 
-		//정렬. - 내림차순.
+		// 정렬. - 내림차순.
 		Collections.sort(arrayList, new Comparator<KeyValue>() {
 
 			@Override
@@ -1749,5 +1749,16 @@ public class ValueUtil {
 		}
 
 		return new String(newChars, 0, index);
+	}
+
+	/**
+	 * 프로그램의 실행 위치를 리턴함.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 9.
+	 * @return
+	 */
+	public static String getBaseDir() {
+		return System.getProperty("user.dir");
 	}
 }

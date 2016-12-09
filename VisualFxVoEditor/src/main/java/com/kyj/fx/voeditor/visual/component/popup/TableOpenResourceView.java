@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.ColumnMapRowMapper;
 
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
@@ -99,7 +100,7 @@ public class TableOpenResourceView {
 			break;
 
 		case ResourceLoader.ORG_MARIADB_JDBC_DRIVER:
-
+			tableName = "table_name";
 			break;
 
 		case ResourceLoader.ORACLE_JDBC_DRIVER_ORACLEDRIVER:
@@ -142,8 +143,7 @@ public class TableOpenResourceView {
 			break;
 
 		case ResourceLoader.ORG_SQLITE_JDBC:
-			schemaName = "";
-			break;
+			return "";
 
 		default:
 			schemaName = "table_schema";
@@ -172,7 +172,7 @@ public class TableOpenResourceView {
 			break;
 
 		case ResourceLoader.ORG_MARIADB_JDBC_DRIVER:
-			databaseName = "TABLE_SCHEMA";
+			databaseName = "table_schema";
 			break;
 
 		case ResourceLoader.ORACLE_JDBC_DRIVER_ORACLEDRIVER:
@@ -184,8 +184,7 @@ public class TableOpenResourceView {
 			break;
 
 		case ResourceLoader.ORG_SQLITE_JDBC:
-			databaseName = "";
-			break;
+			return "";
 
 		default:
 			databaseName = "TABLE_SCHEMA";
@@ -234,8 +233,9 @@ public class TableOpenResourceView {
 		 ********************************/
 		synchronized void loadTable(boolean reload) {
 
+			Connection connection = null;
 			try {
-				Connection connection = conSupplier.get();
+				connection = conSupplier.get();
 
 				driver = DbUtil.getDriverNameByConnection(connection);
 				lvResources.getItems().clear();
@@ -244,31 +244,59 @@ public class TableOpenResourceView {
 					List<Map<String, Object>> select = DbUtil.select(connection, sql, 30);
 					setResources(select);
 					lvResources.getItems().addAll(select);
+				} else {
+					ColumnMapRowMapper mapper = new ColumnMapRowMapper();
+					List<Map<String, Object>> tables = DbUtil.tables(null, rs -> {
+						
+						try {
+							Map<String, Object> mapRow = mapper.mapRow(rs, rs.getRow());
+							return mapRow;
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+						
+						
+						return Collections.emptyMap();
+					});
+
+					setResources(tables);
+					lvResources.getItems().addAll(tables);
+
 				}
 
 				/*
-				 * TODO 추후 아래 메타정보를 이용하여 고칠 수 있게할것.
-				 * REFERENCES.
+				 * TODO 추후 아래 메타정보를 이용하여 고칠 수 있게할것. REFERENCES.
 				 *
-				 * http://docs.oracle.com/javase/6/docs/api/java/sql/DatabaseMetaData.html#getColumns(java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String)
+				 * http://docs.oracle.com/javase/6/docs/api/java/sql/
+				 * DatabaseMetaData.html#getColumns(java.lang.String,%20java.
+				 * lang.String,%20java.lang.String,%20java.lang.String)
 				 *
-				 * */
-				//				ResultSet tables = connection.getMetaData().getTables(null, null, "%", new String[]{"TABLE"});
+				 */
+				// ResultSet tables = connection.getMetaData().getTables(null,
+				// null, "%", new String[]{"TABLE"});
 				//
-				//				while(tables.next())
-				//				{
-				//					String TABLE_CAT = tables.getString(1);
-				//					String TABLE_SCHEM = tables.getString(2);
-				//					String TABLE_NAME = tables.getString(3);
-				//					HashMap<String, Object> hashMap = new HashMap<String,Object>();
-				//					hashMap.put("catalog", TABLE_CAT);
-				//					hashMap.put("schema", TABLE_SCHEM);
-				//					hashMap.put("tableName", TABLE_NAME);
-				//				}
+				// while(tables.next())
+				// {
+				// String TABLE_CAT = tables.getString(1);
+				// String TABLE_SCHEM = tables.getString(2);
+				// String TABLE_NAME = tables.getString(3);
+				// HashMap<String, Object> hashMap = new
+				// HashMap<String,Object>();
+				// hashMap.put("catalog", TABLE_CAT);
+				// hashMap.put("schema", TABLE_SCHEM);
+				// hashMap.put("tableName", TABLE_NAME);
+				// }
 
 			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
 				DialogUtil.showExceptionDailog(e1);
+			} finally {
+				try {
+					DbUtil.close(connection);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 
 		}
@@ -283,7 +311,7 @@ public class TableOpenResourceView {
 
 				@Override
 				public String toString(Map<String, Object> object) {
-					//					LOGGER.debug(object.toString());
+					// LOGGER.debug(object.toString());
 					return String.format("%s // ( %s %s )", getTableName(object).toString(), getSchema(object), getDatabaseName(object));
 				}
 

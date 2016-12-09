@@ -86,16 +86,21 @@ public class ASTSqlCodeAreaHelper extends ASTCodeAreaHelper {
 					Map<String, Object> data = result.getData();
 					if (data == null)
 						return;
-					Object object = data.get("table_name");
-					if (object == null)
+					
+					
+					String tableName = getTableName(data);
+					if(tableName == null)
 						return;
+//					Object object = data.get("table_name");
+//					if (object == null)
+//						return;
 
 					String string = currentPragraph(codeArea);
 					int markTextColumnIndex = getIndexOfValideWhiteSpace(string);
 
 					if (markTextColumnIndex == -1) {
 						codeArea.getUndoManager().mark();
-						codeArea.appendText(object.toString());
+						codeArea.appendText(tableName);
 					} else {
 
 						int anchor = codeArea.getAnchor();
@@ -103,7 +108,7 @@ public class ASTSqlCodeAreaHelper extends ASTCodeAreaHelper {
 
 						IndexRange normalize = IndexRange.normalize(start, anchor);
 						codeArea.getUndoManager().mark();
-						codeArea.replaceText(normalize, object.toString());
+						codeArea.replaceText(normalize, tableName);
 					}
 				}
 
