@@ -274,7 +274,7 @@ public class SkinPreviewViewComposite extends BorderPane {
 
 					if (ValueUtil.isNotEmpty(selectedBtnStyleClassName.get())) {
 						btnStyleClass = selectedBtnStyleClassName.get();
-//						SkinManager.getInstance().registButtonSyleClass(btnStyleClass);
+						SkinManager.getInstance().registButtonSyleClass(btnStyleClass);
 //						SkinManager.getInstance().applyBtnSyleClass(btnStyleClass);
 						stylesheets.add(SkinManager.getInstance().toButtonURL(btnStyleClass).toExternalForm());
 					}
