@@ -130,11 +130,14 @@ public class FileUtil {
 	public static boolean openFile(File file) {
 		boolean isSuccess = false;
 		if (Desktop.isDesktopSupported()) {
-			try {
-				Desktop.getDesktop().open(file);
-			} catch (IOException e) {
-				isSuccess = false;
+			if (file.exists()) {
+				try {
+					Desktop.getDesktop().open(file);
+				} catch (IOException e) {
+					isSuccess = false;
+				}
 			}
+
 		}
 		return isSuccess;
 	}
@@ -142,7 +145,8 @@ public class FileUtil {
 	private static final Map<File, String> cacheReadFile = new CachedMap<>(60000);
 
 	/**
-	 *  파일 읽기 처리.
+	 * 파일 읽기 처리.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 19.
 	 * @param file
@@ -160,7 +164,7 @@ public class FileUtil {
 	 * @작성일 : 2016. 7. 26.
 	 * @param file
 	 * @param useCache
-	 * 			메모리에 읽어온 파일의 컨텐츠를 임시저장함.
+	 *            메모리에 읽어온 파일의 컨텐츠를 임시저장함.
 	 * @param options
 	 * @return
 	 */
@@ -209,7 +213,7 @@ public class FileUtil {
 
 			if (isMatch && file.exists()) {
 
-				//인코딩이 존재하지않는경우 UTF-8로 치환.
+				// 인코딩이 존재하지않는경우 UTF-8로 치환.
 				String encoding = options.getEncoding();
 				if (ValueUtil.isEmpty(encoding))
 					encoding = "UTF-8";
@@ -217,7 +221,7 @@ public class FileUtil {
 				content = FileUtils.readFileToString(file, encoding);
 			} else {
 
-				//만약 파일이 존재하지않는다면 option파라미터에서 제공되는 처리내용을 반영.
+				// 만약 파일이 존재하지않는다면 option파라미터에서 제공되는 처리내용을 반영.
 				Function<File, String> fileNotFoundThan = options.getFileNotFoundThan();
 				if (fileNotFoundThan != null) {
 					content = fileNotFoundThan.apply(file);
@@ -312,7 +316,8 @@ public class FileUtil {
 	}
 
 	/**
-	 * 파일 하위에 .project라는 파일이 존재하며 그 .project파일에 기술된 내용이 실제 디렉토리와 일치한다면 자바 project파일이다.
+	 * 파일 하위에 .project라는 파일이 존재하며 그 .project파일에 기술된 내용이 실제 디렉토리와 일치한다면 자바
+	 * project파일이다.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 3. 16.
@@ -410,7 +415,8 @@ public class FileUtil {
 	 *
 	 * 디렉토리 삭제.
 	 *
-	 * 일반 delete 함수로는 디렉토리안에 파일들이 존재하는 삭제하는 허용되지않음. 그래서 하위파일들을 먼저 삭제하고 디렉토리삭제를 처리해야함. 이 함수는 그런 디렉토리 삭제를 지원해주기 위한 함수.
+	 * 일반 delete 함수로는 디렉토리안에 파일들이 존재하는 삭제하는 허용되지않음. 그래서 하위파일들을 먼저 삭제하고 디렉토리삭제를
+	 * 처리해야함. 이 함수는 그런 디렉토리 삭제를 지원해주기 위한 함수.
 	 *
 	 * @param path
 	 ********************************/
@@ -630,7 +636,7 @@ public class FileUtil {
 				if (result == -1)
 					close();
 
-				//읽기 쓰기 병행시 flip을 호출해줘야함.
+				// 읽기 쓰기 병행시 flip을 호출해줘야함.
 				byteBuffer.flip();
 				byteBuffer.mark();
 				handler.apply(byteBuffer.array());
@@ -673,6 +679,7 @@ public class FileUtil {
 
 	/**
 	 * 파일확장자 리턴
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param extension
@@ -683,6 +690,7 @@ public class FileUtil {
 
 	/**
 	 * 파일확장자 리턴
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param fileName

@@ -116,6 +116,7 @@
 							<items>
 								<MenuItem mnemonicParsing="false" onAction="#menuOpenOnAction" text="Open" />
 								<MenuItem mnemonicParsing="false" onAction="#menuSwitchWorkspaceOnAction" text="Switch Workspace" />
+								<MenuItem mnemonicParsing="false" onAction="#menuShowInstalledLocation" text="Show Installed Location" />
 								<SeparatorMenuItem mnemonicParsing="false" />
 								<MenuItem fx:id="menuPrint" mnemonicParsing="false" onAction="#menuPrintOnAction" text="Print">
 									<accelerator>

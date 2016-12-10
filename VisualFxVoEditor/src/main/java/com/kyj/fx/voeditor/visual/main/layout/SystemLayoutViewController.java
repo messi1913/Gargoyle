@@ -1862,4 +1862,14 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		selectDirFile = new File(baseDir);
 		treeProjectFile.setRoot(createNewTree(selectDirFile));
 	}
+	
+	/**
+	 * 프로그램이 설치된 디렉토리를 open.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 10. 
+	 */
+	@FXML
+	public void menuShowInstalledLocation(){
+		FileUtil.openFile(new File(ValueUtil.getBaseDir()));
+	}
 }
