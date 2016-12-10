@@ -270,10 +270,11 @@ public class ResourceLoaderDbProperties extends Properties {
 
 						Map<Object, Object> hashMap = new HashMap<>();
 						hashMap.put(key, value);
-						if (containsKey(key)) {
-							stat.addBatch(String.format(update, value, key));
+						
+						if (findOne(key) !=null) {
+							stat.addBatch(String.format(update, value.toString(), key.toString()));
 						} else {
-							stat.addBatch(String.format(insert, key, value));
+							stat.addBatch(String.format(insert, key.toString(), value.toString()));
 						}
 
 					} catch (Exception e) {

@@ -388,7 +388,7 @@ public class DatabaseUrlManagementView extends BorderPane {
 			});
 			map.put("database.column.order", colList.toString());
 			instance.putAll(map);
-
+			
 			tbDatabase.getItems().clear();
 			tbDatabase.getItems().addAll(loadResource());
 
