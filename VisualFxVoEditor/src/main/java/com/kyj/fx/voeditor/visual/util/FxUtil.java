@@ -409,7 +409,7 @@ public class FxUtil {
 			List<Node> findAllByNodes = FxUtil.findAllByNodes(parent, v -> v instanceof Button);
 			findAllByNodes.forEach(v -> {
 				GargoyleButtonBuilder.applyStyleClass((Button) v, SkinManager.BUTTON_STYLE_CLASS_NAME);
-				LOGGER.debug("Button :  {}", v);
+//				LOGGER.debug("Button :  {}", v);
 			});
 		});
 

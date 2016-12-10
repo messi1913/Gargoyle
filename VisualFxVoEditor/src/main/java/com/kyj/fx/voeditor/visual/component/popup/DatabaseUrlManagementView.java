@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.popup;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
@@ -60,7 +62,7 @@ import javafx.util.StringConverter;
 /**
  * @author Hong
  * 
- * 2016-12-03 FxUtil.loadRoot()함수를 이용한 로딩으로 수정 by kyj
+ *         2016-12-03 FxUtil.loadRoot()함수를 이용한 로딩으로 수정 by kyj
  *
  */
 @FXMLController(value = "DatabaseUrlManagementView.fxml", isSelfController = true)
@@ -101,16 +103,16 @@ public class DatabaseUrlManagementView extends BorderPane {
 	 */
 	public DatabaseUrlManagementView() {
 		FxUtil.loadRoot(DatabaseUrlManagementView.class, this, err -> LOGGER.error(ValueUtil.toString(err)));
-		
-//		FXMLLoader loader = new FXMLLoader();
-//		loader.setLocation(getClass().getResource("DatabaseUrlManagementView.fxml"));
-//		loader.setController(this);
-//		loader.setRoot(this);
-//		try {
-//			loader.load();
-//		} catch (Exception e) {
-//			LOGGER.error(e.getMessage());
-//		}
+
+		// FXMLLoader loader = new FXMLLoader();
+		// loader.setLocation(getClass().getResource("DatabaseUrlManagementView.fxml"));
+		// loader.setController(this);
+		// loader.setRoot(this);
+		// try {
+		// loader.load();
+		// } catch (Exception e) {
+		// LOGGER.error(e.getMessage());
+		// }
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -148,6 +150,39 @@ public class DatabaseUrlManagementView extends BorderPane {
 		tbDatabase.getColumns().add(1, colColor);
 		tbDatabase.getColumns().get(1).setText("Color");
 		tbDatabase.getColumns().get(1).setId("colColor");
+
+		/*********************************************************/
+		//파일 DagDrop 이벤트. URL에 새 데이터 add.
+		tbDatabase.setOnDragDropped(ev -> {
+
+			if (ev.getDragboard().hasFiles()) {
+				List<File> files = ev.getDragboard().getFiles();
+
+				// tbDatabase.getItems().add(e)
+				files.stream().map(v -> {
+					return v.getAbsolutePath();
+				}).forEach(str -> {
+
+					Map<String, Object> map = new HashMap<String, Object>();
+					map.put(ResourceLoader.BASE_KEY_JDBC_URL, str);
+					tbDatabase.getItems().add(map);
+				});
+
+				ev.setDropCompleted(true);
+				ev.consume();
+			}
+
+		});
+
+		tbDatabase.setOnDragOver(ev -> {
+
+			if (ev.getDragboard().hasFiles()) {
+				ev.acceptTransferModes(TransferMode.LINK);
+				ev.consume();
+			}
+
+		});
+		/*********************************************************/
 
 		colPopup = new ButtonTableColumn() {
 			@Override

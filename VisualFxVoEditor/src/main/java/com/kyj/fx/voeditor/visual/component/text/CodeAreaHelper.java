@@ -6,7 +6,12 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import org.fxmisc.richtext.CodeArea;
@@ -15,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.popup.TextSearchAndReplaceView;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.SqlFormatter;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -26,18 +32,20 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.util.Pair;
 
 /**
  *
- *  코드 처리 관련 Helper 클래스
+ * 코드 처리 관련 Helper 클래스
  *
- *   CodeArea클래스와 연관된 모든 공통처리내용이 구현된다.
+ * CodeArea클래스와 연관된 모든 공통처리내용이 구현된다.
  *
  * @author KYJ
  *
@@ -65,6 +73,13 @@ public class CodeAreaHelper<T extends CodeArea> {
 		this.codeArea.setOnMouseClicked(defaultSelectionHandler);
 		codeMoveDeligator = new CodeAreaMoveLineHelper(codeArea);
 
+		// this.codeArea.addEventHandler(MouseDragEvent.MOUSE_DRAG_OVER,
+		// this::codeAreaDagOver);
+		// this.codeArea.addEventHandler(MouseDragEvent.MOUSE_DRAG_ENTERED_TARGET,
+		// this::codeAreaDagEnteredTarget);
+		this.codeArea.setOnDragOver(this::codeAreaDagOver);
+		this.codeArea.setOnDragDropped(this::setOnDragDropped);
+
 		contextMenu = codeArea.getContextMenu();
 		if (contextMenu == null) {
 			contextMenu = new ContextMenu();
@@ -73,11 +88,70 @@ public class CodeAreaHelper<T extends CodeArea> {
 		createMenus();
 	}
 
+	/*********************************************************/
+	// 파일 드래그 드롭 처리.
+
+	public void codeAreaDagOver(DragEvent ev) {
+		if (ev.isConsumed())
+			return;
+
+		if (ev.getDragboard().hasFiles()) {
+			ev.acceptTransferModes(TransferMode.LINK);
+			ev.consume();
+		}
+
+	}
+
+	public void setOnDragDropped(DragEvent ev) {
+		if (ev.isConsumed())
+			return;
+
+		if (ev.getDragboard().hasFiles()) {
+
+			List<File> files = ev.getDragboard().getFiles();
+
+			// tbDatabase.getItems().add(e)
+			files.stream().findFirst().ifPresent(f -> {
+
+				if (f.length() > dragDropLimitSize()) {
+
+					DialogUtil.showMessageDialog("파일 용량이 너무 큽니다.");
+					return;
+
+				}
+
+				try (FileInputStream is = new FileInputStream(f)) {
+					setContent(FileUtil.readToString(is));
+				} catch (Exception e) {
+					LOGGER.error(ValueUtil.toString(e));
+				}
+
+			});
+
+			ev.setDropCompleted(true);
+			ev.consume();
+		}
+
+	}
+
+	/**
+	 * 드래그 드롭시 파일 제한 사이즈 정의
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 10.
+	 * @return
+	 */
+	protected long dragDropLimitSize() {
+		return 5 * 1024 * 1024;
+	}
+
+	/*********************************************************/
+
 	/**
 	 *
-	 *  2016-10-27 키 이벤트를  setAccelerator를 사용하지않고 이벤트 방식으로 변경
-		이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
-
+	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
+	 * setAccelerator에 등록된 이벤트가 호출안됨
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 */
@@ -146,7 +220,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 			String fullText = codeArea.getText();
 			int caretPosition = codeArea.getCaretPosition();
 
-			//bugfix
+			// bugfix
 			String split = sqlFormatter.split(fullText, caretPosition);
 			return split;
 		}
@@ -159,6 +233,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 
 	/**
 	 * Sql 포멧처리.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 9. 23.
 	 */
@@ -197,6 +272,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 
 	/**
 	 * 찾기 바꾸기 이벤트
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 13.
 	 * @param e
@@ -224,10 +300,11 @@ public class CodeAreaHelper<T extends CodeArea> {
 				String searchText = vo.getSearchText();
 				String replaceText = vo.getReplaceText();
 
-				//					codeArea.getUndoManager().mark();
-				//					codeArea.replaceText(startIndex, (startIndex + searchText.length()), replaceText);
+				// codeArea.getUndoManager().mark();
+				// codeArea.replaceText(startIndex, (startIndex +
+				// searchText.length()), replaceText);
 				setContent(startIndex, startIndex + searchText.length(), replaceText);
-				//					codeArea.getUndoManager().mark();
+				// codeArea.getUndoManager().mark();
 
 				break;
 			}
@@ -357,13 +434,14 @@ public class CodeAreaHelper<T extends CodeArea> {
 		// System.out.println("sqlKeywords");
 		// System.out.println(e.getCode());
 		// CTRL + F 찾기
-		//		if ((e.getCode() == KeyCode.F) && (e.isControlDown() && !e.isShiftDown())) {
-		//			findReplaceEvent(e);
-		//		}
+		// if ((e.getCode() == KeyCode.F) && (e.isControlDown() &&
+		// !e.isShiftDown())) {
+		// findReplaceEvent(e);
+		// }
 		// Ctr + U 선택된 문자 또는 전체 문자를 대문자로 치환
-		//		toUppercaseEvent(e);
+		// toUppercaseEvent(e);
 		// Ctr + L 선택된 문자 또는 전체 문자를 소문자로 치환
-		//		toLowercaseEvent(e);
+		// toLowercaseEvent(e);
 
 	}
 
@@ -371,6 +449,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 	 * 특정라인으로 이동처리하는 메소드
 	 *
 	 * 특정라인블록 전체를 선택처리함.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param moveToLine

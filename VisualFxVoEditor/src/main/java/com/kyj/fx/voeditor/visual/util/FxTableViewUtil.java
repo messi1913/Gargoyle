@@ -94,7 +94,8 @@ class FxTableViewUtil {
 
 	/**
 	 *
-	 * reference  - getValueByConverter(TableView<?> table, TableColumn<?, ?> column, int rowIndex) <br/>
+	 * reference - getValueByConverter(TableView<?> table, TableColumn<?, ?>
+	 * column, int rowIndex) <br/>
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 28.
@@ -111,6 +112,7 @@ class FxTableViewUtil {
 	 * 작성일 : 2016. 5. 12. 작성자 : KYJ
 	 *
 	 * 테이블뷰 클립보드 기능.
+	 * 
 	 * @param table
 	 ********************************/
 	public static void installCopyPasteHandler(TableView<?> table) {
@@ -167,4 +169,5 @@ class FxTableViewUtil {
 
 		});
 	}
+
 }
