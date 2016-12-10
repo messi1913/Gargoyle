@@ -7,6 +7,9 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.momory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -73,6 +76,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 	/**
 	 * 씬빌더 위치정보
+	 * 
 	 * @최초생성일 2016. 6. 19.
 	 */
 	public static final String SCENEBUILDER_LOCATION = "scenebuilder.location";
@@ -84,7 +88,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	 */
 	public static final String USER_SELECT_LOCATION_PATH = "user.select.location.path";
 
-	private static Properties properties;
+	private static Properties properties = ResourceLoaderDbProperties.getInstance();
 	private static ResourceLoader loader;
 
 	public static final String FILE_NAME = "UserConf.properties";
@@ -106,6 +110,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 	/**
 	 * PMD에서 유저가 선택한 상태 값 배열
+	 * 
 	 * @최초생성일 2016. 10. 14.
 	 */
 	public static final String PMD_SELECTED_PRIORITY_VALUES = "pmd.selected.priority.values";
@@ -126,27 +131,35 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	}
 
 	private void initialize() {
-		properties = ResourceLoaderDbProperties.getInstance();//new Properties();
-//
-//		FileInputStream inStream = null;
-//		try {
-//			File file = new File(FILE_NAME);
-//			if (!file.exists()) {
-//				file.createNewFile();
-//			}
-//			inStream = new FileInputStream(FILE_NAME);
-//			properties.load(inStream);
-//			baseKeyLoad(properties);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} finally {
-//			try {
-//				if (inStream != null)
-//					inStream.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
+
+		try {
+			properties.load((InputStream) null);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// new
+		// Properties();
+		//
+		// FileInputStream inStream = null;
+		// try {
+		// File file = new File(FILE_NAME);
+		// if (!file.exists()) {
+		// file.createNewFile();
+		// }
+		// inStream = new FileInputStream(FILE_NAME);
+		// properties.load(inStream);
+		// baseKeyLoad(properties);
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// } finally {
+		// try {
+		// if (inStream != null)
+		// inStream.close();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+		// }
 	}
 
 	/**
@@ -206,20 +219,26 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	 * @작성일 : 2015. 11. 4.
 	 */
 	private void store() {
-//		FileOutputStream out = null;
-//		try {
-//			out = new FileOutputStream(FILE_NAME);
-//			properties.store(out, "User Conf...");
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		} finally {
-//			try {
-//				if (out != null)
-//					out.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
+		// FileOutputStream out = null;
+		// try {
+		// out = new FileOutputStream(FILE_NAME);
+		// properties.store(out, "User Conf...");
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// } finally {
+		// try {
+		// if (out != null)
+		// out.close();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+		// }
+		try {
+			properties.store((Writer) null, "User Conf...");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public String get(String key) {
@@ -259,9 +278,9 @@ public class ResourceLoader implements IFileBaseConfiguration {
 		return properties.entrySet();
 	}
 
-//	public Map<String, Object> toMap() {
-//		return new HashedMap(properties);
-//	}
+	// public Map<String, Object> toMap() {
+	// return new HashedMap(properties);
+	// }
 
 	@Override
 	public String getFileName() {

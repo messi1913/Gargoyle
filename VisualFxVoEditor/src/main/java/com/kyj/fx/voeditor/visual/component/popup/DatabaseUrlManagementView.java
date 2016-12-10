@@ -152,7 +152,7 @@ public class DatabaseUrlManagementView extends BorderPane {
 		tbDatabase.getColumns().get(1).setId("colColor");
 
 		/*********************************************************/
-		//파일 DagDrop 이벤트. URL에 새 데이터 add.
+		// 파일 DagDrop 이벤트. URL에 새 데이터 add.
 		tbDatabase.setOnDragDropped(ev -> {
 
 			if (ev.getDragboard().hasFiles()) {
@@ -342,10 +342,16 @@ public class DatabaseUrlManagementView extends BorderPane {
 		ResourceLoader instance = ResourceLoader.getInstance();
 		instance.initDataBaseInfo();
 		try {
+			String prefiixKey = "database.info.";
 			Map<String, Object> map = new HashMap<>();
 			List<String> colList = new ArrayList<String>();
-			tbDatabase.getItems().forEach(item -> {
-				Object key = item.get("seqNum");
+
+			//2016-12-10 by kyj. 구 코드 버그 수정.
+
+			for (int i = 0; i < tbDatabase.getItems().size(); i++) {
+				Map<String, Object> item = tbDatabase.getItems().get(i);
+				Object key = prefiixKey + i;//  item.get("seqNum");
+				
 				JSONObject json = new JSONObject();
 				json.put("seqNum", item.get("seqNum"));
 				json.put("dbms", item.get("dbms"));
@@ -354,10 +360,28 @@ public class DatabaseUrlManagementView extends BorderPane {
 				json.put(ResourceLoader.BASE_KEY_JDBC_ID, item.get(ResourceLoader.BASE_KEY_JDBC_ID));
 				json.put(ResourceLoader.BASE_KEY_JDBC_PASS, item.get(ResourceLoader.BASE_KEY_JDBC_PASS));
 				json.put("color", item.get("color"));
-				if (key == null)
-					return;
-				map.put(key.toString(), json.toJSONString());
-			});
+				
+				
+				map.put(key.toString(), json.toJSONString());	
+			}
+
+			
+
+//			tbDatabase.getItems().forEach(item -> {
+//				Object key = item.get("seqNum");
+//				JSONObject json = new JSONObject();
+//				json.put("seqNum", item.get("seqNum"));
+//				json.put("dbms", item.get("dbms"));
+//				json.put("alias", item.get("alias"));
+//				json.put(ResourceLoader.BASE_KEY_JDBC_URL, item.get(ResourceLoader.BASE_KEY_JDBC_URL));
+//				json.put(ResourceLoader.BASE_KEY_JDBC_ID, item.get(ResourceLoader.BASE_KEY_JDBC_ID));
+//				json.put(ResourceLoader.BASE_KEY_JDBC_PASS, item.get(ResourceLoader.BASE_KEY_JDBC_PASS));
+//				json.put("color", item.get("color"));
+//				if (key == null)
+//					return;
+//				map.put(key.toString(), json.toJSONString());
+//			});
+
 			tbDatabase.getColumns().forEach(col -> {
 				if (col.isVisible())
 					colList.add(col.getId());

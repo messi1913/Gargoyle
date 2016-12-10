@@ -220,7 +220,7 @@ public class DbUtil extends ConnectionManager {
 
 			/* 쿼리 타임아웃 시간 설정 SEC */
 			// int queryTimeout = getQueryTimeout();
-
+			
 			prepareStatement = prestatementConvert.apply(con, sql); // con.prepareStatement(sql);
 			// postgre-sql can't
 			// prepareStatement.setQueryTimeout(queryTimeout);
