@@ -13,12 +13,15 @@
 
 <fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
-		<TableView fx:id="tbDatabase" editable="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+		<TableView fx:id="tbDatabase" editable="true" BorderPane.alignment="CENTER">
 			<columns>
-				<TableColumn fx:id="colKey" editable="false" prefWidth="192.0" text="Key" />
-				<TableColumn fx:id="colValue" editable="false" minWidth="0.0" prefWidth="343.0" text="Value">
+				<TableColumn fx:id="colKey" editable="false" maxWidth="-1.0" minWidth="200.0" prefWidth="200.0" text="Key" />
+				<TableColumn fx:id="colValue" editable="false" maxWidth="1.7976931348623157E308" minWidth="200.0" prefWidth="378.0" text="Value">
 				</TableColumn>
 			</columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
 		</TableView>
 	</center>
 	<bottom>
