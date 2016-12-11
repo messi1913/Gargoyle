@@ -768,10 +768,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				File file = tmpSelectFileWrapper.getFile();
 				if (file.exists() && file.isDirectory()) {
 					ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH,  file.getAbsolutePath());
-					
+
 					// 경로를 생대경로화 시킨다.
 					Path relativize = FileUtil.toRelativizeForGagoyle(file);
-					
+
 					txtLocation.setText(relativize.toString());
 				} else {
 					DialogUtil.showMessageDialog("Only Directory.");
@@ -1681,6 +1681,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		showYesOrNoDialog.ifPresent(str -> {
 
 			if ("RESULT".equals(str.getKey()) && "Y".equals(str.getValue())) {
+				SharedMemory.getPrimaryStage().close();
 				Platform.exit();
 			}
 		});
@@ -1862,11 +1863,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		selectDirFile = new File(baseDir);
 		treeProjectFile.setRoot(createNewTree(selectDirFile));
 	}
-	
+
 	/**
 	 * 프로그램이 설치된 디렉토리를 open.
 	 * @작성자 : KYJ
-	 * @작성일 : 2016. 12. 10. 
+	 * @작성일 : 2016. 12. 10.
 	 */
 	@FXML
 	public void menuShowInstalledLocation(){
