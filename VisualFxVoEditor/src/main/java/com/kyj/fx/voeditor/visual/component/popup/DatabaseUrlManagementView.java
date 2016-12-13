@@ -61,7 +61,7 @@ import javafx.util.StringConverter;
 
 /**
  * @author Hong
- * 
+ *
  *         2016-12-03 FxUtil.loadRoot()함수를 이용한 로딩으로 수정 by kyj
  *
  */
@@ -351,7 +351,7 @@ public class DatabaseUrlManagementView extends BorderPane {
 			for (int i = 0; i < tbDatabase.getItems().size(); i++) {
 				Map<String, Object> item = tbDatabase.getItems().get(i);
 				Object key = prefiixKey + i;//  item.get("seqNum");
-				
+
 				JSONObject json = new JSONObject();
 				json.put("seqNum", item.get("seqNum"));
 				json.put("dbms", item.get("dbms"));
@@ -360,27 +360,24 @@ public class DatabaseUrlManagementView extends BorderPane {
 				json.put(ResourceLoader.BASE_KEY_JDBC_ID, item.get(ResourceLoader.BASE_KEY_JDBC_ID));
 				json.put(ResourceLoader.BASE_KEY_JDBC_PASS, item.get(ResourceLoader.BASE_KEY_JDBC_PASS));
 				json.put("color", item.get("color"));
-				
-				
-				map.put(key.toString(), json.toJSONString());	
+
+				map.put(key.toString(), json.toJSONString());
 			}
 
-			
-
-//			tbDatabase.getItems().forEach(item -> {
-//				Object key = item.get("seqNum");
-//				JSONObject json = new JSONObject();
-//				json.put("seqNum", item.get("seqNum"));
-//				json.put("dbms", item.get("dbms"));
-//				json.put("alias", item.get("alias"));
-//				json.put(ResourceLoader.BASE_KEY_JDBC_URL, item.get(ResourceLoader.BASE_KEY_JDBC_URL));
-//				json.put(ResourceLoader.BASE_KEY_JDBC_ID, item.get(ResourceLoader.BASE_KEY_JDBC_ID));
-//				json.put(ResourceLoader.BASE_KEY_JDBC_PASS, item.get(ResourceLoader.BASE_KEY_JDBC_PASS));
-//				json.put("color", item.get("color"));
-//				if (key == null)
-//					return;
-//				map.put(key.toString(), json.toJSONString());
-//			});
+			//			tbDatabase.getItems().forEach(item -> {
+			//				Object key = item.get("seqNum");
+			//				JSONObject json = new JSONObject();
+			//				json.put("seqNum", item.get("seqNum"));
+			//				json.put("dbms", item.get("dbms"));
+			//				json.put("alias", item.get("alias"));
+			//				json.put(ResourceLoader.BASE_KEY_JDBC_URL, item.get(ResourceLoader.BASE_KEY_JDBC_URL));
+			//				json.put(ResourceLoader.BASE_KEY_JDBC_ID, item.get(ResourceLoader.BASE_KEY_JDBC_ID));
+			//				json.put(ResourceLoader.BASE_KEY_JDBC_PASS, item.get(ResourceLoader.BASE_KEY_JDBC_PASS));
+			//				json.put("color", item.get("color"));
+			//				if (key == null)
+			//					return;
+			//				map.put(key.toString(), json.toJSONString());
+			//			});
 
 			tbDatabase.getColumns().forEach(col -> {
 				if (col.isVisible())
@@ -388,7 +385,7 @@ public class DatabaseUrlManagementView extends BorderPane {
 			});
 			map.put("database.column.order", colList.toString());
 			instance.putAll(map);
-			
+
 			tbDatabase.getItems().clear();
 			tbDatabase.getItems().addAll(loadResource());
 
@@ -459,12 +456,12 @@ public class DatabaseUrlManagementView extends BorderPane {
 			poolProperties.setPassword(password);
 
 			return poolProperties;
-		}, (bool) -> {
+		} , (bool) -> {
 			String msg = "fail!";
 			if (bool)
 				msg = "success!";
 			DialogUtil.showMessageDialog(msg);
-		}, ex -> {
+		} , ex -> {
 			LOGGER.info(ValueUtil.toString("ping test", ex));
 		});
 
@@ -495,6 +492,10 @@ public class DatabaseUrlManagementView extends BorderPane {
 		String title = String.format("Database[%s]", sqlPane.getClass().getSimpleName());
 
 		DockNode dockNode = new DockNode(sqlPane, title);
+//		Platform.runLater(() -> {
+//			dockNode.setMaximized(true);
+//		});
+
 		// dockNode.setFloating(true, new Point2D(0,0));
 		// dockNode.getStage().centerOnScreen();
 
