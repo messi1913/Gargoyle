@@ -930,7 +930,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * @param e
 	 */
 	public void menuShowApplicationCodeOnAction(ActionEvent e) {
-		FxUtil.EasyFxUtils.showApplicationCode(this.sqlTab.getSqlText());
+		FxUtil.EasyFxUtils.showApplicationCode(this.sqlTab.getSelectedSQLText());
 	}
 
 	/**
