@@ -51,7 +51,7 @@ class FxTableViewUtil {
 	 * @return Object 테이블셀에 정의된 데이터를 리턴할 값으로, 리턴해주는 값이 엑셀에 write된다.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T> Object getValueByConverter(TableView<?> table, TableColumn<?, ?> column, int rowIndex) {
+	public static  Object getValueByConverter(TableView<?> table, TableColumn<?, ?> column, int rowIndex) {
 
 		Callback cellFactory = column.getCellFactory();
 		if (cellFactory != null) {
@@ -112,7 +112,7 @@ class FxTableViewUtil {
 	 * 작성일 : 2016. 5. 12. 작성자 : KYJ
 	 *
 	 * 테이블뷰 클립보드 기능.
-	 * 
+	 *
 	 * @param table
 	 ********************************/
 	public static void installCopyPasteHandler(TableView<?> table) {
