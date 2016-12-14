@@ -1753,12 +1753,23 @@ public class ValueUtil {
 
 	/**
 	 * 프로그램의 실행 위치를 리턴함.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 9.
 	 * @return
 	 */
 	public static String getBaseDir() {
 		return System.getProperty("user.dir");
+	}
+
+	/**
+	 * TODO 메세지 처리 방안 기술.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 14.
+	 * @param messageId
+	 * @return
+	 */
+	public static String getMessage(String messageId) {
+		return "";
 	}
 }
