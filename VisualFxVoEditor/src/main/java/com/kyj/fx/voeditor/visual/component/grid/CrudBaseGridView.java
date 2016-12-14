@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -18,8 +19,10 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -28,12 +31,15 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.util.Duration;
 
 /**
  * 기본적인 Crud를 처리해주는 공통그리드 콤포넌트
@@ -163,7 +169,6 @@ public class CrudBaseGridView<T extends AbstractDVO> extends BorderPane {
 			list.add(btnSave);
 		}
 
-
 		return list;
 	}
 
@@ -218,8 +223,40 @@ public class CrudBaseGridView<T extends AbstractDVO> extends BorderPane {
 					boolean present = findFirst.isPresent();
 					if (present) {
 						String msgFieldName = nullCheckHandler.getMsgNameByfield();
-//						String message = ValueUtil.getMessage("MSG_W_000001", msgFieldName);
-						DialogUtil.showMessageDialog(SharedMemory.getPrimaryStage(), msgFieldName + " Field is empty.");
+						//						String message = ValueUtil.getMessage("MSG_W_000001", msgFieldName);
+
+						int emptyIndex = nullCheckHandler.getEmptyIndex();
+
+
+
+						Set<Node> findAllByNodes = CrudBaseGridView.this.lookupAll("TableRow");
+						findAllByNodes.stream().map(n -> (TableRow) n).filter(r -> {
+							return emptyIndex == r.getIndex();
+						}).findFirst().ifPresent(n -> {
+
+							Timeline timeline = new Timeline();
+							timeline.setCycleCount(10);
+							timeline.setAutoReverse(true);
+
+							KeyFrame keyFrame = new KeyFrame(Duration.millis(500),
+									new KeyValue(n.styleProperty(), "-fx-border-color : red ; -fx-border-width : 1px"));
+							KeyFrame keyFrame2 = new KeyFrame(Duration.millis(500),
+									new KeyValue(n.styleProperty(), ""));
+
+							KeyValue keyValueX = new KeyValue(n.styleProperty(), "-fx-border-color : red ; -fx-border-width : 1px");
+					        KeyValue keyValueY = new KeyValue(n.styleProperty(), "");
+
+							KeyFrame keyFrame3 = new KeyFrame(Duration.seconds(2), "", keyValueX, keyValueY );
+							timeline.getKeyFrames().add(keyFrame3);
+
+							timeline.play();
+//							n.setStyle("-fx-border-color : red ; -fx-border-width : 1px");
+
+						});
+
+						getSelectionModel().select(emptyIndex);
+
+//						DialogUtil.showMessageDialog(SharedMemory.getPrimaryStage(), msgFieldName + " Field is empty.");
 						return;
 					}
 

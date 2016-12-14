@@ -31,6 +31,10 @@ public abstract class AbstractVoNullChecker<T extends AbstractDVO> implements Vo
 
 	private CrudBaseGridView<T> view;
 
+	private T emptyDataset;
+
+	private int emptyIndex = -1;
+
 	public AbstractVoNullChecker() {
 
 	}
@@ -72,7 +76,9 @@ public abstract class AbstractVoNullChecker<T extends AbstractDVO> implements Vo
 		if (list == null)
 			return Optional.empty();
 
-		for (T t : list) {
+		for (int i=0; i<list.size(); i++ ) {
+			T t  = list.get(i);
+
 			for (Field f : getFields(t)) {
 				Object value = null;
 
@@ -98,6 +104,8 @@ public abstract class AbstractVoNullChecker<T extends AbstractDVO> implements Vo
 						this.field = f;
 						this.msgNameByfield = getMessage(f);
 						this.fieldName = f.getName();
+						this.emptyDataset = t;
+						this.emptyIndex = i;
 
 						return Optional.of(f);
 					}
@@ -128,6 +136,13 @@ public abstract class AbstractVoNullChecker<T extends AbstractDVO> implements Vo
 		return msgNameByfield;
 	}
 
+	public T getEmptyDataset(){
+		return emptyDataset;
+	}
+
+	public int getEmptyIndex(){
+		return emptyIndex;
+	}
 	protected String getMessage(Field f) {
 		AnnotationOptions<T> options = view.getOptions();
 		return options.getColumnHeader(f.getName());
