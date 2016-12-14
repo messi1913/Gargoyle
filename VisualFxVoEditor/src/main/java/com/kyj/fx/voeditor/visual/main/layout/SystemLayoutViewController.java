@@ -772,7 +772,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					// 경로를 생대경로화 시킨다.
 					Path relativize = FileUtil.toRelativizeForGagoyle(file);
 
-					txtLocation.setText(relativize.toString());
+					txtLocation.setText(File.separator + relativize.toString());
 				} else {
 					DialogUtil.showMessageDialog("Only Directory.");
 				}
@@ -782,8 +782,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		refleshMenuItem.setOnAction(event -> {
 			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
-			selectedItem.getChildren().clear();
-			selectedItem.getChildren().addAll(createNewTree(selectedItem.getValue().getFile()).getChildren());
+			refleshWorkspaceTreeItem(selectedItem);
 		});
 
 		//함수위치로 이동
@@ -842,6 +841,16 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		});
 
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 14.
+	 * @param selectedItem
+	 */
+	private void refleshWorkspaceTreeItem(final TreeItem<FileWrapper> selectedItem) {
+		selectedItem.getChildren().clear();
+		selectedItem.getChildren().addAll(createNewTree(selectedItem.getValue().getFile()).getChildren());
 	}
 
 	private ProjectFileTreeItemCreator projectFileTreeCreator = new ProjectFileTreeItemCreator();
@@ -1201,7 +1210,12 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				return event1;
 			}), new ActionEvent());
 
+		} else if (KeyCode.F5 == event.getCode()) {
+			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			if (selectedItem != null)
+				refleshWorkspaceTreeItem(selectedItem);
 		}
+
 	}
 
 	public TreeItem<FileWrapper> search(File f) {
