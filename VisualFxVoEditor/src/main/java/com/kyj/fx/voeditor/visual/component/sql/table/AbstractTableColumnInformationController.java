@@ -503,7 +503,9 @@ public abstract class AbstractTableColumnInformationController extends AbstractT
 
 	@FXML
 	public void btnAddColumnOnAction() {
-		tbColumns.getItems().add(new TableColumnMetaVO());
+		TableColumnMetaVO e = new TableColumnMetaVO();
+		e.set_status("I");
+		tbColumns.getItems().add(e);
 	}
 
 	@FXML

@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.component.sql.table;
 
 import java.util.List;
 
+import com.kyj.fx.voeditor.visual.component.grid.AbstractDVO;
 import com.kyj.fx.voeditor.visual.component.sql.table.IKeyType.KEY_TYPE;
 
 import javafx.beans.property.BooleanProperty;
@@ -21,7 +22,7 @@ import javafx.beans.property.StringProperty;
  * @author KYJ
  *
  */
-public class TableColumnMetaVO {
+public class TableColumnMetaVO extends AbstractDVO{
 
 	private StringProperty columnName;
 
