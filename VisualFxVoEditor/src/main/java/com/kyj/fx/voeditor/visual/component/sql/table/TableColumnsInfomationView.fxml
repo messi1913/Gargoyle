@@ -17,10 +17,10 @@
 				<HBox spacing="5.0">
 					<children>
 						<Label prefWidth="100.0" text="열 :" />
-						<Button defaultButton="true" mnemonicParsing="false" prefWidth="55.0" text="추가" />
-						<Button defaultButton="true" mnemonicParsing="false" prefWidth="55.0" text="제거" />
-						<Button defaultButton="true" mnemonicParsing="false" prefWidth="55.0" text="위로" />
-						<Button defaultButton="true" mnemonicParsing="false" prefWidth="55.0" text="아래로" />
+						<Button defaultButton="true" mnemonicParsing="false" prefWidth="55.0" text="추가" onAction="#btnAddColumnOnAction"/>
+						<Button defaultButton="true" mnemonicParsing="false" prefWidth="55.0" text="제거" onAction="#btnRemoveColumnOnAction"/>
+						<Button defaultButton="true" mnemonicParsing="false" prefWidth="55.0" text="위로" onAction="#btnUpColumnOnAction"/>
+						<Button defaultButton="true" mnemonicParsing="false" prefWidth="55.0" text="아래로" onAction="#btnDownColumnOnAction"/>
 					</children>
 					<padding>
 						<Insets bottom="5.0" top="5.0" />

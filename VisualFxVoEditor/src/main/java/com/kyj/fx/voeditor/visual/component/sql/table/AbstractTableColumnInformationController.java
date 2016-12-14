@@ -168,7 +168,6 @@ public abstract class AbstractTableColumnInformationController extends AbstractT
 		this.tbColumns.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		FxUtil.installClipboardKeyEvent(this.tbColumns);
 
-
 	}
 
 	/**
@@ -221,8 +220,7 @@ public abstract class AbstractTableColumnInformationController extends AbstractT
 
 		tbColumns.getItems().addAll(result);
 
-
-//		avaliableTypes();
+		//		avaliableTypes();
 	}
 
 	/**
@@ -250,25 +248,25 @@ public abstract class AbstractTableColumnInformationController extends AbstractT
 		return this.parent.getDbmsDriver();
 	}
 
-//	public void avaliableTypes() throws SQLException {
-//
-//
-//		DatabaseMetaData metaData = this.parent.getConnection().getMetaData();
-//		ResultSet attributes = metaData.getAttributes(null, null, null, null);
-//
-//		ResultSetMetaData rMeta = attributes.getMetaData();
-//		int columnCount = rMeta.getColumnCount();
-//
-//		while (attributes.next()) {
-//			for (int i = 1; i < columnCount; i++) {
-//				String value = attributes.getString(i);
-//				String columnName = rMeta.getColumnName(i);
-//				System.out.println(String.format("%s - %s", columnName, value));
-//			}
-//		}
-//
-//		//		this.parent.getConnection().getMetaData().
-//	}
+	//	public void avaliableTypes() throws SQLException {
+	//
+	//
+	//		DatabaseMetaData metaData = this.parent.getConnection().getMetaData();
+	//		ResultSet attributes = metaData.getAttributes(null, null, null, null);
+	//
+	//		ResultSetMetaData rMeta = attributes.getMetaData();
+	//		int columnCount = rMeta.getColumnCount();
+	//
+	//		while (attributes.next()) {
+	//			for (int i = 1; i < columnCount; i++) {
+	//				String value = attributes.getString(i);
+	//				String columnName = rMeta.getColumnName(i);
+	//				System.out.println(String.format("%s - %s", columnName, value));
+	//			}
+	//		}
+	//
+	//		//		this.parent.getConnection().getMetaData().
+	//	}
 
 	/**
 	 * @author KYJ
@@ -502,4 +500,48 @@ public abstract class AbstractTableColumnInformationController extends AbstractT
 		}
 
 	}
+
+	@FXML
+	public void btnAddColumnOnAction() {
+		tbColumns.getItems().add(new TableColumnMetaVO());
+	}
+
+	@FXML
+	public void btnRemoveColumnOnAction() {
+
+		TableColumnMetaVO selectedItem = tbColumns.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			tbColumns.getItems().remove(selectedItem);
+		}
+
+	}
+
+	@FXML
+	public void btnUpColumnOnAction() {
+		int selectedIndex = tbColumns.getSelectionModel().getSelectedIndex();
+		if (selectedIndex > 0) {
+
+			TableColumnMetaVO tmp = tbColumns.getItems().get(selectedIndex);
+			TableColumnMetaVO tmp2 = tbColumns.getItems().get(selectedIndex - 1);
+
+			tbColumns.getItems().set(selectedIndex - 1, tmp);
+			tbColumns.getItems().set(selectedIndex, tmp2);
+		}
+	}
+
+	@FXML
+	public void btnDownColumnOnAction() {
+
+		int selectedIndex = tbColumns.getSelectionModel().getSelectedIndex();
+		if (tbColumns.getItems().size() - 1 > selectedIndex) {
+
+			TableColumnMetaVO tmp = tbColumns.getItems().get(selectedIndex);
+			TableColumnMetaVO tmp2 = tbColumns.getItems().get(selectedIndex + 1);
+
+			tbColumns.getItems().set(selectedIndex + 1, tmp);
+			tbColumns.getItems().set(selectedIndex, tmp2);
+		}
+
+	}
+
 }
