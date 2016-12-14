@@ -66,7 +66,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NrchRealtimeSrchFlowComposite.class);
 	/**
 	 * 네이버 실시간 검색어간에 데이터 그룹별ㄹ 색상을 입힘.
-	 * 
+	 *
 	 * @최초생성일 2016. 11. 22.
 	 */
 	private AtomicInteger atomicInteger = new AtomicInteger(0);
@@ -76,14 +76,14 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 	private ChoiceBox<String> choWaitItems;
 	/**
 	 * 검색어 요청 처리 시간이 입력되는 라벨.
-	 * 
+	 *
 	 * @최초생성일 2016. 11. 22.
 	 */
 	private Label lblRequestTime = new Label();
 
 	/**
 	 * UI에 인기검색어 카드가 배치되는 Composite의 주소값을 담고있는 property 객체.
-	 * 
+	 *
 	 * @최초생성일 2016. 11. 22.
 	 */
 	private ObjectProperty<FlowCardComposite> flowCardComposite = new SimpleObjectProperty<>();
@@ -94,21 +94,21 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 	private static final String REALTIME_SRCH_THREAD_POOL_NAME = "RealtimeSrch-Thread-Pool";
 	/**
 	 * Network 연결처리와 UI간의 비동기 처리를 적용하기위한 Executor클래스.
-	 * 
+	 *
 	 * @최초생성일 2016. 11. 22.
 	 */
-	private static final ExecutorService gargoyleThreadExecutors = ExecutorDemons.newFixedThreadExecutor(REALTIME_SRCH_THREAD_POOL_NAME, 1);
+	private static ExecutorService gargoyleThreadExecutors = ExecutorDemons.newFixedThreadExecutor(REALTIME_SRCH_THREAD_POOL_NAME, 1);
 
 	/**
 	 * 실시간 검색어 처리에 대한 코드 구현부
-	 * 
+	 *
 	 * @최초생성일 2016. 11. 22.
 	 */
 	private Service<List<RealtimeSearchVO>> service;
 
 	/**
 	 * 실시간 검색어 결과의 임시 데이터 보관소.
-	 * 
+	 *
 	 * @최초생성일 2016. 11. 22.
 	 */
 	private ObservableList<RealtimeSearchVO> data = FXCollections.observableArrayList();
@@ -116,7 +116,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 	private BooleanProperty isRecycle = new SimpleBooleanProperty(false);
 	/**
 	 * FlowCardComposite 에 데이터가 입력되면 UI로 컨버팅 처리할 Node를 구현하는 부분.
-	 * 
+	 *
 	 * @최초생성일 2016. 11. 22.
 	 */
 	private Function<RealtimeSearchVO, List<VBox>> nodeConverter = v -> {
@@ -212,7 +212,6 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 						menuArticleAnalyzer.setOnAction(e -> {
 
-							
 							FxUtil.createStageAndShow(new ArticleExtractorComposite((RealtimeSearchItemVO) userData), stage -> {
 								stage.initOwner(FxUtil.getWindow(getParent()));
 								stage.setTitle(ArticleExtractorComposite.TITLE);
@@ -221,7 +220,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 						});
 
-						contextMenu.getItems().addAll(menuGoogleTrend , menuArticleAnalyzer);
+						contextMenu.getItems().addAll(menuGoogleTrend, menuArticleAnalyzer);
 						contextMenu.show(this.getParent().getScene().getWindow(), ev.getScreenX(), ev.getScreenY());
 					}
 				}
@@ -233,7 +232,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * 구글 트랜드로 조회
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 22.
 	 * @param vo
@@ -255,8 +254,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 		Button btnReload = new Button("Reload");
 
-		HBox hboxItems = new HBox(5,
-				/* choWaitItems, new Label("단위 (초)"), chkTimer, */btnReload, lblRequestTime);
+		HBox hboxItems = new HBox(5, /* choWaitItems, new Label("단위 (초)"), chkTimer, */btnReload, lblRequestTime);
 		hboxItems.setAlignment(Pos.CENTER_LEFT);
 		hboxItems.setPadding(new Insets(5));
 
@@ -307,11 +305,20 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 		defineService();
 
 		try {
+			service.setExecutor(gargoyleThreadExecutors);
 			service.start();
 		} catch (RejectedExecutionException e) {
+
+			if (gargoyleThreadExecutors.isShutdown() || gargoyleThreadExecutors.isTerminated()) {
+				gargoyleThreadExecutors = ExecutorDemons.newFixedThreadExecutor(REALTIME_SRCH_THREAD_POOL_NAME, 1);
+				service.setExecutor(gargoyleThreadExecutors);
+			}
+
+			LOGGER.error(ValueUtil.toString(e));
 			// One more time.
 			defineService();
 			service.start();
+
 		}
 
 		// reload();
@@ -389,8 +396,6 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 			}
 
 		});
-
-		service.setExecutor(gargoyleThreadExecutors);
 	}
 
 	private final static ThreadGroup THREAD_RUNNER_GROUP = new ThreadGroup("nrch-wait-thread-group");
@@ -410,7 +415,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Thread#run()
 		 */
 		@Override
@@ -444,7 +449,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * 실시간검색어 조회 완료된 시각이 라벨에 입력됨.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 22.
 	 */
@@ -454,7 +459,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 	/**
 	 * 실시간 검색어 데이터 리턴
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 21.
 	 * @return
@@ -471,8 +476,23 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 	 * @작성일 : 2016. 11. 21.
 	 */
 	protected void reload() {
-		if (service.isRunning())
+
+		if (gargoyleThreadExecutors.isShutdown() || gargoyleThreadExecutors.isTerminated()) {
+
+
+			if (service.isRunning())
+			{
+				service.cancel();
+				gargoyleThreadExecutors.shutdown();
+			}
+
+			service.setExecutor(gargoyleThreadExecutors = ExecutorDemons.newFixedThreadExecutor(REALTIME_SRCH_THREAD_POOL_NAME, 1));
+		}
+
+		if (service.isRunning()) {
 			return;
+		}
+
 		if (State.SUCCEEDED == service.getState()) {
 			service.restart();
 		} else {
@@ -530,7 +550,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.kyj.fx.voeditor.visual.main.layout.CloseableParent#close()
 	 */
 	@Override

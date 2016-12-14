@@ -49,9 +49,9 @@ class TF_IDF {
 			filtered.add("서비스");
 			filtered.add("본문듣기");
 			filtered.add("듣기");
-
-
-
+			filtered.add("기사입력");
+			filtered.add("기사원문");
+			filtered.add("댓글");
 
 		}
 

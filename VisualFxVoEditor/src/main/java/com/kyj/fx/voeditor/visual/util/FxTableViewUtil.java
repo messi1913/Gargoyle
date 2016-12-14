@@ -115,6 +115,7 @@ class FxTableViewUtil {
 	 *
 	 * @param table
 	 ********************************/
+	@SuppressWarnings("rawtypes")
 	public static void installCopyPasteHandler(TableView<?> table) {
 
 		table.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
@@ -132,6 +133,7 @@ class FxTableViewUtil {
 				return;
 
 			// TableView<Map<String, Object>> tbResult = getTbResult();
+
 			ObservableList<TablePosition> selectedCells = table.getSelectionModel().getSelectedCells();
 
 			TablePosition tablePosition = selectedCells.get(0);

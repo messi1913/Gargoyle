@@ -1436,6 +1436,7 @@ public class FxUtil {
 		dockNode.setFloating(true, initLocation);
 		if (center)
 			dockNode.getStage().centerOnScreen();
+
 	}
 
 	/**

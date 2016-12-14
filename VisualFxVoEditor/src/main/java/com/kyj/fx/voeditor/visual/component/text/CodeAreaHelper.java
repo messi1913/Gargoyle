@@ -59,6 +59,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 	protected T codeArea;
 	protected SqlFormatter sqlFormatter = new SqlFormatter();
 	protected CodeAreaMoveLineHelper codeMoveDeligator;
+	private CodeAreaDragDropHelper dragDropHelper;
 
 	protected ContextMenu contextMenu;
 	protected Menu menuSearch;
@@ -72,13 +73,13 @@ public class CodeAreaHelper<T extends CodeArea> {
 
 		this.codeArea.setOnMouseClicked(defaultSelectionHandler);
 		codeMoveDeligator = new CodeAreaMoveLineHelper(codeArea);
+		this.dragDropHelper = new CodeAreaDragDropHelper(codeArea);
 
 		// this.codeArea.addEventHandler(MouseDragEvent.MOUSE_DRAG_OVER,
 		// this::codeAreaDagOver);
 		// this.codeArea.addEventHandler(MouseDragEvent.MOUSE_DRAG_ENTERED_TARGET,
 		// this::codeAreaDagEnteredTarget);
-		this.codeArea.setOnDragOver(this::codeAreaDagOver);
-		this.codeArea.setOnDragDropped(this::setOnDragDropped);
+
 
 		contextMenu = codeArea.getContextMenu();
 		if (contextMenu == null) {
@@ -88,70 +89,13 @@ public class CodeAreaHelper<T extends CodeArea> {
 		createMenus();
 	}
 
-	/*********************************************************/
-	// 파일 드래그 드롭 처리.
 
-	public void codeAreaDagOver(DragEvent ev) {
-		if (ev.isConsumed())
-			return;
-
-		if (ev.getDragboard().hasFiles()) {
-			ev.acceptTransferModes(TransferMode.LINK);
-			ev.consume();
-		}
-
-	}
-
-	public void setOnDragDropped(DragEvent ev) {
-		if (ev.isConsumed())
-			return;
-
-		if (ev.getDragboard().hasFiles()) {
-
-			List<File> files = ev.getDragboard().getFiles();
-
-			// tbDatabase.getItems().add(e)
-			files.stream().findFirst().ifPresent(f -> {
-
-				if (f.length() > dragDropLimitSize()) {
-
-					DialogUtil.showMessageDialog("파일 용량이 너무 큽니다.");
-					return;
-
-				}
-
-				try (FileInputStream is = new FileInputStream(f)) {
-					setContent(FileUtil.readToString(is));
-				} catch (Exception e) {
-					LOGGER.error(ValueUtil.toString(e));
-				}
-
-			});
-
-			ev.setDropCompleted(true);
-			ev.consume();
-		}
-
-	}
-
-	/**
-	 * 드래그 드롭시 파일 제한 사이즈 정의
-	 * 
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 12. 10.
-	 * @return
-	 */
-	protected long dragDropLimitSize() {
-		return 5 * 1024 * 1024;
-	}
-
-	/*********************************************************/
 
 	/**
 	 *
 	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
 	 * setAccelerator에 등록된 이벤트가 호출안됨
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 27.
 	 */
@@ -233,7 +177,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 
 	/**
 	 * Sql 포멧처리.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 9. 23.
 	 */
@@ -272,7 +216,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 
 	/**
 	 * 찾기 바꾸기 이벤트
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 13.
 	 * @param e
@@ -449,7 +393,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 	 * 특정라인으로 이동처리하는 메소드
 	 *
 	 * 특정라인블록 전체를 선택처리함.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param moveToLine

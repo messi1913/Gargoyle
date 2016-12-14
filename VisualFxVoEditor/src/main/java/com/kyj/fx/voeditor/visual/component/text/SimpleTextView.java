@@ -96,7 +96,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void initialize() {
 
 		codeArea = new CodeArea();
-		helper = new CodeAreaHelper<>(codeArea);
+		this.helper = new CodeAreaHelper<>(codeArea);
 		hboxButtons.setVisible(showButtons);
 		if (!showButtons) {
 			hboxButtons.setMinHeight(0d);
@@ -131,6 +131,13 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	 */
 	@Override
 	public void closeRequest() {
+	}
+
+	/**
+	 * @return the helper
+	 */
+	public final CodeAreaHelper<CodeArea> getHelper() {
+		return helper;
 	}
 
 }

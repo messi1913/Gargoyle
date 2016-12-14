@@ -339,7 +339,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param file
 	 * @param tabs
 	 */
-	private void openFile(File file) {
+	void openFile(File file) {
 
 		List<String> exts = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILE_OPEN_NOT_INPROCESSING_EXTENSION, ",");
 
@@ -767,7 +767,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				TextField txtLocation = (TextField) lookup;
 				File file = tmpSelectFileWrapper.getFile();
 				if (file.exists() && file.isDirectory()) {
-					ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH,  file.getAbsolutePath());
+					ResourceLoader.getInstance().put(ResourceLoader.USER_SELECT_LOCATION_PATH, file.getAbsolutePath());
 
 					// 경로를 생대경로화 시킨다.
 					Path relativize = FileUtil.toRelativizeForGagoyle(file);
@@ -1313,6 +1313,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		tab.setClosable(true);
 		tabPanWorkspace.getTabs().add(tab);
 		tab.setContextMenu(closeContextMenu());
+
+		//DragDrop 기능 설치.
+		new NodeDragDropHelper(tab.getContent());
+
 	}
 
 	/**
@@ -1376,13 +1380,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				DockTab tab = new DockTab(tableName, parent);
 
-
 				addTabItem(tab);
-				if (skin != null)
-				{
+				if (skin != null) {
 					parent.getStylesheets().clear();
-//					parent.getStylesheets().add(skin);
-//					tab.getstyle.add(skin);
+					//					parent.getStylesheets().add(skin);
+					//					tab.getstyle.add(skin);
 				}
 				tabPanWorkspace.getSelectionModel().select(tab);
 
@@ -1449,7 +1451,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				// _parent.getScene().getStylesheets().clear();
 
 				List<Node> findAllByNodes = FxUtil.findAllByNodes(_parent, n -> n instanceof Button);
-				findAllByNodes.forEach(btn ->{
+				findAllByNodes.forEach(btn -> {
 					btn.getStyleClass().add("button-gargoyle");
 				});
 			} catch (Exception e1) {
@@ -1870,7 +1872,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @작성일 : 2016. 12. 10.
 	 */
 	@FXML
-	public void menuShowInstalledLocation(){
+	public void menuShowInstalledLocation() {
 		FileUtil.openFile(new File(ValueUtil.getBaseDir()));
 	}
 }
