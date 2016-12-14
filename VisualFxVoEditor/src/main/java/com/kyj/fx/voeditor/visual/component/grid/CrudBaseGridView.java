@@ -6,13 +6,19 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.grid;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -200,7 +206,24 @@ public class CrudBaseGridView<T extends AbstractDVO> extends BorderPane {
 						errorMsgCallback.accept("saveClickCallback 함수에 에러메세지 콜백을 등록하세요.");
 						return;
 					}
-					List<T> arrayList = new ArrayList<T>(getItems());
+
+					gridview.fireEvent(event);
+
+					List<T> items = getItems();
+
+					//필수값 검증로직 추가. 2016.12.08
+					AbstractVoNullChecker<T> nullCheckHandler = new DefaultVoNullChecker<>(CrudBaseGridView.this);
+					nullCheckHandler.setList(items);
+					Optional<Field> findFirst = nullCheckHandler.findFirst();
+					boolean present = findFirst.isPresent();
+					if (present) {
+						String msgFieldName = nullCheckHandler.getMsgNameByfield();
+//						String message = ValueUtil.getMessage("MSG_W_000001", msgFieldName);
+						DialogUtil.showMessageDialog(SharedMemory.getPrimaryStage(), msgFieldName + " Field is empty.");
+						return;
+					}
+
+					List<T> arrayList = new ArrayList<T>(items);
 					arrayList.addAll(deleteItems);
 					callback.accept(arrayList);
 
