@@ -38,7 +38,7 @@ public class CommonsGridExample extends Application {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javafx.application.Application#start(javafx.stage.Stage) KYJ
 	 */
 	@Override
@@ -70,7 +70,7 @@ public class CommonsGridExample extends Application {
 			person3.setMarrayYn("N");
 
 			// 컬럼명이 name인경우 이름으로 alias를 준다.
-			IOptions options = new AnnotationOptions<Person>(Person.class) {
+			AnnotationOptions<Person> options = new AnnotationOptions<Person>(Person.class) {
 
 				@Override
 				public String convert(String columnName) {
