@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -26,9 +29,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * 기본적인 Crud를 처리해주는 공통그리드 콤포넌트
  *
@@ -42,7 +42,7 @@ public class CrudBaseGridView<T extends AbstractDVO> extends BorderPane {
 	 */
 	private HBox buttonBox;
 
-	private IOptions options;
+	private AnnotationOptions<T> options;
 
 	private CommonsBaseGridView<T> gridview;
 	private Button btnAdd = new Button("추가");
@@ -50,7 +50,7 @@ public class CrudBaseGridView<T extends AbstractDVO> extends BorderPane {
 	private Button btnDelete = new Button("삭제");
 	private Button btnSave = new Button("저장");
 
-	public CrudBaseGridView(Class<T> clazz, IOptions options) {
+	public CrudBaseGridView(Class<T> clazz, AnnotationOptions<T> options) {
 		this.options = options;
 		gridview = new BaseGridView<T>(clazz, options);
 
@@ -125,7 +125,7 @@ public class CrudBaseGridView<T extends AbstractDVO> extends BorderPane {
 		this(clazz, list, new AnnotationOptions<>(clazz));
 	}
 
-	public CrudBaseGridView(Class<T> clazz, ObservableList<T> list, IOptions options) {
+	public CrudBaseGridView(Class<T> clazz, ObservableList<T> list, AnnotationOptions<T> options) {
 		this(clazz, options);
 		addItems(list);
 	}
@@ -385,5 +385,9 @@ public class CrudBaseGridView<T extends AbstractDVO> extends BorderPane {
 		public IColumnMapper<T> createColumnMapper() {
 			return new CrudBaseColumnMapper<>();
 		}
+	}
+
+	public AnnotationOptions<T> getOptions() {
+		return options;
 	}
 }

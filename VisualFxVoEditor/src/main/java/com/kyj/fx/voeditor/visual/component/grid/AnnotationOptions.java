@@ -9,9 +9,11 @@ package com.kyj.fx.voeditor.visual.component.grid;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
+
 /**
  * 어노테이션기반 텍스트헤더를 처리함.
- * 
+ *
  * @COLUMN("텍스트")
  * @author KYJ
  *
@@ -26,7 +28,7 @@ public class AnnotationOptions<T> extends BaseOptions {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * com.kyj.tmp.application.template.grid.commons.IColumnNaming#convert(java
 	 * .lang.String) KYJ
@@ -39,7 +41,7 @@ public class AnnotationOptions<T> extends BaseOptions {
 	/**
 	 * 테이블 헤더를 어노테이션기반 텍스트 형태로 사용한다. 우선순위는 먼저 어노테이션 텍스트존재하면 먼저 맵핑하고 어노테이션이 없는경우
 	 * columnName을 반환한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 21.
 	 * @param classType
@@ -47,26 +49,43 @@ public class AnnotationOptions<T> extends BaseOptions {
 	 * @param options
 	 * @return
 	 */
-	private String getColumnHeader(String columnName) {
+	String getColumnHeader(String columnName) {
 
 		String headerText = "";
 
 		ColumnName annotationsByType = getAnnotationClass(ColumnName.class, columnName);
+
+		// 어노테이션 밸류로 헤더텍스트 처리.[기본.]
+//		if (SysUtil.isEmpty(headerText)) {
+			if (annotationsByType != null) {
+				headerText = annotationsByType.value();
+			}
+//		}
+
+		// 우선순위[상] 어노테이션 msgId 존재유무 확인
 		if (annotationsByType != null) {
-			headerText = annotationsByType.value();
-		} else {
+
+			String messageId = annotationsByType.messageId();
+			if (ValueUtil.isNotEmpty(messageId)) {
+				headerText = ValueUtil.getMessage(messageId);
+			}
+		}
+
+		//그래도 없다면 컬럼명으로 매핑.
+		if (ValueUtil.isEmpty(headerText)) {
 			headerText = columnName;
 		}
 
-		if (headerText == null || headerText.isEmpty())
-			headerText = columnName;
+		//불필요코드 제거.
+//		if (headerText == null || headerText.isEmpty())
+//			headerText = columnName;
 
 		return headerText;
 	}
 
 	/**
 	 * 어노테이션 클래스를 반환, 없으면 null 리턴
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 21.
 	 * @param annotationClass
@@ -86,7 +105,7 @@ public class AnnotationOptions<T> extends BaseOptions {
 
 	/**
 	 * 어노테이션 존재여부를 확인한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 21.
 	 * @param annotationClass
@@ -106,7 +125,7 @@ public class AnnotationOptions<T> extends BaseOptions {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * com.kyj.tmp.application.template.grid.commons.IOptions#editable(java.
 	 * lang.String)
@@ -127,7 +146,7 @@ public class AnnotationOptions<T> extends BaseOptions {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * com.samsung.sds.sos.client.component.grid.IOptions#columnSize(java.lang
 	 * .String)

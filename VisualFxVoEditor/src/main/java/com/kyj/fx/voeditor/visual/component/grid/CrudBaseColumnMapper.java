@@ -11,18 +11,17 @@ import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
-import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventDispatchChain;
 import javafx.event.EventDispatcher;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Skin;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -31,9 +30,6 @@ import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.StringConverter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author KYJ
@@ -175,7 +171,7 @@ public class CrudBaseColumnMapper<T extends AbstractDVO> implements IColumnMappe
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see javafx.scene.control.cell.TextFieldTableCell#startEdit()
 			 */
 			@Override
@@ -240,14 +236,13 @@ public class CrudBaseColumnMapper<T extends AbstractDVO> implements IColumnMappe
 
 	/**
 	 * 어노테이션 클래스를 반환, 없으면 null 리턴
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 21.
 	 * @param annotationClass
 	 * @param fieldName
 	 * @return
 	 */
-	@SuppressWarnings("hiding")
 	private static <T extends Annotation> T getAnnotationClass(Class<?> targetClass, Class<T> annotationClass,
 			String fieldName) {
 		try {
@@ -281,7 +276,7 @@ public class CrudBaseColumnMapper<T extends AbstractDVO> implements IColumnMappe
 
 			@Override
 			public void startEdit() {
-				//TODO 추가 작업 예상됨. 현재는 기본컬럼으로 CheckBox형태가 나올것같지않음. 
+				//TODO 추가 작업 예상됨. 현재는 기본컬럼으로 CheckBox형태가 나올것같지않음.
 				super.startEdit();
 			}
 
@@ -290,7 +285,7 @@ public class CrudBaseColumnMapper<T extends AbstractDVO> implements IColumnMappe
 
 	/**
 	 * 공통 체크 헤더행을 flag값에 따라 선택 혹은 해제한다.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 14.
 	 * @param column
@@ -376,7 +371,7 @@ public class CrudBaseColumnMapper<T extends AbstractDVO> implements IColumnMappe
 
 	/**
 	 * 타입 컨버터
-	 * 
+	 *
 	 * @param textFieldTableCell
 	 *
 	 * @Date 2015. 10. 8.
@@ -411,5 +406,6 @@ public class CrudBaseColumnMapper<T extends AbstractDVO> implements IColumnMappe
 
 		};
 	}
+
 
 }
