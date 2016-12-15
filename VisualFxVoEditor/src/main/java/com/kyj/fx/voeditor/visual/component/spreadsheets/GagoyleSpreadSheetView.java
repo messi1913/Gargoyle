@@ -4,9 +4,22 @@
 package com.kyj.fx.voeditor.visual.component.spreadsheets;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.controlsfx.control.spreadsheet.Grid;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellBase;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
+import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
+import org.controlsfx.control.spreadsheet.SpreadsheetView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,18 +35,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-
-import org.controlsfx.control.spreadsheet.Grid;
-import org.controlsfx.control.spreadsheet.SpreadsheetCell;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellBase;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellEditor;
-import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
-import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
-import org.controlsfx.control.spreadsheet.SpreadsheetView;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
 
 /**
  * @author KYJ
@@ -54,10 +55,12 @@ public class GagoyleSpreadSheetView extends StackPane {
 
 	public GagoyleSpreadSheetView(Grid grid) {
 
-		ssv = new SpreadsheetView();
+		ssv = new SpreadsheetView(grid);
 		ObservableList<SpreadsheetColumn> columns = ssv.getColumns();
-		columns.forEach(col -> col.setPrefWidth(100d));
-		ssv.setGrid(grid);
+		columns.forEach(col -> {
+			col.setPrefWidth(100d);
+		});
+//		ssv.setGrid(grid);
 		init();
 	}
 
@@ -224,16 +227,16 @@ public class GagoyleSpreadSheetView extends StackPane {
 		int column = startColumnIndex;
 
 		int _column = column;
-//		String[] split = pastString.split("\n");
+		//		String[] split = pastString.split("\n");
 
 		Grid grid = ssv.getGrid();
 		ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
 
 		for (Map<String, Object> str : items) {
-//			String[] split2 = str.split("\t");
+			//			String[] split2 = str.split("\t");
 			_column = column;
 			Iterator<String> iterator = str.keySet().iterator();
-			while(iterator.hasNext()) {
+			while (iterator.hasNext()) {
 				String strCol = iterator.next();
 				Object value = str.get(strCol);
 				SpreadsheetCell spreadsheetCell = null;
@@ -242,6 +245,7 @@ public class GagoyleSpreadSheetView extends StackPane {
 					spreadsheetCell = rows.get(row).get(_column);
 				/* 새로운 로우를 생성함. */
 				else {
+
 					ObservableList<SpreadsheetCell> newCells = createNewRow();
 					spreadsheetCell = newCells.get(_column);
 				}
@@ -267,6 +271,7 @@ public class GagoyleSpreadSheetView extends StackPane {
 		String[] split = pastString.split("\n");
 
 		Grid grid = ssv.getGrid();
+
 		ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
 
 		for (String str : split) {
@@ -279,15 +284,20 @@ public class GagoyleSpreadSheetView extends StackPane {
 					spreadsheetCell = rows.get(row).get(_column);
 				/* 새로운 로우를 생성함. */
 				else {
+
 					ObservableList<SpreadsheetCell> newCells = createNewRow();
 					spreadsheetCell = newCells.get(_column);
+					rows.add(newCells);
 				}
 
 				spreadsheetCell.setItem(str2);
 				_column++;
 			}
+
 			row++;
 		}
+
+		ssv.setGrid(grid);
 	}
 
 	/**
@@ -298,17 +308,19 @@ public class GagoyleSpreadSheetView extends StackPane {
 	 * @return
 	 */
 	private ObservableList<SpreadsheetCell> createNewRow() {
+
 		Grid grid = ssv.getGrid();
 		ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
-		ObservableList<SpreadsheetCell> newCells = FXCollections.observableArrayList();
 
 		int columnCount = grid.getColumnCount();
 		int newRow = rows.size();
 
-		for (int newCol = 0; newCol < columnCount; newCol++)
-			newCells.add(SpreadsheetCellType.STRING.createCell(newRow, newCol, 1, 1, ""));
+		ObservableList<SpreadsheetCell> newCells = FXCollections.observableArrayList(new ArrayList<>(columnCount));
 
-		rows.add(newCells);
+		for (int newCol = 0; newCol < columnCount; newCol++) {
+			newCells.add(SpreadsheetCellType.STRING.createCell(newRow, newCol, 1, 1, ""));
+		}
+
 		return newCells;
 	}
 
