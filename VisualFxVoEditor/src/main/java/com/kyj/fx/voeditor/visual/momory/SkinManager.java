@@ -66,12 +66,20 @@ public final class SkinManager {
 	private static final String SKIN_TEPLATE_LOCATION = "template/css/skin/skin.css.template";
 
 	/**
+	 * 스킨 템플릿이 존재하는 위치.
+	 *
+	 * @최초생성일 2016. 12. 3.
+	 */
+	private static final String ROOT_SKIN_TEPLATE_LOCATION = "template/css/skin/rootSkin.css.template";
+
+	/**
 	 * @최초생성일 2016. 12. 5.
 	 */
 	private static final String SKIN_BUTTON_TEPLATE_LOCATION = "template/css/button";
 
 	/**
 	 * 버튼 스타일 클래스명
+	 * 
 	 * @최초생성일 2016. 12. 5.
 	 */
 	public static final String BUTTON_STYLE_CLASS_NAME = "button-gargoyle";
@@ -223,6 +231,7 @@ public final class SkinManager {
 
 	/**
 	 * return Button Skin URL
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 7.
 	 * @param btnStyleClass
@@ -351,6 +360,7 @@ public final class SkinManager {
 
 	/**
 	 * 버튼 스타일 클래스를 적용.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 5.
 	 * @param btnStyleClass
@@ -415,6 +425,25 @@ public final class SkinManager {
 				return f -> "";
 			}
 		});
+	}
+
+	/**
+	 * 폰트나 기본 색상들을 지정하기위한 루트 스킨 템플릿
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 15.
+	 * @return
+	 */
+	public String getRootSkinTemplate() {
+		return FileUtil.readFile(new File(ROOT_SKIN_TEPLATE_LOCATION), new LoadFileOptionHandler() {
+
+			@Override
+			public Function<File, String> getFileNotFoundThan() {
+				LOGGER.warn("template file not found.");
+				return f -> "";
+			}
+		});
+
 	}
 
 	/**
