@@ -1,0 +1,11 @@
+.root{
+	#if($fontName)
+	-fx-font-name: $fontName;
+	#end
+	#if($fontStyle)
+	-fx-font-style : $fontStyle;
+	#end
+	#if($fontWeight)
+	-fx-font-weight: $fontWeight;
+	#end
+}
