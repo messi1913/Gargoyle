@@ -1772,4 +1772,15 @@ public class ValueUtil {
 	public static String getMessage(String messageId) {
 		return "";
 	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 14.
+	 * @param string
+	 * @param msgFieldName
+	 * @return
+	 */
+	public static String getMessage(String string, String msgFieldName) {
+		return "";
+	}
 }
