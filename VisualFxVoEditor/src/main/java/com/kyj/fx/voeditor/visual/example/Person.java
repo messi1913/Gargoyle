@@ -8,23 +8,31 @@ package com.kyj.fx.voeditor.visual.example;
 
 import com.kyj.fx.voeditor.visual.component.grid.AbstractDVO;
 import com.kyj.fx.voeditor.visual.component.grid.NonEditable;
+import com.kyj.fx.voeditor.visual.component.grid.NotNull;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**
  * 샘플 VO
- * 
+ *
  * @author KYJ
  *
  */
 public class Person extends AbstractDVO {
+
+	@NotNull
 	@NonEditable
 	private StringProperty name;
+
 	private StringProperty age;
+
 	private StringProperty address;
+
 	private StringProperty phoneNumber;
+
 	private StringProperty marrayYn;
+
 
 	public Person() {
 		name = new SimpleStringProperty();

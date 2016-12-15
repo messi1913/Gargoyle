@@ -6,16 +6,15 @@ package com.kyj.fx.voeditor.visual.main.layout;
 import java.util.List;
 import java.util.Map;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-
 import org.controlsfx.control.spreadsheet.GridBase;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 
 import com.kyj.fx.voeditor.visual.component.spreadsheets.GagoyleSpreadSheetView;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.layout.BorderPane;
 
 /**
  * @author KYJ
@@ -27,7 +26,7 @@ public class SchoolMgrerSpreadSheetView extends BorderPane {
 
 	public SchoolMgrerSpreadSheetView() {
 
-		GridBase gridBase = new GridBase(100, 100);
+		GridBase gridBase = new GridBase(100, 27);
 		List<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
 		for (int row = 0; row < gridBase.getRowCount(); ++row) {
@@ -44,15 +43,15 @@ public class SchoolMgrerSpreadSheetView extends BorderPane {
 
 		setCenter(gagoyleSpreadSheetView);
 
-		this.setOnKeyPressed(this::spreadSheetKeyPress);
+//		this.setOnKeyPressed(this::spreadSheetKeyPress);
 	}
 
 	/**
 	 * @param e
 	 */
-	public void spreadSheetKeyPress(KeyEvent e) {
-		gagoyleSpreadSheetView.spreadSheetKeyPress(e);
-	}
+//	public void spreadSheetKeyPress(KeyEvent e) {
+//		gagoyleSpreadSheetView.spreadSheetKeyPress(e);
+//	}
 
 	public void paste() {
 		gagoyleSpreadSheetView.paste();
