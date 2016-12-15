@@ -25,7 +25,7 @@
 			<top>
 				<AnchorPane prefHeight="32.0" prefWidth="719.0" BorderPane.alignment="CENTER">
 					<children>
-						<VBox prefHeight="105.0" prefWidth="719.0" AnchorPane.bottomAnchor="-42.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+						<VBox prefHeight="105.0" prefWidth="719.0" styleClass="hbox-gargoyle" AnchorPane.bottomAnchor="-42.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 							<children>
 								<HBox prefHeight="100.0" prefWidth="200.0" styleClass="hbox-gargoyle">
 									<children>

@@ -90,6 +90,8 @@ public class SelectWorkspaceView extends AnchorPane {
 		stage = new Stage();
 		Scene scene = new Scene(this);
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+		scene.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
+
 		stage.setScene(scene);
 		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.setResizable(false);
