@@ -72,9 +72,10 @@ public class AnnotationOptions<T> extends BaseOptions {
 		}
 
 		//convert에 정의된 값이 존재하면 처리.
-		if (ValueUtil.isEmpty(headerText)) {
-			headerText = convert(columnName);
-		}
+//		if (ValueUtil.isEmpty(headerText)) {
+			//무한 재귀호출 가능성이 있으므로 제거.
+			//headerText = convert(columnName);
+//		}
 
 
 		//그래도 없다면 컬럼명으로 매핑.
