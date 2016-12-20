@@ -309,7 +309,7 @@ public class ValueUtil {
 
 		String _sql = sql;
 		// 주석에 대해당하는 문자들을 제거
-		_sql = _sql.replaceAll(STRING_PATTERN, "");
+//		_sql = _sql.replaceAll(STRING_PATTERN, "");
 		_sql = _sql.replaceAll(COMMENT_PATTERN, "");
 		// String pattern = "\\$\\w+|:\\w+";
 		String pattern = "\\$\\w+";

@@ -997,63 +997,18 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				e.consume();
 			}
 		}
-		// 펑션 함수 호출. unuse -> jdbc vender에서 구현코드가 대부분없으므로 커스텀하게 구현할것.
-		// CTRL + SPACE
-		else if (KeyCode.SPACE == e.getCode() && e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
-			// ListView<String> listView = new ListView<String>();
-			// listView.setCellFactory(new Callback<ListView<String>,
-			// ListCell<String>>() {
-			//
-			// @Override
-			// public ListCell<String> call(ListView<String> param) {
-			// return new TextFieldListCell<String>();
-			// }
-			// });
-			//
-			// listView.getItems().addAll(this.sqlFunctions.get());
-			//
-			// SqlKeywords sqlNode = sqlTabPane.getSelectedTab().getSqlNode();
-			//
-			// Integer currentLine = sqlNode.getCurrentLine();
-			// IndexRange selection = sqlNode.getSelection();
-			//
-			// FxUtil.showPopOver(this, listView, pop -> {
-			// pop.setAutoHide(true);
-			// pop.setAnimated(false);
-			// listView.getSelectionModel().select(0);
-			//
-			// listView.setOnKeyPressed(ev -> {
-			// if (KeyCode.ENTER == ev.getCode()) {
-			// String selectedItem =
-			// listView.getSelectionModel().getSelectedItem();
-			// sqlNode.appendContent(selectedItem);
-			// pop.hide();
-			// ev.consume();
-			// } else if (KeyCode.ESCAPE == ev.getCode()) {
-			// pop.hide();
-			// ev.consume();
-			// }
-			// });
-			// listView.setOnMouseClicked(ev -> {
-			//
-			// if (ev.getClickCount() == 2 && MouseButton.PRIMARY ==
-			// ev.getButton()) {
-			// String selectedItem =
-			// listView.getSelectionModel().getSelectedItem();
-			// sqlNode.appendContent(selectedItem);
-			// pop.hide();
-			// ev.consume();
-			// }
-			//
-			// });
-			//
-			//
-			// pop.focusedProperty().addListener((oba, o, n) -> {
-			// if (!n)
-			// pop.hide();
-			// });
-			// return pop;
-			// });
+
+		else if(KeyCode.F1 == e.getCode())
+		{
+			String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
+			List<TreeItem<K>> searchPattern = searchPattern(null, selectedSQLText);
+			if(ValueUtil.isNotEmpty(searchPattern))
+			{
+				TreeItem<K> treeItem = searchPattern.get(0);
+				schemaTree.getSelectionModel().select(treeItem);
+				schemaTree.scrollTo(schemaTree.getSelectionModel().getSelectedIndex());
+				show100RowAction();
+			}
 
 		}
 
@@ -1480,7 +1435,13 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		}
 	}
 
-	public List<TreeItem<K>> searchSchemaTreeItemPattern(String schema) {
+	public List<TreeItem<K>> searchSchemaTreeItemPattern(String _schema) {
+		String schema = _schema;
+		if(schema == null)
+			schema = "";
+		else
+			schema = _schema.toLowerCase();
+
 		TreeItem<K> root = getSchemaTree().getRoot();
 		List<TreeItem<K>> treeItem = new ArrayList<>();
 		for (TreeItem<K> w : root.getChildren()) {
@@ -1493,16 +1454,17 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		return treeItem;
 	}
 
-	public List<TreeItem<K>> searchPattern(String schema, String tableName) {
+	public List<TreeItem<K>> searchPattern(String schema, String _tableName) {
 		List<TreeItem<K>> searchPattern = searchSchemaTreeItemPattern(schema);
 		if (searchPattern.isEmpty())
 			return Collections.emptyList();
 
+		String tableName = _tableName.toLowerCase();
 		return searchPattern.stream().flatMap(root -> {
 
 			List<TreeItem<K>> subList = new ArrayList<>();
 			for (TreeItem<K> w : root.getChildren()) {
-				String _schemaName = w.getValue().toString();
+				String _schemaName = w.getValue().toString().toLowerCase();
 
 				if (_schemaName.indexOf(tableName) >= 0) {
 					subList.add(w);

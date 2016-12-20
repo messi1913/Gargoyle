@@ -8,6 +8,8 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -121,12 +123,12 @@ public class DateUtil {
 
 		Calendar firstCalendar = GregorianCalendar.getInstance();
 		firstCalendar.setWeekDate(startYear, startWeek, Calendar.SUNDAY);
-//		Date firstDate = firstCalendar.getTime();
+		//		Date firstDate = firstCalendar.getTime();
 
 		Calendar lastCalendar = GregorianCalendar.getInstance();
 
-		lastCalendar.setWeekDate(endYear, endWeek, /*Calendar.SUNDAY*/ 	lastCalendar.get(Calendar.DAY_OF_WEEK));
-//		Date lastDate = lastCalendar.getTime();
+		lastCalendar.setWeekDate(endYear, endWeek, /*Calendar.SUNDAY*/ lastCalendar.get(Calendar.DAY_OF_WEEK));
+		//		Date lastDate = lastCalendar.getTime();
 
 		ArrayList<GagoyleDate> arrayList = new ArrayList<>();
 		while (firstCalendar.before(lastCalendar)) {
@@ -134,12 +136,12 @@ public class DateUtil {
 			arrayList.add(new GagoyleDate(firstCalendar.getTime()));
 		}
 
-//		List<GagoyleDate> periodDaysByWeek1 = getPeriodDaysByWeek(startYear, startWeek);
-//		List<GagoyleDate> periodDaysByWeek2 = getPeriodDaysByWeek(endYear, endWeek);
-//
-//		ArrayList<GagoyleDate> arrayList = new ArrayList<>(periodDaysByWeek1.size() + periodDaysByWeek2.size());
-//		arrayList.addAll(periodDaysByWeek1);
-//		arrayList.addAll(periodDaysByWeek2);
+		//		List<GagoyleDate> periodDaysByWeek1 = getPeriodDaysByWeek(startYear, startWeek);
+		//		List<GagoyleDate> periodDaysByWeek2 = getPeriodDaysByWeek(endYear, endWeek);
+		//
+		//		ArrayList<GagoyleDate> arrayList = new ArrayList<>(periodDaysByWeek1.size() + periodDaysByWeek2.size());
+		//		arrayList.addAll(periodDaysByWeek1);
+		//		arrayList.addAll(periodDaysByWeek2);
 
 		return arrayList;
 	}
@@ -361,5 +363,52 @@ public class DateUtil {
 
 	}
 
+	/**
+	 * Javafx에서 사용되는 Date관련 유틸리티
+	 * @author KYJ
+	 *
+	 */
+	public static class Fx {
+
+		public static final String EEE = "EEE";
+		public static final String uuuuMMdd = "uuuuMMdd";
+		public static final String uuuuMMDDHHmmss = "uuuuMMddHmmss";
+
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 12. 16.
+		 * @param date
+		 * @return
+		 */
+		public static String toString(LocalDate date) {
+			return date.format(DateTimeFormatter.ofPattern(uuuuMMDDHHmmss));
+		}
+
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 12. 16.
+		 * @param date
+		 * @param pattern
+		 * @return
+		 */
+		public static String toString(LocalDate date, String pattern) {
+			if (date == null)
+				return "";
+			return date.format(DateTimeFormatter.ofPattern(pattern));
+		}
+
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2016. 12. 16.
+		 * @param eee2
+		 * @param eee3
+		 */
+		public static LocalDate toDate(String eee, String pattern) {
+			if (eee == null || pattern == null)
+				return null;
+			return LocalDate.parse(eee, DateTimeFormatter.ofPattern(pattern));
+		}
+
+	}
 
 }
