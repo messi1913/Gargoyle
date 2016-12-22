@@ -15,11 +15,14 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.tools.javac.util.ByteBuffer;
 
 /**
  * runtime execution
@@ -242,6 +245,74 @@ public class RuntimeClassUtil {
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 22.
+	 * @param args
+	 * @param convert
+	 * 		Integer : exitCode
+	 * 		InputStream  : dataStream
+	 * @return
+	 * @throws Exception
+	 */
+	/*@Deprecated 테스트를 더 해봐야함.*/
+	@Deprecated
+	public static void exeAsynchLazy(List<String> args, BiConsumer<Integer, ByteBuffer> convert) {
+
+		Thread thread = new Thread() {
+
+			/* (non-Javadoc)
+			 * @see java.lang.Thread#run()
+			 */
+			@Override
+			public void run() {
+
+				ProcessBuilder pb = new ProcessBuilder(args);
+				pb.redirectErrorStream(true);
+				int result = -1;
+				Process p = null;
+				BufferedReader br = null;
+				ByteBuffer byteBuffer = new ByteBuffer();
+
+				try {
+					p = pb.start();
+
+
+					InputStream is = p.getInputStream();
+					p.waitFor(10, TimeUnit.SECONDS);
+
+
+					int n;
+					byte[] buf = new byte[4096];
+					while ((n = is.read(buf)) != -1) {
+						byteBuffer.appendByte(n);
+					}
+
+					p.destroy();
+					result = p.exitValue();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} finally {
+					if (br != null) {
+						try {
+							br.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+
+				convert.accept(result, byteBuffer);
+			}
+
+		};
+
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 }

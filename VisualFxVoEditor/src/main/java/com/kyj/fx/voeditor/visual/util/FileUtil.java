@@ -53,7 +53,7 @@ import javafx.scene.control.TreeItem;
  * @author KYJ
  *
  */
-public class FileUtil {
+public class FileUtil implements GargoyleExtensionFilters{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
 	/**
@@ -142,11 +142,13 @@ public class FileUtil {
 		return isSuccess;
 	}
 
+
+
 	private static final Map<File, String> cacheReadFile = new CachedMap<>(60000);
 
 	/**
 	 * 파일 읽기 처리.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 19.
 	 * @param file
@@ -679,7 +681,7 @@ public class FileUtil {
 
 	/**
 	 * 파일확장자 리턴
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param extension
@@ -690,7 +692,7 @@ public class FileUtil {
 
 	/**
 	 * 파일확장자 리턴
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param fileName

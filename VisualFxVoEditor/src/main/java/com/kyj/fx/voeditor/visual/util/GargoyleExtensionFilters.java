@@ -57,4 +57,8 @@ public interface GargoyleExtensionFilters {
 	public static final String FONT_EXTENSION = "ttf";
 	public static final String FONT = EXTENSION_COMMONS + FONT_EXTENSION;
 
+	public static final String HTML_NAME = "html files (*.html)";
+	public static final String HTML_EXTENSION = "html";
+	public static final String HTML = EXTENSION_COMMONS + HTML_EXTENSION;
+
 }

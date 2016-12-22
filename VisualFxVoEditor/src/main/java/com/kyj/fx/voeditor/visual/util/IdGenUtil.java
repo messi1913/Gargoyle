@@ -142,7 +142,7 @@ public class IdGenUtil {
 	}
 
 	public static String getTimestamp17() {
-		String formatted = DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHSSS);
+		String formatted = DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSSS);
 		StringBuffer buf = new StringBuffer("00000000000000000");
 		buf.replace(0, formatted.length(), formatted);
 		return buf.toString();
