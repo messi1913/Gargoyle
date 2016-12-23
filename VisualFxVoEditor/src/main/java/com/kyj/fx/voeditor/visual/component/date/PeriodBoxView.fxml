@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXDatePicker?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root fx:id="vboxRoot" type="VBox" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+	<children>
+		<HBox alignment="CENTER_LEFT" spacing="5.0">
+			<children>
+				<Label maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="일" />
+				<JFXDatePicker fx:id="dpStartDate" showWeekNumbers="true" />
+				<Label text="~" />
+				<JFXDatePicker fx:id="dpEndDate" showWeekNumbers="true" />
+			</children>
+			<padding>
+				<Insets left="5.0" />
+			</padding>
+		</HBox>
+		<HBox alignment="CENTER_LEFT" spacing="5.0">
+			<children>
+				<Label maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="요일" />
+				<JFXDatePicker fx:id="dpStartDay" />
+				<Label text="~" />
+				<JFXDatePicker fx:id="dpEndDay" />
+			</children>
+			<padding>
+				<Insets left="5.0" />
+			</padding>
+		</HBox>
+		<HBox alignment="CENTER_LEFT" spacing="5.0">
+			<children>
+				<Label fx:id="lblTime" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="시간" />
+				<JFXDatePicker fx:id="dpStartTime" showTime="true" />
+				<Label text="~" />
+				<JFXDatePicker fx:id="dpEndTime" showTime="true" />
+			</children>
+			<VBox.margin>
+				<Insets />
+			</VBox.margin>
+			<padding>
+				<Insets left="5.0" />
+			</padding>
+		</HBox>
+		<HBox alignment="CENTER_LEFT" spacing="5.0">
+			<padding>
+				<Insets left="5.0" />
+			</padding>
+		</HBox>
+	</children>
+</fx:root>

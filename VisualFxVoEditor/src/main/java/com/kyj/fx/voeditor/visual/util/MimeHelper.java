@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
 import org.apache.poi.util.IOUtils;
@@ -20,7 +21,10 @@ import com.sun.star.uno.RuntimeException;
  * @author KYJ
  *
  */
-public class MimeHelper {
+public final class MimeHelper {
+
+	private MimeHelper() {
+	}
 
 	/**
 	 *
@@ -73,4 +77,34 @@ public class MimeHelper {
 	public static String stringTo(String str) {
 		return new StringBuffer().append("<p>").append(str).append("<p>").toString();
 	}
+
+	private static String DEFAULT_MIME_HEADER = "MIME-Version: 1.0\n" + "Content-Type: text/html;\n" + "	charset=\"utf-8\"\n"
+			+ "Content-Transfer-Encoding: base64\n" + "\n";
+
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 22.
+	 * @param body
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public static String toMime(String body) throws UnsupportedEncodingException {
+		return toMime(DEFAULT_MIME_HEADER, body);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 22.
+	 * @param header
+	 * @param body
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public static String toMime(String header, String body) throws UnsupportedEncodingException {
+		StringBuilder preffix = new StringBuilder();
+		preffix.append(header).append(new String(Base64.getMimeEncoder().encode(body.getBytes("UTF-8"))));
+		return preffix.toString();
+	}
+
 }

@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -258,61 +259,80 @@ public class RuntimeClassUtil {
 	 * @throws Exception
 	 */
 	/*@Deprecated 테스트를 더 해봐야함.*/
-	@Deprecated
-	public static void exeAsynchLazy(List<String> args, BiConsumer<Integer, ByteBuffer> convert) {
 
-		Thread thread = new Thread() {
+	public static void exeAsynchLazy(List<String> args, BiConsumer<Integer, StringBuffer> convert) {
+		exeAsynchLazy(args, "UTF-8", convert, null);
+	}
 
-			/* (non-Javadoc)
-			 * @see java.lang.Thread#run()
-			 */
-			@Override
-			public void run() {
+	public static void exeAsynchLazy(List<String> args, String encoding, BiConsumer<Integer, StringBuffer> convert) {
+		exeAsynchLazy(args, encoding, convert, null);
+	}
 
-				ProcessBuilder pb = new ProcessBuilder(args);
-				pb.redirectErrorStream(true);
-				int result = -1;
-				Process p = null;
-				BufferedReader br = null;
-				ByteBuffer byteBuffer = new ByteBuffer();
-
-				try {
-					p = pb.start();
-
-
-					InputStream is = p.getInputStream();
-					p.waitFor(10, TimeUnit.SECONDS);
-
-
-					int n;
-					byte[] buf = new byte[4096];
-					while ((n = is.read(buf)) != -1) {
-						byteBuffer.appendByte(n);
-					}
-
-					p.destroy();
-					result = p.exitValue();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} finally {
-					if (br != null) {
-						try {
-							br.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-
-				convert.accept(result, byteBuffer);
-			}
-
-		};
-
+	public static void exeAsynchLazy(List<String> args, String encoding, BiConsumer<Integer, StringBuffer> convert,
+			Consumer<Exception> errorHandler) {
+		Thread thread = new Asynch(args, encoding, convert, errorHandler);
 		thread.setDaemon(true);
+		thread.setName("exeAsynchLazy");
 		thread.start();
 	}
 
+	private static class Asynch extends Thread {
+		List<String> args;
+		String encoding;
+		BiConsumer<Integer, StringBuffer> convert;
+		Consumer<Exception> errorHandler;
+
+		public Asynch(List<String> args, String encoding, BiConsumer<Integer, StringBuffer> convert, Consumer<Exception> errorHandler) {
+			this.args = args;
+			this.encoding = encoding;
+			this.convert = convert;
+			this.errorHandler = errorHandler;
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Thread#run()
+		 */
+		@Override
+		public void run() {
+
+			ProcessBuilder pb = new ProcessBuilder(args);
+			pb.redirectErrorStream(true);
+			int result = -1;
+			Process p = null;
+			BufferedReader br = null;
+			StringBuffer sb = new StringBuffer();
+
+			try {
+				p = pb.start();
+
+				br = new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.forName(encoding)));
+				p.waitFor(10, TimeUnit.SECONDS);
+
+				String temp = null;
+				while ((temp = br.readLine()) != null) {
+					sb.append(temp);
+				}
+
+				p.destroy();
+				result = p.exitValue();
+			} catch (Exception e) {
+				LOGGER.error(ValueUtil.toString(e));
+			} finally {
+				if (br != null) {
+					try {
+						br.close();
+					} catch (IOException e) {
+
+						if (errorHandler != null)
+							LOGGER.error(ValueUtil.toString(e));
+						else
+							errorHandler.accept(e);
+					}
+				}
+			}
+
+			convert.accept(result, sb);
+		}
+
+	}
 }

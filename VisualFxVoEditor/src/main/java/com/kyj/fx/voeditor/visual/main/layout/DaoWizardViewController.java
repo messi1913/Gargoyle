@@ -681,7 +681,7 @@ public class DaoWizardViewController {
 	 * @param size
 	 */
 	private void defaultDaoMethodByTable(ObservableList<TbpSysDaoMethodsDVO> items) {
-		String appendName = DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHSSS);
+		String appendName = DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSSS);
 		TbpSysDaoMethodsDVO e = addDefDaoMethod("dList" + appendName, true);
 		String tableName = txtTableName.getText();
 		List<String> columns = getTableColumns(tableName);

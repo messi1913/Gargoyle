@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
@@ -33,10 +34,8 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 
 /**
@@ -97,9 +96,16 @@ public class ClockNaSkin implements Skin<TimeClocker> {
 	public ClockNaSkin(TimeClocker clock) {
 		this.clock = clock;
 
+
+
+
+
 		// construct the analogueClock pieces.
 		final Circle face = new Circle(100, 100, 100);
+		face.centerXProperty().bind(Bindings.divide(clock.prefWidthProperty(), 2));
+		face.centerYProperty().bind(Bindings.divide(clock.prefHeightProperty(), 2));
 		face.setId("face");
+
 //		face.setMouseTransparent(false);
 //		face.setPickOnBounds(false);
 //		face.setFocusTraversable(false);
@@ -107,28 +113,47 @@ public class ClockNaSkin implements Skin<TimeClocker> {
 		brand.setId("brand");
 		brand.layoutXProperty().bind(face.centerXProperty().subtract(brand.widthProperty().divide(2)));
 		brand.layoutYProperty().bind(face.centerYProperty().add(face.radiusProperty().divide(2)));
+
 		hourHand = new Line(0, 0, 0, -50);
-		hourHand.setTranslateX(100);
-		hourHand.setTranslateY(100);
+//		hourHand.setTranslateX(100);
+//		hourHand.setTranslateY(100);
+		hourHand.translateXProperty().bind(face.centerXProperty());
+		hourHand.translateYProperty().bind(face.centerYProperty());
 		hourHand.setId("hourHand");
+
+
 		minuteHand = new Line(0, 0, 0, -75);
-		minuteHand.setTranslateX(100);
-		minuteHand.setTranslateY(100);
+//		minuteHand.setTranslateX(100);
+//		minuteHand.setTranslateY(100);
+		minuteHand.translateXProperty().bind(face.centerXProperty());
+		minuteHand.translateYProperty().bind(face.centerYProperty());
 		minuteHand.setId("minuteHand");
+
+
 		secondHand = new Line(0, 15, 0, -88);
-		secondHand.setTranslateX(100);
-		secondHand.setTranslateY(100);
+//		secondHand.setTranslateX(100);
+//		secondHand.setTranslateY(100);
+		secondHand.translateXProperty().bind(face.centerXProperty());
+		secondHand.translateYProperty().bind(face.centerYProperty());
 		secondHand.setId("secondHand");
+
+
 //		secondHand.setMouseTransparent(true);
 //		secondHand.setFocusTraversable(true);
 //		secondHand.setPickOnBounds(true);
 		final Circle spindle = new Circle(100, 100, 5);
+		spindle.translateXProperty().bind(face.centerXProperty());
+		spindle.translateYProperty().bind(face.centerYProperty());
 		spindle.setId("spindle");
+
+
 		Group ticks = new Group();
 		for (int i = 0; i < 12; i++) {
 			Line tick = new Line(0, -83, 0, -93);
-			tick.setTranslateX(100);
-			tick.setTranslateY(100);
+//			tick.setTranslateX(100);
+//			tick.setTranslateY(100);
+			tick.translateXProperty().bind(face.centerXProperty());
+			tick.translateYProperty().bind(face.centerYProperty());
 			tick.getStyleClass().add("tick");
 			tick.getTransforms().add(new Rotate(i * (360 / 12)));
 			ticks.getChildren().add(tick);
@@ -217,15 +242,15 @@ public class ClockNaSkin implements Skin<TimeClocker> {
 		});
 
 
-		Rectangle rectangle = new Rectangle(6d, 6d, Color.RED);
-		analogueClock.getChildren().add(rectangle);
+//		Rectangle rectangle = new Rectangle(6d, 6d, Color.RED);
+//		analogueClock.getChildren().add(rectangle);
 
 		layout.setOnMouseEntered(event->{
 //			double x = event.getX();
 //			double y = event.getY();
 //			rectangle.setX(x - 3);
 //			rectangle.setY(y - 3);
-
+//C
 		});
 		layout.setOnMouseClicked(event -> {
 //			double sceneX = event.getSceneX();

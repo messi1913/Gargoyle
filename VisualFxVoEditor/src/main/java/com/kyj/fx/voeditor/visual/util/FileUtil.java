@@ -8,6 +8,8 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -53,7 +55,7 @@ import javafx.scene.control.TreeItem;
  * @author KYJ
  *
  */
-public class FileUtil implements GargoyleExtensionFilters{
+public class FileUtil implements GargoyleExtensionFilters {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
 	/**
@@ -141,8 +143,6 @@ public class FileUtil implements GargoyleExtensionFilters{
 		}
 		return isSuccess;
 	}
-
-
 
 	private static final Map<File, String> cacheReadFile = new CachedMap<>(60000);
 
@@ -540,6 +540,27 @@ public class FileUtil implements GargoyleExtensionFilters{
 	public static void writeFile(File file, String str, Charset charset) throws IOException {
 		try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), charset)) {
 			writer.write(str);
+			writer.flush();
+		}
+	}
+
+	/**
+	 * str 내용을 file로 write처리함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 6. 23.
+	 * @param file
+	 * @param str
+	 * @param charset
+	 * @throws IOException
+	 */
+	public static void writeFile(File file, byte[] bytes, Charset charset) throws IOException {
+		try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), charset)) {
+
+			for (byte b : bytes) {
+				writer.write(b);
+			}
+
 			writer.flush();
 		}
 	}

@@ -13,7 +13,7 @@ package com.kyj.fx.voeditor.visual.util;
  ***************************/
 public interface GargoyleExtensionFilters {
 
-	static final String EXTENSION_COMMONS = "*.";
+	public static final String EXTENSION_COMMONS = "*.";
 
 	public static final String ALL_NAME = "All files";
 	public static final String ALL = "*.*";

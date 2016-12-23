@@ -69,7 +69,7 @@ public class PreferencesUtil {
 	 */
 	public static Preferences getMsOffice() {
 		return getRegidit(userRoot -> {
-
+			
 			Preferences officeNode = userRoot.node("Software").node("Microsoft").node("Office");
 
 			try {

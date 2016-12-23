@@ -93,4 +93,13 @@ public class LoadFileOptionHandler {
 		this.fileNotFoundThan = fileNotFoundThan;
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 23.
+	 * @return
+	 */
+	public static LoadFileOptionHandler getDefaultHandler() {
+		return new LoadFileOptionHandler();
+	}
+
 }

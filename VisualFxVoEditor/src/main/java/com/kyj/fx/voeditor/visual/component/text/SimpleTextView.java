@@ -6,12 +6,20 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
+import com.kyj.fx.voeditor.visual.util.Base64Utils;
+import com.kyj.fx.voeditor.visual.util.DateUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -138,6 +146,36 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	 */
 	public final CodeAreaHelper<CodeArea> getHelper() {
 		return helper;
+	}
+
+	@FXML
+	public void miOpenMsWordOnAction() {
+		StringBuilder preffix = new StringBuilder();
+		preffix.append("MIME-Version: 1.0\n");
+		preffix.append("Content-Type: text/html;\n");
+		preffix.append("	charset=\"utf-8\"\n");
+		preffix.append("Content-Transfer-Encoding: base64\n");
+		preffix.append("X-Generator: Namo ActiveSquare 7 7.0.0.45\n");
+		preffix.append("\n").append("\n");
+
+		String text = codeArea.getText();
+
+		preffix.append(Base64Utils.encode(text.getBytes()));
+
+
+		String currentDateString = DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSSS);
+		String fileName = String.format("%s%s.%s", "_", currentDateString, FileUtil.HTML_EXTENSION);
+
+		try {
+			File file = new File(fileName);
+			FileUtil.writeFile(file, new ByteArrayInputStream(preffix.toString().getBytes()), Charset.forName("UTF-8"));
+
+			if (file.exists())
+				FileUtil.openFile(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 }
