@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.framework.word;
 
-import java.io.File;
 import java.util.List;
 import java.util.function.BiConsumer;
 

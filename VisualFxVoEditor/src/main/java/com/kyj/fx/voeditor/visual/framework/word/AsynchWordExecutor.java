@@ -34,7 +34,8 @@ public class AsynchWordExecutor implements RuntimeExucteHandlerble {
 	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AsynchWordExecutor.class);
 
 	private File mimeFile;
-	private Function<File, String> mimeFileConverter = file -> {
+
+	private Function<File, String> htmlToMimeConverter = file -> {
 		String html = FileUtil.readFile(file, LoadFileOptionHandler.getDefaultHandler());
 		try {
 			return MimeHelper.toMime(html);
@@ -44,11 +45,17 @@ public class AsynchWordExecutor implements RuntimeExucteHandlerble {
 		return null;
 	};
 
-	public AsynchWordExecutor(File htmlFile, Function<File, String> mimeFileConverter) throws UnsupportedEncodingException {
-		this.mimeFileConverter = mimeFileConverter;
+	public AsynchWordExecutor(File htmlFiler) throws UnsupportedEncodingException {
+		this(htmlFiler, null);
 	}
 
-	public AsynchWordExecutor(String html) {
+	public AsynchWordExecutor(File htmlFile, Function<File, String> mimeFileConverter) throws UnsupportedEncodingException {
+		if (mimeFileConverter != null)
+			this.htmlToMimeConverter = mimeFileConverter;
+		init(toMime(htmlFile));
+	}
+
+	private void init(String html) {
 		File tempFileSystem = FileUtil.getTempFileSystem();
 		String currentDateString = DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSSS);
 		String simpleTemplFileName = String.format("_%s.html", currentDateString);
@@ -56,18 +63,12 @@ public class AsynchWordExecutor implements RuntimeExucteHandlerble {
 	}
 
 	public String toMime(File htmlFile) throws UnsupportedEncodingException {
-		return mimeFileConverter.apply(htmlFile);
+		return htmlToMimeConverter.apply(htmlFile);
 	}
 
 	public void execute() {
 		if (mimeFile == null || !mimeFile.exists())
 			return;
-
-		try {
-			toMime(mimeFile);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
 
 		RuntimeClassUtil.exeAsynchLazy(findWordLocationCommand(), encoding(), handler());
 	}
@@ -94,8 +95,7 @@ public class AsynchWordExecutor implements RuntimeExucteHandlerble {
 
 	public BiConsumer<Integer, StringBuffer> handler() {
 		BiConsumer<Integer, StringBuffer> convert = (code, buf) -> {
-			if (code == 0) {
-				System.out.println("exit Code : " + code);
+			if (code != -1) {
 				String str = buf.toString();
 				String matchingStr = "REG_SZ";
 				int indexOf = str.indexOf(matchingStr);
@@ -112,6 +112,8 @@ public class AsynchWordExecutor implements RuntimeExucteHandlerble {
 						LOGGER.error(ValueUtil.toString(e));
 					}
 				}
+			} else {
+
 			}
 
 		};
