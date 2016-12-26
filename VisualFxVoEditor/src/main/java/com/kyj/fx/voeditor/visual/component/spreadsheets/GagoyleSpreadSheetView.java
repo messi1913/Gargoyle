@@ -242,13 +242,27 @@ public class GagoyleSpreadSheetView extends StackPane {
 				SpreadsheetCell spreadsheetCell = null;
 
 				if (rows.size() > row)
-					spreadsheetCell = rows.get(row).get(_column);
+				{
+					ObservableList<SpreadsheetCell> observableList = rows.get(row);
+
+					try{
+						spreadsheetCell = observableList.get(_column);
+					}catch(IndexOutOfBoundsException e)
+					{
+						e.printStackTrace();
+					}
+
+				}
+
 				/* 새로운 로우를 생성함. */
 				else {
 
 					ObservableList<SpreadsheetCell> newCells = createNewRow();
 					spreadsheetCell = newCells.get(_column);
 				}
+
+				if(value !=null)
+					value = value.toString();
 
 				spreadsheetCell.setItem(value);
 				_column++;

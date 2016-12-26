@@ -1292,6 +1292,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		StringBuffer dataBuf = new StringBuffer();
 		List<Map<String, Object>> items = getTbResult().getItems();
 		boolean isFirst = true;
+
+		int colSize = 27;
 		for (Map<String, Object> map : items) {
 
 			Iterator<String> iterator = map.keySet().iterator();
@@ -1307,12 +1309,16 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			if (isFirst) {
 				isFirst = false;
 				columnBuf.append('\n');
+				colSize = map.size();
 			}
 
 		}
 
+		if(colSize < 27)
+			colSize = 27;
+
 		String putString = new StringBuffer().append(columnBuf).append(dataBuf).toString();
-		SchoolMgrerSpreadSheetView parent = new SchoolMgrerSpreadSheetView();
+		SchoolMgrerSpreadSheetView parent = new SchoolMgrerSpreadSheetView(colSize);
 		// parent.paste(putString, 0, 0);
 		parent.paste(items, 0, 0);
 		tabProxy.loadNewSystemTab(SystemLayoutViewController.TAB_TITLE_SPREAD_SHEET, parent);
