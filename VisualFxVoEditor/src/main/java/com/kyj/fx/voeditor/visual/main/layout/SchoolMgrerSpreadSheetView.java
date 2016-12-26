@@ -24,9 +24,11 @@ public class SchoolMgrerSpreadSheetView extends BorderPane {
 
 	private GagoyleSpreadSheetView gagoyleSpreadSheetView;
 
-	public SchoolMgrerSpreadSheetView() {
-
-		GridBase gridBase = new GridBase(100, 27);
+	/**
+	 * @param colSize
+	 */
+	public SchoolMgrerSpreadSheetView(int colSize) {
+		GridBase gridBase = new GridBase(100, colSize);
 		List<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
 		for (int row = 0; row < gridBase.getRowCount(); ++row) {
@@ -42,9 +44,13 @@ public class SchoolMgrerSpreadSheetView extends BorderPane {
 		gagoyleSpreadSheetView = new GagoyleSpreadSheetView(gridBase);
 
 		setCenter(gagoyleSpreadSheetView);
-
-//		this.setOnKeyPressed(this::spreadSheetKeyPress);
 	}
+
+	public SchoolMgrerSpreadSheetView() {
+		this(27);
+	}
+
+
 
 	/**
 	 * @param e
