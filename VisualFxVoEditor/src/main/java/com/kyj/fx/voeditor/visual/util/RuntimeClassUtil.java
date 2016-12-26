@@ -23,8 +23,6 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.tools.javac.util.ByteBuffer;
-
 /**
  * runtime execution
  *
@@ -51,6 +49,10 @@ public class RuntimeClassUtil {
 	 ********************************/
 	public static void simpleExec(List<String> args) throws Exception {
 		try {
+
+			if(args == null || args.isEmpty())
+				return;
+
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.start();
 		} catch (IOException e) {
@@ -268,12 +270,45 @@ public class RuntimeClassUtil {
 		exeAsynchLazy(args, encoding, convert, null);
 	}
 
+	public static void simpleExeAsynchLazy(List<String> args, Consumer<Exception> errorHandler) {
+		Thread thread = new SimpleAsynch(args, errorHandler);
+		thread.setDaemon(true);
+		thread.setName("simple-exeAsynchLazy");
+		thread.start();
+	}
+
 	public static void exeAsynchLazy(List<String> args, String encoding, BiConsumer<Integer, StringBuffer> convert,
 			Consumer<Exception> errorHandler) {
 		Thread thread = new Asynch(args, encoding, convert, errorHandler);
 		thread.setDaemon(true);
 		thread.setName("exeAsynchLazy");
 		thread.start();
+	}
+
+	private static class SimpleAsynch extends Thread {
+		List<String> args;
+		Consumer<Exception> errorHandler;
+
+		public SimpleAsynch(List<String> args, Consumer<Exception> errorHandler) {
+			this.args = args;
+			this.errorHandler = errorHandler;
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Thread#run()
+		 */
+		@Override
+		public void run() {
+			try {
+				RuntimeClassUtil.simpleExec(args);
+			} catch (Exception e) {
+				if (null != errorHandler)
+					errorHandler.accept(e);
+				else
+					LOGGER.error(ValueUtil.toString(e));
+			}
+		}
+
 	}
 
 	private static class Asynch extends Thread {

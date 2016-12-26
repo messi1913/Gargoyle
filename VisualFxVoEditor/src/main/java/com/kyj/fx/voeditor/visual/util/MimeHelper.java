@@ -78,9 +78,12 @@ public final class MimeHelper {
 		return new StringBuffer().append("<p>").append(str).append("<p>").toString();
 	}
 
-	private static String DEFAULT_MIME_HEADER = "MIME-Version: 1.0\n" + "Content-Type: text/html;\n" + "	charset=\"utf-8\"\n"
-			+ "Content-Transfer-Encoding: base64\n" + "\n";
-
+	private static String DEFAULT_MIME_HEADER =
+	/* Define] Mime Default Header*/
+	"MIME-Version: 1.0 \n" + /**/
+			"Content-Type: multipart/mixed; \n" + /**/
+			"charset=\"utf-8\" \n" + /**/
+			"Content-Transfer-Encoding: base64\n"; /**/
 
 	/**
 	 * @작성자 : KYJ
@@ -103,7 +106,10 @@ public final class MimeHelper {
 	 */
 	public static String toMime(String header, String body) throws UnsupportedEncodingException {
 		StringBuilder preffix = new StringBuilder();
-		preffix.append(header).append(new String(Base64.getMimeEncoder().encode(body.getBytes("UTF-8"))));
+		String encode = new String(Base64.getMimeEncoder().encode(body.getBytes()));
+//		String encode = Base64Utils.encode(body.getBytes(encoding));
+
+		preffix.append(header).append("\n").append(encode);
 		return preffix.toString();
 	}
 
