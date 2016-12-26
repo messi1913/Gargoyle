@@ -76,7 +76,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 	/**
 	 * 씬빌더 위치정보
-	 * 
+	 *
 	 * @최초생성일 2016. 6. 19.
 	 */
 	public static final String SCENEBUILDER_LOCATION = "scenebuilder.location";
@@ -110,10 +110,13 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 	/**
 	 * PMD에서 유저가 선택한 상태 값 배열
-	 * 
+	 *
 	 * @최초생성일 2016. 10. 14.
 	 */
 	public static final String PMD_SELECTED_PRIORITY_VALUES = "pmd.selected.priority.values";
+
+
+	public static final String MS_WORD_PATH = "msword.path";
 
 	private String[] baseKeys = { BASE_KEY_JDBC_INFO, BASE_KEY_JDBC_DRIVER, BASE_KEY_JDBC_URL, BASE_KEY_JDBC_ID, BASE_KEY_JDBC_PASS,
 			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES };
