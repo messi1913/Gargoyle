@@ -546,6 +546,28 @@ public class FileUtil implements GargoyleExtensionFilters {
 
 	/**
 	 * str 내용을 file로 write처리함.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 27.
+	 * @param file
+	 * @param str
+	 * @param charset
+	 * @param errorHandler
+	 */
+	public static void writeFile(File file, String str, Charset charset, Consumer<Exception> errorHandler) {
+		try {
+			writeFile(file,str,charset);
+		}catch(Exception e)
+		{
+			if(errorHandler!=null)
+				errorHandler.accept(e);
+			else
+				LOGGER.error(ValueUtil.toString(e));
+		}
+
+	}
+
+	/**
+	 * str 내용을 file로 write처리함.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 23.
