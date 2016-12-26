@@ -6,6 +6,9 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
+import java.io.File;
+import java.nio.charset.Charset;
+
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +17,10 @@ import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
 import com.kyj.fx.voeditor.visual.framework.word.ContentWordAdapter;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
-import com.sun.jna.Platform;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -148,16 +153,12 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	@FXML
 	public void miOpenMsWordOnAction() {
 		String content = codeArea.getText();
-
 		try {
-
 			AsynchWordExecutor executor = new AsynchWordExecutor(new ContentWordAdapter(content));
 			executor.execute();
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@FXML
@@ -182,6 +183,20 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * menuItem 다른이름으로 저장.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 27.
+	 */
+	@FXML
+	public void miSaveAsOnAction(){
+		File saveAs = DialogUtil.showFileSaveCheckDialog(getScene().getWindow(), chooser->{});
+		if(saveAs!=null && saveAs.exists())
+		{
+			FileUtil.writeFile(saveAs, codeArea.getText(), Charset.forName("UTF-8"), err -> LOGGER.error(ValueUtil.toString(err)));
 		}
 	}
 }

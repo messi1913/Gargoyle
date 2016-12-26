@@ -25,8 +25,10 @@
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
-          <Menu mnemonicParsing="false" text="File" />
-          <Menu mnemonicParsing="false" text="Edit" />
+          <Menu mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem fx:id="miSaveAs" mnemonicParsing="false" onAction="#miSaveAsOnAction" text="Save As" />
+               </items></Menu>
           <Menu mnemonicParsing="false" text="View">
                <items>
                   <Menu mnemonicParsing="false" text="Open Width">
