@@ -15,6 +15,7 @@ import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
 import com.kyj.fx.voeditor.visual.framework.word.ContentWordAdapter;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.sun.jna.Platform;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -165,8 +166,20 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 		try {
 			WebView webView = new WebView();
-			webView.getEngine().loadContent(content, "text/html");
-			FxUtil.createStageAndShow(webView);
+
+			FxUtil.createStageAndShow(webView, stage->{
+				stage.setAlwaysOnTop(true);
+				stage.initOwner(getScene().getWindow());
+				stage.focusedProperty().addListener((oba,o, n ) ->{
+					if(!n)
+						stage.close();
+
+				});
+			});
+
+			javafx.application.Platform.runLater(() -> {
+				webView.getEngine().loadContent(content, "text/html");
+			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
