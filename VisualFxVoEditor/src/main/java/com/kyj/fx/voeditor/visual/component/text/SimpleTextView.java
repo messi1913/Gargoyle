@@ -6,20 +6,15 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
-import com.kyj.fx.voeditor.visual.util.Base64Utils;
-import com.kyj.fx.voeditor.visual.util.DateUtil;
-import com.kyj.fx.voeditor.visual.util.FileUtil;
+import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
+import com.kyj.fx.voeditor.visual.framework.word.ContentWordAdapter;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,6 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.web.WebView;
 
 /**
  *
@@ -150,32 +146,29 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 	@FXML
 	public void miOpenMsWordOnAction() {
-		StringBuilder preffix = new StringBuilder();
-		preffix.append("MIME-Version: 1.0\n");
-		preffix.append("Content-Type: text/html;\n");
-		preffix.append("	charset=\"utf-8\"\n");
-		preffix.append("Content-Transfer-Encoding: base64\n");
-		preffix.append("X-Generator: Namo ActiveSquare 7 7.0.0.45\n");
-		preffix.append("\n").append("\n");
-
-		String text = codeArea.getText();
-
-		preffix.append(Base64Utils.encode(text.getBytes()));
-
-
-		String currentDateString = DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSSS);
-		String fileName = String.format("%s%s.%s", "_", currentDateString, FileUtil.HTML_EXTENSION);
+		String content = codeArea.getText();
 
 		try {
-			File file = new File(fileName);
-			FileUtil.writeFile(file, new ByteArrayInputStream(preffix.toString().getBytes()), Charset.forName("UTF-8"));
 
-			if (file.exists())
-				FileUtil.openFile(file);
-		} catch (IOException e) {
+			AsynchWordExecutor executor = new AsynchWordExecutor(new ContentWordAdapter(content));
+			executor.execute();
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
+	@FXML
+	public void mimiOpenWebViewOnAction() {
+		String content = codeArea.getText();
+
+		try {
+			WebView webView = new WebView();
+			webView.getEngine().loadContent(content, "text/html");
+			FxUtil.createStageAndShow(webView);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

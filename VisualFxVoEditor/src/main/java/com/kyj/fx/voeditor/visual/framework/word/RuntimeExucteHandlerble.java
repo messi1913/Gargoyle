@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.framework.word;
 
-import java.util.List;
 import java.util.function.BiConsumer;
 
 /**
@@ -22,14 +21,6 @@ public interface RuntimeExucteHandlerble {
 	 * @작성일 : 2016. 12. 23.
 	 */
 	public void execute();
-
-	/**
-	 * 명령어
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 12. 23.
-	 * @return
-	 */
-	public List<String> getCommand();
 
 	/**
 	 * 인코딩

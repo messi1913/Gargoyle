@@ -32,6 +32,7 @@
                   <Menu mnemonicParsing="false" text="Open Width">
                     <items>
                       <MenuItem fx:id="miOpenMsWord" mnemonicParsing="false" onAction="#miOpenMsWordOnAction" text="MsWord" />
+                      <MenuItem fx:id="miOpenWebView" mnemonicParsing="false" onAction="#mimiOpenWebViewOnAction" text="WebView" />
                     </items>
                   </Menu>
                </items>
