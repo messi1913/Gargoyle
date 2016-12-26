@@ -10,17 +10,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Test;
 
-import com.google.common.primitives.Bytes;
 import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
+import com.kyj.fx.voeditor.visual.framework.word.HtmlMimeAdapter;
 
 /**
  * @author KYJ
@@ -194,24 +191,22 @@ public class ValueUtilTest {
 		Charset forName = Charset.forName("UTF-8");
 		String content = ("<html> <meta charset = 'utf-8'/><body><p>hi 하이</p> </body> </html>");
 
-
-
-
-		String mime = MimeHelper.toMime(content);
+		//		String mime = MimeHelper.toMime(content);
 
 		try {
 			File file = new File("Sample.html");
-			FileUtil.writeFile(file, mime, forName);
+			FileUtil.writeFile(file, content, forName);
 
-
-			AsynchWordExecutor executor = new AsynchWordExecutor(content);
+			AsynchWordExecutor executor = new AsynchWordExecutor(new HtmlMimeAdapter(file));
 			executor.execute();
 
-//			if (file.exists()) {
-//				List<String> asLis = Arrays.asList("C:\\Program Files\\Microsoft Office\\Office15\\WINWORD.exe", file.getAbsolutePath());
-//
-//				RuntimeClassUtil.simpleExec(asLis);
-//			}
+			//			if (file.exists()) {
+			//				List<String> asLis = Arrays.asList("C:\\Program Files\\Microsoft Office\\Office15\\WINWORD.exe", file.getAbsolutePath());
+			//
+			//				RuntimeClassUtil.simpleExec(asLis);
+			//			}
+
+			Thread.sleep(200000);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
