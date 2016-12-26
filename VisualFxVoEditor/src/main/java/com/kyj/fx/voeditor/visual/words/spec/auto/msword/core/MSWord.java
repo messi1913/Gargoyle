@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.words.spec.auto.msword.core;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,7 +53,7 @@ import com.kyj.fx.voeditor.visual.words.spec.auto.msword.interfaces.ITableCustom
 public class MSWord {
 
 	/***********************
-	 * 사용 FONT SIZE  
+	 * 사용 FONT SIZE
 	 **********************/
 	public static final int H1 = 15;
 	public static final int H2 = 14;
@@ -60,9 +61,9 @@ public class MSWord {
 	public static final int H4 = 12;
 	public static final int H5 = 11;
 	public static final int DEFAULT_FONT_SIZE = 10;
-	
+
 	private static final String DEFAULT_FONT_NAME = "Tahoma";
-	
+
 	// Create a new document from scratch
 	private XWPFDocument doc;
 	private String fontName;
@@ -91,7 +92,7 @@ public class MSWord {
 
 	/**
 	 * 텍스트 입력
-	 * 
+	 *
 	 * @param p
 	 * @param text
 	 * @return
@@ -102,9 +103,9 @@ public class MSWord {
 
 	/**
 	 * 텍스트 입력
-	 * 
+	 *
 	 * @param p
-	 * 
+	 *
 	 * @param text
 	 * @param bold
 	 * @param italic
@@ -117,7 +118,7 @@ public class MSWord {
 
 	/**
 	 * 텍스트 입력
-	 * 
+	 *
 	 * @param p
 	 * @param text
 	 * @param fontSize
@@ -145,7 +146,7 @@ public class MSWord {
 
 	/**
 	 * 텍스트 입력
-	 * 
+	 *
 	 * @param text
 	 */
 	public void addBlockText(String text, ParagraphAlignment alignment) {
@@ -172,7 +173,7 @@ public class MSWord {
 
 	/**
 	 * 텍스트 입력
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
@@ -182,7 +183,7 @@ public class MSWord {
 
 	/**
 	 * 텍스트 입력
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
@@ -192,7 +193,7 @@ public class MSWord {
 
 	/**
 	 * 텍스트 입력
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
@@ -241,23 +242,23 @@ public class MSWord {
 
 	/**
 	 * 테이블을 추가한다.
-	 * 
+	 *
 	 * List의 로우는 각 행을 의미. TreeSet은 테이블 컬럼Index 데이터를 의미.
-	 * 
+	 *
 	 * @param list
 	 */
 	public XWPFTable addToTable(List<List<String>> list, ITableCustomProperty property/*
-																					 * ,
-																					 * ThFunction
-																					 * <
-																					 * ,
-																					 * U
-																					 * ,
-																					 * V
-																					 * ,
-																					 * R
-																					 * >
-																					 */) {
+																						* ,
+																						* ThFunction
+																						* <
+																						* ,
+																						* U
+																						* ,
+																						* V
+																						* ,
+																						* R
+																						* >
+																						*/) {
 
 		if (list == null || list.isEmpty()) {
 			return null;
@@ -390,7 +391,7 @@ public class MSWord {
 
 	/**
 	 * 수직셀 병합
-	 * 
+	 *
 	 * @param table
 	 * @param col
 	 * @param fromRow
@@ -415,7 +416,7 @@ public class MSWord {
 
 	/**
 	 * 수평셀 병합
-	 * 
+	 *
 	 * @param table
 	 * @param rowNum
 	 * @param colNum
@@ -435,7 +436,7 @@ public class MSWord {
 
 	/**
 	 * 테이블의 특정 로우의 컬럼에 해당하는 부분의 셀을 나눔. 나누기는 하나.. 컬럼의 셀수가 일치하지 않고 틀어짐.
-	 * 
+	 *
 	 * @param table
 	 * @param rowNum
 	 * @param colNum
@@ -492,7 +493,7 @@ public class MSWord {
 
 	/**
 	 * 사진 추가.
-	 * 
+	 *
 	 * @param imgFile
 	 * @param id
 	 * @param width
@@ -507,7 +508,7 @@ public class MSWord {
 
 	/**
 	 * 사진추가.
-	 * 
+	 *
 	 * @param imgFile
 	 * @param id
 	 * @param width
@@ -532,33 +533,13 @@ public class MSWord {
 			final String picXml = "" + "<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\">"
 					+ "   <a:graphicData uri=\"http://schemas.openxmlformats.org/drawingml/2006/picture\">"
 					+ "      <pic:pic xmlns:pic=\"http://schemas.openxmlformats.org/drawingml/2006/picture\">" + "         <pic:nvPicPr>"
-					+ "            <pic:cNvPr id=\""
-					+ id
-					+ "\" name=\"Generated\"/>"
-					+ "            <pic:cNvPicPr/>"
-					+ "         </pic:nvPicPr>"
-					+ "         <pic:blipFill>"
-					+ "            <a:blip r:embed=\""
-					+ blipId
-					+ "\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"/>"
-					+ "            <a:stretch>"
-					+ "               <a:fillRect/>"
-					+ "            </a:stretch>"
-					+ "         </pic:blipFill>"
-					+ "         <pic:spPr>"
-					+ "            <a:xfrm>"
-					+ "               <a:off x=\"0\" y=\"0\"/>"
-					+ "               <a:ext cx=\""
-					+ width
-					+ "\" cy=\""
-					+ height
-					+ "\"/>"
-					+ "            </a:xfrm>"
-					+ "            <a:prstGeom prst=\"rect\">"
-					+ "               <a:avLst/>"
-					+ "            </a:prstGeom>"
-					+ "         </pic:spPr>"
-					+ "      </pic:pic>"
+					+ "            <pic:cNvPr id=\"" + id + "\" name=\"Generated\"/>" + "            <pic:cNvPicPr/>"
+					+ "         </pic:nvPicPr>" + "         <pic:blipFill>" + "            <a:blip r:embed=\"" + blipId
+					+ "\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"/>" + "            <a:stretch>"
+					+ "               <a:fillRect/>" + "            </a:stretch>" + "         </pic:blipFill>" + "         <pic:spPr>"
+					+ "            <a:xfrm>" + "               <a:off x=\"0\" y=\"0\"/>" + "               <a:ext cx=\"" + width
+					+ "\" cy=\"" + height + "\"/>" + "            </a:xfrm>" + "            <a:prstGeom prst=\"rect\">"
+					+ "               <a:avLst/>" + "            </a:prstGeom>" + "         </pic:spPr>" + "      </pic:pic>"
 					+ "   </a:graphicData>" + "</a:graphic>";
 
 			XmlToken xmlToken = null;
@@ -595,11 +576,15 @@ public class MSWord {
 
 	/**
 	 * 스트림을 닫고 문서를 만든다.
-	 * 
+	 *
 	 * @param docxName
 	 * @throws IOException
 	 */
 	public void close(String docxName) throws IOException {
+		close(new File(docxName));
+	}
+
+	public void close(File docxName) throws IOException {
 		// write the file
 		FileOutputStream out = new FileOutputStream(docxName);
 		doc.write(out);
