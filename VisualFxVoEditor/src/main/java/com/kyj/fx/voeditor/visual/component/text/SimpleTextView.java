@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
-import com.kyj.fx.voeditor.visual.framework.word.ContentWordAdapter;
+import com.kyj.fx.voeditor.visual.framework.word.ContentMimeHtmlAdapter;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
@@ -154,7 +154,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miOpenMsWordOnAction() {
 		String content = codeArea.getText();
 		try {
-			AsynchWordExecutor executor = new AsynchWordExecutor(new ContentWordAdapter(content));
+			AsynchWordExecutor executor = new AsynchWordExecutor(new ContentMimeHtmlAdapter(content));
 			executor.execute();
 		} catch (Exception e) {
 			e.printStackTrace();
