@@ -78,7 +78,6 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.SnapshotResult;
 import javafx.scene.control.Button;
-import javafx.scene.control.Cell;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
@@ -181,19 +180,32 @@ public class FxUtil {
 
 	/********************************
 	 * 작성일 : 2016. 5. 21. 작성자 : KYJ
-	 *
+	 *<br/>
 	 * FXMLController에 정의된 내용을 기준으로 FXML을 로드한다.
-	 *
+	 *<br/>
 	 * @param controllerClass
-	 * @param option
-	 *            FXML을 로드한후 후처리할 내용을 기입한다.
+	 * @param N - Node option <br/>
+	 *            FXML을 로드한후 후처리할 내용을 기입한다. <br/>
 	 * @return
 	 * @throws GargoyleException
 	 * @throws NullPointerException
 	 * @throws IOException
 	 ********************************/
-	public static <T, C> T load(Class<C> controllerClass, Consumer<T> option) throws Exception {
+	public static <N, C> N load(Class<C> controllerClass, Consumer<N> option) throws Exception {
 		return load(controllerClass, null, option, null);
+	}
+
+	public static <N, C> N load(Class<C> controllerClass, Consumer<N> option, Consumer<Exception> errHandler )  {
+		N n = null;
+		try {
+			n = load(controllerClass, null, option, null);
+		} catch (Exception e) {
+			if(errHandler!=null)
+				e.printStackTrace();
+			else
+				LOGGER.error(ValueUtil.toString(e));
+		}
+		return n;
 	}
 
 	/**

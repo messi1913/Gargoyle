@@ -212,6 +212,13 @@ public class DialogUtil {
 		return result;
 	}
 
+	public static File showFileSaveCheckDialog(final Window ownerWindow) {
+		File saveFile = showFileSaveDialog(ownerWindow, option->{
+
+		});
+		return saveFile;
+	}
+
 	/**
 	 * 파일저장다이얼로그,
 	 *
@@ -592,7 +599,7 @@ public class DialogUtil {
 
 		//Modal
 		composite.show(owner, stage -> {
-			
+
 			stage.initModality(Modality.APPLICATION_MODAL);
 			stage.initStyle(StageStyle.UTILITY);
 			node.requestFocus();

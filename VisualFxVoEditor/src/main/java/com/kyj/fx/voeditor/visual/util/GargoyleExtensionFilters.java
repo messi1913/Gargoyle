@@ -38,7 +38,7 @@ public interface GargoyleExtensionFilters {
 
 
 	public static final String XLSX_NAME = "Excel files (*.xlsx)";
-	public static final String XLSX_EXTENSION = EXTENSION_COMMONS + "xlsx";
+	public static final String XLSX_EXTENSION = "xlsx";
 	public static final String XLSX = EXTENSION_COMMONS + XLSX_EXTENSION;
 
 	public static final String DOCX_NAME = "Doc files (*.docx)";
@@ -46,7 +46,7 @@ public interface GargoyleExtensionFilters {
 	public static final String DOCX = EXTENSION_COMMONS + DOCX_EXTENSION;
 
 	public static final String DOC_NAME = "Doc files (*.doc)";
-	public static final String DOC_EXTENSION = "*.doc";
+	public static final String DOC_EXTENSION = "doc";
 	public static final String DOC = EXTENSION_COMMONS + DOC_EXTENSION;
 
 	public static final String PROPERTIES_NAME = "Property files (*.properties)";

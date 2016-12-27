@@ -160,7 +160,8 @@ public class SqlTab extends Tab {
 			/*마지막에 선택한 경로를 자동선택하는 기능이 추가되었으므로 기본경로 선택 처리는 없앰.*/
 			//					String dir = System.getProperty("user.home");
 			//					choser.setInitialDirectory(new File(dir));
-			choser.getExtensionFilters().add(new ExtensionFilter("SQL files (*.sql)", "*.sql"));
+			choser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.SQL_NAME, GargoyleExtensionFilters.SQL));
+//			choser.getExtensionFilters().add(new ExtensionFilter("SQL files (*.sql)", "*.sql"));
 		});
 
 		//선택한 파일이 정상적으로 선택된 경우는 null이 아님.

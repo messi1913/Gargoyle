@@ -508,4 +508,11 @@ public class GagoyleSpreadSheetView extends StackPane {
 
 	}
 
+	public ObservableList<String> getColumnHeaders(){
+		return ssv.getGrid().getColumnHeaders();
+	}
+
+	public ObservableList<ObservableList<SpreadsheetCell>> getRows(){
+		return ssv.getGrid().getRows();
+	}
 }
