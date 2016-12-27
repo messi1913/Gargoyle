@@ -1748,6 +1748,9 @@ public class ValueUtil {
 			case '…':
 				isMatch = true;
 				break;
+			case '’':
+				isMatch = true;
+				break;
 			}
 
 			if (!isMatch) {
