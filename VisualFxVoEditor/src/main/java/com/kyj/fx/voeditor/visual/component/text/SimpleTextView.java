@@ -9,6 +9,11 @@ package com.kyj.fx.voeditor.visual.component.text;
 import java.io.File;
 import java.nio.charset.Charset;
 
+import javax.mail.Session;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,8 +155,13 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		return helper;
 	}
 
+	/**
+	 * 나모형태를 웹형태로 바꿔서 뷰를 보여줌
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 29.
+	 */
 	@FXML
-	public void miOpenMsWordOnAction() {
+	public void miOpenNamoMsWordOnAction() {
 		String content = codeArea.getText();
 		try {
 			AsynchWordExecutor executor = new AsynchWordExecutor(new ContentMimeHtmlAdapter(content));
@@ -161,12 +171,42 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		}
 	}
 
+	/**
+	 * Mime 데이터타입을 Html컨텐츠형태로 조회하기 위한 웹 뷰를 오픈함.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 29.
+	 */
 	@FXML
-	public void mimiOpenWebViewOnAction() {
+	public void miOpenNamoWebViewOnAction(){
+
 		String content = codeArea.getText();
 
 		try {
 			WebView webView = new WebView();
+
+//			String encodeToString = Base64.getEncoder().encodeToString(content.getBytes());
+//
+//			byte[] decode = Base64.getDecoder().decode(encodeToString);
+//			String string = new String(decode);
+//			MimeBodyPart part = new MimeBodyPart(new ByteArrayInputStream(content.getBytes()));
+//			Enumeration allHeaders = part.getAllHeaders();
+//			while(allHeaders.hasMoreElements())
+//			{
+//				javax.mail.Header nextElement = (Header) allHeaders.nextElement();
+//
+//				System.out.println(nextElement.getName());
+//				System.out.println(nextElement.getValue());
+//			}
+//
+//			DataHandler dataHandler = part.getDataHandler();
+//			Object transferData = dataHandler.getTransferData(new DataFlavor("text/html"));
+//			System.out.println(transferData);
+//			ContentMimeHtmlAdapter adapter = new ContentMimeHtmlAdapter(content);
+//			File tempFile = adapter.toTempFile();
+
+
+//			byte[] decode = Base64.getMimeDecoder().decode(content.getBytes("UTF-8"));
+//			String string = new String(decode);
 
 			FxUtil.createStageAndShow(webView, stage->{
 				stage.setAlwaysOnTop(true);
@@ -179,12 +219,35 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			});
 
 			javafx.application.Platform.runLater(() -> {
-				webView.getEngine().loadContent(content, "text/html");
+				try {
+//					LOGGER.debug("Temp File Dir {} "  , tempFile.getAbsolutePath());
+					webView.getEngine().load(content);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+//				webView.getEngine().loadContent(content, "text/html");
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 	}
+
+	@FXML
+	public void miOpenHtmlWordOnAction(){
+		String content = codeArea.getText();
+		try {
+			AsynchWordExecutor executor = new AsynchWordExecutor(new ContentMimeHtmlAdapter(content));
+			executor.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	@FXML
+	public void miOpenHtmlWevViewOnAction() {}
 
 	/**
 	 * menuItem 다른이름으로 저장.

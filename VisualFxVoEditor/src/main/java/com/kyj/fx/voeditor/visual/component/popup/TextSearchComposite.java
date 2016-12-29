@@ -59,7 +59,7 @@ public class TextSearchComposite extends BorderPane {
 	 */
 	private StringProperty contentProperty;
 
-	/**
+	/** 
 	 * 검색 시작 인덱스
 	 *
 	 * @최초생성일 2015. 12. 14.
@@ -163,12 +163,7 @@ public class TextSearchComposite extends BorderPane {
 			LOGGER.error(ValueUtil.toString(e));
 		}
 
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				txtFindTextContent.requestFocus();
-			}
-		});
+		Platform.runLater(() -> txtFindTextContent.requestFocus());
 
 	}
 

@@ -126,7 +126,6 @@ public class SqlKeywords extends BorderPane {
 		this.setBottom(lblLineInfo);
 		// this.getChildren().add();
 		this.getStylesheets().add(SqlKeywords.class.getResource("java-keywords.css").toExternalForm());
-
 	}
 
 	/**
@@ -311,6 +310,5 @@ public class SqlKeywords extends BorderPane {
 	 */
 	public void setWrapText(boolean b) {
 		codeArea.setWrapText(b);
-
 	}
 }

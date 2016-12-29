@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
+import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,15 +24,22 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.postgre.PostgreDatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.postgre.PostgreTableItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.functions.SaveSQLFileFunction;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
+import com.kyj.fx.voeditor.visual.util.ThreadUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.event.ActionEvent;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Pair;
 
 /**
@@ -270,6 +278,36 @@ public class PostgreSqlPane extends CommonsSqllPan {
 
 
 				SqlKeywords parent = new SqlKeywords();
+				//Menu.
+				{
+					MenuBar menuBar = new MenuBar();
+					Menu menuFile = new Menu("File");
+					MenuItem miSaveAs = new MenuItem("Save As");
+					miSaveAs.setOnAction(ev ->{
+
+						File saveAsFile = DialogUtil.showFileSaveCheckDialog(getScene().getWindow(), chooser->{
+							chooser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.SQL_NAME, GargoyleExtensionFilters.SQL ));
+						});
+
+						if(saveAsFile!=null)
+						{
+							ThreadUtil.createNewThreadAndRun("Saveas", ()->{
+								SaveSQLFileFunction function = new SaveSQLFileFunction();
+								function.apply(saveAsFile, parent.getText());
+							});
+						}
+
+
+
+
+//						function.apply(t, u)
+					});
+
+
+					menuFile.getItems().add(miSaveAs);
+					menuBar.getMenus().add(menuFile);
+					parent.setTop(menuBar);
+				}
 				parent.setContent(clip.toString());
 //				SimpleTextView parent = new SimpleTextView(clip.toString());
 				parent.setWrapText(false);

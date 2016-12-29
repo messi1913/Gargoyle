@@ -33,8 +33,18 @@
                <items>
                   <Menu mnemonicParsing="false" text="Open Width">
                     <items>
-                      <MenuItem fx:id="miOpenMsWord" mnemonicParsing="false" onAction="#miOpenMsWordOnAction" text="MsWord" />
-                      <MenuItem fx:id="miOpenWebView" mnemonicParsing="false" onAction="#mimiOpenWebViewOnAction" text="WebView" />
+                        <Menu fx:id="menuNamo" mnemonicParsing="false" text="Mime > ">
+                           <items>
+                            <MenuItem fx:id="miOpenNamoMsWord" mnemonicParsing="false" onAction="#miOpenNamoMsWordOnAction" text="MsWord" />
+                              <MenuItem fx:id="miOpenNamoWebView" mnemonicParsing="false" onAction="#miOpenNamoWebViewOnAction" text="WebView" />
+                           </items>
+                        </Menu>
+                        <Menu fx:id="menuHtml" mnemonicParsing="false" text="Html > ">
+                           <items>
+                            <MenuItem fx:id="miOpenHtmlWord" mnemonicParsing="false" onAction="#miOpenHtmlWordOnAction" text="MsWord" />
+                            <MenuItem fx:id="miOpenHtmlWevView" mnemonicParsing="false" onAction="#miOpenHtmlWevViewOnAction" text="WebView" />
+                           </items>
+                        </Menu>
                     </items>
                   </Menu>
                </items>
