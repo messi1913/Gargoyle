@@ -6,8 +6,6 @@ package com.kyj.fx.voeditor.visual.example;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
-import java.util.Date;
-import java.util.Map;
 
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
@@ -16,15 +14,7 @@ import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.dom.address.Mailbox;
-import org.apache.james.mime4j.dom.address.MailboxList;
-import org.apache.james.mime4j.dom.field.AddressListField;
-import org.apache.james.mime4j.dom.field.ContentTypeField;
-import org.apache.james.mime4j.dom.field.DateTimeField;
-import org.apache.james.mime4j.dom.field.UnstructuredField;
-import org.apache.james.mime4j.field.address.AddressFormatter;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
-import org.apache.james.mime4j.stream.Field;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -32,7 +22,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import scala.collection.mutable.StringBuilder;
 
 /**
  * @author calla
