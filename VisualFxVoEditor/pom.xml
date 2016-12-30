@@ -650,11 +650,40 @@
 			<version>2.9.1</version>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.nekohtml</groupId> -->
-<!-- 			<artifactId>nekohtml</artifactId> -->
-<!-- 			<version>1.9.13</version> -->
-<!-- 		</dependency> -->
+		<!-- Apache Mime4j -->
+		<dependency>
+			<groupId>apache-mime4j</groupId>
+			<artifactId>apache-mime4j-benchmark</artifactId>
+			<version>0.7.2</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/mime4j/apache-mime4j-benchmark-0.7.2.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>apache-mime4j</groupId>
+			<artifactId>apache-mime4j-core</artifactId>
+			<version>0.7.2</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/mime4j/apache-mime4j-core-0.7.2.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>apache-mime4j</groupId>
+			<artifactId>apache-mime4j-dom</artifactId>
+			<version>0.7.2</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/mime4j/apache-mime4j-dom-0.7.2.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>apache-mime4j</groupId>
+			<artifactId>apache-mime4j-storage</artifactId>
+			<version>0.7.2</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/mime4j/apache-mime4j-storage-0.7.2.jar</systemPath>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>net.sourceforge.nekohtml</groupId> -->
+		<!-- <artifactId>nekohtml</artifactId> -->
+		<!-- <version>1.9.13</version> -->
+		<!-- </dependency> -->
 
 
 	</dependencies>

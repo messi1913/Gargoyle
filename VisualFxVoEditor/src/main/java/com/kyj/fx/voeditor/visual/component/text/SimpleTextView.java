@@ -9,11 +9,6 @@ package com.kyj.fx.voeditor.visual.component.text;
 import java.io.File;
 import java.nio.charset.Charset;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +16,9 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
-import com.kyj.fx.voeditor.visual.framework.word.ContentMimeHtmlAdapter;
+import com.kyj.fx.voeditor.visual.framework.word.HtmlTextToMimeAdapter;
+import com.kyj.fx.voeditor.visual.framework.word.MimeToHtmlAdapter;
+import com.kyj.fx.voeditor.visual.framework.word.SimpleWordAdapter;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
@@ -164,7 +161,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miOpenNamoMsWordOnAction() {
 		String content = codeArea.getText();
 		try {
-			AsynchWordExecutor executor = new AsynchWordExecutor(new ContentMimeHtmlAdapter(content));
+			AsynchWordExecutor executor = new AsynchWordExecutor(new HtmlTextToMimeAdapter(content));
 			executor.execute();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -184,6 +181,11 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		try {
 			WebView webView = new WebView();
 
+			
+			
+			
+//			new ContentMimeHtmlAdapter(content)
+			
 //			String encodeToString = Base64.getEncoder().encodeToString(content.getBytes());
 //
 //			byte[] decode = Base64.getDecoder().decode(encodeToString);
@@ -220,13 +222,11 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 			javafx.application.Platform.runLater(() -> {
 				try {
-//					LOGGER.debug("Temp File Dir {} "  , tempFile.getAbsolutePath());
-					webView.getEngine().load(content);
+					MimeToHtmlAdapter adapter = new MimeToHtmlAdapter(content);
+					webView.getEngine().loadContent(adapter.getContent());
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-//				webView.getEngine().loadContent(content, "text/html");
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -238,7 +238,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miOpenHtmlWordOnAction(){
 		String content = codeArea.getText();
 		try {
-			AsynchWordExecutor executor = new AsynchWordExecutor(new ContentMimeHtmlAdapter(content));
+			AsynchWordExecutor executor = new AsynchWordExecutor(new SimpleWordAdapter(content));
 			executor.execute();
 		} catch (Exception e) {
 			e.printStackTrace();

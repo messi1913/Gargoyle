@@ -18,18 +18,18 @@ import com.kyj.fx.voeditor.visual.util.MimeHelper;
  * @author KYJ
  *
  */
-public class ContentMimeAdapter extends AbstractMimeAdapter {
+public class HtmlTextToMimeAdapter extends AbstractMimeAdapter {
 
 	private String content;
 
 	/**
 	 * @param mimeFile
 	 */
-	private ContentMimeAdapter() {
+	private HtmlTextToMimeAdapter() {
 		super(null);
 	}
 
-	public ContentMimeAdapter(String content) {
+	public HtmlTextToMimeAdapter(String content) {
 		super(null);
 		this.content = content;
 	}

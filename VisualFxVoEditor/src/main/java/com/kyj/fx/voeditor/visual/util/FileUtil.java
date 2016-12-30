@@ -538,10 +538,14 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 * @throws IOException
 	 */
 	public static void writeFile(File file, String str, Charset charset) throws IOException {
-		try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), charset)) {
-			writer.write(str);
-			writer.flush();
+		try(FileOutputStream out = new FileOutputStream(file))
+		{
+			try (OutputStreamWriter writer = new OutputStreamWriter(out, charset)) {
+				writer.write(str);
+				writer.flush();
+			}	
 		}
+		
 	}
 
 	/**

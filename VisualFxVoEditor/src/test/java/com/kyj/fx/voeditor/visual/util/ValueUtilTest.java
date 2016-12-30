@@ -17,7 +17,7 @@ import org.apache.velocity.VelocityContext;
 import org.junit.Test;
 
 import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
-import com.kyj.fx.voeditor.visual.framework.word.HtmlMimeAdapter;
+import com.kyj.fx.voeditor.visual.framework.word.HtmlTextToMimeAdapter;
 
 /**
  * @author KYJ
@@ -194,10 +194,10 @@ public class ValueUtilTest {
 		//		String mime = MimeHelper.toMime(content);
 
 		try {
-			File file = new File("Sample.html");
-			FileUtil.writeFile(file, content, forName);
+//			File file = new File("Sample.html");
+//			FileUtil.writeFile(file, content, forName);
 
-			AsynchWordExecutor executor = new AsynchWordExecutor(new HtmlMimeAdapter(file));
+			AsynchWordExecutor executor = new AsynchWordExecutor(new HtmlTextToMimeAdapter(content));
 			executor.execute();
 
 			//			if (file.exists()) {
@@ -207,8 +207,6 @@ public class ValueUtilTest {
 			//			}
 
 			Thread.sleep(200000);
-		} catch (IOException e) {
-			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

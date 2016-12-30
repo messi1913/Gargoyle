@@ -10,18 +10,18 @@ package com.kyj.fx.voeditor.visual.framework.word;
  * @author KYJ
  *
  */
-public class ContentMimeHtmlAdapter extends AbstractMimeAdapter {
+public class SimpleContentAdapter extends AbstractMimeAdapter {
 
 	private String content;
 
 	/**
 	 * @param mimeFile
 	 */
-	private ContentMimeHtmlAdapter() {
+	private SimpleContentAdapter() {
 		super(null);
 	}
 
-	public ContentMimeHtmlAdapter(String content) {
+	public SimpleContentAdapter(String content) {
 		super(null);
 		this.content = content;
 	}

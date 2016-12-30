@@ -14,24 +14,25 @@ import com.kyj.fx.voeditor.visual.words.spec.auto.msword.core.MSWord;
 
 /**
  *
- *  HTML 컨텐츠를 Mime 타입의 컨텐츠로 바꾸기 위한 어댑터
+ *  컨텐츠를  
+ *  파일 확장자 docx로 바꾼후 처리. 
  *
- *  HTML파일을 Mime타입으로 바꾸는 로직 기술.
+ *  
  * @author KYJ
  *
  */
-public class ContentWordAdapter extends AbstractMimeAdapter {
+public class SimpleWordAdapter extends AbstractMimeAdapter {
 
 	private String content;
 
 	/**
 	 * @param mimeFile
 	 */
-	private ContentWordAdapter() {
+	private SimpleWordAdapter() {
 		super(null);
 	}
 
-	public ContentWordAdapter(String content) {
+	public SimpleWordAdapter(String content) {
 		super(null);
 		this.content = content;
 	}
