@@ -717,15 +717,18 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		List<String> tableColumns = this.getSelectedTreeByTableColumns(selectedTableTreeItem);
 		SqlTab selectedTab = getSelectedSqlTab();
 
-		StringBuffer sb = new StringBuffer();
+		StringBuffer sqlColumns = new StringBuffer();
+		StringBuffer sqlValues = new StringBuffer();
 		if (tableColumns != null && !tableColumns.isEmpty()) {
 			for (String col : tableColumns) {
-				sb.append(String.format("'%s' ,", col));
+				sqlColumns.append(String.format("'%s' ,", col));
+				sqlValues.append(String.format("'%s' ,", ValueUtil.toCamelCase(col)));
 			}
-			sb.setLength(sb.length() - 1);
+			sqlColumns.setLength(sqlColumns.length() - 1);
+			sqlValues.setLength(sqlValues.length() - 1);
 		}
 
-		selectedTab.appendTextSql(String.format("insert into %s ( %s ) \nvalues ( )", tableName, sb.toString()));
+		selectedTab.appendTextSql(String.format("insert into %s ( %s ) \nvalues ( %s )", tableName, sqlColumns.toString(), sqlValues.toString()));
 	}
 
 	/**
