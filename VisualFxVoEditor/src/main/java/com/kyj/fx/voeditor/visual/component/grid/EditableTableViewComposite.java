@@ -91,7 +91,7 @@ public class EditableTableViewComposite extends BorderPane {
 			}
 		});
 
-		editableTableView.setOnTransactionSucessListener(lblStatus::setText);
+//		editableTableView.setOnTransactionSucessListener(lblStatus::setText);
 		editableTableView.setOnFailListener(lblStatus::setText);
 
 		//		editableTableView.setOnMouseClicked(ev -> {
@@ -143,9 +143,14 @@ public class EditableTableViewComposite extends BorderPane {
 
 	public int execute() throws Exception {
 		String tableName = txtTableName.getText();
-		if (!sql.get().isEmpty()) {
-			editableTableView.readByTableName(sql.get(), tableName);
+
+		if(ValueUtil.isNotEmpty(tableName))
+		{
+			if (!sql.get().isEmpty()) {
+				editableTableView.readByTableName(sql.get(), tableName);
+			}
 		}
+
 		return editableTableView.getItems().size();
 	}
 
