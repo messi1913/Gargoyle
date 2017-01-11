@@ -70,8 +70,8 @@ public class FileUtilTest {
 		file.mkdirs();
 
 		WatchService newWatchService = FileSystems.getDefault().newWatchService();
-		file.toPath().register(newWatchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-
+		WatchKey register = file.toPath().register(newWatchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+		
 		System.out.println("Watch Service Registered ..");
 
 		while (true) {

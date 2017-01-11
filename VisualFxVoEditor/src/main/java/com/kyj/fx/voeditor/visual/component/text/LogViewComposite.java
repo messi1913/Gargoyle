@@ -12,7 +12,6 @@ import java.io.IOException;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
-import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -36,7 +35,6 @@ public class LogViewComposite extends CloseableParent<BorderPane> {
 			this.controller = c;
 			c.setComposite(this);
 		}));
-
 	}
 
 	/**
@@ -58,18 +56,19 @@ public class LogViewComposite extends CloseableParent<BorderPane> {
 	LogViewController getController() {
 		return this.controller;
 	}
+	
+	
+	public void start(){
+		getController().start();
+	}
 
 	/* (non-Javadoc)
 	 * @see com.kyj.fx.voeditor.visual.main.layout.CloseableParent#close()
 	 */
 	@Override
 	public void close() throws IOException {
-		// TODO Auto-generated method stub
-
+		if (controller != null)
+			controller.close();
 	}
-
-	//	public LogViewComposite() {
-
-	//	}
 
 }

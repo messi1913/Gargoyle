@@ -20,6 +20,8 @@ import javafx.stage.Stage;
  */
 public class LogViewerExam extends Application {
 
+	private LogViewComposite root;
+
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -32,9 +34,11 @@ public class LogViewerExam extends Application {
 
 		File watchTargetFile = new File("C:\\Users\\KYJ\\AppData\\Local\\O-PREA-Batch\\app\\log\\batch-scheduler.log");
 
-		LogViewComposite root = new LogViewComposite(watchTargetFile);
+		root = new LogViewComposite(watchTargetFile);
 		primaryStage.setScene(new Scene(root.getParent()));
 		primaryStage.show();
+
+		root.start();
 
 		//감지 하려는 대상 디렉토리
 

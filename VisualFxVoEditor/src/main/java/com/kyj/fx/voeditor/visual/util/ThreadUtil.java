@@ -16,9 +16,10 @@ public class ThreadUtil {
 	 * 스레드 그룹.
 	 * @최초생성일 2016. 12. 27.
 	 */
-	private static ThreadGroup threadGroup = new ThreadGroup("Gargoyle-ThreadUtil");
+	private static ThreadGroup threadGroup ;
 
 	static {
+		threadGroup = new ThreadGroup("Gargoyle-ThreadUtil");
 		threadGroup.setDaemon(true);
 	}
 
