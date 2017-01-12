@@ -83,7 +83,7 @@ public class LogViewController implements Closeable {
 			int totalPage = (int) (length / seekSize) - (length % seekSize > 0 ? 0 : 1);
 
 			long lastMarkedPosition = mark.get();
-			if (lastMarkedPosition >= 0)
+			if (lastMarkedPosition <= 0)
 				fileChannel.position(totalPage * seekSize);
 			else
 				fileChannel.position(lastMarkedPosition);
