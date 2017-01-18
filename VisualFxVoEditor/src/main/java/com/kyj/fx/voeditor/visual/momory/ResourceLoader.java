@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.SVNKeywords;
 
 import kyj.Fx.dao.wizard.memory.IFileBaseConfiguration;
@@ -117,6 +118,12 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 
 	public static final String MS_WORD_PATH = "msword.path";
+
+	/**
+	 * 로그뷰 화면에서 사용되는 텍스트 인코딩
+	 * @최초생성일 2017. 1. 12.
+	 */
+	public static final String LOGVIEW_ENCODING = "logview.encoding";
 
 	private String[] baseKeys = { BASE_KEY_JDBC_INFO, BASE_KEY_JDBC_DRIVER, BASE_KEY_JDBC_URL, BASE_KEY_JDBC_ID, BASE_KEY_JDBC_PASS,
 			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES };
@@ -242,6 +249,13 @@ public class ResourceLoader implements IFileBaseConfiguration {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public String get(String key, String defaultVal) {
+		String val = get(key);
+		if(ValueUtil.isEmpty(val))
+			return defaultVal;
+		return val;
 	}
 
 	public String get(String key) {

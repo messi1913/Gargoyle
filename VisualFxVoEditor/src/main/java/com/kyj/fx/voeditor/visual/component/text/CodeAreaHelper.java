@@ -6,25 +6,15 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
 import org.fxmisc.richtext.CodeArea;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.component.popup.TextSearchAndReplaceView;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.SqlFormatter;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -32,13 +22,11 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
 import javafx.util.Pair;
 
 /**
@@ -47,39 +35,43 @@ import javafx.util.Pair;
  *
  * CodeArea클래스와 연관된 모든 공통처리내용이 구현된다.
  *
+ *  2017.01.13 FindAndReplace를 별도의 Helper 클래스로 변경처리. by kyj.
  * @author KYJ
  *
  */
 public class CodeAreaHelper<T extends CodeArea> {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(SqlKeywords.class);
+//	private static Logger LOGGER = LoggerFactory.getLogger(CodeAreaHelper.class);
 
-	private static final String CHARACTERS_MATCH = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
+	public static final String CHARACTERS_MATCH = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
 
 	protected T codeArea;
 	protected SqlFormatter sqlFormatter = new SqlFormatter();
 	protected CodeAreaMoveLineHelper codeMoveDeligator;
 	private CodeAreaDragDropHelper dragDropHelper;
+	private CodeAreaFindAndReplaceHelper<T> findAndReplaceHelper;
 
 	protected ContextMenu contextMenu;
-	protected Menu menuSearch;
-	protected MenuItem miFindReplace;
+
 	protected MenuItem menuMoveToLine;
 	protected MenuItem miToUppercase;
 	protected MenuItem miToLowercase;
 
+	// 선택 범위 지정
+	EventHandler<? super MouseEvent> defaultSelectionHandler;
+
 	public CodeAreaHelper(T codeArea) {
 		this.codeArea = codeArea;
 
+		defaultSelectionHandler = new CodeAreaDefaultSelectionHandler(codeArea);
 		this.codeArea.setOnMouseClicked(defaultSelectionHandler);
-		codeMoveDeligator = new CodeAreaMoveLineHelper(codeArea);
+		this.codeMoveDeligator = new CodeAreaMoveLineHelper(codeArea);
 		this.dragDropHelper = new CodeAreaDragDropHelper(codeArea);
-
+		this.findAndReplaceHelper = new CodeAreaFindAndReplaceHelper<>(codeArea);
 		// this.codeArea.addEventHandler(MouseDragEvent.MOUSE_DRAG_OVER,
 		// this::codeAreaDagOver);
 		// this.codeArea.addEventHandler(MouseDragEvent.MOUSE_DRAG_ENTERED_TARGET,
 		// this::codeAreaDagEnteredTarget);
-
 
 		contextMenu = codeArea.getContextMenu();
 		if (contextMenu == null) {
@@ -89,7 +81,28 @@ public class CodeAreaHelper<T extends CodeArea> {
 		createMenus();
 	}
 
+	public CodeArea getCodeArea() {
+		return this.codeArea;
+	}
 
+
+//	EventHandler<? super MouseEvent> defaultSelectionHandler = new EventHandler<MouseEvent>() {
+//		@Override
+//		public void handle(MouseEvent event) {
+//			if (event.getClickCount() == 1) {
+//			} else if (event.getClickCount() == 2) {
+//				String selectedText = codeArea.getSelectedText();
+//				if (ValueUtil.isNotEmpty(selectedText)) {
+//					IndexRange selection = codeArea.getSelection();
+//					String ltrimText = selectedText.replaceAll("^\\s+", "");
+//					String firstStr = ltrimText.substring(0, 1).replaceAll(CHARACTERS_MATCH, "");
+//					int start = selection.getStart();
+//					int end = selection.getEnd();
+//					codeArea.selectRange(start + (selectedText.length() - ltrimText.length() + 1 - firstStr.length()), end);
+//				}
+//			}
+//		}
+//	};
 
 	/**
 	 *
@@ -100,14 +113,13 @@ public class CodeAreaHelper<T extends CodeArea> {
 	 * @작성일 : 2016. 10. 27.
 	 */
 	public void createMenus() {
-		menuSearch = new Menu("Search");
-		miFindReplace = new MenuItem("Find/Replace");
+
+		Menu menuSearch = findAndReplaceHelper.createMenus();
+
 		menuMoveToLine = new MenuItem("Move to line");
 		miToUppercase = new MenuItem("To Uppercase");
 		miToLowercase = new MenuItem("To Lowercase");
 
-		miFindReplace.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN));
-		miFindReplace.setOnAction(this::findReplaceEvent);
 		menuMoveToLine.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
 		menuMoveToLine.setOnAction(this::moveToLineEvent);
 		miToUppercase.setAccelerator(new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
@@ -115,7 +127,6 @@ public class CodeAreaHelper<T extends CodeArea> {
 		miToLowercase.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
 		miToLowercase.setOnAction(this::toLowercaseEvent);
 
-		menuSearch.getItems().add(miFindReplace);
 		codeArea.getContextMenu().getItems().addAll(menuSearch, menuMoveToLine, miToUppercase, miToLowercase);
 
 	}
@@ -195,104 +206,6 @@ public class CodeAreaHelper<T extends CodeArea> {
 		}
 	}
 
-	// 선택 범위 지정
-	protected EventHandler<? super MouseEvent> defaultSelectionHandler = event -> {
-		if (event.getClickCount() == 1) {
-			// codeArea.setStyleSpans(0,
-			// groupBackgroundColor(codeArea.getText(),
-			// codeArea.getCaretPosition()));
-		} else if (event.getClickCount() == 2) {
-			String selectedText = codeArea.getSelectedText();
-			if (ValueUtil.isNotEmpty(selectedText)) {
-				IndexRange selection = codeArea.getSelection();
-				String ltrimText = selectedText.replaceAll("^\\s+", "");
-				String firstStr = ltrimText.substring(0, 1).replaceAll(CHARACTERS_MATCH, "");
-				int start = selection.getStart();
-				int end = selection.getEnd();
-				codeArea.selectRange(start + (selectedText.length() - ltrimText.length() + 1 - firstStr.length()), end);
-			}
-		}
-	};
-
-	/**
-	 * 찾기 바꾸기 이벤트
-	 *
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 10. 13.
-	 * @param e
-	 */
-	protected void findReplaceEvent(Event e) {
-
-		if (e.isConsumed())
-			return;
-
-		ObservableValue<String> textProperty = codeArea.textProperty();
-		TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(codeArea, textProperty);
-
-		textSearchView.setOnSearchResultListener((vo) -> {
-
-			switch (vo.getSearchType()) {
-			case SEARCH_SIMPLE: {
-				int startIndex = vo.getStartIndex();
-				int endIndex = vo.getEndIndex();
-				codeArea.selectRange(startIndex, endIndex);
-				LOGGER.debug(String.format("find text : %s startIdx :%d endIdx :%d", vo.getSearchText(), startIndex, endIndex));
-				break;
-			}
-			case SEARCH_ALL: {
-				int startIndex = vo.getStartIndex();
-				String searchText = vo.getSearchText();
-				String replaceText = vo.getReplaceText();
-
-				// codeArea.getUndoManager().mark();
-				// codeArea.replaceText(startIndex, (startIndex +
-				// searchText.length()), replaceText);
-				setContent(startIndex, startIndex + searchText.length(), replaceText);
-				// codeArea.getUndoManager().mark();
-
-				break;
-			}
-			}
-
-		});
-
-		textSearchView.setOnReplaceResultListener(vo -> {
-			switch (vo.getReaplceType()) {
-			case SIMPLE: {
-				String reaplceResult = vo.getReaplceResult();
-				setContent(reaplceResult);
-				break;
-			}
-			case ALL: {
-				String reaplceResult = vo.getReaplceResult();
-				setContent(reaplceResult);
-				break;
-			}
-			}
-		});
-
-		textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
-			if (newval)
-				LOGGER.debug("User Select Locale Scope..");
-			else
-				LOGGER.debug("User Select Gloval Scope..");
-		});
-
-		codeArea.setOnMouseClicked(event -> {
-
-			IndexRange selection = codeArea.getSelection();
-			int start = selection.getStart();
-			textSearchView.setSlidingStartIndexProperty(start);
-
-		});
-
-		textSearchView.show();
-
-		codeArea.setOnMouseClicked(defaultSelectionHandler);
-
-		e.consume();
-	}
-
 	protected void toUppercaseEvent(KeyEvent e) {
 		if (e.getCode() == KeyCode.U && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
 			if (e.isConsumed())
@@ -352,7 +265,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 
 		if (KeyCode.F == e.getCode() && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
 			if (!e.isConsumed()) {
-				findReplaceEvent(new ActionEvent());
+				findAndReplaceHelper.findReplaceEvent(new ActionEvent());
 				e.consume();
 			}
 

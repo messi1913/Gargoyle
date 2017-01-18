@@ -46,6 +46,7 @@ import com.kyj.fx.voeditor.visual.component.popup.XMLTextView;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
+import com.kyj.fx.voeditor.visual.component.text.LogViewComposite;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
@@ -1452,7 +1453,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				tab.setOnCloseRequest(ev -> {
 					try {
-						LOGGER.debug("closeable parent on close request");
+						LOGGER.debug("closeable parent on close request , tabName : {} " , tableName);
 						parent.close();
 					} catch (Exception e) {
 						LOGGER.error(ValueUtil.toString(e));
@@ -1888,5 +1889,26 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	@FXML
 	public void menuShowInstalledLocation() {
 		FileUtil.openFile(new File(ValueUtil.getBaseDir()));
+	}
+
+	/**
+	 * LogView
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 1. 16.
+	 */
+	@FXML
+	public void miLogViewOnAction() {
+
+		File showFileDialog = DialogUtil.showFileDialog(SharedMemory.getPrimaryStage());
+		if (showFileDialog != null && showFileDialog.exists()) {
+			try {
+				LogViewComposite composite = new LogViewComposite(showFileDialog);
+				loadNewSystemTab(showFileDialog.getName(), (CloseableParent<BorderPane>)composite);
+				composite.start();
+			} catch (Exception e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+		}
+
 	}
 }

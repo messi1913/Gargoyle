@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -106,6 +107,7 @@ import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -195,12 +197,12 @@ public class FxUtil {
 		return load(controllerClass, null, option, null);
 	}
 
-	public static <N, C> N load(Class<C> controllerClass, Consumer<N> option, Consumer<Exception> errHandler )  {
+	public static <N, C> N load(Class<C> controllerClass, Consumer<N> option, Consumer<Exception> errHandler) {
 		N n = null;
 		try {
 			n = load(controllerClass, null, option, null);
 		} catch (Exception e) {
-			if(errHandler!=null)
+			if (errHandler != null)
 				e.printStackTrace();
 			else
 				LOGGER.error(ValueUtil.toString(e));
@@ -421,7 +423,7 @@ public class FxUtil {
 			List<Node> findAllByNodes = FxUtil.findAllByNodes(parent, v -> v instanceof Button);
 			findAllByNodes.forEach(v -> {
 				GargoyleButtonBuilder.applyStyleClass((Button) v, SkinManager.BUTTON_STYLE_CLASS_NAME);
-//				LOGGER.debug("Button :  {}", v);
+				//				LOGGER.debug("Button :  {}", v);
 			});
 		});
 
@@ -1696,6 +1698,54 @@ public class FxUtil {
 			return Stream.of(FontWeight.values()).map(s -> s.name()).collect(Collectors.toList());
 		}
 
+	}
+
+	/**
+	 * 다른이름으로 저장처리를 하기위한 형식을 정의한 클래스
+	 * @author KYJ
+	 *
+	 */
+	public static interface SaveAsModel {
+		public default Charset getEncoding() {
+			return Charset.forName("UTF-8");
+		}
+
+		public abstract String getContent();
+
+		public default Consumer<FileChooser> getFileChooserOption() {
+			//FileChooset에 대한 정의처리.
+			return chooser -> {
+			};
+		}
+
+		/**
+		 * 파일 쓰기 처리중 에러가 발생한경우
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 1. 13.
+		 * @return
+		 */
+		public default Consumer<Exception> onError(){
+			return err -> LOGGER.error(ValueUtil.toString(err));
+		}
+	}
+
+	/**
+	 * 다른이름으로 저장 처리에 대한 공통 API
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 1. 13.
+	 * @param owner
+	 * @param model
+	 *
+	 */
+	public static <T> void saveAsFx(Window owner, SaveAsModel model) {
+		if (model == null) {
+			throw new NullPointerException("SaveAsModel is null");
+		}
+
+		File saveAs = DialogUtil.showFileSaveCheckDialog(owner, model.getFileChooserOption());
+		if (saveAs != null && saveAs.exists()) {
+			FileUtil.writeFile(saveAs, model.getContent(), model.getEncoding(), model.onError());
+		}
 	}
 
 }

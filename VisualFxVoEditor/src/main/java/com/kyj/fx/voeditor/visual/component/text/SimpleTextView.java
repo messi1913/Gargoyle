@@ -6,9 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
-import java.io.File;
-import java.nio.charset.Charset;
-
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +16,7 @@ import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
 import com.kyj.fx.voeditor.visual.framework.word.HtmlTextToMimeAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.MimeToHtmlAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.SimpleWordAdapter;
-import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -181,11 +175,11 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		try {
 			WebView webView = new WebView();
 
-			
-			
-			
+
+
+
 //			new ContentMimeHtmlAdapter(content)
-			
+
 //			String encodeToString = Base64.getEncoder().encodeToString(content.getBytes());
 //
 //			byte[] decode = Base64.getDecoder().decode(encodeToString);
@@ -256,10 +250,12 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	 */
 	@FXML
 	public void miSaveAsOnAction(){
-		File saveAs = DialogUtil.showFileSaveCheckDialog(getScene().getWindow(), chooser->{});
-		if(saveAs!=null && saveAs.exists())
-		{
-			FileUtil.writeFile(saveAs, codeArea.getText(), Charset.forName("UTF-8"), err -> LOGGER.error(ValueUtil.toString(err)));
-		}
+		FxUtil.saveAsFx(getScene().getWindow(), () -> codeArea.getText());
+
+//		File saveAs = DialogUtil.showFileSaveCheckDialog(getScene().getWindow(), chooser->{});
+//		if(saveAs!=null && saveAs.exists())
+//		{
+//			FileUtil.writeFile(saveAs, codeArea.getText(), Charset.forName("UTF-8"), err -> LOGGER.error(ValueUtil.toString(err)));
+//		}
 	}
 }

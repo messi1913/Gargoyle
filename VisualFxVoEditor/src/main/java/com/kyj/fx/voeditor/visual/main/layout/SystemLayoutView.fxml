@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab?>
+<?import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
@@ -18,9 +20,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
-
-<?import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab?>
-<?import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane?>
 
 <BorderPane fx:id="borderPaneMain" prefHeight="762.0" prefWidth="1019.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController">
 	<center>
@@ -205,6 +204,7 @@
 
 									</items>
 								</Menu>
+                        <MenuItem fx:id="miLogView" mnemonicParsing="false" onAction="#miLogViewOnAction" text="Log Viewer" />
 
 
 <!-- 								<Menu mnemonicParsing="false" text="Naver"> -->

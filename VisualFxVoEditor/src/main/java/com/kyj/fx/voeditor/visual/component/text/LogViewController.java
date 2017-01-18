@@ -15,21 +15,34 @@ import java.nio.charset.Charset;
 import java.nio.file.StandardOpenOption;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+import com.kyj.fx.voeditor.visual.util.FxCollectors;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.sun.star.uno.RuntimeException;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
+import javafx.stage.Window;
 
 /**
  * @author KYJ
@@ -47,10 +60,12 @@ public class LogViewController implements Closeable {
 
 	private LogViewComposite composite;
 	@FXML
-	private TextArea txtLog;
+	private CodeArea txtLog;
 
 	private FileChannel fileChannel;
-	private File monitoringFile;
+
+	@FXML
+	private ToggleGroup ENCODING;
 
 	public LogViewController() throws Exception {
 
@@ -58,13 +73,62 @@ public class LogViewController implements Closeable {
 
 	private ByteBuffer buffer;
 	//Default Encoding UTF-8
-	private ObjectProperty<Charset> charset = new SimpleObjectProperty<>(Charset.forName("UTF-8"));
+	private ObjectProperty<Charset> charset = new SimpleObjectProperty<>();
+
+	/**
+	 * 인코딩 변경.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 1. 12.
+	 * @param charset
+	 */
+	public void setCharset(Charset charset) {
+		this.charset.set(charset);
+	}
+
+	@FXML
+	public void initialize() {
+		new CodeAreaFindAndReplaceHelper<>(txtLog);
+	}
 
 	@FxPostInitialize
 	public void onAfter() throws IOException {
-		monitoringFile = composite.getMonitoringFile();
+		File monitoringFile = composite.getMonitoringFile();
 		fileChannel = FileChannel.open(monitoringFile.toPath(), StandardOpenOption.READ);
 		buffer = ByteBuffer.allocate(seekSize);
+
+		String encoding = CharsetManagement.loadCharset();
+		if (Charset.isSupported(encoding)) {
+			charset.set(Charset.forName(encoding));
+		} else {
+			LOGGER.info("does not supported encoding {} , default utf-8 setting. ", encoding);
+			encoding = "UTF-8";
+			charset.set(Charset.forName(encoding));
+		}
+
+		//설정에 저장된 인코딩셋을 불러와 디폴트로 선택되게함.
+		ObservableList<Toggle> toggles = ENCODING.getToggles();
+		toggles.stream().map(tg -> {
+
+			if (tg instanceof RadioMenuItem) {
+				RadioMenuItem r = (RadioMenuItem) tg;
+				if (r.getText().toUpperCase().equals(charset.get().name().toUpperCase())) {
+					return r;
+				}
+			}
+			return null;
+		}).filter(v -> v != null).findFirst().ifPresent(rmi -> {
+			rmi.setSelected(true);
+		});
+
+		//캐릭터셋이 변경될때 환경변수에 등록하는 과정
+		this.charset.addListener((oba, o, newCharset) -> {
+			String name = newCharset.name();
+			if (ValueUtil.isEmpty(name)) {
+				return;
+			}
+			CharsetManagement.saveCharset(name);
+
+		});
 	}
 
 	/**
@@ -79,7 +143,7 @@ public class LogViewController implements Closeable {
 
 			int byteCount;
 
-			long length = monitoringFile.length();
+			long length = composite.getMonitoringFile().length();
 			int totalPage = (int) (length / seekSize) - (length % seekSize > 0 ? 0 : 1);
 
 			long lastMarkedPosition = mark.get();
@@ -112,11 +176,36 @@ public class LogViewController implements Closeable {
 		}
 	}
 
+	/**
+	 * 파일이 변경되었는지 감시하기 위한 Timer , 디폴트값은 0.5초마다 체크.
+	 * @최초생성일 2017. 1. 12.
+	 */
 	private Timer fileWatcher;
-	private LongProperty lastReadTimeStamp = new SimpleLongProperty(-1L);
+	/**
+	 * 파일의 내용을 읽어들일때 마지막으로 수정된 일자를 체크하기 위한 변수
+	 * @최초생성일 2017. 1. 12.
+	 */
+	private LongProperty lastModifiedTime = new SimpleLongProperty(-1L);
+	/**
+	 * 파일의 내용을 읽어들일때 마지막으로 읽은 파일의 크기를 체크하기위한 변수
+	 * @최초생성일 2017. 1. 12.
+	 */
 	private LongProperty lastLength = new SimpleLongProperty(-1L);
 
+	private BooleanProperty isStared = new SimpleBooleanProperty(false);
+
+	public boolean isStarted() {
+		return isStared.get();
+	}
+
+	private AtomicBoolean isRunning = new AtomicBoolean(false);
+
+	public boolean isRunning() {
+		return isRunning.get();
+	}
+
 	private void watchFile() {
+
 		if (null == fileWatcher) {
 
 			fileWatcher = new Timer();
@@ -125,16 +214,18 @@ public class LogViewController implements Closeable {
 				@Override
 				public void run() {
 
-					if (monitoringFile == null)
+					if (composite.getMonitoringFile() == null)
 						return;
 
-					long lastModified = monitoringFile.lastModified();
-					long lastReadTime = lastReadTimeStamp.get();
+					if(fileChannel == null)
+						return;
+
+					long lastModified = composite.getMonitoringFile().lastModified();
+					long lastReadTime = lastModifiedTime.get();
 
 					long space = -1L;
 					try {
 						space = fileChannel.size();
-
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -155,15 +246,29 @@ public class LogViewController implements Closeable {
 						readAction(lastModified);
 
 						lastLength.set(space);
-						lastReadTimeStamp.set(lastModified);
+						lastModifiedTime.set(lastModified);
 
 					}
+					isRunning.lazySet(true);
 
 				}
-			}, 0, 500);
+			}, 0, watchDelayTimeMills());
+
 		}
 	}
 
+	/**
+	 * 파일의 변화를 감지하기위해 대기하는 시간.
+	 * 단위 millsSecond
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 1. 13.
+	 * @return
+	 */
+	protected long watchDelayTimeMills() {
+		return 500;
+	}
+
+	private ObservableList<Chagne> onChangeListener = FXCollections.observableArrayList();
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 10.
@@ -172,9 +277,26 @@ public class LogViewController implements Closeable {
 	private void onModified(String string) {
 
 		Platform.runLater(() -> {
+
+			int anchor = this.txtLog.getAnchor();
+			int currentLength = this.txtLog.getLength();
+			int caretPosition = this.txtLog.getCaretPosition();
+			int caretColumn = this.txtLog.getCaretColumn();
+
+
+			System.out.println();
+
 			this.txtLog.appendText(string);
+
 		});
 
+		/* Create Change Model */
+		Chagne chg = new Chagne();
+		chg.setContent(string);
+		onChangeListener.forEach(v ->{
+
+
+		});
 	}
 
 	/**
@@ -194,16 +316,23 @@ public class LogViewController implements Closeable {
 	 */
 	@Override
 	public void close() throws IOException {
+		isStared.set(false);
+		isRunning.set(false);
 		//		monitorFile.close();
 		if (fileWatcher != null)
 			fileWatcher.cancel();
-		if (fileChannel != null)
+
+		if (fileChannel != null) {
 			fileChannel.close();
+		}
+
 		if (buffer != null) {
 			buffer.flip();
 			buffer.clear();
+			buffer = null;
 		}
 
+		LOGGER.debug("Close Complate!");
 	}
 
 	/**
@@ -212,11 +341,92 @@ public class LogViewController implements Closeable {
 	 */
 	public void start() {
 
+		if (isRunning.get())
+			throw new RuntimeException("Already started. ");
+
 		Thread thread = new Thread(() -> {
+			isStared.set(true);
 			watchFile();
 		});
 		thread.setDaemon(true);
 		thread.start();
+
+	}
+
+	@FXML
+	public void rmiUtf8OnAction() {
+		this.setCharset(Charset.forName("UTF-8"));
+	}
+
+	@FXML
+	public void rmiEucKr8OnAction() {
+		this.setCharset(Charset.forName("EUC-KR"));
+	}
+
+	@FXML
+	public void miClearOnActionAction() {
+		this.txtLog.clear();
+	}
+
+	/**
+	 * 부모 Stage 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 1. 13.
+	 * @return
+	 */
+	Window getWindow() {
+		return this.composite.getParent().getScene().getWindow();
+	}
+
+	@FXML
+	public void miSaveAsOnAction() {
+		FxUtil.saveAsFx(getWindow(), () -> txtLog.getText());
+	}
+
+	/**
+	 * 환경변수 캐릭터셋 관리.
+	 * @author KYJ
+	 *
+	 */
+	private static class CharsetManagement {
+
+		/**
+		 * 저장
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 1. 12.
+		 * @param charset
+		 */
+		public static void saveCharset(String charset) {
+			ResourceLoader.getInstance().put(ResourceLoader.LOGVIEW_ENCODING, charset);
+		}
+
+		/**
+		 * 로드
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 1. 12.
+		 * @return
+		 */
+		public static String loadCharset() {
+			return ResourceLoader.getInstance().get(ResourceLoader.LOGVIEW_ENCODING, "UTF-8");
+		}
+	}
+
+	public static class Chagne {
+		private String content;
+
+		/**
+		 * @return the content
+		 */
+		public final String getContent() {
+			return content;
+		}
+
+		/**
+		 * @param content the content to set
+		 */
+		final void setContent(String content) {
+			this.content = content;
+		}
 
 	}
 }
