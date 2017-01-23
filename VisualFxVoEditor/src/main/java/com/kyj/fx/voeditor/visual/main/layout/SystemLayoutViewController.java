@@ -26,6 +26,7 @@ import com.kyj.fx.voeditor.visual.component.JavaProjectMemberFileTreeItem;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
 import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
+import com.kyj.fx.voeditor.visual.component.bci.view.JavaProcessMonitor;
 import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenComposite;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
@@ -94,6 +95,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -1453,7 +1455,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				tab.setOnCloseRequest(ev -> {
 					try {
-						LOGGER.debug("closeable parent on close request , tabName : {} " , tableName);
+						LOGGER.debug("closeable parent on close request , tabName : {} ", tableName);
 						parent.close();
 					} catch (Exception e) {
 						LOGGER.error(ValueUtil.toString(e));
@@ -1903,7 +1905,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		if (showFileDialog != null && showFileDialog.exists()) {
 			try {
 				LogViewComposite composite = new LogViewComposite(showFileDialog);
-				loadNewSystemTab(showFileDialog.getName(), (CloseableParent<BorderPane>)composite);
+				loadNewSystemTab(showFileDialog.getName(), (CloseableParent<BorderPane>) composite);
 				composite.start();
 			} catch (Exception e) {
 				LOGGER.error(ValueUtil.toString(e));
@@ -1911,4 +1913,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		}
 
 	}
+
+	@FXML
+	public void miJavaTaskMgrOnAction() throws Exception {
+		CloseableParent<SplitPane> javaProcessMonitor = new JavaProcessMonitor();
+		loadNewSystemTab("Java-Task-Manager", javaProcessMonitor);
+	}
+
 }

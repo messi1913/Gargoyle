@@ -47,8 +47,6 @@ public class ScheduleTimeLineComposite extends BorderPane implements MonitorList
 
 	private static Logger LOGGER = LoggerFactory.getLogger(ScheduleTimeLineComposite.class);
 
-	private Predicate<ApplicationModel> filter = new DefaultJavaMonitorFilter();
-
 	@FXML
 	private LineChart<String, Number> chartTimeLine;
 	private Series<String, Number> passBatchProcessSeries;
@@ -56,13 +54,14 @@ public class ScheduleTimeLineComposite extends BorderPane implements MonitorList
 
 	private AtomicBoolean running = new AtomicBoolean(true);
 	private SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
-	private AtomicInteger batchProcessCounting = new AtomicInteger(0);
 
 	// private AtomicInteger allProcessCounting = new AtomicInteger(0);
 	Service<Void> monitorService;
+	private JavaProcessViewController processViewController;
 
-	public ScheduleTimeLineComposite() throws Exception {
+	public ScheduleTimeLineComposite(JavaProcessViewController processViewController) throws Exception {
 		FxUtil.loadRoot(ScheduleTimeLineComposite.class, this);
+		this.processViewController = processViewController;
 	}
 
 	@FXML
@@ -112,7 +111,7 @@ public class ScheduleTimeLineComposite extends BorderPane implements MonitorList
 
 			ObservableList<Data<String, Number>> seriesData = passBatchProcessSeries.getData();
 
-			Data<String, Number> e = new Data<String, Number>(newval, batchProcessCounting.get());
+			Data<String, Number> e = new Data<String, Number>(newval, Monitors.getActivedJavaProcessCount());
 			e.setNode(new Rectangle(1, 1));
 			seriesData.add(e);
 			if (seriesData.size() > CHART_SHOWING_ITEM_COUNT) {
@@ -122,25 +121,35 @@ public class ScheduleTimeLineComposite extends BorderPane implements MonitorList
 
 		monitorService.setOnSucceeded(ev -> {
 			if (running.get())
+			{
 				monitorService.restart();
+				onTickTock();
+			}
+
 		});
 
 		monitorService.start();
 
 	}
 
+	public void onTickTock() {
+		this.processViewController.onTickTock();
+	}
+
 	@Override
 	public void onApplicationLoaded(ApplicationModel model) {
-		if (filter.test(model)) {
-			batchProcessCounting.addAndGet(1);
-		}
+		//		if (filter.test(model)) {
+		//batchProcessCounting.addAndGet(1);
+
+		//			batchProcessCounting.set(Monitors.getActivedCount());
+		//		}
 		// allProcessCounting.addAndGet(1);
 	}
 
 	@Override
 	public void onApplicationTerminated(ApplicationModel model) {
-		if (filter.test(model))
-			batchProcessCounting.addAndGet(-1);
+		//		if (filter.test(model))
+		//			batchProcessCounting.set(Monitors.getActivedCount());
 		// allProcessCounting.addAndGet(-1);
 	}
 

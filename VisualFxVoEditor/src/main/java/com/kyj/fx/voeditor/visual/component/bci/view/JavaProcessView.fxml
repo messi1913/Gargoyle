@@ -40,6 +40,23 @@
 						<PropertyValueFactory property="jvmArgs" />
 					</cellValueFactory>
 				</TableColumn>
+				<TableColumn fx:id="colVmVersion" prefWidth="514.0" text="Vm Version">
+					<cellValueFactory>
+						<PropertyValueFactory property="vmVersion" />
+					</cellValueFactory>
+				</TableColumn>
+
+				<TableColumn fx:id="colJvmFlags" prefWidth="514.0" text="JVM Flag">
+					<cellValueFactory>
+						<PropertyValueFactory property="jvmFlags" />
+					</cellValueFactory>
+				</TableColumn>
+
+				<TableColumn fx:id="colCommandLine" prefWidth="514.0" text="Command Line">
+					<cellValueFactory>
+						<PropertyValueFactory property="commandLine" />
+					</cellValueFactory>
+				</TableColumn>
 			</columns>
 		</TableView>
 	</center>

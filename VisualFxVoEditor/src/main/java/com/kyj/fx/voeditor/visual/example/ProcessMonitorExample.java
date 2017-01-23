@@ -28,7 +28,7 @@ public class ProcessMonitorExample extends Application {
 	public void start(Stage primaryStage) throws Exception {
 
 		javaProcessMonitor = new JavaProcessMonitor();
-		Scene value = new Scene(javaProcessMonitor, 800, 600);
+		Scene value = new Scene(javaProcessMonitor.getParent(), 800, 600);
 
 		primaryStage.setScene(value);
 		primaryStage.show();

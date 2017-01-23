@@ -206,7 +206,7 @@
 								</Menu>
                         <MenuItem fx:id="miLogView" mnemonicParsing="false" onAction="#miLogViewOnAction" text="Log Viewer" />
 
-
+						<MenuItem fx:id="miJavaTaskMgr" mnemonicParsing="false" onAction="#miJavaTaskMgrOnAction" text="Java Task Mgr. Viewer" />
 <!-- 								<Menu mnemonicParsing="false" text="Naver"> -->
 <!-- 									<items> -->
 <!-- 										<MenuItem mnemonicParsing="false" onAction="#lblGoogleTrendOnAction" -->
@@ -217,6 +217,8 @@
 
 							</items>
 						</Menu>
+
+
 						<Menu fx:id="menuPlugins" mnemonicParsing="false" text="Plugins" />
 						<Menu mnemonicParsing="false" text="Help">
 							<items>
