@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
-import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.star.uno.RuntimeException;
@@ -38,10 +37,13 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Window;
 
 /**
@@ -67,6 +69,8 @@ public class LogViewController implements Closeable {
 	@FXML
 	private ToggleGroup ENCODING;
 
+	private CodeAreaFindAndReplaceHelper<CodeArea> findAndReplaceHelper;
+
 	public LogViewController() throws Exception {
 
 	}
@@ -85,9 +89,28 @@ public class LogViewController implements Closeable {
 		this.charset.set(charset);
 	}
 
+
+
 	@FXML
 	public void initialize() {
-		new CodeAreaFindAndReplaceHelper<>(txtLog);
+		findAndReplaceHelper = new CodeAreaFindAndReplaceHelper<>(txtLog);
+		txtLog.addEventHandler(KeyEvent.KEY_PRESSED, this::txtLogOnKeyPress);
+
+	}
+
+	/**
+	 * txt 찾기 바꾸기 키 이벤트.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 1. 24.
+	 * @param e
+	 */
+	public void txtLogOnKeyPress(KeyEvent e) {
+		if (KeyCode.F == e.getCode() && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
+			if (!e.isConsumed()) {
+				findAndReplaceHelper.findReplaceEvent(new ActionEvent());
+				e.consume();
+			}
+		}
 	}
 
 	@FxPostInitialize
@@ -96,7 +119,7 @@ public class LogViewController implements Closeable {
 		fileChannel = FileChannel.open(monitoringFile.toPath(), StandardOpenOption.READ);
 		buffer = ByteBuffer.allocate(seekSize);
 
-		String encoding = CharsetManagement.loadCharset();
+		String encoding = ResourceLoader.loadCharset();
 		if (Charset.isSupported(encoding)) {
 			charset.set(Charset.forName(encoding));
 		} else {
@@ -126,7 +149,7 @@ public class LogViewController implements Closeable {
 			if (ValueUtil.isEmpty(name)) {
 				return;
 			}
-			CharsetManagement.saveCharset(name);
+			ResourceLoader.saveCharset(name);
 
 		});
 	}
@@ -217,7 +240,7 @@ public class LogViewController implements Closeable {
 					if (composite.getMonitoringFile() == null)
 						return;
 
-					if(fileChannel == null)
+					if (fileChannel == null)
 						return;
 
 					long lastModified = composite.getMonitoringFile().lastModified();
@@ -269,6 +292,7 @@ public class LogViewController implements Closeable {
 	}
 
 	private ObservableList<Chagne> onChangeListener = FXCollections.observableArrayList();
+
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 10.
@@ -283,7 +307,6 @@ public class LogViewController implements Closeable {
 			int caretPosition = this.txtLog.getCaretPosition();
 			int caretColumn = this.txtLog.getCaretColumn();
 
-
 			System.out.println();
 
 			this.txtLog.appendText(string);
@@ -293,8 +316,7 @@ public class LogViewController implements Closeable {
 		/* Create Change Model */
 		Chagne chg = new Chagne();
 		chg.setContent(string);
-		onChangeListener.forEach(v ->{
-
+		onChangeListener.forEach(v -> {
 
 		});
 	}
@@ -383,33 +405,6 @@ public class LogViewController implements Closeable {
 		FxUtil.saveAsFx(getWindow(), () -> txtLog.getText());
 	}
 
-	/**
-	 * 환경변수 캐릭터셋 관리.
-	 * @author KYJ
-	 *
-	 */
-	private static class CharsetManagement {
-
-		/**
-		 * 저장
-		 * @작성자 : KYJ
-		 * @작성일 : 2017. 1. 12.
-		 * @param charset
-		 */
-		public static void saveCharset(String charset) {
-			ResourceLoader.getInstance().put(ResourceLoader.LOGVIEW_ENCODING, charset);
-		}
-
-		/**
-		 * 로드
-		 * @작성자 : KYJ
-		 * @작성일 : 2017. 1. 12.
-		 * @return
-		 */
-		public static String loadCharset() {
-			return ResourceLoader.getInstance().get(ResourceLoader.LOGVIEW_ENCODING, "UTF-8");
-		}
-	}
 
 	public static class Chagne {
 		private String content;

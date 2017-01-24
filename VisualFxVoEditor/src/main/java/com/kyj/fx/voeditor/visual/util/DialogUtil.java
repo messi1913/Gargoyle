@@ -489,6 +489,23 @@ public class DialogUtil {
 	 * @param initOwner
 	 * @param message
 	 */
+	public static void showMessageDialog(Window initOwner, String message) {
+		showMessageDialog(null, "Info", "", message, alert -> {
+			alert.initModality(Modality.APPLICATION_MODAL);
+			alert.initOwner(initOwner);
+			alert.showAndWait();
+		});
+
+	}
+
+	/**
+	 * show info Dialog info Dialog
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 7. 12.
+	 * @param initOwner
+	 * @param message
+	 */
 	public static void showMessageDialog(Stage initOwner, String message) {
 		showMessageDialog(initOwner, "Info", "", message, alert -> {
 			alert.initModality(Modality.APPLICATION_MODAL);

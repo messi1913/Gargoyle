@@ -10,8 +10,6 @@ package com.kyj.fx.voeditor.visual.component.bci.view;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +23,7 @@ import com.kyj.fx.voeditor.visual.main.Main;
 import com.kyj.fx.voeditor.visual.momory.MonitorProperties;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -120,8 +119,7 @@ public class ScheduleTimeLineComposite extends BorderPane implements MonitorList
 		});
 
 		monitorService.setOnSucceeded(ev -> {
-			if (running.get())
-			{
+			if (running.get()) {
 				monitorService.restart();
 				onTickTock();
 			}
@@ -157,9 +155,14 @@ public class ScheduleTimeLineComposite extends BorderPane implements MonitorList
 	public void closeRequest() {
 		LOGGER.debug("close request...");
 
-		running.set(false);
-		if (monitorService.isRunning())
-			monitorService.cancel();
+		Platform.runLater(() -> {
+
+			running.set(false);
+			if (monitorService.isRunning()) {
+				monitorService.cancel();
+			}
+		});
+
 	}
 
 }

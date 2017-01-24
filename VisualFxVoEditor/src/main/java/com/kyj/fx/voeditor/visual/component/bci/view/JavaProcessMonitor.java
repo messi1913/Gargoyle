@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.component.bci.view;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Function;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.Logger;
@@ -15,8 +16,11 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.bci.monitor.ApplicationModel;
 import com.kyj.bci.monitor.Monitors;
+import com.kyj.fx.voeditor.visual.component.text.ThreadDumpTextArea;
 import com.kyj.fx.voeditor.visual.framework.JavaLauncher;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -29,6 +33,8 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /***************************
  *
@@ -80,13 +86,38 @@ public class JavaProcessMonitor extends CloseableParent<SplitPane> {
 
 	}
 
+	/**
+	 * 선탠된 아이템에 대한 속성중에 process id값을 리턴.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 1. 24.
+	 * @return
+	 */
 	private Integer getSelectedProcessId() {
-		ApplicationModel selectedItem = tbJavaApplication.getSelectionModel().getSelectedItem();
-		if (selectedItem != null) {
-			return selectedItem.getProcessId();
-		}
-		return -1;
+//		ApplicationModel selectedItem = tbJavaApplication.getSelectionModel().getSelectedItem();
+//		if (selectedItem != null) {
+//			return selectedItem.getProcessId();
+//		}
+//		return -1;
+//
+		return getSelectedItem(item ->{
+			if(item == null)
+				return -1;
+			return item.getProcessId();
+		});
 	}
+
+	/**
+	 * 선택된 데이터를 다른 타입으로 바꿈
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 1. 24.
+	 * @param convert
+	 * @return
+	 */
+	private <T> T getSelectedItem(Function<ApplicationModel, T> convert) {
+		ApplicationModel selectedItem = tbJavaApplication.getSelectionModel().getSelectedItem();
+		return convert.apply(selectedItem);
+	}
+
 
 	public void menuInjectionOnAction(ActionEvent e) {
 		CodeItem selectedItem = injectionItemListComposite.getSelectedItem();
@@ -126,15 +157,37 @@ public class JavaProcessMonitor extends CloseableParent<SplitPane> {
 	 * @throws Exception
 	 */
 	public void menuThreadDumpOnAction(ActionEvent e) {
-		Integer selectedProcessId = getSelectedProcessId();
 
+
+		ApplicationModel selectedItem = getSelectedItem(item -> item);
+		if(selectedItem == null)
+		{
+			Window window = FxUtil.getWindow(this.getParent(), ()->{
+				return SharedMemory.getPrimaryStage();
+			});
+
+			DialogUtil.showMessageDialog(window, "덤프를 출력할 프로세스를 선택.");
+			return;
+		}
+
+		Integer selectedProcessId = selectedItem.getProcessId();
+		String applicationName = selectedItem.getApplicationName();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Monitors.runStackTool(selectedProcessId, out);
 
-		FxUtil.createSimpleTextAreaAndShow(out.toString(), stage -> {
-
+		ThreadDumpTextArea parent = new ThreadDumpTextArea();
+		parent.setContent(out.toString());
+		FxUtil.createStageAndShow(parent, stage ->{
 			stage.initOwner(getParent().getScene().getWindow());
+			stage.setWidth(1200d);
+			stage.setHeight(800d);
+			stage.setTitle("App - "+applicationName);
 		});
+
+//		FxUtil.createSimpleTextAreaAndShow(out.toString(), stage -> {
+//
+//
+//		});
 
 	}
 

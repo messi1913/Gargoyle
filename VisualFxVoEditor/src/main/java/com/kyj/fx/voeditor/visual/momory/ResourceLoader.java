@@ -304,4 +304,54 @@ public class ResourceLoader implements IFileBaseConfiguration {
 		return FILE_NAME;
 	}
 
+	/**
+	 * 환경변수에 캐릭터셋 저장
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 1. 24.
+	 * @param charset
+	 */
+	public static void saveCharset(String charset)
+	{
+		CharsetManagement.saveCharset(charset);
+	}
+
+	/**
+	 * 환경변수에 저장된 캐릭터셋 로드
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 1. 24.
+	 * @return
+	 */
+	public static String loadCharset() {
+		return CharsetManagement.loadCharset();
+	}
+
+
+	/**
+	 * 환경변수 캐릭터셋 관리.
+	 * @author KYJ
+	 *
+	 */
+	private static class CharsetManagement {
+
+		/**
+		 * 저장
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 1. 12.
+		 * @param charset
+		 */
+		public static void saveCharset(String charset) {
+			getInstance().put(ResourceLoader.LOGVIEW_ENCODING, charset);
+		}
+
+		/**
+		 * 로드
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 1. 12.
+		 * @return
+		 */
+		public static String loadCharset() {
+			return getInstance().get(ResourceLoader.LOGVIEW_ENCODING, "UTF-8");
+		}
+	}
+
 }
