@@ -10,13 +10,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.bci.monitor.ApplicationModel;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.btrace.client.Main;
 
 import javafx.concurrent.Service;
@@ -31,7 +31,7 @@ public class BtraceRunner {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(BtraceRunner.class);
 
-//	private static final ExecutorService newFixedThreadPool = Executors.newFixedThreadPool(1);
+	//	private static final ExecutorService newFixedThreadPool = Executors.newFixedThreadPool(1);
 
 	public static void run(ApplicationModel vo, File sampleFileName) {
 
@@ -63,14 +63,11 @@ public class BtraceRunner {
 		/* -v 디버그모드 -d 덤프 */
 		List<String> params = Arrays.asList(/* "-v" , */ "-d", btracedumpDir);
 		List<String> asList = Arrays.asList(pid.toString(), javaSourcePathName);
-		List<String> arrayList = new ArrayList<String>(params.size() + asList.size());
+		final List<String> arrayList = new ArrayList<String>(params.size() + asList.size());
 		arrayList.addAll(params);
 		arrayList.addAll(asList);
 
-		// argument 통합.
-		String[] arguments = arrayList.stream().toArray(String[]::new);
-		String argus = Arrays.toString(arguments);
-		LOGGER.debug(String.format("Btrace arguments : %s", argus));
+
 		// Btrace라이브러리중 메인함수인 btrace-client.jar파일의 메인함수를 호출한다.
 
 		// Thread thread = new Thread(new Runnable() {
@@ -91,14 +88,26 @@ public class BtraceRunner {
 
 					@Override
 					protected Void call() throws Exception {
-						Main.main(arguments);
+						try {
+							// argument 통합.
+							String[] arguments = arrayList.stream().toArray(String[]::new);
+							String argus = Arrays.toString(arguments);
+							LOGGER.debug(String.format("Btrace arguments : %s", argus));
+
+//							Stream.of(arguments).forEach(action);;
+							Main.main(arguments);
+
+							Thread.sleep(2000L);
+						} catch (Exception e) {
+							LOGGER.error(ValueUtil.toString(e));
+						}
 						return null;
 					}
 				};
 			}
 		};
 
-//		service.setExecutor(newFixedThreadPool);
+		//		service.setExecutor(newFixedThreadPool);
 
 		service.setOnSucceeded(e -> {
 			LOGGER.debug("end ");
