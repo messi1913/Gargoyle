@@ -115,10 +115,9 @@ public class CodeAreaFindAndReplaceHelper<T extends CodeArea> {
 		});
 
 		textSearchView.setOnSelectionMoveListener(vo ->{
-
 			codeArea.selectRange(vo.getStartIndex(), vo.getEndIndex());
-
 		});
+		
 		textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
 			if (newval)
 				LOGGER.debug("User Select Locale Scope..");
