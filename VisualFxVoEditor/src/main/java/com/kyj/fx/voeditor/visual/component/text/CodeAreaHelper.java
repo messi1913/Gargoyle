@@ -41,15 +41,15 @@ import javafx.util.Pair;
  */
 public class CodeAreaHelper<T extends CodeArea> {
 
-//	private static Logger LOGGER = LoggerFactory.getLogger(CodeAreaHelper.class);
+	//	private static Logger LOGGER = LoggerFactory.getLogger(CodeAreaHelper.class);
 
 	public static final String CHARACTERS_MATCH = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
 
 	protected T codeArea;
 	protected SqlFormatter sqlFormatter = new SqlFormatter();
 	protected CodeAreaMoveLineHelper codeMoveDeligator;
-	private CodeAreaDragDropHelper dragDropHelper;
-	private CodeAreaFindAndReplaceHelper<T> findAndReplaceHelper;
+	protected CodeAreaDragDropHelper dragDropHelper;
+	protected CodeAreaFindAndReplaceHelper<T> findAndReplaceHelper;
 
 	protected ContextMenu contextMenu;
 
@@ -62,7 +62,10 @@ public class CodeAreaHelper<T extends CodeArea> {
 
 	public CodeAreaHelper(T codeArea) {
 		this.codeArea = codeArea;
+		init();
+	}
 
+	protected void init() {
 		defaultSelectionHandler = new CodeAreaDefaultSelectionHandler(codeArea);
 		this.codeArea.setOnMouseClicked(defaultSelectionHandler);
 		this.codeMoveDeligator = new CodeAreaMoveLineHelper(codeArea);
@@ -85,24 +88,23 @@ public class CodeAreaHelper<T extends CodeArea> {
 		return this.codeArea;
 	}
 
-
-//	EventHandler<? super MouseEvent> defaultSelectionHandler = new EventHandler<MouseEvent>() {
-//		@Override
-//		public void handle(MouseEvent event) {
-//			if (event.getClickCount() == 1) {
-//			} else if (event.getClickCount() == 2) {
-//				String selectedText = codeArea.getSelectedText();
-//				if (ValueUtil.isNotEmpty(selectedText)) {
-//					IndexRange selection = codeArea.getSelection();
-//					String ltrimText = selectedText.replaceAll("^\\s+", "");
-//					String firstStr = ltrimText.substring(0, 1).replaceAll(CHARACTERS_MATCH, "");
-//					int start = selection.getStart();
-//					int end = selection.getEnd();
-//					codeArea.selectRange(start + (selectedText.length() - ltrimText.length() + 1 - firstStr.length()), end);
-//				}
-//			}
-//		}
-//	};
+	//	EventHandler<? super MouseEvent> defaultSelectionHandler = new EventHandler<MouseEvent>() {
+	//		@Override
+	//		public void handle(MouseEvent event) {
+	//			if (event.getClickCount() == 1) {
+	//			} else if (event.getClickCount() == 2) {
+	//				String selectedText = codeArea.getSelectedText();
+	//				if (ValueUtil.isNotEmpty(selectedText)) {
+	//					IndexRange selection = codeArea.getSelection();
+	//					String ltrimText = selectedText.replaceAll("^\\s+", "");
+	//					String firstStr = ltrimText.substring(0, 1).replaceAll(CHARACTERS_MATCH, "");
+	//					int start = selection.getStart();
+	//					int end = selection.getEnd();
+	//					codeArea.selectRange(start + (selectedText.length() - ltrimText.length() + 1 - firstStr.length()), end);
+	//				}
+	//			}
+	//		}
+	//	};
 
 	/**
 	 *
@@ -225,7 +227,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 		}
 	}
 
-	private void toUppercaseEvent(Event e) {
+	protected void toUppercaseEvent(Event e) {
 		String selectedText = codeArea.getSelectedText();
 		if (ValueUtil.isNotEmpty(selectedText)) {
 			// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
@@ -233,7 +235,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 		}
 	}
 
-	private void toLowercaseEvent(Event e) {
+	protected void toLowercaseEvent(Event e) {
 		String selectedText = codeArea.getSelectedText();
 		if (ValueUtil.isNotEmpty(selectedText)) {
 			// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));

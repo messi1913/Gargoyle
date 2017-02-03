@@ -17,20 +17,19 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.text.PagedSimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
@@ -59,7 +58,7 @@ public class BigTextView extends BorderPane implements Closeable {
 	private File file;
 	private RandomAccessFile randomAccessFile;
 	private boolean showButtons;
-//	private TextArea javaTextArea;
+	//	private TextArea javaTextArea;
 
 	private Map<String, String> pageBuffer;
 	private static final int SEEK_SIZE = 1024 * 100;
@@ -97,7 +96,6 @@ public class BigTextView extends BorderPane implements Closeable {
 			this.showButtons = showButtons;
 			pageBuffer = new HashMap<>();
 
-
 			FxUtil.loadRoot(getClass(), this);
 
 			/*FXMLLoader loader = new FXMLLoader();
@@ -105,7 +103,6 @@ public class BigTextView extends BorderPane implements Closeable {
 			loader.setRoot(this);
 			loader.setController(this);
 			loader.load();*/
-
 
 		} catch (Exception e) {
 			if (handler == null) {
@@ -116,9 +113,9 @@ public class BigTextView extends BorderPane implements Closeable {
 		}
 	}
 
-//	public void setEditable(boolean editable) {
-//		javaTextArea.setEditable(false);
-//	}
+	//	public void setEditable(boolean editable) {
+	//		javaTextArea.setEditable(false);
+	//	}
 
 	/**
 	 * 세팅했던 파일정보
@@ -130,42 +127,104 @@ public class BigTextView extends BorderPane implements Closeable {
 	}
 
 	public void show() throws IOException {
-		Stage stage = new Stage();
-		Scene scene = new Scene(this, 1100, 700);
-		stage.setScene(scene);
-		stage.setAlwaysOnTop(true);
-		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.initOwner(SharedMemory.getPrimaryStage());
-		btnClose.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				stage.close();
-			}
-		});
-		stage.showAndWait();
-		stage.close();
+		if(this.file == null || !this.file.exists())
+			return;
 
+		String fileName = this.file.getName();
+
+		FxUtil.createStageAndShow(fileName, this , stage->{
+			stage.setMinWidth(1100);
+			stage.setMinHeight(700);
+			stage.setAlwaysOnTop(true);
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(SharedMemory.getPrimaryStage());
+			btnClose.setOnMouseClicked(event -> stage.close());
+		});
+	}
+
+	private Map<Integer, SimpleTextView> pageCache = new HashMap<>();
+	private boolean isUsePageCache = true;
+
+	/**
+	 * 페이지 캐쉬를 사용할지 유무 디폴트값은 true
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 2.
+	 * @param isUsePageCache
+	 */
+	public void usePageCache(boolean isUsePageCache) {
+		this.isUsePageCache = isUsePageCache;
+
+		if (!isUsePageCache)
+			pageCache.clear();
+
+	}
+
+	private Pagination pagination;
+
+	public Pagination getPaginationView() {
+		return this.pagination;
 	}
 
 	@FXML
 	public void initialize() {
-//		javaTextArea = new TextArea();
-//		javaTextArea.setPrefSize(TextArea.USE_COMPUTED_SIZE, Double.MAX_VALUE);
+		//		javaTextArea = new TextArea();
+		//		javaTextArea.setPrefSize(TextArea.USE_COMPUTED_SIZE, Double.MAX_VALUE);
 		hboxButtons.setVisible(showButtons);
 
-		Pagination pagination = new Pagination(TOTAL_PAGE);
+		pagination = new Pagination(TOTAL_PAGE);
+		pagination.setCache(true);
 		pagination.setPageFactory(new Callback<Integer, Node>() {
 
 			@Override
 			public Node call(Integer param) {
+
+				if (isUsePageCache && pageCache.containsValue(param)) {
+					return pageCache.get(param);
+				}
+
 				String readContent = readPage(param);
-				SimpleTextView simpleTextView = new SimpleTextView(readContent, false);
+				SimpleTextView simpleTextView = new SimpleTextView(readContent, false);//new PagedSimpleTextView(BigTextView.this, readContent, false);
 				simpleTextView.setPrefSize(TextArea.USE_COMPUTED_SIZE, Double.MAX_VALUE);
+
+				if (isUsePageCache)
+					pageCache.put(param, simpleTextView);
+
 				return simpleTextView;
 			}
 		});
 		pagination.setPrefSize(Pagination.USE_COMPUTED_SIZE, Pagination.USE_COMPUTED_SIZE);
 		this.setCenter(pagination);
+	}
+
+	/**
+	 * 현재 페이지 인덱스를 리턴함.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 2.
+	 * @return
+	 */
+	public int getCurrentPageIndex() {
+		return pagination.getCurrentPageIndex();
+	}
+
+	/**
+	 * 현재 페이지 뷰를 리턴.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 2.
+	 * @return
+	 */
+	public SimpleTextView getCurrentPageView() {
+		int currentPageIndex = getCurrentPageIndex();
+		return getPageView(currentPageIndex);
+	}
+
+	public SimpleTextView getPageView(Integer index) {
+		if (isUsePageCache) {
+
+			if (pageCache.containsValue(index))
+				return pageCache.get(index);
+		}
+
+		return (SimpleTextView) pagination.getPageFactory().call(index);
 	}
 
 	public String readPage(int page) {

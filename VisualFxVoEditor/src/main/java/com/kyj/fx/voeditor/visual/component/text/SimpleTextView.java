@@ -18,6 +18,7 @@ import com.kyj.fx.voeditor.visual.framework.word.MimeToHtmlAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.SimpleWordAdapter;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -47,9 +48,9 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	private String content;
 	private boolean showButtons;
 	// private TextArea javaTextArea;
-	private CodeArea codeArea;
+	protected CodeArea codeArea;
 
-	private CodeAreaHelper<CodeArea> helper;
+	protected CodeAreaHelper<CodeArea> helper;
 	/**
 	 * 버튼박스
 	 */
@@ -77,6 +78,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		loader.setLocation(getClass().getResource("SimpleTextView.fxml"));
 		loader.setRoot(this);
 		loader.setController(this);
+
 		try {
 			loader.load();
 		} catch (Exception e) {
@@ -85,7 +87,6 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			} else {
 				handler.handle(e);
 			}
-
 		}
 
 	}
@@ -100,9 +101,17 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 	@FXML
 	public void initialize() {
-
 		codeArea = new CodeArea();
+		initHelpers();
+		initGraphics();
+
+	}
+
+	protected void initHelpers(){
 		this.helper = new CodeAreaHelper<>(codeArea);
+	}
+
+	protected void initGraphics(){
 		hboxButtons.setVisible(showButtons);
 		if (!showButtons) {
 			hboxButtons.setMinHeight(0d);
@@ -131,7 +140,6 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		setBottom(lblLineInfo);
 
 	}
-
 	/* (non-Javadoc)
 	 * @see com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable#closeRequest()
 	 */
@@ -168,47 +176,43 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	 * @작성일 : 2016. 12. 29.
 	 */
 	@FXML
-	public void miOpenNamoWebViewOnAction(){
+	public void miOpenNamoWebViewOnAction() {
 
 		String content = codeArea.getText();
 
 		try {
 			WebView webView = new WebView();
 
+			//			new ContentMimeHtmlAdapter(content)
 
+			//			String encodeToString = Base64.getEncoder().encodeToString(content.getBytes());
+			//
+			//			byte[] decode = Base64.getDecoder().decode(encodeToString);
+			//			String string = new String(decode);
+			//			MimeBodyPart part = new MimeBodyPart(new ByteArrayInputStream(content.getBytes()));
+			//			Enumeration allHeaders = part.getAllHeaders();
+			//			while(allHeaders.hasMoreElements())
+			//			{
+			//				javax.mail.Header nextElement = (Header) allHeaders.nextElement();
+			//
+			//				System.out.println(nextElement.getName());
+			//				System.out.println(nextElement.getValue());
+			//			}
+			//
+			//			DataHandler dataHandler = part.getDataHandler();
+			//			Object transferData = dataHandler.getTransferData(new DataFlavor("text/html"));
+			//			System.out.println(transferData);
+			//			ContentMimeHtmlAdapter adapter = new ContentMimeHtmlAdapter(content);
+			//			File tempFile = adapter.toTempFile();
 
+			//			byte[] decode = Base64.getMimeDecoder().decode(content.getBytes("UTF-8"));
+			//			String string = new String(decode);
 
-//			new ContentMimeHtmlAdapter(content)
-
-//			String encodeToString = Base64.getEncoder().encodeToString(content.getBytes());
-//
-//			byte[] decode = Base64.getDecoder().decode(encodeToString);
-//			String string = new String(decode);
-//			MimeBodyPart part = new MimeBodyPart(new ByteArrayInputStream(content.getBytes()));
-//			Enumeration allHeaders = part.getAllHeaders();
-//			while(allHeaders.hasMoreElements())
-//			{
-//				javax.mail.Header nextElement = (Header) allHeaders.nextElement();
-//
-//				System.out.println(nextElement.getName());
-//				System.out.println(nextElement.getValue());
-//			}
-//
-//			DataHandler dataHandler = part.getDataHandler();
-//			Object transferData = dataHandler.getTransferData(new DataFlavor("text/html"));
-//			System.out.println(transferData);
-//			ContentMimeHtmlAdapter adapter = new ContentMimeHtmlAdapter(content);
-//			File tempFile = adapter.toTempFile();
-
-
-//			byte[] decode = Base64.getMimeDecoder().decode(content.getBytes("UTF-8"));
-//			String string = new String(decode);
-
-			FxUtil.createStageAndShow(webView, stage->{
+			FxUtil.createStageAndShow(webView, stage -> {
 				stage.setAlwaysOnTop(true);
 				stage.initOwner(getScene().getWindow());
-				stage.focusedProperty().addListener((oba,o, n ) ->{
-					if(!n)
+				stage.focusedProperty().addListener((oba, o, n) -> {
+					if (!n)
 						stage.close();
 
 				});
@@ -229,7 +233,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	}
 
 	@FXML
-	public void miOpenHtmlWordOnAction(){
+	public void miOpenHtmlWordOnAction() {
 		String content = codeArea.getText();
 		try {
 			AsynchWordExecutor executor = new AsynchWordExecutor(new SimpleWordAdapter(content));
@@ -239,9 +243,9 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		}
 	}
 
-
 	@FXML
-	public void miOpenHtmlWevViewOnAction() {}
+	public void miOpenHtmlWevViewOnAction() {
+	}
 
 	/**
 	 * menuItem 다른이름으로 저장.
@@ -249,13 +253,19 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	 * @작성일 : 2016. 12. 27.
 	 */
 	@FXML
-	public void miSaveAsOnAction(){
+	public void miSaveAsOnAction() {
 		FxUtil.saveAsFx(getScene().getWindow(), () -> codeArea.getText());
 
-//		File saveAs = DialogUtil.showFileSaveCheckDialog(getScene().getWindow(), chooser->{});
-//		if(saveAs!=null && saveAs.exists())
-//		{
-//			FileUtil.writeFile(saveAs, codeArea.getText(), Charset.forName("UTF-8"), err -> LOGGER.error(ValueUtil.toString(err)));
-//		}
+		//		File saveAs = DialogUtil.showFileSaveCheckDialog(getScene().getWindow(), chooser->{});
+		//		if(saveAs!=null && saveAs.exists())
+		//		{
+		//			FileUtil.writeFile(saveAs, codeArea.getText(), Charset.forName("UTF-8"), err -> LOGGER.error(ValueUtil.toString(err)));
+		//		}
 	}
+
+
+	public CodeArea getCodeArea(){
+		return this.codeArea;
+	}
+
 }

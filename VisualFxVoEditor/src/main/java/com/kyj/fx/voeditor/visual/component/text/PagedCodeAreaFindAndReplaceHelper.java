@@ -10,6 +10,7 @@ import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.popup.BigTextView;
 import com.kyj.fx.voeditor.visual.component.popup.TextSearchAndReplaceView;
 
 import javafx.beans.value.ObservableValue;
@@ -27,18 +28,18 @@ import javafx.scene.input.KeyCombination;
  * @author KYJ
  *
  */
-public class CodeAreaFindAndReplaceHelper<T extends CodeArea> {
+public class PagedCodeAreaFindAndReplaceHelper {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(CodeAreaFindAndReplaceHelper.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(PagedCodeAreaFindAndReplaceHelper.class);
 
-	private CodeArea codeArea;
+	private BigTextView view;
 	protected Menu menuSearch;
 	protected MenuItem miFindReplace;
-//	private EventHandler<? super MouseEvent> defaultSelectionHandler;;
+	//	private EventHandler<? super MouseEvent> defaultSelectionHandler;;
 
-	public CodeAreaFindAndReplaceHelper(T codeArea) {
-		this.codeArea = codeArea;
-//		defaultSelectionHandler = new CodeAreaDefaultSelectionHandler(codeArea);
+	public PagedCodeAreaFindAndReplaceHelper(BigTextView view) {
+		this.view = view;
+		//		defaultSelectionHandler = new CodeAreaDefaultSelectionHandler(codeArea);
 	}
 
 	/**
@@ -67,6 +68,9 @@ public class CodeAreaFindAndReplaceHelper<T extends CodeArea> {
 
 		if (e.isConsumed())
 			return;
+
+		SimpleTextView currentPageView = view.getCurrentPageView();
+		CodeArea codeArea = currentPageView.getCodeArea();
 
 		ObservableValue<String> textProperty = codeArea.textProperty();
 		TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(codeArea, textProperty);
@@ -115,10 +119,9 @@ public class CodeAreaFindAndReplaceHelper<T extends CodeArea> {
 		});
 
 		textSearchView.setOnSelectionMoveListener(vo ->{
-
 			codeArea.selectRange(vo.getStartIndex(), vo.getEndIndex());
-
 		});
+
 		textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
 			if (newval)
 				LOGGER.debug("User Select Locale Scope..");
@@ -136,41 +139,50 @@ public class CodeAreaFindAndReplaceHelper<T extends CodeArea> {
 
 		textSearchView.show();
 
-//		codeArea.setOnMouseClicked(defaultSelectionHandler);
+		//		codeArea.setOnMouseClicked(defaultSelectionHandler);
 
 		e.consume();
 	}
 
 	public void setContent(String content) {
-		codeArea.getUndoManager().mark();
-		codeArea.clear();
-		codeArea.replaceText(0, 0, content);
-		codeArea.getUndoManager().mark();
+		SimpleTextView currentPageView = this.view.getCurrentPageView();
+		if (currentPageView != null) {
+			CodeArea codeArea = currentPageView.getCodeArea();
+			codeArea.getUndoManager().mark();
+			codeArea.clear();
+			codeArea.replaceText(0, 0, content);
+			codeArea.getUndoManager().mark();
+		}
+
 	}
 
 	public void setContent(int start, int end, String text) {
-		codeArea.getUndoManager().mark();
-		codeArea.replaceText(start, end, text);
-		codeArea.getUndoManager().mark();
+		SimpleTextView currentPageView = this.view.getCurrentPageView();
+		if (currentPageView != null) {
+			CodeArea codeArea = currentPageView.getCodeArea();
+			codeArea.getUndoManager().mark();
+			codeArea.replaceText(start, end, text);
+			codeArea.getUndoManager().mark();
+		}
 	}
 
-//	// 선택 범위 지정
-//	EventHandler<? super MouseEvent> defaultSelectionHandler = event -> {
-//		if (event.getClickCount() == 1) {
-//			// codeArea.setStyleSpans(0,
-//			// groupBackgroundColor(codeArea.getText(),
-//			// codeArea.getCaretPosition()));
-//		} else if (event.getClickCount() == 2) {
-//			String selectedText = codeArea.getSelectedText();
-//			if (ValueUtil.isNotEmpty(selectedText)) {
-//				IndexRange selection = codeArea.getSelection();
-//				String ltrimText = selectedText.replaceAll("^\\s+", "");
-//				String firstStr = ltrimText.substring(0, 1).replaceAll(CHARACTERS_MATCH, "");
-//				int start = selection.getStart();
-//				int end = selection.getEnd();
-//				codeArea.selectRange(start + (selectedText.length() - ltrimText.length() + 1 - firstStr.length()), end);
-//			}
-//		}
-//	};
+	//	// 선택 범위 지정
+	//	EventHandler<? super MouseEvent> defaultSelectionHandler = event -> {
+	//		if (event.getClickCount() == 1) {
+	//			// codeArea.setStyleSpans(0,
+	//			// groupBackgroundColor(codeArea.getText(),
+	//			// codeArea.getCaretPosition()));
+	//		} else if (event.getClickCount() == 2) {
+	//			String selectedText = codeArea.getSelectedText();
+	//			if (ValueUtil.isNotEmpty(selectedText)) {
+	//				IndexRange selection = codeArea.getSelection();
+	//				String ltrimText = selectedText.replaceAll("^\\s+", "");
+	//				String firstStr = ltrimText.substring(0, 1).replaceAll(CHARACTERS_MATCH, "");
+	//				int start = selection.getStart();
+	//				int end = selection.getEnd();
+	//				codeArea.selectRange(start + (selectedText.length() - ltrimText.length() + 1 - firstStr.length()), end);
+	//			}
+	//		}
+	//	};
 
 }

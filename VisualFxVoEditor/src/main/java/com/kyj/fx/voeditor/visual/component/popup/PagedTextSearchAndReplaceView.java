@@ -14,10 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.popup.ReplaceResultVO.REPLACE_TYPE;
-import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.sun.star.lang.NullPointerException;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -33,16 +30,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
@@ -56,12 +49,8 @@ import javafx.stage.Stage;
  * @author KYJ
  *
  */
-/**
- * @author KYJ
- *
- */
-public class TextSearchAndReplaceView extends BorderPane {
-	private static Logger LOGGER = LoggerFactory.getLogger(TextSearchAndReplaceView.class);
+public class PagedTextSearchAndReplaceView extends BorderPane {
+	private static Logger LOGGER = LoggerFactory.getLogger(PagedTextSearchAndReplaceView.class);
 
 	private FXMLLoader loader;
 	/**
@@ -98,8 +87,6 @@ public class TextSearchAndReplaceView extends BorderPane {
 
 	private ObjectProperty<ReplaceResultVO> replaceResultVOProperty;
 
-	private ObjectProperty<SearchResultVO> selectionMoveProperty;
-
 	private Parent parent;
 
 	/**
@@ -108,7 +95,10 @@ public class TextSearchAndReplaceView extends BorderPane {
 	private BooleanProperty isSelectScopeProperty = new SimpleBooleanProperty();
 
 	@FXML
-	private RadioButton rdoSelectScope, rdoGlobalScope;
+	private RadioButton rdoSelectScope;
+
+	@FXML
+	private RadioButton rdoGlobalScope;
 
 	/**
 	 * description text field
@@ -124,19 +114,15 @@ public class TextSearchAndReplaceView extends BorderPane {
 	 * @최초생성일 2015. 12. 28.
 	 */
 	@FXML
-	private TextField /* 바꾸기에서 찾기 텍스트*/ txtFind, /*바꾸기 텍스트*/txtReplace;
-
-	@FXML
-	private Accordion accFindAll;
-
-	@FXML
-	private ListView<SearchResultVO> lvFindAll;
-
+	private TextField txtFind;
 	/**
-	 * 모두찾기에서 찾은 데이터를 화면에 표시할 텍스트 포멧을 정의한다.
-	 * @최초생성일 2017. 2. 2.
+	 * 바꾸기 텍스트
+	 *
+	 * @최초생성일 2015. 12. 28.
 	 */
-	public static final String FIND_ALL_TEXT_FORMAT = " Start Index %d   End Index %d   Keyword : %s";
+	@FXML
+	private TextField txtReplace;
+
 	/****************************************************************/
 
 	/****************************************************************/
@@ -165,18 +151,6 @@ public class TextSearchAndReplaceView extends BorderPane {
 		});
 	}
 
-	/**
-	 * 선택된 행으로 이동처리할때의 내용을 기술하는 로직을 등록
-	 * @작성자 : KYJ
-	 * @작성일 : 2017. 2. 3.
-	 * @param consumer
-	 */
-	public void setOnSelectionMoveListener(Consumer<SearchResultVO> consumer) {
-		selectionMoveProperty.addListener((oba, oldval, newval) -> {
-			if (newval != null)
-				consumer.accept(newval);
-		});
-	}
 	/****************************************************************/
 	/****************************************************************/
 
@@ -186,9 +160,9 @@ public class TextSearchAndReplaceView extends BorderPane {
 	 * @param parent
 	 * @param content
 	 */
-	public TextSearchAndReplaceView(Parent parent, ObservableValue<String> content) {
+	public PagedTextSearchAndReplaceView(Parent parent, ObservableValue<String> content) {
 		loader = new FXMLLoader();
-		loader.setLocation(TextSearchAndReplaceView.class.getResource("TextSearchAndReplaceView.fxml"));
+		loader.setLocation(PagedTextSearchAndReplaceView.class.getResource("TextSearchAndReplaceView.fxml"));
 		loader.setRoot(this);
 		loader.setController(this);
 		try {
@@ -197,7 +171,6 @@ public class TextSearchAndReplaceView extends BorderPane {
 			this.contentProperty.bind(content);
 			this.searchResultVOProperty = new SimpleObjectProperty<>();
 			this.replaceResultVOProperty = new SimpleObjectProperty<>();
-			this.selectionMoveProperty = new SimpleObjectProperty<>();
 			slidingStartIndexProperty = new SimpleIntegerProperty();
 
 			this.parent = parent;
@@ -295,12 +268,6 @@ public class TextSearchAndReplaceView extends BorderPane {
 	}
 
 	private void findAll(String findword, String content, Function<SearchResultVO, SearchResultVO> function) {
-
-		if (ValueUtil.isEmpty(findword)) {
-			DialogUtil.showMessageDialog(FxUtil.getWindow(this), "찾을 단어를 입력해야합니다.");
-			return;
-		}
-
 		if (content == null || content.isEmpty())
 			return;
 
@@ -323,46 +290,6 @@ public class TextSearchAndReplaceView extends BorderPane {
 
 			startIdx = endIdx;
 		}
-	}
-
-	public int findAll(String content, Consumer<SearchResultVO> action) throws NullPointerException {
-		return findAll(txtFindTextContent.getText(), content, action);
-	}
-
-	public int findAll(String findword, String content, Consumer<SearchResultVO> action) throws NullPointerException {
-
-		int foundCount = -1;
-		if (action == null)
-			throw new NullPointerException("action is null");
-
-		if (ValueUtil.isEmpty(findword)) {
-			DialogUtil.showMessageDialog(FxUtil.getWindow(this), "찾을 단어를 입력해야합니다.");
-			return foundCount;
-		}
-
-		if (content == null || content.isEmpty())
-			return foundCount;
-
-		int startIdx = 0;
-		while (startIdx >= 0) {
-			startIdx = content.indexOf(findword, startIdx);
-
-			if (startIdx == -1)
-				break;
-
-			int endIdx = startIdx + findword.length();
-			SearchResultVO value = new SearchResultVO();
-			value.setSearchText(findword);
-			value.setStartIndex(startIdx);
-			value.setEndIndex(endIdx);
-			//			LOGGER.debug(String.format("FindContent : %s , %d", content.subSequence(startIdx, endIdx), startIdx));
-
-			action.accept(value);
-			foundCount++;
-			startIdx = endIdx;
-		}
-
-		return foundCount;
 	}
 
 	private void reaplce(String findText, String replaceText) {
@@ -425,41 +352,6 @@ public class TextSearchAndReplaceView extends BorderPane {
 		rdoGlobalScope.selectedProperty().addListener((oba, oldval, newval) -> {
 			if (newval)
 				isSelectScopeProperty.set(false);
-		});
-
-		lvFindAll.setCellFactory(callback -> new ListCell<SearchResultVO>() {
-
-			/* (non-Javadoc)
-			 * @see javafx.scene.control.Cell#updateItem(java.lang.Object, boolean)
-			 */
-			@Override
-			protected void updateItem(SearchResultVO item, boolean empty) {
-				super.updateItem(item, empty);
-
-				if (empty) {
-					setText("");
-				} else {
-
-					if (item == null) {
-						setText("");
-						return;
-					}
-					//  Format Text ::   Start Index %d   End Index %d   Keyword : %s
-					setText(String.format(FIND_ALL_TEXT_FORMAT, item.getStartIndex(), item.getEndIndex(), item.getSearchText()));
-					//							setText(item.get);
-				}
-			}
-
-		});
-
-		lvFindAll.setOnMouseClicked(ev -> {
-
-			if (ev.getClickCount() == 2 && ev.getButton() == MouseButton.PRIMARY) {
-				SearchResultVO selectedItem = lvFindAll.getSelectionModel().getSelectedItem();
-				if (selectedItem != null) {
-					this.selectionMoveProperty.set(selectedItem);
-				}
-			}
 		});
 	}
 
@@ -541,29 +433,14 @@ public class TextSearchAndReplaceView extends BorderPane {
 
 	/**
 	 * 모두찾기
-	 * @throws NullPointerException
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 12. 28.
 	 */
 	@FXML
-	public void btnFindAllOnMouseClick() throws NullPointerException {
+	public void btnFindAllOnMouseClick() {
 		String content = contentProperty.get();
-
-		this.lvFindAll.getItems().clear();
-		int findAll = findAll(content, vo -> {
-			this.lvFindAll.getItems().add(vo);
-		});
-
-		//한개라도 찾으면.
-		if (findAll != -1) {
-			//일치하는 텍스트 정보를 화면에 표시
-			showMatchCount();
-			accFindAll.getPanes().get(0).setExpanded(true);
-		}
-
-		//		accFindAll
-
+		findAll(content, null);
 	}
 
 	/**
@@ -574,40 +451,12 @@ public class TextSearchAndReplaceView extends BorderPane {
 	 */
 	@FXML
 	public void btnMatchCountOnMouseClick() {
-		showMatchCount();
-	}
-
-	/**
-	 * 일치하는 검색 정보를 화면에 표시
-	 * @작성자 : KYJ
-	 * @작성일 : 2017. 2. 3.
-	 */
-	private void showMatchCount() {
-		final String findText = this.txtFindTextContent.getText();
-		showMatchCount(findText);
-	}
-	/**
-	 * 일치하는 검색 정보를 화면에 표시
-	 * @작성자 : KYJ
-	 * @작성일 : 2017. 2. 3.
-	 * @param findText
-	 */
-	private void showMatchCount(String findText) {
 		final String content = contentProperty.get();
-		showMatchCount(findText, content);
-	}
+		final String findText = this.txtFindTextContent.getText();
 
-	/**
-	 * 일치하는 검색 정보를 화면에 표시
-	 * @작성자 : KYJ
-	 * @작성일 : 2017. 2. 3.
-	 * @param findText
-	 * @param content
-	 */
-	private void showMatchCount(String findText, String content) {
 		if (ValueUtil.isEmpty(findText))
 			return;
-
+		
 		Platform.runLater(new Runnable() {
 
 			@Override
