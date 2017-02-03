@@ -608,6 +608,29 @@
 		</copy>
 		<!--[end] boilderpipe -->
 
+
+		<!--[start] mime4j-->
+		<copy todir="externalLibs">
+			<fileset dir="${basedir}\..\lib\mime4j">
+				<filename name="apache-mime4j-benchmark-0.7.2.jar" />
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="${basedir}\..\lib\mime4j">
+				<filename name="apache-mime4j-core-0.7.2.jar" />
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="${basedir}\..\lib\mime4j">
+				<filename name="apache-mime4j-dom-0.7.2.jar" />
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="${basedir}\..\lib\mime4j">
+				<filename name="apache-mime4j-storage-0.7.2.jar" />
+			</fileset>
+		</copy>
+		<!--[end] mime4j-->
 		<copy todir="pmdLibs">
 			<fileset dir="${basedir}\..\..\pmd.core\lib">
 			</fileset>
@@ -780,7 +803,10 @@
 				<include name="nekohtml-relocated-1.9.13.jar" />
 				<include name="nekohtml-1.9.13.jar" />
 
-
+				<include name="apache-mime4j-benchmark-0.7.2.jar" />
+				<include name="apache-mime4j-core-0.7.2.jar" />
+				<include name="apache-mime4j-dom-0.7.2.jar" />
+				<include name="apache-mime4j-storage-0.7.2.jar" />
 			</fileset>
 		</copy>
 
