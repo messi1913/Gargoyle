@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.adapter.IGargoyleChartAdapter;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -27,6 +29,8 @@ import javafx.scene.chart.XYChart.Data;
  *
  */
 public class BaseGoogleTrendAdapter implements IGargoyleChartAdapter<JSONObject, String> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseGoogleTrendAdapter.class);
 
 	private ObjectProperty<JSONObject> json = new SimpleObjectProperty<>();
 	private StringProperty version = new SimpleStringProperty();;
@@ -48,6 +52,14 @@ public class BaseGoogleTrendAdapter implements IGargoyleChartAdapter<JSONObject,
 
 			if (ValueUtil.isNotEmpty(n)) {
 				this.version.set(n.get("version").toString());
+
+
+				if("error".equals(n.get("status")))
+				{
+					LOGGER.info("ERROR STATUS : "  + n.toString());
+					return;
+				}
+
 				Map<String, Object> _table = (Map<String, Object>) n.get("table");
 				table.set(_table);
 
@@ -94,6 +106,9 @@ public class BaseGoogleTrendAdapter implements IGargoyleChartAdapter<JSONObject,
 	 */
 	@Override
 	public int getColumnCount() {
+		if(cols.get() == null)
+			return 0;
+
 		return (int) cols.get().stream().filter(v -> {
 			String string = v.get("id");
 			return string.startsWith("query");
