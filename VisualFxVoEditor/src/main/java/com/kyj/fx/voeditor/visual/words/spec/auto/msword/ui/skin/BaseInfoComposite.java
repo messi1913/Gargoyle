@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
@@ -30,11 +32,13 @@ import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.model.SpecResource;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.tabs.AbstractSpecTab;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodParameterDVO;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -51,6 +55,8 @@ import javafx.scene.layout.BorderPane;
 @FXMLController(value = "BaseInfoApp.fxml", isSelfController = true)
 public class BaseInfoComposite extends BorderPane {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseInfoComposite.class);
+
 	@FXML
 	private TextField lblProjectName, lblRealPath, lblFileName, lblPackage, lblImports, lblUserName;
 
@@ -58,9 +64,12 @@ public class BaseInfoComposite extends BorderPane {
 
 	private AbstractSpecTab projectInfoBaseInfoTab;
 
+	private File projectFile;
+	private File targetFile;
+
 	/**
 	 * Construnctor.
-	 * 
+	 *
 	 * @param projectInfoBaseInfoTab
 	 *
 	 * @param projectDir
@@ -70,24 +79,18 @@ public class BaseInfoComposite extends BorderPane {
 	public BaseInfoComposite(AbstractSpecTab projectInfoBaseInfoTab) throws Exception {
 		this.projectInfoBaseInfoTab = projectInfoBaseInfoTab;
 		FxUtil.loadRoot(getClass(), this);
+
 	}
 
-	@FXML
-	public void initialize() {
+	/**
+	 *
+	 * 코드 분석 시작 처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 3.
+	 */
+	public void start() {
 
-		SpecResource specResource = projectInfoBaseInfoTab.getSpecResource();
-		//TODO SVO형태로 받은경우는 없을 수 있음 처리해야함.
-
-		File projectFile = specResource.getProjectFile();
-		File targetFile = specResource.getTargetFile();
-
-		String projectFileName = projectFile.getName();
-
-		lblProjectName.setText(projectFileName);
-		lblRealPath.setText(targetFile.getAbsolutePath());
-		lblFileName.setText(targetFile.getName());
-		lblUserName.setText(SystemUtils.USER_NAME);
-
+		// 동적처리에 따라 API 함수 수정.
 		FileUtil.consumeJavaParser(targetFile, cu -> {
 
 			NameExpr name = cu.getPackage().getName();
@@ -115,8 +118,30 @@ public class BaseInfoComposite extends BorderPane {
 			};
 			service.start();
 
-		}, System.err::println);
+		} , err ->{
+			LOGGER.error(ValueUtil.toString(err));
+		});
 
+	}
+
+	@FXML
+	public void initialize() {
+
+		SpecResource specResource = projectInfoBaseInfoTab.getSpecResource();
+		//TODO SVO형태로 받은경우는 없을 수 있음 처리해야함.
+
+		projectFile = specResource.getProjectFile();
+		targetFile = specResource.getTargetFile();
+
+		String projectFileName = projectFile.getName();
+
+		lblProjectName.setText(projectFileName);
+		lblRealPath.setText(targetFile.getAbsolutePath());
+		lblFileName.setText(targetFile.getName());
+		lblUserName.setText(SystemUtils.USER_NAME);
+
+
+		//2017-02-03 by kyj 사양서 분석처리를 start() 함수로 분리.
 	}
 	//	}
 
@@ -172,7 +197,6 @@ public class BaseInfoComposite extends BorderPane {
 				Type type = p.getType();
 				String typeName = type.toString();
 				Comment comment = p.getComment();
-				System.out.println(p);
 				methodParameterDVOList.add(new MethodParameterDVO(varName, typeName, "", comment == null ? "" : comment.toString()));
 			}
 
@@ -191,7 +215,7 @@ public class BaseInfoComposite extends BorderPane {
 	 * 작성일 : 2016. 8. 14. 작성자 : KYJ
 	 *
 	 * package List 리턴
-	 * 
+	 *
 	 * @return
 	 ********************************/
 	public List<String> getImports() {

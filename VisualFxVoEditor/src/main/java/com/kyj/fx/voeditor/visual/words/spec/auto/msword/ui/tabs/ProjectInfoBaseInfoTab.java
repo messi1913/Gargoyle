@@ -25,6 +25,8 @@ import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.MethodDVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.ProgramSpecSVO;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.UserSourceMetaDVO;
 
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
@@ -53,7 +55,7 @@ class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<Borde
 	private CrudBaseGridView<MethodDVO> gv;
 	/**
 	 * 사양서생성 버튼.
-	 * 
+	 *
 	 * @최초생성일 2016. 8. 14.
 	 */
 	private Button btnGenerate;
@@ -105,21 +107,30 @@ class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<Borde
 
 			});
 
-			//			baseInfoController.getMethodData().addListener(new ListChangeListener<MethodDVO>() {
-			//				@Override
-			//				public void onChanged(javafx.collections.ListChangeListener.Change<? extends MethodDVO> c) {
-			//					if (c.next()) {
-			//						gv.getItems().addAll(c.getAddedSubList());
-			//					}
-			//				}
-			//			});
+			//이벤트 리스너로 그리드에 추가되는 항목이 존재하면 추가.
+			ObservableList<MethodDVO> methodData = baseInfoController.getMethodData();
+			methodData.addListener(new ListChangeListener<MethodDVO>() {
 
-			gv.getItems().addAll(baseInfoController.getMethodData());
+				@Override
+				public void onChanged(javafx.collections.ListChangeListener.Change<? extends MethodDVO> c) {
+					if (c.next()) {
+						if (c.wasAdded()) {
+							gv.getItems().addAll(c.getAddedSubList());
+						} else if (c.wasRemoved()) {
+							gv.getItems().removeAll(c.getRemoved());
+						}
+					}
+				}
+			});
+//			ObservableList<MethodDVO> items = gv.getItems();
+
+//			gv.getItems().addAll(methodData);
 
 			baseInfoController.setBottom(hboxButton);
 			root.setTop(baseInfoController);
 			root.setCenter(gv);
 
+			baseInfoController.start();
 		} catch (IOException | NullPointerException e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}
@@ -134,7 +145,7 @@ class ProjectInfoBaseInfoTab extends AbstractSpecTab implements SupplySkin<Borde
 	 * 작성일 : 2016. 8. 14. 작성자 : KYJ
 	 *
 	 * 사양서 생성하는 역할을 처리하는 클릭 이벤트.
-	 * 
+	 *
 	 * @param e
 	 ********************************/
 	public void btnGenerateOnMouseClick(MouseEvent e) {

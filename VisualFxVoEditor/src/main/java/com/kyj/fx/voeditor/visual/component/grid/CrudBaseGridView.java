@@ -382,7 +382,7 @@ public class CrudBaseGridView<T extends AbstractDVO> extends BorderPane {
 		gridview.getItems().addAll(items);
 	}
 
-	public List<T> getItems() {
+	public ObservableList<T> getItems() {
 		return gridview.getItems();
 	}
 

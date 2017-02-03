@@ -1113,8 +1113,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						if (javaProjectFileTreeItem != null) {
 
 							Tab tab = new Tab(sourceFile.getName(), new CodeAnalysisJavaTextArea(sourceFile));
-							loadNewSystemTab(sourceFile.getName(),
-									new SpecTabPane(new SpecResource(javaProjectFileTreeItem.getValue().getFile(), sourceFile), tab));
+							SpecResource resource = new SpecResource(javaProjectFileTreeItem.getValue().getFile(), sourceFile);
+							SpecTabPane newInstance = new SpecTabPane(resource, tab);
+							loadNewSystemTab(sourceFile.getName(), newInstance);
 
 						}
 
