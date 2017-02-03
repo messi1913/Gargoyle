@@ -232,7 +232,12 @@ final class NaverRealtimeSearchFactory {
 			Element previousElementSibling = e.previousElementSibling();
 			if (previousElementSibling != null) {
 				realtimeSearchVO = new RealtimeSearchVO();
-				realtimeSearchVO.setTitle(previousElementSibling.text());
+				String text = previousElementSibling.text();
+				if (text.length() >= 15) {
+					realtimeSearchVO.setTitle(text.substring(0, 15) + "...");
+				} else {
+					realtimeSearchVO.setTitle(text);
+				}
 
 				Elements liTags = e.getElementsByTag("li");
 				List<RealtimeSearchItemVO> items = liTags.stream().map(li -> {
