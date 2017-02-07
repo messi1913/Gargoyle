@@ -37,7 +37,14 @@ public class SVNCreateFunction implements Function<Properties, Boolean>, SVNKeyw
 		JSONArray parse = null;
 		try {
 			String string = ResourceLoader.getInstance().get(SVN_REPOSITORIES);
-			parse = (JSONArray) new JSONParser().parse(string);
+			if(string == null || string.length() == 0)
+			{
+				parse = new JSONArray();
+			}
+			else
+			{
+				parse = (JSONArray) new JSONParser().parse(string);
+			}
 		} catch (ParseException e) {
 			LOGGER.error(ValueUtil.toString(e));
 			return false;
@@ -69,7 +76,14 @@ public class SVNCreateFunction implements Function<Properties, Boolean>, SVNKeyw
 		JSONArray parse = null;
 		try {
 			String string = ResourceLoader.getInstance().get(SVN_REPOSITORIES);
-			parse = (JSONArray) new JSONParser().parse(string);
+			if(string == null || string.length() == 0)
+			{
+				parse = new JSONArray();
+			}
+			else
+			{
+				parse = (JSONArray) new JSONParser().parse(string);
+			}
 		} catch (ParseException e) {
 			LOGGER.error(ValueUtil.toString(e));
 			return false;

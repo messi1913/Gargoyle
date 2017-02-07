@@ -40,7 +40,7 @@ public class SVNInitLoader implements SCMInitLoader {
 	public <T extends SVNItem> List<T> load() {
 
 		String jsonArray = ResourceLoader.getInstance().get(ResourceLoader.SVN_REPOSITORIES);
-		if (jsonArray == null)
+		if (jsonArray == null || jsonArray.length() ==0)
 			return null;
 
 		JSONArray parse = null;

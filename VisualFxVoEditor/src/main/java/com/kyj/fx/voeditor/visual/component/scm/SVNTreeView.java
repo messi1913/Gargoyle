@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.scm;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -307,7 +308,7 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 				Properties result = controller.getResult();
 
 				if (result != null) {
-					
+
 					SVNItem newSVNItem = new SVNRepository(new JavaSVNManager(result));
 					TreeItem<SVNItem> createNode = scmTreeMaker.createNode(newSVNItem);
 					getRoot().getChildren().remove(selectedItem);
@@ -430,6 +431,8 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 	 */
 	public List<TreeItem<SVNItem>> loadRepository() {
 		List<SVNItem> load = loader.load();
+		if(load == null)
+			return Collections.emptyList();
 		return load.stream().map(v -> scmTreeMaker.createNode(v)).collect(Collectors.toList());
 	}
 
