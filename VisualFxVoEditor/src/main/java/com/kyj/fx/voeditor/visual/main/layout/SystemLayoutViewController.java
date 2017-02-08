@@ -44,6 +44,7 @@ import com.kyj.fx.voeditor.visual.component.popup.GagoyleWorkspaceOpenResourceVi
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.popup.SelectWorkspaceView;
 import com.kyj.fx.voeditor.visual.component.popup.XMLTextView;
+import com.kyj.fx.voeditor.visual.component.proxy.ProxyServerComposite;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
@@ -1921,4 +1922,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		loadNewSystemTab("Java-Task-Manager", javaProcessMonitor);
 	}
 
+	@FXML
+	public void miProxyServerOnAction(){
+		CloseableParent<BorderPane> javaProcessMonitor = new ProxyServerComposite();
+		loadNewSystemTab(ProxyServerComposite.class.getSimpleName(), javaProcessMonitor);
+	}
 }

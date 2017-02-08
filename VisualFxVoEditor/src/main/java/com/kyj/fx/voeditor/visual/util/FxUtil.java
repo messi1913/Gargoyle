@@ -65,6 +65,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker.State;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
 import javafx.print.PageLayout;
@@ -301,6 +302,17 @@ public class FxUtil {
 		return null;
 	}
 
+	private static <C> FXMLController getFxmlController(Class<C> controllerClass) throws GargoyleException {
+		return controllerClass.getAnnotation(FXMLController.class);
+	}
+
+	private static String getFxml(FXMLController controller) {
+		if (controller == null) {
+			return null;
+		}
+		return controller.value();
+	}
+
 	/********************************
 	 * 작성일 : 2016. 5. 21. 작성자 : KYJ
 	 *
@@ -322,12 +334,12 @@ public class FxUtil {
 			throw new NullPointerException("controller is null.");
 
 		String fullClassName = controllerClass.getCanonicalName();
-
-		FXMLController controller = controllerClass.getAnnotation(FXMLController.class);
+		FXMLController controller = getFxmlController(controllerClass);
 		if (controller == null) {
 			throw new GargoyleException("this is not FXMLController. check @FXMLController");
 		}
-		String fxml = controller.value();
+
+		String fxml = getFxml(controller);//controller.value();
 
 		if (ValueUtil.isEmpty(fxml))
 			throw new IllegalArgumentException("value is empty..");
@@ -365,8 +377,18 @@ public class FxUtil {
 		return newInstance(controllerClass, rootInstance, isSelfController, fxml, option, controllerAction);
 	}
 
-	private static <T, C> T newInstance(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml,
+	private static <T, C> T newInstance(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String _fxml,
 			Consumer<T> option, Consumer<C> controllerAction) throws Exception {
+
+		String fxml = _fxml;
+		if (fxml == null) {
+			FXMLController controller = getFxmlController(controllerClass);
+			if (controller == null) {
+				throw new GargoyleException("this is not FXMLController. check @FXMLController");
+			}
+			fxml = getFxml(controller);//controller.value();
+		}
+
 		URL resource = controllerClass.getResource(fxml);
 
 		FXMLLoader loader = createNewFxmlLoader();
@@ -387,24 +409,27 @@ public class FxUtil {
 		if (load == null) {
 			LOGGER.warn("load result is empty.. controller class : {} ", controllerClass);
 		}
-
 		Method[] declaredMethods = controllerClass.getDeclaredMethods();
 
-		// findfirst로 수정. @FxPostInitialize가 여러건있는경우를 잘못된 로직 유도를 방지.
+		//  2017-02-07 findfirst에서 어노테이션으로 선언된 다건의 함수를 호출하게 다시 유도.
+		//  findfirst로 수정. @FxPostInitialize가 여러건있는경우를 잘못된 로직 유도를 방지.
 		Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null).forEach(m -> {
 			//				.ifPresent((m -> {
 			if (m.getModifiers() == Modifier.PUBLIC) {
 				try {
+					if (instanceController != null) {
+						// Lazy Run.
+						Platform.runLater(() -> {
+							try {
 
-					// Lazy Run.
-					Platform.runLater(() -> {
-						try {
-							m.invoke(instanceController);
-						} catch (Exception e) {
-							LOGGER.error(ValueUtil.toString(e));
-						}
-					});
+								m.setAccessible(true);
+								m.invoke(instanceController);
 
+							} catch (Exception e) {
+								LOGGER.error(ValueUtil.toString(e));
+							}
+						});
+					}
 				} catch (Exception e) {
 					LOGGER.error(ValueUtil.toString(e));
 				}
@@ -1724,7 +1749,7 @@ public class FxUtil {
 		 * @작성일 : 2017. 1. 13.
 		 * @return
 		 */
-		public default Consumer<Exception> onError(){
+		public default Consumer<Exception> onError() {
 			return err -> LOGGER.error(ValueUtil.toString(err));
 		}
 	}

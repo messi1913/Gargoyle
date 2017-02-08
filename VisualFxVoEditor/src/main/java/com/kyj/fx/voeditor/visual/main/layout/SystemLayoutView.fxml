@@ -207,15 +207,9 @@
                         <MenuItem fx:id="miLogView" mnemonicParsing="false" onAction="#miLogViewOnAction" text="Log Viewer" />
 
 						<MenuItem fx:id="miJavaTaskMgr" mnemonicParsing="false" onAction="#miJavaTaskMgrOnAction" text="Java Task Mgr. Viewer" />
-<!-- 								<Menu mnemonicParsing="false" text="Naver"> -->
-<!-- 									<items> -->
-<!-- 										<MenuItem mnemonicParsing="false" onAction="#lblGoogleTrendOnAction" -->
-<!-- 											text="Google Trend"> -->
-<!-- 										</MenuItem> -->
-<!-- 									</items> -->
-<!-- 								</Menu> -->
+						<MenuItem fx:id="miProxyServer" mnemonicParsing="false" onAction="#miProxyServerOnAction" text="Proxy Server" />
 
-							</items>
+						</items>
 						</Menu>
 
 

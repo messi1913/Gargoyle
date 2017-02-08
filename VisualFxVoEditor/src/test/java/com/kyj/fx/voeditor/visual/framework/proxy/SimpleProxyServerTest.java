@@ -30,7 +30,7 @@ public class SimpleProxyServerTest {
 
 	@Before
 	public void setup() {
-		server = new SimpleProxyServer(8001, "localhost", 8000);
+		server = new SimpleProxyServer(8000, "localhost", 8001);
 	}
 
 	@Test

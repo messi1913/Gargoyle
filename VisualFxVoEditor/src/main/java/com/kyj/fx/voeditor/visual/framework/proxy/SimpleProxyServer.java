@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleRuntimeException;
+import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 /**
@@ -34,6 +35,7 @@ public class SimpleProxyServer {
 	private List<ProxyListener> onRequests = new ArrayList<>();
 	@SuppressWarnings("rawtypes")
 	private List<ProxyListener> onResponses = new ArrayList<>();
+	private List<ExceptionHandler> onError = new ArrayList<>();
 
 	/**
 	 * @return the onRequests
@@ -51,6 +53,10 @@ public class SimpleProxyServer {
 		return onResponses;
 	}
 
+	public SimpleProxyServer() {
+
+	}
+
 	public SimpleProxyServer(int localPort, String host, int remotePort) {
 		this.localPort = localPort;
 		this.host = host;
@@ -65,13 +71,35 @@ public class SimpleProxyServer {
 		return this.onResponses.add(listener);
 	}
 
-	public void start() throws GagoyleRuntimeException, IOException {
+	public boolean addOnErrorListener(ExceptionHandler handler) {
+		return this.onError.add(handler);
+	}
 
-		close();
+	public void start() {
+		try {
+			close();
+			validate();
+			Thread thread = new Thread(new Runnable() {
 
-		validate();
+				@Override
+				public void run() {
+					try {
+						runServer(host, remotePort, localPort);
+					} catch (IOException e) {
+						SimpleProxyServer.this.notifyErrorMessage(e);
+					}
+				}
+			});
 
-		runServer(this.host, this.remotePort, this.localPort); // never returns
+			thread.setPriority(4);
+			thread.start();
+		} catch (IOException e) {
+			notifyErrorMessage(e);
+		} // never returns
+	}
+
+	private void notifyErrorMessage(Exception e) {
+		this.onError.forEach(listener -> listener.handle(e));
 	}
 
 	/**
@@ -132,7 +160,7 @@ public class SimpleProxyServer {
 				fromServer.run();
 
 			} catch (IOException e) {
-				System.err.println(e);
+				notifyErrorMessage(e);
 			} finally {
 				try {
 					if (server != null)
@@ -140,6 +168,7 @@ public class SimpleProxyServer {
 					if (client != null)
 						client.close();
 				} catch (IOException e) {
+					notifyErrorMessage(e);
 				}
 			}
 		}
@@ -147,6 +176,48 @@ public class SimpleProxyServer {
 
 	static enum EVENT_TYPE {
 		REQUEST, RESPONSE;
+	}
+
+	/**
+	 * @return the host
+	 */
+	public final String getHost() {
+		return host;
+	}
+
+	/**
+	 * @return the localPort
+	 */
+	public final int getLocalPort() {
+		return localPort;
+	}
+
+	/**
+	 * @return the remotePort
+	 */
+	public final int getRemotePort() {
+		return remotePort;
+	}
+
+	/**
+	 * @param host the host to set
+	 */
+	public final void setHost(String host) {
+		this.host = host;
+	}
+
+	/**
+	 * @param localPort the localPort to set
+	 */
+	public final void setLocalPort(int localPort) {
+		this.localPort = localPort;
+	}
+
+	/**
+	 * @param remotePort the remotePort to set
+	 */
+	public final void setRemotePort(int remotePort) {
+		this.remotePort = remotePort;
 	}
 
 	/* (non-Javadoc)
@@ -159,8 +230,27 @@ public class SimpleProxyServer {
 
 			if (!ss.isClosed()) {
 				ss.close();
+				ss = null;
 			}
 
 		}
+	}
+
+	/**
+	 * @return
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 7.
+	 */
+	public boolean isRunning() {
+
+		if (ss != null) {
+
+			if (ss.isClosed()) {
+				return true;
+			}
+
+		}
+		return !closeRequest;
+
 	}
 }
