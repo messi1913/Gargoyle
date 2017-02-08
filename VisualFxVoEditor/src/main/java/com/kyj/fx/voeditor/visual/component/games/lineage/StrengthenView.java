@@ -1,0 +1,15 @@
+/********************************
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.component.games.lineage
+ *	작성일   : 2017. 2. 8.
+ *	작성자   : KYJ
+ *******************************/
+package com.kyj.fx.voeditor.visual.component.games.lineage;
+
+/**
+ * @author KYJ
+ *
+ */
+public class StrengthenView {
+
+}
