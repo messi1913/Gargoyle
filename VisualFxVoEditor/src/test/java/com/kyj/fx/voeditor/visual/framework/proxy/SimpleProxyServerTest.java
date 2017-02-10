@@ -38,7 +38,7 @@ public class SimpleProxyServerTest {
 		server.addOnRequestListener(new UTF8EncodingProxyListener() {
 
 			@Override
-			public void onAction(String str) {
+			public void onAction(int seq, String str) {
 				System.out.printf("\n request : \n%s", str);
 			}
 
@@ -47,7 +47,7 @@ public class SimpleProxyServerTest {
 		server.addOnResponseListener(new UTF8EncodingProxyListener() {
 
 			@Override
-			public void onAction(String str) {
+			public void onAction(int seq, String str) {
 				System.out.printf("\n response : \n%s", str);
 			}
 

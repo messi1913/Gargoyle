@@ -6,22 +6,17 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Test;
 
 import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
 import com.kyj.fx.voeditor.visual.framework.word.HtmlTextToMimeAdapter;
-
-import javafx.scene.control.IndexRange;
 
 /**
  * @author KYJ
@@ -227,10 +222,10 @@ public class ValueUtilTest {
 
 		System.out.println("#### before");
 		System.out.println(sb.toString());
-		String tabbing  = sb.toString();
+		String tabbing = sb.toString();
 
 		for (int i = 0; i < 3; i++) {
-			System.out.println("#### tabping " + i );
+			System.out.println("#### tabping " + i);
 			tabbing = ValueUtil.tapping(tabbing);
 			System.out.println(tabbing);
 		}
@@ -242,7 +237,7 @@ public class ValueUtilTest {
 		}
 
 		for (int i = 0; i < 3; i++) {
-			System.out.println("#### tabping " + i );
+			System.out.println("#### tabping " + i);
 			tabbing = ValueUtil.tapping(tabbing);
 			System.out.println(tabbing);
 		}
@@ -252,6 +247,19 @@ public class ValueUtilTest {
 			tabbing = ValueUtil.reverseTapping(tabbing);
 			System.out.println(tabbing);
 		}
+
+	}
+
+	@Test
+	public void atomicIntegerTest() {
+		AtomicInteger z = new AtomicInteger();
+
+		System.out.println(z.addAndGet(1));
+		System.out.println(z.addAndGet(1));
+		System.out.println(z.addAndGet(1));
+		System.out.println(z.addAndGet(1));
+		System.out.println(z.addAndGet(1));
+		System.out.println(z.addAndGet(1));
 
 	}
 

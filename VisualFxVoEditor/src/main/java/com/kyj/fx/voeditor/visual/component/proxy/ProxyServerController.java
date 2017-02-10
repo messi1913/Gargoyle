@@ -13,16 +13,19 @@ import org.fxmisc.richtext.CodeArea;
 
 import com.jfoenix.controls.JFXListView;
 import com.kyj.fx.voeditor.visual.component.text.IntegerField;
+import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
-import com.kyj.fx.voeditor.visual.framework.proxy.ProxyListener;
+import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.proxy.SimpleProxyServer;
 import com.kyj.fx.voeditor.visual.framework.proxy.UTF8EncodingProxyListener;
+import com.kyj.fx.voeditor.visual.main.Main;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 
 /**
  * @author KYJ
@@ -33,8 +36,6 @@ public class ProxyServerController implements Closeable {
 
 	private ProxyServerComposite proxyServerComposite;
 
-	@FXML
-	private TitledPane titServerInfo;
 	@FXML
 	private TextField txtRemoteHost;
 	@FXML
@@ -47,18 +48,15 @@ public class ProxyServerController implements Closeable {
 	private SimpleProxyServer server;
 	private ProxyServerLogManager log;
 
-	@FXML
-	public void initialize() {
-	}
-
 	public ProxyServerController() {
+
 		this.server = new SimpleProxyServer();
 		this.server.addOnRequestListener(new UTF8EncodingProxyListener() {
 
 			@Override
-			public void onAction(String str) {
+			public void onAction(int seq, String str) {
 				Platform.runLater(() -> {
-					lvLocalData.getItems().add(str);
+					lvLocalData.getItems().add(String.format("[%d] Content : %s", seq, str));
 				});
 			}
 		});
@@ -66,10 +64,10 @@ public class ProxyServerController implements Closeable {
 		server.addOnResponseListener(new UTF8EncodingProxyListener() {
 
 			@Override
-			public void onAction(String str) {
+			public void onAction(int seq, String str) {
 
 				Platform.runLater(() -> {
-					lvRemoteData.getItems().add(str);
+					lvRemoteData.getItems().add(String.format("[%d]Content : %s", seq, str));
 				});
 			}
 		});
@@ -84,6 +82,35 @@ public class ProxyServerController implements Closeable {
 			codeServerLog.appendText(message);
 		});
 
+	}
+
+	@FXML
+	public void initialize() {
+
+	}
+
+	@FxPostInitialize
+	public void afterInitialize() {
+		initLocal();
+		initRemote();
+	}
+
+	private void initLocal() {
+		MenuItem miClear = new MenuItem("Clear All");
+		lvLocalData.setContextMenu(new ContextMenu(miClear));
+
+		miClear.setOnAction(ev -> {
+			lvLocalData.getItems().clear();
+		});
+	}
+
+	private void initRemote() {
+		MenuItem miClear = new MenuItem("Clear All");
+		lvRemoteData.setContextMenu(new ContextMenu(miClear));
+
+		miClear.setOnAction(ev -> {
+			lvRemoteData.getItems().clear();
+		});
 	}
 
 	/**
@@ -174,6 +201,5 @@ public class ProxyServerController implements Closeable {
 				e.printStackTrace();
 			}
 		}
-
 	}
 }

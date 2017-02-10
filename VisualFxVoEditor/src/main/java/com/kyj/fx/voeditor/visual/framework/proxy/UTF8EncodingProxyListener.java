@@ -16,7 +16,7 @@ public interface UTF8EncodingProxyListener extends ProxyListener<String> {
 
 	static final Charset FOR_NAME = Charset.forName("UTF-8");
 
-	public void onAction(String str);
+	public void onAction(int seq, String str);
 
 	@Override
 	public default String convert(byte[] bytes) {
