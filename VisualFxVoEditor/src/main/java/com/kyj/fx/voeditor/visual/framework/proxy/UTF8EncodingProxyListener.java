@@ -12,15 +12,10 @@ import java.nio.charset.Charset;
  * @author KYJ
  *
  */
-public interface UTF8EncodingProxyListener extends ProxyListener<String> {
+public abstract class UTF8EncodingProxyListener extends EncodingProxyListener {
 
-	static final Charset FOR_NAME = Charset.forName("UTF-8");
-
-	public void onAction(int seq, String str);
-
-	@Override
-	public default String convert(byte[] bytes) {
-		return new String(bytes, FOR_NAME);
+	public UTF8EncodingProxyListener() {
+		super(Charset.forName("UTF-8"));
 	}
 
 }
