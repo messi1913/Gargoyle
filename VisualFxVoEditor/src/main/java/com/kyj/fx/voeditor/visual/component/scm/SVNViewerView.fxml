@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -12,16 +13,15 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
 
-<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65"
-	xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<top>
-		<HBox alignment="CENTER_RIGHT" spacing="5.0"
-			BorderPane.alignment="CENTER">
+		<HBox alignment="CENTER_RIGHT" spacing="5.0" BorderPane.alignment="CENTER">
 			<children>
-				<TextField />
-				<Button mnemonicParsing="false" text="Button" />
+				<Label text="Revision : "></Label>
+				<TextField fx:id="txtRevisionFilter"/>
+				<Button mnemonicParsing="false" text="Reload" onAction="#reloadOnAction"/>
 			</children>
 			<BorderPane.margin>
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -29,33 +29,35 @@
 		</HBox>
 	</top>
 	<center>
-		<SplitPane dividerPositions="0.2529928172386273" prefHeight="891.0"
-			prefWidth="1255.0" BorderPane.alignment="CENTER">
+		<SplitPane dividerPositions="0.2529928172386273" prefHeight="891.0" prefWidth="1255.0" BorderPane.alignment="CENTER">
 			<items>
-				<SplitPane dividerPositions="0.5" orientation="VERTICAL"
-					prefHeight="889.0" prefWidth="257.0">
+				<SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="889.0" prefWidth="257.0">
 					<items>
-						<AnchorPane fx:id="anTreePane">
-							<children>
-								<TreeView prefHeight="443.0" prefWidth="471.0"
-									AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-									AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
-									BorderPane.alignment="CENTER" />
-							</children>
-						</AnchorPane>
+                  <VBox>
+                     <children>
+                        <AnchorPane>
+                           <children>
+                              <Label fx:id="txtLastRevision" maxWidth="1.7976931348623157E308" style="-fx-graphic: url('META-INF/images/eclipse/elcl16/public_co.gif');" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <Button layoutY="15.0" mnemonicParsing="false" text="Reflesh" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+                              onAction="#btnRefleshOnAction"
+                               />
+                           </children>
+                        </AnchorPane>
+      						<AnchorPane fx:id="anTreePane" VBox.vgrow="ALWAYS">
+      							<children>
+      								<TreeView prefHeight="443.0" prefWidth="471.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="CENTER" />
+      							</children>
+      						</AnchorPane>
+                     </children>
+                  </VBox>
 						<BorderPane prefHeight="200.0" prefWidth="200.0">
 							<center>
-								<TableView fx:id="tbRevision" prefHeight="200.0"
-									prefWidth="200.0" BorderPane.alignment="CENTER" onMouseClicked="#tbRevisionOnMouseClick">
+								<TableView fx:id="tbRevision" onMouseClicked="#tbRevisionOnMouseClick" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 									<columns>
-										<TableColumn fx:id="colRevision" prefWidth="84.0"
-											text="Revision" />
-										<TableColumn fx:id="colUser" prefWidth="98.0"
-											text="User" />
-										<TableColumn fx:id="colDate" prefWidth="161.0"
-											text="Date" />
-										<TableColumn fx:id="colComment" prefWidth="223.0"
-											text="Comment" />
+										<TableColumn fx:id="colRevision" prefWidth="84.0" text="Revision" />
+										<TableColumn fx:id="colUser" prefWidth="98.0" text="User" />
+										<TableColumn fx:id="colDate" prefWidth="161.0" text="Date" />
+										<TableColumn fx:id="colComment" prefWidth="223.0" text="Comment" />
 									</columns>
 								</TableView>
 							</center>
@@ -66,9 +68,9 @@
 					<tabs>
 						<Tab fx:id="tabHistChart" closable="false" text="Hist Chart">
 							<content>
-								<BorderPane fx:id="borChart" >
+								<BorderPane fx:id="borChart">
 								<top>
-									<Label fx:id="lblRevisionChartTitle" text="Revision Graph" style=" -fx-font-size:15px;"></Label>
+									<Label fx:id="lblRevisionChartTitle" style=" -fx-font-size:15px;" text="Revision Graph" />
 								</top>
 								</BorderPane>
 							</content>
@@ -76,9 +78,9 @@
 
 						<Tab fx:id="tabSource" closable="false" text="Source">
 							<content>
-								<BorderPane fx:id="borSource" >
+								<BorderPane fx:id="borSource">
 								<top>
-									<Label fx:id="lblSourceTitle" text="Source" style=" -fx-font-size:15px;"></Label>
+									<Label fx:id="lblSourceTitle" style=" -fx-font-size:15px;" text="Source" />
 								</top>
 								</BorderPane>
 							</content>

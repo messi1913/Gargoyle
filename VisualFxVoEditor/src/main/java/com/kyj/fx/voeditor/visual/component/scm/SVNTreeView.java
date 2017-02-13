@@ -15,7 +15,9 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tmatesoft.svn.core.SVNException;
 
+import com.google.common.base.Predicate;
 import com.kyj.fx.voeditor.visual.functions.SVNDiscardLocationFunction;
 import com.kyj.fx.voeditor.visual.loder.SVNInitLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
@@ -90,23 +92,48 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 		scmTreeMaker = new ScmTreeMaker();
 		loader = new SVNInitLoader();
 		discardFunction = new SVNDiscardLocationFunction();
-		// SVNRepository scmItem = new SVNRepository();
-		// scmItem.setDir(true);
 
+
+		addContextMenus();
+		this.setOnMouseClicked(this::svnTreeOnMouseClick);
+	}
+
+
+	/**
+	 * revision 번호를 필터링하면서 초기 데이터 로드
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 13.
+	 * @param revisionHandler
+	 */
+	public void load(Predicate<Long> revisionHandler){
 		SVNRootItem svnRootItem = new SVNRootItem();
-		// TreeItem<SVNItem> createNode = scmTreeMaker.createNode(scmItem);
-
-		List<TreeItem<SVNItem>> loadRepository = loadRepository();
+		List<TreeItem<SVNItem>> loadRepository = loadRepository(revisionHandler);
 		TreeItem<SVNItem> value = new TreeItem<>(svnRootItem);
 		value.getChildren().addAll(loadRepository);
 		setRoot(value);
 		getRoot().setExpanded(true);
 		setShowRoot(false);
-		addContextMenus();
-		this.setOnMouseClicked(this::svnTreeOnMouseClick);
-
 	}
 
+	/**
+	 * 기본 데이터 로드
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 13.
+	 */
+	public void load(){
+		this.load(null);
+	}
+
+	public long getLatestRevision() throws SVNException{
+		ObservableList<TreeItem<SVNItem>> children = getRoot().getChildren();
+		if(children!=null && !children.isEmpty())
+		{
+			TreeItem<SVNItem> treeItem = children.get(0);
+			if(treeItem!=null && treeItem.getValue() !=null)
+				return treeItem.getValue().getLatestRevision();
+		}
+		return -1;
+	}
 	/***********************************************************************************/
 	/* 이벤트 구현 */
 
@@ -310,7 +337,7 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 				if (result != null) {
 
 					SVNItem newSVNItem = new SVNRepository(new JavaSVNManager(result));
-					TreeItem<SVNItem> createNode = scmTreeMaker.createNode(newSVNItem);
+					TreeItem<SVNItem> createNode = scmTreeMaker.createNode(newSVNItem, null);
 					getRoot().getChildren().remove(selectedItem);
 					getRoot().getChildren().add(createNode);
 				}
@@ -353,7 +380,7 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 
 			if (result != null) {
 				SVNItem newSVNItem = new SVNRepository(new JavaSVNManager(result));
-				TreeItem<SVNItem> createNode = scmTreeMaker.createNode(newSVNItem);
+				TreeItem<SVNItem> createNode = scmTreeMaker.createNode(newSVNItem, null);
 				getRoot().getChildren().add(createNode);
 			}
 
@@ -430,10 +457,13 @@ public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
 	 * @return
 	 */
 	public List<TreeItem<SVNItem>> loadRepository() {
+		return this.loadRepository(null);
+	}
+	public List<TreeItem<SVNItem>> loadRepository(Predicate<Long> revisionHandler) {
 		List<SVNItem> load = loader.load();
 		if(load == null)
 			return Collections.emptyList();
-		return load.stream().map(v -> scmTreeMaker.createNode(v)).collect(Collectors.toList());
+		return load.stream().map(v -> scmTreeMaker.createNode(v, revisionHandler)).collect(Collectors.toList());
 	}
 
 	/***********************************************************************************/

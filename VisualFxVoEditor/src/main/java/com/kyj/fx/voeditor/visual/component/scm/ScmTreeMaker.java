@@ -13,6 +13,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Predicate;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
@@ -34,7 +36,7 @@ public class ScmTreeMaker {
 	 * @return
 	 * @User KYJ
 	 */
-	public TreeItem<SVNItem> createNode(final SVNItem f) {
+	public TreeItem<SVNItem> createNode(final SVNItem f, Predicate<Long> revisionHandler) {
 		TreeItem<SVNItem> treeItem = new TreeItem<SVNItem>(f) {
 			private boolean isLeaf;
 			private boolean isFirstTimeChildren = true;
@@ -83,8 +85,19 @@ public class ScmTreeMaker {
 					List<SVNItem> childrens = f.getChildrens();
 					ObservableList<TreeItem<SVNItem>> children = FXCollections.observableArrayList();
 					for (SVNItem child : childrens) {
-						TreeItem<SVNItem> createNode = createNode(child);
-						children.add(createNode);
+						TreeItem<SVNItem> createNode = createNode(child, revisionHandler);
+						SVNItem _value = createNode.getValue();
+						if (_value != null) {
+							long revision = _value.getRevision();
+							if (revisionHandler == null)
+								children.add(createNode);
+							else {
+								if (revisionHandler.apply(revision))
+									children.add(createNode);
+							}
+
+						}
+
 					}
 					return children;
 				}
