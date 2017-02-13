@@ -80,6 +80,7 @@ import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.sun.star.lang.IllegalArgumentException;
 
 import javafx.collections.ObservableList;
+import javafx.scene.control.IndexRange;
 
 /**
  * @author KYJ
@@ -317,7 +318,7 @@ public class ValueUtil {
 
 		String _sql = sql;
 		// 주석에 대해당하는 문자들을 제거
-//		_sql = _sql.replaceAll(STRING_PATTERN, "");
+		//		_sql = _sql.replaceAll(STRING_PATTERN, "");
 		_sql = _sql.replaceAll(COMMENT_PATTERN, "");
 		// String pattern = "\\$\\w+|:\\w+";
 		String pattern = "\\$\\w+";
@@ -942,7 +943,11 @@ public class ValueUtil {
 	}
 
 	public static String leftTrim(String text) {
-		return text.replaceAll("^\\s+", "");
+		return leftReplace(text, "");
+	}
+
+	public static String leftReplace(String text, String replaceText) {
+		return text.replaceAll("^\\s+", replaceText);
 	}
 
 	/**
@@ -1776,6 +1781,33 @@ public class ValueUtil {
 		return System.getProperty("user.dir");
 	}
 
+	public static String tapping(String text) {
+		String[] split = text.split("\n");
+		if (split != null) {
+			Optional<String> reduce = Stream.of(split).map(str -> "\t".concat(str)).reduce((str1, str2) -> str1.concat("\n").concat(str2));
+			if (reduce.isPresent()) {
+				return reduce.get();
+			}
+		}
+		return text;
+	}
+
+	public static String reverseTapping(String text) {
+
+		String[] split = text.split("\n");
+		if (split != null) {
+			Optional<String> reduce = Stream.of(split).map(str -> {
+
+				return str.replaceAll("^(\t|[ ]{1,3})", "");
+
+				//				return str;
+			}).reduce((str1, str2) -> str1.concat("\n").concat(str2));
+			if (reduce.isPresent()) {
+				return reduce.get();
+			}
+		}
+		return text;
+	}
 
 	/**
 	 * TODO 메세지 처리 방안 기술.

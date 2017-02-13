@@ -12,7 +12,7 @@ package com.kyj.fx.voeditor.visual.framework.proxy;
  */
 public interface ProxyListener<T> {
 
-	public void onAction(T t);
+	public void onAction(int seq, T t);
 
 	public T convert(byte[] bytes);
 

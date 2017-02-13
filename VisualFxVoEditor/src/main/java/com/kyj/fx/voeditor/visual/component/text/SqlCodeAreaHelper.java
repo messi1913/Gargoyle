@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.scene.control.IndexRange;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -70,6 +71,56 @@ public class SqlCodeAreaHelper extends CodeAreaHelper<CodeArea> {
 			e.consume();
 		}
 
+		//////////////////////////////////////////////////////////////////////////////////////
+		/*선택된 행의 selection을 이동시키기 위한 처리  tab, shift + tab*/
+		//Tab
+		else if(e.getCode() == KeyCode.TAB && (!e.isControlDown() && !e.isShiftDown()))
+		{
+
+			if(e.isConsumed())
+				return;
+
+			String selectedText = codeArea.getSelectedText();
+			IndexRange selection = codeArea.getSelection();
+			int start = selection.getStart();
+			if(ValueUtil.isEmpty(selectedText))
+				return;
+
+			String tabbing = ValueUtil.tapping(selectedText);
+			replaceSelection(tabbing);
+			IndexRange selection2 = codeArea.getSelection();
+			int end = selection2.getEnd();
+			codeArea.selectRange( start, end);
+
+			e.consume();
+		}
+		//Shift + Tab
+		else if(e.getCode() == KeyCode.TAB && (!e.isControlDown() && e.isShiftDown()))
+		{
+			if(e.isConsumed())
+				return;
+
+			String selectedText = codeArea.getSelectedText();
+			IndexRange selection = codeArea.getSelection();
+
+			if(selection.getStart() == selection.getEnd())
+			{
+				codeArea.selectLine();
+				selectedText = codeArea.getSelectedText();
+				selection = codeArea.getSelection();
+				String tabbing = ValueUtil.reverseTapping(selectedText);
+				replaceSelection(tabbing);
+				codeArea.selectRange(selection.getStart(), selection.getStart());
+			}
+			else
+			{
+				String tabbing = ValueUtil.reverseTapping(selectedText);
+				replaceSelection(tabbing);
+				codeArea.selectRange(selection.getStart() , selection.getEnd() );
+			}
+			e.consume();
+		}
+		//////////////////////////////////////////////////////////////////////////////////////
 	}
 
 	/**

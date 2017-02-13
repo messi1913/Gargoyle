@@ -6,12 +6,11 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Test;
@@ -194,8 +193,8 @@ public class ValueUtilTest {
 		//		String mime = MimeHelper.toMime(content);
 
 		try {
-//			File file = new File("Sample.html");
-//			FileUtil.writeFile(file, content, forName);
+			//			File file = new File("Sample.html");
+			//			FileUtil.writeFile(file, content, forName);
 
 			AsynchWordExecutor executor = new AsynchWordExecutor(new HtmlTextToMimeAdapter(content));
 			executor.execute();
@@ -210,6 +209,57 @@ public class ValueUtilTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	@Test
+	public void tabbingTest() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("	select    \n");
+		sb.append("	*    \n");
+		sb.append("	from    \n");
+		sb.append(" tbm_sys_user    \n");
+
+		System.out.println("#### before");
+		System.out.println(sb.toString());
+		String tabbing = sb.toString();
+
+		for (int i = 0; i < 3; i++) {
+			System.out.println("#### tabping " + i);
+			tabbing = ValueUtil.tapping(tabbing);
+			System.out.println(tabbing);
+		}
+
+		for (int i = 0; i < 3; i++) {
+			System.out.println("#### un tabpping " + i);
+			tabbing = ValueUtil.reverseTapping(tabbing);
+			System.out.println(tabbing);
+		}
+
+		for (int i = 0; i < 3; i++) {
+			System.out.println("#### tabping " + i);
+			tabbing = ValueUtil.tapping(tabbing);
+			System.out.println(tabbing);
+		}
+
+		for (int i = 0; i < 6; i++) {
+			System.out.println("#### un tabpping " + i);
+			tabbing = ValueUtil.reverseTapping(tabbing);
+			System.out.println(tabbing);
+		}
+
+	}
+
+	@Test
+	public void atomicIntegerTest() {
+		AtomicInteger z = new AtomicInteger();
+
+		System.out.println(z.addAndGet(1));
+		System.out.println(z.addAndGet(1));
+		System.out.println(z.addAndGet(1));
+		System.out.println(z.addAndGet(1));
+		System.out.println(z.addAndGet(1));
+		System.out.println(z.addAndGet(1));
 
 	}
 

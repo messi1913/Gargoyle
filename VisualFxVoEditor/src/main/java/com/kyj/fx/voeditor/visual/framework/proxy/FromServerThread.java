@@ -21,22 +21,25 @@ public class FromServerThread extends ProxyThread {
 	byte[] reply = new byte[4096];
 	private InputStream streamFromServer;
 	private OutputStream streamToClient;
-
-	public FromServerThread(SimpleProxyServer server, InputStream streamFromServer, OutputStream streamToClient) {
+	private ConnectionInfo info;
+	public FromServerThread(SimpleProxyServer server, ConnectionInfo info, InputStream streamFromServer, OutputStream streamToClient) {
 		super(server);
 		this.streamFromServer = streamFromServer;
 		this.streamToClient = streamToClient;
+		this.info = info;
 	}
 
 	@Override
 	public void run() {
 		int bytesRead = -1;
+		int seq = 0;
 		try {
 
 			while ((bytesRead = streamFromServer.read(reply)) != -1) {
-				on(EVENT_TYPE.RESPONSE, reply);
+				on(seq, EVENT_TYPE.RESPONSE, reply);
 				streamToClient.write(reply, 0, bytesRead);
 				streamToClient.flush();
+				seq = server.resIncrementAndGet();
 			}
 
 		} catch (IOException e) {

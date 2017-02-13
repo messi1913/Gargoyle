@@ -21,25 +21,30 @@ public class FromClientThread extends ProxyThread {
 	final byte[] request = new byte[1024];
 	private InputStream streamFromClient;
 	private OutputStream streamToServer;
-
-	public FromClientThread(SimpleProxyServer server, InputStream streamFromClient, OutputStream streamToServer) {
+	private ConnectionInfo info;
+	public FromClientThread(SimpleProxyServer server, ConnectionInfo info, InputStream streamFromClient, OutputStream streamToServer) {
 		super(server);
 		this.streamFromClient = streamFromClient;
 		this.streamToServer = streamToServer;
+		this.info = info;
 	}
 
 	@Override
 	public void run() {
 		int bytesRead;
+		int seq = 0;
 		try {
 			//							System.out.printf("request : \n ");
 			while ((bytesRead = streamFromClient.read(request)) != -1) {
 
+				System.out.println("Local Socket : "  +  info.getClient().getLocalAddress());
+				System.out.println("Remote Socket : "  +  info.getClient().getRemoteSocketAddress());
 				//								String string = new String(request, Charset.forName("UTF-8"));
-				on(EVENT_TYPE.REQUEST, request);
+				on(seq, EVENT_TYPE.REQUEST, request);
 
 				streamToServer.write(request, 0, bytesRead);
 				streamToServer.flush();
+				seq = server.reqIncrementAndGet();
 			}
 
 		} catch (IOException e) {

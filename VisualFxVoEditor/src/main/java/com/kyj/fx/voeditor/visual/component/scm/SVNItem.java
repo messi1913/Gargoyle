@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNDirEntry;
+import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
 
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -121,7 +122,7 @@ public class SVNItem implements SCMItem<SVNItem> {
 			String svnPath = p.getURL().getPath();
 			String url = p.getURL().toString();
 			svnPath = url.replaceFirst(svnUrl, "");
-
+			long revision = p.getRevision();
 			String name = p.getName();
 			SVNItem svnItem = null;
 
@@ -130,21 +131,45 @@ public class SVNItem implements SCMItem<SVNItem> {
 			if (kind == SVNNodeKind.DIR) {
 				svnItem = new SVNDirItem(svnPath, name, manager);
 				svnItem.setDir(true);
-				LOGGER.info("{} .... Dir {}", name, true);
+				LOGGER.debug("{} .... Dir {}", name, true);
 			} else {
 				svnItem = new SVNFileItem(svnPath, name, manager);
 				svnItem.setDir(false);
-				LOGGER.info("{} .... File {}", name, true);
+				LOGGER.debug("{} .... File {}", name, true);
 			}
+
+			svnItem.setRevision(revision);
 
 			return svnItem;
 		}).collect(Collectors.toList());
 		return collect;
 	}
 
+	private long revision;
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 13.
+	 * @param revision
+	 */
+	private void setRevision(long revision) {
+		this.revision = revision;
+	}
+
+	public final long getRevision() {
+		return this.revision;
+	}
+
+	public final long getLatestRevision() throws SVNException{
+
+		if(this.manager ==null)
+			return -1;
+
+		return this.manager.getLatestRevision();
+	}
+
 	@Override
 	public String toString() {
-		return simpleName;
+		return String.format("%s   [%d]", simpleName, this.revision);
 	}
 
 }

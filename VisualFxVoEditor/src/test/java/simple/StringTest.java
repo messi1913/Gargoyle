@@ -38,6 +38,16 @@ public class StringTest {
 
 	}
 
+	@Test
+	public void charConcat(){
+		char[] chars = new char[5];
+		chars[0] = 'a';
+		chars[1] = 'b';
+		chars[2] = 'c';
+
+
+		System.out.print(new String(chars, 0, 3));
+	}
 	public static void main(String[] args) {
 		System.out.println(KEYWORD_PATTERN);
 	}

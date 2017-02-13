@@ -30,7 +30,7 @@ public class SimpleProxyServerTest {
 
 	@Before
 	public void setup() {
-		server = new SimpleProxyServer(8001, "localhost", 8000);
+		server = new SimpleProxyServer(8000, "localhost", 8001);
 	}
 
 	@Test
@@ -38,7 +38,7 @@ public class SimpleProxyServerTest {
 		server.addOnRequestListener(new UTF8EncodingProxyListener() {
 
 			@Override
-			public void onAction(String str) {
+			public void onAction(int seq, String str) {
 				System.out.printf("\n request : \n%s", str);
 			}
 
@@ -47,7 +47,7 @@ public class SimpleProxyServerTest {
 		server.addOnResponseListener(new UTF8EncodingProxyListener() {
 
 			@Override
-			public void onAction(String str) {
+			public void onAction(int seq, String str) {
 				System.out.printf("\n response : \n%s", str);
 			}
 

@@ -6,21 +6,21 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.scm;
 
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 
 import com.kyj.fx.voeditor.visual.component.TextBaseDiffAppController;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
-import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -45,6 +45,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.input.KeyCode;
@@ -105,9 +106,11 @@ public class SVNViewer extends BorderPane {
 	@FXML
 	private Tab tabSource;
 	@FXML
-	private Label lblSourceTitle;
+	private Label lblSourceTitle, /*SVN 형상의 최근 리비전 정보를 보여줌*/ txtLastRevision;
 	private JavaTextArea javaTextAre;
 	private LineChart<String, String> lineHist;
+	@FXML
+	private TextField txtRevisionFilter;
 
 	public SVNViewer() throws Exception {
 		FxUtil.loadRoot(SVNViewer.class, this);
@@ -118,6 +121,8 @@ public class SVNViewer extends BorderPane {
 		tvSvnView = new SVNTreeView();
 		tvSvnView.setOnAction(this::svnTreeViewOnAction);
 		tvSvnView.setOnKeyPressed(this::svnTreeVoewOnKeyPressed);
+		tvSvnView.load();
+
 		anTreePane.getChildren().set(0, tvSvnView);
 		AnchorPane.setLeftAnchor(tvSvnView, 0.0);
 		AnchorPane.setRightAnchor(tvSvnView, 0.0);
@@ -153,8 +158,26 @@ public class SVNViewer extends BorderPane {
 				}
 			}
 		});
+
+		displayLatestRevision();
 	}
 
+	@FXML
+	public void btnRefleshOnAction(){
+		displayLatestRevision();
+	}
+
+	/**
+	 * SVN형상의 최신 리비전 번호를 UI에 표시한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 13.
+	 */
+	public void displayLatestRevision(){
+		try {
+			long latestRevision = tvSvnView.getLatestRevision();
+			this.txtLastRevision.setText(String.format("Latest Revision : %d", latestRevision));
+		} catch (SVNException e) {}
+	}
 	/**********************************************************************************************/
 	/* 이벤트 처리항목 기술 */
 	// TODO Auto-generated constructor stub
@@ -282,9 +305,8 @@ public class SVNViewer extends BorderPane {
 			borChart.setCenter(lineHist);
 
 			String cat = item.getManager().cat(item.getPath());
-//			String simpleName = item.getSimpleName();
+			//			String simpleName = item.getSimpleName();
 			javaTextAre.setContent(cat);
-
 
 			tabPaneSVN.getSelectionModel().select(tabHistChart);
 		}
@@ -345,6 +367,22 @@ public class SVNViewer extends BorderPane {
 
 		}
 
+	}
+
+	@FXML
+	public void reloadOnAction(){
+		String revisionFilter = txtRevisionFilter.getText();
+		if(ValueUtil.isNotEmpty(revisionFilter))
+		{
+			try{
+				int revision = Integer.parseInt(revisionFilter);
+				tvSvnView.getRoot().getChildren().clear();
+				tvSvnView.load(r -> r >= revision);
+			}catch(NumberFormatException e)
+			{}
+
+
+		}
 	}
 	/**********************************************************************************************/
 	/* 그 밖의 API 기술 */

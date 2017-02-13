@@ -14,18 +14,30 @@ import com.kyj.fx.voeditor.visual.framework.proxy.SimpleProxyServer.EVENT_TYPE;
  */
 public class ProxyThread extends Thread {
 
-	private SimpleProxyServer server;
+	protected SimpleProxyServer server;
+
 
 	public ProxyThread(SimpleProxyServer server) {
 		this.server = server;
+		setDaemon(true);
+		setName("ProxyServer- Thread");
 	}
 
-	protected void on(EVENT_TYPE type, byte[] bytes) {
+	//	protected void on(EVENT_TYPE type, byte[] bytes) {
+	//
+	//		if (EVENT_TYPE.REQUEST == type) {
+	//			new ProxyEvent(server.getOnRequests(), bytes).fire();
+	//		} else {
+	//			new ProxyEvent(server.getOnResponses(), bytes).fire();
+	//		}
+	//	}
+
+	protected void on(int seq, EVENT_TYPE type, byte[] bytes) {
 
 		if (EVENT_TYPE.REQUEST == type) {
-			new ProxyEvent(server.getOnRequests(), bytes).fire();
+			new ProxyEvent(seq, server.getOnRequests(), bytes).fire();
 		} else {
-			new ProxyEvent(server.getOnResponses(), bytes).fire();
+			new ProxyEvent(seq, server.getOnResponses(), bytes).fire();
 		}
 	}
 
