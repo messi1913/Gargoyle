@@ -6,6 +6,10 @@ package simple;
  *	작성자   : KYJ
  *******************************/
 
+import java.io.File;
+
+import org.junit.Test;
+
 /**
  * @author KYJ
  *
@@ -101,6 +105,11 @@ public class SimpleTest {
 
 		return true;
 
+	}
+
+	@Test
+	public void test() {
+		new File(System.getProperty("user.home"), ".opsvnkit").mkdirs();
 	}
 
 }

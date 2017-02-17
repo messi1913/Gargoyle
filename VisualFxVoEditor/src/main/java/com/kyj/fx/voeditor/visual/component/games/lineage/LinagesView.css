@@ -1,0 +1,12 @@
+.tab-pane:top > .tab-header-area > .tab-header-background{
+	-fx-background-color: #3B414C;
+}
+
+.tab-pane:top > .tab-header-area > .headers-region > .tab:top{
+	-fx-background-color: #3B414C;
+}
+
+.tab-pane:top > .tab-header-area > .headers-region > .tab:top Label{
+	-fx-text-fill: white;
+}
+

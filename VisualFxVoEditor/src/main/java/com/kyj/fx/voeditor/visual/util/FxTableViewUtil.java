@@ -51,7 +51,7 @@ class FxTableViewUtil {
 	 * @return Object 테이블셀에 정의된 데이터를 리턴할 값으로, 리턴해주는 값이 엑셀에 write된다.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static  Object getValueByConverter(TableView<?> table, TableColumn<?, ?> column, int rowIndex) {
+	public static  Object getValue(TableView<?> table, TableColumn<?, ?> column, int rowIndex) {
 
 		Callback cellFactory = column.getCellFactory();
 		if (cellFactory != null) {
@@ -104,8 +104,8 @@ class FxTableViewUtil {
 	 * @param rowIndex
 	 * @return
 	 */
-	public static <T> Object getValueByConverter(TableView<?> table, int columnIndex, int rowIndex) {
-		return getValueByConverter(table, table.getColumns().get(columnIndex), rowIndex);
+	public static <T> Object getValue(TableView<?> table, int columnIndex, int rowIndex) {
+		return getValue(table, table.getColumns().get(columnIndex), rowIndex);
 	}
 
 	/********************************

@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.scm;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
 
+import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
@@ -25,7 +27,6 @@ import com.kyj.scm.manager.svn.java.JavaSVNManager;
  *
  */
 public class SVNItem implements SCMItem<SVNItem> {
-
 
 	private static Logger LOGGER = LoggerFactory.getLogger(SVNItem.class);
 	public String path;
@@ -114,8 +115,8 @@ public class SVNItem implements SCMItem<SVNItem> {
 		 * new SVNRepository("", url.toString(), manager);
 		 */
 
-//		if(_path.startsWith("/"))
-//			_path = _path.substring(1);
+		//		if(_path.startsWith("/"))
+		//			_path = _path.substring(1);
 
 		List<SVNDirEntry> list = manager.listEntry(_path, ex -> DialogUtil.showExceptionDailog(ex, "SVN Connection Fail"));
 		List<SVNItem> collect = list.stream().map(p -> {
@@ -124,6 +125,8 @@ public class SVNItem implements SCMItem<SVNItem> {
 			svnPath = url.replaceFirst(svnUrl, "");
 			long revision = p.getRevision();
 			String name = p.getName();
+			String author = p.getAuthor();
+			Date date = p.getDate();
 			SVNItem svnItem = null;
 
 			// scm에서 디렉토리인경우 /로 끝남.
@@ -137,15 +140,52 @@ public class SVNItem implements SCMItem<SVNItem> {
 				svnItem.setDir(false);
 				LOGGER.debug("{} .... File {}", name, true);
 			}
-
+			svnItem.setAuthor(author);
 			svnItem.setRevision(revision);
-
+			svnItem.setDate(date);
 			return svnItem;
 		}).collect(Collectors.toList());
 		return collect;
 	}
 
+	private Date date;
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 17.
+	 * @param date
+	 */
+	private void setDate(Date date) {
+		this.date = date;
+	}
+
+
+	/**
+	 * @return the date
+	 */
+	public final Date getDate() {
+		return date;
+	}
+
+	private String author;
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 16.
+	 * @param author
+	 */
+	private void setAuthor(String author) {
+		this.author = author;
+	}
+
+	/**
+	 * @return the author
+	 */
+	public final String getAuthor() {
+		return author;
+	}
+
 	private long revision;
+
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 2. 13.
@@ -159,9 +199,9 @@ public class SVNItem implements SCMItem<SVNItem> {
 		return this.revision;
 	}
 
-	public final long getLatestRevision() throws SVNException{
+	public final long getLatestRevision() throws SVNException {
 
-		if(this.manager ==null)
+		if (this.manager == null)
 			return -1;
 
 		return this.manager.getLatestRevision();
@@ -169,7 +209,9 @@ public class SVNItem implements SCMItem<SVNItem> {
 
 	@Override
 	public String toString() {
-		return String.format("%s   [%d]", simpleName, this.revision);
+
+		String dateAsStr = DateUtil.getDateAsStr(this.date, DateUtil.SYSTEM_DATEFORMAT_YYYY_MM_DD_HH_MM);
+		return String.format("%s   [%s] [%d] [%s]", simpleName, this.author, this.revision , dateAsStr);
 	}
 
 }

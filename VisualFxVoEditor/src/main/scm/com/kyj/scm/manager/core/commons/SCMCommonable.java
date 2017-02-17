@@ -14,7 +14,7 @@ import java.util.Properties;
  * @author KYJ
  *
  */
-public interface SCMCommonable extends SVNKeywords {
+public interface SCMCommonable extends SCMKeywords {
 
 	/**
 	 * 접속

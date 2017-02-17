@@ -19,6 +19,7 @@ import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -142,6 +143,9 @@ public class SVNViewer extends BorderPane {
 
 		tbRevision.getSelectionModel().setCellSelectionEnabled(true);
 		tbRevision.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		//		FxClipboardUtil.installCopyPasteHandler(tbRevision);
+		//		FxTableViewUtil.
+		FxUtil.installClipboardKeyEvent(tbRevision);
 
 		MenuItem menuDiff = new MenuItem("Diff");
 		menuDiff.setOnAction(this::menuDiffOnAction);
@@ -163,7 +167,7 @@ public class SVNViewer extends BorderPane {
 	}
 
 	@FXML
-	public void btnRefleshOnAction(){
+	public void btnRefleshOnAction() {
 		displayLatestRevision();
 	}
 
@@ -172,12 +176,14 @@ public class SVNViewer extends BorderPane {
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 2. 13.
 	 */
-	public void displayLatestRevision(){
+	public void displayLatestRevision() {
 		try {
 			long latestRevision = tvSvnView.getLatestRevision();
 			this.txtLastRevision.setText(String.format("Latest Revision : %d", latestRevision));
-		} catch (SVNException e) {}
+		} catch (SVNException e) {
+		}
 	}
+
 	/**********************************************************************************************/
 	/* 이벤트 처리항목 기술 */
 	// TODO Auto-generated constructor stub
@@ -370,18 +376,17 @@ public class SVNViewer extends BorderPane {
 	}
 
 	@FXML
-	public void reloadOnAction(){
+	public void reloadOnAction() {
 		String revisionFilter = txtRevisionFilter.getText();
-		if(ValueUtil.isNotEmpty(revisionFilter))
-		{
-			try{
+		if (ValueUtil.isNotEmpty(revisionFilter)) {
+			try {
 				int revision = Integer.parseInt(revisionFilter);
 				tvSvnView.getRoot().getChildren().clear();
 				tvSvnView.load(r -> r >= revision);
-			}catch(NumberFormatException e)
-			{}
-
-
+			} catch (NumberFormatException e) {
+			}
+		} else {
+			tvSvnView.load();
 		}
 	}
 	/**********************************************************************************************/

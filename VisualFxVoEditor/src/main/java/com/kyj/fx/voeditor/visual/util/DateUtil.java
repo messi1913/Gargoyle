@@ -246,6 +246,17 @@ public class DateUtil {
 		return new SimpleDateFormat(format, Locale.ENGLISH).format(date);
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 15.
+	 * @param when
+	 * @param systemDateformatYyyyMmDdHhMmSs
+	 * @return
+	 */
+	public static String toString(Date when, String format) {
+		return getDateAsStr(when, format);
+	}
+
 	public static String getDateAsStr(String date, String fromFormat, String toFormat) {
 		String returnDate = "";
 
@@ -265,6 +276,9 @@ public class DateUtil {
 	public static Date toDate(String data, String format) throws ParseException {
 		return new SimpleDateFormat(format).parse(data);
 	}
+
+
+
 
 	/**
 	 * 타임존에 대한 정보를 리턴함.
@@ -410,5 +424,7 @@ public class DateUtil {
 		}
 
 	}
+
+
 
 }

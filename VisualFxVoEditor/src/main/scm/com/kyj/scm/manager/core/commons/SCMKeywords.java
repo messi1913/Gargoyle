@@ -12,7 +12,9 @@ package com.kyj.scm.manager.core.commons;
  * @author KYJ
  *
  */
-public interface SVNKeywords {
+public interface SCMKeywords {
+	
+	
 
 	public static final String SVN_USER_ID = "svn.userId";
 	public static final String SVN_USER_PASS = "svn.userPass";
@@ -20,5 +22,11 @@ public interface SVNKeywords {
 	public static final String SVN_PATH = "svn.path";
 	public static final String SVN_PATH_WINDOW = "svn.path.window";
 	public static final String SVN_REPOSITORIES = "svn.repositores";
+	
+	
+	
+	
+	
+	
 
 }

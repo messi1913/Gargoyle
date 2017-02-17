@@ -1626,7 +1626,7 @@ public class FxUtil {
 				int row = tablePosition.getRow();
 
 				// tablePosition.getTableColumn().
-				Object valueByConverter = FxTableViewUtil.getValueByConverter(tbMetadata, column, row);
+				Object valueByConverter = FxTableViewUtil.getValue(tbMetadata, column, row);
 				String value = "";
 				if (ValueUtil.isNotEmpty(valueByConverter)) {
 					value = valueByConverter.toString();

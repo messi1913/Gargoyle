@@ -17,14 +17,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -35,7 +31,7 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 /**
  * 2016-12-09 File기반 환경설정에서 Database 기반 환경설정으로 변경 by kyj.
- * 
+ *
  * @author KYJ
  *
  */
@@ -123,7 +119,7 @@ public class ResourceLoaderDbProperties extends Properties {
 //	private boolean isEmpty(Object key) {
 ////		try (Connection con = supplier.get()) {
 ////
-////			
+////
 ////			Map<String, Object> findOne = DbUtil.findOne(con,
 ////					String.format("select 1 as v from tbm_sys_env where key ='%s'", key.toString()));
 ////
@@ -256,7 +252,7 @@ public class ResourceLoaderDbProperties extends Properties {
 				con.setAutoCommit(false);
 				Iterator<java.util.Map.Entry<Object, Object>> iterator = entrys.iterator();
 				Statement stat = con.createStatement();
-				
+
 				while (iterator.hasNext()) {
 					java.util.Map.Entry<Object, Object> next = iterator.next();
 					Object key = next.getKey();
@@ -270,7 +266,7 @@ public class ResourceLoaderDbProperties extends Properties {
 
 						Map<Object, Object> hashMap = new HashMap<>();
 						hashMap.put(key, value);
-						
+
 						if (findOne(key) !=null) {
 							stat.addBatch(String.format(update, value.toString(), key.toString()));
 						} else {
@@ -281,7 +277,7 @@ public class ResourceLoaderDbProperties extends Properties {
 						e.printStackTrace();
 					}
 				}
-				
+
 				int[] executeBatch = stat.executeBatch();
 				int sum = IntStream.of(executeBatch).sum();
 

@@ -5,7 +5,7 @@
  *              2016.7          API 추가. Commit , Log등
  *	작성자   : KYJ
  *******************************/
-package com.kyj.scm.manager.svn.java;
+package com.kyj.scm.manager.dimmension;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -22,14 +22,13 @@ import java.util.stream.Collectors;
 
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
-import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
-import com.kyj.scm.manager.core.commons.SCMKeywords;
+import com.kyj.scm.manager.core.commons.DimKeywords;
+import com.sun.star.uno.RuntimeException;
 
 /**
  * SVN명령어를 모아놓은 매니저클래스
@@ -38,26 +37,27 @@ import com.kyj.scm.manager.core.commons.SCMKeywords;
  *
  */
 
-public class JavaSVNManager implements SCMKeywords, SVNFormatter {
-	private SVNCat catCommand;
+public class DimmensionManager implements DimKeywords, DimFormatter {
 
-	private SVNList listCommand;
+	private DimCat catCommand;
 
-	private SVNLog logCommand;
+	private DimList listCommand;
 
-	private SVNCheckout checkoutCommand;
+	private DimLog logCommand;
 
-	private SVNDiff diffCommand;
+	private DimCheckout checkoutCommand;
 
-	private SVNImport svnImport;
+	private DimDiff diffCommand;
 
-	private SVNCommit svnCommit;
+	private DimImport importCommand;
 
-	private SVNResource svnResource;
+	private DimCommit commitCommand;
+
+	private DimResource resourceCommand;
 
 	private Properties properties;
 
-	public JavaSVNManager(Properties properties) {
+	public DimmensionManager(Properties properties) {
 		init(properties);
 	}
 
@@ -70,14 +70,14 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 */
 	void init(Properties properties) {
 		this.properties = properties;
-		this.checkoutCommand = new SVNCheckout(this, properties);
-		this.catCommand = new SVNCat(this, properties);
-		this.listCommand = new SVNList(this, properties);
-		this.logCommand = new SVNLog(this, properties);
-		this.diffCommand = new SVNDiff(this, properties);
-		this.svnImport = new SVNImport(this, properties);
-		this.svnCommit = new SVNCommit(this, properties);
-		this.svnResource = new SVNResource(this, properties);
+		this.checkoutCommand = new DimCheckout(this, properties);
+		this.catCommand = new DimCat(this, properties);
+		this.listCommand = new DimList(this, properties);
+		this.logCommand = new DimLog(this, properties);
+		this.diffCommand = new DimDiff(this, properties);
+		this.importCommand = new DimImport(this, properties);
+		this.commitCommand = new DimCommit(this, properties);
+		this.resourceCommand = new DimResource(this, properties);
 	}
 
 	/**
@@ -87,10 +87,10 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @param url
 	 * @return
 	 */
-	public static final JavaSVNManager createNewInstance(String url) {
+	public static final DimmensionManager createNewInstance(String url) {
 		Properties properties = new Properties();
-		properties.put(JavaSVNManager.SVN_URL, url);
-		return new JavaSVNManager(properties);
+		properties.put(DimmensionManager.DIM_URL, url);
+		return new DimmensionManager(properties);
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @return
 	 */
 	public boolean isContainsURL() {
-		return this.properties.containsKey(SVN_URL) && this.properties.containsValue(SVN_URL);
+		return this.properties.containsKey(DIM_URL) && this.properties.containsValue(DIM_URL);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @return
 	 */
 	public boolean isContainsUserId() {
-		return this.properties.containsKey(SVN_USER_ID) && this.properties.containsValue(SVN_USER_ID);
+		return this.properties.containsKey(DIM_USER_ID) && this.properties.containsValue(DIM_USER_ID);
 	}
 
 	/**
@@ -123,14 +123,14 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @return
 	 */
 	public String getUrl() {
-		Object objURL = this.properties.get(SVN_URL);
+		Object objURL = this.properties.get(DIM_URL);
 		if (objURL == null)
-			throw new GagoyleParamEmptyException("SVN URL IS EMPTY.");
+			throw new GagoyleParamEmptyException("Dimmension URL IS EMPTY.");
 		return objURL.toString();
 	}
 
 	public Object getUserId() {
-		return this.properties.get(SVN_USER_ID);
+		return this.properties.get(DIM_USER_ID);
 		//		if (objUserId == null)
 		//			throw new GagoyleParamEmptyException("SVN ID IS EMPTY.");
 		//		return objUserId.toString();
@@ -353,7 +353,7 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @throws Exception
 	 */
 	public void doImport(String from, SVNURL to) throws Exception {
-		svnImport.importProject(from, to);
+		importCommand.importProject(from, to);
 	}
 
 	/**
@@ -368,11 +368,11 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @param data
 	 * @param commitMessage
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 *             신규파일이 아닌 , 존재하는 파일 경우 에러발생.
 	 */
-	public SVNCommitInfo commit_new(String relativePath, String fileName, byte[] data, String commitMessage) throws SVNException {
-		return svnCommit.addFileCommit(relativePath, fileName, data, commitMessage);
+	public SVNCommitInfo commit_new(String relativePath, String fileName, byte[] data, String commitMessage) throws Exception {
+		return commitCommand.addFileCommit(relativePath, fileName, data, commitMessage);
 	}
 
 	/**
@@ -386,12 +386,12 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @param inputStream
 	 * @param commitMessage
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 *             신규파일이 아닌 , 존재하는 파일 경우 에러발생.
 	 */
 	public SVNCommitInfo commit_new(String relativePath, String fileName, InputStream inputStream, String commitMessage)
-			throws SVNException {
-		return svnCommit.addFileCommit(relativePath, fileName, inputStream, commitMessage);
+			throws Exception {
+		return commitCommand.addFileCommit(relativePath, fileName, inputStream, commitMessage);
 	}
 
 	/**
@@ -403,10 +403,10 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @param relativePath
 	 * @param commitMessage
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 */
-	public SVNCommitInfo commit_new(String relativePath, String commitMessage) throws SVNException {
-		return svnCommit.addDirCommit(relativePath, commitMessage);
+	public SVNCommitInfo commit_new(String relativePath, String commitMessage) throws Exception {
+		return commitCommand.addDirCommit(relativePath, commitMessage);
 	}
 
 	/**
@@ -421,12 +421,12 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @param newData
 	 * @param commitMessage
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 * @throws IOException
 	 */
 	public SVNCommitInfo commit_modify(String relativePath, String fileName, InputStream oldData, InputStream newData, String commitMessage)
-			throws SVNException, IOException {
-		return svnCommit.modifyFileCommit(relativePath, fileName, oldData, newData, commitMessage);
+			throws Exception, IOException {
+		return commitCommand.modifyFileCommit(relativePath, fileName, oldData, newData, commitMessage);
 	}
 
 	/**
@@ -439,13 +439,13 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @param newData
 	 * @param commitMessage
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 * @throws IOException
 	 */
 	public SVNCommitInfo commit_modify(String relativePath, String fileName, InputStream newData, String commitMessage)
-			throws SVNException, IOException {
+			throws Exception, IOException {
 		String headerRevisionContent = this.catCommand.cat(relativePath.concat("/").concat(fileName));
-		return svnCommit.modifyFileCommit(relativePath, fileName, new ByteArrayInputStream(headerRevisionContent.getBytes("UTF-8")),
+		return commitCommand.modifyFileCommit(relativePath, fileName, new ByteArrayInputStream(headerRevisionContent.getBytes("UTF-8")),
 				newData, commitMessage);
 	}
 
@@ -459,15 +459,15 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @param revision
 	 * @param commitMessage
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 * @throws IOException
 	 */
-	public SVNCommitInfo commit_modify_reverse(String relativePath, String fileName, long revision) throws SVNException, IOException {
+	public SVNCommitInfo commit_modify_reverse(String relativePath, String fileName, long revision) throws Exception, IOException {
 
 		String currentContent = this.catCommand.cat(relativePath.concat("/").concat(fileName));
 		String revertContent = this.catCommand.cat(relativePath.concat("/").concat(fileName), String.valueOf(revision));
 
-		return svnCommit.modifyFileCommit(relativePath, fileName, new ByteArrayInputStream(currentContent.getBytes("UTF-8")),
+		return commitCommand.modifyFileCommit(relativePath, fileName, new ByteArrayInputStream(currentContent.getBytes("UTF-8")),
 				new ByteArrayInputStream(revertContent.getBytes("UTF-8")), "Revert");
 
 	}
@@ -478,14 +478,14 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @param paths
 	 * @param commitMessage
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 * @throws IOException
 	 *
 	 * @deprecated 서버간의 API연계에서 사용되면 안됨. 해당 API가 사용되는 때는 FileSystem으로 버젼관리가 되는 상황에서만 사용되야함. (( 로컬시스템으로 svn파일이 관리되는 경우에만 사용. ))
 	 */
 	@Deprecated
-	public SVNCommitInfo commitClient(File[] paths, String commitMessage) throws SVNException, IOException {
-		return svnCommit.commitClient(paths, commitMessage);
+	public SVNCommitInfo commitClient(File[] paths, String commitMessage) throws Exception, IOException {
+		return commitCommand.commitClient(paths, commitMessage);
 	}
 
 	/**
@@ -495,26 +495,26 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @작성일 : 2016. 7. 14.
 	 * @param relativePath
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 */
-	public boolean isExistsPath(String relativePath) throws Exception {
-		return this.svnResource.isExists(relativePath);
+	public boolean isExistsPath(String projSpec, String relativePath) throws Exception {
+		return this.resourceCommand.isExists(projSpec, relativePath);
 	}
 
-	public Collection<SVNLogEntry> getAllLogs(String relativePath) throws SVNException {
-		return getAllLogs(relativePath, 0);
+	public Collection<SVNLogEntry> getAllLogs(String projSpec, String relativePath) throws Exception {
+		return getAllLogs(projSpec, relativePath, 0);
 	}
 
-	public Collection<SVNLogEntry> getAllLogs(long startRevision, long endRevision) throws SVNException {
+	public Collection<SVNLogEntry> getAllLogs(long startRevision, long endRevision) throws Exception {
 		return getAllLogs("", startRevision, endRevision);
 	}
 
-	public Collection<SVNLogEntry> getAllLogs(String relativePath, long startRevision) throws SVNException {
-		long latestRevision = this.svnResource.getLatestRevision();
+	public Collection<SVNLogEntry> getAllLogs(String projSpec, String relativePath, long startRevision) throws Exception {
+		long latestRevision = this.resourceCommand.getLatestRevision(projSpec);
 		return getAllLogs(relativePath, startRevision, latestRevision);
 	}
 
-	public Collection<SVNLogEntry> getAllLogs(String relativePath, long startRevision, long endRevision) throws SVNException {
+	public Collection<SVNLogEntry> getAllLogs(String relativePath, long startRevision, long endRevision) throws Exception {
 		return this.logCommand.getAllLogs(relativePath, startRevision, endRevision);
 	}
 
@@ -523,12 +523,10 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @작성일 : 2016. 7. 19.
 	 * @param date
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 */
-	public Collection<SVNLogEntry> getAllLogs(Date date) throws SVNException {
-		long startRevision = getRevision(date);
-		long endRevision = getRevision(date);
-		return getAllLogs(startRevision, endRevision);
+	public Collection<SVNLogEntry> getAllLogs(Date date) throws Exception {
+		throw new RuntimeException("Not Yet Support");
 	}
 
 	/**
@@ -537,10 +535,10 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 */
-	public long getLatestRevision() throws SVNException {
-		return this.svnResource.getLatestRevision();
+	public long getLatestRevision(String projSpec) throws Exception {
+		return this.resourceCommand.getLatestRevision(projSpec);
 	}
 
 	/**
@@ -550,11 +548,11 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @작성일 : 2016. 7. 14.
 	 * @param date
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 */
-	public long getRevision(Date date) throws SVNException {
-		long r = this.svnResource.getRevision(date);
-		return r < svnResource.getLatestRevision() ? r + 1 : r;
+	public long getRevision(String projSpec, Date date) throws Exception {
+		long r = this.resourceCommand.getRevision(date);
+		return r < resourceCommand.getLatestRevision(projSpec) ? r + 1 : r;
 	}
 
 	/**
@@ -565,17 +563,17 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @return
 	 */
 	public String getRootUrl() {
-		return this.svnResource.getRootUrl();
+		return this.resourceCommand.getRootUrl();
 	}
 
 	/********************************
 	 * 작성일 :  2016. 7. 31. 작성자 : KYJ
 	 *
 	 * SVN 서버 접속 여부를 확인
-	 * @throws SVNException
+	 * @throws Exception
 	 ********************************/
-	public void ping() throws SVNException {
-		this.svnResource.ping();
+	public void ping() throws Exception {
+		this.resourceCommand.ping();
 	}
 
 	/********************************
@@ -584,10 +582,10 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * SVN 서버 RepositoryUUID를 리턴.
 	 *
 	 * @return
-	 * @throws SVNException
+	 * @throws Exception
 	 ********************************/
-	public String getRepositoryUUID() throws SVNException {
-		return this.svnResource.getRepositoryUUID();
+	public String getRepositoryUUID() throws Exception {
+		return this.resourceCommand.getRepositoryUUID();
 	}
 
 	/**
@@ -602,7 +600,7 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @throws Exception
 	 */
 	public SVNURL getSvnUrlByFileSystem(File file) throws Exception {
-		return this.svnResource.getSvnUrlByFileSystem(file, SVNRevision.create(-1L));
+		throw new RuntimeException("Not Yet Support");
 	}
 
 	/**

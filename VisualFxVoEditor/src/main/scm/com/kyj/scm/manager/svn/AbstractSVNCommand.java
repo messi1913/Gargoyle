@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
 import com.kyj.scm.manager.core.commons.SCMCommonable;
-import com.kyj.scm.manager.core.commons.SVNKeywords;
+import com.kyj.scm.manager.core.commons.SCMKeywords;
 
 /**
  * SVN에 접속하기 위한 메타정보를 처리한다.
@@ -23,7 +23,7 @@ import com.kyj.scm.manager.core.commons.SVNKeywords;
  *
  */
 @Deprecated
-public abstract class AbstractSVNCommand implements SCMCommonable, SVNKeywords {
+public abstract class AbstractSVNCommand implements SCMCommonable, SCMKeywords {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(AbstractSVNCommand.class);
 

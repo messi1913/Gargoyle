@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.component.scm.SVNRepository;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.kyj.scm.manager.core.commons.SVNKeywords;
+import com.kyj.scm.manager.core.commons.SCMKeywords;
 
 /**
  * SVN 저장소 정보를 삭제하는 역할을 함.
@@ -27,7 +27,7 @@ import com.kyj.scm.manager.core.commons.SVNKeywords;
  * @author KYJ
  *
  */
-public class SVNDiscardLocationFunction implements Function<SVNRepository, Boolean>, SVNKeywords {
+public class SVNDiscardLocationFunction implements Function<SVNRepository, Boolean>, SCMKeywords {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(SVNDiscardLocationFunction.class);
 

@@ -4,23 +4,20 @@
  *	작성일   : 2016. 3. 23.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.scm.manager.svn.java;
+package com.kyj.scm.manager.dimmension;
 
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
-import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
-import org.tmatesoft.svn.core.io.SVNRepository;
-import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
-import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
+import com.kyj.scm.manager.core.commons.DimKeywords;
 import com.kyj.scm.manager.core.commons.SCMCommonable;
-import com.kyj.scm.manager.core.commons.SCMKeywords;
+import com.serena.dmclient.api.DimensionsConnection;
+import com.serena.dmclient.api.DimensionsConnectionDetails;
+import com.serena.dmclient.api.DimensionsConnectionManager;
+import com.serena.dmclient.api.DimensionsObjectFactory;
+import com.serena.dmclient.api.Project;
 
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
@@ -30,24 +27,22 @@ import kyj.Fx.dao.wizard.core.util.ValueUtil;
  * @author KYJ
  *
  */
-abstract class AbstractSVN implements SCMCommonable, SCMKeywords {
+abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSVN.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDimmension.class);
 
 	/** [시작] 일반상수 정의 */
 	public static final String SVN_REVISION_HISTORY_ROW_COUNT = "15";
+
 	/** [끝] 일반상수 정의 */
 
 	private Properties properties;
 
-	private SVNURL svnURL;
-	private SVNRepository repository;
-	private ISVNAuthenticationManager authManager;
-	private SVNClientManager svnManager;
-	private final JavaSVNManager javaSVNManager;
+	private final DimmensionManager dimManager;
+	private DimensionsConnection connection;
 
-	public AbstractSVN(JavaSVNManager javaSVNManager, Properties properties) {
-		this.javaSVNManager = javaSVNManager;
+	public AbstractDimmension(DimmensionManager dimManager, Properties properties) {
+		this.dimManager = dimManager;
 		init(properties);
 	}
 
@@ -89,57 +84,63 @@ abstract class AbstractSVN implements SCMCommonable, SCMKeywords {
 		validate();
 
 		try {
-			svnURL = SVNURL.parseURIEncoded(getUrl());
-			repository = SVNRepositoryFactory.create(svnURL);
-
+			DimensionsConnectionDetails details = new DimensionsConnectionDetails();
 			if ((getUserId() == null && getUserPassword() == null) || (getUserId().isEmpty() && getUserPassword().isEmpty())) {
-				authManager = SVNWCUtil.createDefaultAuthenticationManager(SVNWCUtil.getDefaultConfigurationDirectory());
+				throw new RuntimeException("Properties Infomation is empty.");
 			} else {
-				authManager = SVNWCUtil.createDefaultAuthenticationManager(getUserId(), getUserPassword().toCharArray());
+				details.setUsername(getUserId());
+				details.setPassword(getUserPassword());
+				details.setDbName(getDbName());
+				details.setDbConn(getDbConn());
+				details.setServer(getUrl());
 			}
-
-			repository.setAuthenticationManager(authManager);
-			
-
-			DefaultSVNOptions options = new DefaultSVNOptions();
-			svnManager = SVNClientManager.newInstance(options, authManager);
-
-			//			svnManager.dispose();
-			//			repository.closeSession();
-		} catch (SVNException e) {
+			connection = DimensionsConnectionManager.getConnection(details);
+		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
-//			throw new RuntimeException(e);
 		}
 
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 16.
+	 * @return
+	 */
+	private String getDbConn() {
+		return this.properties.getProperty(DIM_DB_CONN);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 16.
+	 * @return
+	 */
+	private String getDbName() {
+		return this.properties.getProperty(DIM_DB_NAME);
+	}
+
 	@Override
 	public String getUserId() {
-		return this.properties.getProperty(SVN_USER_ID);
+		return this.properties.getProperty(DIM_USER_ID);
 	}
 
 	@Override
 	public String getUserPassword() {
-		return this.properties.getProperty(SVN_USER_PASS);
+		return this.properties.getProperty(DIM_USER_PASS);
 	}
 
 	@Override
 	public String getUrl() {
-		return this.properties.getProperty(SVN_URL);
+		return this.properties.getProperty(DIM_URL);
 	}
 
 	/**
-	 * @return the svnURL
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 16.
+	 * @return
 	 */
-	public final SVNURL getSvnURL() {
-		return svnURL;
-	}
-
-	/**
-	 * @return the repository
-	 */
-	public final SVNRepository getRepository() {
-		return repository;
+	public final DimensionsObjectFactory getDimmensionObjectFactory() {
+		return connection.getObjectFactory();
 	}
 
 	/********************************
@@ -152,25 +153,20 @@ abstract class AbstractSVN implements SCMCommonable, SCMKeywords {
 		return properties;
 	}
 
-	/********************************
-	 * 작성일 : 2016. 5. 4. 작성자 : KYJ
-	 *
-	 *
-	 * @return
-	 ********************************/
-	public ISVNAuthenticationManager getAuthManager() {
-		return authManager;
+	public DimensionsConnection getConnection(){
+		return this.connection;
 	}
-
-	public SVNClientManager getSvnManager() {
-		return svnManager;
-	}
-
 	/**
 	 * @return the javaSVNManager
 	 */
-	public final JavaSVNManager getJavaSVNManager() {
-		return javaSVNManager;
+	public final DimmensionManager getDimmensionManager() {
+		return dimManager;
+	}
+
+	public Project getProject(String projSpec) {
+		DimensionsObjectFactory fac = getDimmensionObjectFactory();
+		Project projObj = fac.getProject(projSpec);
+		return projObj;
 	}
 
 }

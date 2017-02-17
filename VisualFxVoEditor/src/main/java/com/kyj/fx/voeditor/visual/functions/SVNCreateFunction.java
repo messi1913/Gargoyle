@@ -21,13 +21,13 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.EncrypUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.kyj.scm.manager.core.commons.SVNKeywords;
+import com.kyj.scm.manager.core.commons.SCMKeywords;
 
 /**
  * @author KYJ
  *
  */
-public class SVNCreateFunction implements Function<Properties, Boolean>, SVNKeywords {
+public class SVNCreateFunction implements Function<Properties, Boolean>, SCMKeywords {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(SVNCreateFunction.class);
 
@@ -56,7 +56,7 @@ public class SVNCreateFunction implements Function<Properties, Boolean>, SVNKeyw
 			while (iterator.hasNext()) {
 				JSONObject next = iterator.next();
 
-				if (url.equals(next.get(SVNKeywords.SVN_URL))) {
+				if (url.equals(next.get(SCMKeywords.SVN_URL))) {
 					isDuple = true;
 					break;
 				}

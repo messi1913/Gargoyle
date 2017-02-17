@@ -15,7 +15,7 @@ import com.kyj.fx.voeditor.visual.functions.SVNCreateFunction;
 import com.kyj.fx.voeditor.visual.functions.SVNModifyFunction;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.kyj.scm.manager.core.commons.SVNKeywords;
+import com.kyj.scm.manager.core.commons.SCMKeywords;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
 import javafx.beans.binding.BooleanExpression;
@@ -37,7 +37,7 @@ import javafx.stage.Stage;
  * @author KYJ
  *
  */
-public class AddNewSVNRepositoryController implements SVNKeywords {
+public class AddNewSVNRepositoryController implements SCMKeywords {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(AddNewSVNRepositoryController.class);
 

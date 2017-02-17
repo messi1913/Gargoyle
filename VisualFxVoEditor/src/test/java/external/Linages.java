@@ -92,7 +92,7 @@ public class Linages {
 
 	}
 
-	int currentLevel = 14;
+	int currentLevel = 21;
 
 	static final String RESULT = "확률 : %d%% \t %d -> %d \t 강화 %s (남은 줌서 %d)\t(%d장 소모) \t(남은 아데나 %,3d) \t(%,3d 아데나 소모)";
 	static final String SUCCESS_WORD = "성공";
@@ -101,9 +101,9 @@ public class Linages {
 	@Test
 	public void test() {
 		//보유 강화 주문서수
-		int iGot = 140;
+		int iGot = 100;
 		//보유 아데나
-		int iGotAdena = 100000000;
+		int iGotAdena = 1000000000;
 		//강화에 소모된 누적 아데나
 		int accumulateAdena = 0;
 		//		int iGotStrengthPageCount = 10;

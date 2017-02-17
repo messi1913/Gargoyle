@@ -25,6 +25,7 @@ import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.wc.SVNClientManager;
 
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.IListCommand;
@@ -147,6 +148,25 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 		}
 
 		return resultList;
+	}
+
+	/**
+	 * Not Yet Support.
+	 * 아직 미구현
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 16.
+	 * @param relativePath
+	 * @param startRevision
+	 * @param isRecursive
+	 * @return
+	 * @throws SVNException
+	 */
+	@Deprecated
+	public List<SVNLogEntry> listRemoved(String relativePath, long startRevision, boolean isRecursive) throws SVNException {
+		SVNClientManager mgr = getSvnManager();
+		Collection<SVNLogEntry> allLogs = getJavaSVNManager().getAllLogs(relativePath, startRevision);
+
+		return Collections.emptyList();
 	}
 
 }

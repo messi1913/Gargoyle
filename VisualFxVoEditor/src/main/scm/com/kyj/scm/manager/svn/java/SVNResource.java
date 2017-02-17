@@ -37,22 +37,25 @@ class SVNResource extends AbstractSVN {
 
 	/**
 	 * 존재여부 확인
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.
 	 * @param relativePath
 	 * @return
 	 * @throws SVNException
 	 */
-	public SVNNodeKind isExists(String relativePath) throws Exception {
+	public boolean isExists(String relativePath) throws Exception {
 		//		ArrayList<Object> dirEntries = new ArrayList<>();
 		//		getRepository().getDir(relativePath, -1, null, dirEntries);
-		return getRepository().checkPath(relativePath, -1);
+		SVNNodeKind checkPath = getRepository().checkPath(relativePath, -1);
+		if (checkPath == SVNNodeKind.FILE || checkPath == SVNNodeKind.DIR)
+			return true;
+		return false;
 	}
 
 	/**
 	 * 저장소에 저장된 최신 리비젼 리턴.
-	 * 
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.
 	 * @return
@@ -79,7 +82,7 @@ class SVNResource extends AbstractSVN {
 	 * 작성일 : 2016. 7. 21. 작성자 : KYJ
 	 *
 	 * SVN 서버 접속 여부 확인
-	 * 
+	 *
 	 * @throws SVNException
 	 ********************************/
 	public void ping() throws SVNException {
@@ -90,7 +93,7 @@ class SVNResource extends AbstractSVN {
 	 * 작성일 : 2016. 7. 31. 작성자 : KYJ
 	 *
 	 * SVN 서버 RepositoryUUID를 리턴.
-	 * 
+	 *
 	 * @return
 	 * @throws SVNException
 	 ********************************/

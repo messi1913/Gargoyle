@@ -13,6 +13,7 @@
 	</classpathentry>
 	<classpathentry kind="src" path="src/main/scm"/>
 	<classpathentry kind="src" path="src/main/compiler"/>
+	<classpathentry kind="src" path="src/build/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
 		<attributes>
 			<attribute name="optional" value="true"/>
@@ -41,5 +42,12 @@
 	<classpathentry kind="lib" path="lib/boilerpipe/boilerpipe-demo-2.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/boilerpipe/nekohtml-1.9.13.jar"/>
 	<classpathentry kind="lib" path="lib/boilerpipe/nekohtml-relocated-1.9.13.jar"/>
+	<classpathentry kind="lib" path="lib/customjfoenix.jar"/>
+	<classpathentry kind="lib" path="lib/egit/org.eclipse.egit.core-4.6.0.201612231935-r.jar"/>
+	<classpathentry kind="lib" path="lib/scm/dimmension/darius-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/scm/dimmension/dmclient-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/scm/dimmension/dmfile-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/scm/dimmension/dmnet-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/scm/dimmension/dmtpi-1.0.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -24,7 +24,7 @@ import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
-import com.kyj.scm.manager.core.commons.SVNKeywords;
+import com.kyj.scm.manager.core.commons.SCMKeywords;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
 import javafx.beans.property.ObjectProperty;
@@ -55,7 +55,7 @@ import kyj.Fx.dao.wizard.core.util.ValueUtil;
  * @author KYJ
  *
  */
-public class SVNTreeView extends TreeView<SVNItem> implements SVNKeywords {
+public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 	private static Logger LOGGER = LoggerFactory.getLogger(SVNTreeView.class);
 
 	// private Properties prop;

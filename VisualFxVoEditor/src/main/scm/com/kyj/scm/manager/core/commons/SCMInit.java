@@ -14,7 +14,7 @@ import java.util.Properties;
  * @author KYJ
  *
  */
-public interface SCMInit extends SVNKeywords {
+public interface SCMInit extends SCMKeywords {
 
 	/**
 	 * 접속

@@ -8,6 +8,46 @@
 	<echo message="basedir : ${basedir}">
 	</echo>
 
+	<target name="notifyBuildForVersion" description="Simple Message">
+		<!--
+		<path id="execpath">
+			<filelist>
+				<file name="${basedir}/../target/classes/" />
+			</filelist>
+		</path>
+		-->
+		<delete dir="${basedir}/antBehaviors" />
+		<mkdir dir="${basedir}/antBehaviors" />
+
+		<echo> javac exec....</echo>
+
+		<javac destdir="${basedir}/antBehaviors" classpath="" source="1.8" target="1.8" srcdir="${basedir}/../src/build/java">
+			<classpath>
+				<fileset dir="${basedir}/build/libs/">
+					<include name="*" />
+				</fileset>
+			</classpath>
+		</javac>
+
+		<echo> java exec....</echo>
+
+		<java fork="true" failonerror="on" classname="com.kyj.build.print.NotifyBuildMessage">
+			<classpath>
+				<fileset dir="${basedir}/build/libs/">
+					<include name="*" />
+				</fileset>
+				<dirset dir="${basedir}/build/classes">
+				</dirset>
+				<dirset dir="${basedir}/antBehaviors">
+				</dirset>
+			</classpath>
+
+
+			<arg line="${product.version}" />
+		</java>
+	</target>
+
+
 	<!-- Inno Setup 파일 스크립트 생성 여기선 버젼 스크립트 자동화 처리내용이 포함됨 -->
 	<target name="create-iss-script" description="Create InnoScript.">
 		<copy tofile="../Gargoyle.iss" overwrite="true">

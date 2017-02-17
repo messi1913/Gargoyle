@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.kyj.scm.manager.core.commons.SVNKeywords;
+import com.kyj.scm.manager.core.commons.SCMKeywords;
 
 import kyj.Fx.dao.wizard.memory.IFileBaseConfiguration;
 
@@ -34,13 +34,13 @@ import kyj.Fx.dao.wizard.memory.IFileBaseConfiguration;
 public class ResourceLoader implements IFileBaseConfiguration {
 
 	/* SVN 키 */
-	public static final String SVN_USER_ID = SVNKeywords.SVN_USER_ID;
-	public static final String SVN_USER_PASS = SVNKeywords.SVN_USER_PASS;
-	public static final String SVN_PATH = SVNKeywords.SVN_PATH;
+	public static final String SVN_USER_ID = SCMKeywords.SVN_USER_ID;
+	public static final String SVN_USER_PASS = SCMKeywords.SVN_USER_PASS;
+	public static final String SVN_PATH = SCMKeywords.SVN_PATH;
 	/**
 	 * @최초생성일 2016. 4. 3.
 	 */
-	public static final String SVN_REPOSITORIES = SVNKeywords.SVN_REPOSITORIES;
+	public static final String SVN_REPOSITORIES = SCMKeywords.SVN_REPOSITORIES;
 
 	public static final String BASE_KEY_JDBC_DRIVER = "jdbc.driver";
 	public static final String BASE_KEY_JDBC_URL = "jdbc.url";
@@ -131,7 +131,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static ResourceLoader getInstance() {
 		if (loader == null) {
 			loader = new ResourceLoader();
-			loader.initialize();
+//			loader.initialize();
 		}
 		return loader;
 	}

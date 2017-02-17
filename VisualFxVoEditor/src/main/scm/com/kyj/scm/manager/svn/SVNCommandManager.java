@@ -15,7 +15,7 @@ import org.apache.commons.lang.SystemUtils;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
-import com.kyj.scm.manager.core.commons.SVNKeywords;
+import com.kyj.scm.manager.core.commons.SCMKeywords;
 
 /**
  * SVN명령어를 모아놓은 매니저클래스
@@ -24,7 +24,7 @@ import com.kyj.scm.manager.core.commons.SVNKeywords;
  *
  */
 @Deprecated
-public class SVNCommandManager implements SVNKeywords {
+public class SVNCommandManager implements SCMKeywords {
 
 	private SVNCatCommand catCommand;
 
