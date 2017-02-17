@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
@@ -24,15 +23,13 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.api.errors.TransportException;
-import org.eclipse.jgit.lib.ObjectDatabase;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectLoader;
-import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.sun.star.uno.RuntimeException;
 
@@ -54,7 +51,9 @@ public class GitTest {
 
 	@Before
 	public void credential() throws IOException {
-		usernamePasswordCredentials = new UsernamePasswordCredentialsProvider("callakrsos@naver.com", "zkffk88");
+		String userId = ResourceLoader.getInstance().get("git.userId");
+		String pass = ResourceLoader.getInstance().get("git.userpass");
+		usernamePasswordCredentials = new UsernamePasswordCredentialsProvider(userId, pass);
 		//		new File("");
 	}
 
