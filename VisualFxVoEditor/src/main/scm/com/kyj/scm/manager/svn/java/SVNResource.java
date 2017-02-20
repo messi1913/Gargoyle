@@ -75,7 +75,7 @@ class SVNResource extends AbstractSVN {
 	 * @throws SVNException
 	 */
 	public long getRevision(Date date) throws SVNException {
-		return getRepository().getDatedRevision(date) ;
+		return getRepository().getDatedRevision(date);
 	}
 
 	/********************************
@@ -130,4 +130,76 @@ class SVNResource extends AbstractSVN {
 		return doInfo.getURL();
 	}
 
+	/**
+	 * 프로토콜에 따라 경로를 적절한 상대경로화 처리함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 13.
+	 * @param path
+	 * @return
+	 * @throws SVNException
+	 */
+	public String relativePath(SVNURL path) throws SVNException {
+
+		if (getJavaSVNManager().isHttp() || getJavaSVNManager().isHttps()) {
+
+			return relativePath(path.toString());
+		}
+
+		return path.getPath();
+	}
+
+	/**
+	 * 프로토콜에 따라 경로를 적절한 상대경로화 처리함.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 13.
+	 * @param relativePath
+	 * @return
+	 * @throws SVNException
+	 */
+	private final String relativePath(String relativePath) throws SVNException {
+
+		String repositoryPath = relativePath;
+
+		if (getJavaSVNManager().isHttp() || getJavaSVNManager().isHttps()) {
+
+			//http or https 프로토콜은 아래 함수 인자에 false만줘도 리턴되는 값이 있으나 svn:// 프로토콜은 true로 줘야함.
+			SVNURL repoRoot = getRepository().getRepositoryRoot(false);
+			if (repoRoot == null)
+				repoRoot = getRepository().getRepositoryRoot(true);
+
+			//실제 root의 경로만 리턴받음.
+			String rootPath = repoRoot.toString();
+
+			//루트로부터 상대경로만 뽑아내고 리턴.
+			int indexOf = relativePath.indexOf(rootPath) + rootPath.length();
+			repositoryPath = relativePath.substring(indexOf);
+
+		}
+
+		return repositoryPath;
+	}
+
+	/**
+	 * JavaSVNManager를 이용하여 아래 값을 체크할것.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 12.
+	 * @return
+	 */
+	boolean isHttp() {
+		String protocol = getRepository().getLocation().getProtocol();
+		return "http".equals(protocol);
+	}
+
+	/**
+	 * JavaSVNManager를 이용하여 아래 값을 체크할것.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 13.
+	 * @return
+	 */
+	boolean isHttps() {
+		String protocol = getRepository().getLocation().getProtocol();
+		return "https".equals(protocol);
+	}
 }

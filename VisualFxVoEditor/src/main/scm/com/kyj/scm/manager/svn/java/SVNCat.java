@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.SVNProperty;
+import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
 import com.kyj.scm.manager.core.commons.ICatCommand;
@@ -55,6 +56,27 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 	@Override
 	public String cat(String path) {
 		return cat(path, "-1");
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param url
+	 * @return
+	 */
+	public String cat(SVNURL url) {
+		return cat(url.getPath());
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param url
+	 * @param revision
+	 * @return
+	 */
+	public String cat(SVNURL url, String revision) {
+		return cat(url.getPath(), revision);
 	}
 
 	/**
@@ -159,7 +181,7 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 			if (isTextType) {
 //				try (StringOutputStream out = new StringOutputStream()) {
 //					baos.writeTo(out);
-				
+
 					result = baos.toString(encoding); // out.getString();
 //				}
 			} else {
@@ -175,6 +197,10 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 		return result;
 	}
 
-	
+
+
+
+
+
 
 }

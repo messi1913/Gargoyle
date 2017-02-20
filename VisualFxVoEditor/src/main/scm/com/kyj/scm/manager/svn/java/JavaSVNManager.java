@@ -57,6 +57,20 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 
 	private Properties properties;
 
+	/*
+	 * [시작] SVN URL의 특이 프로토콜에 대한 체크를 위해 추가 변수 생성
+	 *
+	 */
+	/**
+	 * @최초생성일 2016. 12. 13.
+	 */
+	private boolean isHttp;
+	/**
+	 * @최초생성일 2016. 12. 13.
+	 */
+	private boolean isHttps;
+	/*[끝] SVN URL의 특이 프로토콜에 대한 체크를 위해 추가 변수 생성*/
+
 	public JavaSVNManager(Properties properties) {
 		init(properties);
 	}
@@ -78,6 +92,9 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 		this.svnImport = new SVNImport(this, properties);
 		this.svnCommit = new SVNCommit(this, properties);
 		this.svnResource = new SVNResource(this, properties);
+
+		isHttp = this.svnResource.isHttp();
+		isHttps = this.svnResource.isHttps();
 	}
 
 	/**
@@ -162,6 +179,25 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	}
 
 	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param url
+	 * @return
+	 */
+	public String cat(SVNURL url) {
+		return catCommand.cat(url);
+	}
+	
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param url
+	 * @return
+	 */
+	public String cat(SVNURL url, String revision) {
+		return catCommand.cat(url, revision);
+	}
+	/**
 	 * svn cat명령어
 	 *
 	 * @작성자 : KYJ
@@ -231,6 +267,17 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 			predicate = v -> parseLong <= v.getRevision();
 
 		return listEntry.stream().filter(predicate).collect(Collectors.toList());
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param relativePath
+	 * @param handler
+	 * @throws Exception
+	 */
+	public void listEntry(String relativePath, SVNDirHandler handler) throws Exception {
+		listCommand.listEntry(relativePath, handler);
 	}
 
 	/**
@@ -618,4 +665,38 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	public Properties getProperties() {
 		return (Properties) this.properties.clone();
 	}
+
+	/**
+	 * 상대경로를 구함.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 13.
+	 * @param path
+	 * @return
+	 * @throws SVNException
+	 */
+	public String relativePath(SVNURL path) throws SVNException {
+		return svnResource.relativePath(path);
+	}
+
+	/**
+	 * svnurl이 http 프로토콜인지 확인
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 13.
+	 * @return
+	 */
+	public final boolean isHttp() {
+		return isHttp;
+	}
+
+	/**
+	 * svnurl이 https 프로토콜인지 확인
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 13.
+	 * @return
+	 */
+	public final boolean isHttps() {
+		return isHttps;
+	}
+
+
 }

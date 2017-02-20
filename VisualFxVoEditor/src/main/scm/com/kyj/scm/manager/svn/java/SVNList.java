@@ -151,6 +151,87 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 	}
 
 	/**
+	 *  메타정보를 포함하는 리소스 탐색.
+	 *  데이터를 바로 처리하기위한 handler 처리 .
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 1. 3.
+	 * @param relativePath
+	 * 			탐색할 상대경로
+	 * @param handler
+	 * @throws Exception
+	 */
+	public void listEntry(String relativePath, SVNDirHandler handler) throws Exception {
+
+		try {
+			SVNRepository repository = getRepository();
+			SVNURL location = repository.getLocation();
+
+			List<SVNDirEntry> list = new ArrayList<>();
+
+			/*
+			 * @param  path                    a directory path
+			 * @param  revision                a revision number
+			 * @param  includeCommitMessages   if <span class="javakeyword">true</span> then
+			 *                                 dir entries (<b>SVNDirEntry</b> objects) will be supplied
+			 *                                 with commit log messages, otherwise not
+			 * @param  entries                 a collection that receives fetched dir entries
+			*/
+			repository.getDir(relativePath /* relativePath */, -1, true,
+					list /*fileProperties, (SVNDirEntry.DIRENT_ALL | SVNDirEntry.DIRENT_COMMIT_MESSAGE), handler*/);
+
+			Iterator<SVNDirEntry> iterator = list.iterator();
+			while (iterator.hasNext()) {
+
+				SVNDirEntry entry = iterator.next();
+
+				/*
+				*  @param protocol       a protocol component
+				 * @param userInfo       a user info component
+				 * @param host           a host component
+				 * @param port           a port number
+				 * @param path           a path component
+				 * @param uriEncoded     <span class="javakeyword">true</span> if
+				*/
+				/*
+				 * 2016-12-14
+				 * VisualSVN과의 호환성을 위해 상대경로를 만드는 URL로직을 추가한다.
+				 * Root경로를 확인하려면
+				 *
+				 * SVNDirEntry클래스의 .getRepositoryRoot()를 확인해보면된다.
+				 * by kyj.
+				 */
+
+				SVNURL url = SVNURL.create(location.getProtocol(), location.getUserInfo(), location.getHost(), location.getPort(),
+						getJavaSVNManager().relativePath(entry.getURL()), true);
+
+				if (entry.getKind() == SVNNodeKind.DIR) {
+					if (handler.test(entry)) {
+						handler.accept(entry);
+						//만들어진 상대경로
+						listEntry(url.getPath(), handler);
+					}
+
+				} else {
+
+					//만들어진 상대경로
+					entry = new SVNDirEntry(url, entry.getRepositoryRoot(), entry.getName(), entry.getKind(), entry.getSize(),
+							entry.hasProperties(), entry.getRevision(), entry.getDate(), entry.getAuthor(), entry.getCommitMessage());
+					handler.accept(entry);
+				}
+			}
+
+			//			if (parseLong != -1)
+			//				resultList.addAll(list.stream().filter(v -> parseLong <= v.getRevision()).collect(Collectors.toList()));
+			//			else
+			//				resultList.addAll(list);
+			//			return resultList;
+		} catch (SVNException e) {
+			throw e;
+		}
+
+	}
+
+	/**
 	 * Not Yet Support.
 	 * 아직 미구현
 	 * @작성자 : KYJ
