@@ -20,6 +20,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.SCMKeywords;
 
@@ -116,7 +121,6 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	 */
 	public static final String PMD_SELECTED_PRIORITY_VALUES = "pmd.selected.priority.values";
 
-
 	public static final String MS_WORD_PATH = "msword.path";
 
 	/**
@@ -131,7 +135,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static ResourceLoader getInstance() {
 		if (loader == null) {
 			loader = new ResourceLoader();
-//			loader.initialize();
+			//			loader.initialize();
 		}
 		return loader;
 	}
@@ -253,7 +257,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 	public String get(String key, String defaultVal) {
 		String val = get(key);
-		if(ValueUtil.isEmpty(val))
+		if (ValueUtil.isEmpty(val))
 			return defaultVal;
 		return val;
 	}
@@ -310,8 +314,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	 * @작성일 : 2017. 1. 24.
 	 * @param charset
 	 */
-	public static void saveCharset(String charset)
-	{
+	public static void saveCharset(String charset) {
 		CharsetManagement.saveCharset(charset);
 	}
 
@@ -324,7 +327,6 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static String loadCharset() {
 		return CharsetManagement.loadCharset();
 	}
-
 
 	/**
 	 * 환경변수 캐릭터셋 관리.
@@ -354,4 +356,51 @@ public class ResourceLoader implements IFileBaseConfiguration {
 		}
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param key
+	 * @return
+	 * @throws ParseException
+	 */
+	public JSONObject getJsonObject(String key) throws ParseException {
+		return getJsonObject(key, new JSONObject());
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param string
+	 * @return
+	 * @throws ParseException
+	 */
+	public JSONObject getJsonObject(String key, JSONObject defaultVal) throws ParseException {
+		String string = get(key);
+		if (ValueUtil.isEmpty(string))
+			return defaultVal;
+		return (JSONObject) new JSONParser().parse(string);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param key
+	 * @return
+	 * @throws ParseException
+	 */
+	public JSONArray getJsonArray(String key) throws ParseException {
+		return getJsonArray(key, new JSONArray());
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param string
+	 * @return
+	 * @throws ParseException
+	 */
+	public JSONArray getJsonArray(String key, JSONArray defaultVal) throws ParseException {
+		String string = get(key);
+		return (JSONArray) new JSONParser().parse(string);
+	}
 }
