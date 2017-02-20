@@ -94,7 +94,7 @@ public class Linages {
 
 	int currentLevel = 14;
 
-	static final String RESULT = "확률 : %d%% \t %d -> %d \t 강화 %s (남은 줌서 %d)\t(%d장 소모) \t(남은 아데나 %,3d) \t(%,3d 아데나 소모)\t(확률 : %d%%)";
+	static final String RESULT = "(확률 : %d%%) \t %d -> %d \t 강화 %s (남은 줌서 %d)\t(%d장 소모) \t(남은 아데나 %,3d) \t(%,3d 아데나 소모)";
 	static final String SUCCESS_WORD = "성공";
 	static final String FAIL_WORD = "실패";
 
@@ -144,11 +144,11 @@ public class Linages {
 			String resultMsg = "";
 			if (result) {
 				resultMsg = String.format(RESULT, percent, currentLevel, currentLevel + getUpLavel(isSpecial) /*currentLevel + 1*/, SUCCESS_WORD, iGot, needs, iGotAdena,
-						accumulateAdena, percent);
+						accumulateAdena);
 				currentLevel++;
 			} else {
 				resultMsg = String.format(RESULT, percent, currentLevel, currentLevel - 1, FAIL_WORD, iGot, needs, iGotAdena,
-						accumulateAdena , percent);
+						accumulateAdena );
 				currentLevel--;
 			}
 
