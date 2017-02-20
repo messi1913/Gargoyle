@@ -92,21 +92,25 @@ public class Linages {
 
 	}
 
-	int currentLevel = 21;
+	int currentLevel = 14;
 
-	static final String RESULT = "확률 : %d%% \t %d -> %d \t 강화 %s (남은 줌서 %d)\t(%d장 소모) \t(남은 아데나 %,3d) \t(%,3d 아데나 소모)";
+	static final String RESULT = "확률 : %d%% \t %d -> %d \t 강화 %s (남은 줌서 %d)\t(%d장 소모) \t(남은 아데나 %,3d) \t(%,3d 아데나 소모)\t(확률 : %d%%)";
 	static final String SUCCESS_WORD = "성공";
 	static final String FAIL_WORD = "실패";
 
 	@Test
 	public void test() {
 		//보유 강화 주문서수
-		int iGot = 100;
+		int iGot = 20;
 		//보유 아데나
 		int iGotAdena = 1000000000;
 		//강화에 소모된 누적 아데나
 		int accumulateAdena = 0;
 		//		int iGotStrengthPageCount = 10;
+
+		//축 주문서 사용유무
+		boolean isSpecial = false;
+
 		System.out.println("가지고있는 주문서수 " + iGot);
 		System.out.println(String.format("보유 아데나 %,3d", iGotAdena));
 		System.out.println("현재 강화 레벨 " + currentLevel);
@@ -114,27 +118,37 @@ public class Linages {
 		System.out.println("############################################################################");
 		//		for (int i = 0; i < iGotStrengthPageCount; i++) {
 		while (true) {
+
 			boolean result = doit(currentLevel);
 			int needs = getNeeds(currentLevel);
 			int adena = getAdena(currentLevel);
 			long percent = getPercent(currentLevel);
+
+			if (iGot < needs) {
+				System.out.println(String.format("주문서가 모자랍니다. (필요 : %d장, 보유량 %d장 )", needs, iGot));
+				break;
+			}
+
 			iGot = iGot - needs;
 			iGotAdena = iGotAdena - adena;
 			accumulateAdena += adena;
+			//			if (needs <= 0 || iGot <= 0) {
+			//				break;
+			//			}
+
 			if (iGotAdena <= 0) {
 				System.out.println("아데나가 모자랍니다.");
 				break;
 			}
-			if (needs <= 0 || iGot <= 0)
-				break;
+
 			String resultMsg = "";
 			if (result) {
-				resultMsg = String.format(RESULT, percent, currentLevel, currentLevel + 1, SUCCESS_WORD, iGot, needs, iGotAdena,
-						accumulateAdena);
+				resultMsg = String.format(RESULT, percent, currentLevel, currentLevel + getUpLavel(isSpecial) /*currentLevel + 1*/, SUCCESS_WORD, iGot, needs, iGotAdena,
+						accumulateAdena, percent);
 				currentLevel++;
 			} else {
 				resultMsg = String.format(RESULT, percent, currentLevel, currentLevel - 1, FAIL_WORD, iGot, needs, iGotAdena,
-						accumulateAdena);
+						accumulateAdena , percent);
 				currentLevel--;
 			}
 
@@ -144,6 +158,28 @@ public class Linages {
 		System.out.println("############################################################################");
 		System.out.println(String.format("결과 : %d 강", currentLevel));
 
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param isSpecial
+	 * @return
+	 */
+	public int getUpLavel(boolean isSpecial) {
+
+		if (!isSpecial)
+			return 1;
+
+		Random random = new Random();
+		int nextInt = random.nextInt(300);
+		if (nextInt <= 100)
+			return 1;
+		if (100 < nextInt && nextInt <= 200)
+			return 2;
+		if (200 < nextInt)
+			return 3;
+		return 1;
 	}
 
 	public int getAdena(int level) {
