@@ -219,11 +219,11 @@ public class ThreadDumpTextArea extends BorderPane {
 		return codeArea.getText(paragraph);
 	}
 
-	public Paragraph<Collection<String>> getParagraph(int index) {
+	public Paragraph<Collection<String>, Collection<String>> getParagraph(int index) {
 		return codeArea.getParagraph(index);
 	}
 
-	public ObservableList<Paragraph<Collection<String>>> getParagraphs() {
+	public ObservableList<Paragraph<Collection<String>, Collection<String>>> getParagraphs() {
 		return codeArea.getParagraphs();
 	}
 

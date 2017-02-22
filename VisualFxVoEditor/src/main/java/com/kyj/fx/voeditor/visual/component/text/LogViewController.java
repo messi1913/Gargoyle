@@ -39,8 +39,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -68,9 +70,11 @@ public class LogViewController implements Closeable {
 
 	@FXML
 	private ToggleGroup ENCODING;
-
+	@FXML
+	private ToggleButton btnScrollLock;
 	private CodeAreaFindAndReplaceHelper<CodeArea> findAndReplaceHelper;
 
+	private BooleanProperty isScrollLock = new SimpleBooleanProperty();
 	public LogViewController() throws Exception {
 
 	}
@@ -88,8 +92,6 @@ public class LogViewController implements Closeable {
 	public void setCharset(Charset charset) {
 		this.charset.set(charset);
 	}
-
-
 
 	@FXML
 	public void initialize() {
@@ -302,14 +304,11 @@ public class LogViewController implements Closeable {
 
 		Platform.runLater(() -> {
 
-			int anchor = this.txtLog.getAnchor();
-			int currentLength = this.txtLog.getLength();
-			int caretPosition = this.txtLog.getCaretPosition();
-			int caretColumn = this.txtLog.getCaretColumn();
-
-			System.out.println();
-
-			this.txtLog.appendText(string);
+//			int anchor = this.txtLog.getAnchor();
+//			int currentLength = this.txtLog.getLength();
+//			int caretPosition = this.txtLog.getCaretPosition();
+//			int caretColumn = this.txtLog.getCaretColumn();
+			this.txtLog.appendText(string, !isScrollLock.get());
 
 		});
 
@@ -405,7 +404,6 @@ public class LogViewController implements Closeable {
 		FxUtil.saveAsFx(getWindow(), () -> txtLog.getText());
 	}
 
-
 	public static class Chagne {
 		private String content;
 
@@ -423,5 +421,11 @@ public class LogViewController implements Closeable {
 			this.content = content;
 		}
 
+	}
+
+	@FXML
+	public void btnScrollLockOnAction(){
+		boolean value = !isScrollLock.get();
+		isScrollLock.set(value);
 	}
 }

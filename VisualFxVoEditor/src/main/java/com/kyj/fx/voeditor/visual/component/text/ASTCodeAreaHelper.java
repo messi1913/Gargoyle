@@ -38,13 +38,13 @@ public abstract class ASTCodeAreaHelper {
 		return 0;
 	}
 
-	protected Paragraph<Collection<String>> currentParagraphRange(CodeArea textArea) {
+	protected Paragraph<Collection<String>, Collection<String>> currentParagraphRange(CodeArea textArea) {
 		int currentParagraph = textArea.getCurrentParagraph();
 		return textArea.getDocument().getParagraphs().get(currentParagraph);
 	}
 
 	protected String currentPragraph(CodeArea textArea) {
-		Paragraph<Collection<String>> x = currentParagraphRange(textArea);
+		Paragraph<Collection<String>, Collection<String>> x = currentParagraphRange(textArea);
 		return x.toString();
 	}
 

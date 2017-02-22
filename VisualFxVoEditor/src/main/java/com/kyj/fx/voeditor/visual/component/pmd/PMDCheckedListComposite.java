@@ -159,7 +159,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see com.kyj.fx.voeditor.visual.component.text.
 			 * JavaTextAreaForAutoComment#getLineFactory()
 			 */
@@ -171,7 +171,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 				lineFactory.setLineMarkFactory(new LineMapper<Integer>() {
 
 					@Override
-					public Integer map(int row, Paragraph<?> pra) {
+					public Integer map(int row, Paragraph< ? , ?> pra) {
 
 						Optional<RuleViolation> findFirst = violationList.stream().filter(v -> v.getBeginLine() == row).findFirst();
 						if (findFirst.isPresent()) {
@@ -191,7 +191,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 				lineFactory.setGraphicsMapperFactory(new GraphicsMapper<Node>() {
 
 					@Override
-					public Node map(int row, Paragraph<?> pra, int typeValue) {
+					public Node map(int row, Paragraph<?, ?> pra, int typeValue) {
 
 						Circle g = new Circle(5d);
 						// Rectangle rectangle = new Rectangle();
@@ -547,7 +547,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 	private Callback<ListView<RuleViolation>, ListCell<RuleViolation>> ruleCheckListener = new Callback<ListView<RuleViolation>, ListCell<RuleViolation>>() {
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see javafx.util.Callback#call(java.lang.Object)
 		 */
 		@Override
@@ -715,7 +715,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 			// javaTextArea.appendContent("");
 			// javaTextArea.getCodeArea().getParagraphs().forEach(s ->
 			// javaTextArea.getCodeArea().clearStyle(s));
-			ObservableList<Paragraph<Collection<String>>> paragraphs = javaTextArea.getCodeArea().getParagraphs();
+			ObservableList<Paragraph<Collection<String>, Collection<String>>> paragraphs = javaTextArea.getCodeArea().getParagraphs();
 			int t = paragraphs.size();
 			IntStream.range(0, t).forEach(v -> {
 				javaTextArea.getCodeArea().clearStyle(v);
@@ -728,7 +728,7 @@ public class PMDCheckedListComposite extends CloseableParent<BorderPane> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.io.Closeable#close()
 	 */
 	@Override

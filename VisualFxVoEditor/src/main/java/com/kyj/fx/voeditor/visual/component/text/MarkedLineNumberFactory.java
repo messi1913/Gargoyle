@@ -53,22 +53,22 @@ public class MarkedLineNumberFactory implements IntFunction<Node> {
 	private static final Font DEFAULT_FONT = Font.font("monospace", FontPosture.ITALIC, 13);
 	private static final Background DEFAULT_BACKGROUND = new Background(new BackgroundFill(Color.web("#ddd"), null, null));
 
-	public static IntFunction<Node> get(StyledTextArea<?> area) {
+	public static IntFunction<Node> get(StyledTextArea<?, ?> area) {
 		return get(area, digits -> "%0" + digits + "d");
 	}
 
-	public static IntFunction<Node> get(StyledTextArea<?> area, IntFunction<String> format) {
+	public static IntFunction<Node> get(StyledTextArea<?, ?> area, IntFunction<String> format) {
 		return new MarkedLineNumberFactory(area, format);
 	}
 
 	private final Val<Integer> nParagraphs;
 	private final IntFunction<String> format;
-	private StyledTextArea<?> area;
+	private StyledTextArea<?, ?> area;
 	private int appendLineKeywordLength = JavaCodeAreaHelper.appendLineKeyword.length();
 	private ObjectProperty<LineMapper<Integer>> lineMarkFactory = new SimpleObjectProperty<>();
 	private ObjectProperty<GraphicsMapper<Node>> graphicsMapperFactory = new SimpleObjectProperty<>();
 
-	private MarkedLineNumberFactory(StyledTextArea<?> area, IntFunction<String> format) {
+	private MarkedLineNumberFactory(StyledTextArea<?, ?> area, IntFunction<String> format) {
 		this.area = area;
 		nParagraphs = LiveList.sizeOf(area.getParagraphs());
 		this.format = format;
@@ -83,7 +83,7 @@ public class MarkedLineNumberFactory implements IntFunction<Node> {
 	 */
 	public static interface LineMapper<T> {
 
-		public T map(int row, Paragraph<?> pra);
+		public T map(int row, Paragraph<?, ?> pra);
 
 	}
 
@@ -94,7 +94,7 @@ public class MarkedLineNumberFactory implements IntFunction<Node> {
 	 */
 	public static interface GraphicsMapper<T extends Node> {
 
-		public T map(int row, Paragraph<?> pra, int typeValue);
+		public T map(int row, Paragraph<?, ?> pra, int typeValue);
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class MarkedLineNumberFactory implements IntFunction<Node> {
 		return new LineMapper<Integer>() {
 
 			@Override
-			public Integer map(int row, Paragraph<?> pra) {
+			public Integer map(int row, Paragraph<?, ?> pra) {
 
 				String substring = pra.substring(0, appendLineKeywordLength);
 				if (JavaCodeAreaHelper.appendLineKeyword.equals(substring)) {
@@ -132,7 +132,7 @@ public class MarkedLineNumberFactory implements IntFunction<Node> {
 		return new GraphicsMapper<Node>() {
 
 			@Override
-			public Node map(int row, Paragraph<?> pra, int typeValue) {
+			public Node map(int row, Paragraph<?, ?> pra, int typeValue) {
 				Circle g = new Circle(5d);
 				g.setStyle("-fx-fill:transparent");
 
@@ -158,7 +158,7 @@ public class MarkedLineNumberFactory implements IntFunction<Node> {
 			return format(row, n);
 		});
 
-		Paragraph<?> paragraph = this.area.getParagraph(idx);
+		Paragraph<?, ?> paragraph = this.area.getParagraph(idx);
 
 		//		Optional<Boolean> findAny = paragraph.chars().limit(1L).mapToObj(v -> {
 		//

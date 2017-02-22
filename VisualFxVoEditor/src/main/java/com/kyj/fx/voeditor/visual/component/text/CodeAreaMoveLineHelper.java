@@ -47,14 +47,14 @@ public class CodeAreaMoveLineHelper {
 
 		int position = 0;
 		int row = moveToLine - 1;
-		ObservableList<Paragraph<Collection<String>>> paragraphs = codeArea.getParagraphs();
+		ObservableList<Paragraph<Collection<String>, Collection<String>>> paragraphs = codeArea.getParagraphs();
 		if (paragraphs.size() < moveToLine)
 			return;
 
 		for (Paragraph par : paragraphs.subList(0, row)) {
 			position += par.length() + 1; // account for line terminators
 		}
-		Paragraph<Collection<String>> paragraph = paragraphs.get(row);
+		Paragraph<Collection<String>, Collection<String>> paragraph = paragraphs.get(row);
 		int length = paragraph.length();
 		codeArea.selectRange(position, (position + length));
 	}
@@ -63,14 +63,14 @@ public class CodeAreaMoveLineHelper {
 	public void moveToLine(int moveToLine, int startCol) {
 		int position = 0;
 		int row = moveToLine - 1;
-		ObservableList<Paragraph<Collection<String>>> paragraphs = codeArea.getParagraphs();
+		ObservableList<Paragraph<Collection<String>, Collection<String>>> paragraphs = codeArea.getParagraphs();
 		if (paragraphs.size() < moveToLine)
 			return;
 
 		for (Paragraph par : paragraphs.subList(0, row)) {
 			position += par.length() + 1; // account for line terminators
 		}
-		Paragraph<Collection<String>> paragraph = paragraphs.get(row);
+		Paragraph<Collection<String>, Collection<String>> paragraph = paragraphs.get(row);
 		int length = paragraph.length();
 
 		int lineStartLength = position + startCol;
@@ -84,7 +84,7 @@ public class CodeAreaMoveLineHelper {
 		int position = 0;
 		int row = moveToLine - 1;
 
-		ObservableList<Paragraph<Collection<String>>> paragraphs = codeArea.getParagraphs();
+		ObservableList<Paragraph<Collection<String>, Collection<String>>> paragraphs = codeArea.getParagraphs();
 		if (paragraphs.size() < moveToLine)
 			return;
 

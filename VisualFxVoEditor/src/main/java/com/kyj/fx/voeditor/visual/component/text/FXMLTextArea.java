@@ -49,7 +49,7 @@ public class FXMLTextArea extends BorderPane {
 	public FXMLTextArea() {
 		codeArea = new CodeArea();
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
-		
+
 		codeArea.richChanges().subscribe(change -> {
 			codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
 		});
@@ -109,7 +109,7 @@ public class FXMLTextArea extends BorderPane {
 		return codeArea.getText(paragraph);
 	}
 
-	public Paragraph<Collection<String>> getParagraph(int index) {
+	public Paragraph<Collection<String>, Collection<String>> getParagraph(int index) {
 		return codeArea.getParagraph(index);
 	}
 
