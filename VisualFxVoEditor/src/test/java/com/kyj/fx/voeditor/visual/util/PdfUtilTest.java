@@ -7,7 +7,10 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,20 +26,34 @@ public class PdfUtilTest {
 	public void test() {
 		File newFile = new File("Hello.pdf");
 
-//		String text = "HelloWorld! \nhell abcdefghijklmnopqrstuvwxyz sadasdasdasasdas asdasdasdasdas \n\nzzzz";
-//		boolean createNew = PDFUtil.createNew(newFile, text);
-		String[][] contents = {{"a","b", "1"},
-                {"c","d", "2"},
-                {"e","f", "3"},
-                {"g","h", "4"},
-                {"i","j", "5"}} ;
+		//		String text = "HelloWorld! \nhell abcdefghijklmnopqrstuvwxyz sadasdasdasasdas asdasdasdasdas \n\nzzzz";
+		//		boolean createNew = PDFUtil.createNew(newFile, text);
+		String[][] contents = { { "레벨", "강화확률", "소모아데나", "필요 주문서양" }, { "1", "100", "3800", "1" }, { "2", "100", "3800", "1" },
+				{ "3", "100", "3800", "1" }, };
 
-		TablePDFHelpeBuilder tablePDFHelpeBuilder = new TablePDFHelpeBuilder(newFile, contents);
+		TablePDFHelpeBuilder tablePDFHelpeBuilder = new TablePDFHelpeBuilder(newFile, contents) {
+
+			/* (non-Javadoc)
+			 * @see com.kyj.fx.voeditor.visual.framework.pdf.concreate.TablePDFHelpeBuilder#accept(org.apache.pdfbox.pdmodel.PDPage, org.apache.pdfbox.pdmodel.PDPageContentStream)
+			 */
+			@Override
+			public void accept(PDPage page, PDPageContentStream contentStream) throws Exception {
+				drawTable(page, contentStream, contents);
+			}
+
+		};
 		boolean build = tablePDFHelpeBuilder.build();
 		if (build)
 			FileUtil.openFile(newFile);
 
 		Assert.assertEquals(true, build);
 
+	}
+
+	@Test
+	public void pdfToImageTest() throws IOException {
+		File file = new File("PdfOut");
+		file.mkdirs();
+		PDFUtil.toImage(new File("Hello.pdf"), file);
 	}
 }

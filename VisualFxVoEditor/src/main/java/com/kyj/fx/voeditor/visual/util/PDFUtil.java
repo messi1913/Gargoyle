@@ -16,11 +16,16 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.function.Consumer;
 
+import javax.imageio.ImageIO;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,8 +97,8 @@ public class PDFUtil {
 	 * @throws IOException
 	 */
 	public static PDFont getFont(PDDocument doc) throws IOException {
-//		GraphicsEnvironment localGraphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//		Font[] allFonts = localGraphicsEnvironment.getAllFonts();
+		//		GraphicsEnvironment localGraphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		//		Font[] allFonts = localGraphicsEnvironment.getAllFonts();
 		PDFont font = PDType0Font.load(doc, ClassLoader.getSystemClassLoader().getResourceAsStream(FxUtil.FONTS_NANUMBARUNGOTHIC_TTF));
 		return font;
 	}
@@ -142,5 +147,98 @@ public class PDFUtil {
 		ImageIOUtil.writeImage(bufferedImage, "png", output);
 		return new ByteArrayInputStream(output.toByteArray()/*, 0, output.size()*/);
 	}
+
+	/*************************************************************************************************************************************/
+	// PDF 페이지내 컨텐츠를 페이지별로  파일로 변환하는 API 작성
+	/*************************************************************************************************************************************/
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param pdfFile
+	 * @throws IOException
+	 */
+	public static void toImage(File pdfFile, File outDir) throws IOException {
+		toImage(pdfFile, outDir, -1);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param pdfFile
+	 * @param pageIndex
+	 * @throws IOException
+	 */
+	public static void toImage(File pdfFile, File outDir, int pageIndex) throws IOException {
+		PdfToImageHandler handler = new PdfToImageHandler(pdfFile, outDir) {
+
+			@Override
+			public void write(File dir, int page, BufferedImage img) {
+				try {
+					ImageIO.write(img, "png", new File(dir, page + ".png"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		handler.setStartPage(pageIndex);
+		handler.setEndPage(pageIndex);
+		PDFUtil.toImage(handler);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 20.
+	 * @param pdfFile
+	 * @param handler
+	 * @throws IOException
+	 */
+	public static void toImage(PdfToImageHandler handler) throws IOException {
+		File pdfFile = handler.getPdfFile();
+		try (PDDocument doc = PDDocument.load(pdfFile)) {
+			PDFRenderer pdfRenderer = new PDFRenderer(doc);
+			PDDocumentCatalog catal = doc.getDocumentCatalog();
+			PDPageTree pages = catal.getPages();
+			int totalPageCount = pages.getCount();
+			int start = handler.getStartPage();
+			int end = handler.getEndPage();
+
+			//페이지 유효성 검증
+			if (start > end) {
+				throw new RuntimeException(String.format("Invalide page index start : %d end : %d", start, end));
+			}
+
+			if (start == -1)
+				start = 0;
+			if (end == -1)
+				end = totalPageCount;
+
+			if (end > totalPageCount) {
+				end = totalPageCount;
+			}
+
+			// 파일 디렉토리 검증
+			File outputDir = handler.getOutputDir();
+			if (!outputDir.isDirectory()) {
+				throw new RuntimeException("OutputDir is not Directory.");
+			}
+
+			//디렉토리가 없으면 생성
+			if (!outputDir.exists())
+				outputDir.mkdirs();
+
+			for (int currentPage = start; currentPage < totalPageCount; currentPage++) {
+				if (currentPage > end)
+					break;
+				BufferedImage renderImage = pdfRenderer.renderImage(currentPage);
+				handler.write(outputDir, currentPage, renderImage);
+			}
+		}
+
+	}
+
+	/*************************************************************************************************************************************/
+	/// 이미지 파일의 내용을 PDF 파일로 만드는 API 작성
+	/*************************************************************************************************************************************/
 
 }
