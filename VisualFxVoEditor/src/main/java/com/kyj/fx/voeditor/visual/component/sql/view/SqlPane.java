@@ -967,8 +967,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * @param e
 	 ********************************/
 	public void txtSqlOnKeyEvent(KeyEvent e) {
-		// System.out.println(e.getCode());
-		// switch (e.getCode()) {
+
 		/* CTRL + ENTER */
 		// case ENTER:
 		if ((e.getCode() == KeyCode.ENTER) && e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
@@ -992,6 +991,9 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		/* CTRL + P (Properties) */
 		// case P:
 		else if ((e.getCode() == KeyCode.P) && e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
+			if(e.isConsumed())
+				return;
+
 			String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
 			TreeItem<K> selectedItem = schemaTree.getSelectionModel().getSelectedItem();
 			String selectedSchemName = getSchemaName(selectedItem);

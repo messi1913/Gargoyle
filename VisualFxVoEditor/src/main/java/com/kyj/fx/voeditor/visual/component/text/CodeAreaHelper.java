@@ -88,24 +88,6 @@ public class CodeAreaHelper<T extends CodeArea> {
 		return this.codeArea;
 	}
 
-	//	EventHandler<? super MouseEvent> defaultSelectionHandler = new EventHandler<MouseEvent>() {
-	//		@Override
-	//		public void handle(MouseEvent event) {
-	//			if (event.getClickCount() == 1) {
-	//			} else if (event.getClickCount() == 2) {
-	//				String selectedText = codeArea.getSelectedText();
-	//				if (ValueUtil.isNotEmpty(selectedText)) {
-	//					IndexRange selection = codeArea.getSelection();
-	//					String ltrimText = selectedText.replaceAll("^\\s+", "");
-	//					String firstStr = ltrimText.substring(0, 1).replaceAll(CHARACTERS_MATCH, "");
-	//					int start = selection.getStart();
-	//					int end = selection.getEnd();
-	//					codeArea.selectRange(start + (selectedText.length() - ltrimText.length() + 1 - firstStr.length()), end);
-	//				}
-	//			}
-	//		}
-	//	};
-
 	/**
 	 *
 	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
@@ -265,42 +247,87 @@ public class CodeAreaHelper<T extends CodeArea> {
 	 */
 	public void codeAreaKeyClick(KeyEvent e) {
 
+
+		//CTRL + F
 		if (KeyCode.F == e.getCode() && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
 			if (!e.isConsumed()) {
 				findAndReplaceHelper.findReplaceEvent(new ActionEvent());
 				e.consume();
 			}
 
-		} else if (KeyCode.L == e.getCode() && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
+		}
+		//CTRL + L
+		else if (KeyCode.L == e.getCode() && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
 			if (!e.isConsumed()) {
 				moveToLineEvent(new ActionEvent());
 				e.consume();
 			}
-		} else if (KeyCode.U == e.getCode() && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
+		}
+		// CTRL + U
+		else if (KeyCode.U == e.getCode() && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
 			if (!e.isConsumed()) {
 				toUppercaseEvent(new ActionEvent());
 				e.consume();
 			}
-		} else if (KeyCode.L == e.getCode() && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
+		}
+		//CTRL + L
+		else if (KeyCode.L == e.getCode() && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
 			if (!e.isConsumed()) {
 				toLowercaseEvent(new ActionEvent());
 				e.consume();
 			}
-		} else {
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////
+		/*선택된 행의 selection을 이동시키기 위한 처리  tab, shift + tab*/
+		//Tab
+		else if (e.getCode() == KeyCode.TAB && (!e.isControlDown() && !e.isShiftDown())) {
+
+			if (e.isConsumed())
+				return;
+
+			String selectedText = codeArea.getSelectedText();
+			IndexRange selection = codeArea.getSelection();
+			int start = selection.getStart();
+			if (ValueUtil.isEmpty(selectedText))
+				return;
+
+			String tabbing = ValueUtil.tapping(selectedText);
+			replaceSelection(tabbing);
+			IndexRange selection2 = codeArea.getSelection();
+			int end = selection2.getEnd();
+			codeArea.selectRange(start, end);
+
+			e.consume();
+		}
+		//Shift + Tab
+		else if (e.getCode() == KeyCode.TAB && (!e.isControlDown() && e.isShiftDown())) {
+			if (e.isConsumed())
+				return;
+
+			String selectedText = codeArea.getSelectedText();
+			IndexRange selection = codeArea.getSelection();
+
+			if (selection.getStart() == selection.getEnd()) {
+				codeArea.selectLine();
+				selectedText = codeArea.getSelectedText();
+				selection = codeArea.getSelection();
+				String tabbing = ValueUtil.reverseTapping(selectedText);
+				replaceSelection(tabbing);
+				codeArea.selectRange(selection.getStart(), selection.getStart());
+			} else {
+				String tabbing = ValueUtil.reverseTapping(selectedText);
+				replaceSelection(tabbing);
+				codeArea.selectRange(selection.getStart(), selection.getEnd());
+			}
+			e.consume();
+		}
+		//////////////////////////////////////////////////////////////////////////////////////
+
+		else {
 			codeArea.getUndoManager().mark();
 		}
 
-		// System.out.println("sqlKeywords");
-		// System.out.println(e.getCode());
-		// CTRL + F 찾기
-		// if ((e.getCode() == KeyCode.F) && (e.isControlDown() &&
-		// !e.isShiftDown())) {
-		// findReplaceEvent(e);
-		// }
-		// Ctr + U 선택된 문자 또는 전체 문자를 대문자로 치환
-		// toUppercaseEvent(e);
-		// Ctr + L 선택된 문자 또는 전체 문자를 소문자로 치환
-		// toLowercaseEvent(e);
 
 	}
 
