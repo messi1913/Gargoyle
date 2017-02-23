@@ -45,7 +45,9 @@ public class SVNItem implements SCMItem<SVNItem> {
 			return -1;
 		else if (SVNNodeKind.DIR != kind1 && SVNNodeKind.DIR == kind2)
 			return 1;
-		return kind1.compareTo(kind2);
+
+
+		return e1.getName().compareTo(e2.getName());
 	};
 
 	/**
