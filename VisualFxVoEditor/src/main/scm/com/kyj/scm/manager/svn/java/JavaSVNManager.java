@@ -13,12 +13,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
@@ -187,7 +189,7 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	public String cat(SVNURL url) {
 		return catCommand.cat(url);
 	}
-	
+
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 2. 20.
@@ -197,6 +199,7 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	public String cat(SVNURL url, String revision) {
 		return catCommand.cat(url, revision);
 	}
+
 	/**
 	 * svn cat명령어
 	 *
@@ -257,6 +260,11 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @return
 	 */
 	public List<SVNDirEntry> listEntry(String path, String revision, boolean recurive, Consumer<Exception> exceptionHandler) {
+		return listEntry(path, revision, recurive, null, exceptionHandler);
+	}
+
+	public List<SVNDirEntry> listEntry(String path, String revision, boolean recurive, Comparator<SVNDirEntry> compare,
+			Consumer<Exception> exceptionHandler) {
 		long parseLong = Long.parseLong(revision, 10);
 		List<SVNDirEntry> listEntry = listCommand.listEntry(path, revision, recurive, exceptionHandler);
 		Predicate<? super SVNDirEntry> predicate = null;
@@ -266,7 +274,12 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 		else
 			predicate = v -> parseLong <= v.getRevision();
 
-		return listEntry.stream().filter(predicate).collect(Collectors.toList());
+
+		Stream<SVNDirEntry> filter = listEntry.stream().filter(predicate);
+		if (compare != null) {
+			filter = filter.sorted(compare);
+		}
+		return filter.collect(Collectors.toList());
 	}
 
 	/**
@@ -697,6 +710,5 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	public final boolean isHttps() {
 		return isHttps;
 	}
-
 
 }

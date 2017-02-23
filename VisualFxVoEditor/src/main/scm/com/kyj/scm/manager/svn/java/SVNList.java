@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.scm.manager.svn.java;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -123,8 +124,14 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 			long parseLong = Long.parseLong(revision, 10);
 
 			List<SVNDirEntry> list = new ArrayList<>();
+			String _path = path;
+			try {
+				_path = URLDecoder.decode(_path, "UTF-8");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
-			repository.getDir(path, parseLong, true, list);
+			repository.getDir(_path, parseLong, true, list);
 
 			if (isRecursive) {
 				Iterator<SVNDirEntry> iterator = list.iterator();
@@ -132,6 +139,7 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 					SVNDirEntry entry = iterator.next();
 					if (entry.getKind() == SVNNodeKind.DIR) {
 						SVNURL url = entry.getURL();
+
 						List<SVNDirEntry> listEntry = listEntry(url.getPath(), revision, isRecursive, exceptionHandler);
 						resultList.addAll(listEntry);
 					} else {

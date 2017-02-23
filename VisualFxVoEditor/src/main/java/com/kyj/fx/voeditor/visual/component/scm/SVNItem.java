@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.scm;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +37,16 @@ public class SVNItem implements SCMItem<SVNItem> {
 	public boolean isDir;
 
 	private JavaSVNManager manager;
+
+	private static final Comparator<SVNDirEntry> BASIC_COMPAREABLE = (e1, e2) -> {
+		SVNNodeKind kind1 = e1.getKind();
+		SVNNodeKind kind2 = e2.getKind();
+		if (SVNNodeKind.DIR == kind1 && SVNNodeKind.DIR != kind2)
+			return -1;
+		else if (SVNNodeKind.DIR != kind1 && SVNNodeKind.DIR == kind2)
+			return 1;
+		return kind1.compareTo(kind2);
+	};
 
 	/**
 	 * @param manager
@@ -95,6 +106,8 @@ public class SVNItem implements SCMItem<SVNItem> {
 		return manager;
 	}
 
+
+
 	/*
 	 * @inheritDoc
 	 */
@@ -118,7 +131,8 @@ public class SVNItem implements SCMItem<SVNItem> {
 		//		if(_path.startsWith("/"))
 		//			_path = _path.substring(1);
 
-		List<SVNDirEntry> list = manager.listEntry(_path, ex -> DialogUtil.showExceptionDailog(ex, "SVN Connection Fail"));
+		List<SVNDirEntry> list = manager.listEntry(_path, "-1", false, BASIC_COMPAREABLE,
+				ex -> DialogUtil.showExceptionDailog(ex, "SVN Connection Fail"));
 		List<SVNItem> collect = list.stream().map(p -> {
 			String svnPath = p.getURL().getPath();
 			String url = p.getURL().toString();
@@ -149,6 +163,7 @@ public class SVNItem implements SCMItem<SVNItem> {
 	}
 
 	private Date date;
+
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 2. 17.
@@ -157,7 +172,6 @@ public class SVNItem implements SCMItem<SVNItem> {
 	private void setDate(Date date) {
 		this.date = date;
 	}
-
 
 	/**
 	 * @return the date
@@ -211,7 +225,7 @@ public class SVNItem implements SCMItem<SVNItem> {
 	public String toString() {
 
 		String dateAsStr = DateUtil.getDateAsStr(this.date, DateUtil.SYSTEM_DATEFORMAT_YYYY_MM_DD_HH_MM);
-		return String.format("%s   [%s] [%d] [%s]", simpleName, this.author, this.revision , dateAsStr);
+		return String.format("%s   [%s] [%d] [%s]", simpleName, this.author, this.revision, dateAsStr);
 	}
 
 }
