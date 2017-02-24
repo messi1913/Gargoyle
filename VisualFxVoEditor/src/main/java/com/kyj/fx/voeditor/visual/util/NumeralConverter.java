@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * 진법 변환 클래스 (10진법, 16진법, 21진법, 32진법, 36진법)
- * 
+ *
  * @author hyunjong.noh
  */
 public class NumeralConverter {
@@ -69,7 +69,7 @@ public class NumeralConverter {
 
 	/**
 	 * 10진수 값 {@code value}를 {@code numeral}진수 값으로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 10진수 값
 	 * @param numeral
@@ -95,7 +95,7 @@ public class NumeralConverter {
 
 	/**
 	 * 10진수 값 {@code value}를 {@code numeral}진수 값으로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 10진수 값
 	 * @param numeral
@@ -121,7 +121,7 @@ public class NumeralConverter {
 
 	/**
 	 * {@code numeral}진수 값 {@code value}를 10진수로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 진수 값
 	 * @param numeral
@@ -147,7 +147,7 @@ public class NumeralConverter {
 
 	/**
 	 * {@code numeral}진수 값 {@code value}를 10진수로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 진수 값
 	 * @param numeral
@@ -173,7 +173,7 @@ public class NumeralConverter {
 
 	/**
 	 * 10진수를 16진수로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 10진수 값
 	 * @return 16진수로 변환된 값
@@ -184,7 +184,7 @@ public class NumeralConverter {
 
 	/**
 	 * 10진수를 21진수로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 10진수 값
 	 * @return 21진수로 변환된 값
@@ -195,7 +195,7 @@ public class NumeralConverter {
 
 	/**
 	 * 10진수를 32진수로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 10진수 값
 	 * @return 32진수로 변환된 값
@@ -206,7 +206,7 @@ public class NumeralConverter {
 
 	/**
 	 * 10진수를 36진수로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 10진수 값
 	 * @return 36진수로 변환된 값
@@ -217,7 +217,7 @@ public class NumeralConverter {
 
 	/**
 	 * {@code numeral}진수 값 {@code value}를 16진수로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 진수 값
 	 * @param numeral
@@ -231,7 +231,7 @@ public class NumeralConverter {
 
 	/**
 	 * {@code numeral}진수 값 {@code value}를 21진수로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 진수 값
 	 * @param numeral
@@ -245,7 +245,7 @@ public class NumeralConverter {
 
 	/**
 	 * {@code numeral}진수 값 {@code value}를 32진수로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 진수 값
 	 * @param numeral
@@ -259,7 +259,7 @@ public class NumeralConverter {
 
 	/**
 	 * {@code numeral}진수 값 {@code value}를 36진수로 변환합니다.
-	 * 
+	 *
 	 * @param value
 	 *            변환 대상이 되는 진수 값
 	 * @param numeral
@@ -273,7 +273,7 @@ public class NumeralConverter {
 
 	/**
 	 * 10진수 값 리스트 {@code valueList}의 값들을 {@code toNumeral}진수 값들로 변환합니다.
-	 * 
+	 *
 	 * @param valueList
 	 *            변환 대상이 되는 10진수 값 리스트
 	 * @param toNumeral
@@ -294,7 +294,7 @@ public class NumeralConverter {
 	/**
 	 * {@code fromNumeral}진수 값 리스트 {@code valueList}의 값들을 {@code toNumeral}진수
 	 * 값들로 변환합니다.
-	 * 
+	 *
 	 * @param valueList
 	 *            변환 대상이 되는 진수 값 리스트
 	 * @param fromNumeral
@@ -316,7 +316,7 @@ public class NumeralConverter {
 
 	/**
 	 * {@code numeral}진수 값 {@code value}를 {@code step}만큼 증가시킨 값을 얻어옵니다.
-	 * 
+	 *
 	 * @param value
 	 *            대상이 되는 진수 값
 	 * @param numeral
@@ -332,7 +332,7 @@ public class NumeralConverter {
 
 	/**
 	 * {@code numeral}진수 값 {@code value}의 다음값(1 증가한 값)을 얻어옵니다.
-	 * 
+	 *
 	 * @param value
 	 *            대상이 되는 진수 값
 	 * @param numeral
@@ -346,7 +346,7 @@ public class NumeralConverter {
 
 	/**
 	 * 16진수 값 {@code value}의 다음값(1 증가시킨 값)을 얻어옵니다.
-	 * 
+	 *
 	 * @param value
 	 *            대상이되는 16진수 값
 	 * @return 값이 증가된 16진수 값
@@ -358,7 +358,7 @@ public class NumeralConverter {
 
 	/**
 	 * 21진수 값 {@code value}의 다음값(1 증가시킨 값)을 얻어옵니다.
-	 * 
+	 *
 	 * @param value
 	 *            대상이되는 21진수 값
 	 * @return 값이 증가된 21진수 값
@@ -370,7 +370,7 @@ public class NumeralConverter {
 
 	/**
 	 * 32진수 값 {@code value}의 다음값(1 증가시킨 값)을 얻어옵니다.
-	 * 
+	 *
 	 * @param value
 	 *            대상이되는 32진수 값
 	 * @return 값이 증가된 32진수 값
@@ -382,7 +382,7 @@ public class NumeralConverter {
 
 	/**
 	 * 36진수 값 {@code value}의 다음값(1 증가시킨 값)을 얻어옵니다.
-	 * 
+	 *
 	 * @param value
 	 *            대상이되는 36진수 값
 	 * @return 값이 증가된 36진수 값
@@ -391,4 +391,20 @@ public class NumeralConverter {
 	public static String getNext36(String value) throws Exception {
 		return getNext(value, 36, 1);
 	}
+
+	/**
+	 * 숫자를 뒤집은 값을 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 24.
+	 * @param num
+	 * @return
+	 */
+	public static int flip(int num){
+        int result=0;
+        while(num!=0){
+            result= result * 10 + num % 10;
+            num /= 10;
+        }
+        return result;
+    }
 }
