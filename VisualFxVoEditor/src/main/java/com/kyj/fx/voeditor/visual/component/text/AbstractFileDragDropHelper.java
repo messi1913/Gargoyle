@@ -13,16 +13,17 @@ import javafx.scene.Node;
 import javafx.scene.input.DragEvent;
 
 /**
+ * 파일드래그 드롭 기능을 지원
  * @author KYJ
  *
  */
-public abstract class AbstractDragDropHelper<T extends Node> {
+public abstract class AbstractFileDragDropHelper<T extends Node> {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(AbstractDragDropHelper.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(AbstractFileDragDropHelper.class);
 
 	protected T node;
 
-	public AbstractDragDropHelper(T node) {
+	public AbstractFileDragDropHelper(T node) {
 		this.node = node;
 
 		this.node.setOnDragOver(this::onDagOver);

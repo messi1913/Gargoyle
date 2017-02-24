@@ -13,6 +13,12 @@ public class NumeralConverter {
 	public static void main(String[] args) throws Exception {
 		// 10진수 값을 지정한 진수 값으로 변환
 		int value = 291;
+
+
+
+		System.out.println(flip(291));
+		System.out.println(flip(-291));
+
 		String n16 = NumeralConverter.to(value, 16);
 		String n21 = NumeralConverter.to(value, 21);
 		String n32 = NumeralConverter.to(value, 32);

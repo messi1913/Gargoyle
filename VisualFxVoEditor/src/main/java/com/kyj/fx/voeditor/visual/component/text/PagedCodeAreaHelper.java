@@ -48,7 +48,7 @@ public class PagedCodeAreaHelper<T extends CodeArea> extends CodeAreaHelper<T> {
 		defaultSelectionHandler = new CodeAreaDefaultSelectionHandler(codeArea);
 		this.codeArea.setOnMouseClicked(defaultSelectionHandler);
 		this.codeMoveDeligator = new CodeAreaMoveLineHelper(codeArea);
-		this.dragDropHelper = new CodeAreaDragDropHelper(codeArea);
+		this.dragDropHelper = new CodeAreaFileDragDropHelper(codeArea);
 		this.findAndReplaceHelper = new PagedCodeAreaFindAndReplaceHelper(bigTextView);
 
 		contextMenu = codeArea.getContextMenu();
