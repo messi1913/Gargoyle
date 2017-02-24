@@ -48,7 +48,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 	protected T codeArea;
 	protected SqlFormatter sqlFormatter = new SqlFormatter();
 	protected CodeAreaMoveLineHelper codeMoveDeligator;
-	protected CodeAreaDragDropHelper dragDropHelper;
+	protected CodeAreaFileDragDropHelper dragDropHelper;
 	protected CodeAreaFindAndReplaceHelper<T> findAndReplaceHelper;
 
 	protected ContextMenu contextMenu;
@@ -69,7 +69,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 		defaultSelectionHandler = new CodeAreaDefaultSelectionHandler(codeArea);
 		this.codeArea.setOnMouseClicked(defaultSelectionHandler);
 		this.codeMoveDeligator = new CodeAreaMoveLineHelper(codeArea);
-		this.dragDropHelper = new CodeAreaDragDropHelper(codeArea);
+		this.dragDropHelper = new CodeAreaFileDragDropHelper(codeArea);
 		this.findAndReplaceHelper = new CodeAreaFindAndReplaceHelper<>(codeArea);
 		// this.codeArea.addEventHandler(MouseDragEvent.MOUSE_DRAG_OVER,
 		// this::codeAreaDagOver);
