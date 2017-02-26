@@ -120,6 +120,9 @@ class FxTableViewUtil {
 
 		table.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
 
+			if(e.isConsumed())
+				return;
+
 			int type = -1;
 			if (e.isControlDown() && e.getCode() == KeyCode.C) {
 				if (e.isShiftDown()) {
@@ -132,8 +135,6 @@ class FxTableViewUtil {
 			if (type == -1)
 				return;
 
-			// TableView<Map<String, Object>> tbResult = getTbResult();
-
 			ObservableList<TablePosition> selectedCells = table.getSelectionModel().getSelectedCells();
 
 			TablePosition tablePosition = selectedCells.get(0);
@@ -145,7 +146,6 @@ class FxTableViewUtil {
 			case 1:
 				StringBuilder sb = new StringBuilder();
 				for (TablePosition cell : selectedCells) {
-					// TODO :: 첫번째 컬럼(행 선택 기능)도 빈값으로 복사됨..
 					// 행변경시
 					if (row != cell.getRow()) {
 						sb.append("\n");
@@ -159,13 +159,12 @@ class FxTableViewUtil {
 					sb.append(ValueUtil.decode(cellData, cellData, "").toString());
 				}
 				FxClipboardUtil.putString(sb.toString());
-
-				// Map<String, Object> map = tbResult.getItems().get(row);
-				// FxClipboardUtil.putString(ValueUtil.toCVSString(map));
+				e.consume();
 				break;
 			case 2:
 				Object cellData = tableColumn.getCellData(row);
 				FxClipboardUtil.putString(ValueUtil.decode(cellData, cellData, "").toString());
+				e.consume();
 				break;
 			}
 
