@@ -104,13 +104,14 @@ public class FileWrapper implements Serializable {
 			@Override
 			public int compare(File o1, File o2) {
 
-				if (o1.isDirectory())
+				if (o1.isDirectory() == !o2.isDirectory())
 					return -1;
 
-				if (o2.isDirectory())
+				if (!o1.isDirectory() == o2.isDirectory())
 					return 1;
 
-				return 0;
+
+				return o1.getName().compareTo(o2.getName());
 			}
 		});
 		return listFiles;
