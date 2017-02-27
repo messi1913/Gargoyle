@@ -27,6 +27,8 @@ class FxTreeViewClipboardUtil {
 	public static void installCopyPasteHandler(TreeView<?> table) {
 		table.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
 
+			if(e.isConsumed())
+				return;
 			if (e.isControlDown() && e.getCode() == KeyCode.C) {
 
 				ObservableList<?> selectedItems = table.getSelectionModel().getSelectedItems();
@@ -40,6 +42,7 @@ class FxTreeViewClipboardUtil {
 					}
 				}
 				FxClipboardUtil.putString(sb.toString());
+				e.consume();
 			}
 
 		});

@@ -971,9 +971,13 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		/* CTRL + ENTER */
 		// case ENTER:
 		if ((e.getCode() == KeyCode.ENTER) && e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
+			if(e.isConsumed())
+				return;
 			execute();
 			e.consume();
 		} else if ((e.getCode() == KeyCode.ENTER) && e.isAltDown()) {
+			if(e.isConsumed())
+				return;
 			try {
 				String selectedSQLText = sqlTab.getSelectedSQLText().trim();
 				// Connection connection = connectionSupplier.get();
@@ -1005,6 +1009,9 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		else if(KeyCode.F1 == e.getCode())
 		{
+			if(e.isConsumed())
+				return;
+
 			String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
 			List<TreeItem<K>> searchPattern = searchPattern(null, selectedSQLText);
 			if(ValueUtil.isNotEmpty(searchPattern))
@@ -1013,6 +1020,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				schemaTree.getSelectionModel().select(treeItem);
 				schemaTree.scrollTo(schemaTree.getSelectionModel().getSelectedIndex());
 				show100RowAction();
+				e.consume();
 			}
 
 		}
