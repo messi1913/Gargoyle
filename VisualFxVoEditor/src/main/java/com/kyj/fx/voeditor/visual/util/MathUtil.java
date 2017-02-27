@@ -6,6 +6,10 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 /***************************
  *
  * @author KYJ
@@ -78,8 +82,87 @@ public class MathUtil {
 
 	public static void main(String[] args) {
 
+		System.out.println("## 최대공약수");
 		System.out.println(gcd(10, 4));
+		System.out.println("## 최소공배수");
 		System.out.println(lcm(10, 4));
+		System.out.println("## sumLange");
 		System.out.println(sumLange(5, 2));
+		System.out.println("## combination");
+		combination(new int[] { 1, 2, 3 }, 2, items -> {
+			System.out.println(items);
+		});
+	}
+
+	/**
+	 * data값의 모든 조합을 구한뒤 handler로 넘겨쥼.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 24.
+	 * @param data
+	 * @param r
+	 * @param handle
+	 */
+	public static void combination(int[] data, int r, Consumer<List<Integer>> handle) {
+		int N = data.length;
+		int flag[] = new int[N];
+		combination(data, flag, N, r, handle);
+	}
+
+	/**
+	 * data값의 모든 조합을 구한뒤 handler로 넘겨쥼.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 2. 24.
+	 * @param data
+	 * @param flag
+	 * @param n
+	 * @param r
+	 * @param handle
+	 */
+	private static void combination(int[] data, int[] flag, int n, int r, Consumer<List<Integer>> handle) {
+
+		if (r == 1) {
+
+			for (int i = 0; i < n; i++) {
+				List<Integer> arrayList = new ArrayList<Integer>();
+				flag[i] = 1;
+				for (int j = 0; j < data.length; j++) {
+					if (flag[j] == 1) {
+						arrayList.add(data[j]);
+					}
+				}
+				handle.accept(arrayList);
+				flag[i] = 0;
+
+			}
+
+			return;
+		}
+
+		if (n == r) {
+
+			List<Integer> arrayList = new ArrayList<Integer>();
+			for (int i = 0; i < r; i++) {
+				flag[i] = 1;
+			}
+
+			for (int i = 0; i < data.length; i++) {
+				if (flag[i] == 1) {
+					arrayList.add(data[i]);
+				}
+			}
+			handle.accept(arrayList);
+			for (int i = 0; i < r; i++) {
+				flag[i] = 0;
+			}
+
+			return;
+		}
+
+		flag[n - 1] = 1;
+		combination(data, flag, n - 1, r - 1, handle);
+		flag[n - 1] = 0;
+		combination(data, flag, n - 1, r, handle);
+
+		return;
 	}
 }
