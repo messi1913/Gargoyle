@@ -93,12 +93,14 @@ public class FileWrapper implements Serializable {
 
 	public File[] listFiles() {
 
-		File[] listFiles = this.file.listFiles((dir, name) -> {
-			if (!isShowHiddenFile()) {
-				return !name.startsWith(".");
-			}
-			return true;
-		});
+//		File[] listFiles = this.file.listFiles((dir, name) -> {
+//			if (!isShowHiddenFile()) {
+//				return !name.startsWith(".");
+//			}
+//			return true;
+//		});
+
+		File[] listFiles = this.file.listFiles();
 		Arrays.sort(listFiles, new Comparator<File>() {
 
 			@Override
