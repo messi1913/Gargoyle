@@ -947,7 +947,52 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		});
 
-		ContextMenu contextMenu = new ContextMenu(closeMenuItem, closeOtherMenuItem, closeAllMenuItem);
+		MenuItem closeRightMenuItem = new MenuItem("Close Tab to the Right");
+		closeRightMenuItem.setOnAction(hander -> {
+			ObservableList<DockTab> tabs = tabPanWorkspace.getTabs();
+			int tabSize = tabs.size();
+			int selectedIndex = tabPanWorkspace.getSelectionModel().getSelectedIndex();
+			if (selectedIndex == -1)
+				return;
+
+			for (int i = tabSize - 1; i > selectedIndex; i--) {
+				DockTab otherTab = tabs.get(i);
+				closeTab(otherTab);
+			}
+
+		});
+
+		MenuItem closeLeftMenuItem = new MenuItem("Close Tab to the Left");
+		closeLeftMenuItem.setOnAction(hander -> {
+			DockTab selectedItem = tabPanWorkspace.getSelectionModel().getSelectedItem();
+			if (selectedItem == null)
+				return;
+
+			ObservableList<DockTab> tabs = null;
+			while (true) {
+
+				//삭제처리이기때문에 배열을 지속적으로 다시 가져와야함.
+				tabs = tabPanWorkspace.getTabs();
+				//WelCome Page는 닫지않음
+				if(tabs.size() == 1)
+					break;
+
+				//WelCome Page -> 0 index므로 1번부터 조회
+				DockTab dockTab = tabs.get(1);
+
+				//선택된 탭이면 종료
+				if(selectedItem == dockTab)
+					break;
+
+				if (dockTab!=null)
+					closeTab(dockTab);
+
+			}
+
+		});
+
+		ContextMenu contextMenu = new ContextMenu(closeMenuItem, closeOtherMenuItem, closeAllMenuItem, closeRightMenuItem,
+				closeLeftMenuItem);
 
 		return contextMenu;
 	}
@@ -961,6 +1006,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 */
 	public void closeTab(DockTab tab) {
 		if (tab != null) {
+
+			//WelCome Page는 닫지않음.
+			if(tabPanWorkspace.getTabs().indexOf(tab) == 0)
+				return;
 
 			// 만들어진 closeRequest 이벤트 호출
 			EventHandler<Event> onCloseRequest = tab.getOnCloseRequest();
@@ -1923,7 +1972,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	}
 
 	@FXML
-	public void miProxyServerOnAction(){
+	public void miProxyServerOnAction() {
 		CloseableParent<BorderPane> javaProcessMonitor = new ProxyServerComposite();
 		loadNewSystemTab(ProxyServerComposite.class.getSimpleName(), javaProcessMonitor);
 	}
