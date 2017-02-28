@@ -9,6 +9,7 @@ package com.kyj.scm.manager.svn.java;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
@@ -123,8 +124,15 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 			 * is located at a path in a revision. -1 means the latest revision.
 			 */
 
+			String _path = path;
+			try {
+				_path = URLDecoder.decode(_path, "UTF-8");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 			SVNRepository repository = getRepository();
-			SVNNodeKind nodeKind = repository.checkPath(path, -1);
+			SVNNodeKind nodeKind = repository.checkPath(_path, -1);
 
 			if (nodeKind == SVNNodeKind.NONE) {
 				if (exceptionHandler != null) {
@@ -149,7 +157,7 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 				parseLong = Long.parseLong(revision);
 			} catch (NumberFormatException e) {
 			}
-			repository.getFile(path, parseLong, fileProperties, baos);
+			repository.getFile(_path, parseLong, fileProperties, baos);
 
 			/*
 			 * Here the SVNProperty class is used to get the value of the
@@ -163,6 +171,7 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 			 * mime-type file property and says if the file is a text (true) or
 			 * not (false).
 			 */
+
 			boolean isTextType = SVNProperty.isTextMimeType(mimeType);
 
 			Iterator<String> iterator = fileProperties.nameSet().iterator();
@@ -184,7 +193,16 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 
 					result = baos.toString(encoding); // out.getString();
 //				}
-			} else {
+			}
+			/*
+			 * 2017.2.28
+			 * binay type은 무거운 데이터를 읽어들일수있는 가능성때문에 여기서 제외시켜놓겠음.
+			 */
+			else if(SVNProperty.isBinaryMimeType(mimeType))
+			{
+				result = mimeType + " is not support.";   //baos.toString(encoding);
+			}
+			else {
 				LOGGER.debug(
 						"File contents can not be displayed in the console since the mime-type property says that it's not a kind of a text file.");
 

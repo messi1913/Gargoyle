@@ -7,6 +7,7 @@
 package com.kyj.scm.manager.svn.java;
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -82,7 +83,15 @@ class SVNLog extends AbstractSVN implements ILogCommand<String, List<SVNLogEntry
 				//				LOGGER.debug("properties :: " + logEntry.getRevisionProperties());
 				result.add(logEntry);
 			};
-			logClient.doLog(getSvnURL(), new String[] { path }, SVNRevision.create(Long.parseLong(revision)),
+
+			String _path = path;
+			try {
+				_path = URLDecoder.decode(_path, "UTF-8");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			logClient.doLog(getSvnURL(), new String[] { _path }, SVNRevision.create(Long.parseLong(revision)),
 					SVNRevision.create(Long.parseLong(revision) == -1 ? 0 : Long.parseLong(revision)), SVNRevision.HEAD, true, false, 100L,
 					handler);
 
