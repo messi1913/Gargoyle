@@ -724,9 +724,13 @@ public class DesignerFx implements ClipboardOwner {
 	private class CodeHighlightListener implements TreeSelectionListener {
 		public void valueChanged(TreeSelectionEvent e) {
 			if (e.getNewLeadSelectionPath() != null) {
-				ASTTreeNode selected = (ASTTreeNode) e.getNewLeadSelectionPath().getLastPathComponent();
-				if (selected != null) {
-					codeEditorPane.select(selected.node);
+				Object selected = e.getNewLeadSelectionPath().getLastPathComponent();
+				if (selected != null &&  selected instanceof ASTTreeNode) {
+					codeEditorPane.select(((ASTTreeNode)selected).node);
+				}
+				else
+				{
+					LOGGER.error("Can't Catched Type Value : %s" , selected);
 				}
 			}
 		}

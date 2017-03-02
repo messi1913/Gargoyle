@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.nrch.realtime;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -27,6 +28,7 @@ import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.suppliers.NaverRealtimeSrchSupplier;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -148,6 +150,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 						return;
 
 					String link = obj.getLink();
+					LOGGER.debug("Link : {} " , link);
 					FxUtil.openBrowser(this.getParent(), "https:" + link);
 					ev.consume();
 				}
@@ -338,7 +341,13 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 					@Override
 					protected List<RealtimeSearchVO> call() throws Exception {
-						return NaverRealtimeSrchSupplier.getInstance().getMeta();
+						List<RealtimeSearchVO> meta = Collections.emptyList();
+						try {
+							meta = NaverRealtimeSrchSupplier.getInstance().getMeta();
+						} catch (Exception e) {
+							DialogUtil.showExceptionDailog(e);
+						}
+						return meta;
 					}
 				};
 			}
@@ -479,9 +488,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 		if (gargoyleThreadExecutors.isShutdown() || gargoyleThreadExecutors.isTerminated()) {
 
-
-			if (service.isRunning())
-			{
+			if (service.isRunning()) {
 				service.cancel();
 				gargoyleThreadExecutors.shutdown();
 			}

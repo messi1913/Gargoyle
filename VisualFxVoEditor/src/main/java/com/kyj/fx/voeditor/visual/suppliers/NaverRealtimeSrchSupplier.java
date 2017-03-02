@@ -63,13 +63,13 @@ public final class NaverRealtimeSrchSupplier implements Supplier<List<String>> {
 		return rsltDVOList;
 	}
 
-	public List<RealtimeSearchVO> getMeta() {
+	public List<RealtimeSearchVO> getMeta() throws Exception {
 		List<RealtimeSearchVO> rsltDVOList = Collections.emptyList();
-		try {
+//		try {
 			rsltDVOList = NaverRealtimeSearchFactory.getInstance().getRealtimeSearchMeta();
-		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(e));
-		}
+//		} catch (Exception e) {
+//			LOGGER.error(ValueUtil.toString(e));
+//		}
 		return rsltDVOList;
 	}
 

@@ -486,7 +486,7 @@
 		</copy>
 		<copy todir="externalLibs">
 			<fileset dir="${basedir}\..\lib\richtext">
-				<filename name="richtextfx-fat-0.6.10.jar" />
+				<filename name="richtextfx-fat-1.0.0-SNAPSHOT.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
@@ -782,7 +782,7 @@
 				<include name="bcprov-jdk16-1.46.jar" />
 				<include name="fontbox-2.0.0.jar" />
 				<include name="commons-lang-2.4.jar" />
-				<include name="richtextfx-fat-0.6.10.jar" />
+				<include name="richtextfx-fat-1.0.0-SNAPSHOT.jar" />
 				<include name="hamcrest-core-1.3.jar" />
 				<include name="reflections-0.9.9-RC1.jar" />
 				<include name="httpmime-4.3.6.jar" />

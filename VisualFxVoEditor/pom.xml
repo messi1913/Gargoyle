@@ -306,6 +306,14 @@
 <!-- 			<version>0.6.10</version> -->
 <!-- 		</dependency> -->
 
+		<dependency>
+			<groupId>org.fxmisc.richtext</groupId>
+			<artifactId>richtextfx</artifactId>
+			<version>0.6.10</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/richtext/richtextfx-fat-1.0.0-SNAPSHOT.jar</systemPath>
+		</dependency>
+
 
 		<!-- JSON -->
 		<dependency>

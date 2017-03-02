@@ -1531,6 +1531,11 @@ public class FxUtil {
 		WebView view = new WebView();
 		WebEngine engine = view.getEngine();
 
+		engine.setOnError(err ->{
+			String message = err.getMessage();
+			DialogUtil.showMessageDialog( FxUtil.getWindow(parent) , message);
+		});
+
 		engine.setJavaScriptEnabled(true);
 		engine.setCreatePopupHandler(new Callback<PopupFeatures, WebEngine>() {
 
@@ -1576,6 +1581,7 @@ public class FxUtil {
 		engine.setOnAlert((WebEvent<String> wEvent) -> {
 			System.out.println("Alert Event  -  Message:  " + wEvent.getData());
 		});
+
 		engine.load(link);
 
 		BorderPane root = new BorderPane(view);
