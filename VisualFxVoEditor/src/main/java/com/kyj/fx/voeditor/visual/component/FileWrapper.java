@@ -31,7 +31,7 @@ public class FileWrapper implements Serializable {
 	 *
 	 * @최초생성일 2015. 10. 21.
 	 */
-	private boolean showHiddenFile;
+	private boolean showHiddenFile = true;
 
 	/**
 	 * 자바 프로젝트인지 유무
@@ -93,14 +93,14 @@ public class FileWrapper implements Serializable {
 
 	public File[] listFiles() {
 
-//		File[] listFiles = this.file.listFiles((dir, name) -> {
-//			if (!isShowHiddenFile()) {
-//				return !name.startsWith(".");
-//			}
-//			return true;
-//		});
+		File[] listFiles = this.file.listFiles((dir, name) -> {
+			if (!isShowHiddenFile()) {
+				return !name.startsWith(".");
+			}
+			return true;
+		});
 
-		File[] listFiles = this.file.listFiles();
+//		File[] listFiles = this.file.listFiles();
 		Arrays.sort(listFiles, new Comparator<File>() {
 
 			@Override

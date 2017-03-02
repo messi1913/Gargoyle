@@ -130,7 +130,16 @@ public class ProjectFileTreeItemCreator {
 				if (isFirstTimeLeaf) {
 					isFirstTimeLeaf = false;
 					FileWrapper f = (FileWrapper) getValue();
-					isLeaf = f.isFile();
+					File file = f.getFile();
+
+					if(file.isDirectory())
+					{
+						isLeaf = file.list().length == 0 ? true : false;
+					}
+					else
+					{
+						isLeaf = f.isFile();
+					}
 				}
 				return isLeaf;
 			}
@@ -157,7 +166,16 @@ public class ProjectFileTreeItemCreator {
 				if (isFirstTimeLeaf) {
 					isFirstTimeLeaf = false;
 					FileWrapper f = (FileWrapper) getValue();
-					isLeaf = f.isFile();
+					File file = f.getFile();
+
+					if(file.isDirectory())
+					{
+						isLeaf = file.list().length == 0 ? true : false;
+					}
+					else
+					{
+						isLeaf = f.isFile();
+					}
 				}
 				return isLeaf;
 			}
@@ -201,7 +219,17 @@ public class ProjectFileTreeItemCreator {
 				if (isFirstTimeLeaf) {
 					isFirstTimeLeaf = false;
 					FileWrapper f = (FileWrapper) getValue();
-					isLeaf = f.isFile();
+					File file = f.getFile();
+
+					if(file.isDirectory())
+					{
+						isLeaf = file.list().length == 0 ? true : false;
+					}
+					else
+					{
+						isLeaf = f.isFile();
+					}
+
 				}
 				return isLeaf;
 			}
