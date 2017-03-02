@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.apache.commons.lang.StringUtils;
+import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,7 +188,7 @@ public class TextSearchAndReplaceView extends BorderPane {
 	 * @param parent
 	 * @param content
 	 */
-	public TextSearchAndReplaceView(Parent parent, ObservableValue<String> content) {
+	public TextSearchAndReplaceView(CodeArea parent, ObservableValue<String> content) {
 		loader = new FXMLLoader();
 		loader.setLocation(TextSearchAndReplaceView.class.getResource("TextSearchAndReplaceView.fxml"));
 		loader.setRoot(this);
@@ -208,6 +210,9 @@ public class TextSearchAndReplaceView extends BorderPane {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
+				String selectedText = parent.getSelectedText();
+				txtFind.setText(selectedText);
+				txtFindTextContent.setText(selectedText);
 				txtFindTextContent.requestFocus();
 			}
 		});
@@ -372,7 +377,8 @@ public class TextSearchAndReplaceView extends BorderPane {
 		if (startIndex >= 0) {
 			String preContent = content.substring(0, startIndex);
 			String afterContent = content.substring(startIndex);
-			afterContent = afterContent.replaceFirst(findText, replaceText);
+//			afterContent = afterContent.replaceFirst(findText, replaceText);
+			afterContent = StringUtils.replaceOnce(afterContent, findText, replaceText);
 
 			StringBuffer sb = new StringBuffer();
 			sb.append(preContent);
@@ -406,7 +412,8 @@ public class TextSearchAndReplaceView extends BorderPane {
 		String findText = txtFind.getText();
 		String replaceText = txtReplace.getText();
 
-		String reaplceResult = content.replaceAll(findText, replaceText);
+		String reaplceResult = StringUtils.replace(content, findText, replaceText);
+//		String reaplceResult = content.replaceAll(findText, replaceText);
 		ReplaceResultVO replaceResultVO = new ReplaceResultVO();
 		replaceResultVO.setReaplceType(REPLACE_TYPE.ALL);
 		replaceResultVO.setSearchText(findText);
