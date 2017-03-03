@@ -384,11 +384,13 @@
 				<filename name="commons-collections-3.2.1.jar" />
 			</fileset>
 		</copy>
+		<!--
 		<copy todir="externalLibs">
 			<fileset dir="${m2.dir}\org\fxmisc\richtext\richtextfx\0.6.10">
 				<filename name="richtextfx-0.6.10.jar" />
 			</fileset>
 		</copy>
+		-->
 		<copy todir="externalLibs">
 			<fileset dir="${m2.dir}\com\fasterxml\jackson\core\jackson-annotations\2.4.2">
 				<filename name="jackson-annotations-2.4.2.jar" />
@@ -742,7 +744,9 @@
 				<include name="btrace-boot.jar" />
 				<include name="antlr-runtime-3.4.jar" />
 				<include name="pdfbox-tools-2.0.0.jar" />
-				<include name="richtextfx-0.6.10.jar" />
+
+				<!--<include name="richtextfx-0.6.10.jar" />-->
+
 				<include name="reactfx-2.0-M4u1.jar" />
 				<include name="controlsfx-8.40.12.jar" />
 				<include name="jcl-over-slf4j-1.7.7.jar" />

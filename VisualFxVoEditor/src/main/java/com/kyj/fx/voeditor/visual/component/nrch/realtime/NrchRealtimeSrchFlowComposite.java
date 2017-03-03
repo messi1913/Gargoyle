@@ -151,7 +151,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 					String link = obj.getLink();
 					LOGGER.debug("Link : {} " , link);
-					FxUtil.openBrowser(this.getParent(), "https:" + link);
+					FxUtil.openBrowser(this.getParent(), "http:" + link);
 					ev.consume();
 				}
 

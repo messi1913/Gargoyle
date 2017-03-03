@@ -707,6 +707,13 @@
 			<version>4.0.0.201506090130-r</version>
 		</dependency>
 
+
+		<dependency>
+		    <groupId>fr.opensagres.xdocreport</groupId>
+		    <artifactId>org.apache.poi.xwpf.converter.pdf</artifactId>
+		    <version>1.0.6</version>
+		</dependency>
+
 	</dependencies>
 
 

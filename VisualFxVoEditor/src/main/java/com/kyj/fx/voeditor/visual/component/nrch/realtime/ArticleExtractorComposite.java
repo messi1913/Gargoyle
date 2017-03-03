@@ -86,7 +86,7 @@ public class ArticleExtractorComposite extends BorderPane {
 
 	/**
 	 * 불필요한 URL을 제거하기 위해 URL정보를 저장관리하는 클래스.
-	 * 
+	 *
 	 * @최초생성일 2016. 12. 6.
 	 */
 	private URLFilterRepository filterRepository;
@@ -515,7 +515,7 @@ public class ArticleExtractorComposite extends BorderPane {
 	private URL toURL(String url) throws MalformedURLException {
 		if (url.startsWith("https:") || url.startsWith("http:"))
 			return new URL(url);
-		return new URL("https:" + url);
+		return new URL("http:" + url);
 	}
 
 	private void updateMainContent(Class<? extends ExtractorBase> algorism, URLModel userData) {
