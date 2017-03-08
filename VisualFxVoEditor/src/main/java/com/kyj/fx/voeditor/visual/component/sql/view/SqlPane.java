@@ -581,6 +581,14 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						// LOGGER.error(ValueUtil.toString(e));
 						// }
 					}
+					else if( item instanceof String)
+					{
+						FxUtil.createStageAndShow(new SimpleTextView(item.toString()), stage -> {
+							stage.setAlwaysOnTop(true);
+							stage.initModality(Modality.APPLICATION_MODAL);
+							stage.initOwner(SqlPane.this.getScene().getWindow());
+						});
+					}
 
 				}
 			});

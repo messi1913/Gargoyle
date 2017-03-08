@@ -7,6 +7,7 @@ package com.kyj.fx.voeditor.visual.main.layout;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -102,6 +103,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -191,6 +194,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	@FXML
 	private VBox accordionItems;
+	@FXML
+	private Tab tabPackageExplorer;
 
 	private File selectDirFile;
 	private FileWrapper tmpSelectFileWrapper = null;
@@ -332,6 +337,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			}
 
 		});
+
+		//tab image 아이콘 처리
+		try (InputStream is = getClass().getResourceAsStream("/META-INF/images/eclipse/eview16/packages.gif")) {
+			tabPackageExplorer.setGraphic(new ImageView(new Image(is)));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -661,7 +673,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					//TODO 메인함수인지 아닌지 여부를 결정해서 Java Application 기능 처리.
 
 					if (FileUtil.isJavaFile(file)) {
-						menuRunAs.getItems().add(new MenuItem("Java Application"));
+						MenuItem runJavaApp = new MenuItem("Java Application");
+						runJavaApp.setOnAction(this::miRunJavaAppOnAction);
+						menuRunAs.getItems().add(runJavaApp);
 					}
 				}
 
@@ -974,17 +988,17 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				//삭제처리이기때문에 배열을 지속적으로 다시 가져와야함.
 				tabs = tabPanWorkspace.getTabs();
 				//WelCome Page는 닫지않음
-				if(tabs.size() == 1)
+				if (tabs.size() == 1)
 					break;
 
 				//WelCome Page -> 0 index므로 1번부터 조회
 				DockTab dockTab = tabs.get(1);
 
 				//선택된 탭이면 종료
-				if(selectedItem == dockTab)
+				if (selectedItem == dockTab)
 					break;
 
-				if (dockTab!=null)
+				if (dockTab != null)
 					closeTab(dockTab);
 
 			}
@@ -1008,7 +1022,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		if (tab != null) {
 
 			//WelCome Page는 닫지않음.
-			if(tabPanWorkspace.getTabs().indexOf(tab) == 0)
+			if (tabPanWorkspace.getTabs().indexOf(tab) == 0)
 				return;
 
 			// 만들어진 closeRequest 이벤트 호출
@@ -1976,4 +1990,24 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		CloseableParent<BorderPane> javaProcessMonitor = new ProxyServerComposite();
 		loadNewSystemTab(ProxyServerComposite.class.getSimpleName(), javaProcessMonitor);
 	}
+
+	/**
+	 * Java Application 실행처리.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 6.
+	 * @param e
+	 */
+	public void miRunJavaAppOnAction(ActionEvent e) {
+		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		if(selectedItem instanceof JavaProjectMemberFileTreeItem)
+		{
+			JavaProjectMemberFileTreeItem ti = (JavaProjectMemberFileTreeItem) selectedItem;
+			
+		}
+		if (selectedItem != null) {
+			FileWrapper value = selectedItem.getValue();
+//			new EclipseJavaCompiler(value);
+		}
+	}
+
 }

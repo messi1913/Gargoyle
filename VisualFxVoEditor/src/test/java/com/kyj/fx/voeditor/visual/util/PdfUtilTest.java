@@ -56,4 +56,14 @@ public class PdfUtilTest {
 		file.mkdirs();
 		PDFUtil.toImage(new File("Hello.pdf"), file);
 	}
+
+	@Test
+	public void createPdFromImageTest() throws IOException {
+		File imgFile = new File("C:\\Users\\KYJ\\Pictures\\2014022503792_0.jpg");
+		File pdfFile = new File("Sample.pdf");
+		PDFUtil.toPdf(pdfFile, imgFile);
+
+		FileUtil.openFile(pdfFile);
+	}
+
 }

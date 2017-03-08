@@ -7,11 +7,13 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +52,7 @@ public class RuntimeClassUtil {
 	public static void simpleExec(List<String> args) throws Exception {
 		try {
 
-			if(args == null || args.isEmpty())
+			if (args == null || args.isEmpty())
 				return;
 
 			ProcessBuilder pb = new ProcessBuilder(args);
@@ -221,6 +223,140 @@ public class RuntimeClassUtil {
 	}
 
 	public static int exe(List<String> args, Consumer<String> messageReceiver) throws Exception {
+		return exe(args, Charset.defaultCharset(), messageReceiver);
+	}
+
+	static class TThread extends Thread implements Closeable {
+		protected Process p;
+		protected OutputStream out;
+
+		public TThread(Process p, OutputStream out) {
+			this.p = p;
+			this.out = out;
+		}
+
+		public InputStream getInputStream() {
+			return this.p.getInputStream();
+		}
+
+		public InputStream getErrorStream() {
+			return this.p.getErrorStream();
+		}
+
+		/* (non-Javadoc)
+		 * @see java.io.Closeable#close()
+		 */
+		@Override
+		public void close() throws IOException {
+
+			if (p != null) {
+				p.destroy();
+			}
+
+			InputStream inputStream = getInputStream();
+			if (inputStream != null)
+				inputStream.close();
+			InputStream errorStream = getErrorStream();
+			if (errorStream != null)
+				errorStream.close();
+
+		}
+
+	}
+
+	public static int exe(List<String> args, OutputStream out, OutputStream err) throws Exception {
+		int result = -1;
+		ProcessBuilder pb = new ProcessBuilder(args);
+		pb.redirectErrorStream(true);
+
+		Process p = null;
+
+		TThread outThread = null;
+		TThread errThread = null;
+		try {
+			p = pb.start();
+
+			outThread = new TThread(p, out) {
+
+				/* (non-Javadoc)
+				 * @see java.lang.Thread#run()
+				 */
+				@Override
+				public void run() {
+
+					try {
+						InputStream inputStream = p.getInputStream();
+						p.waitFor(10, TimeUnit.SECONDS);
+
+						byte[] b = new byte[1024];
+
+						while (inputStream.read(b) != -1) {
+							out.write(b);
+							out.flush();
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+
+			};
+
+			errThread = new TThread(p, err) {
+
+				/* (non-Javadoc)
+				 * @see java.lang.Thread#run()
+				 */
+				@Override
+				public void run() {
+
+					try {
+						InputStream inputStream = p.getErrorStream();
+						p.waitFor(10, TimeUnit.SECONDS);
+
+						byte[] b = new byte[1024];
+
+						while (inputStream.read(b) != -1) {
+							out.write(b);
+							out.flush();
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+
+			};
+
+			outThread.start();
+			errThread.start();
+
+			while (p.isAlive()) {
+				Thread.sleep(1000);
+			}
+
+			result = p.exitValue();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+
+			if (p != null) {
+				p.destroy();
+			}
+
+			if (outThread != null)
+				outThread.close();
+
+			if (errThread != null)
+				errThread.close();
+
+		}
+		return result;
+	}
+
+	public static int exe(List<String> args, Charset encoding, Consumer<String> messageReceiver) throws Exception {
 		int result = -1;
 		ProcessBuilder pb = new ProcessBuilder(args);
 		pb.redirectErrorStream(true);
@@ -231,7 +367,7 @@ public class RuntimeClassUtil {
 		try {
 			p = pb.start();
 
-			br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			br = new BufferedReader(new InputStreamReader(p.getInputStream(), encoding));
 			p.waitFor(10, TimeUnit.SECONDS);
 			String temp = null;
 

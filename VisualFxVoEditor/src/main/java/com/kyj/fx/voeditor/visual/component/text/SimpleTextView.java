@@ -155,7 +155,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	}
 
 	/**
-	 * 나모형태를 웹형태로 바꿔서 뷰를 보여줌
+	 * 마임 형태를 웹형태로 바꿔서 뷰를 보여줌
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 29.
 	 */
@@ -163,7 +163,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miOpenNamoMsWordOnAction() {
 		String content = codeArea.getText();
 		try {
-			AsynchWordExecutor executor = new AsynchWordExecutor(new HtmlTextToMimeAdapter(content));
+			AsynchWordExecutor executor = new AsynchWordExecutor(  /*new HtmlTextToMimeAdapter(content)*/  new HtmlTextToMimeAdapter(content));
 			executor.execute();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -245,6 +245,26 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 	@FXML
 	public void miOpenHtmlWevViewOnAction() {
+		String content = codeArea.getText();
+
+		try {
+			WebView webView = new WebView();
+			webView.getEngine().loadContent(content);
+
+
+			FxUtil.createStageAndShow(webView, stage -> {
+				stage.setAlwaysOnTop(true);
+				stage.initOwner(getScene().getWindow());
+				stage.focusedProperty().addListener((oba, o, n) -> {
+					if (!n)
+						stage.close();
+
+				});
+			});
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

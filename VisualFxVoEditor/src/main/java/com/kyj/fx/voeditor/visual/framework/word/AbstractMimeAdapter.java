@@ -65,8 +65,10 @@ public abstract class AbstractMimeAdapter {
 		try {
 			FileUtil.writeFile(mimeFile, getContent(), Charset.forName("UTF-8"));
 
-			if (mimeFile.exists())
-				mimeFile.deleteOnExit();
+
+			FileUtil.openFile(mimeFile);
+//			if (mimeFile.exists())
+//				mimeFile.deleteOnExit();
 
 		} catch (IOException e) {
 			LOGGER.error(ValueUtil.toString(e));

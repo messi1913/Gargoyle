@@ -11,8 +11,12 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.function.Consumer;
 
@@ -25,8 +29,12 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
+import org.apache.poi.xwpf.converter.pdf.PdfConverter;
+import org.apache.poi.xwpf.converter.pdf.PdfOptions;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +81,22 @@ public class PDFUtil {
 		helper.setExceptionHandler(errorHandler);
 
 		return helper.build();
+	}
+
+	public static void toPdf(File newPdfFile, File imageFile) throws IOException {
+		try (PDDocument doc = new PDDocument()) {
+			PDPage pdPage = new PDPage();
+			doc.addPage(pdPage);
+
+			PDImageXObject pdImage = PDImageXObject.createFromFile(imageFile.getAbsolutePath(), doc);
+
+			try (PDPageContentStream stream = new PDPageContentStream(doc, pdPage)) {
+				stream.drawImage(pdImage, 0, 420);
+
+			}
+
+			doc.save(newPdfFile);
+		}
 	}
 
 	/**
@@ -239,6 +263,35 @@ public class PDFUtil {
 
 	/*************************************************************************************************************************************/
 	/// 이미지 파일의 내용을 PDF 파일로 만드는 API 작성
-	/*************************************************************************************************************************************/
+	/**
+	 * @throws IOException
+	 * @throws FileNotFoundException ***********************************************************************************************************************************/
 
+	/**
+	 * Docx파일로부터 Pdf로 변환
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 3.
+	 * @param document
+	 * @param outPdfFile
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static void convertFromDocx(File document, File outPdfFile) throws FileNotFoundException, IOException {
+		convert(new XWPFDocument(new FileInputStream(document)), outPdfFile);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 3.
+	 * @param docxFile
+	 * @param outPdfFile
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static void convert(XWPFDocument document, File outPdfFile) throws FileNotFoundException, IOException {
+		try (OutputStream out = new FileOutputStream(outPdfFile)) {
+			PdfOptions options = PdfOptions.getDefault();
+			PdfConverter.getInstance().convert(document, out, options);
+		}
+	}
 }
