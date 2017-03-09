@@ -22,22 +22,7 @@ import com.kyj.fx.voeditor.visual.framework.jdt.javaRun.RuntimeJavaRunner;
  */
 public class DefaultJavaExecutorTest {
 
-	/**
-	 * ant의 build.xml 파일을 이용한 컴파일 테스트
-	 * @작성자 : KYJ
-	 * @작성일 : 2017. 3. 7.
-	 */
-	@Test
-	public void antBuildTest() {
 
-//		String buildFile = "C:\\Users\\KYJ\\eclipse\\jee-neon\\workspace\\Algorism\\build.xml";
-		String buildFile = "C:\\Users\\KYJ\\.git\\Gargoyle\\VisualFxVoEditor\\build\\build.xml";
-
-		AntJavaCompiler c = new AntJavaCompiler(new File(buildFile));
-		c.setTarget("notifyBuildForVersion");
-		c.run();
-
-	}
 
 	/**
 	 * src 디렉토리를 이용한 컴파일 테스트

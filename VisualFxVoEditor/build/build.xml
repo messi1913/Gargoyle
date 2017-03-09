@@ -21,21 +21,34 @@
 
 		<echo> javac exec....</echo>
 
-		<javac destdir="${basedir}/antBehaviors" classpath="" source="1.8" target="1.8" srcdir="${basedir}/../src/build/java">
+		<javac destdir="${basedir}/antBehaviors" classpath="" source="1.8" target="1.8" srcdir="${basedir}/../src/build/java" encoding="UTF-8">
 			<classpath>
+
 				<fileset dir="${basedir}/build/libs/">
 					<include name="*" />
 				</fileset>
+
+				<fileset dir="${basedir}/build/src">
+					<include name="**" />
+				</fileset>
+
 			</classpath>
 		</javac>
 
 		<echo> java exec....</echo>
 
 		<java fork="true" failonerror="on" classname="com.kyj.build.print.NotifyBuildMessage">
+			<env key="-encoding" value="UTF-8">
+			</env>
 			<classpath>
 				<fileset dir="${basedir}/build/libs/">
-					<include name="*" />
+					<include name="VisualFxVoEditor.jar" />
 				</fileset>
+
+				<fileset dir="${basedir}/dist/">
+					<include name="**" />
+				</fileset>
+
 				<dirset dir="${basedir}/build/classes">
 				</dirset>
 				<dirset dir="${basedir}/antBehaviors">
@@ -73,11 +86,13 @@
 		<path id="fxant">
 			<filelist>
 				<file name="${java.home}\..\lib\ant-javafx.jar" />
-				<file name="${java.home}\lib\jfxrt.jar" />
+				<!--<file name="${java.home}\lib\ext\jfxrt.jar" />-->
 				<file name="${basedir}" />
 			</filelist>
 		</path>
-
+		<echo> ant-javafx.jar :::  ${java.home}\..\lib\ant-javafx.jar</echo>
+		<echo> java home :::  ${java.home}</echo>
+		<echoproperties></echoproperties>
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpathref="fxant" />
 	</target>
 
@@ -648,6 +663,34 @@
 				<filename name="nekohtml-1.9.13.jar" />
 			</fileset>
 		</copy>
+
+		<copy todir="externalLibs">
+			<fileset dir="${m2.dir}\org\eclipse\jdt\core\compiler\ecj\4.6.1">
+				<filename name="ecj-4.6.1.jar" />
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="${m2.dir}\org\apache\ant\ant\1.9.4">
+				<filename name="ant-1.9.4.jar" />
+			</fileset>
+		</copy>
+
+		<copy todir="externalLibs">
+			<fileset dir="${m2.dir}\fr\opensagres\xdocreport\org.apache.poi.xwpf.converter.pdf\1.0.6">
+				<filename name="org.apache.poi.xwpf.converter.pdf-1.0.6.jar" />
+			</fileset>
+		</copy>
+
+		<copy todir="externalLibs">
+			<fileset dir="${m2.dir}\fr\opensagres\xdocreport\org.apache.poi.xwpf.converter.core\1.0.6">
+				<filename name="org.apache.poi.xwpf.converter.core-1.0.6.jar" />
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="${m2.dir}\fr\opensagres\xdocreport\fr.opensagres.xdocreport.itext.extension\1.0.6">
+				<filename name="fr.opensagres.xdocreport.itext.extension-1.0.6.jar" />
+			</fileset>
+		</copy>
 		<!--[end] boilderpipe -->
 
 
@@ -851,6 +894,13 @@
 				<include name="apache-mime4j-core-0.7.2.jar" />
 				<include name="apache-mime4j-dom-0.7.2.jar" />
 				<include name="apache-mime4j-storage-0.7.2.jar" />
+
+				<include name="ecj-4.6.1.jar" />
+				<include name="ant-1.9.4.jar" />
+				<include name="org.apache.poi.xwpf.converter.pdf-1.0.6.jar" />
+				<include name="org.apache.poi.xwpf.converter.core-1.0.6.jar" />
+				<include name="fr.opensagres.xdocreport.itext.extension-1.0.6.jar" />
+
 			</fileset>
 		</copy>
 
@@ -883,6 +933,8 @@
 		<copy todir="build/src">
 			<fileset dir="project/src/main/scm">
 				<include name="**/*" />
+				<!-- exclude dimmension lib -->
+				<exclude name="com/kyj/scm/manager/dimmension/**" />
 			</fileset>
 		</copy>
 		<copy todir="build/src">
@@ -893,6 +945,7 @@
 		</copy>
 
 		<javac includeantruntime="false" source="1.8" target="1.8" srcdir="build/src" destdir="build/classes" encoding="UTF-8">
+
 			<classpath>
 				<fileset dir="build/libs">
 					<include name="*" />

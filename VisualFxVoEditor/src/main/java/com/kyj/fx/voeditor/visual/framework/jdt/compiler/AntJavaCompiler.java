@@ -11,20 +11,30 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.Hashtable;
 
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
+import org.apache.tools.ant.Target;
 import org.apache.tools.ant.listener.TimestampedLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.sun.star.uno.RuntimeException;
 
 /**
+ *
+ * Ant기반으로 build.xml을 파싱하고 기술된 내용대로
+ * 파싱처리를 하는 코어를 사용하기 쉽게 wapper 처리함
  * @author KYJ
  *
  */
 public class AntJavaCompiler implements JavaCompilerable {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AntJavaCompiler.class);
 
 	private File baseDir, buildFile;
 	private Charset encoding = Charset.defaultCharset();
@@ -37,10 +47,14 @@ public class AntJavaCompiler implements JavaCompilerable {
 	private boolean occurError;
 	private Exception ex;
 
+	//표준 출력
 	private OutputStream out = System.out;
+	//표준 에러 출력
 	private OutputStream err = System.err;
 	private Project p;
 	private ProjectHelper helper;
+	//build.xml 파일이 파싱되어 빌드처리 준비가 되었는지 확인
+	private boolean wasParse;
 	/**
 	 * 사용할 build.xml target명
 	 * @최초생성일 2017. 3. 7.
@@ -65,14 +79,20 @@ public class AntJavaCompiler implements JavaCompilerable {
 	}
 
 	/**
+	 *
+	 * build.xml파일을 파싱처리하여
+	 * 빌드처리 준비상태로 처리한다.
+	 * 이후 run 함수를 호출하여 빌드를 실행할 수 있다.
+	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 3. 7.
 	 */
-	private void init() {
+	public void parse() {
 
 		p = new Project();
 		p.setUserProperty("ant.file", buildFile.getAbsolutePath());
-		p.setUserProperty("-encoding", encoding.displayName());
+		p.setUserProperty("encoding", encoding.displayName());
+
 		p.init();
 		helper = ProjectHelper.getProjectHelper();
 		p.addReference("ant.projectHelper", helper);
@@ -83,7 +103,7 @@ public class AntJavaCompiler implements JavaCompilerable {
 			p.setBaseDir(buildFile.getParentFile());
 
 		//setting console
-		DefaultLogger consoleLogger = new TimestampedLogger();
+		DefaultLogger consoleLogger = getLogger();
 
 		consoleLogger.setOutputPrintStream(new PrintStream(out));
 		consoleLogger.setErrorPrintStream(new PrintStream(err));
@@ -94,14 +114,52 @@ public class AntJavaCompiler implements JavaCompilerable {
 		//parse build.xml
 		helper.parse(p, buildFile);
 
-		System.out.println("base dir : " + p.getBaseDir());
-		System.out.println("default target : " + p.getDefaultTarget());
+		LOGGER.debug("  ##### base dir : " + p.getBaseDir());
+		LOGGER.debug("  ##### default target : " + p.getDefaultTarget());
 
 		//append build debugger.
 		BuildListener buildListener = getBuildListener();
 		if (buildListener != null)
 			p.addBuildListener(buildListener);
 
+		wasParse = true;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 9.
+	 * @return
+	 */
+	private DefaultLogger getLogger() {
+		return new TimestampedLogger();
+	}
+
+	/**
+	 * build.xml에 기술된 target 목록을 리턴한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 9.
+	 * @return
+	 */
+	public Hashtable<String, Target> getTargets() {
+		validateParse();
+
+		return p.getTargets();
+	}
+
+	/**
+	 * build.,xml에 기술된 디폴트 target을 리턴한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 9.
+	 * @return
+	 */
+	public String getDefaultTarget() {
+		validateParse();
+		return p.getDefaultTarget();
+	}
+
+	private void validateParse() {
+		if (p == null)
+			throw new RuntimeException("was not parse.");
 	}
 
 	protected BuildListener getBuildListener() {
@@ -156,6 +214,7 @@ public class AntJavaCompiler implements JavaCompilerable {
 
 	}
 
+	@SuppressWarnings("unused")
 	private void write(String str) {
 		write(out, str);
 	}
@@ -165,9 +224,12 @@ public class AntJavaCompiler implements JavaCompilerable {
 	 */
 	@Override
 	public final void run() {
-		init();
+
+		if (!wasParse)
+			throw new RuntimeException("was not parse..");
 
 		try {
+			parse();
 			if (ValueUtil.isEmpty(target))
 				p.executeTarget(p.getDefaultTarget());
 			else
@@ -177,6 +239,8 @@ public class AntJavaCompiler implements JavaCompilerable {
 			occurError = true;
 			this.ex = e;
 			write(err, ValueUtil.toString(e));
+		} finally {
+			wasParse = false;
 		}
 
 	}
