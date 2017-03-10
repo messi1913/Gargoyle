@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.DefaultLogger;
@@ -59,7 +61,8 @@ public class AntJavaCompiler implements JavaCompilerable {
 	 * 사용할 build.xml target명
 	 * @최초생성일 2017. 3. 7.
 	 */
-	private String target;
+//	private String target;
+	private Vector<String> targets = new Vector<>();
 
 	public AntJavaCompiler(File buildFile) {
 		this(null, buildFile);
@@ -75,7 +78,12 @@ public class AntJavaCompiler implements JavaCompilerable {
 	}
 
 	public void setTarget(String target) {
-		this.target = target;
+		setTargets(target);
+	}
+
+	public void setTargets(String ... targets) {
+		this.targets.clear();
+		this.targets.addAll(Arrays.asList(targets));
 	}
 
 	/**
@@ -140,9 +148,10 @@ public class AntJavaCompiler implements JavaCompilerable {
 	 * @작성일 : 2017. 3. 10.
 	 * @return
 	 */
-	public String getProjectName(){
+	public String getProjectName() {
 		return p.getName();
 	}
+
 	/**
 	 * build.xml에 기술된 target 목록을 리턴한다.
 	 * @작성자 : KYJ
@@ -239,17 +248,19 @@ public class AntJavaCompiler implements JavaCompilerable {
 
 		try {
 			parse();
-			if (ValueUtil.isEmpty(target))
+			if (ValueUtil.isEmpty(targets))
 				p.executeTarget(p.getDefaultTarget());
 			else
-				p.executeTarget(target);
+			{
+				p.executeTargets( targets);
+			}
 		} catch (Exception e) {
 			compiled = false;
 			occurError = true;
 			this.ex = e;
 			write(err, ValueUtil.toString(e));
 		} finally {
-//			wasParse = false;
+			//			wasParse = false;
 		}
 
 	}

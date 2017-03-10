@@ -7,15 +7,21 @@
 package com.kyj.fx.voeditor.visual.component.config.view;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.tools.ant.BuildEvent;
+import org.apache.tools.ant.BuildListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.config.model.AntRunConfigItem;
+import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.jdt.compiler.AntJavaCompiler;
@@ -63,7 +69,7 @@ public class AntRunConfigView extends BorderPane {
 	@FXML
 	private TextArea txtTargetCont;
 	@FXML
-	private TextField txtBuildFileLocation , txtProjectName;
+	private TextField txtBuildFileLocation, txtProjectName;
 	@FXML
 	private Button btnBuildFileOpen;
 	@FXML
@@ -113,12 +119,61 @@ public class AntRunConfigView extends BorderPane {
 	}
 
 	@FxPostInitialize
-	public void post(){
+	public void post() {
 		tabAntConfig.getSelectionModel().select(tabTargets);
 	}
+
+	private BuildListener progressListener = new BuildListener() {
+
+		@Override
+		public void taskStarted(BuildEvent event) {
+
+		}
+
+		@Override
+		public void taskFinished(BuildEvent event) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void targetStarted(BuildEvent event) {
+			System.out.println("target start\n" + event);
+
+		}
+
+		@Override
+		public void targetFinished(BuildEvent event) {
+			System.out.println("target start\n" + event);
+
+		}
+
+		@Override
+		public void messageLogged(BuildEvent event) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void buildStarted(BuildEvent event) {
+
+		}
+
+		@Override
+		public void buildFinished(BuildEvent event) {
+			// TODO Auto-generated method stub
+
+		}
+	};
+
 	@FXML
 	public void initialize() {
-		c = new AntJavaCompiler(this.buildFile.getParentFile(), this.buildFile);
+		c = new AntJavaCompiler(this.buildFile.getParentFile(), this.buildFile) {
+			@Override
+			protected BuildListener getBuildListener() {
+				return progressListener;
+			}
+		};
 		c.parse();
 
 		this.txtBuildFileLocation.setText(this.buildFile.getAbsolutePath());
@@ -157,10 +212,9 @@ public class AntRunConfigView extends BorderPane {
 		tcTargetName.setEditable(false);
 		tcTargetDesc.setEditable(false);
 
-
-//		Platform.runLater(()->{
-//
-//		});
+		//		Platform.runLater(()->{
+		//
+		//		});
 
 	}
 
