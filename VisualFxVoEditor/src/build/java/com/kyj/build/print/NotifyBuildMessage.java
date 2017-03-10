@@ -35,7 +35,7 @@ public class NotifyBuildMessage {
 		}
 
 		String version = args[0];
-		System.out.println(String.format("Gargoyle %s is success!", version));
+		System.out.println(String.format("Gargoyle %s is start!", version));
 
 		//Database Write
 

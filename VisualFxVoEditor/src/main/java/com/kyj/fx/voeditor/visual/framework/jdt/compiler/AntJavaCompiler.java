@@ -135,6 +135,15 @@ public class AntJavaCompiler implements JavaCompilerable {
 	}
 
 	/**
+	 * 프로젝트명을 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 10.
+	 * @return
+	 */
+	public String getProjectName(){
+		return p.getName();
+	}
+	/**
 	 * build.xml에 기술된 target 목록을 리턴한다.
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 3. 9.
@@ -240,7 +249,7 @@ public class AntJavaCompiler implements JavaCompilerable {
 			this.ex = e;
 			write(err, ValueUtil.toString(e));
 		} finally {
-			wasParse = false;
+//			wasParse = false;
 		}
 
 	}
@@ -314,6 +323,20 @@ public class AntJavaCompiler implements JavaCompilerable {
 	@Override
 	public boolean wasCompiled() {
 		return compiled;
+	}
+
+	/**
+	 * @return the buildFile
+	 */
+	public final File getBuildFile() {
+		return buildFile;
+	}
+
+	/**
+	 * @param buildFile the buildFile to set
+	 */
+	public final void setBuildFile(File buildFile) {
+		this.buildFile = buildFile;
 	}
 
 }

@@ -65,7 +65,6 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker.State;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
 import javafx.print.PageLayout;
@@ -272,7 +271,7 @@ public class FxUtil {
 	 * @param errorCallback
 	 * @return
 	 ********************************/
-	public static <T, C> T loadRoot(Class<C> controllerClass, Consumer<Exception> errorCallback) {
+	private static <T, C> T loadRoot(Class<C> controllerClass, Consumer<Exception> errorCallback) {
 		try {
 			return load(controllerClass, controllerClass.newInstance(), null, null);
 		} catch (Exception e) {

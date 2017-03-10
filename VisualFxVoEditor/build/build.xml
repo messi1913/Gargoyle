@@ -37,20 +37,24 @@
 
 		<echo> java exec....</echo>
 
+
 		<java fork="true" failonerror="on" classname="com.kyj.build.print.NotifyBuildMessage">
 			<env key="-encoding" value="UTF-8">
 			</env>
 			<classpath>
-				<fileset dir="${basedir}/build/libs/">
+				<fileset dir="${basedir}/dist">
 					<include name="VisualFxVoEditor.jar" />
 				</fileset>
 
+				<!--
 				<fileset dir="${basedir}/dist/">
 					<include name="**" />
 				</fileset>
-
+				-->
+				<!--
 				<dirset dir="${basedir}/build/classes">
 				</dirset>
+				-->
 				<dirset dir="${basedir}/antBehaviors">
 				</dirset>
 			</classpath>
