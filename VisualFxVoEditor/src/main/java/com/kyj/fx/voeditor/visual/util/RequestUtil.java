@@ -12,23 +12,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.kyj.fx.voeditor.visual.framework.URLModel;
 
 /**
  * @author KYJ
@@ -38,74 +29,8 @@ public class RequestUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtil.class);
 	private static HostnameVerifier hostnameVerifier = (arg0, arg1) -> {
-		LOGGER.debug(arg0);
 		return true;
 	};
-
-	static SSLContext ctx;
-
-	static {
-		try {
-			ctx = SSLContext.getInstance("TLS");
-			ctx.init(new KeyManager[0], new TrustManager[] { new DefaultTrustManager() }, new SecureRandom());
-			SSLContext.setDefault(ctx);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	/**
-	 *
-	 * SSL 통신 인증
-	 *
-	 * @author KYJ
-	 *
-	 */
-	private static class DefaultTrustManager implements X509TrustManager {
-
-		@Override
-		public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-			// LOGGER.debug("######################");
-			// LOGGER.debug("checkClientTrusted");
-			LOGGER.debug(arg1);
-			// LOGGER.debug("######################");
-		}
-
-		@Override
-		public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-			// LOGGER.debug("########################################################################################");
-			// LOGGER.debug("checkServerTrusted");
-			// LOGGER.debug(arg1);
-
-			boolean present = Stream.of(arg0).filter(v -> {
-
-				switch (v.getSigAlgName()) {
-				case "SHA256withRSA":
-					return true;
-				case "SHA384withECDSA":
-					return true;
-				case "SHA384withRSA":
-					return true;
-				}
-
-				return false;
-			}).findFirst().isPresent();
-
-			if (!present) {
-				LOGGER.debug("Can't not found Truested Algorisms ");
-				Stream.of(arg0).forEach(v -> LOGGER.warn(v.getSigAlgName()));
-				throw new CertificateException();
-			}
-
-			// LOGGER.debug("########################################################################################");
-		}
-
-		@Override
-		public X509Certificate[] getAcceptedIssuers() {
-			return null;
-		}
-	}
 
 	public static String reqeustSSL_JSONString(URL url, BiFunction<InputStream, Integer, String> response) throws Exception {
 		return requestSSL(url, (is, code) -> {
