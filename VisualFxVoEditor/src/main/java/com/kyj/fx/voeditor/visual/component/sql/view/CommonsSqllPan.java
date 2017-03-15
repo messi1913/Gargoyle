@@ -127,7 +127,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			show100RowAction();
 		}
 
-		else if(KeyCode.F1 == e.getCode() && (e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
+		else if (KeyCode.F1 == e.getCode() && (e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
 			showEditableDataAction();
 		}
 
@@ -931,12 +931,12 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 		Optional<Pair<String, String[]>> showTableInputDialog = showTableInputDialog(f -> f.getName());
 
 		//		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
-		if(showTableInputDialog == null)
+		if (showTableInputDialog == null)
 			return;
 
 		showTableInputDialog.ifPresent(op -> {
 
-			if(op == null || op.getValue() == null)
+			if (op == null || op.getValue() == null)
 				return;
 
 			String schemaName = op.getValue()[0];
@@ -944,6 +944,8 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			String tableName = "";
 			if (ValueUtil.isNotEmpty(schemaName)) {
 				tableName = String.format("%s.%s", schemaName, _tableName);
+			} else {
+				tableName = _tableName;
 			}
 
 			List<Map<String, Object>> items = getSelectedTabResultItems();
