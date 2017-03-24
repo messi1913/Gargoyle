@@ -301,9 +301,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 							JarWrapper jar = (JarWrapper) pluginMenu.getUserData();
 
 							try {
-								Parent newInstance = (Parent) jar.getNodeClass().newInstance();
+								Object newInstance = jar.getNodeClass().newInstance();
 
-								loadNewSystemTab(jar.getDisplayMenuName(), newInstance, SkinManager.getInstance().getJavafxDefaultSkin());
+								if (newInstance instanceof CloseableParent<?>) {
+									loadNewSystemTab(jar.getDisplayMenuName(), (CloseableParent<?>) newInstance);
+								} else {
+									loadNewSystemTab(jar.getDisplayMenuName(), (Parent) newInstance,
+											SkinManager.getInstance().getJavafxDefaultSkin());
+								}
+
 							} catch (Exception e) {
 								LOGGER.error("regist fail plugin.");
 								LOGGER.error(ValueUtil.toString(e));
@@ -1999,14 +2005,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 */
 	public void miRunJavaAppOnAction(ActionEvent e) {
 		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
-		if(selectedItem instanceof JavaProjectMemberFileTreeItem)
-		{
+		if (selectedItem instanceof JavaProjectMemberFileTreeItem) {
 			JavaProjectMemberFileTreeItem ti = (JavaProjectMemberFileTreeItem) selectedItem;
-			
+
 		}
 		if (selectedItem != null) {
 			FileWrapper value = selectedItem.getValue();
-//			new EclipseJavaCompiler(value);
+			//			new EclipseJavaCompiler(value);
 		}
 	}
 

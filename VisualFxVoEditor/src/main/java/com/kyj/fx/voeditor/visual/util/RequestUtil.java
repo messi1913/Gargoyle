@@ -8,16 +8,35 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -205,6 +224,10 @@ public class RequestUtil {
 	}
 
 	public static <T> T request200(URL url, BiFunction<InputStream, Charset, T> response, boolean autoClose) throws Exception {
+		return request200(url, null, response, autoClose);
+	}
+
+	public static <T> T request200(URL url, byte[] out, BiFunction<InputStream, Charset, T> response, boolean autoClose) throws Exception {
 
 		URLConnection openConnection = url.openConnection();
 		HttpURLConnection conn = (HttpURLConnection) openConnection;
@@ -219,7 +242,7 @@ public class RequestUtil {
 			conn.setRequestProperty("Accept-Encoding", "UTF-8");
 			// conn.setRequestProperty("Connection", "keep-alive");
 
-			conn.setRequestProperty("Accept", "text/html");
+			conn.setRequestProperty("Accept", "application/json");
 			conn.setRequestProperty("Accept-Charset", "UTF-8");
 			conn.setRequestProperty("Accept-Encoding", "UTF-8");
 			conn.setRequestProperty("Accept-Language", "KR");
@@ -227,15 +250,24 @@ public class RequestUtil {
 			conn.setConnectTimeout(6000);
 			conn.setReadTimeout(6000);
 
+			if (out != null) {
+				conn.setDoOutput(true);
+				OutputStream stream = conn.getOutputStream();
+				stream.write(out);
+			}
+
 			conn.connect();
 
 			is = conn.getInputStream();
 
 			String contentType = conn.getContentType();
 
-			String charset = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset")).findFirst().map(v -> {
-				return v.substring(v.indexOf("=") + 1);
-			}).get();
+			String charset = "UTF-8";
+			if (contentType != null) {
+				charset = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset")).findFirst().map(v -> {
+					return v.substring(v.indexOf("=") + 1);
+				}).get();
+			}
 
 			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), url.toString());
 
@@ -279,7 +311,6 @@ public class RequestUtil {
 			conn.setRequestProperty("Accept-Language", "KR");
 
 			conn.setConnectTimeout(6000);
-			conn.setReadTimeout(6000);
 
 			conn.connect();
 
@@ -305,6 +336,216 @@ public class RequestUtil {
 
 		}
 		return result;
+	}
+
+	public static class CookieBase {
+
+		private static BasicCookieStore cookieStore = new BasicCookieStore();
+
+		public static <T> T request(String url, Map<String, String> data, Function<CloseableHttpResponse, T> res) throws Exception {
+			return request(url, null, data, res);
+		}
+
+		public static <T> Function<CloseableHttpResponse, T> forEntry(Function<HttpEntity, T> res) {
+			return response -> {
+				Stream.of(response.getAllHeaders()).forEach(header -> {
+					LOGGER.debug("{} : {} ", header.getName(), header.getValue());
+				});
+
+				HttpEntity entity = response.getEntity();
+				return res.apply(entity);
+			};
+		}
+
+		public static <T> T request(String url, Header[] headers, Map<String, String> data, Function<CloseableHttpResponse, T> res /*, boolean storeCookie, boolean clearCookie*/)
+				throws Exception {
+
+			T rslt = null;
+			CloseableHttpResponse response = null;
+			CloseableHttpClient httpclient = null;
+
+			// 시작 쿠키관리
+			List<Cookie> cookies = cookieStore.getCookies();
+			LOGGER.debug("Get cookies...  : " + cookies);
+
+			// BasicClientCookie cookie = new BasicClientCookie("userId", (String)
+			// SharedMemoryMap.getInstance().get(
+			// SharedMemoryMap.USER_ID));
+			// cookie.setDomain(url);
+			// cookie.setPath("/");
+			// cookieStore.addCookie(cookie);
+			// 종료 쿠키관리
+
+			try {
+
+				HttpEntityEnclosingRequestBase http = new HttpPost(url);
+				LOGGER.debug(url);
+
+				if (headers != null) {
+					for (Header header : headers) {
+						if (header == null)
+							continue;
+						http.addHeader(header);
+					}
+				}
+
+				httpclient = HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build();
+				// httpclient = HttpClients.createDefault();
+
+				// 시작 서버로 보낼 데이터를 묶음.
+
+				List<NameValuePair> dataArr = new ArrayList<NameValuePair>();
+
+				if (ValueUtil.isNotEmpty(data)) {
+					Iterator<String> iterator = data.keySet().iterator();
+					while (iterator.hasNext()) {
+						String key = iterator.next();
+						String value = data.get(key);
+						dataArr.add(new BasicNameValuePair(key, value));
+					}
+
+				}
+
+				UrlEncodedFormEntity sendEntityData = new UrlEncodedFormEntity(dataArr, "UTF-8");
+				http.setEntity(sendEntityData);
+				// 끝 서버로 보낼 데이터를 묶음.
+
+				/* 프록시 체크 */
+				//			if (USE_PROXY) {
+				//				HttpHost proxy = new HttpHost(PROXY_URL, PROXY_PORT, "http");
+				//				response = httpclient.execute(proxy, http);
+				//			}
+				//			else {
+				response = httpclient.execute(http);
+				//			}
+
+				rslt = res.apply(response);
+
+				//				Stream.of(response.getAllHeaders()).forEach(header -> {
+				//					LOGGER.debug("{} : {} ", header.getName(), header.getValue());
+				//				});
+
+				//				HttpEntity entity = response.getEntity();
+
+				//				rslt = res.apply(entity);
+				//				rslt = res.apply(entity.getContent(), response.getStatusLine().getStatusCode());
+
+			} finally {
+
+				if (response != null)
+					EntityUtils.consume(response.getEntity());
+
+				if (httpclient != null) {
+					httpclient.close();
+				}
+
+			}
+
+			return rslt;
+
+		}
+
+		public static <T> T request(String url, Map<String, String> data, BiFunction<InputStream, Integer, T> res) throws Exception {
+			return request(url, null, data, res);
+		}
+
+		public static <T> T request(String url, Header[] headers, Map<String, String> data, BiFunction<InputStream, Integer, T> res)
+				throws Exception {
+
+			T rslt = null;
+			CloseableHttpResponse response = null;
+			CloseableHttpClient httpclient = null;
+
+			// 시작 쿠키관리
+			List<Cookie> cookies = cookieStore.getCookies();
+			LOGGER.debug("Get cookies...  : " + cookies);
+
+			// BasicClientCookie cookie = new BasicClientCookie("userId", (String)
+			// SharedMemoryMap.getInstance().get(
+			// SharedMemoryMap.USER_ID));
+			// cookie.setDomain(url);
+			// cookie.setPath("/");
+			// cookieStore.addCookie(cookie);
+			// 종료 쿠키관리
+
+			try {
+
+				HttpEntityEnclosingRequestBase http = new HttpPost(url);
+				LOGGER.debug(url);
+
+				if (headers != null) {
+					for (Header header : headers) {
+						if (header == null)
+							continue;
+						http.addHeader(header);
+					}
+				}
+
+				httpclient = HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build();
+				// httpclient = HttpClients.createDefault();
+
+				// 시작 서버로 보낼 데이터를 묶음.
+
+				List<NameValuePair> dataArr = new ArrayList<NameValuePair>();
+
+				if (ValueUtil.isNotEmpty(data)) {
+					Iterator<String> iterator = data.keySet().iterator();
+					while (iterator.hasNext()) {
+						String key = iterator.next();
+						String value = data.get(key);
+						dataArr.add(new BasicNameValuePair(key, value));
+					}
+
+				}
+
+				UrlEncodedFormEntity sendEntityData = new UrlEncodedFormEntity(dataArr, "UTF-8");
+				http.setEntity(sendEntityData);
+				// 끝 서버로 보낼 데이터를 묶음.
+
+				/* 프록시 체크 */
+				//			if (USE_PROXY) {
+				//				HttpHost proxy = new HttpHost(PROXY_URL, PROXY_PORT, "http");
+				//				response = httpclient.execute(proxy, http);
+				//			}
+				//			else {
+				response = httpclient.execute(http);
+				//			}
+
+				Stream.of(response.getAllHeaders()).forEach(h -> {
+
+					//					if ("Set-cookie".equals(h.getName()))
+					//						cookieStore.getCookies().add(new BasicClientCookie("Set-cookie", h.getValue()));
+
+					LOGGER.debug("[[Response Cookie]] {} : {} ", h.getName(), h.getValue());
+				});
+
+				HttpEntity entity = response.getEntity();
+
+				rslt = res.apply(entity.getContent(), response.getStatusLine().getStatusCode());
+
+			} finally {
+
+				if (response != null)
+					EntityUtils.consume(response.getEntity());
+
+				if (httpclient != null) {
+					httpclient.close();
+				}
+
+			}
+
+			return rslt;
+
+		}
+
+		/**
+		 * @return
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 3. 22.
+		 */
+		public static List<Cookie> getCookies() {
+			return cookieStore.getCookies();
+		}
 	}
 
 }

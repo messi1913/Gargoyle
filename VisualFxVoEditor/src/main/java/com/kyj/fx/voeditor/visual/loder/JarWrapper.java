@@ -52,6 +52,7 @@ public class JarWrapper {
 	String setOnParentBeforeLoadedListener;
 	Class<GagoyleParentBeforeLoad> setOnParentBeforeLoadedListenerClass;
 
+	String openType = "INNER";
 
 	/**
 	 * @return the setOnParentBeforeLoadedListenerClass
@@ -215,6 +216,21 @@ public class JarWrapper {
 	 */
 	public void setConfigNodeName(String configNodeName) {
 		this.configNodeName = configNodeName;
+	}
+
+
+	/**
+	 * @return the openType
+	 */
+	public final String getOpenType() {
+		return openType;
+	}
+
+	/**
+	 * @param openType the openType to set
+	 */
+	public final void setOpenType(String openType) {
+		this.openType = openType;
 	}
 
 	/*

@@ -6,28 +6,14 @@
  *******************************/
 package com.kyj.scm.manager.dimmension;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tmatesoft.svn.core.SVNNodeKind;
-import org.tmatesoft.svn.core.SVNProperties;
-import org.tmatesoft.svn.core.SVNProperty;
-import org.tmatesoft.svn.core.io.SVNRepository;
 
 import com.kyj.scm.manager.core.commons.ICatCommand;
-import com.kyj.scm.manager.stream.StringOutputStream;
 import com.sun.star.uno.RuntimeException;
-
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * SVN의 CAT명령어를 수행한다.
@@ -76,7 +62,6 @@ class DimCat extends AbstractDimmension implements ICatCommand<String, String> {
 	 * @return
 	 */
 	public String cat(String path, String revision, Consumer<Exception> exceptionHandler) {
-
 		return cat(path, revision, DEFAULT_ENCODING, exceptionHandler);
 	}
 
@@ -90,7 +75,21 @@ class DimCat extends AbstractDimmension implements ICatCommand<String, String> {
 	 * @return
 	 */
 	public String cat(String path, String revision, String encoding, Consumer<Exception> exceptionHandler) {
-		throw new RuntimeException("Not yet support");
+		return cat(getProjSpec(), path  , revision , encoding, exceptionHandler);
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 14.
+	 * @param prjSpec
+	 * @param path
+	 * @param revision
+	 * @param encoding
+	 * @param exceptionHandler
+	 * @return
+	 */
+	public String cat(String prjSpec, String path, String revision, String encoding, Consumer<Exception> exceptionHandler) {
+		getConnection();
+		throw new RuntimeException("Not yet support");
+	}
 }

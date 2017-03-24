@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentOnLoaded;
+import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.scene.Parent;
@@ -96,6 +97,7 @@ class DefaultPluginLoader implements IPluginLoader {
 					String configNodeName = zipWrapper.prop.getProperty(KEY_DISPLAY_CONFIG_NAME);
 					String addOnParentLoadedListener = zipWrapper.prop.getProperty(ADD_ON_PARENT_LOADED_LISTENER);
 					String setOnParentBeforeLoadedListener = zipWrapper.prop.getProperty(SET_ON_PARENT_BEFORE_LOADED_LISTENER);
+					String openType = zipWrapper.prop.getProperty(OPEN_TYPE);
 
 					if (clazz != null && !clazz.isEmpty()) {
 						zipWrapper.clazz = clazz;
@@ -105,6 +107,7 @@ class DefaultPluginLoader implements IPluginLoader {
 						zipWrapper.configNodeName = configNodeName;
 						zipWrapper.addOnParentLoadedListener = addOnParentLoadedListener;
 						zipWrapper.setOnParentBeforeLoadedListener = setOnParentBeforeLoadedListener;
+						zipWrapper.openType = ValueUtil.isEmpty(openType) ? "INNER" : openType;
 						return zipWrapper;
 					}
 					return null;
@@ -113,8 +116,13 @@ class DefaultPluginLoader implements IPluginLoader {
 					try {
 						Class<?> loadFromJarFile = DynamicClassLoader.loadFromJarFile(zipWrapper.location, zipWrapper.clazz);
 
-						// JAVAFX Parent 노드 타입이어야 유효하다.
-						if (Parent.class.isAssignableFrom(loadFromJarFile)) {
+						/* 2017-03-23
+						 * JAVAFX Parent 노드 타입과 더블어 CloseableParent 타입도 허용한다.
+						 * JAVAFX Parent 노드 타입이어야 유효하다.
+						 */
+						if (Parent.class.isAssignableFrom(loadFromJarFile) ||
+								CloseableParent.class.isAssignableFrom(loadFromJarFile)
+								) {
 							zipWrapper.nodeClass = loadFromJarFile;
 							LOGGER.debug(String.format("valide plugin class info : %s ", loadFromJarFile.getName()));
 						} else {

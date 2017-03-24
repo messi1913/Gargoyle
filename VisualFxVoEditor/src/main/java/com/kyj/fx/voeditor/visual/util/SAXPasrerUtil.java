@@ -7,8 +7,10 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -101,20 +103,46 @@ public class SAXPasrerUtil {
 	 * @throws Exception
 	 ********************************/
 	public static List<String> getAllQNames(File f) throws Exception {
+		try (FileInputStream is = new FileInputStream(f)) {
+			List<String> allQNames = getAllQNames(is);
+			return allQNames;
+		}
+	}
+
+	/**
+	 * 유틸리티 클래스에서 사용하는 디폴트 핸들러
+	 *
+	 * @author KYJ
+	 *
+	 */
+	public static class SAXHandler extends DefaultHandler {
+		protected List<String> arrayList = new ArrayList<String>();
+
+		@Override
+		public void startElement(String url, String arg1, String qName, Attributes arg3) throws SAXException {
+			if (ValueUtil.isNotEmpty(qName))
+				arrayList.add(qName);
+		}
+
+		public List<String> getList() {
+			return arrayList;
+		}
+	}
+
+	public static List<String> getAllQNames(InputStream is) throws Exception {
+		return getAllQNames(is, new SAXHandler());
+	}
+
+	public static List<String> getAllQNames(InputStream is, SAXHandler defaultHandler) throws Exception {
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		SAXParser sp = spf.newSAXParser();
+		sp.parse(is, defaultHandler);
+		return defaultHandler.getList();
+	}
 
-		List<String> arrayList = new ArrayList<String>();
-		DefaultHandler defaultHandler = new DefaultHandler() {
-
-			@Override
-			public void startElement(String url, String arg1, String qName, Attributes arg3) throws SAXException {
-				if (ValueUtil.isNotEmpty(qName))
-					arrayList.add(qName);
-			}
-
-		};
-		sp.parse(f, defaultHandler);
-		return arrayList;
+	public static void simpleSaxHandler(InputStream is, DefaultHandler defaultHandler) throws Exception {
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		SAXParser sp = spf.newSAXParser();
+		sp.parse(is, defaultHandler);
 	}
 }

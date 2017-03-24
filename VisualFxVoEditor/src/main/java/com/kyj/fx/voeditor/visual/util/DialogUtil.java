@@ -213,7 +213,7 @@ public class DialogUtil {
 	}
 
 	public static File showFileSaveCheckDialog(final Window ownerWindow) {
-		File saveFile = showFileSaveDialog(ownerWindow, option->{
+		File saveFile = showFileSaveDialog(ownerWindow, option -> {
 
 		});
 		return saveFile;
@@ -490,7 +490,8 @@ public class DialogUtil {
 	 * @param message
 	 */
 	public static void showMessageDialog(Window initOwner, String message) {
-		showMessageDialog(null, "Info", "", message, alert -> {
+
+		showMessageDialog((Stage) initOwner, "Info", "", message, alert -> {
 			alert.initModality(Modality.APPLICATION_MODAL);
 			alert.initOwner(initOwner);
 			alert.showAndWait();

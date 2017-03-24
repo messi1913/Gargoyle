@@ -11,6 +11,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.DimKeywords;
 import com.kyj.scm.manager.core.commons.SCMCommonable;
 import com.serena.dmclient.api.DimensionsConnection;
@@ -18,8 +19,6 @@ import com.serena.dmclient.api.DimensionsConnectionDetails;
 import com.serena.dmclient.api.DimensionsConnectionManager;
 import com.serena.dmclient.api.DimensionsObjectFactory;
 import com.serena.dmclient.api.Project;
-
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * SVN에 접속하기 위한 메타정보를 처리한다.
@@ -38,6 +37,7 @@ abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 
 	private Properties properties;
 
+	private String prjSpec;
 	private final DimmensionManager dimManager;
 	private DimensionsConnection connection;
 
@@ -72,6 +72,10 @@ abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 
 	}
 
+	public String getProjSpec(){
+		return prjSpec;
+	}
+
 	/**
 	 * 접속정보 초기화
 	 *
@@ -83,11 +87,31 @@ abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 		this.properties = properties;
 		validate();
 
+		if (ValueUtil.isNotEmpty(properties.getProperty(PROJECT_SPEC))) {
+			this.prjSpec = properties.getProperty(PROJECT_SPEC);
+		}
+
+		//		prjSpec =
 		try {
 			DimensionsConnectionDetails details = new DimensionsConnectionDetails();
+
 			if ((getUserId() == null && getUserPassword() == null) || (getUserId().isEmpty() && getUserPassword().isEmpty())) {
-				throw new RuntimeException("Properties Infomation is empty.");
-			} else {
+				throw new RuntimeException("Properties Infomation is empty.  [userId or passwrd ]");
+			}
+
+			if ((getDbName() == null || getDbName().isEmpty())) {
+				throw new RuntimeException("Properties Infomation is empty.  [ dbName ]");
+			}
+
+			if ((getDbName() == null || getDbName().isEmpty())) {
+				throw new RuntimeException("Properties Infomation is empty.  [ dbName ]");
+			}
+
+			if ((getUrl() == null || getUrl().isEmpty())) {
+				throw new RuntimeException("Properties Infomation is empty.  [ server url ]");
+			}
+
+			{
 				details.setUsername(getUserId());
 				details.setPassword(getUserPassword());
 				details.setDbName(getDbName());
@@ -153,9 +177,10 @@ abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 		return properties;
 	}
 
-	public DimensionsConnection getConnection(){
+	public DimensionsConnection getConnection() {
 		return this.connection;
 	}
+
 	/**
 	 * @return the javaSVNManager
 	 */

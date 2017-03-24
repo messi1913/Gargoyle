@@ -26,6 +26,19 @@ public interface DimKeywords {
 	public static final String DIM_DB_CONN = "dim.db.conn";
 	public static final String DIM_DB_NAME = "dim.db.name";
 
+	/**
+	 * 디멘전에서 관리되는 루트 프로젝트를 의미함.
+	 * @최초생성일 2017. 3. 14.
+	 */
+	public static final String PROJECT_SPEC = "proj.spec";
+
+	/**
+	 * 기본설정값으로 사용할 디폴트 PROJECT_SPEC에 대한 값을 정의하는 키
+	 * @최초생성일 2017. 3. 14.
+	 */
+	public static final String DEFAULT_PROJECT_SPEC = "def.proj.spec";
+
+
 
 
 }

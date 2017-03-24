@@ -47,11 +47,25 @@ public interface IPluginLoader {
 	 */
 	public static final String ADD_ON_PARENT_LOADED_LISTENER = "add.on.parent.loaded.listener";
 
-
 	public static final String SET_ON_PARENT_BEFORE_LOADED_LISTENER = "add.on.parent.before.loaded.listener";
 
 	public static final String PLUGIN_DESC = "plugin.desc";
 
+	/**
+	 * 해당 노드가 화면에 열릴때 팝업(POPUP)으로 열릴지, 안으로 포함시킬지(INNER) 여부를 결정함.
+	 * 디폴트값은 INNER
+	 * @최초생성일 2017. 3. 23.
+	 */
+	public static final String OPEN_TYPE = "open.type";
+
+	public static enum OPEN_TYPE {
+		POPUP("POPUP"), INNER("INNER");
+		String openType;
+
+		OPEN_TYPE(String openType) {
+			this.openType = openType;
+		}
+	}
 
 	/**
 	 * 플러그인 정보를 로드함.
