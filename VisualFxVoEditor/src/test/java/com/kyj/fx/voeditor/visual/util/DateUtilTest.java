@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -22,6 +23,14 @@ import com.kyj.fx.voeditor.visual.framework.model.GagoyleDate;
  */
 public class DateUtilTest {
 
+	@Test
+	public void daytest(){
+		Date monday = DateUtil.getFirstWeekOfEEE(new Date(), Calendar.MONDAY);
+		Date friday = DateUtil.getFirstWeekOfEEE(new Date(), Calendar.FRIDAY);
+		System.out.println(monday);
+		System.out.println(friday);
+	}
+	
 	@Test
 	public void print2016() {
 

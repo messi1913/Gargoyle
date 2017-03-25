@@ -229,6 +229,23 @@ public class DateUtil {
 		return instance.getTime();
 	}
 
+	/**
+	 * date 파라미터에 해당하는 주에 포함되는  eee(요일)을 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 25. 
+	 * @param date
+	 *   적용하려는 주의 date값
+	 * @param eee
+	 *    Calendar안에 속하는 요일값
+	 * @return
+	 */
+	public static Date getFirstWeekOfEEE(Date date, int eee) {
+		Calendar instance = GregorianCalendar.getInstance();
+		instance.setTime(date);
+		instance.set(Calendar.DAY_OF_WEEK, eee);
+		return instance.getTime();
+	}
+	
 	public static String getCurrentDateString(String format) {
 		Date time = GregorianCalendar.getInstance().getTime();
 		return new SimpleDateFormat(format).format(time);
@@ -424,6 +441,8 @@ public class DateUtil {
 		}
 
 	}
+
+	
 
 
 
