@@ -697,6 +697,8 @@
 			<groupId>org.kohsuke</groupId>
 			<artifactId>github-api</artifactId>
 			<version>1.84</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/jgit/github-api-1.84.jar</systemPath>
 		</dependency>
 
 		<!-- Github project 다운로드 가능, 단 메타정보 조회 불가능 -->
@@ -704,6 +706,8 @@
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>4.0.0.201506090130-r</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/jgit/org.eclipse.jgit-4.6.0.201612231935-r.jar</systemPath>
 		</dependency>
 
 
