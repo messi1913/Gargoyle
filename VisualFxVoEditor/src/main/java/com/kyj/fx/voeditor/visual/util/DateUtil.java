@@ -9,6 +9,8 @@ package com.kyj.fx.voeditor.visual.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -42,7 +44,7 @@ public class DateUtil {
 	public static final String SYSTEM_DATEFORMAT_YYYY_MM = "yyyyMM";
 	public static final String SYSTEM_DATEFORMAT_YYYY = "yyyy";
 	public static final String SYSTEM_DATEFORMAT_YY_MM_DD_HH_MM_SS = "yy-MM-dd HH:mm:ss";
-	public static final String SYSTEM_DATEFORMAT_EEE = "EEE";/*요일패턴.*/
+	public static final String SYSTEM_DATEFORMAT_EEE = "EEE";/* 요일패턴. */
 	public static final String ORACLE_DATEFORMAT_YYYYMMDDHH24MISS = "YYYYMMDDHH24MISS";
 
 	private static final SimpleDateFormat DEFAULT_SYSTEM_DATE_FORMAT = new SimpleDateFormat(SYSTEM_DATEFORMAT_YYYY_MM_DD_HH_MM_SS_SSS);
@@ -88,6 +90,7 @@ public class DateUtil {
 
 	/**
 	 * 현재 주차에 해당하는 일자수 리턴.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.
 	 * @return
@@ -101,6 +104,7 @@ public class DateUtil {
 
 	/**
 	 * 현재 주에서 gap주차를 뺀값부터 나열.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 18.
 	 * @param gap
@@ -123,12 +127,12 @@ public class DateUtil {
 
 		Calendar firstCalendar = GregorianCalendar.getInstance();
 		firstCalendar.setWeekDate(startYear, startWeek, Calendar.SUNDAY);
-		//		Date firstDate = firstCalendar.getTime();
+		// Date firstDate = firstCalendar.getTime();
 
 		Calendar lastCalendar = GregorianCalendar.getInstance();
 
-		lastCalendar.setWeekDate(endYear, endWeek, /*Calendar.SUNDAY*/ lastCalendar.get(Calendar.DAY_OF_WEEK));
-		//		Date lastDate = lastCalendar.getTime();
+		lastCalendar.setWeekDate(endYear, endWeek, /* Calendar.SUNDAY */ lastCalendar.get(Calendar.DAY_OF_WEEK));
+		// Date lastDate = lastCalendar.getTime();
 
 		ArrayList<GagoyleDate> arrayList = new ArrayList<>();
 		while (firstCalendar.before(lastCalendar)) {
@@ -136,18 +140,22 @@ public class DateUtil {
 			arrayList.add(new GagoyleDate(firstCalendar.getTime()));
 		}
 
-		//		List<GagoyleDate> periodDaysByWeek1 = getPeriodDaysByWeek(startYear, startWeek);
-		//		List<GagoyleDate> periodDaysByWeek2 = getPeriodDaysByWeek(endYear, endWeek);
+		// List<GagoyleDate> periodDaysByWeek1 = getPeriodDaysByWeek(startYear,
+		// startWeek);
+		// List<GagoyleDate> periodDaysByWeek2 = getPeriodDaysByWeek(endYear,
+		// endWeek);
 		//
-		//		ArrayList<GagoyleDate> arrayList = new ArrayList<>(periodDaysByWeek1.size() + periodDaysByWeek2.size());
-		//		arrayList.addAll(periodDaysByWeek1);
-		//		arrayList.addAll(periodDaysByWeek2);
+		// ArrayList<GagoyleDate> arrayList = new
+		// ArrayList<>(periodDaysByWeek1.size() + periodDaysByWeek2.size());
+		// arrayList.addAll(periodDaysByWeek1);
+		// arrayList.addAll(periodDaysByWeek2);
 
 		return arrayList;
 	}
 
 	/**
 	 * 주차에 해당하는 일자수 리턴.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.
 	 * @param year
@@ -160,13 +168,15 @@ public class DateUtil {
 
 		instance.setWeekDate(year, week, Calendar.SUNDAY);
 
-		//		int minimum = instance.getActualMinimum(GregorianCalendar.DAY_OF_WEEK);
-		//		int maximum = instance.getActualMaximum(GregorianCalendar.DAY_OF_WEEK);
+		// int minimum =
+		// instance.getActualMinimum(GregorianCalendar.DAY_OF_WEEK);
+		// int maximum =
+		// instance.getActualMaximum(GregorianCalendar.DAY_OF_WEEK);
 
 		TimeZone timeZone = instance.getTimeZone();
 		List<GagoyleDate> dateList = new ArrayList<>();
 
-		for (int i = 0 /*minimum*/; i <= 6/*maximum*/; i++)
+		for (int i = 0 /* minimum */; i <= 6/* maximum */; i++)
 
 			dateList.add(new GagoyleDate(timeZone, instance.get(GregorianCalendar.YEAR), instance.get(GregorianCalendar.MONTH),
 					instance.get(GregorianCalendar.DAY_OF_MONTH) + i));
@@ -200,7 +210,8 @@ public class DateUtil {
 	}
 
 	/**
-	 *  속하는 해당 월의 마지막 첫번째 일자를 리턴
+	 * 속하는 해당 월의 마지막 첫번째 일자를 리턴
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 4.
 	 * @param date
@@ -216,6 +227,7 @@ public class DateUtil {
 
 	/**
 	 * 속하는 해당 월의 마지막 일자를 리턴
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 4.
 	 * @param date
@@ -230,13 +242,14 @@ public class DateUtil {
 	}
 
 	/**
-	 * date 파라미터에 해당하는 주에 포함되는  eee(요일)을 리턴
+	 * date 파라미터에 해당하는 주에 포함되는 eee(요일)을 리턴
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 3. 25. 
+	 * @작성일 : 2017. 3. 25.
 	 * @param date
-	 *   적용하려는 주의 date값
+	 *            적용하려는 주의 date값
 	 * @param eee
-	 *    Calendar안에 속하는 요일값
+	 *            Calendar안에 속하는 요일값
 	 * @return
 	 */
 	public static Date getFirstWeekOfEEE(Date date, int eee) {
@@ -245,7 +258,7 @@ public class DateUtil {
 		instance.set(Calendar.DAY_OF_WEEK, eee);
 		return instance.getTime();
 	}
-	
+
 	public static String getCurrentDateString(String format) {
 		Date time = GregorianCalendar.getInstance().getTime();
 		return new SimpleDateFormat(format).format(time);
@@ -293,9 +306,6 @@ public class DateUtil {
 	public static Date toDate(String data, String format) throws ParseException {
 		return new SimpleDateFormat(format).parse(data);
 	}
-
-
-
 
 	/**
 	 * 타임존에 대한 정보를 리턴함.
@@ -396,6 +406,7 @@ public class DateUtil {
 
 	/**
 	 * Javafx에서 사용되는 Date관련 유틸리티
+	 * 
 	 * @author KYJ
 	 *
 	 */
@@ -404,6 +415,7 @@ public class DateUtil {
 		public static final String EEE = "EEE";
 		public static final String uuuuMMdd = "uuuuMMdd";
 		public static final String uuuuMMDDHHmmss = "uuuuMMddHmmss";
+		public static final String HHmm = "HHmm";
 
 		/**
 		 * @작성자 : KYJ
@@ -428,6 +440,12 @@ public class DateUtil {
 			return date.format(DateTimeFormatter.ofPattern(pattern));
 		}
 
+		public static String toString(LocalTime date, String pattern) {
+			if (date == null)
+				return "";
+			return date.format(DateTimeFormatter.ofPattern(pattern));
+		}
+
 		/**
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 12. 16.
@@ -440,10 +458,29 @@ public class DateUtil {
 			return LocalDate.parse(eee, DateTimeFormatter.ofPattern(pattern));
 		}
 
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 03. 27.
+		 * @param eee
+		 * @param pattern
+		 */
+		public static LocalDateTime toDateTime(String eee, String pattern) {
+			if (eee == null || pattern == null)
+				return null;
+			return LocalDateTime.parse(eee, DateTimeFormatter.ofPattern(pattern));
+		}
+
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 03. 27.
+		 * @param eee
+		 * @param pattern
+		 */
+		public static LocalTime toLocalTime(String eee, String pattern) {
+			if (eee == null || pattern == null)
+				return null;
+			return LocalTime.parse(eee, DateTimeFormatter.ofPattern(pattern));
+		}
 	}
-
-	
-
-
 
 }
