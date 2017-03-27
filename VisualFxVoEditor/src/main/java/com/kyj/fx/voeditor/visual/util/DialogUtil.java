@@ -548,8 +548,16 @@ public class DialogUtil {
 	public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message) {
 		return showYesOrNoDialog(title, message, null);
 	}
-
+	public static Optional<Pair<String, String>> showYesOrNoDialog(Stage stage, String title, String message) {
+		return showYesOrNoDialog(stage, title, message, null);
+	}
+	
 	public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message,
+			Consumer<? super Pair<String, String>> consumer) {
+		return showYesOrNoDialog(SharedMemory.getPrimaryStage(), title, message, consumer);
+	}
+	
+	public static Optional<Pair<String, String>> showYesOrNoDialog(Stage stage, String title, String message,
 			Consumer<? super Pair<String, String>> consumer) {
 
 		// Create the custom dialog.
@@ -572,7 +580,7 @@ public class DialogUtil {
 			return null;
 		});
 
-		dialog.initOwner(SharedMemory.getPrimaryStage());
+		dialog.initOwner(stage);
 
 		Optional<Pair<String, String>> result = dialog.showAndWait();
 

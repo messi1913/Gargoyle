@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 
 import com.kyj.fx.voeditor.visual.framework.model.GagoyleDate;
+import com.sun.star.uno.RuntimeException;
 
 /**
  * 날짜처리와 관련된 유틸리티 클래스
@@ -239,6 +240,50 @@ public class DateUtil {
 		int maximum = instance.getMaximum(Calendar.DAY_OF_MONTH);
 		instance.set(Calendar.DAY_OF_MONTH, maximum);
 		return instance.getTime();
+	}
+
+	/**
+	 *  두 날짜  사이의 차이를  calendarField 타입형태로 리턴한다.
+	 *  
+	 *  밀리초, 초, 분, 시간만 지원한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 27. 
+	 * @param date
+	 * @param workOnDate
+	 * @param millisecond
+	 * @return
+	 */
+	public static long calcTime(Date end, Date start, int calendarField) {
+		long diff = end.getTime() - start.getTime();
+
+		switch (calendarField) {
+		case Calendar.MILLISECOND:
+			return diff;
+
+		case Calendar.SECOND:
+			return diff / 1000;
+
+		case Calendar.MINUTE:
+			return diff / (1000 * 60);
+
+		case Calendar.HOUR:
+			return diff / (1000 * 60 * 24);
+		default:
+			throw new RuntimeException("Not support.");
+		}
+	}
+
+	public static final Calendar toNowCalendar() {
+		return toCalendar(new Date());
+	}
+
+	public static final Calendar toCalendar(Date date) {
+		if (date == null)
+			throw new RuntimeException("date is null.");
+
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.setTime(date);
+		return cal;
 	}
 
 	/**
@@ -464,10 +509,10 @@ public class DateUtil {
 		 * @param eee
 		 * @param pattern
 		 */
-		public static LocalDateTime toDateTime(String eee, String pattern) {
-			if (eee == null || pattern == null)
+		public static LocalDateTime toDateTime(String date, String pattern) {
+			if (date == null || pattern == null)
 				return null;
-			return LocalDateTime.parse(eee, DateTimeFormatter.ofPattern(pattern));
+			return LocalDateTime.parse(date, DateTimeFormatter.ofPattern(pattern));
 		}
 
 		/**
@@ -476,10 +521,10 @@ public class DateUtil {
 		 * @param eee
 		 * @param pattern
 		 */
-		public static LocalTime toLocalTime(String eee, String pattern) {
-			if (eee == null || pattern == null)
+		public static LocalTime toLocalTime(String date, String pattern) {
+			if (date == null || pattern == null)
 				return null;
-			return LocalTime.parse(eee, DateTimeFormatter.ofPattern(pattern));
+			return LocalTime.parse(date, DateTimeFormatter.ofPattern(pattern));
 		}
 	}
 
