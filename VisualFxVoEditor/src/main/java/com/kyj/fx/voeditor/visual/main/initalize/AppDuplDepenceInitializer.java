@@ -33,8 +33,18 @@ public abstract class AppDuplDepenceInitializer implements Initializable, Except
 	/**
 	 * @throws IOException
 	 */
+	public AppDuplDepenceInitializer(int port) {
+		this.port = port;
+		try {
+			local = new ServerSocket(port);
+		} catch (Exception e) {
+			handle(e);
+		}
+
+	}
+
 	public AppDuplDepenceInitializer() throws IOException {
-		local = new ServerSocket(port);
+		this(54545);
 	}
 
 	/**
@@ -73,7 +83,7 @@ public abstract class AppDuplDepenceInitializer implements Initializable, Except
 				LOGGER.debug("Keep Going...");
 			}
 
-		}, e -> handle(e));
+		} , e -> handle(e));
 
 		newThread.setName("Application Duplication Check Thread - Gargoyle");
 		// Thread thread = new Thread(new Runnable() {

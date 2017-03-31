@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -51,6 +52,7 @@ import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.builder.GargoyleBuilderFactory;
 import com.kyj.fx.voeditor.visual.framework.builder.GargoyleButtonBuilder;
+import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
@@ -1530,9 +1532,9 @@ public class FxUtil {
 		WebView view = new WebView();
 		WebEngine engine = view.getEngine();
 
-		engine.setOnError(err ->{
+		engine.setOnError(err -> {
 			String message = err.getMessage();
-			DialogUtil.showMessageDialog( FxUtil.getWindow(parent) , message);
+			DialogUtil.showMessageDialog(FxUtil.getWindow(parent), message);
 		});
 
 		engine.setJavaScriptEnabled(true);
@@ -1776,6 +1778,29 @@ public class FxUtil {
 		if (saveAs != null && saveAs.exists()) {
 			FileUtil.writeFile(saveAs, model.getContent(), model.getEncoding(), model.onError());
 		}
+	}
+
+	/**
+	 * tableView의 item을 엑셀파일로 전환
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 31. 
+	 * @param saveFile
+	 * @param tableView
+	 */
+	public static void exportExcelFile(File saveFile, TableView<?> tableView) {
+
+		List<Map<String, Object>> items = tableView.getItems().stream().map(v -> {
+			if (v instanceof Map) {
+				return (Map<String, Object>) v;
+			}
+			return (Map<String, Object>) ObjectUtil.toMap(v);
+		}).collect(Collectors.toList());
+
+		//		ObservableList<Map<String, Object>> items = this.tbResult.getItems();
+		ToExcelFileFunction toExcelFileFunction = new ToExcelFileFunction();
+		List<String> columns = tableView.getColumns().stream().map(col -> col.getText()).collect(Collectors.toList());
+		toExcelFileFunction.generate0(saveFile, columns, items);
+		DialogUtil.showMessageDialog("complete...");
 	}
 
 }

@@ -318,7 +318,11 @@ public class DateUtil {
 	}
 
 	public static String getDateAsStr(Date date, String format) {
-		return new SimpleDateFormat(format, Locale.ENGLISH).format(date);
+		return getDateAsStr(date, format, Locale.ENGLISH);
+	}
+
+	public static String getDateAsStr(Date date, String format, Locale locale) {
+		return new SimpleDateFormat(format, locale).format(date);
 	}
 
 	/**
@@ -330,6 +334,19 @@ public class DateUtil {
 	 */
 	public static String toString(Date when, String format) {
 		return getDateAsStr(when, format);
+	}
+
+	/**
+	 * Date클래스 toString 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 31. 
+	 * @param when
+	 * @param format
+	 * @param locale
+	 * @return
+	 */
+	public static String toString(Date when, String format, Locale locale) {
+		return getDateAsStr(when, format, locale);
 	}
 
 	public static String getDateAsStr(String date, String fromFormat, String toFormat) {
