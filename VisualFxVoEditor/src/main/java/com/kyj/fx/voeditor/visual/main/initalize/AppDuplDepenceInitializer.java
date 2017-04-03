@@ -12,9 +12,12 @@ import java.net.ServerSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.thread.CloseableCallable;
 import com.kyj.fx.voeditor.visual.framework.thread.DemonThreadFactory;
+import com.kyj.fx.voeditor.visual.main.Main;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 /***************************
  *
@@ -23,7 +26,7 @@ import com.kyj.fx.voeditor.visual.framework.thread.DemonThreadFactory;
  *         중복실행 방지처리를 위한 로직 구현
  ***************************/
 
-public abstract class AppDuplDepenceInitializer implements Initializable, ExceptionHandler {
+public abstract class AppDuplDepenceInitializer implements Initializable, ExceptionHandler, PrimaryStageCloseable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AppDuplDepenceInitializer.class);
 	int port = 54545;
@@ -101,6 +104,21 @@ public abstract class AppDuplDepenceInitializer implements Initializable, Except
 		// }, "Application Duplication Check Thread - Gargoyle");
 		// thread.setDaemon(true);
 		newThread.start();
+
+		Main.addPrimaryStageCloseListener(this);
+	}
+
+	@Override
+	public void closeRequest() {
+		if (local != null) {
+			try {
+				local.close();
+				LOGGER.debug("Close");
+			} catch (IOException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+		}
+
 	}
 
 }
