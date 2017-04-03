@@ -546,19 +546,24 @@ public class DialogUtil {
 	}
 
 	public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message) {
-		return showYesOrNoDialog(title, message, null);
+		return showYesOrNoDialog(SharedMemory.getPrimaryStage(), title, message, null, null);
 	}
+
 	public static Optional<Pair<String, String>> showYesOrNoDialog(Stage stage, String title, String message) {
-		return showYesOrNoDialog(stage, title, message, null);
+		return showYesOrNoDialog(stage, title, message, null, null);
 	}
-	
-	public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message,
-			Consumer<? super Pair<String, String>> consumer) {
-		return showYesOrNoDialog(SharedMemory.getPrimaryStage(), title, message, consumer);
-	}
-	
+
 	public static Optional<Pair<String, String>> showYesOrNoDialog(Stage stage, String title, String message,
-			Consumer<? super Pair<String, String>> consumer) {
+			Consumer<Dialog<Pair<String, String>>> dialogHandler) {
+		return showYesOrNoDialog(stage, title, message, null, dialogHandler);
+	}
+
+//	public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message) {
+//		return showYesOrNoDialog(SharedMemory.getPrimaryStage(), title, message, consumer, null);
+//	}
+
+	public static Optional<Pair<String, String>> showYesOrNoDialog(Stage stage, String title, String message,
+			Consumer<? super Pair<String, String>> consumer, Consumer<Dialog<Pair<String, String>>> dialogHandler) {
 
 		// Create the custom dialog.
 		Dialog<Pair<String, String>> dialog = new Dialog<>();
@@ -581,6 +586,8 @@ public class DialogUtil {
 		});
 
 		dialog.initOwner(stage);
+		if (dialogHandler != null)
+			dialogHandler.accept(dialog);
 
 		Optional<Pair<String, String>> result = dialog.showAndWait();
 
