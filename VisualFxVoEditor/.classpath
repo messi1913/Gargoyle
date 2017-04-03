@@ -31,7 +31,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/richtext/richtextfx-fat-0.6.10.jar"/>
 	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
@@ -49,5 +48,6 @@
 	<classpathentry kind="lib" path="lib/scm/dimmension/dmnet-1.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/scm/dimmension/dmtpi-1.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/jgit/org.eclipse.jgit-4.6.0.201612231935-r.jar"/>
+	<classpathentry kind="lib" path="lib/richtext/richtextfx-fat-1.0.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
