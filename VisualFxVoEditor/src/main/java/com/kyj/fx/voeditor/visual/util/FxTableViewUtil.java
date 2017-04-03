@@ -9,6 +9,7 @@ package com.kyj.fx.voeditor.visual.util;
 import java.lang.reflect.Method;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -51,7 +52,7 @@ class FxTableViewUtil {
 	 * @return Object 테이블셀에 정의된 데이터를 리턴할 값으로, 리턴해주는 값이 엑셀에 write된다.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static  Object getValue(TableView<?> table, TableColumn<?, ?> column, int rowIndex) {
+	public static Object getValue(TableView<?> table, TableColumn<?, ?> column, int rowIndex) {
 
 		Callback cellFactory = column.getCellFactory();
 		if (cellFactory != null) {
@@ -120,7 +121,7 @@ class FxTableViewUtil {
 
 		table.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
 
-			if(e.isConsumed())
+			if (e.isConsumed())
 				return;
 
 			int type = -1;
@@ -171,4 +172,70 @@ class FxTableViewUtil {
 		});
 	}
 
+	/**
+	 * 테이블컬럼에서 화면에 보여주는 텍스트를 리턴한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 31. 
+	 * @param tc
+	 * @param row
+	 * @return
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Object getDisplayText(TableColumn<?, ?> tc, int row) {
+
+		Callback cellFactory = tc.getCellFactory();
+
+		ObservableValue<?> cellObservableValue = tc.getCellObservableValue(row);
+
+		if (cellFactory != null) {
+			Object value = cellObservableValue.getValue();
+			if (cellObservableValue != null) {
+				TableCell cell = (TableCell) cellFactory.call(value);
+				if (cell != null) {
+					StringConverter converter = null;
+					if (cell instanceof TextFieldTableCell) {
+						TextFieldTableCell txtCell = (TextFieldTableCell) cell;
+						converter = txtCell.getConverter();
+					}
+
+					//					else if (cell instanceof TextAreaTableCell) {
+					//						TextAreaTableCell txtCell = (TextAreaTableCell) cell;
+					//						converter = txtCell.getConverter();
+					//					} 
+					else if (cell instanceof ComboBoxTableCell) {
+						ComboBoxTableCell txtCell = (ComboBoxTableCell) cell;
+						converter = txtCell.getConverter();
+					}
+
+					//					else if (cell instanceof HyperlinkTableCell) {
+					//						HyperlinkTableCell txtCell = (HyperlinkTableCell) cell;
+					//						converter = txtCell.getConverter();
+					//					}
+					/* else 기본값. */
+					else {
+						try {
+							Method m = cell.getClass().getMethod("converterProperty");
+							if (m != null) {
+								Object object = m.invoke(cell);
+								if (object != null && object instanceof ObjectProperty) {
+									ObjectProperty<StringConverter> convert = (ObjectProperty<StringConverter>) object;
+									converter = convert.get();
+								}
+							}
+						} catch (Exception e) {
+							// Nothing...
+						}
+					}
+
+					if (converter != null) {
+						Object cellData = tc.getCellData(row);
+						return converter.toString(cellData);
+					}
+				}
+				return cellFactory.call(value);
+			}
+		}
+
+		return tc.getCellData(row);
+	}
 }

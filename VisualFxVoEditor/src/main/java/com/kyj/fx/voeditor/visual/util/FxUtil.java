@@ -84,6 +84,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -1624,6 +1625,10 @@ public class FxUtil {
 	 */
 	@SuppressWarnings("rawtypes")
 	public static <T> void installDoubleClickPopup(POPUP_STYLE style, TableView<T> tbMetadata) {
+		installDoubleClickPopup(null, style, tbMetadata);
+	}
+
+	public static <T> void installDoubleClickPopup(Window owner, POPUP_STYLE style, TableView<T> tbMetadata) {
 		tbMetadata.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
 
 			if (MouseButton.PRIMARY == ev.getButton() && ev.getClickCount() == 2) {
@@ -1659,7 +1664,7 @@ public class FxUtil {
 						stage.setWidth(WIDTH);
 						stage.setHeight(HEIGHT);
 						stage.initStyle(StageStyle.UTILITY);
-
+						stage.initOwner(owner);
 						stage.focusedProperty().addListener((oba, o, n) -> {
 							if (!n)
 								stage.close();
@@ -1803,4 +1808,19 @@ public class FxUtil {
 		DialogUtil.showMessageDialog("complete...");
 	}
 
+	/**
+	 * 테이블컬럼에서 화면에 보여주는 텍스트를 리턴한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 3. 31. 
+	 * @param tc
+	 * @param row
+	 * @return
+	 */
+	public static String getDisplayText(TableColumn<?, ?> tc, int row) {
+		return FxTableViewUtil.getDisplayText(tc, row).toString();
+	}
+
+	public static Object getValue(TableView<?> table, TableColumn<?, ?> column, int rowIndex) {
+		return FxTableViewUtil.getValue(table, column, rowIndex);
+	}
 }

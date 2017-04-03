@@ -7,6 +7,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.framework.excel;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public interface IExcelDataSetHandler<S extends Sheet, D extends LinkedHashMap<E
 	 * @최초생성일 2016. 9. 20.
 	 */
 	public static final int EXCEL_SIZE_UNIT = 40;
-	
+
 	/**
 	 * Sheet정보와 DataSet정보파라미터를 받으면
 	 * Sheet에 필요한정보를 매핑하는 내용을 기술한다.
@@ -103,13 +104,14 @@ public interface IExcelDataSetHandler<S extends Sheet, D extends LinkedHashMap<E
 			createCell.setCellValue((Float) value);
 		} else if (value == null) {
 			createCell.setCellValue("");
+		} else if (value instanceof Date) {
+			createCell.setCellValue((Date) value);
 		}
 		/*그 이외 특이 사항은 구현. else if로 구현할것.*/
 		else {
 			createCell.setCellValue(value.toString());
 		}
 
-		
 		/* 
 		 * Border 처리시 속도 저하의 원인... 
 		 * 
@@ -135,14 +137,13 @@ public interface IExcelDataSetHandler<S extends Sheet, D extends LinkedHashMap<E
 	static final Callback<CellStyle, CellStyle> DEFAULT_DATA_CELL_STYLE_FACTORY = new Callback<CellStyle, CellStyle>() {
 		@Override
 		public CellStyle call(CellStyle style) {
-//			style.setBorderTop(CellStyle.BORDER_THIN);
-//			style.setBorderLeft(CellStyle.BORDER_THIN);
-//			style.setBorderRight(CellStyle.BORDER_THIN);
-//			style.setBorderBottom(CellStyle.BORDER_THIN);
+			//			style.setBorderTop(CellStyle.BORDER_THIN);
+			//			style.setBorderLeft(CellStyle.BORDER_THIN);
+			//			style.setBorderRight(CellStyle.BORDER_THIN);
+			//			style.setBorderBottom(CellStyle.BORDER_THIN);
 			return style;
 		}
 	};
-	
 
 	/**
 	 * 데이터부 셀에 표현할 스타일 팩토리 정의.
