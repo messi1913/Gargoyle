@@ -39,10 +39,12 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.RowMapperResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.ParameterizedBeanPropertyRowMapper;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -1192,6 +1194,17 @@ public class DbUtil extends ConnectionManager {
 
 	}
 
+	/**
+	 * 빈프로퍼티 로우 매퍼클래스를 생성후 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 4. 
+	 * @param clazz
+	 * @return
+	 */
+	public static <T> BeanPropertyRowMapper<T> createBeanRowMapper(Class<T> clazz){
+		return ParameterizedBeanPropertyRowMapper.newInstance(clazz);
+	}
+	
 	// TODO 구현가능한부분인지 확인.
 	// public void cancel(Connection activeConnection) {
 	// try {
