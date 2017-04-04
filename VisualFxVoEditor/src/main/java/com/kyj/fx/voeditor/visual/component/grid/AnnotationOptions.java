@@ -167,4 +167,16 @@ public class AnnotationOptions<T> extends BaseOptions {
 		return super.columnSize(columnName);
 	}
 
+	@Override
+	public boolean visible(String columnName) {
+		boolean visible = true;
+		ColumnVisible colVisible = getAnnotationClass(ColumnVisible.class, columnName);
+
+		if(colVisible != null)
+			visible  =  colVisible.value();
+		
+		return visible;
+	}
+
+	
 }

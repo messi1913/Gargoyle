@@ -106,6 +106,9 @@ public class CrudBaseColumnMapper<T extends AbstractDVO> implements IColumnMappe
 		setColumnProperty(tableColumn, columnName, options);
 		tableColumn.setId(columnName);
 
+		//보임속성 추가.
+		tableColumn.setVisible(options.visible(columnName));
+		
 		return tableColumn;
 	}
 
