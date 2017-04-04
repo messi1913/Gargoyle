@@ -184,56 +184,58 @@ class FxTableViewUtil {
 	public static Object getDisplayText(TableColumn<?, ?> tc, int row) {
 
 		Callback cellFactory = tc.getCellFactory();
+//		ObservableValue<?> cellObservableValue = tc.getCellObservableValue(row);
+		
+		if (cellFactory != null /*&& cellObservableValue != null*/) {
 
-		ObservableValue<?> cellObservableValue = tc.getCellObservableValue(row);
+//			Object value = cellObservableValue.getValue();
+			
+			Object call = cellFactory.call(tc /*value*/);
 
-		if (cellFactory != null) {
-			Object value = cellObservableValue.getValue();
-			if (cellObservableValue != null) {
-				TableCell cell = (TableCell) cellFactory.call(value);
-				if (cell != null) {
-					StringConverter converter = null;
-					if (cell instanceof TextFieldTableCell) {
-						TextFieldTableCell txtCell = (TextFieldTableCell) cell;
-						converter = txtCell.getConverter();
-					}
+			if (call != null && call instanceof TableCell) {
+				TableCell cell = (TableCell) call;
+				StringConverter converter = null;
+				if (cell instanceof TextFieldTableCell) {
+					TextFieldTableCell txtCell = (TextFieldTableCell) cell;
+					converter = txtCell.getConverter();
+				}
 
-					//					else if (cell instanceof TextAreaTableCell) {
-					//						TextAreaTableCell txtCell = (TextAreaTableCell) cell;
-					//						converter = txtCell.getConverter();
-					//					} 
-					else if (cell instanceof ComboBoxTableCell) {
-						ComboBoxTableCell txtCell = (ComboBoxTableCell) cell;
-						converter = txtCell.getConverter();
-					}
+				//					else if (cell instanceof TextAreaTableCell) {
+				//						TextAreaTableCell txtCell = (TextAreaTableCell) cell;
+				//						converter = txtCell.getConverter();
+				//					} 
+				else if (cell instanceof ComboBoxTableCell) {
+					ComboBoxTableCell txtCell = (ComboBoxTableCell) cell;
+					converter = txtCell.getConverter();
+				}
 
-					//					else if (cell instanceof HyperlinkTableCell) {
-					//						HyperlinkTableCell txtCell = (HyperlinkTableCell) cell;
-					//						converter = txtCell.getConverter();
-					//					}
-					/* else 기본값. */
-					else {
-						try {
-							Method m = cell.getClass().getMethod("converterProperty");
-							if (m != null) {
-								Object object = m.invoke(cell);
-								if (object != null && object instanceof ObjectProperty) {
-									ObjectProperty<StringConverter> convert = (ObjectProperty<StringConverter>) object;
-									converter = convert.get();
-								}
+				//					else if (cell instanceof HyperlinkTableCell) {
+				//						HyperlinkTableCell txtCell = (HyperlinkTableCell) cell;
+				//						converter = txtCell.getConverter();
+				//					}
+				/* else 기본값. */
+				else {
+					try {
+						Method m = cell.getClass().getMethod("converterProperty");
+						if (m != null) {
+							Object object = m.invoke(cell);
+							if (object != null && object instanceof ObjectProperty) {
+								ObjectProperty<StringConverter> convert = (ObjectProperty<StringConverter>) object;
+								converter = convert.get();
 							}
-						} catch (Exception e) {
-							// Nothing...
 						}
-					}
-
-					if (converter != null) {
-						Object cellData = tc.getCellData(row);
-						return converter.toString(cellData);
+					} catch (Exception e) {
+						// Nothing...
 					}
 				}
-				return cellFactory.call(value);
+
+				if (converter != null) {
+					Object cellData = tc.getCellData(row);
+					return converter.toString(cellData);
+				}
 			}
+
+			return call;
 		}
 
 		return tc.getCellData(row);
