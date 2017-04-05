@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Hyesung Lee
  */
+@Deprecated
 public class SSOAuth {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SSOAuth.class);

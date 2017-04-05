@@ -37,6 +37,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -499,8 +500,11 @@ public class RequestUtil {
 			CloseableHttpClient httpclient = null;
 
 			// 시작 쿠키관리
-			List<Cookie> cookies = cookieStore.getCookies();
-			LOGGER.debug("Get cookies...  : " + cookies);
+			List<Cookie> cookies = CookieBase.getCookies();//cookieStore.getCookies();
+			LOGGER.debug("Request cookies...  : ");
+			cookies.forEach(c -> {
+				LOGGER.debug("[req] k : {} v : {}", c.getName(), c.getValue());
+			});
 			// 종료 쿠키관리
 
 			try {
@@ -545,15 +549,21 @@ public class RequestUtil {
 				//			else {
 				response = httpclient.execute(http);
 				//			}
-
+				
+				LOGGER.debug("Response headers ...   ");
 				Stream.of(response.getAllHeaders()).forEach(h -> {
-					LOGGER.debug("[[Response Cookie]] {} : {} ", h.getName(), h.getValue());
+					LOGGER.debug("[res] k : {}  v : {} ", h.getName(), h.getValue());
 				});
 
 				HttpEntity entity = response.getEntity();
 
 				rslt = res.apply(entity.getContent(), response.getStatusLine().getStatusCode());
 
+				LOGGER.debug("Res cookies...  : ");
+				CookieBase.getCookies().forEach(c -> {
+					LOGGER.debug("[res] k : {} v : {}", c.getName(), c.getValue());
+				});
+				
 			} finally {
 
 				if (response != null)
@@ -575,7 +585,10 @@ public class RequestUtil {
 
 			// 시작 쿠키관리
 			List<Cookie> cookies = cookieStore.getCookies();
-			LOGGER.debug("Get cookies...  : " + cookies);
+			LOGGER.debug("Request cookies...  : ");
+			cookies.forEach(c -> {
+				LOGGER.debug("[req] k : {} v : {}", c.getName(), c.getValue());
+			});
 			// 종료 쿠키관리
 
 			try {
@@ -598,13 +611,18 @@ public class RequestUtil {
 				response = httpclient.execute(http);
 
 				Stream.of(response.getAllHeaders()).forEach(h -> {
-					LOGGER.debug("[[Response Cookie]] {} : {} ", h.getName(), h.getValue());
+					LOGGER.debug("[[Res Header]] {} : {} ", h.getName(), h.getValue());
 				});
 
 				HttpEntity entity = response.getEntity();
 
 				rslt = res.apply(entity.getContent(), response.getStatusLine().getStatusCode());
-
+				
+				LOGGER.debug("Res cookies...  : ");
+				CookieBase.getCookies().forEach(c -> {
+					LOGGER.debug("[res] k : {} v : {}", c.getName(), c.getValue());
+				});
+				
 			} finally {
 
 				if (response != null)
@@ -619,6 +637,7 @@ public class RequestUtil {
 		}
 
 		/**
+		 *  read only cookies.
 		 * @return
 		 * @작성자 : KYJ
 		 * @작성일 : 2017. 3. 22.
@@ -626,6 +645,19 @@ public class RequestUtil {
 		public static List<Cookie> getCookies() {
 			return cookieStore.getCookies();
 		}
+
+		public static void addCookies(Cookie... cookies) {
+			cookieStore.addCookies(cookies);
+		}
+
+		public static void addCookie(Cookie cookie) {
+			cookieStore.addCookie(cookie);
+		}
+
+		public static void addCookie(String key, String value) {
+			addCookie(new BasicClientCookie(key, value));
+		}
+
 	}
 
 }
