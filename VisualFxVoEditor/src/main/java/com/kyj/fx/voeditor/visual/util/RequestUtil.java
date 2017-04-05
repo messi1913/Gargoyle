@@ -30,8 +30,10 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -357,7 +359,11 @@ public class RequestUtil {
 			};
 		}
 
-		public static <T> T request(String url, Header[] headers, Map<String, String> data, Function<CloseableHttpResponse, T> res /*, boolean storeCookie, boolean clearCookie*/)
+		public static <T> T request(String url, Map<String, String> data, BiFunction<InputStream, Integer, T> res) throws Exception {
+			return request(url, null, data, res);
+		}
+
+		public static <T> T request(String url, Header[] headers, Map<String, String> data, Function<CloseableHttpResponse, T> res)
 				throws Exception {
 
 			T rslt = null;
@@ -367,14 +373,6 @@ public class RequestUtil {
 			// 시작 쿠키관리
 			List<Cookie> cookies = cookieStore.getCookies();
 			LOGGER.debug("Get cookies...  : " + cookies);
-
-			// BasicClientCookie cookie = new BasicClientCookie("userId", (String)
-			// SharedMemoryMap.getInstance().get(
-			// SharedMemoryMap.USER_ID));
-			// cookie.setDomain(url);
-			// cookie.setPath("/");
-			// cookieStore.addCookie(cookie);
-			// 종료 쿠키관리
 
 			try {
 
@@ -421,15 +419,6 @@ public class RequestUtil {
 
 				rslt = res.apply(response);
 
-				//				Stream.of(response.getAllHeaders()).forEach(header -> {
-				//					LOGGER.debug("{} : {} ", header.getName(), header.getValue());
-				//				});
-
-				//				HttpEntity entity = response.getEntity();
-
-				//				rslt = res.apply(entity);
-				//				rslt = res.apply(entity.getContent(), response.getStatusLine().getStatusCode());
-
 			} finally {
 
 				if (response != null)
@@ -445,8 +434,61 @@ public class RequestUtil {
 
 		}
 
-		public static <T> T request(String url, Map<String, String> data, BiFunction<InputStream, Integer, T> res) throws Exception {
-			return request(url, null, data, res);
+		public static <T> T request(String url, Header[] headers, String data, BiFunction<InputStream, Integer, T> res) throws Exception {
+
+			T rslt = null;
+			CloseableHttpResponse response = null;
+			CloseableHttpClient httpclient = null;
+
+			// 시작 쿠키관리
+			List<Cookie> cookies = cookieStore.getCookies();
+			LOGGER.debug("Get cookies...  : " + cookies);
+			// 종료 쿠키관리
+
+			try {
+
+				HttpEntityEnclosingRequestBase http = new HttpPost(url);
+				LOGGER.debug(url);
+
+				if (headers != null) {
+					for (Header header : headers) {
+						if (header == null)
+							continue;
+						http.addHeader(header);
+					}
+				}
+
+				httpclient = HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build();
+				// httpclient = HttpClients.createDefault();
+
+				// 시작 서버로 보낼 데이터를 묶음.
+
+				StringEntity sendEntityData = new StringEntity(data, "UTF-8");
+				http.setEntity(sendEntityData);
+				// 끝 서버로 보낼 데이터를 묶음.
+
+				/* 프록시 체크 */
+				response = httpclient.execute(http);
+
+				Stream.of(response.getAllHeaders()).forEach(h -> {
+					LOGGER.debug("[[Response Cookie]] {} : {} ", h.getName(), h.getValue());
+				});
+
+				HttpEntity entity = response.getEntity();
+
+				rslt = res.apply(entity.getContent(), response.getStatusLine().getStatusCode());
+
+			} finally {
+
+				if (response != null)
+					EntityUtils.consume(response.getEntity());
+
+				if (httpclient != null) {
+					httpclient.close();
+				}
+
+			}
+			return rslt;
 		}
 
 		public static <T> T request(String url, Header[] headers, Map<String, String> data, BiFunction<InputStream, Integer, T> res)
@@ -459,13 +501,6 @@ public class RequestUtil {
 			// 시작 쿠키관리
 			List<Cookie> cookies = cookieStore.getCookies();
 			LOGGER.debug("Get cookies...  : " + cookies);
-
-			// BasicClientCookie cookie = new BasicClientCookie("userId", (String)
-			// SharedMemoryMap.getInstance().get(
-			// SharedMemoryMap.USER_ID));
-			// cookie.setDomain(url);
-			// cookie.setPath("/");
-			// cookieStore.addCookie(cookie);
 			// 종료 쿠키관리
 
 			try {
@@ -512,10 +547,6 @@ public class RequestUtil {
 				//			}
 
 				Stream.of(response.getAllHeaders()).forEach(h -> {
-
-					//					if ("Set-cookie".equals(h.getName()))
-					//						cookieStore.getCookies().add(new BasicClientCookie("Set-cookie", h.getValue()));
-
 					LOGGER.debug("[[Response Cookie]] {} : {} ", h.getName(), h.getValue());
 				});
 
@@ -533,9 +564,58 @@ public class RequestUtil {
 				}
 
 			}
-
 			return rslt;
+		}
 
+		public static <T> T requestGet(String url, Header[] headers, BiFunction<InputStream, Integer, T> res) throws Exception {
+
+			T rslt = null;
+			CloseableHttpResponse response = null;
+			CloseableHttpClient httpclient = null;
+
+			// 시작 쿠키관리
+			List<Cookie> cookies = cookieStore.getCookies();
+			LOGGER.debug("Get cookies...  : " + cookies);
+			// 종료 쿠키관리
+
+			try {
+
+				HttpGet http = new HttpGet(url);
+				LOGGER.debug(url);
+
+				if (headers != null) {
+					for (Header header : headers) {
+						if (header == null)
+							continue;
+						http.addHeader(header);
+					}
+				}
+
+				httpclient = HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build();
+				// httpclient = HttpClients.createDefault();
+
+				/* 프록시 체크 */
+				response = httpclient.execute(http);
+
+				Stream.of(response.getAllHeaders()).forEach(h -> {
+					LOGGER.debug("[[Response Cookie]] {} : {} ", h.getName(), h.getValue());
+				});
+
+				HttpEntity entity = response.getEntity();
+
+				rslt = res.apply(entity.getContent(), response.getStatusLine().getStatusCode());
+
+			} finally {
+
+				if (response != null)
+					EntityUtils.consume(response.getEntity());
+
+				if (httpclient != null) {
+					httpclient.close();
+				}
+
+			}
+			return rslt;
 		}
 
 		/**

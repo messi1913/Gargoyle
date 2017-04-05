@@ -12,7 +12,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
@@ -40,13 +39,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.util.ByteArrayDataSource;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang.StringUtils;
@@ -66,6 +58,8 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kohlschutter.boilerpipe.document.TextDocument;
@@ -80,7 +74,6 @@ import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.sun.star.lang.IllegalArgumentException;
 
 import javafx.collections.ObservableList;
-import javafx.scene.control.IndexRange;
 
 /**
  * @author KYJ
@@ -680,6 +673,19 @@ public class ValueUtil {
 		return new JsonParser().parse(jsonString).getAsJsonObject();
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 5. 
+	 * @param json
+	 * @return
+	 */
+	public static String toStringPrettyFormat(String json){
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		JsonParser jp = new JsonParser();
+		JsonElement je = jp.parse(json);
+		return gson.toJson(je);
+	}
+	
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 4. 4.
