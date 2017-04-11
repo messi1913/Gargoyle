@@ -16,6 +16,7 @@ import com.kyj.fx.voeditor.visual.component.ResourcesConfigView;
 import com.kyj.fx.voeditor.visual.component.SceneBuilderLocationComposite;
 import com.kyj.fx.voeditor.visual.component.SkinConfigView;
 import com.kyj.fx.voeditor.visual.component.config.skin.CustomSkinConfigView;
+import com.kyj.fx.voeditor.visual.component.config.skin.InstalledJresComposte;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseConfigView;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseUrlManagementView;
 import com.kyj.fx.voeditor.visual.component.scm.SVNConfigView;
@@ -67,10 +68,13 @@ public class ConfigurationViewController {
 		ConfigurationTreeItem resources = new ConfigurationTreeItem();
 		resources.setItemName("Resources");
 
+		ConfigurationTreeItem java = new ConfigurationTreeItem();
+		java.setItemName("Java");
+
 		ConfigurationTreeItem javafx = new ConfigurationTreeItem();
 		javafx.setItemName("Java FX");
 
-		root = new ConfigurationTreeItem(Arrays.asList(databases, resources, javafx));
+		root = new ConfigurationTreeItem(Arrays.asList(databases, resources, java, javafx));
 		root.setItemName("Configurations");
 		{
 			ConfigurationLeafNodeItem children1 = new ConfigurationLeafNodeItem();
@@ -118,6 +122,21 @@ public class ConfigurationViewController {
 		}
 		resources.setChildrens(resourcesChildrens);
 
+		List<ConfigurationTreeItem> javaChildrens = new ArrayList<>();
+		{
+			ConfigurationGraphicsNodeItem tiInstallJres = new ConfigurationGraphicsNodeItem();
+			tiInstallJres.setItemName("Installed JREs");
+			tiInstallJres.setContentNode(InstalledJresComposte.class);
+			{
+				ConfigurationLeafNodeItem children = new ConfigurationLeafNodeItem();
+				children.setItemName("Execution Environment");
+				
+				tiInstallJres.setChildrens(Arrays.asList(children));
+			}
+			javaChildrens.add(tiInstallJres);
+		}
+		java.setChildrens(javaChildrens);
+		
 		List<ConfigurationTreeItem> javafxChildrens = new ArrayList<>();
 		{
 			{

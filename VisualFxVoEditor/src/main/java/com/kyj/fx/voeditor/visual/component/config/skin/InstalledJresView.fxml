@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root prefHeight="533.0" prefWidth="878.0" style="-fx-padding: 5;" stylesheets="@../../../../../../../../../../../skins/application_simple_sea.css" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <VBox style="-fx-padding: 3 3 3 3; -fx-border-color: gray;" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label style="-fx-padding: 0 0 5 0;" text="Installed JREs" />
+                  <HBox VBox.vgrow="ALWAYS">
+                     <children>
+                        <TableView maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                          <columns>
+                            <TableColumn prefWidth="149.0" text="Name" />
+                            <TableColumn prefWidth="305.0" text="Location" />
+                              <TableColumn prefWidth="205.0" text="Type" />
+                          </columns>
+                        </TableView>
+                        <VBox style="-fx-padding: 0 5 0 5; -fx-spacing: 5;">
+                           <children>
+                              <Button mnemonicParsing="false" prefWidth="80.0" text="Add" />
+                              <Button mnemonicParsing="false" prefWidth="80.0" text="Edit" />
+                              <Button mnemonicParsing="false" prefWidth="80.0" text="Remove" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </center>
+   <bottom>
+      <HBox style="-fx-alignment: center_right; -fx-padding: 5 5 0 0;" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" prefWidth="80.0" text="Apply" />
+         </children>
+      </HBox>
+   </bottom>
+   <top>
+      <VBox style="-fx-spacing: 5;" BorderPane.alignment="CENTER">
+         <children>
+            <HBox styleClass="hbox-gargoyle">
+               <children>
+                  <Label style="-fx-font-size: 20;" text="Installed JREs" />
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <Label style="-fx-padding: 0 0 10 0;" text="Add, remove or edit JRE definitions. by default, the checked JRE is added to the build path of newly created java projects." />
+         </children>
+      </VBox>
+   </top>
+</fx:root>
