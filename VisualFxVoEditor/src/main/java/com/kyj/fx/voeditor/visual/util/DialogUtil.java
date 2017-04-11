@@ -510,7 +510,6 @@ public class DialogUtil {
 	public static void showMessageDialog(Stage initOwner, String message) {
 		showMessageDialog(initOwner, "Info", "", message, alert -> {
 			alert.initModality(Modality.APPLICATION_MODAL);
-			alert.initOwner(initOwner);
 			alert.showAndWait();
 		});
 
@@ -534,6 +533,8 @@ public class DialogUtil {
 			alert.setTitle(title);
 			alert.setHeaderText(headerText);
 			alert.setContentText(message);
+			alert.initOwner(initOwner);
+			
 			apply.accept(alert);
 		});
 
