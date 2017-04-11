@@ -52,6 +52,7 @@ import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.builder.GargoyleBuilderFactory;
 import com.kyj.fx.voeditor.visual.framework.builder.GargoyleButtonBuilder;
+import com.kyj.fx.voeditor.visual.framework.contextmenu.FxContextManager;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
@@ -1195,6 +1196,18 @@ public class FxUtil {
 	}
 
 	/**
+	 * 컨텐스트 메뉴를 추가하기 위한
+	 * 유틸리티성 클래스
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 10. 
+	 * @param contextManager
+	 */
+	public static void installContextMenu(FxContextManager contextManager) {
+		contextManager.install();
+		LOGGER.debug(" contextmenu install success. ");
+	}
+
+	/**
 	 * 편의성 처리를 위해 완성코드 리턴.
 	 *
 	 * @author KYJ
@@ -1823,4 +1836,5 @@ public class FxUtil {
 	public static Object getValue(TableView<?> table, TableColumn<?, ?> column, int rowIndex) {
 		return FxTableViewUtil.getValue(table, column, rowIndex);
 	}
+
 }

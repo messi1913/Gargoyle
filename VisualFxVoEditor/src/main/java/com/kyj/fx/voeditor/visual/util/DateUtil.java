@@ -273,6 +273,24 @@ public class DateUtil {
 		}
 	}
 
+	/**
+	 * date에 calendarField 속성에 맞는 amount값을 처리한 결과를 리턴함.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 10. 
+	 * @param date
+	 * @param totayTotalMin
+	 * @param calendarField
+	 * @return
+	 */
+	public static Date calc(Date date, int calendarField, int amount) {
+		//date값을 복사
+		Date newDate = new Date(date.getTime());
+		Calendar instance = Calendar.getInstance();
+		instance.setTime(newDate);
+		instance.add(calendarField, amount);
+		return instance.getTime();
+	}
+
 	public static final Calendar toNowCalendar() {
 		return toCalendar(new Date());
 	}
@@ -367,6 +385,44 @@ public class DateUtil {
 
 	public static Date toDate(String data, String format) throws ParseException {
 		return new SimpleDateFormat(format).parse(data);
+	}
+
+	/**
+	 * 요일 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 10. 
+	 * @param date
+	 * @return
+	 */
+	public static int getDayOfWeek(Date date) {
+		return getField(date, Locale.getDefault(), Calendar.DAY_OF_WEEK);
+	}
+
+	/**
+	 * Date의 특정 필드값 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 10. 
+	 * @param date
+	 * @param calendarField
+	 * @return
+	 */
+	public static int getField(Date date, int calendarField) {
+		return getField(date, Locale.getDefault(), calendarField);
+	}
+
+	/**
+	 * Date의 특정 필드값 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 10. 
+	 * @param date
+	 * @param locale
+	 * @param calendarField
+	 * @return
+	 */
+	public static int getField(Date date, Locale locale, int calendarField) {
+		Calendar instance = Calendar.getInstance(locale);
+		instance.setTime(date);
+		return instance.get(calendarField);
 	}
 
 	/**
