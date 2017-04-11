@@ -8,8 +8,6 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -21,7 +19,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
@@ -748,5 +748,28 @@ public class FileUtil implements GargoyleExtensionFilters {
 	public static String getFileExtension(String fileName) {
 		int dotIndex = fileName.lastIndexOf('.');
 		return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
+	}
+	
+	/**
+	 * 디렉토리 생성
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 11. 
+	 * @param file
+	 * @throws IOException
+	 */
+	public static final void mkDirs(File file) throws IOException {
+
+		if (file.exists())
+			return;
+
+		File parentFile = null;
+		if (file.isFile()) {
+			parentFile = file.getParentFile();
+		}
+
+		if (parentFile == null || !parentFile.exists()) {
+			Path path = Paths.get(file.getAbsolutePath());
+			Files.createDirectories(path.getParent());
+		}
 	}
 }
