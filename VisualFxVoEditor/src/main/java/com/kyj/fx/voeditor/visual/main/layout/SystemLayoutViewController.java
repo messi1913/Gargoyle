@@ -101,6 +101,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -1433,6 +1434,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				}
 
 				DockTab tab = new DockTab(tabName, parent);
+				// 툴팁 처리 (클래스위치)
+				tab.setTooltip(new Tooltip(loader.getController().getClass().getName()));
+				
 				addTabItem(tab);
 				tab.getTabPane().getSelectionModel().select(tab);
 
@@ -1467,7 +1471,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				}
 
 				DockTab tab = new DockTab(tableName, parent);
-
+				// 툴팁 처리 (클래스위치)
+				tab.setTooltip(new Tooltip(parent.getClass().getName()));
 				addTabItem(tab);
 				if (skin != null) {
 					parent.getStylesheets().clear();
@@ -1521,6 +1526,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				}
 
 				DockTab tab = new DockTab(tableName, _parent);
+				// 툴팁 처리 (클래스위치)
+				tab.setTooltip(new Tooltip(parent.getClass().getName()));
+				
 				addTabItem(tab);
 				tabPanWorkspace.getSelectionModel().select(tab);
 
