@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.kyj.fx.voeditor.visual.framework.mail.Mail;
+import com.kyj.fx.voeditor.visual.framework.mail.SenderMailInfo;
 import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
 
 /**
@@ -30,20 +31,25 @@ public class MailUtilTest {
 	public void sendMailTest() throws Exception {
 
 		Mail mail = new Mail();
-		mail.setMailTo("callakrsos@naver.com");
+		mail.setMailTo(new String[] { "", "" });
+
 		Map<String, Object> velocityContext = new HashMap<>();
 
 		velocityContext.put("seq", "667");
 		velocityContext.put("date", "2015-09-12");
 		velocityContext.put("numbers", "테스트번호입니다.");
 
-		MailUtil.sendMail(Arrays.asList(mail), velocityContext);
+		SenderMailInfo senderMailInfo = new SenderMailInfo();
+		senderMailInfo.setSendUserId("");
+		senderMailInfo.setSendUserPassword("");
+
+		MailUtil.sendMail(senderMailInfo, mail, velocityContext);
 	}
 
 	@Test
 	public void bodyMailTest() throws Exception {
 		Mail mail = new Mail();
-		mail.setMailTo("callakrsos@naver.com");
+		mail.setMailTo(new String[] { "" });
 		Map<String, Object> velocityContext = new HashMap<>();
 
 		velocityContext.put("seq", "667");
