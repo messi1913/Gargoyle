@@ -1,13 +1,12 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : com.kyj.scm.manager.svn.java
- *	작성일   : 2016. 3. 23.
+ *	패키지   : com.kyj.scm.manager.dimmension
+ *	작성일   : 2017. 4. 13.
  *	작성자   : KYJ
  *******************************/
 package com.kyj.scm.manager.dimmension;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -19,11 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.wc.SVNLogClient;
-import org.tmatesoft.svn.core.wc.SVNRevision;
 
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.ILogCommand;
 
 /**

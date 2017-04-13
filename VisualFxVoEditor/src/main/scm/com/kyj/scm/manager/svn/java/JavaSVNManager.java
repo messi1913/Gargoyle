@@ -22,16 +22,17 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
-import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
+import com.kyj.scm.manager.core.commons.AbstractScmManager;
 import com.kyj.scm.manager.core.commons.SCMKeywords;
+import com.kyj.scm.manager.core.commons.ScmDirHandler;
 
 /**
  * SVN명령어를 모아놓은 매니저클래스
@@ -40,7 +41,7 @@ import com.kyj.scm.manager.core.commons.SCMKeywords;
  *
  */
 
-public class JavaSVNManager implements SCMKeywords, SVNFormatter {
+public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, SVNFormatter {
 	private SVNCat catCommand;
 
 	private SVNList listCommand;
@@ -74,6 +75,7 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	/*[끝] SVN URL의 특이 프로토콜에 대한 체크를 위해 추가 변수 생성*/
 
 	public JavaSVNManager(Properties properties) {
+		super();
 		init(properties);
 	}
 
@@ -84,7 +86,7 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @작성일 : 2016. 4. 2.
 	 * @param properties
 	 */
-	void init(Properties properties) {
+	public void init(Properties properties) {
 		this.properties = properties;
 		this.checkoutCommand = new SVNCheckout(this, properties);
 		this.catCommand = new SVNCat(this, properties);
@@ -142,17 +144,21 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 * @return
 	 */
 	public String getUrl() {
-		Object objURL = this.properties.get(SVN_URL);
-		if (objURL == null)
-			throw new GagoyleParamEmptyException("SVN URL IS EMPTY.");
-		return objURL.toString();
+		return this.svnResource.getUrl();
+		//		Object objURL = this.properties.get(SVN_URL);
+		//		if (objURL == null)
+		//			throw new GagoyleParamEmptyException("SVN URL IS EMPTY.");
+		//		return objURL.toString();
 	}
 
-	public Object getUserId() {
-		return this.properties.get(SVN_USER_ID);
-		//		if (objUserId == null)
-		//			throw new GagoyleParamEmptyException("SVN ID IS EMPTY.");
-		//		return objUserId.toString();
+	public String getUserId() {
+		return this.svnResource.getUserId();
+		//		return getProperties().get(SVN_USER_ID).toString();
+	}
+
+	@Override
+	public String getUserPassword() {
+		return this.svnResource.getUserPassword();
 	}
 
 	/**
@@ -274,7 +280,6 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 		else
 			predicate = v -> parseLong <= v.getRevision();
 
-
 		Stream<SVNDirEntry> filter = listEntry.stream().filter(predicate);
 		if (compare != null) {
 			filter = filter.sorted(compare);
@@ -291,6 +296,11 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 */
 	public void listEntry(String relativePath, SVNDirHandler handler) throws Exception {
 		listCommand.listEntry(relativePath, handler);
+	}
+
+	@Override
+	public <T> void listEntry(String relativePath, ScmDirHandler<T> handler) throws Exception {
+		listEntry(relativePath, (SVNDirHandler) handler);
 	}
 
 	/**
@@ -709,6 +719,11 @@ public class JavaSVNManager implements SCMKeywords, SVNFormatter {
 	 */
 	public final boolean isHttps() {
 		return isHttps;
+	}
+
+	@Override
+	public File tmpDir() {
+		return new File(SystemUtils.getJavaIoTmpDir(), "svn");
 	}
 
 }

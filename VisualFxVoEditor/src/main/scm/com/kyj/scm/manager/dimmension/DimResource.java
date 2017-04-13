@@ -1,14 +1,16 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : com.kyj.scm.manager.svn.java
- *	작성일   : 2016. 7. 14.
+ *	패키지   : com.kyj.scm.manager.dimmension
+ *	작성일   : 2017. 4. 13.
  *	작성자   : KYJ
  *******************************/
 package com.kyj.scm.manager.dimmension;
 
+import java.io.File;
 import java.util.Date;
 import java.util.Properties;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.tmatesoft.svn.core.SVNException;
 
 import com.serena.dmclient.api.ItemRevision;
@@ -17,7 +19,7 @@ import com.serena.dmclient.api.SystemAttributes;
 
 /**
  *
- * SVN Resource정보 리턴.
+ * 디멘전 Resource와 관련된 API 처리 묶음 
  *
  * @author KYJ
  *
@@ -28,8 +30,8 @@ class DimResource extends AbstractDimmension {
 	 * @param javaSVNManager
 	 * @param properties
 	 */
-	public DimResource(DimmensionManager javaSVNManager, Properties properties) {
-		super(javaSVNManager, properties);
+	public DimResource(DimmensionManager manager, Properties properties) {
+		super(manager, properties);
 	}
 
 	/**
@@ -100,23 +102,19 @@ class DimResource extends AbstractDimmension {
 		return getConnection().getConnectionDetails().getServer();
 	}
 
+	public File tmpDir() {
+		return new File(SystemUtils.getJavaIoTmpDir(), "dimmension");
+	}
+
 	/**
-	 * SVN Root Url
+	 * Root Url
 	 *
 	 * @작성자 : KYJ
-	 * @작성일 : 2016. 7. 21.
+	 * @작성일 : 2017. 4. 13.
 	 * @return
 	 */
 	public String getRootUrl() {
-
-		//		DimensionsObjectFactory dimmensionObjectFactory = getDimmensionObjectFactory();
-		//		dimmensionObjectFactory.getProject(arg0)
 		return getConnection().getConnectionDetails().getServer();
-		//		SVNURL location = getRepository().getLocation();
-		//		String decodedString = location.toDecodedString();
-		//		String uriEncodedPath = location.getURIEncodedPath();
-		//		String rootUrl = decodedString.replaceAll(uriEncodedPath, "");
-		//		return rootUrl;
 	}
 
 }

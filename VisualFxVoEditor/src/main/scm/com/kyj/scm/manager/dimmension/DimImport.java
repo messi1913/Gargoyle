@@ -1,7 +1,7 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : com.kyj.scm.manager.svn.java
- *	작성일   : 2016. 7. 11.
+ *	패키지   : com.kyj.scm.manager.dimmension
+ *	작성일   : 2017. 4. 13.
  *	작성자   : KYJ
  *******************************/
 package com.kyj.scm.manager.dimmension;
@@ -13,22 +13,20 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNCommitInfo;
-import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.wc.SVNCommitClient;
 
-import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.scm.manager.core.commons.ISCMCommit;
 import com.sun.star.uno.RuntimeException;
 
 /**
  * 최초 프로젝트 import
  *
+ * 
  * @author KYJ
- *
+ * @deprecated 구현 지원안함.
  */
+@Deprecated
 class DimImport extends AbstractDimmension implements ISCMCommit {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DimImport.class);
@@ -60,7 +58,9 @@ class DimImport extends AbstractDimmension implements ISCMCommit {
 	 *    결과 상태값  -1 : 실패
 	 * @throws SVNException
 	 */
-	public int importProject(String from, SVNURL to) throws Exception {throw new RuntimeException("Not yet support");}
+	public int importProject(String from, SVNURL to) throws Exception {
+		throw new RuntimeException("Not yet support");
+	}
 
 	/**
 	 *  SVN Import Command 수행.
@@ -72,5 +72,7 @@ class DimImport extends AbstractDimmension implements ISCMCommit {
 	 * @return
 	 * @throws SVNException
 	 */
-	private SVNCommitInfo doImport(File checkoutedDir, SVNURL to) throws SVNException {throw new RuntimeException("Not yet support");}
+	private SVNCommitInfo doImport(File checkoutedDir, SVNURL to) throws SVNException {
+		throw new RuntimeException("Not yet support");
+	}
 }

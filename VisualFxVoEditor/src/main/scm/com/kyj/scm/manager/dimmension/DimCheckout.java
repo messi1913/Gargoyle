@@ -1,7 +1,7 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : com.kyj.scm.manager.svn.java
- *	작성일   : 2016. 3. 23.
+ *	패키지   : com.kyj.scm.manager.dimmension
+ *	작성일   : 2017. 4. 13.
  *	작성자   : KYJ
  *******************************/
 package com.kyj.scm.manager.dimmension;

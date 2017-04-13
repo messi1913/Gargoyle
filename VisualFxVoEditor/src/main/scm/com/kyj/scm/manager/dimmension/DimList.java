@@ -1,7 +1,7 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : com.kyj.scm.manager.svn.java
- *	작성일   : 2016. 3. 23.
+ *	패키지   : com.kyj.scm.manager.dimmension
+ *	작성일   : 2017. 4. 13.
  *	작성자   : KYJ
  *******************************/
 package com.kyj.scm.manager.dimmension;
@@ -17,10 +17,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNDirEntry;
-import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.SVNNodeKind;
 
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.IListCommand;
 import com.serena.dmclient.api.Project;
 import com.serena.dmclient.api.RepositoryFolder;
@@ -38,8 +35,8 @@ class DimList extends AbstractDimmension implements IListCommand<String, List<St
 	 * @param javaSVNManager
 	 * @param properties
 	 */
-	public DimList(DimmensionManager javaSVNManager, Properties properties) {
-		super(javaSVNManager, properties);
+	public DimList(DimmensionManager manager, Properties properties) {
+		super(manager, properties);
 	}
 
 	private static Logger LOGGER = LoggerFactory.getLogger(DimList.class);
@@ -156,19 +153,6 @@ class DimList extends AbstractDimmension implements IListCommand<String, List<St
 			return childFolder.getImmediateChildFolders();
 		}
 	}
-
-	//커밋메세지 기능 추가.
-	private Consumer<SVNDirEntry> addMessage = v -> {
-		if (v.getKind() == SVNNodeKind.FILE) {
-			String svnPath = v.getURL().getPath();
-
-			List<SVNLogEntry> log = getDimmensionManager().log(svnPath, v.getDate(), ex -> LOGGER.error(ValueUtil.toString(ex)));
-			if (!log.isEmpty()) {
-				SVNLogEntry svnLogEntry = log.get(log.size() - 1);
-				v.setCommitMessage(svnLogEntry.getMessage());
-			}
-		}
-	};
 
 	/********************************
 	 * 작성일 : 2016. 5. 9. 작성자 : KYJ

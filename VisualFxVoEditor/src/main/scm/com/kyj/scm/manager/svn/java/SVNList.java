@@ -30,6 +30,7 @@ import org.tmatesoft.svn.core.wc.SVNClientManager;
 
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.IListCommand;
+import com.kyj.scm.manager.core.commons.ScmDirHandler;
 
 /**
  * SVN의 LIST명령어를 수행한다.
@@ -168,7 +169,7 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 	 * @param handler
 	 * @throws Exception
 	 */
-	public void listEntry(String relativePath, SVNDirHandler handler) throws Exception {
+	public void listEntry(String relativePath, ScmDirHandler<SVNDirEntry> handler) throws Exception {
 
 		try {
 			SVNRepository repository = getRepository();

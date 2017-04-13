@@ -1,18 +1,14 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : com.kyj.scm.manager.svn.java
- *	작성일   : 2016. 7. 11.
+ *	패키지   : com.kyj.scm.manager.dimmension
+ *	작성일   : 2017. 4. 13.
  *	작성자   : KYJ
  *******************************/
 package com.kyj.scm.manager.dimmension;
 
 import java.util.Properties;
 
-import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.wc.SVNCopySource;
-
 import com.kyj.scm.manager.core.commons.ISCMCommit;
-import com.sun.star.uno.RuntimeException;
 
 /**
  *
@@ -21,8 +17,9 @@ import com.sun.star.uno.RuntimeException;
  * Copy의 경우 Revision 정보까지 복사하고자하는 경우 사용.
  *
  * @author KYJ
- *
+ * @Deprecated 지원안함.
  */
+@Deprecated
 public class DimCopy extends AbstractDimmension implements ISCMCommit {
 
 	/**
@@ -33,9 +30,4 @@ public class DimCopy extends AbstractDimmension implements ISCMCommit {
 		super(javaSVNManager, properties);
 	}
 
-	public void copy(SVNURL targetURL, SVNURL[] paths) throws Exception {throw new RuntimeException("Not yet support");}
-
-	private SVNCopySource[] convert(SVNURL[] urls) {throw new RuntimeException("Not yet support");}
-
-	private SVNCopySource convert(SVNURL url) {throw new RuntimeException("Not yet support");}
 }

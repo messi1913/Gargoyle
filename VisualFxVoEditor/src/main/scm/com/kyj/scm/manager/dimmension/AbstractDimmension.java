@@ -1,7 +1,7 @@
 /********************************
  *	프로젝트 : VisualFxVoEditor
- *	패키지   : kyj.Fx.scm.manager.command.svn
- *	작성일   : 2016. 3. 23.
+ *	패키지   : com.kyj.scm.manager.dimmension
+ *	작성일   : 2017. 4. 13.
  *	작성자   : KYJ
  *******************************/
 package com.kyj.scm.manager.dimmension;
@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.scm.manager.core.commons.AbstractScm;
+import com.kyj.scm.manager.core.commons.AbstractScmManager;
 import com.kyj.scm.manager.core.commons.DimKeywords;
 import com.kyj.scm.manager.core.commons.SCMCommonable;
 import com.serena.dmclient.api.DimensionsConnection;
@@ -26,7 +28,7 @@ import com.serena.dmclient.api.Project;
  * @author KYJ
  *
  */
-abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
+abstract class AbstractDimmension extends AbstractScm implements SCMCommonable, DimKeywords {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDimmension.class);
 
@@ -35,13 +37,11 @@ abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 
 	/** [끝] 일반상수 정의 */
 
-	private Properties properties;
+	private AbstractScmManager dimManager;
+	private DimensionsConnectionDetails details;
 
-	private String prjSpec;
-	private final DimmensionManager dimManager;
-	private DimensionsConnection connection;
-
-	public AbstractDimmension(DimmensionManager dimManager, Properties properties) {
+	public AbstractDimmension(AbstractScmManager dimManager, Properties properties) {
+		super(properties);
 		this.dimManager = dimManager;
 		init(properties);
 	}
@@ -53,27 +53,27 @@ abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 	 * @작성일 : 2016. 3. 24.
 	 */
 	private void validate() {
-		if (this.properties == null) {
+		if (getProperties() == null) {
 			throw new RuntimeException("properties is null.");
 		}
 
-		Object url = this.properties.get(SCMCommonable.SVN_URL);
+		Object url = getProperties().get(DimKeywords.DIM_URL);
 		if (url == null || url.toString().trim().isEmpty())
 			throw new RuntimeException("does not exist url");
 
-		//		Object userId = this.properties.get(SCMCommonable.SVN_USER_ID);
-		//		if (userId == null || userId.toString().trim().isEmpty())
-		//			throw new RuntimeException("does not exist userId");
-		//
-		//		Object userPass = this.properties.get(SCMCommonable.SVN_USER_PASS);
-		//		if (userPass == null || userPass.toString().trim().isEmpty()) {
-		//			throw new RuntimeException("does not exist userPassword");
-		//		}
+		Object projectSpec = getProperties().get(DimKeywords.PROJECT_SPEC);
+		if (projectSpec == null || projectSpec.toString().trim().isEmpty())
+			throw new RuntimeException("does not exist projectSpec");
 
 	}
 
-	public String getProjSpec(){
-		return prjSpec;
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 13. 
+	 * @return
+	 */
+	public String getProjSpec() {
+		return (String) getProperties().get(DimKeywords.PROJECT_SPEC);
 	}
 
 	/**
@@ -84,16 +84,14 @@ abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 	 * @param properties
 	 */
 	public void init(Properties properties) {
-		this.properties = properties;
 		validate();
 
-		if (ValueUtil.isNotEmpty(properties.getProperty(PROJECT_SPEC))) {
-			this.prjSpec = properties.getProperty(PROJECT_SPEC);
+		if (ValueUtil.isEmpty(properties.getProperty(PROJECT_SPEC))) {
+			throw new RuntimeException("Properties Infomation is empty.  [ project spec ]");
 		}
 
-		//		prjSpec =
 		try {
-			DimensionsConnectionDetails details = new DimensionsConnectionDetails();
+			details = new DimensionsConnectionDetails();
 
 			if ((getUserId() == null && getUserPassword() == null) || (getUserId().isEmpty() && getUserPassword().isEmpty())) {
 				throw new RuntimeException("Properties Infomation is empty.  [userId or passwrd ]");
@@ -118,7 +116,7 @@ abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 				details.setDbConn(getDbConn());
 				details.setServer(getUrl());
 			}
-			connection = DimensionsConnectionManager.getConnection(details);
+
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}
@@ -131,7 +129,7 @@ abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 	 * @return
 	 */
 	private String getDbConn() {
-		return this.properties.getProperty(DIM_DB_CONN);
+		return getProperties().getProperty(DIM_DB_CONN);
 	}
 
 	/**
@@ -140,22 +138,22 @@ abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 	 * @return
 	 */
 	private String getDbName() {
-		return this.properties.getProperty(DIM_DB_NAME);
+		return getProperties().getProperty(DIM_DB_NAME);
 	}
 
 	@Override
 	public String getUserId() {
-		return this.properties.getProperty(DIM_USER_ID);
+		return getProperties().getProperty(DIM_USER_ID);
 	}
 
 	@Override
 	public String getUserPassword() {
-		return this.properties.getProperty(DIM_USER_PASS);
+		return getProperties().getProperty(DIM_USER_PASS);
 	}
 
 	@Override
 	public String getUrl() {
-		return this.properties.getProperty(DIM_URL);
+		return getProperties().getProperty(DIM_URL);
 	}
 
 	/**
@@ -164,34 +162,21 @@ abstract class AbstractDimmension implements SCMCommonable, DimKeywords {
 	 * @return
 	 */
 	public final DimensionsObjectFactory getDimmensionObjectFactory() {
-		return connection.getObjectFactory();
-	}
-
-	/********************************
-	 * 작성일 : 2016. 5. 4. 작성자 : KYJ
-	 *
-	 *
-	 * @return
-	 ********************************/
-	public Properties getProperties() {
-		return properties;
+		return getConnection().getObjectFactory();
 	}
 
 	public DimensionsConnection getConnection() {
-		return this.connection;
-	}
-
-	/**
-	 * @return the javaSVNManager
-	 */
-	public final DimmensionManager getDimmensionManager() {
-		return dimManager;
+		return DimensionsConnectionManager.getConnection(details);
 	}
 
 	public Project getProject(String projSpec) {
 		DimensionsObjectFactory fac = getDimmensionObjectFactory();
 		Project projObj = fac.getProject(projSpec);
 		return projObj;
+	}
+
+	public AbstractScmManager getManager() {
+		return this.dimManager;
 	}
 
 }
