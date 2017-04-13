@@ -5,6 +5,7 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.List;
@@ -131,7 +132,16 @@ public class MailUtil {
 	 * @User KYJ
 	 */
 	public static Template getTemplateFromFile(final String templateFileName) throws Exception {
-		String readFileToString = FileUtils.readFileToString(new File(templateFileName));
+		String readFileToString = "";
+		if(templateFileName.startsWith("classpath:"))
+		{
+			String res = templateFileName.replace("classpath:", "");
+			InputStream resourceAsStream = ClassLoader.getSystemClassLoader().getResourceAsStream(res);
+			readFileToString = ValueUtil.toString(resourceAsStream);
+		}
+		else
+			readFileToString = FileUtils.readFileToString(new File(templateFileName));
+		
 		RuntimeServices runtimeServices = RuntimeSingleton.getRuntimeServices();
 		StringReader reader = new StringReader(readFileToString);
 		SimpleNode node = runtimeServices.parse(reader, templateFileName);
