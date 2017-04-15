@@ -5,7 +5,7 @@ Gargoyle
 사용 언어 (Application Language) :: JavaFx , JDK1.8
 
 
-다운로드 사이트 (Download Site) ::  [Download](https://github.com/callakrsos/Gargoyle/releases/download/PreGargoyle-v1.6.0/Gargoyle-1.7.3.exe) Version 1.7.3
+다운로드 사이트 (Download Site) ::  [Download](https://github.com/callakrsos/Gargoyle/releases/download/PreGargoyle-v1.7.3/Gargoyle-1.7.3.exe) Version 1.7.3
               
 
 환경 설치 가이드(Install Guide) :  http://cafe.naver.com/bluegrayfn1yo/1361
