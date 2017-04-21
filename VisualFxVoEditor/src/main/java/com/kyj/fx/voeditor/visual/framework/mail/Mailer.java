@@ -16,6 +16,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.MailUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.star.lang.IllegalArgumentException;
@@ -64,8 +65,7 @@ public class Mailer {
 		this.mailUseYn = mailUseYn;
 	}
 
-	public void sendMail(SenderMailInfo mailSenderInfo, List<Mail> mails, VelocityContext velocityContext)
-			throws Exception {
+	public void sendMail(SenderMailInfo mailSenderInfo, List<Mail> mails, VelocityContext velocityContext) throws Exception {
 
 		for (Mail mail : mails) {
 			sendMail(mailSenderInfo, mail, velocityContext);
@@ -87,8 +87,11 @@ public class Mailer {
 
 		if (mail.getMailFrom() != null) {
 			message.setFrom(mail.getMailFrom());
-		} else {
+		} else if (ValueUtil.isNotEmpty(mailFrom)) {
 			message.setFrom(mailFrom);
+		} else {
+			String fromAddr = ResourceLoader.getInstance().get("mail.from.address");
+			message.setFrom(fromAddr);
 		}
 
 		message.setTo(mail.getMailTo());
@@ -118,11 +121,10 @@ public class Mailer {
 
 		StringWriter stringWriter = new StringWriter();
 		template.merge(velocityContext, stringWriter);
-		message.setText( stringWriter.toString());
+		message.setText(stringWriter.toString());
 
-//		MimeMessage createMimeMessage = mailSender.createMimeMessage();
-//		createMimeMessage.addHeader("text/html", stringWriter.toString());
-
+		// MimeMessage createMimeMessage = mailSender.createMimeMessage();
+		// createMimeMessage.addHeader("text/html", stringWriter.toString());
 
 		mailSender.send(message);
 
