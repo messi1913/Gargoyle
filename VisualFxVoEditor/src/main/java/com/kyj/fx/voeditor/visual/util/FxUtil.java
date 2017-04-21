@@ -1837,4 +1837,7 @@ public class FxUtil {
 		return FxTableViewUtil.getValue(table, column, rowIndex);
 	}
 
-}
+	public static Consumer<Exception> DEFAULT_LOGGER = err->{
+		LOGGER.error(ValueUtil.toString(err));
+	};
+} 

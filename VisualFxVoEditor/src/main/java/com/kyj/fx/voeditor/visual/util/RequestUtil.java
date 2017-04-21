@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -267,9 +268,17 @@ public class RequestUtil {
 
 			String charset = "UTF-8";
 			if (contentType != null) {
-				charset = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset")).findFirst().map(v -> {
-					return v.substring(v.indexOf("=") + 1);
-				}).get();
+				Optional<String> map = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset")).findFirst()
+						.map(v -> {
+							return v.substring(v.indexOf("=") + 1);
+						});
+				if (map.isPresent())
+					charset = map.get();
+				else {
+					String headerField = conn.getHeaderField("Accept-Charset");
+					if (ValueUtil.isNotEmpty(headerField))
+						charset = headerField;
+				}
 			}
 
 			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), url.toString());
@@ -549,7 +558,7 @@ public class RequestUtil {
 				//			else {
 				response = httpclient.execute(http);
 				//			}
-				
+
 				LOGGER.debug("Response headers ...   ");
 				Stream.of(response.getAllHeaders()).forEach(h -> {
 					LOGGER.debug("[res] k : {}  v : {} ", h.getName(), h.getValue());
@@ -563,7 +572,7 @@ public class RequestUtil {
 				CookieBase.getCookies().forEach(c -> {
 					LOGGER.debug("[res] k : {} v : {}", c.getName(), c.getValue());
 				});
-				
+
 			} finally {
 
 				if (response != null)
@@ -617,12 +626,12 @@ public class RequestUtil {
 				HttpEntity entity = response.getEntity();
 
 				rslt = res.apply(entity.getContent(), response.getStatusLine().getStatusCode());
-				
+
 				LOGGER.debug("Res cookies...  : ");
 				CookieBase.getCookies().forEach(c -> {
 					LOGGER.debug("[res] k : {} v : {}", c.getName(), c.getValue());
 				});
-				
+
 			} finally {
 
 				if (response != null)
