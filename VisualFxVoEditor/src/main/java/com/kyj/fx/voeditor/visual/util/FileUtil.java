@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -538,14 +539,13 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 * @throws IOException
 	 */
 	public static void writeFile(File file, String str, Charset charset) throws IOException {
-		try(FileOutputStream out = new FileOutputStream(file))
-		{
+		try (FileOutputStream out = new FileOutputStream(file)) {
 			try (OutputStreamWriter writer = new OutputStreamWriter(out, charset)) {
 				writer.write(str);
 				writer.flush();
-			}	
+			}
 		}
-		
+
 	}
 
 	/**
@@ -559,10 +559,9 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 */
 	public static void writeFile(File file, String str, Charset charset, Consumer<Exception> errorHandler) {
 		try {
-			writeFile(file,str,charset);
-		}catch(Exception e)
-		{
-			if(errorHandler!=null)
+			writeFile(file, str, charset);
+		} catch (Exception e) {
+			if (errorHandler != null)
 				errorHandler.accept(e);
 			else
 				LOGGER.error(ValueUtil.toString(e));
@@ -749,7 +748,7 @@ public class FileUtil implements GargoyleExtensionFilters {
 		int dotIndex = fileName.lastIndexOf('.');
 		return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
 	}
-	
+
 	/**
 	 * 디렉토리 생성
 	 * @작성자 : KYJ
@@ -771,5 +770,23 @@ public class FileUtil implements GargoyleExtensionFilters {
 			Path path = Paths.get(file.getAbsolutePath());
 			Files.createDirectories(path.getParent());
 		}
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 24. 
+	 * @param is  source
+	 * @param file dst. file
+	 * @throws IOException
+	 */
+	public static void copy(InputStream is, File file) throws IOException {
+
+		try (FileWriter writer = new FileWriter(file)) {
+			int tmp = -1;
+			while ((tmp = is.read()) != -1) {
+				writer.write(tmp);
+			}
+		}
+
 	}
 }

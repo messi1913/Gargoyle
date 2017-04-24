@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +57,7 @@ import com.kyj.fx.voeditor.visual.framework.contextmenu.FxContextManager;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
@@ -136,14 +138,34 @@ public class FxUtil {
 	/**
 	 * @최초생성일 2016. 10. 6.
 	 */
-	public static final String FONTS_NANUMBARUNGOTHIC_TTF = "fonts/NANUMBARUNGOTHIC.TTF";
+	public static final String DEFAULT_FONT_SIMPLE = "NANUMBARUNGOTHIC";
+	public static final String DEFAULT_FONT = DEFAULT_FONT_SIMPLE + ".TTF";
+	public static final String FONTS_NANUMBARUNGOTHIC_TTF = "fonts/" + DEFAULT_FONT;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FxUtil.class);
 
 	static {
 
 		try {
-			Font.loadFont(ClassLoader.getSystemResource(FONTS_NANUMBARUNGOTHIC_TTF).openStream(), 12);
+
+			/*
+			 * 2017-04-24
+			 * Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임.
+			 * 관련된 버그수정을 위해
+			 * Font를 임시디렉토리로 복사한후 읽어옴.
+			 * */
+			File parentFile = new File(FileUtil.getTempGagoyle(), "font");
+			if (!parentFile.exists())
+				parentFile.mkdirs();
+
+			File fontFile = new File(parentFile, DEFAULT_FONT);
+
+			//복사.
+			try (InputStream is = ClassLoader.getSystemResource(FONTS_NANUMBARUNGOTHIC_TTF).openStream()) {
+				FileUtil.copy(is, fontFile);
+			}
+
+			Font.loadFont(new FileInputStream(fontFile), 12);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -156,7 +178,7 @@ public class FxUtil {
 	}
 
 	public static Font getBoldFont(double fontSize) {
-		return Font.font("NANUMBARUNGOTHIC", FontWeight.BOLD, FontPosture.ITALIC, fontSize);
+		return Font.font(DEFAULT_FONT_SIMPLE, FontWeight.BOLD, FontPosture.ITALIC, fontSize);
 	}
 
 	/**
@@ -1837,7 +1859,7 @@ public class FxUtil {
 		return FxTableViewUtil.getValue(table, column, rowIndex);
 	}
 
-	public static Consumer<Exception> DEFAULT_LOGGER = err->{
+	public static Consumer<Exception> DEFAULT_LOGGER = err -> {
 		LOGGER.error(ValueUtil.toString(err));
 	};
-} 
+}
