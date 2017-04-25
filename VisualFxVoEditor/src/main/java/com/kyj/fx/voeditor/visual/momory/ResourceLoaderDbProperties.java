@@ -20,6 +20,7 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -45,6 +46,7 @@ public class ResourceLoaderDbProperties extends Properties {
 	public static final String GARGOYLE_DB_URL;
 
 	public static final String DRIVER = "org.sqlite.JDBC";
+
 	static {
 		GARGOYLE_DB_URL = "jdbc:sqlite:" + ValueUtil.getBaseDir() + File.separator + "gargoyle.db";
 	}
@@ -116,24 +118,24 @@ public class ResourceLoaderDbProperties extends Properties {
 		return INSTANCE;
 	}
 
-//	private boolean isEmpty(Object key) {
-////		try (Connection con = supplier.get()) {
-////
-////
-////			Map<String, Object> findOne = DbUtil.findOne(con,
-////					String.format("select 1 as v from tbm_sys_env where key ='%s'", key.toString()));
-////
-////			if (findOne.isEmpty())
-////				return true;
-////
-////			if (findOne.get("v") == null)
-////				return true;
-////			return false;
-////		} catch (Exception e) {
-////
-////		}
-//		return super.isEmpty();
-//	}
+	//	private boolean isEmpty(Object key) {
+	////		try (Connection con = supplier.get()) {
+	////
+	////
+	////			Map<String, Object> findOne = DbUtil.findOne(con,
+	////					String.format("select 1 as v from tbm_sys_env where key ='%s'", key.toString()));
+	////
+	////			if (findOne.isEmpty())
+	////				return true;
+	////
+	////			if (findOne.get("v") == null)
+	////				return true;
+	////			return false;
+	////		} catch (Exception e) {
+	////
+	////		}
+	//		return super.isEmpty();
+	//	}
 
 	private int update(Object key, Object value) {
 		try (Connection con = supplier.get()) {
@@ -154,30 +156,30 @@ public class ResourceLoaderDbProperties extends Properties {
 		return -1;
 	}
 
-//	@Override
-//	public synchronized Object put(Object key, Object v) {
-//		// super.put(key, v);
-//
-//		if (isEmpty(key)) {
-//			insert(key, v);
-//		} else {
-//			update(key, v);
-//		}
-//
-//		return v;
-//	}
+	//	@Override
+	//	public synchronized Object put(Object key, Object v) {
+	//		// super.put(key, v);
+	//
+	//		if (isEmpty(key)) {
+	//			insert(key, v);
+	//		} else {
+	//			update(key, v);
+	//		}
+	//
+	//		return v;
+	//	}
 
-//	@Override
-//	public synchronized Object remove(Object key) {
-//
-////		try (Connection con = supplier.get()) {
-////			return DbUtil.update(con, String.format("delete from tbm_sys_env where key = '%s'", key.toString()));
-////		} catch (Exception e) {
-////			e.printStackTrace();
-////		}
-//
-//		return super.remove(key);
-//	}
+	//	@Override
+	//	public synchronized Object remove(Object key) {
+	//
+	////		try (Connection con = supplier.get()) {
+	////			return DbUtil.update(con, String.format("delete from tbm_sys_env where key = '%s'", key.toString()));
+	////		} catch (Exception e) {
+	////			e.printStackTrace();
+	////		}
+	//
+	//		return super.remove(key);
+	//	}
 
 	public Object findOne(Object key) {
 		Object v = null;
@@ -212,13 +214,13 @@ public class ResourceLoaderDbProperties extends Properties {
 	@Override
 	public void store(Writer writer, String comments) throws IOException {
 		saveAll();
-//		load();
+		//		load();
 	}
 
 	@Override
 	public void store(OutputStream out, String comments) throws IOException {
 		saveAll();
-//		load();
+		//		load();
 	}
 
 	private void load() {
@@ -267,7 +269,7 @@ public class ResourceLoaderDbProperties extends Properties {
 						Map<Object, Object> hashMap = new HashMap<>();
 						hashMap.put(key, value);
 
-						if (findOne(key) !=null) {
+						if (findOne(key) != null) {
 							stat.addBatch(String.format(update, value.toString(), key.toString()));
 						} else {
 							stat.addBatch(String.format(insert, key.toString(), value.toString()));
@@ -293,5 +295,54 @@ public class ResourceLoaderDbProperties extends Properties {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void clearKeys(List<String> keys) {
+
+		try {
+			Connection con = null;
+			String update = "delete from tbm_sys_env where key = '%s'";
+
+			try {
+				con = supplier.get();
+				con.setAutoCommit(false);
+				Iterator<String> iterator = keys.iterator();
+				Statement stat = con.createStatement();
+
+				while (iterator.hasNext()) {
+					String key = iterator.next();
+
+					try {
+
+						// Map<String, Object> findOne = DbUtil.findOne(con,
+						// String.format("select 1 as v from tbm_sys_env where
+						// key ='%s'", key));
+
+						Map<Object, Object> hashMap = new HashMap<>();
+						hashMap.put(key, key);
+
+						stat.addBatch(String.format(update, key.toString()));
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+
+				stat.executeBatch();
+//				int sum = IntStream.of(executeBatch).sum();
+
+				con.commit();
+			} catch (SQLException e1) {
+				con.rollback();
+				e1.printStackTrace();
+			} finally {
+				if (con != null) {
+					con.close();
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 	}
 }

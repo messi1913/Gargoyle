@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.font;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXSlider;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -46,8 +48,10 @@ public class FontViewComposite extends BorderPane {
 	@FXML
 	private Label lblPreviewText, lblFontInfo;
 
+	private static ExecutorService newFixedThreadExecutor = ExecutorDemons.newFixedThreadExecutor(1);
 	public FontViewComposite() {
 		FxUtil.loadRoot(FontViewComposite.class, this, err -> LOGGER.error(ValueUtil.toString(err)));
+		
 	}
 
 	@FXML
@@ -199,7 +203,8 @@ public class FontViewComposite extends BorderPane {
 
 			cbFontNames.setDisable(false);
 		});
-
+		
+		createFxService.setExecutor(newFixedThreadExecutor);
 		createFxService.start();
 
 	}
@@ -248,6 +253,8 @@ public class FontViewComposite extends BorderPane {
 			List<String> value = createFxService.getValue();
 			cbFontStyles.getItems().addAll(value);
 		});
+		
+		
 
 		createFxService.start();
 

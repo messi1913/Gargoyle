@@ -155,7 +155,6 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws IOException {
-
 		// 초기화 처리
 		callInitializers();
 

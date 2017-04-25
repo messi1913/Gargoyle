@@ -94,7 +94,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	 */
 	public static final String USER_SELECT_LOCATION_PATH = "user.select.location.path";
 
-	private static Properties properties = ResourceLoaderDbProperties.getInstance();
+	private static ResourceLoaderDbProperties properties = ResourceLoaderDbProperties.getInstance();
 	private static ResourceLoader loader;
 
 	public static final String FILE_NAME = "UserConf.properties";
@@ -132,10 +132,9 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	private String[] baseKeys = { BASE_KEY_JDBC_INFO, BASE_KEY_JDBC_DRIVER, BASE_KEY_JDBC_URL, BASE_KEY_JDBC_ID, BASE_KEY_JDBC_PASS,
 			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES };
 
-	public static ResourceLoader getInstance() {
+	public static synchronized ResourceLoader getInstance() {
 		if (loader == null) {
 			loader = new ResourceLoader();
-			//			loader.initialize();
 		}
 		return loader;
 	}
@@ -402,5 +401,13 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public JSONArray getJsonArray(String key, JSONArray defaultVal) throws ParseException {
 		String string = get(key);
 		return (JSONArray) new JSONParser().parse(string);
+	}
+
+	public Set<Entry<Object, Object>> entrySet() {
+		return properties.entrySet();
+	}
+
+	public void clearKeys(List<String> keys) {
+		properties.clearKeys(keys);
 	}
 }

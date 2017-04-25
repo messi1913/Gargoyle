@@ -353,7 +353,7 @@ public class DatabaseUrlManagementView extends BorderPane {
 				Object key = prefiixKey + i;//  item.get("seqNum");
 
 				JSONObject json = new JSONObject();
-				json.put("seqNum", item.get("seqNum"));
+				json.put("seqNum", /*item.get("seqNum")*/ key);
 				json.put("dbms", item.get("dbms"));
 				json.put("alias", item.get("alias"));
 				json.put(ResourceLoader.BASE_KEY_JDBC_URL, item.get(ResourceLoader.BASE_KEY_JDBC_URL));
@@ -364,30 +364,20 @@ public class DatabaseUrlManagementView extends BorderPane {
 				map.put(key.toString(), json.toJSONString());
 			}
 
-			//			tbDatabase.getItems().forEach(item -> {
-			//				Object key = item.get("seqNum");
-			//				JSONObject json = new JSONObject();
-			//				json.put("seqNum", item.get("seqNum"));
-			//				json.put("dbms", item.get("dbms"));
-			//				json.put("alias", item.get("alias"));
-			//				json.put(ResourceLoader.BASE_KEY_JDBC_URL, item.get(ResourceLoader.BASE_KEY_JDBC_URL));
-			//				json.put(ResourceLoader.BASE_KEY_JDBC_ID, item.get(ResourceLoader.BASE_KEY_JDBC_ID));
-			//				json.put(ResourceLoader.BASE_KEY_JDBC_PASS, item.get(ResourceLoader.BASE_KEY_JDBC_PASS));
-			//				json.put("color", item.get("color"));
-			//				if (key == null)
-			//					return;
-			//				map.put(key.toString(), json.toJSONString());
-			//			});
-
 			tbDatabase.getColumns().forEach(col -> {
 				if (col.isVisible())
 					colList.add(col.getId());
 			});
 			map.put("database.column.order", colList.toString());
-			instance.putAll(map);
 
-			tbDatabase.getItems().clear();
-			tbDatabase.getItems().addAll(loadResource());
+			{/*하나의 트랜잭션*/
+				removeKeys();
+				instance.putAll(map);
+				delItems.clear();
+			}
+
+			//			tbDatabase.getItems().clear();
+			tbDatabase.getItems().setAll(loadResource());
 
 			DialogUtil.showMessageDialog("Save Complete...");
 		} catch (Exception e) {
@@ -400,6 +390,14 @@ public class DatabaseUrlManagementView extends BorderPane {
 				LOGGER.error(ValueUtil.toString(e));
 			}
 		}
+	}
+
+	private void removeKeys() {
+
+		List<String> collect = delItems.stream().flatMap(m -> m.entrySet().stream())
+				.filter(ent -> "seqNum".equals(ent.getKey())).map(ent -> ent.getValue().toString()).collect(Collectors.toList());
+		ResourceLoader.getInstance().clearKeys(collect);
+
 	}
 
 	@FXML
@@ -415,11 +413,14 @@ public class DatabaseUrlManagementView extends BorderPane {
 		tbDatabase.getItems().add(newItem);
 	}
 
+	ObservableList<Map<String, Object>> delItems = FXCollections.observableArrayList();
+
 	@FXML
 	public void btnDeleteOnMouseClick(MouseEvent event) {
-		tbDatabase.getSelectionModel().getSelectedItems().forEach(map -> {
-			tbDatabase.getItems().remove(map);
-		});
+
+		delItems.addAll(tbDatabase.getSelectionModel().getSelectedItems());
+		tbDatabase.getItems().removeAll(tbDatabase.getSelectionModel().getSelectedItems());
+
 	}
 
 	public void tbDatabaseMouseClick(MouseEvent e) {
@@ -492,9 +493,9 @@ public class DatabaseUrlManagementView extends BorderPane {
 		String title = String.format("Database[%s]", sqlPane.getClass().getSimpleName());
 
 		DockNode dockNode = new DockNode(sqlPane, title);
-//		Platform.runLater(() -> {
-//			dockNode.setMaximized(true);
-//		});
+		//		Platform.runLater(() -> {
+		//			dockNode.setMaximized(true);
+		//		});
 
 		// dockNode.setFloating(true, new Point2D(0,0));
 		// dockNode.getStage().centerOnScreen();
