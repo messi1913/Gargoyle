@@ -161,16 +161,16 @@ abstract class AbstractDimmension extends AbstractScm implements SCMCommonable, 
 	 * @작성일 : 2017. 2. 16.
 	 * @return
 	 */
-	public final DimensionsObjectFactory getDimmensionObjectFactory() {
-		return getConnection().getObjectFactory();
+	public final DimensionsObjectFactory getDimmensionObjectFactory(DimensionsConnection conn) {
+		return conn.getObjectFactory();
 	}
 
 	public DimensionsConnection getConnection() {
 		return DimensionsConnectionManager.getConnection(details);
 	}
 
-	public Project getProject(String projSpec) {
-		DimensionsObjectFactory fac = getDimmensionObjectFactory();
+	public Project getProject(DimensionsConnection conn, String projSpec) {
+		DimensionsObjectFactory fac = getDimmensionObjectFactory(conn);
 		Project projObj = fac.getProject(projSpec);
 		return projObj;
 	}

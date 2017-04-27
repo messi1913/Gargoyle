@@ -7,22 +7,22 @@
 package com.kyj.scm.manager.dimmension;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.SystemUtils;
-import org.tmatesoft.svn.core.SVNDirEntry;
-import org.tmatesoft.svn.core.SVNLogEntry;
 
 import com.kyj.scm.manager.core.commons.AbstractScmManager;
 import com.kyj.scm.manager.core.commons.DimKeywords;
 import com.kyj.scm.manager.core.commons.ScmDirHandler;
+import com.serena.dmclient.api.DimensionsConnection;
+import com.serena.dmclient.api.Filter;
+import com.serena.dmclient.api.ItemRevision;
+import com.serena.dmclient.api.RepositoryFolder;
+import com.serena.dmclient.api.SystemAttributes;
 
 /**
  * 디멘전 명령어를 모아놓은 매니저 클래스
@@ -162,161 +162,6 @@ public class DimmensionManager extends AbstractScmManager implements DimKeywords
 	}
 
 	/**
-	 * svn cat명령어
-	 *
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 3. 23.
-	 * @param param
-	 * @return
-	 */
-	public List<String> list(String path) {
-		return listCommand.list(path);
-	}
-
-	/**
-	 * 메타정보를 포함하는 SVN 엔트리 반환
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 11. 3.
-	 * @param path
-	 * @return
-	 */
-	public List<SVNDirEntry> listEntry(String path) {
-		return listEntry(path, "-1", false, null);
-	}
-
-	/**
-	 * 메타정보를 포함하는 SVN 엔트리 반환
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 11. 3.
-	 * @param path
-	 * @param exceptionHandler
-	 * @return
-	 */
-	public List<SVNDirEntry> listEntry(String path, Consumer<Exception> exceptionHandler) {
-		return listEntry(path, "-1", false, exceptionHandler);
-	}
-
-	/**
-	 * 메타정보를 포함하는 SVN 엔트리 반환
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 11. 3.
-	 * @param path
-	 * @param revision
-	 * @param exceptionHandler
-	 * @return
-	 */
-	public List<SVNDirEntry> listEntry(String path, String revision, Consumer<Exception> exceptionHandler) {
-		return listEntry(path, revision, false, exceptionHandler);
-	}
-
-	/**
-	 * 메타정보를 포함하는 SVN 엔트리 반환
-	 *
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 11. 3.
-	 * @param path
-	 * @param revision
-	 * @param recurive
-	 * @param exceptionHandler
-	 * @return
-	 */
-	public List<SVNDirEntry> listEntry(String path, String revision, boolean recurive, Consumer<Exception> exceptionHandler) {
-		long parseLong = Long.parseLong(revision, 10);
-		List<SVNDirEntry> listEntry = listCommand.listEntry(path, revision, recurive, exceptionHandler);
-		Predicate<? super SVNDirEntry> predicate = null;
-
-		if (parseLong == -1)
-			predicate = v -> true;
-		else
-			predicate = v -> parseLong <= v.getRevision();
-
-		return listEntry.stream().filter(predicate).collect(Collectors.toList());
-	}
-
-	/**
-	 * svn 리비젼 정보 조회
-	 *
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 3. 24.
-	 * @param param
-	 * @return
-	 */
-	public List<SVNLogEntry> log(String path) {
-		return logCommand.log(path);
-	}
-
-	/**
-	 * svn 리비젼 정보 조회
-	 *
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 6. 13.
-	 * @param path
-	 * @param revision
-	 * @param exceptionHandler
-	 * @return
-	 */
-	public List<SVNLogEntry> log(String path, String revision, Consumer<Exception> exceptionHandler) {
-		return logCommand.log(path, revision, exceptionHandler);
-	}
-
-	/**
-	 * svn 리비젼 정보 조회
-	 *
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 7. 13.
-	 * @param path
-	 * @param endDate
-	 * @param exceptionHandler
-	 * @return
-	 */
-	public List<SVNLogEntry> log(String path, Date endDate, Consumer<Exception> exceptionHandler) {
-		return logCommand.log(path, -1, endDate, exceptionHandler);
-	}
-
-	/**
-	 * svn 리비젼 정보 조회
-	 *
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 7. 13.
-	 * @param path
-	 * @param startRevision
-	 * @param endDate
-	 * @param exceptionHandler
-	 * @return
-	 */
-	public List<SVNLogEntry> log(String path, long startRevision, Date endDate, Consumer<Exception> exceptionHandler) {
-		return logCommand.log(path, startRevision, endDate, exceptionHandler);
-	}
-
-	/********************************
-	 * 작성일 : 2016. 7. 13. 작성자 : KYJ
-	 *
-	 * FileSystem Base Log.
-	 *
-	 * @param path
-	 * @param startRevision
-	 * @param endDate
-	 * @param exceptionHandler
-	 * @return
-	 ********************************/
-	public List<SVNLogEntry> logFileSystem(File path, Date endDate, Consumer<Exception> exceptionHandler) {
-		return logCommand.logFileSystem( /*only one target supported.*/new File[] { path }, 0, endDate, exceptionHandler);
-	}
-
-	/**
-	 * 코드 체크아웃
-	 *
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 3. 24.
-	 * @param param
-	 * @return
-	 * @throws FileNotFoundException
-	 */
-	public Long checkout(String param, File outDir) throws FileNotFoundException {
-		return checkoutCommand.checkout(param, outDir);
-	}
-
-	/**
 	 * Resource가 서버에 존재하는지 여부를 체크함.
 	 *
 	 * @작성자 : KYJ
@@ -327,34 +172,6 @@ public class DimmensionManager extends AbstractScmManager implements DimKeywords
 	 */
 	public boolean isExistsPath(String projSpec, String relativePath) throws Exception {
 		return this.resourceCommand.isExists(projSpec, relativePath);
-	}
-
-	public Collection<SVNLogEntry> getAllLogs(String projSpec, String relativePath) throws Exception {
-		return getAllLogs(projSpec, relativePath, 0);
-	}
-
-	public Collection<SVNLogEntry> getAllLogs(long startRevision, long endRevision) throws Exception {
-		return getAllLogs("", startRevision, endRevision);
-	}
-
-	public Collection<SVNLogEntry> getAllLogs(String projSpec, String relativePath, long startRevision) throws Exception {
-		long latestRevision = this.resourceCommand.getLatestRevision(projSpec);
-		return getAllLogs(relativePath, startRevision, latestRevision);
-	}
-
-	public Collection<SVNLogEntry> getAllLogs(String relativePath, long startRevision, long endRevision) throws Exception {
-		return this.logCommand.getAllLogs(relativePath, startRevision, endRevision);
-	}
-
-	/**
-	 * @작성자 : KYJ
-	 * @작성일 : 2016. 7. 19.
-	 * @param date
-	 * @return
-	 * @throws Exception
-	 */
-	public Collection<SVNLogEntry> getAllLogs(Date date) throws Exception {
-		throw new RuntimeException("Not Yet Support");
 	}
 
 	/**
@@ -372,15 +189,53 @@ public class DimmensionManager extends AbstractScmManager implements DimKeywords
 	/**
 	 * 날짜에 매치되는 리비젼 번호를 구함.
 	 *
+	 * 값이 없거나 유효하지않는경우 -1
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 7. 14.
 	 * @param date
 	 * @return
 	 * @throws Exception
 	 */
-	public long getRevision(String projSpec, Date date) throws Exception {
-		long r = this.resourceCommand.getRevision(date);
-		return r < resourceCommand.getLatestRevision(projSpec) ? r + 1 : r;
+	public float getRevision(String projSpec, String path, String fileName) throws Exception {
+
+		DimDirHandler handler = new DimDirHandler() {
+
+			Object findOne;
+
+			@Override
+			public boolean test(RepositoryFolder entry) {
+				return entry.getName().equals(path);
+			}
+
+			@Override
+			public Filter itemFilter() {
+				Filter filter = new Filter();
+				filter.criteria().add(new Filter.Criterion(SystemAttributes.IS_LATEST_REV, "Y", 0));
+				filter.criteria().add(new Filter.Criterion(SystemAttributes.ITEMFILE_FILENAME, fileName, Filter.Criterion.EQUALS));
+				return filter;
+			}
+
+			@Override
+			public void handle(ItemRevision r) {
+				r.queryAttribute(SystemAttributes.REVISION);
+				findOne = r.getAttribute(SystemAttributes.REVISION);
+			}
+
+			@Override
+			public Object get() {
+				return findOne;
+			}
+
+		};
+
+		this.listEntry(projSpec, path, handler);
+
+		Object object = handler.get();
+
+		if (object != null)
+			return Float.parseFloat(object.toString());
+
+		return -1;
 	}
 
 	/**
@@ -417,35 +272,116 @@ public class DimmensionManager extends AbstractScmManager implements DimKeywords
 
 	@Override
 	public String getUserPassword() {
-		// TODO Auto-generated method stub
-		return null;
+		return resourceCommand.getUserPassword();
 	}
 
 	@Override
-	public void listEntry(String relativePath, ScmDirHandler handler) throws Exception {
-		// TODO Auto-generated method stub
+	public <K> void listEntry(String path, ScmDirHandler<K> handler) throws Exception {
+		listEntry(path, (DimDirHandler) handler);
+	}
+
+	public void listEntry(String path, DimDirHandler handler) throws Exception {
+		listCommand.listEntry(path, handler);
+	}
+
+	public void listEntry(String projSpec, String path, DimDirHandler handler) throws Exception {
+		listCommand.listEntry(projSpec, path, handler);
+	}
+
+	public void listEntry(RepositoryFolder rootFolder, DimDirHandler dimDirHandler) throws Exception {
+		listCommand.listEntry(rootFolder, dimDirHandler);
 	}
 
 	@Override
 	public boolean isExistsPath(String relativePath) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
+		return resourceCommand.isExists(relativePath);
 	}
 
+	/* 
+	 * 최신 리비전 보기
+	 * 디멘전에선 -1 리턴
+	 * (non-Javadoc)
+	 * @see com.kyj.scm.manager.core.commons.AbstractScmManager#getLatestRevision()
+	 * 
+	 * @Deprecated
+	 * 정확한 수치값이 아닌 -1을 리턴함.
+	 */
 	@Override
+	@Deprecated
 	public long getLatestRevision() throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return resourceCommand.getLatestRevision();
 	}
 
+	/* 
+	 * 디멘전에서 구할 수 없음.
+	 * (non-Javadoc)
+	 * @see com.kyj.scm.manager.core.commons.AbstractScmManager#getRevision(java.util.Date)
+	 */
 	@Override
+	@Deprecated
 	public long getRevision(Date date) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return resourceCommand.getRevision(date);
+	}
+
+	public ItemRevision searchFindOne(RepositoryFolder folder, List<String> linkedList, String revision) {
+		return this.resourceCommand.searchFindOne(folder, linkedList, revision);
+	}
+
+	/**
+	 * 디멘전 커넥션 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 14. 
+	 * @return
+	 */
+	public DimensionsConnection getConnection() {
+		return this.resourceCommand.getConnection();
 	}
 
 	@Override
 	public File tmpDir() {
 		return new File(SystemUtils.getJavaIoTmpDir(), "dimmension");
 	}
+
+	/* (non-Javadoc)
+	 * @see com.kyj.scm.manager.core.commons.AbstractScmManager#list(java.lang.String)
+	 */
+	@Override
+	public List<String> list(String path) {
+		return listCommand.list(path);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 24. 
+	 * @param projSpec
+	 * @param path
+	 * @param fileName
+	 * @param revision
+	 * @param convert
+	 * @param exceptionHandler
+	 * @return
+	 */
+	public <T> List<T> list(String projSpec, String path, String fileName, String revision, Function<ItemRevision, T> convert,
+			Consumer<Exception> exceptionHandler) {
+		return listCommand.list(projSpec, path, fileName, revision, convert, exceptionHandler);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 24. 
+	 * @param conn
+	 */
+	public void close(DimensionsConnection conn) {
+		resourceCommand.close(conn);
+	}
+
+	/* 
+	 * 아래 파라미터 구현 지원안함.
+	 */
+	@Deprecated
+	@Override
+	public Long checkout(String param, File outDir) throws Exception {
+		throw new RuntimeException("not support.");
+	}
+
 }

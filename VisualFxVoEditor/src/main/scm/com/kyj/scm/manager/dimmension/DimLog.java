@@ -23,11 +23,12 @@ import org.tmatesoft.svn.core.wc.SVNLogClient;
 import com.kyj.scm.manager.core.commons.ILogCommand;
 
 /**
- * SVN의 이력 정보 조회
- *
+ * 
+ * Not yet support. 
  * @author KYJ
  *
  */
+@Deprecated
 class DimLog extends AbstractDimmension implements ILogCommand<String, List<SVNLogEntry>> {
 
 	/**
