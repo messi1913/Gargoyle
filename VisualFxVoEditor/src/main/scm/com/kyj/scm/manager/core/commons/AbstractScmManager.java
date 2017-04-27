@@ -98,7 +98,7 @@ public abstract class AbstractScmManager implements SCMCommonable, DimKeywords {
 	 * @throws Exception
 	 */
 
-	public abstract <T> void listEntry(String relativePath, ScmDirHandler<T> handler) throws Exception;
+	public abstract <K> void listEntry(String relativePath, ScmDirHandler<K> handler) throws Exception;
 
 	/**
 	 * 코드 체크아웃
@@ -109,7 +109,7 @@ public abstract class AbstractScmManager implements SCMCommonable, DimKeywords {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public abstract Long checkout(String param, File outDir) throws FileNotFoundException;
+	public abstract Long checkout(String param, File outDir) throws Exception;
 
 	/**
 	 * Resource가 서버에 존재하는지 여부를 체크함.
@@ -160,9 +160,7 @@ public abstract class AbstractScmManager implements SCMCommonable, DimKeywords {
 	 * @throws SVNException
 	 ********************************/
 	public abstract void ping() throws Exception;
-	
-	
-	
+
 	/**
 	 * 시스템 관리 임시디렉토리
 	 * @return 

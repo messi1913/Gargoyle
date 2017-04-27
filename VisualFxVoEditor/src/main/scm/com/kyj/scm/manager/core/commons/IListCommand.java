@@ -17,7 +17,9 @@ public interface IListCommand<T, R> extends SCMCommonable {
 	/********************************
 	 * 작성일 : 2016. 5. 4. 작성자 : KYJ
 	 *
-	 *
+	 * T에 대한 노드 정보를 통해 
+	 * 자식 노드에 대한 정보(R) 를 리턴함  
+	 * 
 	 * @param t
 	 * @return
 	 ********************************/
