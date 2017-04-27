@@ -515,7 +515,7 @@ public class ArticleExtractorComposite extends BorderPane {
 	private URL toURL(String url) throws MalformedURLException {
 		if (url.startsWith("https:") || url.startsWith("http:"))
 			return new URL(url);
-		return new URL("http:" + url);
+		return new URL("https:" + url);
 	}
 
 	private void updateMainContent(Class<? extends ExtractorBase> algorism, URLModel userData) {
