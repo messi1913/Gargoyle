@@ -32,6 +32,7 @@ import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenComposite;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
 import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
+import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
 import com.kyj.fx.voeditor.visual.component.file.FilePropertiesComposite;
@@ -274,6 +275,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			if (event.getClickCount() >= 1) {
 				webvWelcome.getEngine().load(txtUrl.getText());
 			}
+		});
+		
+		webvWelcome.setOnKeyPressed(key ->{
+			
+			if(key.getCode() == KeyCode.F12){
+				
+				FxUtil.createStageAndShow("Simple Web Console", new WebViewConsole(webvWelcome));
+			}
+			
 		});
 
 		treeProjectFile.setRoot(createNewTree(selectDirFile));
