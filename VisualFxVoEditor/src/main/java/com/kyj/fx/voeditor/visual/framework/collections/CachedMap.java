@@ -21,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
+import com.kyj.fx.voeditor.visual.framework.thread.DemonThreadFactory;
+import com.kyj.fx.voeditor.visual.framework.thread.DemonTimerFactory;
 import com.kyj.fx.voeditor.visual.main.Main;
 
 /**
@@ -69,7 +71,12 @@ public class CachedMap<K, V> implements Map<K, V>, PrimaryStageCloseable {
 	 */
 	public CachedMap(Map<K, V> valueMap, long cachetime) {
 		this.valueMap = valueMap;
-		this.timer = new Timer();
+		/*
+		 * 파라미터 설명
+		 * name, isDemon
+		 */
+		
+		this.timer = DemonTimerFactory.newInsance("Gargoyle-CacheMap"); //new Timer("cacheMap", true);
 		this.cachetime = cachetime;
 		this.scheduleMap = new HashMap<>();
 
