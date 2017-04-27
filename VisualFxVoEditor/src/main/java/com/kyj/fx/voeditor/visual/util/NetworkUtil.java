@@ -9,8 +9,11 @@ package com.kyj.fx.voeditor.visual.util;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.http.HttpHost;
 
@@ -42,6 +45,7 @@ public final class NetworkUtil {
 		}
 	};
 
+	private static Predicate<String> CONTINUE = r -> true;
 	/**
 	 * InetAddress클래스로부터 조건에 일치하는 정보를 리턴. </br>
 	 * 
@@ -51,11 +55,31 @@ public final class NetworkUtil {
 	 * @return
 	 * @throws SocketException
 	 */
-	private static String getAddressInfo(Function<InetAddress, String> convertValue) throws SocketException {
+	private static String getAddressInfoFindOne(Function<InetAddress, String> convertValue) throws SocketException {
+		List<String> addressInfoFindAll = getAddressInfoFindAll(convertValue, v -> false);
+		
+		if(addressInfoFindAll.isEmpty())
+			return "";
+		
+		return addressInfoFindAll.get(0);
+	}
+
+	/**
+	 * InetAddress클래스로부터 조건에 일치하는 정보를 리턴. </br>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 6. 10.
+	 * @param convertValue
+	 * @return
+	 * @throws SocketException
+	 */
+	private static List<String> getAddressInfoFindAll(Function<InetAddress, String> convertValue, Predicate<String> doBreak)
+			throws SocketException {
 
 		Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+		List<String> findAll = new ArrayList<>();
 
-		while (networkInterfaces.hasMoreElements()) {
+		END: while (networkInterfaces.hasMoreElements()) {
 			NetworkInterface nextElement = networkInterfaces.nextElement();
 
 			if (nextElement.isVirtual())
@@ -75,14 +99,18 @@ public final class NetworkUtil {
 					String hostAddress = netAddress.getHostAddress();
 					if (hostAddress.startsWith("192.168"))
 						continue;
-					return convertValue.apply(netAddress);
+
+					String val = convertValue.apply(netAddress);
+					findAll.add(val);
+					if (doBreak.test(val))
+						break END;
 				}
 			}
 		}
 
-		return "";
-
+		return findAll;
 	}
+
 
 	/**
 	 * 장비 IP 주소리턴. </br>
@@ -94,7 +122,20 @@ public final class NetworkUtil {
 	 * @throws SocketException
 	 */
 	public static String getRealAddress() throws SocketException {
-		return getAddressInfo(hostAddressConverter);
+		return getAddressInfoFindOne(hostAddressConverter);
+	}
+	
+	/**
+	 * 장비 IP 주소리턴. </br>
+	 * 127.0 으로 시작하거나 192.168로 시작하는 IP주소 대상아님.
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 6. 10.
+	 * @return
+	 * @throws SocketException
+	 */
+	public static List<String> getAllRealAddress() throws SocketException {
+		return getAddressInfoFindAll(hostAddressConverter, CONTINUE);
 	}
 
 	/**
