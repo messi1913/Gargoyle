@@ -9,6 +9,7 @@ package com.kyj.fx.voeditor.visual.util;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -24,13 +25,35 @@ import com.kyj.fx.voeditor.visual.framework.model.GagoyleDate;
 public class DateUtilTest {
 
 	@Test
-	public void daytest(){
+	public void calcTimeTest() {
+
+		Date date = new Date();
+
+		Calendar end = DateUtil.toCalendar(date);
+		end.set(2017, 3, 27, 17, 43, 00);
+
+		Calendar start = DateUtil.toCalendar(date);
+		start.set(2017, 3, 27, 07, 56, 00);
+
+		System.out.println("시간 차이 : " + DateUtil.calcTime(end.getTime(), start.getTime(), Calendar.HOUR));
+		System.out.println("분 차이 : " + DateUtil.calcTime(end.getTime(), start.getTime(), Calendar.MINUTE));
+		System.out.println("초 차이 : " + DateUtil.calcTime(end.getTime(), start.getTime(), Calendar.SECOND));
+		
+		
+		
+		
+		
+
+	}
+
+	@Test
+	public void daytest() {
 		Date monday = DateUtil.getFirstWeekOfEEE(new Date(), Calendar.MONDAY);
 		Date friday = DateUtil.getFirstWeekOfEEE(new Date(), Calendar.FRIDAY);
 		System.out.println(monday);
 		System.out.println(friday);
 	}
-	
+
 	@Test
 	public void print2016() {
 
