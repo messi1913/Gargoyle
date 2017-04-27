@@ -57,7 +57,6 @@ import com.kyj.fx.voeditor.visual.framework.contextmenu.FxContextManager;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.FxMemory;
-import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
@@ -72,6 +71,7 @@ import javafx.concurrent.Worker.State;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.print.PageLayout;
 import javafx.print.PageOrientation;
 import javafx.print.Paper;
@@ -115,6 +115,7 @@ import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
@@ -801,7 +802,7 @@ public class FxUtil {
 
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 		scene.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
-
+		
 		if (option != null)
 			option.accept(stage);
 		return stage;
@@ -1862,4 +1863,24 @@ public class FxUtil {
 	public static Consumer<Exception> DEFAULT_LOGGER = err -> {
 		LOGGER.error(ValueUtil.toString(err));
 	};
+
+	private static final float CENTER_ON_SCREEN_X_FRACTION = 1.0f / 2;
+	private static final float CENTER_ON_SCREEN_Y_FRACTION = 1.0f / 3;
+
+	
+	
+	
+	public Point2D getCenter(Parent parent) {
+		Stage window = (Stage) parent.getScene().getWindow();
+		return getCenter(window);
+	}
+	
+	public Point2D getCenter(Stage window) {
+
+		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+		double centerX = bounds.getMinX() + (bounds.getWidth() - window.getWidth()) * CENTER_ON_SCREEN_X_FRACTION;
+		double centerY = bounds.getMinY() + (bounds.getHeight() - window.getHeight()) * CENTER_ON_SCREEN_Y_FRACTION;
+
+		return new Point2D(centerX, centerY);
+	}
 }
