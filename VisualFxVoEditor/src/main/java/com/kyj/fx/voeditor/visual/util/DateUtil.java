@@ -601,4 +601,24 @@ public class DateUtil {
 		}
 	}
 
+	/**
+	 * date 기준으로 h, m , s 를 
+	 * 더한 시간 정보를 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 4. 28. 
+	 * @param date
+	 * @param h
+	 * @param m
+	 * @param s
+	 * @return
+	 */
+	public static Date addDelta(Date date, int h, int m, int s) {
+		Calendar instance = Calendar.getInstance();
+		instance.setTime(date);
+		instance.set(Calendar.HOUR_OF_DAY, h);
+		instance.set(Calendar.MINUTE, m);
+		instance.set(Calendar.SECOND, s);
+		return instance.getTime();
+	}
+
 }
