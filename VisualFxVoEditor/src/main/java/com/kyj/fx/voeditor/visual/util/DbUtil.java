@@ -464,6 +464,7 @@ public class DbUtil extends ConnectionManager {
 
 				@SuppressWarnings("unchecked")
 				Map<String, ?>[] array = maps.toArray(new HashMap[maps.size()]);
+				noticeQuery(query);
 				int[] batchUpdate = u.batchUpdate(query, array);
 				return IntStream.of(batchUpdate).sum();
 			}
