@@ -583,7 +583,7 @@
 
 		<copy todir="externalLibs">
 			<fileset dir="${m2.dir}\kyj\Fx\dao\wizard\kyj.Fx.dao.wizard\0.0.3-SNAPSHOT">
-				<filename name="kyj.Fx.dao.wizard-0.0.3-SNAPSHOT.jar" />
+				<filename name="kyj.Fx.dao.wizard-0.0.4-SNAPSHOT.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
