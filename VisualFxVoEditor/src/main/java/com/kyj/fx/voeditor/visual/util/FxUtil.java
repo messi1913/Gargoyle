@@ -63,6 +63,7 @@ import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
+import javafx.animation.Transition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -123,6 +124,8 @@ import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import jidefx.animation.AnimationType;
+import jidefx.animation.AnimationUtils;
 
 /**
  * Javafx UI 관련 유틸리티 클래스
@@ -1892,5 +1895,21 @@ public class FxUtil {
 		double centerY = bounds.getMinY() + (bounds.getHeight() - window.getHeight()) * CENTER_ON_SCREEN_Y_FRACTION;
 
 		return new Point2D(centerX, centerY);
+	}
+	
+
+	public static class Animation {
+		
+		public static Transition createTransition(Node node, AnimationType type) {
+			return AnimationUtils.createTransition(node, type);
+		}
+		
+		public static Transition createFadeInTransition(Node node){
+			return createTransition(node, AnimationType.FADE_IN);
+		}
+		
+		public static Transition createBounceInTransition(Node node){
+			return createTransition(node, AnimationType.BOUNCE_IN);
+		}
 	}
 }
