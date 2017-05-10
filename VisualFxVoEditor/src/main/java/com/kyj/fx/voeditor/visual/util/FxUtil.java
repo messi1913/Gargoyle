@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.bar.GargoyleLoadBar;
 import com.kyj.fx.voeditor.visual.component.bar.GargoyleSynchLoadBar;
+import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
@@ -1573,6 +1574,15 @@ public class FxUtil {
 			String message = err.getMessage();
 			DialogUtil.showMessageDialog(FxUtil.getWindow(parent), message);
 		});
+		
+		view.setOnKeyPressed(key ->{
+			
+			if(key.getCode() == KeyCode.F12){
+				FxUtil.createStageAndShow("Simple Web Console", new WebViewConsole(view));
+			}
+			
+		});
+
 
 		engine.setJavaScriptEnabled(true);
 		engine.setCreatePopupHandler(new Callback<PopupFeatures, WebEngine>() {

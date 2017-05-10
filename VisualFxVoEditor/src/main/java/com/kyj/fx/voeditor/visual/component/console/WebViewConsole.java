@@ -11,11 +11,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.html.HTMLDocument;
 
-import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
@@ -42,13 +43,22 @@ public class WebViewConsole extends BorderPane {
 		txtResult = new TextArea();
 		btnExec = new Button(" Apply ");
 		SplitPane value = new SplitPane(txtResult, txtCommand);
-		
+
 		value.setOrientation(Orientation.VERTICAL);
-		
+
 		setCenter(value);
 		setBottom(btnExec);
 
 		btnExec.setOnMouseClicked(this::btnExecOnMouseClick);
+
+		txtCommand.setOnKeyPressed(this::txtCommandOnKeyClick);
+	}
+
+	public void txtCommandOnKeyClick(KeyEvent e) {
+
+		if (e.getCode() == KeyCode.ENTER && e.isControlDown()) {
+			exec();
+		}
 	}
 
 	public void btnExecOnMouseClick(MouseEvent e) {
