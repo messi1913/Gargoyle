@@ -65,7 +65,7 @@ class ClipboardKeyEventInstaller {
 					else if (col != tb.getColumns().indexOf(cell.getTableColumn())) {
 						sb.append("\t");
 					}
-					Object cellData = getDisplayText(tableColumn, row);//cell.getTableColumn().getCellData(cell.getRow());
+					Object cellData = getDisplayText(/*tableColumn*/ cell, row);//cell.getTableColumn().getCellData(cell.getRow());
 					sb.append(ValueUtil.decode(cellData, cellData, "").toString());
 				}
 				FxClipboardUtil.putString(sb.toString());
@@ -82,6 +82,10 @@ class ClipboardKeyEventInstaller {
 			e.consume();
 		});
 
+	}
+
+	private static Object getDisplayText(TablePosition cell, int row) {
+		return getDisplayText(cell.getTableColumn(), row);
 	}
 
 	private static Object getDisplayText(TableColumn<?, ?> tc, int row) {
