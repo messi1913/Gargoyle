@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -193,7 +194,8 @@ public final class SkinManager {
 	public boolean existSkinFullPath(String skinFullPathName) {
 		boolean exists = false;
 		try {
-			File file = new File(skinFullPathName);
+			String property = System.getProperty("user.dir");
+			File file = new File(property, skinFullPathName);
 			exists = file.exists();
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
@@ -275,7 +277,13 @@ public final class SkinManager {
 				skinPath = DEFAULT_SKIN_PATH_NAME;
 
 			if (!existSkinFullPath(skinPath)) {
-				userRoot.put(USER_SKIN_NAME, "");
+				
+				/*
+				 *  2017.05.11 값을 제거하는 처리는 하지않는다.
+				 *  값이 사라지면서 기존에 적용한 스킨이 지워지는 현상이 발생하기 때문이다.
+				 */
+				// userRoot.put(USER_SKIN_NAME, "");
+				
 				return "";
 			}
 			return toURL(skinPath).toExternalForm();
