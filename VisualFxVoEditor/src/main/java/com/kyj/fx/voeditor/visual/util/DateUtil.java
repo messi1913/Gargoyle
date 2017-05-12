@@ -615,9 +615,9 @@ public class DateUtil {
 	public static Date addDelta(Date date, int h, int m, int s) {
 		Calendar instance = Calendar.getInstance();
 		instance.setTime(date);
-		instance.set(Calendar.HOUR_OF_DAY, h);
-		instance.set(Calendar.MINUTE, m);
-		instance.set(Calendar.SECOND, s);
+		instance.add(Calendar.HOUR_OF_DAY, h);
+		instance.add(Calendar.MINUTE, m);
+		instance.add(Calendar.SECOND, s);
 		return instance.getTime();
 	}
 
