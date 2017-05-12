@@ -515,4 +515,30 @@ public class GagoyleSpreadSheetView extends StackPane {
 	public ObservableList<ObservableList<SpreadsheetCell>> getRows(){
 		return ssv.getGrid().getRows();
 	}
+	
+	
+	/**
+	 * 시트의 컬럼 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 5. 12. 
+	 * @return
+	 */
+	public ObservableList<SpreadsheetColumn> getColumns(){
+		return this.ssv.getColumns();
+	}
+	
+	public void setColumnWidth(int index, int width){
+		SpreadsheetColumn spreadsheetColumn = getColumns().get(index);
+		spreadsheetColumn.setPrefWidth(width);
+	}
+	
+	public SpreadsheetColumn getColumn(SpreadsheetCell cell){
+		int column = cell.getColumn();
+		return getColumns().get(column);
+	}
+
+	public SpreadsheetColumn getColumn(int index) {
+		return getColumns().get(index);
+	}
+	
 }
