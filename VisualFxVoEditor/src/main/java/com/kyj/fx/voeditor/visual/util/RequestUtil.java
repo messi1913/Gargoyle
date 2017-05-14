@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -110,14 +111,28 @@ public class RequestUtil {
 			return requestSSL(url, response);
 		}
 
-		return reqeustSSL(url, response, true);
+		return requestSSL(url, response, true);
 	}
 
 	public static <T> T requestSSL(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
-		return reqeustSSL(url, response, true);
+		return requestSSL(url, response, true);
 	}
 
-	public static <T> T reqeustSSL(URL url, BiFunction<InputStream, Integer, T> response, boolean autoClose) throws Exception {
+	public static String requestSSL(URL url) throws Exception {
+		return request(url, (is, code) -> {
+			if (code == 200) {
+				try {
+					return ValueUtil.toString(is);
+				} catch (IOException e) {
+					LOGGER.error(ValueUtil.toString(e));
+				}
+			} else
+				LOGGER.error("response code was not 200");
+			return null;
+		}, true);
+	}
+
+	public static <T> T requestSSL(URL url, BiFunction<InputStream, Integer, T> response, boolean autoClose) throws Exception {
 
 		// SSLContext ctx = SSLContext.getInstance("TLS");
 
@@ -419,13 +434,13 @@ public class RequestUtil {
 				// 끝 서버로 보낼 데이터를 묶음.
 
 				/* 프록시 체크 */
-				//			if (USE_PROXY) {
-				//				HttpHost proxy = new HttpHost(PROXY_URL, PROXY_PORT, "http");
-				//				response = httpclient.execute(proxy, http);
-				//			}
-				//			else {
+				// if (USE_PROXY) {
+				// HttpHost proxy = new HttpHost(PROXY_URL, PROXY_PORT, "http");
+				// response = httpclient.execute(proxy, http);
+				// }
+				// else {
 				response = httpclient.execute(http);
-				//			}
+				// }
 
 				rslt = res.apply(response);
 
@@ -509,7 +524,7 @@ public class RequestUtil {
 			CloseableHttpClient httpclient = null;
 
 			// 시작 쿠키관리
-			List<Cookie> cookies = CookieBase.getCookies();//cookieStore.getCookies();
+			List<Cookie> cookies = CookieBase.getCookies();// cookieStore.getCookies();
 			LOGGER.debug("Request cookies...  : ");
 			cookies.forEach(c -> {
 				LOGGER.debug("[req] k : {} v : {}", c.getName(), c.getValue());
@@ -551,13 +566,13 @@ public class RequestUtil {
 				// 끝 서버로 보낼 데이터를 묶음.
 
 				/* 프록시 체크 */
-				//			if (USE_PROXY) {
-				//				HttpHost proxy = new HttpHost(PROXY_URL, PROXY_PORT, "http");
-				//				response = httpclient.execute(proxy, http);
-				//			}
-				//			else {
+				// if (USE_PROXY) {
+				// HttpHost proxy = new HttpHost(PROXY_URL, PROXY_PORT, "http");
+				// response = httpclient.execute(proxy, http);
+				// }
+				// else {
 				response = httpclient.execute(http);
-				//			}
+				// }
 
 				LOGGER.debug("Response headers ...   ");
 				Stream.of(response.getAllHeaders()).forEach(h -> {
@@ -646,7 +661,8 @@ public class RequestUtil {
 		}
 
 		/**
-		 *  read only cookies.
+		 * read only cookies.
+		 * 
 		 * @return
 		 * @작성자 : KYJ
 		 * @작성일 : 2017. 3. 22.
