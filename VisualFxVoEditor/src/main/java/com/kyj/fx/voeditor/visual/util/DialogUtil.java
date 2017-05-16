@@ -5,6 +5,7 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -78,6 +79,31 @@ public class DialogUtil {
 		return file;
 	}
 
+	/**
+	 * 멀티 파일 다이얼로그 오픈
+	 *
+	 * @Date 2015. 10. 12.
+	 * @param ownerWindow
+	 * @param option
+	 * @return
+	 * @User KYJ
+	 */
+	public static List<File> showMultiFileDialog(final Window ownerWindow, Consumer<FileChooser> option) {
+		FileChooser fileChooser = new FileChooser();
+
+		fileChooser.setTitle("Open Resource File");
+
+		installDefaultPath(fileChooser);
+		option.accept(fileChooser);
+
+		List<File> files = fileChooser.showOpenMultipleDialog(ownerWindow);
+		if (files != null && !files.isEmpty()) {
+			applyLastPath(files.get(files.size() - 1));
+		}
+
+		return files;
+	}
+
 	public static File showFileDialog(final Window ownerWindow) {
 		return showFileDialog(ownerWindow, option -> {
 		});
@@ -136,18 +162,18 @@ public class DialogUtil {
 	 * @param fileChooser
 	 ********************************/
 	private static void installDefaultPath(FileChooser fileChooser) {
-		//		String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
-		//		if (ValueUtil.isNotEmpty(path)) {
-		//			File file = new File(path);
-		//			if (file.exists()) {
+		// String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
+		// if (ValueUtil.isNotEmpty(path)) {
+		// File file = new File(path);
+		// if (file.exists()) {
 		//
-		//				if (file.isFile()) {
-		//					fileChooser.setInitialDirectory(file.getParentFile());
-		//				} else if (file.isDirectory()) {
-		//					fileChooser.setInitialDirectory(file);
-		//				}
-		//			}
-		//		}
+		// if (file.isFile()) {
+		// fileChooser.setInitialDirectory(file.getParentFile());
+		// } else if (file.isDirectory()) {
+		// fileChooser.setInitialDirectory(file);
+		// }
+		// }
+		// }
 		File initDir = getInitDir();
 		if (initDir != null) {
 			if (initDir.isDirectory()) {
@@ -165,18 +191,18 @@ public class DialogUtil {
 	}
 
 	private static void installDefaultPath(DirectoryChooser fileChooser) {
-		//		String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
-		//		if (ValueUtil.isNotEmpty(path)) {
-		//			File file = new File(path);
-		//			if (file.exists()) {
+		// String path = PreferencesUtil.getDefault().get(PreferencesUtil.KEY_LAST_SELECTED_PATH, "");
+		// if (ValueUtil.isNotEmpty(path)) {
+		// File file = new File(path);
+		// if (file.exists()) {
 		//
-		//				if (file.isFile()) {
-		//					fileChooser.setInitialDirectory(file.getParentFile());
-		//				} else if (file.isDirectory()) {
-		//					fileChooser.setInitialDirectory(file);
-		//				}
-		//			}
-		//		}
+		// if (file.isFile()) {
+		// fileChooser.setInitialDirectory(file.getParentFile());
+		// } else if (file.isDirectory()) {
+		// fileChooser.setInitialDirectory(file);
+		// }
+		// }
+		// }
 		File initDir = getInitDir();
 		if (initDir != null) {
 			if (initDir.isDirectory()) {
@@ -466,8 +492,7 @@ public class DialogUtil {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		/*
-		 * if (result.get() == ButtonType.OK) { // ... user chose OK } else { //
-		 * ... user chose CANCEL or closed the dialog }
+		 * if (result.get() == ButtonType.OK) { // ... user chose OK } else { // ... user chose CANCEL or closed the dialog }
 		 */
 		return result.get();
 	}
@@ -534,7 +559,7 @@ public class DialogUtil {
 			alert.setHeaderText(headerText);
 			alert.setContentText(message);
 			alert.initOwner(initOwner);
-			
+
 			apply.accept(alert);
 		});
 
@@ -559,9 +584,9 @@ public class DialogUtil {
 		return showYesOrNoDialog(stage, title, message, null, dialogHandler);
 	}
 
-//	public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message) {
-//		return showYesOrNoDialog(SharedMemory.getPrimaryStage(), title, message, consumer, null);
-//	}
+	// public static Optional<Pair<String, String>> showYesOrNoDialog(String title, String message) {
+	// return showYesOrNoDialog(SharedMemory.getPrimaryStage(), title, message, consumer, null);
+	// }
 
 	public static Optional<Pair<String, String>> showYesOrNoDialog(Stage stage, String title, String message,
 			Consumer<? super Pair<String, String>> consumer, Consumer<Dialog<Pair<String, String>>> dialogHandler) {
@@ -609,6 +634,7 @@ public class DialogUtil {
 
 	/**
 	 * Graphics 부분을 커스텀 처리할 수 있는 InputDialog
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 21.
 	 * @param owner
@@ -631,7 +657,7 @@ public class DialogUtil {
 		T node = customGrahics.getNode();
 		composite.setGraphic(node);
 
-		//Modal
+		// Modal
 		composite.show(owner, stage -> {
 
 			stage.initModality(Modality.APPLICATION_MODAL);
@@ -703,7 +729,7 @@ public class DialogUtil {
 		Optional<Pair<String, String>> empty = Optional.empty();
 		SimpleObjectProperty<Optional<Pair<String, String>>> prop = new SimpleObjectProperty<>(empty);
 
-		//Modal
+		// Modal
 		composite.show(owner, stage -> {
 			stage.initModality(Modality.APPLICATION_MODAL);
 			text.requestFocus();
@@ -747,43 +773,43 @@ public class DialogUtil {
 
 		return prop.get();
 		// Create the custom dialog.
-		//		Dialog<Pair<String, String>> dialog = new Dialog<>();
-		//		dialog.setTitle(title);
-		//		dialog.setHeaderText(message);
-		//		TextField text = new TextField();
-		//		text.setFocusTraversable(true);
+		// Dialog<Pair<String, String>> dialog = new Dialog<>();
+		// dialog.setTitle(title);
+		// dialog.setHeaderText(message);
+		// TextField text = new TextField();
+		// text.setFocusTraversable(true);
 		//
-		//		dialog.setGraphic(text);
-		//		text.requestFocus();
+		// dialog.setGraphic(text);
+		// text.requestFocus();
 		//
-		//		// Set the button types.
-		//		ButtonType okBtn = new ButtonType("OK", ButtonData.OK_DONE);
+		// // Set the button types.
+		// ButtonType okBtn = new ButtonType("OK", ButtonData.OK_DONE);
 		//
-		//		dialog.getDialogPane().getButtonTypes().add(okBtn);
+		// dialog.getDialogPane().getButtonTypes().add(okBtn);
 		//
-		//		dialog.setResultConverter(dialogButton -> {
-		//			if (dialogButton == okBtn) {
-		//				return new Pair<>("OK", text.getText());
-		//			} else {
-		//				return null;
-		//			}
-		//		});
+		// dialog.setResultConverter(dialogButton -> {
+		// if (dialogButton == okBtn) {
+		// return new Pair<>("OK", text.getText());
+		// } else {
+		// return null;
+		// }
+		// });
 		//
-		//		if (inputValue != null && inputValue != "") {
-		//			text.setText(inputValue);
-		//		}
+		// if (inputValue != null && inputValue != "") {
+		// text.setText(inputValue);
+		// }
 		//
-		//		dialog.initModality(Modality.APPLICATION_MODAL);
-		//		dialog.initOwner(owner);
-		//		dialog.getGraphic().requestFocus();
-		//		//		dialog.initModality(Modality.APPLICATION_MODAL);
-		//		//		graphic.setFocusTraversable(true);
+		// dialog.initModality(Modality.APPLICATION_MODAL);
+		// dialog.initOwner(owner);
+		// dialog.getGraphic().requestFocus();
+		// // dialog.initModality(Modality.APPLICATION_MODAL);
+		// // graphic.setFocusTraversable(true);
 		//
-		//		Optional<Pair<String, String>> result = dialog.showAndWait();
+		// Optional<Pair<String, String>> result = dialog.showAndWait();
 		//
-		//		result.ifPresent(consumer);
+		// result.ifPresent(consumer);
 		//
-		//		return result;
+		// return result;
 
 	}
 

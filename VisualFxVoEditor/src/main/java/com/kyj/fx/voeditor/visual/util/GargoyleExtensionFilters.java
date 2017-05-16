@@ -60,5 +60,10 @@ public interface GargoyleExtensionFilters {
 	public static final String HTML_NAME = "html files (*.html)";
 	public static final String HTML_EXTENSION = "html";
 	public static final String HTML = EXTENSION_COMMONS + HTML_EXTENSION;
+	
+	
+	public static final String MP3_NAME = "mp3 files (*.mp3)";
+	public static final String MP3_EXTENSION = "mp3";
+	public static final String MP3 = EXTENSION_COMMONS + MP3_EXTENSION;
 
 }
