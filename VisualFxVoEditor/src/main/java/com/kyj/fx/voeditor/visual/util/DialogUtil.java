@@ -5,6 +5,7 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -97,9 +98,11 @@ public class DialogUtil {
 		option.accept(fileChooser);
 
 		List<File> files = fileChooser.showOpenMultipleDialog(ownerWindow);
-		if (files != null && !files.isEmpty()) {
-			applyLastPath(files.get(files.size() - 1));
-		}
+
+		if (files == null || files.isEmpty())
+			return Collections.emptyList();
+
+		applyLastPath(files.get(files.size() - 1));
 
 		return files;
 	}
