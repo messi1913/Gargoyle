@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.loder;
 
 import java.io.File;
+import java.net.URLClassLoader;
 import java.util.Properties;
 import java.util.jar.JarFile;
 
@@ -59,6 +60,13 @@ public class JarWrapper {
 	 * @최초생성일 2017. 5. 17.
 	 */
 	String classpath;
+	
+	
+	/**
+	 * 전용 클래스 로더
+	 * @최초생성일 2017. 5. 17.
+	 */
+	public URLClassLoader loader;
 
 	/**
 	 * @return the setOnParentBeforeLoadedListenerClass

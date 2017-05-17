@@ -312,7 +312,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 							JarWrapper jar = (JarWrapper) pluginMenu.getUserData();
 
 							try {
-								Object newInstance = jar.getNodeClass().newInstance();
+								Class<?> nodeClass = jar.getNodeClass();
+								Object newInstance = jar.loader.loadClass(nodeClass.getName()).newInstance();
+//								Object newInstance = jar.getNodeClass().newInstance();
 
 								if (newInstance instanceof CloseableParent<?>) {
 									loadNewSystemTab(jar.getDisplayMenuName(), (CloseableParent<?>) newInstance);

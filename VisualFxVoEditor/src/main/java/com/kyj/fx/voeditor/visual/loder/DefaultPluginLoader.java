@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.loder;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -116,8 +117,9 @@ class DefaultPluginLoader implements IPluginLoader {
 				}).filter(/* 유효한 정보만 다시 필터링하고 클래스 로딩 */ zipWrapper -> {
 
 					try {
-						Class<?> loadFromJarFile = DynamicClassLoader.loadFromJarFile(zipWrapper.location, zipWrapper.clazz, zipWrapper.classpath);
-
+						URLClassLoader createLoader = DynamicClassLoader.createLoader(zipWrapper.location, zipWrapper.classpath);
+						Class<?> loadFromJarFile = createLoader.loadClass(zipWrapper.clazz);//DynamicClassLoader.loadFromJarFile(zipWrapper.location, zipWrapper.clazz, zipWrapper.classpath);
+						zipWrapper.loader = createLoader;
 						/* 2017-03-23
 						 * JAVAFX Parent 노드 타입과 더블어 CloseableParent 타입도 허용한다.
 						 * JAVAFX Parent 노드 타입이어야 유효하다.
