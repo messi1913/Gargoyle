@@ -41,6 +41,9 @@ public interface IPluginLoader {
 	// 설정정보가 존재한다면 설정정보에서 위치될떄 보여줄 이름
 	public static final String KEY_DISPLAY_CONFIG_NAME = "display.config.name";
 
+	// 해당 플러그인이 참조하는 클래스패스 2017.5.17 by kyj
+	public static final String KEY_CLASSPATH = "classpath";
+		
 	/**
 	 * 메인탭에 Parent가 로드될때 처리할 리스너를 등록할 클래스를 정의.
 	 * @최초생성일 2016. 6. 16.

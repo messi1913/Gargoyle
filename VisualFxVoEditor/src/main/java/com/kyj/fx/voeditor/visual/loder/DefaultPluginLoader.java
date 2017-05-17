@@ -97,6 +97,7 @@ class DefaultPluginLoader implements IPluginLoader {
 					String configNodeName = zipWrapper.prop.getProperty(KEY_DISPLAY_CONFIG_NAME);
 					String addOnParentLoadedListener = zipWrapper.prop.getProperty(ADD_ON_PARENT_LOADED_LISTENER);
 					String setOnParentBeforeLoadedListener = zipWrapper.prop.getProperty(SET_ON_PARENT_BEFORE_LOADED_LISTENER);
+					String classpath = zipWrapper.prop.getProperty(KEY_CLASSPATH);
 					String openType = zipWrapper.prop.getProperty(OPEN_TYPE);
 
 					if (clazz != null && !clazz.isEmpty()) {
@@ -108,13 +109,14 @@ class DefaultPluginLoader implements IPluginLoader {
 						zipWrapper.addOnParentLoadedListener = addOnParentLoadedListener;
 						zipWrapper.setOnParentBeforeLoadedListener = setOnParentBeforeLoadedListener;
 						zipWrapper.openType = ValueUtil.isEmpty(openType) ? "INNER" : openType;
+						zipWrapper.classpath = classpath;
 						return zipWrapper;
 					}
 					return null;
 				}).filter(/* 유효한 정보만 다시 필터링하고 클래스 로딩 */ zipWrapper -> {
 
 					try {
-						Class<?> loadFromJarFile = DynamicClassLoader.loadFromJarFile(zipWrapper.location, zipWrapper.clazz);
+						Class<?> loadFromJarFile = DynamicClassLoader.loadFromJarFile(zipWrapper.location, zipWrapper.clazz, zipWrapper.classpath);
 
 						/* 2017-03-23
 						 * JAVAFX Parent 노드 타입과 더블어 CloseableParent 타입도 허용한다.
@@ -151,11 +153,15 @@ class DefaultPluginLoader implements IPluginLoader {
 								Class<?> setOnParentBeforeLoadedListenerClass = DynamicClassLoader.loadFromJarFile(zipWrapper.location,
 										zipWrapper.setOnParentBeforeLoadedListener);
 								// JAVAFX Parent 노드 타입이어야 유효하다.
-								if (GagoyleParentBeforeLoad.class.isAssignableFrom(setOnParentBeforeLoadedListenerClass)) {
-									zipWrapper.setOnParentBeforeLoadedListenerClass = (Class<GagoyleParentBeforeLoad>) setOnParentBeforeLoadedListenerClass;
-									LOGGER.debug(String.format("added plugin listener ::  class info : %s ",
-											zipWrapper.setOnParentBeforeLoadedListener));
+								if(setOnParentBeforeLoadedListenerClass !=null)
+								{
+									if (GagoyleParentBeforeLoad.class.isAssignableFrom(setOnParentBeforeLoadedListenerClass)) {
+										zipWrapper.setOnParentBeforeLoadedListenerClass = (Class<GagoyleParentBeforeLoad>) setOnParentBeforeLoadedListenerClass;
+										LOGGER.debug(String.format("added plugin listener ::  class info : %s ",
+												zipWrapper.setOnParentBeforeLoadedListener));
+									}	
 								}
+								
 							} catch (Exception e) {
 								LOGGER.error(ValueUtil.toString(e));
 							}

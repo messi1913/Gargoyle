@@ -53,6 +53,12 @@ public class JarWrapper {
 	Class<GagoyleParentBeforeLoad> setOnParentBeforeLoadedListenerClass;
 
 	String openType = "INNER";
+	
+	/**
+	 * 클래스 패스 추가
+	 * @최초생성일 2017. 5. 17.
+	 */
+	String classpath;
 
 	/**
 	 * @return the setOnParentBeforeLoadedListenerClass

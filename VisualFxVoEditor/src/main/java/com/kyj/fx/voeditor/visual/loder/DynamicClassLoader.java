@@ -42,6 +42,7 @@ import com.kyj.fx.voeditor.visual.main.model.vo.ClassPath;
 import com.kyj.fx.voeditor.visual.main.model.vo.ClassPathEntry;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.fx.voeditor.visual.util.ZipUtil;
 
 /**
  *
@@ -459,8 +460,54 @@ public class DynamicClassLoader {
 	 *            로딩하고자하는 클래스
 	 * @throws MalformedURLException
 	 */
+	/**
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2015. 10. 23.
+	 * @param JarFile
+	 *            "C:\\Users\\KYJ\\JAVA_FX\\webWorkspace\\meerkat-core\\xxx.jar"
+	 * @param classForName
+	 *            로딩하고자하는 클래스
+	 * @throws MalformedURLException
+	 */
 	public static Class<?> loadFromJarFile(File jarFile, String classForName) throws Exception {
+		return loadFromJarFile(jarFile, classForName, "");
+	}
+
+	public static Class<?> loadFromJarFile(File jarFile, String classForName, String jarInClasspath) throws Exception {
 		URL url = jarFile.toURI().toURL();
+
+		URL[] urls = null;
+		if (ValueUtil.isNotEmpty(jarInClasspath)) {
+
+			String name = jarFile.getName();
+			int indexOf = name.indexOf(".");
+
+			File dir = new File(jarFile.getParentFile(), name.substring(0, indexOf));
+			dir.mkdirs();
+
+			if (dir.exists()) {
+
+				ZipUtil.unzip(jarFile, dir);
+
+				String[] split = jarInClasspath.split(";");
+
+				int length = split.length + 1;
+				urls = new URL[length + 1];
+				urls[0] = url;
+				for (int i = 1; i < length; i++ /*String res : split*/) {
+					String res = split[i - 1];
+					if (ValueUtil.isEmpty(res))
+						continue;
+
+					urls[i] = new File(dir, res).toURI().toURL(); //new URL(url.toExternalForm() + "!/" + res);
+				}
+
+			}
+
+		} else {
+			urls = new URL[] { url };
+		}
 
 		/*
 		 * URL클래스로더는 한번 로드된 JAR파일을 삭제할수없다고 한다. 이 부분이 좀 애매한데. 로드된 클래스정보가 언제 사용될지
@@ -475,18 +522,22 @@ public class DynamicClassLoader {
 		 */
 		// if (loader == null)
 
-		ClassLoader loader = URLClassLoader.newInstance(new URL[] { url }, DynamicClassLoader.class.getClassLoader());
+		ClassLoader loader = URLClassLoader.newInstance(urls, DynamicClassLoader.class.getClassLoader());
+		Class<?> forName = null;
 		try {
 
 			// RuntimeJarLoader.loadJarIndDir(loader,
 			// jarFile.getAbsolutePath());
 			if (loader != null) {
-				return loader.loadClass(classForName);
+				forName = loader.loadClass(classForName);
+				return forName;
 			}
+
+			forName = Class.forName(classForName, true, loader);
 		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(e));
+			LOGGER.error(ValueUtil.toString(String.format("jar file : %s class : %s", jarFile.toString(), classForName), e));
 		}
-		Class<?> forName = Class.forName(classForName, true, loader);
+
 		return forName;
 	}
 
