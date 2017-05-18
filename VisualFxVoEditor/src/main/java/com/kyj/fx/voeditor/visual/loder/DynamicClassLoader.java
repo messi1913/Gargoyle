@@ -475,6 +475,30 @@ public class DynamicClassLoader {
 	}
 
 	public static Class<?> loadFromJarFile(File jarFile, String classForName, String jarInClasspath) throws Exception {
+		
+
+		URLClassLoader loader = createLoader(jarFile,jarInClasspath);//URLClassLoader.newInstance(urls, DynamicClassLoader.class.getClassLoader());
+		Class<?> forName = null;
+		
+		
+		try {
+
+			if (loader != null) {
+				LOGGER.debug("from loder loaded");
+				forName = loader.loadClass(classForName);
+				return forName;
+			}
+			
+			LOGGER.debug("class forName loaded");
+			forName = Class.forName(classForName, true, loader);
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(String.format("load fail. \ndetail :: \ntarget : %s target class : %s", jarFile.toString(), classForName), e));
+		}
+
+		return forName;
+	}
+
+	public static URLClassLoader createLoader(File jarFile, String jarInClasspath) throws Exception {
 		URL url = jarFile.toURI().toURL();
 
 		URL[] urls = null;
@@ -500,9 +524,12 @@ public class DynamicClassLoader {
 					if (ValueUtil.isEmpty(res))
 						continue;
 
-					urls[i] = new File(dir, res).toURI().toURL(); //new URL(url.toExternalForm() + "!/" + res);
+					File file = new File(dir, res);
+					urls[i] = file.toURI().toURL();
+					LOGGER.debug("append url : {} " , urls[i].toExternalForm());
 				}
-
+				
+				
 			}
 
 		} else {
@@ -522,25 +549,12 @@ public class DynamicClassLoader {
 		 */
 		// if (loader == null)
 
-		ClassLoader loader = URLClassLoader.newInstance(urls, DynamicClassLoader.class.getClassLoader());
-		Class<?> forName = null;
-		try {
+		URLClassLoader loader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
+		
 
-			// RuntimeJarLoader.loadJarIndDir(loader,
-			// jarFile.getAbsolutePath());
-			if (loader != null) {
-				forName = loader.loadClass(classForName);
-				return forName;
-			}
-
-			forName = Class.forName(classForName, true, loader);
-		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(String.format("jar file : %s class : %s", jarFile.toString(), classForName), e));
-		}
-
-		return forName;
+		return loader;
 	}
-
+	
 	// static class RuntimeJarLoader {
 	//
 	// public static void loadJarIndDir(String dir) {

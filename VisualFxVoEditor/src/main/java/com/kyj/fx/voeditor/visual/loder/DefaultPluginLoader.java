@@ -89,94 +89,92 @@ class DefaultPluginLoader implements IPluginLoader {
 				LOGGER.error(String.format("is not jar file \n%s", ValueUtil.toString(e)));
 			}
 			return null;
-		}).filter(/* jar파일이라면 로드됨. */zipWrapper -> zipWrapper != null)
-				.map(/* 클래스정보 노출 */zipWrapper -> {
-					String clazz = zipWrapper.prop.getProperty(KEY_DISPLAY_JAVAFX_NODE_CLASS);
-					String diplayMenuName = zipWrapper.prop.getProperty(KEY_DISPLAY_MENU_NAME);
-					String menuPath = zipWrapper.prop.getProperty(KEY_DISPLAY_MENU_PATH);
-					String configNodeClass = zipWrapper.prop.getProperty(KEY_DISPLAY_CONFIG_JAVAFX_NODE_CLASS);
-					String configNodeName = zipWrapper.prop.getProperty(KEY_DISPLAY_CONFIG_NAME);
-					String addOnParentLoadedListener = zipWrapper.prop.getProperty(ADD_ON_PARENT_LOADED_LISTENER);
-					String setOnParentBeforeLoadedListener = zipWrapper.prop.getProperty(SET_ON_PARENT_BEFORE_LOADED_LISTENER);
-					String classpath = zipWrapper.prop.getProperty(KEY_CLASSPATH);
-					String openType = zipWrapper.prop.getProperty(OPEN_TYPE);
+		}).filter(/* jar파일이라면 로드됨. */zipWrapper -> zipWrapper != null).map(/* 클래스정보 노출 */zipWrapper -> {
+			String clazz = zipWrapper.prop.getProperty(KEY_DISPLAY_JAVAFX_NODE_CLASS);
+			String diplayMenuName = zipWrapper.prop.getProperty(KEY_DISPLAY_MENU_NAME);
+			String menuPath = zipWrapper.prop.getProperty(KEY_DISPLAY_MENU_PATH);
+			String configNodeClass = zipWrapper.prop.getProperty(KEY_DISPLAY_CONFIG_JAVAFX_NODE_CLASS);
+			String configNodeName = zipWrapper.prop.getProperty(KEY_DISPLAY_CONFIG_NAME);
+			String addOnParentLoadedListener = zipWrapper.prop.getProperty(ADD_ON_PARENT_LOADED_LISTENER);
+			String setOnParentBeforeLoadedListener = zipWrapper.prop.getProperty(SET_ON_PARENT_BEFORE_LOADED_LISTENER);
+			String classpath = zipWrapper.prop.getProperty(KEY_CLASSPATH);
+			String openType = zipWrapper.prop.getProperty(OPEN_TYPE);
 
-					if (clazz != null && !clazz.isEmpty()) {
-						zipWrapper.clazz = clazz;
-						zipWrapper.displayMenuName = diplayMenuName;
-						zipWrapper.menuPath = menuPath;
-						zipWrapper.configNodeClass = configNodeClass;
-						zipWrapper.configNodeName = configNodeName;
-						zipWrapper.addOnParentLoadedListener = addOnParentLoadedListener;
-						zipWrapper.setOnParentBeforeLoadedListener = setOnParentBeforeLoadedListener;
-						zipWrapper.openType = ValueUtil.isEmpty(openType) ? "INNER" : openType;
-						zipWrapper.classpath = classpath;
-						return zipWrapper;
-					}
-					return null;
-				}).filter(/* 유효한 정보만 다시 필터링하고 클래스 로딩 */ zipWrapper -> {
+			if (clazz != null && !clazz.isEmpty()) {
+				zipWrapper.clazz = clazz;
+				zipWrapper.displayMenuName = diplayMenuName;
+				zipWrapper.menuPath = menuPath;
+				zipWrapper.configNodeClass = configNodeClass;
+				zipWrapper.configNodeName = configNodeName;
+				zipWrapper.addOnParentLoadedListener = addOnParentLoadedListener;
+				zipWrapper.setOnParentBeforeLoadedListener = setOnParentBeforeLoadedListener;
+				zipWrapper.openType = ValueUtil.isEmpty(openType) ? "INNER" : openType;
+				zipWrapper.classpath = classpath;
+				return zipWrapper;
+			}
+			return null;
+		}).filter(/* 유효한 정보만 다시 필터링하고 클래스 로딩 */ zipWrapper -> {
 
+			try {
+				URLClassLoader createLoader = DynamicClassLoader.createLoader(zipWrapper.location, zipWrapper.classpath);
+				zipWrapper.loader = createLoader;
+				Class<?> loadFromJarFile = createLoader.loadClass(zipWrapper.clazz);
+				
+				
+				
+				/* 2017-03-23
+				 * JAVAFX Parent 노드 타입과 더블어 CloseableParent 타입도 허용한다.
+				 * JAVAFX Parent 노드 타입이어야 유효하다.
+				 */
+				if (Parent.class.isAssignableFrom(loadFromJarFile) || CloseableParent.class.isAssignableFrom(loadFromJarFile)) {
+					zipWrapper.nodeClass = loadFromJarFile;
+					LOGGER.debug(String.format("valide plugin class info : %s ", loadFromJarFile.getName()));
+				} else {
+					return false;
+				}
+
+				if (ValueUtil.isNotEmpty(zipWrapper.addOnParentLoadedListener)) {
+					/* 리스너 클래스 등록 과정에서 성공여부 중요치않음. */
 					try {
-						URLClassLoader createLoader = DynamicClassLoader.createLoader(zipWrapper.location, zipWrapper.classpath);
-						Class<?> loadFromJarFile = createLoader.loadClass(zipWrapper.clazz);//DynamicClassLoader.loadFromJarFile(zipWrapper.location, zipWrapper.clazz, zipWrapper.classpath);
-						zipWrapper.loader = createLoader;
-						/* 2017-03-23
-						 * JAVAFX Parent 노드 타입과 더블어 CloseableParent 타입도 허용한다.
-						 * JAVAFX Parent 노드 타입이어야 유효하다.
-						 */
-						if (Parent.class.isAssignableFrom(loadFromJarFile) ||
-								CloseableParent.class.isAssignableFrom(loadFromJarFile)
-								) {
-							zipWrapper.nodeClass = loadFromJarFile;
-							LOGGER.debug(String.format("valide plugin class info : %s ", loadFromJarFile.getName()));
-						} else {
-							return false;
+						Class<?> addOnParentLoadedListenerClass = DynamicClassLoader.loadFromJarFile(zipWrapper.location,
+								zipWrapper.addOnParentLoadedListener);
+						// JAVAFX Parent 노드 타입이어야 유효하다.
+						if (GagoyleParentOnLoaded.class.isAssignableFrom(addOnParentLoadedListenerClass)) {
+							zipWrapper.addOnParentLoadedListenerClass = (Class<GagoyleParentOnLoaded>) addOnParentLoadedListenerClass;
+							LOGGER.debug(String.format("added plugin listener ::  class info : %s ", zipWrapper.addOnParentLoadedListener));
 						}
+					} catch (Exception e) {
+						LOGGER.error(ValueUtil.toString(e));
+					}
+				}
 
-						if (ValueUtil.isNotEmpty(zipWrapper.addOnParentLoadedListener)) {
-							/* 리스너 클래스 등록 과정에서 성공여부 중요치않음. */
-							try {
-								Class<?> addOnParentLoadedListenerClass = DynamicClassLoader.loadFromJarFile(zipWrapper.location,
-										zipWrapper.addOnParentLoadedListener);
-								// JAVAFX Parent 노드 타입이어야 유효하다.
-								if (GagoyleParentOnLoaded.class.isAssignableFrom(addOnParentLoadedListenerClass)) {
-									zipWrapper.addOnParentLoadedListenerClass = (Class<GagoyleParentOnLoaded>) addOnParentLoadedListenerClass;
-									LOGGER.debug(String.format("added plugin listener ::  class info : %s ",
-											zipWrapper.addOnParentLoadedListener));
-								}
-							} catch (Exception e) {
-								LOGGER.error(ValueUtil.toString(e));
-							}
-						}
-
-						if (ValueUtil.isNotEmpty(zipWrapper.setOnParentBeforeLoadedListener)) {
-							/* 리스너 클래스 등록 과정에서 성공여부 중요치않음. */
-							try {
-								Class<?> setOnParentBeforeLoadedListenerClass = DynamicClassLoader.loadFromJarFile(zipWrapper.location,
-										zipWrapper.setOnParentBeforeLoadedListener);
-								// JAVAFX Parent 노드 타입이어야 유효하다.
-								if(setOnParentBeforeLoadedListenerClass !=null)
-								{
-									if (GagoyleParentBeforeLoad.class.isAssignableFrom(setOnParentBeforeLoadedListenerClass)) {
-										zipWrapper.setOnParentBeforeLoadedListenerClass = (Class<GagoyleParentBeforeLoad>) setOnParentBeforeLoadedListenerClass;
-										LOGGER.debug(String.format("added plugin listener ::  class info : %s ",
-												zipWrapper.setOnParentBeforeLoadedListener));
-									}	
-								}
-								
-							} catch (Exception e) {
-								LOGGER.error(ValueUtil.toString(e));
+				if (ValueUtil.isNotEmpty(zipWrapper.setOnParentBeforeLoadedListener)) {
+					/* 리스너 클래스 등록 과정에서 성공여부 중요치않음. */
+					try {
+						Class<?> setOnParentBeforeLoadedListenerClass = DynamicClassLoader.loadFromJarFile(zipWrapper.location,
+								zipWrapper.setOnParentBeforeLoadedListener);
+						// JAVAFX Parent 노드 타입이어야 유효하다.
+						if (setOnParentBeforeLoadedListenerClass != null) {
+							if (GagoyleParentBeforeLoad.class.isAssignableFrom(setOnParentBeforeLoadedListenerClass)) {
+								zipWrapper.setOnParentBeforeLoadedListenerClass = (Class<GagoyleParentBeforeLoad>) setOnParentBeforeLoadedListenerClass;
+								LOGGER.debug(String.format("added plugin listener ::  class info : %s ",
+										zipWrapper.setOnParentBeforeLoadedListener));
 							}
 						}
 
 					} catch (Exception e) {
 						LOGGER.error(ValueUtil.toString(e));
-						return false;
 					}
+				}
 
-					return true;
+			} catch (Exception e) {
+				LOGGER.error(ValueUtil.toString(e));
+				return false;
+			}
 
-				}).collect(Collectors.toList());
+			return true;
+
+		}).collect(Collectors.toList());
 	}
 
 }
