@@ -108,8 +108,8 @@
 			</exclusions>
 		</dependency>
 
-		<!-- SLF4J가 지원하는 로깅을 대신 구현해주는 이름들입니다. 결과적으로 자신이 고칠수 없는 소스를 그대로 두고 SLF4J를
-			사용하는것처럼 바꿀수 있는 방법입니다. 쉽게 말해 각각 로깅 구현체를 SLF4J가 package이름으로 구현을 해놓은 것입니다. 참고로
+		<!-- SLF4J가 지원하는 로깅을 대신 구현해주는 이름들입니다. 결과적으로 자신이 고칠수 없는 소스를 그대로 두고 SLF4J를 
+			사용하는것처럼 바꿀수 있는 방법입니다. 쉽게 말해 각각 로깅 구현체를 SLF4J가 package이름으로 구현을 해놓은 것입니다. 참고로 
 			jcl은 jarkarta commons logging의 약자이고, jul은 java util logging의 약자입니다. -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -234,7 +234,7 @@
 		</dependency>
 
 		<!-- sqlite -->
-		<!-- 버젼을 하향함. 3.8.11.2 최신버젼에서 getPrimaryKey() 함수에 버그가 존재함. 해당버그는 pk리스팅을
+		<!-- 버젼을 하향함. 3.8.11.2 최신버젼에서 getPrimaryKey() 함수에 버그가 존재함. 해당버그는 pk리스팅을 
 			잘못가져옴. 사람들이 가장 많이 쓰는 버젼으로 교체. -->
 		<dependency>
 			<groupId>org.xerial</groupId>
@@ -513,7 +513,7 @@
 			</exclusions>
 		</dependency>
 
-		<!-- org.bouncycastle.jce.provider.BouncyCastleProvider pdf박스에서 에러발생되는
+		<!-- org.bouncycastle.jce.provider.BouncyCastleProvider pdf박스에서 에러발생되는 
 			부분을 해결해보기위해 추가함. 클래스 NotFoundException 발생. -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -737,6 +737,17 @@
 			<groupId>org.apache.ant</groupId>
 			<artifactId>ant</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.axet</groupId>
+			<artifactId>vget</artifactId>
+			<version>1.1.34</version>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>commons-codec</groupId> -->
+		<!-- <artifactId>commons-codec</artifactId> -->
+		<!-- <version>1.10</version> -->
+		<!-- </dependency> -->
 
 
 	</dependencies>

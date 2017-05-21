@@ -96,7 +96,8 @@
 		</path>
 		<echo> ant-javafx.jar :::  ${java.home}\..\lib\ant-javafx.jar</echo>
 		<echo> java home :::  ${java.home}</echo>
-		<echoproperties></echoproperties>
+		<echoproperties>
+		</echoproperties>
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpathref="fxant" />
 	</target>
 
@@ -582,7 +583,7 @@
 		</copy>
 
 		<copy todir="externalLibs">
-			<fileset dir="${m2.dir}\kyj\Fx\dao\wizard\kyj.Fx.dao.wizard\0.0.3-SNAPSHOT">
+			<fileset dir="${m2.dir}\kyj\Fx\dao\wizard\kyj.Fx.dao.wizard\0.0.4-SNAPSHOT">
 				<filename name="kyj.Fx.dao.wizard-0.0.4-SNAPSHOT.jar" />
 			</fileset>
 		</copy>
@@ -720,6 +721,18 @@
 			</fileset>
 		</copy>
 		<!--[end] mime4j-->
+
+		<copy todir="externalLibs">
+			<fileset dir="${m2.dir}\com\github\axet\vget\1.1.34">
+				<filename name="vget-1.1.34.jar" />
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="${m2.dir}\com\github\axet\wget\1.2.21">
+				<filename name="wget-1.2.21.jar" />
+			</fileset>
+		</copy>
+
 		<copy todir="pmdLibs">
 			<fileset dir="${basedir}\..\..\pmd.core\lib">
 			</fileset>
@@ -874,7 +887,7 @@
 				<include name="sqlite-jdbc-3.7.2.jar" />
 				<include name="javaparser-core-2.4.0.jar" />
 
-				<include name="kyj.Fx.dao.wizard-0.0.3-SNAPSHOT.jar" />
+				<include name="kyj.Fx.dao.wizard-0.0.4-SNAPSHOT.jar" />
 				<include name="kyj.FxVoEditor-0.0.1-SNAPSHOT.jar" />
 				<include name="pmd.core-0.0.1-SNAPSHOT.jar" />
 
@@ -904,6 +917,9 @@
 				<include name="org.apache.poi.xwpf.converter.pdf-1.0.6.jar" />
 				<include name="org.apache.poi.xwpf.converter.core-1.0.6.jar" />
 				<include name="fr.opensagres.xdocreport.itext.extension-1.0.6.jar" />
+				<include name="vget-1.1.34.jar" />
+				<include name="wget-1.2.21.jar" />
+				
 
 			</fileset>
 		</copy>
