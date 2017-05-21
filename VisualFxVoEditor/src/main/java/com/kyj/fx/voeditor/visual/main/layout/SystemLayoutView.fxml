@@ -217,6 +217,12 @@
 
 									</items>
 								</Menu>
+								<Menu mnemonicParsing="false" text="Media">
+									<items>
+										<MenuItem mnemonicParsing="false" onAction="#lblUtubeDownloaderOnAction" text="Utube Downloader">
+										</MenuItem>
+									</items>
+								</Menu>
                         <MenuItem fx:id="miLogView" mnemonicParsing="false" onAction="#miLogViewOnAction" text="Log Viewer" />
 
 						<MenuItem fx:id="miJavaTaskMgr" mnemonicParsing="false" onAction="#miJavaTaskMgrOnAction" text="Java Task Mgr. Viewer" />

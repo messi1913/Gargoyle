@@ -281,7 +281,11 @@ public class DialogUtil {
 		installDefaultPath(chooser);
 		if (option != null)
 			option.accept(chooser);
-		return chooser.showDialog(ownerWindow);
+		
+		File showDialog = chooser.showDialog(ownerWindow);
+		
+		applyLastPath(showDialog);
+		return showDialog;
 	}
 
 	public static File showDirectoryDialog(final Window ownerWindow) {

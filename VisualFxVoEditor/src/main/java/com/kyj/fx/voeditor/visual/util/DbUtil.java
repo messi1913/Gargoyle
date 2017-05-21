@@ -39,7 +39,6 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.RowMapperResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -249,6 +248,10 @@ public class DbUtil extends ConnectionManager {
 		return arrayList;
 	}
 
+	public static <T> List<T> select(Connection con, String sql, Class<T> clazz) throws Exception {
+		return select(con, sql, 10, createBeanRowMapper(clazz));
+	}
+	
 	public static <T> List<T> select(final Connection con, final String sql, int fetchCount, RowMapper<T> mapper) throws Exception {
 		List<T> resultList = Collections.emptyList();
 
@@ -1202,9 +1205,11 @@ public class DbUtil extends ConnectionManager {
 	 * @param clazz
 	 * @return
 	 */
-	public static <T> BeanPropertyRowMapper<T> createBeanRowMapper(Class<T> clazz){
+	public static <T> RowMapper<T> createBeanRowMapper(Class<T> clazz){
 		return ParameterizedBeanPropertyRowMapper.newInstance(clazz);
 	}
+
+
 	
 	// TODO 구현가능한부분인지 확인.
 	// public void cancel(Connection activeConnection) {

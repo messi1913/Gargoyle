@@ -319,8 +319,7 @@ public class FileUtil implements GargoyleExtensionFilters {
 	}
 
 	/**
-	 * 파일 하위에 .project라는 파일이 존재하며 그 .project파일에 기술된 내용이 실제 디렉토리와 일치한다면 자바
-	 * project파일이다.
+	 * 파일 하위에 .project라는 파일이 존재하며 그 .project파일에 기술된 내용이 실제 디렉토리와 일치한다면 자바 project파일이다.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 3. 16.
@@ -418,8 +417,7 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 *
 	 * 디렉토리 삭제.
 	 *
-	 * 일반 delete 함수로는 디렉토리안에 파일들이 존재하는 삭제하는 허용되지않음. 그래서 하위파일들을 먼저 삭제하고 디렉토리삭제를
-	 * 처리해야함. 이 함수는 그런 디렉토리 삭제를 지원해주기 위한 함수.
+	 * 일반 delete 함수로는 디렉토리안에 파일들이 존재하는 삭제하는 허용되지않음. 그래서 하위파일들을 먼저 삭제하고 디렉토리삭제를 처리해야함. 이 함수는 그런 디렉토리 삭제를 지원해주기 위한 함수.
 	 *
 	 * @param path
 	 ********************************/
@@ -550,6 +548,7 @@ public class FileUtil implements GargoyleExtensionFilters {
 
 	/**
 	 * str 내용을 file로 write처리함.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 27.
 	 * @param file
@@ -751,8 +750,9 @@ public class FileUtil implements GargoyleExtensionFilters {
 
 	/**
 	 * 디렉토리 생성
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 4. 11. 
+	 * @작성일 : 2017. 4. 11.
 	 * @param file
 	 * @throws IOException
 	 */
@@ -774,9 +774,11 @@ public class FileUtil implements GargoyleExtensionFilters {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 4. 24. 
-	 * @param is  source
-	 * @param file dst. file
+	 * @작성일 : 2017. 4. 24.
+	 * @param is
+	 *            source
+	 * @param file
+	 *            dst. file
 	 * @throws IOException
 	 */
 	public static void copy(InputStream is, File file) throws IOException {
@@ -786,6 +788,19 @@ public class FileUtil implements GargoyleExtensionFilters {
 			while ((tmp = is.read()) != -1) {
 				writer.write(tmp);
 			}
+			writer.flush();
+		}
+
+	}
+
+	public static void copy2(InputStream is, File file) throws IOException {
+
+		try (FileOutputStream out = new FileOutputStream(file)) {
+			int tmp = -1;
+			while ((tmp = is.read()) != -1) {
+				out.write(tmp);
+			}
+			out.flush();
 		}
 
 	}

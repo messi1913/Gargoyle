@@ -839,8 +839,7 @@ public class FxUtil {
 	 ********************************/
 	public static void snapShot(Node target, File saveFile, Consumer<Exception> errorCallback) {
 
-		try {
-			FileOutputStream out = new FileOutputStream(saveFile);
+		try (FileOutputStream out = new FileOutputStream(saveFile)){
 			snapShot(target, out, errorCallback);
 		} catch (IOException e) {
 			errorCallback.accept(e);

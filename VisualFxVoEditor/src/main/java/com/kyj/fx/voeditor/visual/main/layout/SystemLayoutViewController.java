@@ -52,6 +52,7 @@ import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.LogViewComposite;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
+import com.kyj.fx.voeditor.visual.component.utube.UtubeDownloaderComposite;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentOnLoaded;
@@ -1910,6 +1911,12 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	public void lblNaverRschOnAction() {
 		loadNewSystemTab(NrchRealtimeSrchFlowComposite.TITLE, new NrchRealtimeSrchFlowComposite());
+	}
+	
+	@FXML
+	public void lblUtubeDownloaderOnAction(){
+		
+		loadNewSystemTab(UtubeDownloaderComposite.TITLE, new UtubeDownloaderComposite());
 	}
 
 	/*

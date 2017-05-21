@@ -213,9 +213,12 @@ public class RequestUtil {
 
 			String contentType = conn.getContentType();
 
-			String charset = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset")).findFirst().map(v -> {
-				return v.substring(v.indexOf("=") + 1);
-			}).get();
+			Optional<String> map = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset")).findFirst()
+					.map(v -> {
+						return v.substring(v.indexOf("=") + 1);
+					});
+
+			String charset = map.isPresent() ? map.get() : "UTF-8";
 
 			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), conn.getContentEncoding(), url.toString());
 
@@ -229,8 +232,10 @@ public class RequestUtil {
 				if (is != null)
 					is.close();
 
-				if (conn != null)
+				if (conn != null) {
 					conn.disconnect();
+				}
+
 			}
 
 		}

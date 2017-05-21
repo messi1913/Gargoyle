@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
@@ -266,18 +267,22 @@ abstract class ConnectionManager {
 	 * @throws Exception
 	 * @User KYJ
 	 */
-	public static void close(Connection con) throws Exception {
+	public static void close(Connection con) {
 		if (con != null) {
-			if (!con.isClosed()) {
-				try {
-					con.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-					con.close();
+			try {
+				if (!con.isClosed()) {
+					try {
+						con.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+						con.close();
 
-					LOGGER.error(e.getMessage());
+						LOGGER.error(e.getMessage());
+					}
+					con = null;
 				}
-				con = null;
+			} catch (SQLException e) {
+				//e.printStackTrace();
 			}
 		}
 	}
