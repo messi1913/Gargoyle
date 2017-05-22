@@ -200,6 +200,7 @@ public final class NetworkUtil {
 	 * @return
 	 */
 	public static final boolean isUseProxy() {
-		return "Y".equals(ConfigResourceLoader.getInstance().get(ConfigResourceLoader.USE_PROXY_YN));
+		return "Y".equals(ResourceLoader.getInstance().get(ConfigResourceLoader.USE_PROXY_YN));
+//		return "Y".equals(ConfigResourceLoader.getInstance().get(ConfigResourceLoader.USE_PROXY_YN));
 	}
 }
