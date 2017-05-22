@@ -282,7 +282,7 @@ abstract class ConnectionManager {
 					con = null;
 				}
 			} catch (SQLException e) {
-				//e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 	}

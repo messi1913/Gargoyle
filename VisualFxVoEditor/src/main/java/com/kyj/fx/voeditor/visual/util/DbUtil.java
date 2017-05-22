@@ -221,7 +221,7 @@ public class DbUtil extends ConnectionManager {
 
 			/* 쿼리 타임아웃 시간 설정 SEC */
 			// int queryTimeout = getQueryTimeout();
-			
+
 			prepareStatement = prestatementConvert.apply(con, sql); // con.prepareStatement(sql);
 			// postgre-sql can't
 			// prepareStatement.setQueryTimeout(queryTimeout);
@@ -248,10 +248,11 @@ public class DbUtil extends ConnectionManager {
 		return arrayList;
 	}
 
-	public static <T> List<T> select(Connection con, String sql, Class<T> clazz) throws Exception {
-		return select(con, sql, 10, createBeanRowMapper(clazz));
+	public static <T> List<T> select(final Connection con, String sql, final Class<T> bean) throws Exception {
+		RowMapper<T> createBeanRowMapper = createBeanRowMapper(bean);
+		return select(con, sql, 30, createBeanRowMapper);
 	}
-	
+
 	public static <T> List<T> select(final Connection con, final String sql, int fetchCount, RowMapper<T> mapper) throws Exception {
 		List<T> resultList = Collections.emptyList();
 
@@ -786,7 +787,7 @@ public class DbUtil extends ConnectionManager {
 			8.TYPE_NAME String => type name (may be null) </br>
 			9.SELF_REFERENCING_COL_NAME String => name of the designated "identifier" column of a typed table (may be null) </br>
 			10.REF_GENERATION String => specifies how values in SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER", "DERIVED". (may be null) </br>
-
+	
 	 * @param converter
 	 * @return
 	 * @throws Exception
@@ -1205,12 +1206,10 @@ public class DbUtil extends ConnectionManager {
 	 * @param clazz
 	 * @return
 	 */
-	public static <T> RowMapper<T> createBeanRowMapper(Class<T> clazz){
+	public static <T> RowMapper<T> createBeanRowMapper(Class<T> clazz) {
 		return ParameterizedBeanPropertyRowMapper.newInstance(clazz);
 	}
 
-
-	
 	// TODO 구현가능한부분인지 확인.
 	// public void cancel(Connection activeConnection) {
 	// try {
