@@ -307,13 +307,16 @@ public class UtubeDownloaderComposite extends BorderPane {
 				break;
 			case ERROR:
 				System.out.println(videoinfo.getState() + " " + videoinfo.getDelay());
-
+				
+				
 				if (dinfoList != null) {
 					for (DownloadInfo dinfo : dinfoList) {
 						System.out
 								.println("file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getException() + " delay:" + dinfo.getDelay());
 					}
 				}
+				
+				LOGGER.error(ValueUtil.toString(videoinfo.getException()));
 				break;
 			case RETRYING:
 				System.out.println(videoinfo.getState() + " " + videoinfo.getDelay());
