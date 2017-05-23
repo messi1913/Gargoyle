@@ -48,6 +48,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
@@ -72,7 +73,9 @@ public class UtubeDownloaderComposite extends BorderPane {
 	// @FXML
 	// private JFXListView<UtubeItemDVO> lvDownlaodCont;
 	@FXML
-	private JFXTextField txtDownloadLocation, txtUtubeURL, txtFileName;
+	private JFXTextField txtDownloadLocation, txtUtubeURL;
+	@FXML
+	private Label txtFileName;
 	@FXML
 	private JFXButton btnDownload, btnOpen;
 	@FXML
@@ -208,7 +211,7 @@ public class UtubeDownloaderComposite extends BorderPane {
 							// // or download url link before start download. or just skip it.
 							v.extract(user, stop, notify);
 							//
-							System.out.println("Title: " + videoinfo.getTitle());
+							LOGGER.debug("Title: " + videoinfo.getTitle());
 							List<VideoFileInfo> list = videoinfo.getInfo();
 							if (list != null) {
 								VideoFileInfo d = list.get(0);
@@ -219,13 +222,15 @@ public class UtubeDownloaderComposite extends BorderPane {
 								// d.targetFile = new File("/Downloads/CustomName.mp3");
 								// to set file name manually.
 
-								System.out.println("Download URL: " + d.getSource() + "\nfilename : " + d.getContentFilename());
+								LOGGER.debug("Download URL: " + d.getSource() + "\nfilename : " + d.getContentFilename());
 								// }
-								downloadedFile.set(null);
 
 							}
 							//
 							// v.download(user, stop, notify);
+
+							downloadedFile.set(null);
+							getBar().setProgress(0.0d);
 
 							wasDownloading.set(true);
 
@@ -289,7 +294,7 @@ public class UtubeDownloaderComposite extends BorderPane {
 			// you can extract information from DownloadInfo info;
 			switch (videoinfo.getState()) {
 			case EXTRACTING:
-				getBar().setProgress(0.0d);
+
 				//				break;
 			case EXTRACTING_DONE: {
 				//				break;
@@ -297,51 +302,43 @@ public class UtubeDownloaderComposite extends BorderPane {
 			case DONE: {
 				if (videoinfo instanceof YouTubeInfo) {
 					YouTubeInfo i = (YouTubeInfo) videoinfo;
-					System.out.println(videoinfo.getState() + " " + i.getVideoQuality());
+					LOGGER.debug(videoinfo.getState() + " " + i.getVideoQuality());
 					//					contName = i.getInfo().get(0).getContentFilename();
 				} else if (videoinfo instanceof VimeoInfo) {
 					VimeoInfo i = (VimeoInfo) videoinfo;
-					System.out.println(videoinfo.getState() + " " + i.getVideoQuality());
+					LOGGER.debug(videoinfo.getState() + " " + i.getVideoQuality());
 					//					contName = i.getInfo().get(0).getContentFilename();
 				} else {
-					System.out.println("downloading unknown quality");
+					LOGGER.debug("downloading unknown quality");
 				}
 
 				VideoFileInfo d = videoinfo.getInfo().get(0);
 				// for (VideoFileInfo d : videoinfo.getInfo()) {
 				SpeedInfo speedInfo = getSpeedInfo(d);
 				speedInfo.end(d.getCount());
-				System.out.println(
+				LOGGER.debug(
 						String.format("file:%d - %s (%s)", dinfoList.indexOf(d), d.targetFile, formatSpeed(speedInfo.getAverageSpeed())));
 
 				if (com.github.axet.vget.info.VideoInfo.States.DONE == videoinfo.getState()) {
-					String contentFilename = d.getContentFilename();
 
-					if (ValueUtil.isEmpty(contentFilename)) {
-						File target = d.getTarget();
-//						if (videoinfo instanceof YouTubeInfo) {https://www.youtube.com/watch?v=Q6eEibsZ6LA
-//							YouTubeInfo i = (YouTubeInfo) videoinfo;
-//							contentFilename = i.getInfo().get(0).getContentFilename();
-//							//					contName = i.getInfo().get(0).getContentFilename();
-//						} else if (videoinfo instanceof VimeoInfo) {
-//							VimeoInfo i = (VimeoInfo) videoinfo;
-//							contentFilename = i.getInfo().get(0).getContentFilename();
-//						}
-//						System.out.println("s");
-						downloadedFile.set(target);
-					}
+					Platform.runLater(() -> {
+						String contentFilename = d.getContentFilename();
 
-					//					if (ValueUtil.isNotEmpty(contentFilename))
+						if (ValueUtil.isEmpty(contentFilename)) {
+							File target = d.getTarget();
+							downloadedFile.set(target);
+						}
 
-					wasDownloading.set(false);
-					getBar().setProgress(1.0d);
+						wasDownloading.set(false);
+						getBar().setProgress(1.0d);
+					});
 				}
 
 			}
 
 				break;
 			case ERROR:
-				System.out.println(videoinfo.getState() + " " + videoinfo.getDelay());
+				LOGGER.debug(videoinfo.getState() + " " + videoinfo.getDelay());
 
 				if (dinfoList != null) {
 					for (DownloadInfo dinfo : dinfoList) {
@@ -353,12 +350,12 @@ public class UtubeDownloaderComposite extends BorderPane {
 				LOGGER.error(ValueUtil.toString(videoinfo.getException()));
 				break;
 			case RETRYING:
-				System.out.println(videoinfo.getState() + " " + videoinfo.getDelay());
+				LOGGER.debug(videoinfo.getState() + " " + videoinfo.getDelay());
 
 				if (dinfoList != null) {
 					for (DownloadInfo dinfo : dinfoList) {
-						System.out.println("file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getState() + " " + dinfo.getException()
-								+ " delay:" + dinfo.getDelay());
+						LOGGER.debug("file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getState() + " " + dinfo.getException() + " delay:"
+								+ dinfo.getDelay());
 					}
 				}
 				LOGGER.error(ValueUtil.toString(videoinfo.getException()));
@@ -393,16 +390,17 @@ public class UtubeDownloaderComposite extends BorderPane {
 					//					txtFileName.setText(dinfo.getTarget().getName());
 
 					//					if (com.github.axet.vget.info.VideoInfo.States.DONE == videoinfo.getState()) {
-					String contentFilename = dinfo.getContentFilename();
-					if (ValueUtil.isNotEmpty(contentFilename))
-						downloadedFile.set(new File(txtDownloadLocation.getText(), contentFilename));
+					//					String contentFilename = dinfo.getContentFilename();
+
+					//					if (ValueUtil.isNotEmpty(contentFilename))
+					//					downloadedFile.set(dinfo.targetFile);
 					//						getBar().setProgress(1.0d);
 					//						wasDownloading.set(false);
 					//					}
 
-					// Platform.runLater(() -> {
-					getBar().setProgress(progress);
-					// });
+					Platform.runLater(() -> {
+						getBar().setProgress(progress);
+					});
 
 					// }
 				}

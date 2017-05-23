@@ -35,8 +35,8 @@
                   <Label text="파일명" GridPane.rowIndex="2" />
                   <HBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2">
                      <children>
-                        <JFXTextField fx:id="txtFileName" HBox.hgrow="ALWAYS" />
-                        <JFXButton fx:id="btnOpen" onAction="#btnOpenOnAction" text="Open" disable="true"/>
+                        <Label fx:id="txtFileName" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                        <JFXButton fx:id="btnOpen" disable="true" onAction="#btnOpenOnAction" text="Open" />
                      </children>
                   </HBox>
                </children>
