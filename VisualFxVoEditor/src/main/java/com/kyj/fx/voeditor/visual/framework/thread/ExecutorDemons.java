@@ -69,4 +69,14 @@ public class ExecutorDemons {
 	public static ExecutorService newFixedThreadExecutor(String name, int count) {
 		return Executors.newFixedThreadPool(count, new GargoyleThreadFactory(name));
 	}
+
+	private static ExecutorService gargoyleSystemExecutorService;
+
+	static {
+		gargoyleSystemExecutorService = newFixedThreadExecutor(1);
+	}
+
+	public static ExecutorService getGargoyleSystemExecutorSerivce() {
+		return gargoyleSystemExecutorService;
+	}
 }

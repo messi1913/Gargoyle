@@ -34,6 +34,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
@@ -215,35 +216,35 @@ public class UtubeDownloaderComposite extends BorderPane {
 							List<VideoFileInfo> list = videoinfo.getInfo();
 							if (list != null) {
 								VideoFileInfo d = list.get(0);
-								// for (VideoFileInfo d : list) {
-								// [OPTIONAL] setTarget file for each download source video/audio
-								// use d.getContentType() to determine which or use
-								// v.targetFile(dinfo, ext, conflict) to set name dynamically or
-								// d.targetFile = new File("/Downloads/CustomName.mp3");
-								// to set file name manually.
-
 								LOGGER.debug("Download URL: " + d.getSource() + "\nfilename : " + d.getContentFilename());
-								// }
-
 							}
-							//
-							// v.download(user, stop, notify);
 
-							downloadedFile.set(null);
-							getBar().setProgress(0.0d);
+							Platform.runLater(() -> {
+								downloadedFile.set(null);
+								getBar().setProgress(0.0d);
 
-							wasDownloading.set(true);
+								wasDownloading.set(true);
+							});
 
 							doDownload(v, user, notify, stop);
 
 						} catch (DownloadInterruptedError e) {
-							wasDownloading.set(false);
+							LOGGER.error(ValueUtil.toString(e));
+							Platform.runLater(() -> {
+								wasDownloading.set(false);
+							});
 							throw e;
 						} catch (RuntimeException e) {
-							wasDownloading.set(false);
+							LOGGER.error(ValueUtil.toString(e));
+							Platform.runLater(() -> {
+								wasDownloading.set(false);
+							});
 							throw e;
 						} catch (Exception e) {
-							wasDownloading.set(false);
+							LOGGER.error(ValueUtil.toString(e));
+							Platform.runLater(() -> {
+								wasDownloading.set(false);
+							});
 							throw new RuntimeException(e);
 						}
 
@@ -254,6 +255,7 @@ public class UtubeDownloaderComposite extends BorderPane {
 
 		};
 
+		service.setExecutor(ExecutorDemons.getGargoyleSystemExecutorSerivce());
 		service.start();
 
 	}
@@ -288,40 +290,40 @@ public class UtubeDownloaderComposite extends BorderPane {
 
 		@Override
 		public void run() {
-			List<VideoFileInfo> dinfoList = videoinfo.getInfo();
+			Platform.runLater(() -> {
+				List<VideoFileInfo> dinfoList = videoinfo.getInfo();
 
-			// notify app or save download state
-			// you can extract information from DownloadInfo info;
-			switch (videoinfo.getState()) {
-			case EXTRACTING:
+				// notify app or save download state
+				// you can extract information from DownloadInfo info;
+				switch (videoinfo.getState()) {
+				case EXTRACTING:
 
-				//				break;
-			case EXTRACTING_DONE: {
-				//				break;
-			}
-			case DONE: {
-				if (videoinfo instanceof YouTubeInfo) {
-					YouTubeInfo i = (YouTubeInfo) videoinfo;
-					LOGGER.debug(videoinfo.getState() + " " + i.getVideoQuality());
-					//					contName = i.getInfo().get(0).getContentFilename();
-				} else if (videoinfo instanceof VimeoInfo) {
-					VimeoInfo i = (VimeoInfo) videoinfo;
-					LOGGER.debug(videoinfo.getState() + " " + i.getVideoQuality());
-					//					contName = i.getInfo().get(0).getContentFilename();
-				} else {
-					LOGGER.debug("downloading unknown quality");
+					//				break;
+				case EXTRACTING_DONE: {
+					//				break;
 				}
+				case DONE: {
+					if (videoinfo instanceof YouTubeInfo) {
+						YouTubeInfo i = (YouTubeInfo) videoinfo;
+						LOGGER.debug(videoinfo.getState() + " " + i.getVideoQuality());
+						//					contName = i.getInfo().get(0).getContentFilename();
+					} else if (videoinfo instanceof VimeoInfo) {
+						VimeoInfo i = (VimeoInfo) videoinfo;
+						LOGGER.debug(videoinfo.getState() + " " + i.getVideoQuality());
+						//					contName = i.getInfo().get(0).getContentFilename();
+					} else {
+						LOGGER.debug("downloading unknown quality");
+					}
 
-				VideoFileInfo d = videoinfo.getInfo().get(0);
-				// for (VideoFileInfo d : videoinfo.getInfo()) {
-				SpeedInfo speedInfo = getSpeedInfo(d);
-				speedInfo.end(d.getCount());
-				LOGGER.debug(
-						String.format("file:%d - %s (%s)", dinfoList.indexOf(d), d.targetFile, formatSpeed(speedInfo.getAverageSpeed())));
+					VideoFileInfo d = videoinfo.getInfo().get(0);
+					// for (VideoFileInfo d : videoinfo.getInfo()) {
+					SpeedInfo speedInfo = getSpeedInfo(d);
+					speedInfo.end(d.getCount());
+					LOGGER.debug(String.format("file:%d - %s (%s)", dinfoList.indexOf(d), d.targetFile,
+							formatSpeed(speedInfo.getAverageSpeed())));
 
-				if (com.github.axet.vget.info.VideoInfo.States.DONE == videoinfo.getState()) {
+					if (com.github.axet.vget.info.VideoInfo.States.DONE == videoinfo.getState()) {
 
-					Platform.runLater(() -> {
 						String contentFilename = d.getContentFilename();
 
 						if (ValueUtil.isEmpty(contentFilename)) {
@@ -331,84 +333,73 @@ public class UtubeDownloaderComposite extends BorderPane {
 
 						wasDownloading.set(false);
 						getBar().setProgress(1.0d);
-					});
-				}
 
-			}
-
-				break;
-			case ERROR:
-				LOGGER.debug(videoinfo.getState() + " " + videoinfo.getDelay());
-
-				if (dinfoList != null) {
-					for (DownloadInfo dinfo : dinfoList) {
-						System.out
-								.println("file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getException() + " delay:" + dinfo.getDelay());
 					}
+
 				}
 
-				LOGGER.error(ValueUtil.toString(videoinfo.getException()));
-				break;
-			case RETRYING:
-				LOGGER.debug(videoinfo.getState() + " " + videoinfo.getDelay());
+					break;
+				case ERROR:
+					LOGGER.debug(videoinfo.getState() + " " + videoinfo.getDelay());
 
-				if (dinfoList != null) {
-					for (DownloadInfo dinfo : dinfoList) {
-						LOGGER.debug("file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getState() + " " + dinfo.getException() + " delay:"
-								+ dinfo.getDelay());
-					}
-				}
-				LOGGER.error(ValueUtil.toString(videoinfo.getException()));
-				break;
-			case DOWNLOADING:
-				long now = System.currentTimeMillis();
-				if (now - 1000 > last) {
-					last = now;
-
-					String parts = "";
-
-					VideoFileInfo dinfo = dinfoList.get(0);
-					// for (VideoFileInfo dinfo : dinfoList) {
-
-					SpeedInfo speedInfo = getSpeedInfo(dinfo);
-					speedInfo.step(dinfo.getCount());
-
-					List<Part> pp = dinfo.getParts();
-					if (pp != null) {
-						// multipart download
-						for (Part p : pp) {
-							if (p.getState().equals(States.DOWNLOADING)) {
-								parts += String.format("part#%d(%.2f) ", p.getNumber(), p.getCount() / (float) p.getLength());
-							}
+					if (dinfoList != null) {
+						for (DownloadInfo dinfo : dinfoList) {
+							System.out.println(
+									"file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getException() + " delay:" + dinfo.getDelay());
 						}
 					}
-					float progress = dinfo.getCount() / (float) dinfo.getLength();
-					String format = String.format("file:%d - %s %.2f %s (%s)", dinfoList.indexOf(dinfo), videoinfo.getState(), progress,
-							parts, formatSpeed(speedInfo.getCurrentSpeed()));
-					LOGGER.debug(format);
+					wasDownloading.set(false);
 
-					//					txtFileName.setText(dinfo.getTarget().getName());
+					LOGGER.error(ValueUtil.toString(videoinfo.getException()));
+					break;
+				case RETRYING:
+					LOGGER.debug(videoinfo.getState() + " " + videoinfo.getDelay());
 
-					//					if (com.github.axet.vget.info.VideoInfo.States.DONE == videoinfo.getState()) {
-					//					String contentFilename = dinfo.getContentFilename();
+					if (dinfoList != null) {
+						for (DownloadInfo dinfo : dinfoList) {
+							LOGGER.debug("file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getState() + " " + dinfo.getException()
+									+ " delay:" + dinfo.getDelay());
+						}
+					}
+					LOGGER.error(ValueUtil.toString(videoinfo.getException()));
+					break;
+				case DOWNLOADING:
+					long now = System.currentTimeMillis();
+					if (now - 1000 > last) {
+						last = now;
 
-					//					if (ValueUtil.isNotEmpty(contentFilename))
-					//					downloadedFile.set(dinfo.targetFile);
-					//						getBar().setProgress(1.0d);
-					//						wasDownloading.set(false);
-					//					}
+						String parts = "";
 
-					Platform.runLater(() -> {
+						VideoFileInfo dinfo = dinfoList.get(0);
+						// for (VideoFileInfo dinfo : dinfoList) {
+
+						SpeedInfo speedInfo = getSpeedInfo(dinfo);
+						speedInfo.step(dinfo.getCount());
+
+						List<Part> pp = dinfo.getParts();
+						if (pp != null) {
+							// multipart download
+							for (Part p : pp) {
+								if (p.getState().equals(States.DOWNLOADING)) {
+									parts += String.format("part#%d(%.2f) ", p.getNumber(), p.getCount() / (float) p.getLength());
+								}
+							}
+						}
+						float progress = dinfo.getCount() / (float) dinfo.getLength();
+						String format = String.format("file:%d - %s %.2f %s (%s)", dinfoList.indexOf(dinfo), videoinfo.getState(), progress,
+								parts, formatSpeed(speedInfo.getCurrentSpeed()));
+						LOGGER.debug(format);
+
 						getBar().setProgress(progress);
-					});
-
-					// }
+					}
+					break;
+				default:
+					break;
 				}
-				break;
-			default:
-				break;
-			}
+			});
+
 		}
+
 	}
 
 	public String formatSpeed(long s) {
