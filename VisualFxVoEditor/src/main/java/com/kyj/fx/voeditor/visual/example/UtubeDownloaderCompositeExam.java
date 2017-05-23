@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.example;
 
 import com.kyj.fx.voeditor.visual.component.utube.UtubeDownloaderComposite;
+import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
 import com.kyj.fx.voeditor.visual.main.initalize.SSLInitializable;
 
 import javafx.application.Application;
@@ -33,6 +34,7 @@ public class UtubeDownloaderCompositeExam extends Application {
 
 	public static void main(String[] args) throws Exception {
 		new SSLInitializable().initialize();
+		new ProxyInitializable().initialize();
 		launch(args);
 	}
 

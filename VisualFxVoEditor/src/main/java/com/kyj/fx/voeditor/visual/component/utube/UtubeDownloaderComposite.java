@@ -35,12 +35,15 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -71,11 +74,14 @@ public class UtubeDownloaderComposite extends BorderPane {
 	@FXML
 	private JFXTextField txtDownloadLocation, txtUtubeURL, txtFileName;
 	@FXML
-	private JFXButton btnDownload;
+	private JFXButton btnDownload, btnOpen;
 	@FXML
 	private ProgressBar pb;
 	@FXML
 	private JFXComboBox<YoutubeQuality> cbQuality;
+
+	@FXML
+	private ObjectProperty<File> downloadedFile = new SimpleObjectProperty<>();
 
 	public UtubeDownloaderComposite() {
 
@@ -147,6 +153,14 @@ public class UtubeDownloaderComposite extends BorderPane {
 				this.btnDownload.setDisable(n.booleanValue());
 		});
 
+		this.downloadedFile.addListener((oba, o, n) -> {
+			if (n != null && n.exists()) {
+				btnOpen.setDisable(false);
+				this.txtFileName.setText(n.getName());
+			} else {
+				btnOpen.setDisable(true);
+			}
+		});
 	}
 
 	private BooleanProperty wasDownloading = new SimpleBooleanProperty();
@@ -207,7 +221,7 @@ public class UtubeDownloaderComposite extends BorderPane {
 
 								System.out.println("Download URL: " + d.getSource() + "\nfilename : " + d.getContentFilename());
 								// }
-								txtFileName.setText(d.getContentFilename());
+								downloadedFile.set(null);
 
 							}
 							//
@@ -275,16 +289,20 @@ public class UtubeDownloaderComposite extends BorderPane {
 			// you can extract information from DownloadInfo info;
 			switch (videoinfo.getState()) {
 			case EXTRACTING:
+				getBar().setProgress(0.0d);
+				//				break;
 			case EXTRACTING_DONE: {
-
+				//				break;
 			}
 			case DONE: {
 				if (videoinfo instanceof YouTubeInfo) {
 					YouTubeInfo i = (YouTubeInfo) videoinfo;
 					System.out.println(videoinfo.getState() + " " + i.getVideoQuality());
+					//					contName = i.getInfo().get(0).getContentFilename();
 				} else if (videoinfo instanceof VimeoInfo) {
 					VimeoInfo i = (VimeoInfo) videoinfo;
 					System.out.println(videoinfo.getState() + " " + i.getVideoQuality());
+					//					contName = i.getInfo().get(0).getContentFilename();
 				} else {
 					System.out.println("downloading unknown quality");
 				}
@@ -296,26 +314,42 @@ public class UtubeDownloaderComposite extends BorderPane {
 				System.out.println(
 						String.format("file:%d - %s (%s)", dinfoList.indexOf(d), d.targetFile, formatSpeed(speedInfo.getAverageSpeed())));
 
-				// }
+				if (com.github.axet.vget.info.VideoInfo.States.DONE == videoinfo.getState()) {
+					String contentFilename = d.getContentFilename();
 
-				// Platform.runLater(() -> {
-				getBar().setProgress(1.0d);
-				wasDownloading.set(false);
-				// });
+					if (ValueUtil.isEmpty(contentFilename)) {
+						File target = d.getTarget();
+//						if (videoinfo instanceof YouTubeInfo) {https://www.youtube.com/watch?v=Q6eEibsZ6LA
+//							YouTubeInfo i = (YouTubeInfo) videoinfo;
+//							contentFilename = i.getInfo().get(0).getContentFilename();
+//							//					contName = i.getInfo().get(0).getContentFilename();
+//						} else if (videoinfo instanceof VimeoInfo) {
+//							VimeoInfo i = (VimeoInfo) videoinfo;
+//							contentFilename = i.getInfo().get(0).getContentFilename();
+//						}
+//						System.out.println("s");
+						downloadedFile.set(target);
+					}
+
+					//					if (ValueUtil.isNotEmpty(contentFilename))
+
+					wasDownloading.set(false);
+					getBar().setProgress(1.0d);
+				}
+
 			}
 
 				break;
 			case ERROR:
 				System.out.println(videoinfo.getState() + " " + videoinfo.getDelay());
-				
-				
+
 				if (dinfoList != null) {
 					for (DownloadInfo dinfo : dinfoList) {
 						System.out
 								.println("file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getException() + " delay:" + dinfo.getDelay());
 					}
 				}
-				
+
 				LOGGER.error(ValueUtil.toString(videoinfo.getException()));
 				break;
 			case RETRYING:
@@ -327,6 +361,7 @@ public class UtubeDownloaderComposite extends BorderPane {
 								+ " delay:" + dinfo.getDelay());
 					}
 				}
+				LOGGER.error(ValueUtil.toString(videoinfo.getException()));
 				break;
 			case DOWNLOADING:
 				long now = System.currentTimeMillis();
@@ -353,9 +388,17 @@ public class UtubeDownloaderComposite extends BorderPane {
 					float progress = dinfo.getCount() / (float) dinfo.getLength();
 					String format = String.format("file:%d - %s %.2f %s (%s)", dinfoList.indexOf(dinfo), videoinfo.getState(), progress,
 							parts, formatSpeed(speedInfo.getCurrentSpeed()));
-					System.out.println(format);
+					LOGGER.debug(format);
 
-					txtFileName.setText(dinfo.getTarget().getName());
+					//					txtFileName.setText(dinfo.getTarget().getName());
+
+					//					if (com.github.axet.vget.info.VideoInfo.States.DONE == videoinfo.getState()) {
+					String contentFilename = dinfo.getContentFilename();
+					if (ValueUtil.isNotEmpty(contentFilename))
+						downloadedFile.set(new File(txtDownloadLocation.getText(), contentFilename));
+					//						getBar().setProgress(1.0d);
+					//						wasDownloading.set(false);
+					//					}
 
 					// Platform.runLater(() -> {
 					getBar().setProgress(progress);
@@ -393,6 +436,15 @@ public class UtubeDownloaderComposite extends BorderPane {
 		File showDirectoryDialog = DialogUtil.showDirectoryDialog(FxUtil.getWindow(this));
 		if (showDirectoryDialog != null) {
 			this.txtDownloadLocation.setText(showDirectoryDialog.getAbsolutePath());
+		}
+	}
+
+	@FXML
+	public void btnOpenOnAction() {
+
+		File file = downloadedFile.get();
+		if (file != null && file.exists()) {
+			FileUtil.openFile(file);
 		}
 	}
 

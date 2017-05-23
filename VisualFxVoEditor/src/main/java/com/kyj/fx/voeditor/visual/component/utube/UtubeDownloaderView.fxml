@@ -33,7 +33,12 @@
                   <Label text="퀄리티" GridPane.rowIndex="1" />
                   <JFXComboBox fx:id="cbQuality" prefHeight="23.0" prefWidth="172.0" style="-fx-padding: 0 0 0 7;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Label text="파일명" GridPane.rowIndex="2" />
-                  <JFXTextField fx:id="txtFileName" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
+                  <HBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2">
+                     <children>
+                        <JFXTextField fx:id="txtFileName" HBox.hgrow="ALWAYS" />
+                        <JFXButton fx:id="btnOpen" onAction="#btnOpenOnAction" text="Open" disable="true"/>
+                     </children>
+                  </HBox>
                </children>
             </GridPane>
          </children>
