@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -475,12 +476,10 @@ public class DynamicClassLoader {
 	}
 
 	public static Class<?> loadFromJarFile(File jarFile, String classForName, String jarInClasspath) throws Exception {
-		
 
-		URLClassLoader loader = createLoader(jarFile,jarInClasspath);//URLClassLoader.newInstance(urls, DynamicClassLoader.class.getClassLoader());
+		URLClassLoader loader = createLoader(jarFile, jarInClasspath);//URLClassLoader.newInstance(urls, DynamicClassLoader.class.getClassLoader());
 		Class<?> forName = null;
-		
-		
+
 		try {
 
 			if (loader != null) {
@@ -488,11 +487,12 @@ public class DynamicClassLoader {
 				forName = loader.loadClass(classForName);
 				return forName;
 			}
-			
+
 			LOGGER.debug("class forName loaded");
 			forName = Class.forName(classForName, true, loader);
 		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(String.format("load fail. \ndetail :: \ntarget : %s target class : %s", jarFile.toString(), classForName), e));
+			LOGGER.error(ValueUtil.toString(
+					String.format("load fail. \ndetail :: \ntarget : %s target class : %s", jarFile.toString(), classForName), e));
 		}
 
 		return forName;
@@ -510,6 +510,7 @@ public class DynamicClassLoader {
 			File dir = new File(jarFile.getParentFile(), name.substring(0, indexOf));
 			dir.mkdirs();
 
+			ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
 			if (dir.exists()) {
 
 				ZipUtil.unzip(jarFile, dir);
@@ -526,10 +527,13 @@ public class DynamicClassLoader {
 
 					File file = new File(dir, res);
 					urls[i] = file.toURI().toURL();
-					LOGGER.debug("append url : {} " , urls[i].toExternalForm());
+					LOGGER.debug("append url : {} ", urls[i].toExternalForm());
+
+					final Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
+					method.setAccessible(true);
+					method.invoke(systemClassLoader, new Object[] {urls[i]  });
 				}
-				
-				
+
 			}
 
 		} else {
@@ -550,11 +554,10 @@ public class DynamicClassLoader {
 		// if (loader == null)
 
 		URLClassLoader loader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
-		
 
 		return loader;
 	}
-	
+
 	// static class RuntimeJarLoader {
 	//
 	// public static void loadJarIndDir(String dir) {
