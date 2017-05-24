@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
@@ -12,7 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root prefHeight="287.0" prefWidth="623.0" style="-fx-padding: 5;" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="413.0" prefWidth="623.0" style="-fx-padding: 5;" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <VBox style="-fx-padding: 3 0 0 0;" BorderPane.alignment="CENTER">
          <children>
@@ -26,6 +27,7 @@
                 <RowConstraints maxHeight="45.0" minHeight="45.0" prefHeight="45.0" vgrow="NEVER" />
                 <RowConstraints maxHeight="45.0" minHeight="45.0" prefHeight="45.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="45.0" minHeight="45.0" prefHeight="45.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="1.7976931348623157E308" vgrow="ALWAYS" />
               </rowConstraints>
                <children>
                   <Label text="유튜브 URL" />
@@ -36,9 +38,11 @@
                   <HBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2">
                      <children>
                         <Label fx:id="txtFileName" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                        <JFXButton fx:id="btnOpen" disable="true" onAction="#btnOpenOnAction" text="Open" />
+                        <JFXButton fx:id="btnOpen" disable="true" minWidth="80.0" onAction="#btnOpenOnAction" prefWidth="80.0" text="Open" />
                      </children>
                   </HBox>
+                  <JFXTextArea fx:id="lblStatusMsg" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />
+                  <Label text="상태메세지" GridPane.rowIndex="3" />
                </children>
             </GridPane>
          </children>
@@ -49,8 +53,8 @@
          <children>
             <Label text="Download Location" />
             <JFXTextField fx:id="txtDownloadLocation" HBox.hgrow="ALWAYS" />
-            <JFXButton fx:id="btnBrowse" onAction="#btnBrowseOnAction" text="Browse" />
-            <JFXButton fx:id="btnDownload" onAction="#btnDownloadOnAction" text="Download" />
+            <JFXButton fx:id="btnBrowse" minWidth="80.0" onAction="#btnBrowseOnAction" prefWidth="80.0" text="Browse" />
+            <JFXButton fx:id="btnDownload" minWidth="80.0" onAction="#btnDownloadOnAction" prefWidth="80.0" text="Download" />
          </children>
       </HBox>
    </top>

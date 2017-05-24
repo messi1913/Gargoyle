@@ -732,6 +732,11 @@
 				<filename name="wget-1.2.21.jar" />
 			</fileset>
 		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="${m2.dir}\com\github\axet\threads\0.0.13">
+				<filename name="threads-0.0.13.jar" />
+			</fileset>
+		</copy>
 
 		<copy todir="pmdLibs">
 			<fileset dir="${basedir}\..\..\pmd.core\lib">
@@ -919,6 +924,7 @@
 				<include name="fr.opensagres.xdocreport.itext.extension-1.0.6.jar" />
 				<include name="vget-1.1.34.jar" />
 				<include name="wget-1.2.21.jar" />
+				<include name="threads-0.0.13.jar" />
 				
 
 			</fileset>

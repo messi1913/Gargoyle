@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -32,12 +33,14 @@ import com.github.axet.wget.info.DownloadInfo.Part.States;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.RequestUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
@@ -83,8 +86,9 @@ public class UtubeDownloaderComposite extends BorderPane {
 	private ProgressBar pb;
 	@FXML
 	private JFXComboBox<YoutubeQuality> cbQuality;
-
 	@FXML
+	private JFXTextArea lblStatusMsg;
+
 	private ObjectProperty<File> downloadedFile = new SimpleObjectProperty<>();
 
 	public UtubeDownloaderComposite() {
@@ -171,92 +175,92 @@ public class UtubeDownloaderComposite extends BorderPane {
 
 	public void doDownload(String url, File path) {
 
-		Service<Void> service = new Service<Void>() {
+		ExecutorService gargoyleSystemExecutorSerivce = ExecutorDemons.getGargoyleSystemExecutorSerivce();
+
+		gargoyleSystemExecutorSerivce.execute(new Runnable() {
 
 			@Override
-			protected Task<Void> createTask() {
+			public void run() {
 
-				return new Task<Void>() {
-
-					@Override
-					protected Void call() throws Exception {
-
-						try {
-							final AtomicBoolean stop = new AtomicBoolean(false);
-							URL web = new URL(url);
-							//
-							// // [OPTIONAL] limit maximum quality, or do not call this function if
-							// // you wish maximum quality available.
-							// //
-							// // if youtube does not have video with requested quality, program
-							// // will raise en exception.
-							VGetParser user = null;
-							//
-							// // create proper html parser depends on url
-							user = VGet.parser(web);
-							//
-							// // download limited video quality from youtube
-							user = new YouTubeQParser(cbQuality.getValue());
-							//
-							// // download mp4 format only, fail if non exist
-							user = new YouTubeMPGParser();
-							//
-							// // create proper videoinfo to keep specific video information
-							VideoInfo videoinfo = user.info(web);
-							//
-							VGet v = new VGet(videoinfo, path);
-							//
-							VGetStatus notify = new VGetStatus(videoinfo);
-							//
-							// // [OPTIONAL] call v.extract() only if you d like to get video title
-							// // or download url link before start download. or just skip it.
-							v.extract(user, stop, notify);
-							//
-							LOGGER.debug("Title: " + videoinfo.getTitle());
-							List<VideoFileInfo> list = videoinfo.getInfo();
-							if (list != null) {
-								VideoFileInfo d = list.get(0);
-								LOGGER.debug("Download URL: " + d.getSource() + "\nfilename : " + d.getContentFilename());
-							}
-
-							Platform.runLater(() -> {
-								downloadedFile.set(null);
-								getBar().setProgress(0.0d);
-
-								wasDownloading.set(true);
-							});
-
-							doDownload(v, user, notify, stop);
-
-						} catch (DownloadInterruptedError e) {
-							LOGGER.error(ValueUtil.toString(e));
-							Platform.runLater(() -> {
-								wasDownloading.set(false);
-							});
-							throw e;
-						} catch (RuntimeException e) {
-							LOGGER.error(ValueUtil.toString(e));
-							Platform.runLater(() -> {
-								wasDownloading.set(false);
-							});
-							throw e;
-						} catch (Exception e) {
-							LOGGER.error(ValueUtil.toString(e));
-							Platform.runLater(() -> {
-								wasDownloading.set(false);
-							});
-							throw new RuntimeException(e);
+				try {
+					final AtomicBoolean stop = new AtomicBoolean(false);
+					URL web = new URL(url);
+					//
+					// // [OPTIONAL] limit maximum quality, or do not call this function if
+					// // you wish maximum quality available.
+					// //
+					// // if youtube does not have video with requested quality, program
+					// // will raise en exception.
+					VGetParser user = null;
+					//
+					// // create proper html parser depends on url
+					user = VGet.parser(web);
+					//
+					// // download limited video quality from youtube
+					user = new YouTubeQParser(cbQuality.getValue());
+					//
+					// // download mp4 format only, fail if non exist
+					user = new YouTubeMPGParser();
+					//
+					// // create proper videoinfo to keep specific video information
+					VideoInfo videoinfo = user.info(web);
+					//
+					VGet v = new VGet(videoinfo, path);
+					//
+					VGetStatus notify = new VGetStatus(videoinfo, stop);
+					//
+					// // [OPTIONAL] call v.extract() only if you d like to get video title
+					// // or download url link before start download. or just skip it.
+					v.extract(user, stop, notify);
+					//
+					LOGGER.debug("Title: " + videoinfo.getTitle());
+					Platform.runLater(() -> {
+						lblStatusMsg.appendText("Title: " + videoinfo.getTitle());
+						lblStatusMsg.appendText("\n");
+						List<VideoFileInfo> list = videoinfo.getInfo();
+						if (list != null) {
+							VideoFileInfo d = list.get(0);
+							lblStatusMsg.appendText("Download URL: " + d.getSource() + "\nfilename : " + d.getContentFilename());
+							lblStatusMsg.appendText("\n");
 						}
 
-						return null;
-					}
-				};
+						downloadedFile.set(null);
+						getBar().setProgress(0.0d);
+
+						wasDownloading.set(true);
+					});
+
+					doDownload(v, user, notify, stop);
+
+				} catch (DownloadInterruptedError e) {
+					LOGGER.error(ValueUtil.toString(e));
+					Platform.runLater(() -> {
+						wasDownloading.set(false);
+						lblStatusMsg.appendText(ValueUtil.toString(e));
+						lblStatusMsg.appendText("\n");
+					});
+					throw e;
+				} catch (RuntimeException e) {
+					LOGGER.error(ValueUtil.toString(e));
+
+					Platform.runLater(() -> {
+						wasDownloading.set(false);
+						lblStatusMsg.appendText(ValueUtil.toString(e));
+						lblStatusMsg.appendText("\n");
+					});
+					throw e;
+				} catch (Exception e) {
+					LOGGER.error(ValueUtil.toString(e));
+
+					Platform.runLater(() -> {
+						wasDownloading.set(false);
+						lblStatusMsg.appendText(ValueUtil.toString(e));
+						lblStatusMsg.appendText("\n");
+					});
+					throw new RuntimeException(e);
+				}
 			}
-
-		};
-
-		service.setExecutor(ExecutorDemons.getGargoyleSystemExecutorSerivce());
-		service.start();
+		});
 
 	}
 
@@ -271,11 +275,12 @@ public class UtubeDownloaderComposite extends BorderPane {
 	class VGetStatus implements Runnable {
 		VideoInfo videoinfo;
 		long last;
-
+		AtomicBoolean stop;
 		Map<VideoFileInfo, SpeedInfo> map = new HashMap<VideoFileInfo, SpeedInfo>();
 
-		public VGetStatus(VideoInfo i) {
+		public VGetStatus(VideoInfo i, AtomicBoolean stop) {
 			this.videoinfo = i;
+			this.stop = stop;
 		}
 
 		public SpeedInfo getSpeedInfo(VideoFileInfo dinfo) {
@@ -296,31 +301,54 @@ public class UtubeDownloaderComposite extends BorderPane {
 				// notify app or save download state
 				// you can extract information from DownloadInfo info;
 				switch (videoinfo.getState()) {
-				case EXTRACTING:
+				//				case EXTRACTING:
 
-					//				break;
-				case EXTRACTING_DONE: {
-					//				break;
-				}
+				//				break;
+				//				case EXTRACTING_DONE: {
+				//				break;
+				//				}
 				case DONE: {
 					if (videoinfo instanceof YouTubeInfo) {
 						YouTubeInfo i = (YouTubeInfo) videoinfo;
-						LOGGER.debug(videoinfo.getState() + " " + i.getVideoQuality());
+						lblStatusMsg.appendText(videoinfo.getState() + " " + i.getVideoQuality());
+						lblStatusMsg.appendText("\n");
+						//TODO 이미지 로드 작업
+//						String imageUrl = i.getImageUrl();
+//						if (ValueUtil.isNotEmpty(imageUrl)) {
+//							byte[] image = null;
+//							try {
+//								image = RequestUtil.requestSSL(new URL(imageUrl), (is, code) -> {
+//									byte[] buff = new byte[1024 * 1024 * 1024];
+//									try {
+//										is.read(buff);
+//									} catch (Exception e) {
+//									}
+//									return buff;
+//								});
+//							} catch (Exception e) {
+//								e.printStackTrace();
+//							}
+//							
+//						}
+
 						//					contName = i.getInfo().get(0).getContentFilename();
 					} else if (videoinfo instanceof VimeoInfo) {
 						VimeoInfo i = (VimeoInfo) videoinfo;
-						LOGGER.debug(videoinfo.getState() + " " + i.getVideoQuality());
+						lblStatusMsg.appendText(videoinfo.getState() + " " + i.getVideoQuality());
+						lblStatusMsg.appendText("\n");
 						//					contName = i.getInfo().get(0).getContentFilename();
 					} else {
-						LOGGER.debug("downloading unknown quality");
+						lblStatusMsg.appendText("downloading unknown quality");
+						lblStatusMsg.appendText("\n");
 					}
 
 					VideoFileInfo d = videoinfo.getInfo().get(0);
 					// for (VideoFileInfo d : videoinfo.getInfo()) {
 					SpeedInfo speedInfo = getSpeedInfo(d);
 					speedInfo.end(d.getCount());
-					LOGGER.debug(String.format("file:%d - %s (%s)", dinfoList.indexOf(d), d.targetFile,
+					lblStatusMsg.appendText(String.format("file:%d - %s (%s)", dinfoList.indexOf(d), d.targetFile,
 							formatSpeed(speedInfo.getAverageSpeed())));
+					lblStatusMsg.appendText("\n");
 
 					if (com.github.axet.vget.info.VideoInfo.States.DONE == videoinfo.getState()) {
 
@@ -340,12 +368,13 @@ public class UtubeDownloaderComposite extends BorderPane {
 
 					break;
 				case ERROR:
-					LOGGER.debug(videoinfo.getState() + " " + videoinfo.getDelay());
 
+					lblStatusMsg.appendText(videoinfo.getState() + " " + videoinfo.getDelay());
 					if (dinfoList != null) {
 						for (DownloadInfo dinfo : dinfoList) {
-							System.out.println(
+							lblStatusMsg.appendText(
 									"file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getException() + " delay:" + dinfo.getDelay());
+							lblStatusMsg.appendText("\n");
 						}
 					}
 					wasDownloading.set(false);
@@ -353,15 +382,21 @@ public class UtubeDownloaderComposite extends BorderPane {
 					LOGGER.error(ValueUtil.toString(videoinfo.getException()));
 					break;
 				case RETRYING:
-					LOGGER.debug(videoinfo.getState() + " " + videoinfo.getDelay());
-
+					lblStatusMsg.appendText(videoinfo.getState() + " " + videoinfo.getDelay());
+					lblStatusMsg.appendText("\n");
 					if (dinfoList != null) {
 						for (DownloadInfo dinfo : dinfoList) {
-							LOGGER.debug("file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getState() + " " + dinfo.getException()
-									+ " delay:" + dinfo.getDelay());
+							lblStatusMsg.appendText("file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getState() + " "
+									+ dinfo.getException() + " delay:" + dinfo.getDelay());
+							lblStatusMsg.appendText("\n");
 						}
 					}
-					LOGGER.error(ValueUtil.toString(videoinfo.getException()));
+
+					if (videoinfo.getDelay() == 0) {
+						LOGGER.error(ValueUtil.toString(videoinfo.getException()));
+						stop.set(true);
+					}
+
 					break;
 				case DOWNLOADING:
 					long now = System.currentTimeMillis();
@@ -388,7 +423,11 @@ public class UtubeDownloaderComposite extends BorderPane {
 						float progress = dinfo.getCount() / (float) dinfo.getLength();
 						String format = String.format("file:%d - %s %.2f %s (%s)", dinfoList.indexOf(dinfo), videoinfo.getState(), progress,
 								parts, formatSpeed(speedInfo.getCurrentSpeed()));
-						LOGGER.debug(format);
+
+						lblStatusMsg.appendText(format);
+						lblStatusMsg.appendText("\n");
+						lblStatusMsg.appendText("progress : " + progress);
+						lblStatusMsg.appendText("\n");
 
 						getBar().setProgress(progress);
 					}
