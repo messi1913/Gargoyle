@@ -38,7 +38,7 @@
                   <HBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2">
                      <children>
                         <Label fx:id="txtFileName" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                        <JFXButton fx:id="btnOpen" disable="true" minWidth="80.0" onAction="#btnOpenOnAction" prefWidth="80.0" text="Open" />
+                        <JFXButton fx:id="btnOpen" minWidth="80.0" onAction="#btnOpenOnAction" prefWidth="80.0" text="Open" />
                      </children>
                   </HBox>
                   <JFXTextArea fx:id="lblStatusMsg" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />

@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.utube;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -38,9 +39,7 @@ import com.jfoenix.controls.JFXTextField;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
-import com.kyj.fx.voeditor.visual.util.RequestUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
@@ -48,10 +47,9 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -60,6 +58,9 @@ import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -163,10 +164,10 @@ public class UtubeDownloaderComposite extends BorderPane {
 
 		this.downloadedFile.addListener((oba, o, n) -> {
 			if (n != null && n.exists()) {
-				btnOpen.setDisable(false);
+				//				btnOpen.setDisable(false);
 				this.txtFileName.setText(n.getName());
 			} else {
-				btnOpen.setDisable(true);
+				//				btnOpen.setDisable(true);
 			}
 		});
 	}
@@ -219,9 +220,10 @@ public class UtubeDownloaderComposite extends BorderPane {
 						lblStatusMsg.appendText("\n");
 						List<VideoFileInfo> list = videoinfo.getInfo();
 						if (list != null) {
-							VideoFileInfo d = list.get(0);
-							lblStatusMsg.appendText("Download URL: " + d.getSource() + "\nfilename : " + d.getContentFilename());
-							lblStatusMsg.appendText("\n");
+							for (VideoFileInfo d : list) {
+								lblStatusMsg.appendText("Download URL: " + d.getSource() + "\nfilename : " + d.getContentFilename());
+								lblStatusMsg.appendText("\n");
+							}
 						}
 
 						downloadedFile.set(null);
@@ -313,23 +315,23 @@ public class UtubeDownloaderComposite extends BorderPane {
 						lblStatusMsg.appendText(videoinfo.getState() + " " + i.getVideoQuality());
 						lblStatusMsg.appendText("\n");
 						//TODO 이미지 로드 작업
-//						String imageUrl = i.getImageUrl();
-//						if (ValueUtil.isNotEmpty(imageUrl)) {
-//							byte[] image = null;
-//							try {
-//								image = RequestUtil.requestSSL(new URL(imageUrl), (is, code) -> {
-//									byte[] buff = new byte[1024 * 1024 * 1024];
-//									try {
-//										is.read(buff);
-//									} catch (Exception e) {
-//									}
-//									return buff;
-//								});
-//							} catch (Exception e) {
-//								e.printStackTrace();
-//							}
-//							
-//						}
+						//						String imageUrl = i.getImageUrl();
+						//						if (ValueUtil.isNotEmpty(imageUrl)) {
+						//							byte[] image = null;
+						//							try {
+						//								image = RequestUtil.requestSSL(new URL(imageUrl), (is, code) -> {
+						//									byte[] buff = new byte[1024 * 1024 * 1024];
+						//									try {
+						//										is.read(buff);
+						//									} catch (Exception e) {
+						//									}
+						//									return buff;
+						//								});
+						//							} catch (Exception e) {
+						//								e.printStackTrace();
+						//							}
+						//							
+						//						}
 
 						//					contName = i.getInfo().get(0).getContentFilename();
 					} else if (videoinfo instanceof VimeoInfo) {
@@ -405,31 +407,33 @@ public class UtubeDownloaderComposite extends BorderPane {
 
 						String parts = "";
 
-						VideoFileInfo dinfo = dinfoList.get(0);
-						// for (VideoFileInfo dinfo : dinfoList) {
+						//						VideoFileInfo dinfo = dinfoList.get(0);
+						for (VideoFileInfo dinfo : dinfoList) {
 
-						SpeedInfo speedInfo = getSpeedInfo(dinfo);
-						speedInfo.step(dinfo.getCount());
+							SpeedInfo speedInfo = getSpeedInfo(dinfo);
+							speedInfo.step(dinfo.getCount());
 
-						List<Part> pp = dinfo.getParts();
-						if (pp != null) {
-							// multipart download
-							for (Part p : pp) {
-								if (p.getState().equals(States.DOWNLOADING)) {
-									parts += String.format("part#%d(%.2f) ", p.getNumber(), p.getCount() / (float) p.getLength());
+							List<Part> pp = dinfo.getParts();
+							if (pp != null) {
+								// multipart download
+								for (Part p : pp) {
+									if (p.getState().equals(States.DOWNLOADING)) {
+										parts += String.format("part#%d(%.2f) ", p.getNumber(), p.getCount() / (float) p.getLength());
+									}
 								}
 							}
+							float progress = dinfo.getCount() / (float) dinfo.getLength();
+							String format = String.format("file:%d - %s %.2f %s (%s)", dinfoList.indexOf(dinfo), videoinfo.getState(),
+									progress, parts, formatSpeed(speedInfo.getCurrentSpeed()));
+
+							lblStatusMsg.appendText(format);
+							lblStatusMsg.appendText("\n");
+							lblStatusMsg.appendText("progress : " + progress);
+							lblStatusMsg.appendText("\n");
+
+							getBar().setProgress(progress);
 						}
-						float progress = dinfo.getCount() / (float) dinfo.getLength();
-						String format = String.format("file:%d - %s %.2f %s (%s)", dinfoList.indexOf(dinfo), videoinfo.getState(), progress,
-								parts, formatSpeed(speedInfo.getCurrentSpeed()));
 
-						lblStatusMsg.appendText(format);
-						lblStatusMsg.appendText("\n");
-						lblStatusMsg.appendText("progress : " + progress);
-						lblStatusMsg.appendText("\n");
-
-						getBar().setProgress(progress);
 					}
 					break;
 				default:
@@ -470,9 +474,70 @@ public class UtubeDownloaderComposite extends BorderPane {
 	@FXML
 	public void btnOpenOnAction() {
 
-		File file = downloadedFile.get();
-		if (file != null && file.exists()) {
-			FileUtil.openFile(file);
+		//		if (file != null && file.exists()) {
+		//			FileUtil.openFile(file);
+		//		}
+
+		File showFileDialog = DialogUtil.showFileDialog(null, chooser -> {
+			File file = downloadedFile.get();
+			if (file != null) {
+				chooser.setInitialDirectory(file.getParentFile());
+				chooser.setInitialFileName(file.getName());
+			}
+
+		});
+
+		if (showFileDialog == null)
+			return;
+
+		try {
+			Media media = new Media(showFileDialog.toURI().toURL().toExternalForm());
+
+			MediaPlayer mediaPlayer = new MediaPlayer(media);
+			mediaPlayer.setAutoPlay(true);
+			mediaPlayer.setOnReady(() -> {
+				LOGGER.debug("ready");
+			});
+			mediaPlayer.setOnEndOfMedia(() -> {
+				mediaPlayer.dispose();
+			});
+
+			MediaView mediaView = new MediaView(mediaPlayer);
+			mediaView.setPreserveRatio(true);
+
+			mediaView.setOnMouseClicked(ev -> {
+				if (ev.getClickCount() == 1) {
+					if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+						mediaPlayer.pause();
+					}
+					else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+						mediaPlayer.play();
+					}
+				}
+			});
+
+			BorderPane borderPane = new BorderPane(mediaView);
+			borderPane.setPrefSize(1200d, 800d);
+			Scene scene = new Scene(borderPane, 1200d, 800d);
+
+			FxUtil.createStageAndShow(scene, stage -> {
+				stage.setOnCloseRequest(ev -> {
+					mediaPlayer.dispose();
+				});
+
+				stage.widthProperty().addListener((oba, o, n) -> {
+					mediaView.setFitWidth(n.doubleValue());
+				});
+
+				stage.heightProperty().addListener((oba, o, n) -> {
+					mediaView.setFitHeight(n.doubleValue());
+				});
+
+			});
+
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
