@@ -234,18 +234,22 @@ public class SimpleSQLResultView extends BorderPane {
 
 		LOGGER.debug("SHOW SimpleSQLResult View.....");
 		LOGGER.debug("call executeSQL function....");
-		executeSQL(this);
-		LOGGER.debug("end function");
-		Scene scene = new Scene(this, 1100, 700);
-		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-		stage.setScene(scene);
-		stage.setAlwaysOnTop(false);
-		// stage.initModality(Modality.APPLICATION_MODAL);
-		stage.initOwner(SharedMemory.getPrimaryStage());
-		stage.showAndWait();
+		try {
+			executeSQL(this);
+			LOGGER.debug("end function");
+			Scene scene = new Scene(this, 1100, 700);
+			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+			stage.setScene(scene);
+			stage.setAlwaysOnTop(false);
+			// stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(SharedMemory.getPrimaryStage());
+			stage.showAndWait();
 
-		// 재사용금지 1회성 뷰
-		close();
+			// 재사용금지 1회성 뷰
+			close();
+		} catch (Exception e) {
+			DialogUtil.showExceptionDailog(SharedMemory.getPrimaryStage(), e);
+		}
 	}
 
 	private void close() {
