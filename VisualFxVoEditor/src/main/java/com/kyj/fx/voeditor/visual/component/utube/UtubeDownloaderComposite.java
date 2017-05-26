@@ -31,13 +31,17 @@ import com.github.axet.wget.SpeedInfo;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.DownloadInfo.Part;
 import com.github.axet.wget.info.DownloadInfo.Part.States;
+import com.github.axet.wget.info.ProxyInfo;
+import com.github.axet.wget.info.ex.DownloadIOCodeError;
 import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -172,6 +176,17 @@ public class UtubeDownloaderComposite extends BorderPane {
 		});
 	}
 
+	@FxPostInitialize
+	public void postInit() {
+		String location = ResourceLoader.getInstance().get(ResourceLoader.UTUBE_LAST_DOUWNLOAD_LOCATION);
+		if (ValueUtil.isNotEmpty(location)) {
+			File file = new File(location);
+			if (file.exists()) {
+				txtDownloadLocation.setText(file.getAbsolutePath());
+			}
+		}
+	}
+
 	private BooleanProperty wasDownloading = new SimpleBooleanProperty();
 
 	public void doDownload(String url, File path) {
@@ -194,14 +209,16 @@ public class UtubeDownloaderComposite extends BorderPane {
 					// // will raise en exception.
 					VGetParser user = null;
 					//
+					
+					ProxyInfo proxyInfo = new ProxyInfo("168.219.61.252",8080);
 					// // create proper html parser depends on url
 					user = VGet.parser(web);
 					//
 					// // download limited video quality from youtube
-					user = new YouTubeQParser(cbQuality.getValue());
+//					user = new YouTubeQParser(cbQuality.getValue());
 					//
 					// // download mp4 format only, fail if non exist
-					user = new YouTubeMPGParser();
+//					user = new YouTubeMPGParser();
 					//
 					// // create proper videoinfo to keep specific video information
 					VideoInfo videoinfo = user.info(web);
@@ -234,14 +251,14 @@ public class UtubeDownloaderComposite extends BorderPane {
 
 					doDownload(v, user, notify, stop);
 
-				} catch (DownloadInterruptedError e) {
+				} 
+				catch (DownloadInterruptedError e) {
 					LOGGER.error(ValueUtil.toString(e));
 					Platform.runLater(() -> {
 						wasDownloading.set(false);
 						lblStatusMsg.appendText(ValueUtil.toString(e));
 						lblStatusMsg.appendText("\n");
 					});
-					throw e;
 				} catch (RuntimeException e) {
 					LOGGER.error(ValueUtil.toString(e));
 
@@ -250,7 +267,6 @@ public class UtubeDownloaderComposite extends BorderPane {
 						lblStatusMsg.appendText(ValueUtil.toString(e));
 						lblStatusMsg.appendText("\n");
 					});
-					throw e;
 				} catch (Exception e) {
 					LOGGER.error(ValueUtil.toString(e));
 
@@ -259,7 +275,6 @@ public class UtubeDownloaderComposite extends BorderPane {
 						lblStatusMsg.appendText(ValueUtil.toString(e));
 						lblStatusMsg.appendText("\n");
 					});
-					throw new RuntimeException(e);
 				}
 			}
 		});
@@ -374,6 +389,9 @@ public class UtubeDownloaderComposite extends BorderPane {
 					lblStatusMsg.appendText(videoinfo.getState() + " " + videoinfo.getDelay());
 					if (dinfoList != null) {
 						for (DownloadInfo dinfo : dinfoList) {
+							
+							LOGGER.debug(ValueUtil.toString(dinfo.getException()));
+							
 							lblStatusMsg.appendText(
 									"file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getException() + " delay:" + dinfo.getDelay());
 							lblStatusMsg.appendText("\n");
@@ -381,20 +399,25 @@ public class UtubeDownloaderComposite extends BorderPane {
 					}
 					wasDownloading.set(false);
 
-					LOGGER.error(ValueUtil.toString(videoinfo.getException()));
+//					LOGGER.error(ValueUtil.toString(videoinfo.getException()));
 					break;
 				case RETRYING:
 					lblStatusMsg.appendText(videoinfo.getState() + " " + videoinfo.getDelay());
 					lblStatusMsg.appendText("\n");
+					int errorCode = -1;
 					if (dinfoList != null) {
 						for (DownloadInfo dinfo : dinfoList) {
-							lblStatusMsg.appendText("file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getState() + " "
-									+ dinfo.getException() + " delay:" + dinfo.getDelay());
+							Throwable exception = dinfo.getException();
+							if (exception instanceof DownloadIOCodeError) {
+								errorCode = ((DownloadIOCodeError) exception).getCode();
+							}
+							lblStatusMsg.appendText("file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getState() + " " + exception
+									+ " delay:" + dinfo.getDelay());
 							lblStatusMsg.appendText("\n");
 						}
 					}
 
-					if (videoinfo.getDelay() == 0) {
+					if (videoinfo.getDelay() == 0 && (errorCode == 403)) {
 						LOGGER.error(ValueUtil.toString(videoinfo.getException()));
 						stop.set(true);
 					}
@@ -468,6 +491,7 @@ public class UtubeDownloaderComposite extends BorderPane {
 		File showDirectoryDialog = DialogUtil.showDirectoryDialog(FxUtil.getWindow(this));
 		if (showDirectoryDialog != null) {
 			this.txtDownloadLocation.setText(showDirectoryDialog.getAbsolutePath());
+			ResourceLoader.getInstance().put(ResourceLoader.UTUBE_LAST_DOUWNLOAD_LOCATION, showDirectoryDialog.getAbsolutePath());
 		}
 	}
 
@@ -509,8 +533,7 @@ public class UtubeDownloaderComposite extends BorderPane {
 				if (ev.getClickCount() == 1) {
 					if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
 						mediaPlayer.pause();
-					}
-					else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+					} else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
 						mediaPlayer.play();
 					}
 				}

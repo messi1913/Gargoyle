@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -18,6 +17,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -115,7 +115,7 @@ public class SAXPasrerUtil {
 	 * @author KYJ
 	 *
 	 */
-	public static class SAXHandler extends DefaultHandler {
+	public static class SAXHandler extends Handler<String> {
 		protected List<String> arrayList = new ArrayList<String>();
 
 		@Override
@@ -125,6 +125,17 @@ public class SAXPasrerUtil {
 		}
 
 		public List<String> getList() {
+			return arrayList;
+		}
+	}
+
+	public static abstract class Handler<T> extends DefaultHandler {
+		protected List<T> arrayList = new ArrayList<T>();
+
+		@Override
+		public abstract void startElement(String url, String arg1, String qName, Attributes arg3) throws SAXException;
+
+		public List<T> getList() {
 			return arrayList;
 		}
 	}
@@ -144,5 +155,12 @@ public class SAXPasrerUtil {
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		SAXParser sp = spf.newSAXParser();
 		sp.parse(is, defaultHandler);
+	}
+
+	public static <T> List<T> getAll(InputStream is, Handler<T> handler) throws Exception {
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		SAXParser sp = spf.newSAXParser();
+		sp.parse(is, handler);
+		return handler.getList();
 	}
 }

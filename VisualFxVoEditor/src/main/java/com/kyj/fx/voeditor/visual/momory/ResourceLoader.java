@@ -128,6 +128,13 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	 * @최초생성일 2017. 1. 12.
 	 */
 	public static final String LOGVIEW_ENCODING = "logview.encoding";
+	
+	
+	/**
+	 *  사용자가 마지막으로 설정했던 유튜브 다운로드 위치
+	 * @최초생성일 2017. 5. 26.
+	 */
+	public static final String UTUBE_LAST_DOUWNLOAD_LOCATION = "utube.last.download.location";
 
 	private String[] baseKeys = { BASE_KEY_JDBC_INFO, BASE_KEY_JDBC_DRIVER, BASE_KEY_JDBC_URL, BASE_KEY_JDBC_ID, BASE_KEY_JDBC_PASS,
 			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES };
