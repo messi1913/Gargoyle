@@ -6,17 +6,22 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
@@ -113,10 +118,13 @@ class FxTableViewUtil {
 	 * 작성일 : 2016. 5. 12. 작성자 : KYJ
 	 *
 	 * 테이블뷰 클립보드 기능.
-	 *
+	 * 
+	 * @Deprecated COPY 기능과 PASTE 기능을 분리.
+	 *   installCopyHandler 사용할것
 	 * @param table
 	 ********************************/
 	@SuppressWarnings("rawtypes")
+	@Deprecated
 	public static void installCopyPasteHandler(TableView<?> table) {
 
 		table.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
@@ -137,7 +145,6 @@ class FxTableViewUtil {
 				return;
 
 			ObservableList<TablePosition> selectedCells = table.getSelectionModel().getSelectedCells();
-
 			TablePosition tablePosition = selectedCells.get(0);
 			TableColumn tableColumn = tablePosition.getTableColumn();
 			int row = tablePosition.getRow();
@@ -170,6 +177,150 @@ class FxTableViewUtil {
 			}
 
 		});
+
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static void installCopyHandler(TableView<?> table) {
+
+		table.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+
+			if (e.isConsumed())
+				return;
+
+			int type = -1;
+			if (e.isControlDown() && e.getCode() == KeyCode.C) {
+				if (e.isShiftDown()) {
+					type = 2;
+				} else {
+					type = 1;
+				}
+			}
+
+			if (type == -1)
+				return;
+
+			TableViewSelectionModel<?> selectionModel = table.getSelectionModel();
+			SelectionMode selectionMode = selectionModel.getSelectionMode();
+			boolean cellSelectionEnabled = selectionModel.isCellSelectionEnabled();
+
+			//			switch (selectionMode) {
+			//			case SINGLE:
+			//
+			//				break;
+			//			case MULTIPLE:
+			//
+			//				break;
+			//			}
+
+			if (!cellSelectionEnabled) {
+				Object selectedItem = table.getSelectionModel().getSelectedItem();
+
+				ObservableList<?> columns = table.getColumns();
+				Optional<String> reduce = columns.stream().filter(ob -> ob instanceof TableColumn).map(obj -> (TableColumn) obj)
+						.map(tc -> tc.getCellData(selectedItem)).filter(v -> v != null).map(v -> v.toString())
+						.reduce((o1, o2) -> o1.toString().concat("\t").concat(o2.toString()));
+				reduce.ifPresent(str -> {
+					FxClipboardUtil.putString(str);
+					e.consume();
+				});
+
+			} else if (cellSelectionEnabled) {
+				ObservableList<TablePosition> selectedCells = selectionModel.getSelectedCells();
+				TablePosition tablePosition = selectedCells.get(0);
+				TableColumn tableColumn = tablePosition.getTableColumn();
+				int row = tablePosition.getRow();
+				int col = table.getColumns().indexOf(tableColumn);
+
+				switch (type) {
+				case 1:
+					StringBuilder sb = new StringBuilder();
+					for (TablePosition cell : selectedCells) {
+						// 행변경시
+						if (row != cell.getRow()) {
+							sb.append("\n");
+							row++;
+						}
+						// 열 변경시
+						else if (col != table.getColumns().indexOf(cell.getTableColumn())) {
+							sb.append("\t");
+						}
+						Object cellData = cell.getTableColumn().getCellData(cell.getRow());
+						sb.append(ValueUtil.decode(cellData, cellData, "").toString());
+					}
+					FxClipboardUtil.putString(sb.toString());
+					e.consume();
+					break;
+				case 2:
+					Object cellData = tableColumn.getCellData(row);
+					FxClipboardUtil.putString(ValueUtil.decode(cellData, cellData, "").toString());
+					e.consume();
+					break;
+				}
+			}
+
+		});
+
+	}
+
+	public static <K> void installPasteClipboard(TableView<K> tb, K instance, String targetField) {
+		try {
+			Class<K> class1 = (Class<K>) instance.getClass();
+			Field field = class1.getField(targetField);
+			installPasteClipboard(tb, class1, field);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static <K> void installPasteClipboard(TableView<K> tb, Class<K> clazz, Field targetField) {
+		tb.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+
+			if (e.isControlDown() && e.getCode() == KeyCode.V) {
+				Clipboard clip = Clipboard.getSystemClipboard();
+
+				ObservableList<TableColumn<K, ?>> columns = tb.getColumns();
+				if (columns.isEmpty())
+					return;
+
+				Object value = null;
+
+				if (clip.hasFiles()) {
+					value = clip.getFiles();
+				} else if (clip.hasHtml()) {
+					value = clip.getHtml();
+				} else if (clip.hasImage()) {
+					value = clip.getImage();
+				} else if (clip.hasRtf()) {
+					value = clip.getRtf();
+				} else if (clip.hasString()) {
+					value = clip.getString();
+				} else if (clip.hasUrl()) {
+					value = clip.getUrl();
+				}
+
+				if (value == null)
+					return;
+
+				try {
+
+					K newInstance = clazz.newInstance();
+					Field field = clazz.getField(targetField.getName());
+					if (field != null) {
+						if (!field.isAccessible())
+							field.setAccessible(true);
+						field.set(newInstance, value);
+					}
+					tb.getItems().add(newInstance);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			}
+		});
+
 	}
 
 	/**
@@ -184,12 +335,12 @@ class FxTableViewUtil {
 	public static Object getDisplayText(TableColumn<?, ?> tc, int row) {
 
 		Callback cellFactory = tc.getCellFactory();
-//		ObservableValue<?> cellObservableValue = tc.getCellObservableValue(row);
-		
+		//		ObservableValue<?> cellObservableValue = tc.getCellObservableValue(row);
+
 		if (cellFactory != null /*&& cellObservableValue != null*/) {
 
-//			Object value = cellObservableValue.getValue();
-			
+			//			Object value = cellObservableValue.getValue();
+
 			Object call = cellFactory.call(tc /*value*/);
 
 			if (call != null && call instanceof TableCell) {

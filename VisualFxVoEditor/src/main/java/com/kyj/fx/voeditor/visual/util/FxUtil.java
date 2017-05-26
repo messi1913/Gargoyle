@@ -1218,7 +1218,10 @@ public class FxUtil {
 	 * @param tb
 	 ********************************/
 	public static void installClipboardKeyEvent(TableView<?> tb) {
-		ClipboardKeyEventInstaller.install(tb);
+//		FxTableViewUtil.installCopyPasteHandler(tb);
+		FxTableViewUtil.installCopyHandler(tb);
+		//2017.05.26 사용안함.
+//		ClipboardKeyEventInstaller.install(tb);
 	}
 
 	/**

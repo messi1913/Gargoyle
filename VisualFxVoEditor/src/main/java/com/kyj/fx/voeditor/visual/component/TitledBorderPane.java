@@ -7,10 +7,10 @@
 package com.kyj.fx.voeditor.visual.component;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
 /**
@@ -28,6 +28,10 @@ public class TitledBorderPane extends BorderPane {
 	 */
 	private Pane paneColor = new Pane();
 	private Label lblTitle = new Label();
+	protected HBox titleContainer;
+
+	private String title;
+	private Node content;
 
 	/**
 	 * Construnct.
@@ -35,14 +39,26 @@ public class TitledBorderPane extends BorderPane {
 	 * @param content
 	 */
 	public TitledBorderPane(String title, Node content) {
+		this.title = title;
+		this.content = content;
+		init();
+	}
+
+	protected void init() {
 		this.setCenter(content);
-		lblTitle.setPrefWidth(Double.MAX_VALUE);
-		lblTitle.setMaxWidth(Double.MAX_VALUE);
+//		lblTitle.setPrefWidth(Double.MAX_VALUE);
+//		lblTitle.setMaxWidth(Double.MAX_VALUE);
 		lblTitle.setPadding(new Insets(3d));
 		paneColor.setPrefSize(10d, 10d);
 		lblTitle.setGraphic(paneColor);
-		this.setTop(lblTitle);
-		setTitle(title);
+		titleContainer = new HBox(lblTitle);
+//		titleContainer.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
+		this.setTop(titleContainer);
+		setTitle(this.title);
+	}
+
+	public HBox getTitleContainer() {
+		return titleContainer;
 	}
 
 	/**

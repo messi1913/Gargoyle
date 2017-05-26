@@ -18,6 +18,8 @@ import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import org.controlsfx.control.table.TableFilter;
 
+import com.kyj.fx.voeditor.visual.util.FxUtil;
+
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -34,6 +36,8 @@ public class FilterTableExample extends Application {
 
 		TableView<DataItem> tableView = new TableView<>();
 
+		FxUtil.installClipboardKeyEvent(tableView);
+		
 		tableView.setItems(FXCollections.observableArrayList());
 		IntStream.range(0, 20000).mapToObj(i -> new DataItem()).forEach(d -> tableView.getItems().add(d));
 

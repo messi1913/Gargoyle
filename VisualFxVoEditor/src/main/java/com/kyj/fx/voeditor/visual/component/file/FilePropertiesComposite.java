@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 import com.kyj.fx.voeditor.visual.component.chart.AttachedTextValuePieChart;
 import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -97,6 +98,7 @@ public class FilePropertiesComposite extends TabPane implements Function<File, L
 		tbFileProperties.getSelectionModel().setCellSelectionEnabled(true);
 		tbFileProperties.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+		FxUtil.installClipboardKeyEvent(tbFileProperties);
 		FxClipboardUtil.installCopyPasteHandler(tbFileProperties);
 	}
 

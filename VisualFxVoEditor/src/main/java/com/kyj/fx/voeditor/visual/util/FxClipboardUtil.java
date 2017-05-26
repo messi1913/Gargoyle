@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.scene.control.TableView;
-import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -130,7 +129,8 @@ public class FxClipboardUtil {
 	 * @param table
 	 ********************************/
 	public static void installCopyPasteHandler(TableView<?> table) {
-		FxTableViewUtil.installCopyPasteHandler(table);
+//		FxTableViewUtil.installCopyPasteHandler(table);
+		FxTableViewUtil.installCopyHandler(table);
 	}
 
 	/**
