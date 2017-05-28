@@ -121,13 +121,8 @@ public class RequestUtil {
 	public static String requestSSL(URL url) throws Exception {
 		return request(url, (is, code) -> {
 			if (code == 200) {
-				try {
-					return ValueUtil.toString(is);
-				} catch (IOException e) {
-					LOGGER.error(ValueUtil.toString(e));
-				}
-			} else
-				LOGGER.error("response code was not 200");
+				return ValueUtil.toString(is);
+			}
 			return null;
 		}, true);
 	}

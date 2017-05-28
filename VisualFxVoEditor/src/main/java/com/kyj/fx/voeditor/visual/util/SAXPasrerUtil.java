@@ -17,7 +17,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -127,6 +126,7 @@ public class SAXPasrerUtil {
 		public List<String> getList() {
 			return arrayList;
 		}
+
 	}
 
 	public static abstract class Handler<T> extends DefaultHandler {
@@ -138,6 +138,7 @@ public class SAXPasrerUtil {
 		public List<T> getList() {
 			return arrayList;
 		}
+
 	}
 
 	public static List<String> getAllQNames(InputStream is) throws Exception {

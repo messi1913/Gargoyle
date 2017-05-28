@@ -362,6 +362,8 @@ public class ArticleExtractorComposite extends BorderPane {
 					try {
 
 						String content = ValueUtil.toString(is, charset);
+						if (content == null)
+							return URLModel.empty();
 
 						Document parse = Jsoup.parse(content, "http");
 						Element head = parse.head();
@@ -369,8 +371,6 @@ public class ArticleExtractorComposite extends BorderPane {
 
 						urlModel = new URLModel(link, content);
 						urlModel.setTitle(title.text());
-					} catch (IOException e) {
-						return URLModel.empty();
 					} finally {
 						try {
 							is.close();

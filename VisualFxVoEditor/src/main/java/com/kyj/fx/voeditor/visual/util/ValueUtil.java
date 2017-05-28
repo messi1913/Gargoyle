@@ -311,7 +311,7 @@ public class ValueUtil {
 
 		String _sql = sql;
 		// 주석에 대해당하는 문자들을 제거
-		//		_sql = _sql.replaceAll(STRING_PATTERN, "");
+		// _sql = _sql.replaceAll(STRING_PATTERN, "");
 		_sql = _sql.replaceAll(COMMENT_PATTERN, "");
 		// String pattern = "\\$\\w+|:\\w+";
 		String pattern = "\\$\\w+";
@@ -675,17 +675,17 @@ public class ValueUtil {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 4. 5. 
+	 * @작성일 : 2017. 4. 5.
 	 * @param json
 	 * @return
 	 */
-	public static String toStringPrettyFormat(String json){
+	public static String toStringPrettyFormat(String json) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		JsonParser jp = new JsonParser();
 		JsonElement je = jp.parse(json);
 		return gson.toJson(je);
 	}
-	
+
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 4. 4.
@@ -823,19 +823,16 @@ public class ValueUtil {
 	/**
 	 * from springframework
 	 *
-	 * Tokenize the given String into a String array via a StringTokenizer.
-	 * Trims tokens and omits empty tokens.
+	 * Tokenize the given String into a String array via a StringTokenizer. Trims tokens and omits empty tokens.
 	 * <p>
-	 * The given delimiters string is supposed to consist of any number of
-	 * delimiter characters. Each of those characters can be used to separate
-	 * tokens. A delimiter is always a single character; for multi-character
-	 * delimiters, consider using {@code delimitedListToStringArray}
+	 * The given delimiters string is supposed to consist of any number of delimiter characters. Each of those characters can be used to
+	 * separate tokens. A delimiter is always a single character; for multi-character delimiters, consider using
+	 * {@code delimitedListToStringArray}
 	 *
 	 * @param str
 	 *            the String to tokenize
 	 * @param delimiters
-	 *            the delimiter characters, assembled as String (each of those
-	 *            characters is individually considered as delimiter).
+	 *            the delimiter characters, assembled as String (each of those characters is individually considered as delimiter).
 	 * @return an array of the tokens
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
@@ -851,24 +848,20 @@ public class ValueUtil {
 	 *
 	 * Tokenize the given String into a String array via a StringTokenizer.
 	 * <p>
-	 * The given delimiters string is supposed to consist of any number of
-	 * delimiter characters. Each of those characters can be used to separate
-	 * tokens. A delimiter is always a single character; for multi-character
-	 * delimiters, consider using {@code delimitedListToStringArray}
+	 * The given delimiters string is supposed to consist of any number of delimiter characters. Each of those characters can be used to
+	 * separate tokens. A delimiter is always a single character; for multi-character delimiters, consider using
+	 * {@code delimitedListToStringArray}
 	 *
 	 * @param str
 	 *            the String to tokenize
 	 * @param delimiters
-	 *            the delimiter characters, assembled as String (each of those
-	 *            characters is individually considered as delimiter)
+	 *            the delimiter characters, assembled as String (each of those characters is individually considered as delimiter)
 	 * @param trimTokens
 	 *            trim the tokens via String's {@code trim}
 	 * @param ignoreEmptyTokens
-	 *            omit empty tokens from the result array (only applies to
-	 *            tokens that are empty after trimming; StringTokenizer will not
+	 *            omit empty tokens from the result array (only applies to tokens that are empty after trimming; StringTokenizer will not
 	 *            consider subsequent delimiters as token in the first place).
-	 * @return an array of the tokens ({@code null} if the input String was
-	 *         {@code null})
+	 * @return an array of the tokens ({@code null} if the input String was {@code null})
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
 	 * @see #delimitedListToStringArray
@@ -895,13 +888,11 @@ public class ValueUtil {
 	/**
 	 * from springframework.
 	 *
-	 * Copy the given Collection into a String array. The Collection must
-	 * contain String elements only.
+	 * Copy the given Collection into a String array. The Collection must contain String elements only.
 	 *
 	 * @param collection
 	 *            the Collection to copy
-	 * @return the String array ({@code null} if the passed-in Collection was
-	 *         {@code null})
+	 * @return the String array ({@code null} if the passed-in Collection was {@code null})
 	 */
 	public static String[] toStringArray(Collection<String> collection) {
 		if (collection == null) {
@@ -1059,8 +1050,7 @@ public class ValueUtil {
 	 * 단 객체가 테이블명 규칙에 준해야한다.
 	 *
 	 *
-	 * ex) TbmUser ::: TBM_USER 테이블을 찾는다. TbpSx ::: Tbp_Sx 테이블을 찾는다. ex)
-	 * TbmMsMdDVO ::: TBM_MS_MD 테이블을 찾는다.
+	 * ex) TbmUser ::: TBM_USER 테이블을 찾는다. TbpSx ::: Tbp_Sx 테이블을 찾는다. ex) TbmMsMdDVO ::: TBM_MS_MD 테이블을 찾는다.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 3. 29.
@@ -1246,8 +1236,7 @@ public class ValueUtil {
 				if ("*".equals(t)) {
 
 					/*
-					 * 2016-10-13 NoSuchElementException 예외처리 by kyj. 주석에 해당하는
-					 * 내용은 대소문자 처리안함에 관련된 로직인데 예외에 걸림.
+					 * 2016-10-13 NoSuchElementException 예외처리 by kyj. 주석에 해당하는 내용은 대소문자 처리안함에 관련된 로직인데 예외에 걸림.
 					 */
 					try {
 						do {
@@ -1399,11 +1388,16 @@ public class ValueUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static String toString(InputStream inputStream, Charset charset) throws IOException {
-		return IOUtils.toString(inputStream, charset);
+	public static String toString(InputStream inputStream, Charset charset) {
+		try {
+			return IOUtils.toString(inputStream, charset);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-	public static String toString(InputStream inputStream) throws IOException {
+	public static String toString(InputStream inputStream) {
 		return toString(inputStream, Charset.forName("UTF-8"));
 	}
 
@@ -1806,7 +1800,7 @@ public class ValueUtil {
 
 				return str.replaceAll("^(\t|[ ]{1,3})", "");
 
-				//				return str;
+				// return str;
 			}).reduce((str1, str2) -> str1.concat("\n").concat(str2));
 			if (reduce.isPresent()) {
 				return reduce.get();
@@ -1817,6 +1811,7 @@ public class ValueUtil {
 
 	/**
 	 * TODO 메세지 처리 방안 기술.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 14.
 	 * @param messageId

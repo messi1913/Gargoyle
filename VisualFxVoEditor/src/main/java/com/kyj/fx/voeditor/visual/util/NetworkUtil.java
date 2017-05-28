@@ -16,6 +16,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.http.HttpHost;
+import org.springframework.util.DigestUtils;
 
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
@@ -203,4 +204,21 @@ public final class NetworkUtil {
 		return "Y".equals(ResourceLoader.getInstance().get(ConfigResourceLoader.USE_PROXY_YN));
 //		return "Y".equals(ConfigResourceLoader.getInstance().get(ConfigResourceLoader.USE_PROXY_YN));
 	}
+
+//	public static List<> getMac() {
+//		try {
+//			Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+//			while(networkInterfaces.hasMoreElements())
+//			{
+//				NetworkInterface nextElement = networkInterfaces.nextElement();
+//				byte[] hardwareAddress = nextElement.getHardwareAddress();
+//				String md5DigestAsHex = DigestUtils.md5DigestAsHex(hardwareAddress);
+//				System.out.println(md5DigestAsHex);
+//			}
+//		} catch (SocketException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//	}
 }
