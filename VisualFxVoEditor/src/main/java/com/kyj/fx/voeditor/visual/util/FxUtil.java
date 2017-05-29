@@ -1513,52 +1513,57 @@ public class FxUtil {
 	 *            메인화면이 되는 노드.
 	 */
 	public static void createDockStageAndShow(Window owner, DockNode dockNode, Point2D initLocation, boolean center) {
-		Parent p = (Parent) dockNode.getContents();
-		p.getStylesheets().add(SkinManager.getInstance().getSkin());
-		p.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
-		dockNode.setOwner(owner);
-		dockNode.setFloating(true, initLocation);
-		if (center)
-			dockNode.getStage().centerOnScreen();
-
-		if (p instanceof Closeable) {
-			Closeable closeable = (Closeable) p;
-			owner.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, ev -> {
-				try {
-					closeable.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			});
-		}
-
-	}
-
-	public static void createDockStageAndShow(CloseableParent<DockNode> node) {
-		createDockStageAndShow(null, node, null, true);
-	}
-
-	public static void createDockStageAndShow(Window owner, CloseableParent<DockNode> node) {
-		createDockStageAndShow(owner, node, null, true);
-	}
-
-	public static void createDockStageAndShow(Window owner, CloseableParent<DockNode> node, Point2D initLocation, boolean center) {
-
-		DockNode p = node.getParent();
-		createDockStageAndShow(owner, p, initLocation, center);
-
 		Platform.runLater(() -> {
-			Window window = p.getScene().getWindow();
-			window.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, ev -> {
-				try {
-					node.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			});
+
+			Parent p = (Parent) dockNode.getContents();
+			p.getStylesheets().add(SkinManager.getInstance().getSkin());
+			p.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
+			dockNode.setOwner(owner);
+			dockNode.setFloating(true, initLocation);
+			if (center)
+				dockNode.getStage().centerOnScreen();
+
 		});
 
 	}
+
+	//	public static void createDockStageAndShow(CloseableParent<DockNode> node) {
+	//		createDockStageAndShow(null, node, null, true);
+	//	}
+
+	//	public static void createDockStageAndShow(Window owner, CloseableParent<DockNode> node) {
+	//		createDockStageAndShow(owner, node, null, true);
+	//	}
+	//
+	//	public static void createDockStageAndShow(Window owner, CloseableParent<DockNode> node, Point2D initLocation, boolean center) {
+	//
+	//		//		DockNode p = node.getParent();
+	//		//		createDockStageAndShow(owner, p, initLocation, center);
+	//
+	//		DockNode dockNode = node.getParent();
+	//		Parent p = node.getParent();
+	//		p.getStylesheets().add(SkinManager.getInstance().getSkin());
+	//		p.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
+	//
+	//		dockNode.setOwner(owner);
+	//
+	//		dockNode.setFloating(true, initLocation);
+	//		if (center)
+	//			dockNode.getStage().centerOnScreen();
+	//
+	//		Platform.runLater(() -> {
+	//			//			Window window = p.getScene().getWindow();
+	//
+	//			owner.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, ev -> {
+	//				try {
+	//					node.close();
+	//				} catch (Exception e) {
+	//					e.printStackTrace();
+	//				}
+	//			});
+	//		});
+	//
+	//	}
 
 	/**
 	 * 로딩바가 뜨면서 액션 처리.
