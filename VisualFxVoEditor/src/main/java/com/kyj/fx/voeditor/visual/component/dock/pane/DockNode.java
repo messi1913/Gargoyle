@@ -20,6 +20,9 @@
 
 package com.kyj.fx.voeditor.visual.component.dock.pane;
 
+import java.io.Closeable;
+import java.util.function.Consumer;
+
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 
 import javafx.beans.property.BooleanProperty;
@@ -28,6 +31,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -44,6 +49,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 
 /**
  * Base class for a dock node that provides the layout of the content along with a title bar and a
@@ -291,6 +297,32 @@ public class DockNode extends VBox implements EventHandler<MouseEvent> {
 			if (null == stage.getOwner() && null != this.owner)
 				stage.initOwner(this.owner);
 
+			/* append close handler. 2017-05-29 by kyj.*/
+			stage.setOnCloseRequest(ev -> {
+				try {
+					ObservableList<Node> childrenUnmodifiable = null;
+					if (dockPane != null)
+						dockPane.getChildrenUnmodifiable();
+					else
+						childrenUnmodifiable = FXCollections.observableArrayList(getContents());
+
+					Consumer<Closeable> clo = n -> {
+						try {
+							n.close();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					};
+
+					childrenUnmodifiable.stream().filter(n -> n instanceof Closeable).map(n -> (Closeable) n).forEach(clo);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+			
+			
+			//			stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, );
+
 			// offset the new stage to cover exactly the area the dock was local to the scene
 			// this is useful for when the user presses the + sign and we have no information
 			// on where the mouse was clicked
@@ -334,7 +366,7 @@ public class DockNode extends VBox implements EventHandler<MouseEvent> {
 					stagePosition = stagePosition.add(translation);
 				}
 
-//				Insets insetsDelta = borderPane.getInsets();
+				//				Insets insetsDelta = borderPane.getInsets();
 				stage.setX(/*stagePosition.getX() - insetsDelta.getLeft()*/ translation.getX());
 				stage.setY(/*stagePosition.getY() - insetsDelta.getTop()*/translation.getY());
 			} else

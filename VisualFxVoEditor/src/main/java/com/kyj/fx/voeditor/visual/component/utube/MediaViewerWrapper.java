@@ -7,15 +7,13 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.utube;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
-import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.Media;
@@ -26,14 +24,15 @@ import javafx.scene.media.MediaView;
  * @author KYJ
  *
  */
-public class MediaViewerWrapper extends CloseableParent<DockNode> {
+public class MediaViewerWrapper extends BorderPane implements Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UtubeDownloaderComposite.class);
 
 	private MediaPlayer mediaPlayer;
+	private MediaView mediaView;
 
 	public MediaViewerWrapper(File f) {
-		super(new DockNode(new BorderPane()));
+
 		try {
 			init(f);
 		} catch (MalformedURLException e) {
@@ -57,7 +56,7 @@ public class MediaViewerWrapper extends CloseableParent<DockNode> {
 			}
 		});
 
-		MediaView mediaView = new MediaView(mediaPlayer);
+		mediaView = new MediaView(mediaPlayer);
 		mediaView.setPreserveRatio(true);
 
 		mediaView.setOnMouseClicked(ev -> {
@@ -71,29 +70,34 @@ public class MediaViewerWrapper extends CloseableParent<DockNode> {
 		});
 		//		mediaView.setFitHeight(value);
 		//		mediaView.setPrefSize(BorderPane.USE_COMPUTED_SIZE, BorderPane.USE_COMPUTED_SIZE);
-		getParent().setPrefSize(BorderPane.USE_COMPUTED_SIZE, BorderPane.USE_COMPUTED_SIZE);
-		BorderPane borderPane = (BorderPane) getParent().getContents();
-		borderPane.setCenter(mediaView);
 
-		getParent().widthProperty().addListener((oba, o, n) -> {
-			mediaView.setFitWidth(n.doubleValue());
-		});
+		//		this.getParent().widthProperty().addListener((oba, o, n) -> {
+		//			mediaView.setFitWidth(n.doubleValue());
+		//		});
+		//
+		//		this.getParent().heightProperty().addListener((oba, o, n) -> {
+		//			mediaView.setFitHeight(n.doubleValue());
+		//		});
 
-		getParent().heightProperty().addListener((oba, o, n) -> {
-			mediaView.setFitHeight(n.doubleValue());
-		});
-
+		setCenter(mediaView);
 	}
 
 	@Override
 	public void close() throws IOException {
-		if (mediaPlayer != null)
+		if (mediaPlayer != null) {
 			mediaPlayer.dispose();
+			LOGGER.debug("media disposed");
+		}
+
 	}
 
-	public void setPrefSize(double width, double height) {
-		BorderPane borderPane = (BorderPane) getParent().getContents();
-		borderPane.setPrefSize(width, height);
+	public void setFitWidth(double doubleValue) {
+		mediaView.setFitWidth(doubleValue);
+
+	}
+
+	public void setFitHeight(double doubleValue) {
+		mediaView.setFitHeight(doubleValue);
 	}
 
 }

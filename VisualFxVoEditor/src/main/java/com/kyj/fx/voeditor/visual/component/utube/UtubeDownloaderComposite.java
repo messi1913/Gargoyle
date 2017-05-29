@@ -35,6 +35,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
+import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
@@ -536,27 +537,18 @@ public class UtubeDownloaderComposite extends BorderPane {
 		//			Scene scene = new Scene(borderPane, 1200d, 800d);
 
 		MediaViewerWrapper wrapper = new MediaViewerWrapper(showFileDialog);
-//		Stage owner = new Stage();
+		Stage owner = new Stage();
 		wrapper.setPrefSize(1200d, 800d);
-		
-		FxUtil.createDockStageAndShow(wrapper);
-		//		GagoyleTabProxy.getInstance().loadNewSystemTab(showFileDialog.getName(), wrapper);
 
-		//			
-		//			FxUtil.createStageAndShow(scene, stage -> {
-		//				stage.setOnCloseRequest(ev -> {
-		//					mediaPlayer.dispose();
-		//				});
-		//
-		//				stage.widthProperty().addListener((oba, o, n) -> {
-		//					mediaView.setFitWidth(n.doubleValue());
-		//				});
-		//
-		//				stage.heightProperty().addListener((oba, o, n) -> {
-		//					mediaView.setFitHeight(n.doubleValue());
-		//				});
-		//
-		//			});
+		FxUtil.createDockStageAndShow(owner, new DockNode(wrapper, showFileDialog.getName()));
+
+		owner.widthProperty().addListener((oba, o, n) -> {
+			wrapper.setFitWidth(n.doubleValue());
+		});
+
+		owner.heightProperty().addListener((oba, o, n) -> {
+			wrapper.setFitHeight(n.doubleValue());
+		});
 
 	}
 
