@@ -1873,9 +1873,20 @@ public class FxUtil {
 		}
 
 		File saveAs = DialogUtil.showFileSaveCheckDialog(owner, model.getFileChooserOption());
-		if (saveAs != null && saveAs.exists()) {
-			FileUtil.writeFile(saveAs, model.getContent(), model.getEncoding(), model.onError());
+		if (saveAs == null)
+			return;
+
+		if (!saveAs.exists()) {
+			try {
+				saveAs.createNewFile();
+			} catch (IOException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
 		}
+
+		if(saveAs.exists())
+			FileUtil.writeFile(saveAs, model.getContent(), model.getEncoding(), model.onError());
+
 	}
 
 	/**
