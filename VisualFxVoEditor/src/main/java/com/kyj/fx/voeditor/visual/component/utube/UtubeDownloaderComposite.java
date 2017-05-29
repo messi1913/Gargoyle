@@ -7,7 +7,6 @@
 package com.kyj.fx.voeditor.visual.component.utube;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +24,6 @@ import com.github.axet.vget.info.VideoInfo;
 import com.github.axet.vget.vhs.VimeoInfo;
 import com.github.axet.vget.vhs.YouTubeInfo;
 import com.github.axet.vget.vhs.YouTubeInfo.YoutubeQuality;
-import com.github.axet.vget.vhs.YouTubeMPGParser;
-import com.github.axet.vget.vhs.YouTubeQParser;
 import com.github.axet.wget.SpeedInfo;
 import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.DownloadInfo.Part;
@@ -53,7 +50,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -62,9 +58,7 @@ import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -209,16 +203,16 @@ public class UtubeDownloaderComposite extends BorderPane {
 					// // will raise en exception.
 					VGetParser user = null;
 					//
-					
-					ProxyInfo proxyInfo = new ProxyInfo("168.219.61.252",8080);
+
+					ProxyInfo proxyInfo = new ProxyInfo("168.219.61.252", 8080);
 					// // create proper html parser depends on url
 					user = VGet.parser(web);
 					//
 					// // download limited video quality from youtube
-//					user = new YouTubeQParser(cbQuality.getValue());
+					//					user = new YouTubeQParser(cbQuality.getValue());
 					//
 					// // download mp4 format only, fail if non exist
-//					user = new YouTubeMPGParser();
+					//					user = new YouTubeMPGParser();
 					//
 					// // create proper videoinfo to keep specific video information
 					VideoInfo videoinfo = user.info(web);
@@ -251,8 +245,7 @@ public class UtubeDownloaderComposite extends BorderPane {
 
 					doDownload(v, user, notify, stop);
 
-				} 
-				catch (DownloadInterruptedError e) {
+				} catch (DownloadInterruptedError e) {
 					LOGGER.error(ValueUtil.toString(e));
 					Platform.runLater(() -> {
 						wasDownloading.set(false);
@@ -389,9 +382,9 @@ public class UtubeDownloaderComposite extends BorderPane {
 					lblStatusMsg.appendText(videoinfo.getState() + " " + videoinfo.getDelay());
 					if (dinfoList != null) {
 						for (DownloadInfo dinfo : dinfoList) {
-							
+
 							LOGGER.debug(ValueUtil.toString(dinfo.getException()));
-							
+
 							lblStatusMsg.appendText(
 									"file:" + dinfoList.indexOf(dinfo) + " - " + dinfo.getException() + " delay:" + dinfo.getDelay());
 							lblStatusMsg.appendText("\n");
@@ -399,7 +392,7 @@ public class UtubeDownloaderComposite extends BorderPane {
 					}
 					wasDownloading.set(false);
 
-//					LOGGER.error(ValueUtil.toString(videoinfo.getException()));
+					//					LOGGER.error(ValueUtil.toString(videoinfo.getException()));
 					break;
 				case RETRYING:
 					lblStatusMsg.appendText(videoinfo.getState() + " " + videoinfo.getDelay());
@@ -514,54 +507,57 @@ public class UtubeDownloaderComposite extends BorderPane {
 		if (showFileDialog == null)
 			return;
 
-		try {
-			Media media = new Media(showFileDialog.toURI().toURL().toExternalForm());
+		//			Media media = new Media(showFileDialog.toURI().toURL().toExternalForm());
+		//
+		//			MediaPlayer mediaPlayer = new MediaPlayer(media);
+		//			mediaPlayer.setAutoPlay(true);
+		//			mediaPlayer.setOnReady(() -> {
+		//				LOGGER.debug("ready");
+		//			});
+		//			mediaPlayer.setOnEndOfMedia(() -> {
+		//				mediaPlayer.dispose();
+		//			});
+		//
+		//			MediaView mediaView = new MediaView(mediaPlayer);
+		//			mediaView.setPreserveRatio(true);
+		//
+		//			mediaView.setOnMouseClicked(ev -> {
+		//				if (ev.getClickCount() == 1) {
+		//					if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+		//						mediaPlayer.pause();
+		//					} else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+		//						mediaPlayer.play();
+		//					}
+		//				}
+		//			});
+		//
+		//			BorderPane borderPane = new BorderPane(mediaView);
+		//			borderPane.setPrefSize(1200d, 800d);
+		//			Scene scene = new Scene(borderPane, 1200d, 800d);
 
-			MediaPlayer mediaPlayer = new MediaPlayer(media);
-			mediaPlayer.setAutoPlay(true);
-			mediaPlayer.setOnReady(() -> {
-				LOGGER.debug("ready");
-			});
-			mediaPlayer.setOnEndOfMedia(() -> {
-				mediaPlayer.dispose();
-			});
+		MediaViewerWrapper wrapper = new MediaViewerWrapper(showFileDialog);
+//		Stage owner = new Stage();
+		wrapper.setPrefSize(1200d, 800d);
+		
+		FxUtil.createDockStageAndShow(wrapper);
+		//		GagoyleTabProxy.getInstance().loadNewSystemTab(showFileDialog.getName(), wrapper);
 
-			MediaView mediaView = new MediaView(mediaPlayer);
-			mediaView.setPreserveRatio(true);
+		//			
+		//			FxUtil.createStageAndShow(scene, stage -> {
+		//				stage.setOnCloseRequest(ev -> {
+		//					mediaPlayer.dispose();
+		//				});
+		//
+		//				stage.widthProperty().addListener((oba, o, n) -> {
+		//					mediaView.setFitWidth(n.doubleValue());
+		//				});
+		//
+		//				stage.heightProperty().addListener((oba, o, n) -> {
+		//					mediaView.setFitHeight(n.doubleValue());
+		//				});
+		//
+		//			});
 
-			mediaView.setOnMouseClicked(ev -> {
-				if (ev.getClickCount() == 1) {
-					if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-						mediaPlayer.pause();
-					} else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
-						mediaPlayer.play();
-					}
-				}
-			});
-
-			BorderPane borderPane = new BorderPane(mediaView);
-			borderPane.setPrefSize(1200d, 800d);
-			Scene scene = new Scene(borderPane, 1200d, 800d);
-
-			FxUtil.createStageAndShow(scene, stage -> {
-				stage.setOnCloseRequest(ev -> {
-					mediaPlayer.dispose();
-				});
-
-				stage.widthProperty().addListener((oba, o, n) -> {
-					mediaView.setFitWidth(n.doubleValue());
-				});
-
-				stage.heightProperty().addListener((oba, o, n) -> {
-					mediaView.setFitHeight(n.doubleValue());
-				});
-
-			});
-
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 }

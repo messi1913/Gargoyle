@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.awt.image.BufferedImage;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -806,7 +807,7 @@ public class FxUtil {
 
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 		scene.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
-		
+
 		if (option != null)
 			option.accept(stage);
 		return stage;
@@ -839,7 +840,7 @@ public class FxUtil {
 	 ********************************/
 	public static void snapShot(Node target, File saveFile, Consumer<Exception> errorCallback) {
 
-		try (FileOutputStream out = new FileOutputStream(saveFile)){
+		try (FileOutputStream out = new FileOutputStream(saveFile)) {
 			snapShot(target, out, errorCallback);
 		} catch (IOException e) {
 			errorCallback.accept(e);
@@ -1218,10 +1219,10 @@ public class FxUtil {
 	 * @param tb
 	 ********************************/
 	public static void installClipboardKeyEvent(TableView<?> tb) {
-//		FxTableViewUtil.installCopyPasteHandler(tb);
+		//		FxTableViewUtil.installCopyPasteHandler(tb);
 		FxTableViewUtil.installCopyHandler(tb);
 		//2017.05.26 사용안함.
-//		ClipboardKeyEventInstaller.install(tb);
+		//		ClipboardKeyEventInstaller.install(tb);
 	}
 
 	/**
@@ -1520,6 +1521,43 @@ public class FxUtil {
 		if (center)
 			dockNode.getStage().centerOnScreen();
 
+		if (p instanceof Closeable) {
+			Closeable closeable = (Closeable) p;
+			owner.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, ev -> {
+				try {
+					closeable.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+		}
+
+	}
+
+	public static void createDockStageAndShow(CloseableParent<DockNode> node) {
+		createDockStageAndShow(null, node, null, true);
+	}
+
+	public static void createDockStageAndShow(Window owner, CloseableParent<DockNode> node) {
+		createDockStageAndShow(owner, node, null, true);
+	}
+
+	public static void createDockStageAndShow(Window owner, CloseableParent<DockNode> node, Point2D initLocation, boolean center) {
+
+		DockNode p = node.getParent();
+		createDockStageAndShow(owner, p, initLocation, center);
+
+		Platform.runLater(() -> {
+			Window window = p.getScene().getWindow();
+			window.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, ev -> {
+				try {
+					node.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+		});
+
 	}
 
 	/**
@@ -1579,15 +1617,14 @@ public class FxUtil {
 			String message = err.getMessage();
 			DialogUtil.showMessageDialog(FxUtil.getWindow(parent), message);
 		});
-		
-		view.setOnKeyPressed(key ->{
-			
-			if(key.getCode() == KeyCode.F12){
+
+		view.setOnKeyPressed(key -> {
+
+			if (key.getCode() == KeyCode.F12) {
 				FxUtil.createStageAndShow("Simple Web Console", new WebViewConsole(view));
 			}
-			
-		});
 
+		});
 
 		engine.setJavaScriptEnabled(true);
 		engine.setCreatePopupHandler(new Callback<PopupFeatures, WebEngine>() {
@@ -1882,14 +1919,11 @@ public class FxUtil {
 	private static final float CENTER_ON_SCREEN_X_FRACTION = 1.0f / 2;
 	private static final float CENTER_ON_SCREEN_Y_FRACTION = 1.0f / 3;
 
-	
-	
-	
 	public Point2D getCenter(Parent parent) {
 		Stage window = (Stage) parent.getScene().getWindow();
 		return getCenter(window);
 	}
-	
+
 	public Point2D getCenter(Stage window) {
 
 		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
@@ -1898,19 +1932,18 @@ public class FxUtil {
 
 		return new Point2D(centerX, centerY);
 	}
-	
 
 	public static class Animation {
-		
+
 		public static Transition createTransition(Node node, AnimationType type) {
 			return AnimationUtils.createTransition(node, type);
 		}
-		
-		public static Transition createFadeInTransition(Node node){
+
+		public static Transition createFadeInTransition(Node node) {
 			return createTransition(node, AnimationType.FADE_IN);
 		}
-		
-		public static Transition createBounceInTransition(Node node){
+
+		public static Transition createBounceInTransition(Node node) {
 			return createTransition(node, AnimationType.BOUNCE_IN);
 		}
 	}

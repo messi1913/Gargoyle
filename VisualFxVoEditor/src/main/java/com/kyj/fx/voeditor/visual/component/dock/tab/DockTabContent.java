@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.dock.tab;
 
-import com.kyj.fx.voeditor.visual.component.dock.pane.DockEvent;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 
 import javafx.scene.Node;
