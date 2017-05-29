@@ -140,15 +140,9 @@ public class TFIDF {
 
 				if (link.startsWith("https")) {
 					model = RequestUtil.requestSSL(new URL(link), (is, code) -> {
-
 						if (code == 200) {
-							try {
-								return new URLModel(link, ValueUtil.toString(is));
-							} catch (IOException e) {
-								return URLModel.empty();
-							}
+							return new URLModel(link, ValueUtil.toString(is));
 						}
-
 						return URLModel.empty();
 
 					});
@@ -156,11 +150,7 @@ public class TFIDF {
 				} else {
 					model = RequestUtil.request(new URL(link), (is, code) -> {
 						if (code == 200) {
-							try {
-								return new URLModel(link, ValueUtil.toString(is));
-							} catch (IOException e) {
-								return URLModel.empty();
-							}
+							return new URLModel(link, ValueUtil.toString(is));
 						}
 
 						return URLModel.empty();
@@ -197,8 +187,7 @@ public class TFIDF {
 	@Test
 	public void boilerpipeTest() throws Exception {
 		URL url;
-		url = new URL(
-				"https://twitter.com/intent/favorite?tweet_id=805627131061374976");
+		url = new URL("https://twitter.com/intent/favorite?tweet_id=805627131061374976");
 
 		String str = RequestUtil.request(url, (st, code) -> {
 			try {
@@ -212,10 +201,9 @@ public class TFIDF {
 				System.out.println("HH");
 				LOGGER.debug("HH");
 
-
 				System.out.println(KeepEverythingExtractor.INSTANCE.getText(doc));
 				return ArticleSentencesExtractor.INSTANCE.getText(doc);
-//				return ArticleExtractor.INSTANCE.getText(doc);
+				//				return ArticleExtractor.INSTANCE.getText(doc);
 
 			} catch (Exception e) {
 				e.printStackTrace();
