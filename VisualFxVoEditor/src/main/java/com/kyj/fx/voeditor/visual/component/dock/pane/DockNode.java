@@ -298,7 +298,7 @@ public class DockNode extends VBox implements EventHandler<MouseEvent> {
 				stage.initOwner(this.owner);
 
 			/* append close handler. 2017-05-29 by kyj.*/
-			stage.setOnCloseRequest(ev -> {
+			EventHandler<WindowEvent> closeHandler = ev -> {
 				try {
 					ObservableList<Node> childrenUnmodifiable = null;
 					if (dockPane != null)
@@ -318,10 +318,11 @@ public class DockNode extends VBox implements EventHandler<MouseEvent> {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			});
+			};
+//			stage.setOnCloseRequest(value);
+			stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, closeHandler);
 			
 			
-			//			stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, );
 
 			// offset the new stage to cover exactly the area the dock was local to the scene
 			// this is useful for when the user presses the + sign and we have no information
