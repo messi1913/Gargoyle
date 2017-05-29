@@ -1392,9 +1392,8 @@ public class ValueUtil {
 		try {
 			return IOUtils.toString(inputStream, charset);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return null;
 	}
 
 	public static String toString(InputStream inputStream) {
