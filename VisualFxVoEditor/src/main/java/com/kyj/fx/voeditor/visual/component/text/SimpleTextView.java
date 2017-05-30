@@ -6,6 +6,8 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
+import java.util.Base64;
+
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +18,10 @@ import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
 import com.kyj.fx.voeditor.visual.framework.word.HtmlTextToMimeAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.MimeToHtmlAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.SimpleWordAdapter;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -107,11 +110,11 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 	}
 
-	protected void initHelpers(){
+	protected void initHelpers() {
 		this.helper = new CodeAreaHelper<>(codeArea);
 	}
 
-	protected void initGraphics(){
+	protected void initGraphics() {
 		hboxButtons.setVisible(showButtons);
 		if (!showButtons) {
 			hboxButtons.setMinHeight(0d);
@@ -140,6 +143,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		setBottom(lblLineInfo);
 
 	}
+
 	/* (non-Javadoc)
 	 * @see com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable#closeRequest()
 	 */
@@ -163,7 +167,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miOpenNamoMsWordOnAction() {
 		String content = codeArea.getText();
 		try {
-			AsynchWordExecutor executor = new AsynchWordExecutor(  /*new HtmlTextToMimeAdapter(content)*/  new HtmlTextToMimeAdapter(content));
+			AsynchWordExecutor executor = new AsynchWordExecutor(/*new HtmlTextToMimeAdapter(content)*/ new HtmlTextToMimeAdapter(content));
 			executor.execute();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -251,7 +255,6 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			WebView webView = new WebView();
 			webView.getEngine().loadContent(content);
 
-
 			FxUtil.createStageAndShow(webView, stage -> {
 				stage.setAlwaysOnTop(true);
 				stage.initOwner(getScene().getWindow());
@@ -283,9 +286,27 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		//		}
 	}
 
-
-	public CodeArea getCodeArea(){
+	public CodeArea getCodeArea() {
 		return this.codeArea;
 	}
 
+	@FXML
+	public void miBase64EncodeOnAction() {
+		String text = codeArea.getText();
+		String encodeToString = Base64.getEncoder().encodeToString(text.getBytes());
+		codeArea.replaceText(encodeToString);
+	}
+
+	@FXML
+	public void miBase64DecodeOnAction() {
+		try {
+			String text = codeArea.getText();
+			byte[] b = Base64.getDecoder().decode(text.getBytes());
+			codeArea.replaceText(new String(b));
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+			DialogUtil.showMessageDialog("Invalide Content.");
+		}
+
+	}
 }
