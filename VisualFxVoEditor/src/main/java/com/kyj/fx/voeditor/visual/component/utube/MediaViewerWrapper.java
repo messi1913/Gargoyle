@@ -22,64 +22,104 @@ import javafx.scene.media.MediaView;
 
 /**
  * @author KYJ
- *
+ * @Deprecated 지원불가한게 많음.
  */
+@Deprecated
 public class MediaViewerWrapper extends BorderPane implements Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UtubeDownloaderComposite.class);
 
 	private MediaPlayer mediaPlayer;
+	private MediaPlayer audioPlayer;
+
 	private MediaView mediaView;
+	private MediaView audioView;
+	private File webm, mp4;
 
-	public MediaViewerWrapper(File f) {
-
+	public MediaViewerWrapper(File webm, File mp4) {
+		this.webm = webm;
+		this.mp4 = mp4;
 		try {
-			init(f);
+			init();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void init(File m) throws MalformedURLException {
-		Media media = new Media(m.toURI().toURL().toExternalForm());
+	public void init() throws MalformedURLException {
 
-		mediaPlayer = new MediaPlayer(media);
-		mediaPlayer.setAutoPlay(true);
-		mediaPlayer.setOnReady(() -> {
-			LOGGER.debug("ready");
-		});
-		mediaPlayer.setOnEndOfMedia(() -> {
-			try {
-				close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
+		if (!webm.exists() && mp4.exists()) {
+			Media media = new Media(mp4.toURI().toURL().toExternalForm());
 
-		mediaView = new MediaView(mediaPlayer);
-		mediaView.setPreserveRatio(true);
-
-		mediaView.setOnMouseClicked(ev -> {
-			if (ev.getClickCount() == 1) {
-				if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-					mediaPlayer.pause();
-				} else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
-					mediaPlayer.play();
+			mediaPlayer = new MediaPlayer(media);
+			mediaPlayer.setAutoPlay(true);
+			mediaPlayer.setOnReady(() -> {
+				LOGGER.debug("ready");
+			});
+			mediaPlayer.setOnEndOfMedia(() -> {
+				try {
+					close();
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			}
-		});
-		//		mediaView.setFitHeight(value);
-		//		mediaView.setPrefSize(BorderPane.USE_COMPUTED_SIZE, BorderPane.USE_COMPUTED_SIZE);
+			});
 
-		//		this.getParent().widthProperty().addListener((oba, o, n) -> {
-		//			mediaView.setFitWidth(n.doubleValue());
-		//		});
-		//
-		//		this.getParent().heightProperty().addListener((oba, o, n) -> {
-		//			mediaView.setFitHeight(n.doubleValue());
-		//		});
+			mediaView = new MediaView(mediaPlayer);
 
-		setCenter(mediaView);
+			mediaView.setPreserveRatio(true);
+
+			mediaView.setOnMouseClicked(ev -> {
+				if (ev.getClickCount() == 1) {
+					if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+						mediaPlayer.pause();
+					} else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+						mediaPlayer.play();
+					}
+				}
+			});
+			setCenter(mediaView);
+		}
+
+		else if (webm.exists() && mp4.exists()) {
+			Media media = new Media(webm.toURI().toURL().toExternalForm());
+			Media audio = new Media(mp4.toURI().toURL().toExternalForm());
+
+			mediaPlayer = new MediaPlayer(media);
+			audioPlayer = new MediaPlayer(audio);
+
+			mediaPlayer.setAutoPlay(false);
+			audioPlayer.setAutoPlay(false);
+
+			mediaPlayer.setOnReady(() -> {
+				LOGGER.debug("ready");
+			});
+			mediaPlayer.setOnEndOfMedia(() -> {
+				try {
+					close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+
+			mediaView = new MediaView(mediaPlayer);
+			audioView = new MediaView(audioPlayer);
+
+			mediaView.setPreserveRatio(true);
+
+			mediaView.setOnMouseClicked(ev -> {
+				if (ev.getClickCount() == 1) {
+					if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+						mediaPlayer.pause();
+						audioPlayer.pause();
+					} else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+						mediaPlayer.play();
+						audioPlayer.play();
+					}
+				}
+			});
+			setCenter(mediaView);
+		}
+
 	}
 
 	@Override
@@ -87,6 +127,10 @@ public class MediaViewerWrapper extends BorderPane implements Closeable {
 		if (mediaPlayer != null) {
 			mediaPlayer.dispose();
 			LOGGER.debug("media disposed");
+		}
+		if (audioPlayer != null) {
+			audioPlayer.dispose();
+			LOGGER.debug("audio disposed");
 		}
 
 	}

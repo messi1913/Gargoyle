@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.utube;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -35,12 +36,12 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
-import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -59,7 +60,6 @@ import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -492,11 +492,7 @@ public class UtubeDownloaderComposite extends BorderPane {
 	@FXML
 	public void btnOpenOnAction() {
 
-		//		if (file != null && file.exists()) {
-		//			FileUtil.openFile(file);
-		//		}
-
-		File showFileDialog = DialogUtil.showFileDialog(null, chooser -> {
+		File userSelectFile = DialogUtil.showFileDialog(null, chooser -> {
 			File file = downloadedFile.get();
 			if (file != null) {
 				chooser.setInitialDirectory(file.getParentFile());
@@ -505,50 +501,47 @@ public class UtubeDownloaderComposite extends BorderPane {
 
 		});
 
-		if (showFileDialog == null)
+		if (userSelectFile == null)
 			return;
 
-		//			Media media = new Media(showFileDialog.toURI().toURL().toExternalForm());
-		//
-		//			MediaPlayer mediaPlayer = new MediaPlayer(media);
-		//			mediaPlayer.setAutoPlay(true);
-		//			mediaPlayer.setOnReady(() -> {
-		//				LOGGER.debug("ready");
-		//			});
-		//			mediaPlayer.setOnEndOfMedia(() -> {
-		//				mediaPlayer.dispose();
-		//			});
-		//
-		//			MediaView mediaView = new MediaView(mediaPlayer);
-		//			mediaView.setPreserveRatio(true);
-		//
-		//			mediaView.setOnMouseClicked(ev -> {
-		//				if (ev.getClickCount() == 1) {
-		//					if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-		//						mediaPlayer.pause();
-		//					} else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
-		//						mediaPlayer.play();
-		//					}
-		//				}
-		//			});
-		//
-		//			BorderPane borderPane = new BorderPane(mediaView);
-		//			borderPane.setPrefSize(1200d, 800d);
-		//			Scene scene = new Scene(borderPane, 1200d, 800d);
+		File webm = null;
+		File mp4 = null;
+		String name = userSelectFile.getName();
+		String ext = ValueUtil.getExtension(name);
+		if (".mp4".equals(ext)) {
+			String noExtFileName = name.replace(".mp4", "");
+			File parentFile = userSelectFile.getParentFile();
+			File findWebm = new File(parentFile, noExtFileName.concat(".webm"));
+			mp4 = userSelectFile;
+			if (findWebm.exists()) {
+				webm = findWebm;
+			}
 
-		MediaViewerWrapper wrapper = new MediaViewerWrapper(showFileDialog);
-		Stage owner = new Stage();
-		wrapper.setPrefSize(1200d, 800d);
+		} else if (".webm".equals(ext)) {
+			String noExtFileName = name.replace(".webm", "");
+			File parentFile = userSelectFile.getParentFile();
+			File findMp4 = new File(parentFile, noExtFileName.concat(".mp4"));
+			webm = userSelectFile;
+			if (findMp4.exists()) {
+				mp4 = findMp4;
+			}
+		}
 
-		FxUtil.createDockStageAndShow(owner, new DockNode(wrapper, showFileDialog.getName()));
+		try {
 
-		owner.widthProperty().addListener((oba, o, n) -> {
-			wrapper.setFitWidth(n.doubleValue());
-		});
+			//영상을 보기위한 html문을 작성하는 클래스
+			WebViewWriter writer = new WebViewWriter(webm, mp4);
 
-		owner.heightProperty().addListener((oba, o, n) -> {
-			wrapper.setFitHeight(n.doubleValue());
-		});
+			//영상을 보기 위한 html문을 작성
+			writer.run();
+
+			File outputFile = writer.outputFile(userSelectFile.getName() + ".html");
+
+			//OS기반뷰 open.
+			FileUtil.openFile(outputFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
