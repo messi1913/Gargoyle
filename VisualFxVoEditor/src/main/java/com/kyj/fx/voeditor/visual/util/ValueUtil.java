@@ -1830,4 +1830,23 @@ public class ValueUtil {
 	public static String getMessage(String string, String msgFieldName) {
 		return "";
 	}
+
+	public static String reverse(String name) {
+		int length = name.length();
+		char[] ca = new char[length];
+		for (int i = 0; i < length; i++) {
+			ca[length - 1 - i] = name.charAt(i);
+		}
+		return new String(ca);
+	}
+
+	public static String getExtension(String name) {
+
+		for (int i = name.length() - 1; i >= 0; i--) {
+			if (name.charAt(i) == '.') {
+				return name.substring(i);
+			}
+		}
+		return null;
+	}
 }
