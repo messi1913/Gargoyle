@@ -1610,10 +1610,14 @@ public class FxUtil {
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 18.
-	 * @param link
+	 * @param content
 	 * @return
 	 */
-	public static WebView openBrowser(Node parent, String link) {
+	public static WebView openBrowser(Node parent, String content) {
+		return openBrowser(parent, content, true);
+	}
+	
+	public static WebView openBrowser(Node parent, String content , boolean isLink) {
 
 		WebView view = new WebView();
 		WebEngine engine = view.getEngine();
@@ -1648,7 +1652,7 @@ public class FxUtil {
 				// parent.getScene().getWindow());
 				// stage.show();
 
-				WebView openBrowser = openBrowser(view, "");
+				WebView openBrowser = openBrowser(view, "", false);
 
 				return openBrowser.getEngine();
 			}
@@ -1676,11 +1680,13 @@ public class FxUtil {
 		engine.setOnAlert((WebEvent<String> wEvent) -> {
 			System.out.println("Alert Event  -  Message:  " + wEvent.getData());
 		});
-
-		engine.load(link);
-
+		if(isLink)
+			engine.load(content);
+		else
+			engine.loadContent(content);
+		
 		BorderPane root = new BorderPane(view);
-		TextField txtLink = new TextField(link);
+		TextField txtLink = new TextField(content);
 		txtLink.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
 			if (KeyCode.ENTER == ev.getCode())
 				engine.load(txtLink.getText());

@@ -4,6 +4,7 @@
  */
 package com.kyj.fx.voeditor.visual.main.layout;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -84,6 +85,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -277,14 +279,14 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				webvWelcome.getEngine().load(txtUrl.getText());
 			}
 		});
-		
-		webvWelcome.setOnKeyPressed(key ->{
-			
-			if(key.getCode() == KeyCode.F12){
-				
+
+		webvWelcome.setOnKeyPressed(key -> {
+
+			if (key.getCode() == KeyCode.F12) {
+
 				FxUtil.createStageAndShow("Simple Web Console", new WebViewConsole(webvWelcome));
 			}
-			
+
 		});
 
 		treeProjectFile.setRoot(createNewTree(selectDirFile));
@@ -315,7 +317,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 							try {
 								Class<?> nodeClass = jar.getNodeClass();
 								Object newInstance = jar.loader.loadClass(nodeClass.getName()).newInstance();
-//								Object newInstance = jar.getNodeClass().newInstance();
+								//								Object newInstance = jar.getNodeClass().newInstance();
 
 								if (newInstance instanceof CloseableParent<?>) {
 									loadNewSystemTab(jar.getDisplayMenuName(), (CloseableParent<?>) newInstance);
@@ -365,7 +367,41 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			e.printStackTrace();
 		}
 
+		tabPanWorkspace.getTabs().addListener(dockTabCloseListener);
 	}
+
+	/**
+	 * tab이 닫혔을떄 리소스를 해제하는 리스너
+	 * 
+	 * @최초생성일 2017. 6. 1.
+	 */
+	private ListChangeListener<DockTab> dockTabCloseListener = new ListChangeListener<DockTab>() {
+
+		@Override
+		public void onChanged(javafx.collections.ListChangeListener.Change<? extends DockTab> c) {
+			if (c.next()) {
+				List<? extends DockTab> removed = c.getRemoved();
+				removed.forEach(tab -> {
+
+					// 만들어진 closeRequest 이벤트 호출
+					EventHandler<Event> onCloseRequest = tab.getOnCloseRequest();
+					if (onCloseRequest != null)
+						onCloseRequest.handle(new ActionEvent());
+
+					Node content = tab.getContent();
+					if (content != null && content instanceof Closeable) {
+						try {
+							((Closeable) content).close();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+
+				});
+			}
+		}
+
+	};
 
 	/**
 	 * 파일을 연다.
@@ -1045,11 +1081,6 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			if (tabPanWorkspace.getTabs().indexOf(tab) == 0)
 				return;
 
-			// 만들어진 closeRequest 이벤트 호출
-			EventHandler<Event> onCloseRequest = tab.getOnCloseRequest();
-			if (onCloseRequest != null)
-				onCloseRequest.handle(new ActionEvent());
-
 			// main tab close
 			tabPanWorkspace.getTabs().remove(tab);
 
@@ -1449,7 +1480,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				DockTab tab = new DockTab(tabName, parent);
 				// 툴팁 처리 (클래스위치)
 				tab.setTooltip(new Tooltip(loader.getController().getClass().getName()));
-				
+
 				addTabItem(tab);
 				tab.getTabPane().getSelectionModel().select(tab);
 
@@ -1541,7 +1572,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				DockTab tab = new DockTab(tableName, _parent);
 				// 툴팁 처리 (클래스위치)
 				tab.setTooltip(new Tooltip(parent.getClass().getName()));
-				
+
 				addTabItem(tab);
 				tabPanWorkspace.getSelectionModel().select(tab);
 
@@ -1912,10 +1943,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	public void lblNaverRschOnAction() {
 		loadNewSystemTab(NrchRealtimeSrchFlowComposite.TITLE, new NrchRealtimeSrchFlowComposite());
 	}
-	
+
 	@FXML
-	public void lblUtubeDownloaderOnAction(){
-		
+	public void lblUtubeDownloaderOnAction() {
+
 		loadNewSystemTab(UtubeDownloaderComposite.TITLE, new UtubeDownloaderComposite());
 	}
 
