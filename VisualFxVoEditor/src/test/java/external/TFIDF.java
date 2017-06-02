@@ -7,6 +7,7 @@
 package external;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,6 +37,7 @@ import com.kyj.fx.voeditor.visual.framework.KeyValue;
 import com.kyj.fx.voeditor.visual.framework.URLModel;
 import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
 import com.kyj.fx.voeditor.visual.util.RequestUtil;
+import com.kyj.fx.voeditor.visual.util.ResponseHandler;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 /**
@@ -56,76 +58,82 @@ public class TFIDF {
 		URL url;
 		url = new URL("https://search.naver.com/search.naver?where=nexearch&query=%ED%91%9C%EC%B0%BD%EC%9B%90&sm=top_hty&fbm=1&ie=utf8");
 
-		Set<String> reqeustSSL = RequestUtil.requestSSL(url, (is, code) -> {
+		ResponseHandler<Set<String>> responseHandler = new ResponseHandler<Set<String>>() {
 
-			Set<String> collect = Collections.emptySet();
-			try {
-				Document parse = Jsoup.parse(is, "UTF-8", "http");
+			@Override
+			public Set<String> apply(InputStream is, Integer code) {
 
-				/*a 태그 만 추출.*/
-				Elements elementsByTag = parse.getElementsByTag("a");// parse.getElementsByTag("a");
+				Set<String> collect = Collections.emptySet();
+				try {
+					Document parse = Jsoup.parse(is, "UTF-8", "http");
 
-				collect = elementsByTag.stream().filter(e -> e.hasAttr("href")).map(e -> e.attr("href").trim())
-						/*http or https인 링크만 추출.*/
-						.filter(e -> e.startsWith("http") || e.startsWith("https"))
+					/*a 태그 만 추출.*/
+					Elements elementsByTag = parse.getElementsByTag("a");// parse.getElementsByTag("a");
 
-						/* 검색에 불필요한 URL */
-						.filter(v -> {
+					collect = elementsByTag.stream().filter(e -> e.hasAttr("href")).map(e -> e.attr("href").trim())
+							/*http or https인 링크만 추출.*/
+							.filter(e -> e.startsWith("http") || e.startsWith("https"))
 
-					if ("https://submit.naver.com/".equals(v))
-						return false;
+							/* 검색에 불필요한 URL */
+							.filter(v -> {
 
-					else if ("http://www.naver.com".equals(v))
-						return false;
+						if ("https://submit.naver.com/".equals(v))
+							return false;
 
-					else if (v.startsWith("https://nid.naver.com"))
-						return false;
+						else if ("http://www.naver.com".equals(v))
+							return false;
 
-					else if (v.startsWith("http://searchad.naver.com"))
-						return false;
+						else if (v.startsWith("https://nid.naver.com"))
+							return false;
 
-					else if (v.contains("namu.wiki"))
-						return false;
+						else if (v.startsWith("http://searchad.naver.com"))
+							return false;
 
-					else if (v.contains("wikipedia.org"))
-						return false;
+						else if (v.contains("namu.wiki"))
+							return false;
 
-					else if (v.startsWith("http://music.naver.com"))
-						return false;
+						else if (v.contains("wikipedia.org"))
+							return false;
 
-					else if (v.startsWith("http://m.post.naver.com"))
-						return false;
+						else if (v.startsWith("http://music.naver.com"))
+							return false;
 
-					else if (v.startsWith("http://tvcast.naver.com"))
-						return false;
+						else if (v.startsWith("http://m.post.naver.com"))
+							return false;
 
-					else if (v.startsWith("http://shopping.naver.com"))
-						return false;
+						else if (v.startsWith("http://tvcast.naver.com"))
+							return false;
 
-					else if (v.startsWith("https://help.naver"))
-						return false;
+						else if (v.startsWith("http://shopping.naver.com"))
+							return false;
 
-					else if (v.startsWith("http://www.navercorp.com"))
-						return false;
+						else if (v.startsWith("https://help.naver"))
+							return false;
 
-					else if (v.startsWith("http://book.naver.com"))
-						return false;
+						else if (v.startsWith("http://www.navercorp.com"))
+							return false;
 
-					else if (v.startsWith("http://www.cwpyo.com"))
-						return false;
+						else if (v.startsWith("http://book.naver.com"))
+							return false;
 
-					else if (v.startsWith("http://navercast.naver.com"))
-						return false;
+						else if (v.startsWith("http://www.cwpyo.com"))
+							return false;
 
-					return true;
-				}).collect(Collectors.toSet());
+						else if (v.startsWith("http://navercast.naver.com"))
+							return false;
 
-			} catch (IOException e) {
-				e.printStackTrace();
+						return true;
+					}).collect(Collectors.toSet());
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				return collect;
 			}
+		};
 
-			return collect;
-		});
+		Set<String> reqeustSSL = RequestUtil.requestSSL(url, responseHandler);
 
 		// reqeustSSL.forEach(System.out::println);
 		getString(reqeustSSL);
@@ -138,24 +146,21 @@ public class TFIDF {
 			URLModel model = URLModel.empty();
 			try {
 
+				ResponseHandler<URLModel> responseHandler = new ResponseHandler<URLModel>() {
+
+					@Override
+					public URLModel apply(InputStream is, Integer code) {
+						if (code == 200) {
+							return new URLModel(link, ValueUtil.toString(is));
+						}
+						return URLModel.empty();
+					}
+				};
+
 				if (link.startsWith("https")) {
-					model = RequestUtil.requestSSL(new URL(link), (is, code) -> {
-						if (code == 200) {
-							return new URLModel(link, ValueUtil.toString(is));
-						}
-						return URLModel.empty();
-
-					});
-
+					model = RequestUtil.requestSSL(new URL(link), responseHandler);
 				} else {
-					model = RequestUtil.request(new URL(link), (is, code) -> {
-						if (code == 200) {
-							return new URLModel(link, ValueUtil.toString(is));
-						}
-
-						return URLModel.empty();
-
-					});
+					model = RequestUtil.request(new URL(link), responseHandler);
 				}
 			} catch (Exception e) {
 				return URLModel.empty();
@@ -189,28 +194,32 @@ public class TFIDF {
 		URL url;
 		url = new URL("https://twitter.com/intent/favorite?tweet_id=805627131061374976");
 
-		String str = RequestUtil.request(url, (st, code) -> {
-			try {
+		String str = RequestUtil.request(url, new ResponseHandler<String>() {
 
-				InputSource inputSource = new InputSource(st);
-				inputSource.setEncoding("UTF-8");
+			@Override
+			public String apply(InputStream is, Integer code) {
+				try {
 
-				final BoilerpipeSAXInput in = new BoilerpipeSAXInput(inputSource);
-				final TextDocument doc = in.getTextDocument();
+					InputSource inputSource = new InputSource(is);
+					inputSource.setEncoding("UTF-8");
 
-				System.out.println("HH");
-				LOGGER.debug("HH");
+					final BoilerpipeSAXInput in = new BoilerpipeSAXInput(inputSource);
+					final TextDocument doc = in.getTextDocument();
 
-				System.out.println(KeepEverythingExtractor.INSTANCE.getText(doc));
-				return ArticleSentencesExtractor.INSTANCE.getText(doc);
-				//				return ArticleExtractor.INSTANCE.getText(doc);
+					System.out.println("HH");
+					LOGGER.debug("HH");
 
-			} catch (Exception e) {
-				e.printStackTrace();
+					System.out.println(KeepEverythingExtractor.INSTANCE.getText(doc));
+					return ArticleSentencesExtractor.INSTANCE.getText(doc);
+					//				return ArticleExtractor.INSTANCE.getText(doc);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				return null;
 			}
-
-			return null;
-		} , true);
+		}, true);
 
 		LOGGER.debug(str);
 		System.out.println(str);
@@ -220,15 +229,7 @@ public class TFIDF {
 	@Test
 	public void removeTags() throws MalformedURLException, Exception {
 		String reqeustSSL = RequestUtil.request(new URL("http://view.asiae.co.kr/news/view.htm?idxno=2016120314584743535"),
-				(is, resCode) -> {
-
-					try {
-						return ValueUtil.toString(is);
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-					return "";
-				});
+				RequestUtil.DEFAULT_REQUEST_HANDLER);
 
 		System.out.println(ValueUtil.HTML.escapeHtml(reqeustSSL));
 
@@ -239,15 +240,7 @@ public class TFIDF {
 
 		String reqeustSSL = RequestUtil.requestSSL(
 				new URL("https://search.naver.com/search.naver?where=nexearch&sm=tab_htf&ie=utf8&query=%EA%B9%80%EB%AC%B4%EC%84%B1+%EB%8C%80%EC%84%A0+%EB%B6%88%EC%B6%9C%EB%A7%88"),
-				(is, resCode) -> {
-
-					try {
-						return ValueUtil.toString(is);
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-					return "";
-				});
+				RequestUtil.DEFAULT_REQUEST_HANDLER);
 
 		System.out.println(reqeustSSL);
 
