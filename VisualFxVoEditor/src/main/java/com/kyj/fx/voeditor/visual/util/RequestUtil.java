@@ -6,14 +6,13 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +44,8 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.star.uno.RuntimeException;
+
 /**
  * @author KYJ
  *
@@ -55,32 +56,6 @@ public class RequestUtil {
 	private static HostnameVerifier hostnameVerifier = (arg0, arg1) -> {
 		return true;
 	};
-
-	public static String reqeustSSL_JSONString(URL url, BiFunction<InputStream, Integer, String> response) throws Exception {
-		return requestSSL(url, (is, code) -> {
-			String dirtyConent = "";
-			if (200 == code) {
-				// 버퍼로 그냥 읽어봐도 되지만 인코딩 변환을 추후 쉽게 처리하기 위해 ByteArrayOutputStream을
-				// 사용
-
-				try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-					// int read = -1;
-					byte[] b = new byte[4096];
-					while (is.read(b) != -1) {
-						out.write(b);
-					}
-					out.flush();
-					dirtyConent = out.toString("UTF-8");
-				} catch (Exception e) {
-					LOGGER.error(ValueUtil.toString(e));
-				}
-			} else {
-				LOGGER.warn("not unnomal response code");
-			}
-			return dirtyConent;
-
-		});
-	}
 
 	/**
 	 * @작성자 : KYJ
@@ -102,7 +77,7 @@ public class RequestUtil {
 		return reqeustSSL200(url, response, autoClose);
 	}
 
-	public static <T> T req(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
+	public static <T> T req(URL url, ResponseHandler<T> response) throws Exception {
 		String protocol = url.getProtocol();
 
 		if ("http".equals(protocol))
@@ -114,20 +89,26 @@ public class RequestUtil {
 		return requestSSL(url, response, true);
 	}
 
-	public static <T> T requestSSL(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
+	public static <T> T requestSSL(URL url, ResponseHandler<T> response) throws Exception {
 		return requestSSL(url, response, true);
 	}
 
-	public static String requestSSL(URL url) throws Exception {
-		return request(url, (is, code) -> {
+	public static ResponseHandler<String> DEFAULT_REQUEST_HANDLER = new ResponseHandler<String>() {
+
+		@Override
+		public String apply(InputStream is, Integer code) {
 			if (code == 200) {
 				return ValueUtil.toString(is);
 			}
 			return null;
-		}, true);
+		}
+	};
+
+	public static String requestSSL(URL url) throws Exception {
+		return request(url, DEFAULT_REQUEST_HANDLER, true);
 	}
 
-	public static <T> T requestSSL(URL url, BiFunction<InputStream, Integer, T> response, boolean autoClose) throws Exception {
+	public static <T> T requestSSL(URL url, ResponseHandler<T> response, boolean autoClose) throws Exception {
 
 		// SSLContext ctx = SSLContext.getInstance("TLS");
 
@@ -157,8 +138,12 @@ public class RequestUtil {
 
 			is = conn.getInputStream();
 
-			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), conn.getContentEncoding(), url.toString());
-
+			String contentEncoding = conn.getContentEncoding();
+			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), contentEncoding, url.toString());
+			response.setContentEncoding(contentEncoding);
+			response.setResponseCode(conn.getResponseCode());
+			Map<String, List<String>> headerFields = conn.getHeaderFields();
+			response.setHeaderFields(headerFields);
 			result = response.apply(is, conn.getResponseCode());
 
 		} finally {
@@ -207,18 +192,20 @@ public class RequestUtil {
 			is = conn.getInputStream();
 
 			String contentType = conn.getContentType();
+			String contentEncoding = conn.getContentEncoding();
 
-			Optional<String> map = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset")).findFirst()
-					.map(v -> {
-						return v.substring(v.indexOf("=") + 1);
-					});
+			if (ValueUtil.isEmpty(contentEncoding)) {
+				Optional<String> map = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset")).findFirst()
+						.map(v -> {
+							return v.substring(v.indexOf("=") + 1);
+						});
+				contentEncoding = map.isPresent() ? map.get() : "UTF-8";
+			}
 
-			String charset = map.isPresent() ? map.get() : "UTF-8";
-
-			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), conn.getContentEncoding(), url.toString());
+			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), contentEncoding, url.toString());
 
 			if (200 == conn.getResponseCode()) {
-				result = response.apply(is, Charset.forName(charset));
+				result = response.apply(is, Charset.forName(contentEncoding));
 			}
 
 		} finally {
@@ -238,7 +225,7 @@ public class RequestUtil {
 		return result;
 	}
 
-	public static <T> T request(URL url, BiFunction<InputStream, Integer, T> response) throws Exception {
+	public static <T> T request(URL url, ResponseHandler<T> response) throws Exception {
 		return request(url, response, true);
 	}
 
@@ -280,26 +267,56 @@ public class RequestUtil {
 			is = conn.getInputStream();
 
 			String contentType = conn.getContentType();
+			String contentEncoding = conn.getContentEncoding();
+			Map<String, List<String>> headerFields = conn.getHeaderFields();
+			try {
+				Optional<String> findAny = headerFields.keySet().stream().filter(f -> f != null).filter(str -> {
+					
+					if("Accept-Encoding".equals(str))
+						return true;
+					
+					return str.toLowerCase().indexOf("charset") >= 0 ;
+				}).findAny();
 
-			String charset = "UTF-8";
-			if (contentType != null) {
-				Optional<String> map = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset")).findFirst()
-						.map(v -> {
-							return v.substring(v.indexOf("=") + 1);
-						});
-				if (map.isPresent())
-					charset = map.get();
-				else {
-					String headerField = conn.getHeaderField("Accept-Charset");
-					if (ValueUtil.isNotEmpty(headerField))
-						charset = headerField;
+				if (findAny.isPresent()) {
+					String wow = findAny.get();
+					List<String> list = headerFields.get(wow);
+					wow = list.get(0);
+					if (Charset.isSupported(wow)) {
+						contentEncoding = wow;
+					}
+				}
+
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			}
+
+			//			String charset = "UTF-8";
+			if (ValueUtil.isEmpty(contentEncoding)) {
+				if (contentType != null) {
+					Optional<String> map = Stream.of(contentType.split(";")).filter(txt -> txt.toLowerCase().contains("charset"))
+							.findFirst().map(v -> {
+								return v.substring(v.indexOf("=") + 1);
+							});
+					if (map.isPresent())
+						contentEncoding = map.get();
+					else {
+						String headerField = conn.getHeaderField("Accept-Charset");
+						if (ValueUtil.isNotEmpty(headerField))
+							contentEncoding = headerField;
+					}
 				}
 			}
 
-			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), url.toString());
+			if (ValueUtil.isEmpty(contentEncoding)) {
+				contentEncoding = "UTF-8";
+				LOGGER.debug("force encoding 'UTF-8' -  what is encoding ?????  ########################################");
+			}
+
+			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), contentEncoding, url.toString());
 
 			if (200 == conn.getResponseCode()) {
-				result = response.apply(is, Charset.forName(charset));
+				result = response.apply(is, Charset.forName(contentEncoding));
 			}
 
 		} finally {
@@ -317,7 +334,7 @@ public class RequestUtil {
 
 	}
 
-	public static <T> T request(URL url, BiFunction<InputStream, Integer, T> response, boolean autoClose) throws Exception {
+	public static <T> T request(URL url, ResponseHandler<T> response, boolean autoClose) throws Exception {
 
 		URLConnection openConnection = url.openConnection();
 		HttpURLConnection conn = (HttpURLConnection) openConnection;
@@ -347,6 +364,11 @@ public class RequestUtil {
 			// });
 
 			LOGGER.debug("code : [{}] [{}] URL : {} ,  ", conn.getResponseCode(), url.toString());
+			response.setContentEncoding(conn.getContentEncoding());
+
+			Map<String, List<String>> headerFields = conn.getHeaderFields();
+			response.setHeaderFields(headerFields);
+			response.setResponseCode(conn.getResponseCode());
 
 			// LOGGER.debug(conn.getPermission().toString());
 			result = response.apply(is, conn.getResponseCode());

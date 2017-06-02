@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.suppliers;
 
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.RealtimeSearchItemVO;
 import com.kyj.fx.voeditor.visual.framework.RealtimeSearchVO;
+import com.kyj.fx.voeditor.visual.util.ResponseHandler;
 import com.kyj.fx.voeditor.visual.util.RequestUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -65,11 +67,11 @@ public final class NaverRealtimeSrchSupplier implements Supplier<List<String>> {
 
 	public List<RealtimeSearchVO> getMeta() throws Exception {
 		List<RealtimeSearchVO> rsltDVOList = Collections.emptyList();
-//		try {
-			rsltDVOList = NaverRealtimeSearchFactory.getInstance().getRealtimeSearchMeta();
-//		} catch (Exception e) {
-//			LOGGER.error(ValueUtil.toString(e));
-//		}
+		//		try {
+		rsltDVOList = NaverRealtimeSearchFactory.getInstance().getRealtimeSearchMeta();
+		//		} catch (Exception e) {
+		//			LOGGER.error(ValueUtil.toString(e));
+		//		}
 		return rsltDVOList;
 	}
 
@@ -153,31 +155,23 @@ final class NaverRealtimeSearchFactory {
 	}
 
 	private String getDrityString() throws Exception, MalformedURLException {
-		String realtimeSearch = RequestUtil.request(new URL(NAVER_REALTIME_URL2), (is, code) -> {
-
-			if (code == 200) {
-				try {
-					return ValueUtil.toString(is);
-				} catch (Exception e) {
-					LOGGER.error(ValueUtil.toString(e));
-				}
-			}
-
-			return "";
-		});
+		String realtimeSearch = RequestUtil.request(new URL(NAVER_REALTIME_URL2), RequestUtil.DEFAULT_REQUEST_HANDLER);
 
 		if (ValueUtil.isEmpty(realtimeSearch)) {
 
-			realtimeSearch = RequestUtil.requestSSL(new URL(NAVER_REALTIME_URL), (is, code) -> {
-				if (code == 200) {
-					try {
-						return ValueUtil.toString(is);
-					} catch (Exception e) {
-						LOGGER.error(ValueUtil.toString(e));
-					}
-				}
+			realtimeSearch = RequestUtil.requestSSL(new URL(NAVER_REALTIME_URL), new ResponseHandler<String>() {
 
-				return "";
+				@Override
+				public String apply(InputStream is, Integer code) {
+					if (code == 200) {
+						try {
+							return ValueUtil.toString(is);
+						} catch (Exception e) {
+							LOGGER.error(ValueUtil.toString(e));
+						}
+					}
+					return null;
+				}
 			});
 
 		}

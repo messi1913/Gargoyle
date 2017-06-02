@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.example;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.component.chart.service.BaseGoogleTrendChart;
 import com.kyj.fx.voeditor.visual.component.chart.service.GoogleTrendChartEvent;
 import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
+import com.kyj.fx.voeditor.visual.util.ResponseHandler;
 import com.kyj.fx.voeditor.visual.util.RequestUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -45,14 +47,10 @@ public class GoogleTrendExam extends Application {
 		launch(args);
 	}
 
-	/* (non-Javadoc)
-	 * @see javafx.application.Application#start(javafx.stage.Stage)
-	 */
-	@Override
-	public void start(Stage primaryStage) throws Exception {
+	private ResponseHandler<String> requestHandler = new ResponseHandler<String>() {
 
-		URL url = new URL(createUrl());
-		String jsonString = RequestUtil.requestSSL(url, (is, code) -> {
+		@Override
+		public String apply(InputStream is, Integer code) {
 			String result = "";
 			if (200 == code) {
 
@@ -108,7 +106,19 @@ public class GoogleTrendExam extends Application {
 			}
 
 			return result;
-		});
+		}
+
+	};
+
+	/* (non-Javadoc)
+	 * @see javafx.application.Application#start(javafx.stage.Stage)
+	 */
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+
+		URL url = new URL(createUrl());
+
+		String jsonString = RequestUtil.requestSSL(url, requestHandler);
 
 		//		String source = ValueUtil.toString(GoogleTrendExam.class.getResourceAsStream("GoogleTrendSample.json"));
 		BaseGoogleTrendChart root = new BaseGoogleTrendChart(jsonString, new CategoryAxis(), new NumberAxis(0, 100, 10));

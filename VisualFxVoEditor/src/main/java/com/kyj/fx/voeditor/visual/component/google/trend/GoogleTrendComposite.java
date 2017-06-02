@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.component.google.trend;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -31,6 +32,7 @@ import com.kyj.fx.voeditor.visual.component.chart.service.ChartOverTooltip;
 import com.kyj.fx.voeditor.visual.component.chart.service.GoogleTrendChartEvent;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ResponseHandler;
 import com.kyj.fx.voeditor.visual.util.RequestUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -320,16 +322,7 @@ public class GoogleTrendComposite extends BorderPane {
 	}
 
 	private String loadContent(URL url) throws IOException, Exception {
-		return RequestUtil.requestSSL(url, (is, code) -> {
-			if (code == 200) {
-				try {
-					return ValueUtil.toString(is);
-				} catch (Exception e) {
-					LOGGER.error(ValueUtil.toString(e));
-				}
-			}
-			return "";
-		});
+		return RequestUtil.requestSSL(url, RequestUtil.DEFAULT_REQUEST_HANDLER);
 	}
 
 	private String getGoogoleSearchUrl(String _keyword, Date start, Date end) throws UnsupportedEncodingException {
@@ -356,9 +349,10 @@ public class GoogleTrendComposite extends BorderPane {
 
 	}
 
-	private String request(String keywords) throws Exception {
-		URL url = new URL(createUrl(keywords));
-		String jsonString = RequestUtil.requestSSL(url, (is, code) -> {
+	private ResponseHandler<String> requestHandler = new ResponseHandler<String>() {
+
+		@Override
+		public String apply(InputStream is, Integer code) {
 			String result = "";
 			if (200 == code || 203 == code) {
 
@@ -420,7 +414,13 @@ public class GoogleTrendComposite extends BorderPane {
 			//			}
 
 			return result;
-		});
+		}
+	};
+
+	private String request(String keywords) throws Exception {
+		URL url = new URL(createUrl(keywords));
+
+		String jsonString = RequestUtil.requestSSL(url, requestHandler);
 		return jsonString;
 	}
 

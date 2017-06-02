@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.example;
 
 import com.kyj.fx.voeditor.visual.component.nrch.realtime.NrchRealtimeSrchFlowComposite;
 import com.kyj.fx.voeditor.visual.main.initalize.ProxyInitializable;
+import com.kyj.fx.voeditor.visual.main.initalize.SSLInitializable;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -21,6 +22,7 @@ public class NrchRealtimeSearchExam extends Application {
 
 	public static void main(String[] args) throws Exception {
 		new ProxyInitializable().initialize();
+		new SSLInitializable().initialize();
 		launch(args);
 	}
 

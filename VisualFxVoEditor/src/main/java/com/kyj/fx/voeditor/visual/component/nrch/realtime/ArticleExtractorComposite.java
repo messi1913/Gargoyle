@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.nrch.realtime;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -43,6 +46,7 @@ import com.kyj.fx.voeditor.visual.framework.RealtimeSearchItemVO;
 import com.kyj.fx.voeditor.visual.framework.URLModel;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ResponseHandler;
 import com.kyj.fx.voeditor.visual.util.RequestUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -462,21 +466,53 @@ public class ArticleExtractorComposite extends BorderPane {
 		return collect;
 	}
 
+	private ResponseHandler<String> handler = new ResponseHandler<String>() {
+
+		@Override
+		public String apply(InputStream t, Integer u) {
+			if (u == 200) {
+				String contentEncoding = getContentEncoding();
+				Charset charset = Charset.forName("UTF-8");
+				if (ValueUtil.isNotEmpty(contentEncoding))
+					charset = Charset.forName(contentEncoding);
+				else {
+
+					Map<String, List<String>> headers = getHeaders();
+					List<String> list = headers.get("Content-Type");
+					Optional<String> findAny = list.stream().filter(v -> {
+						String[] expects = v.split(";");
+						if (expects.length == 2) {
+							expects = expects[1].split("=");
+							if (expects.length == 2) {
+								return Charset.isSupported(expects[1]);
+							}
+						}
+						return false;
+					}).findAny();
+
+					if (findAny.isPresent()) {
+						String wow = findAny.get().split(";")[1].split("=")[1];
+						charset = Charset.forName(wow);
+						LOGGER.debug("{}" , charset);
+					} else {
+						LOGGER.debug("empty encoding.. ");
+					}
+
+				}
+				return ValueUtil.toString(t, charset);
+
+			}
+
+			return null;
+		}
+	};
+
 	private URLModel getHTMLContent(RealtimeSearchItemVO userData) throws Exception {
 		if (userData == null || ValueUtil.isEmpty(userData.getLink()))
 			return null;
 		URL url = toURL(userData);
 
-		String str = RequestUtil.requestSSL(url, (st, code) -> {
-			if (code == 200) {
-				try {
-					return ValueUtil.toString(st);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			return null;
-		});
+		String str = RequestUtil.requestSSL(url, handler);
 		if (str == null)
 			return URLModel.empty();
 
@@ -487,22 +523,39 @@ public class ArticleExtractorComposite extends BorderPane {
 		if (ValueUtil.isEmpty(url))
 			return null;
 		URL url2 = toURL(url);
-		String str = RequestUtil.req(url2, (st, code) -> {
-			if (code == 200) {
-				try {
-					return ValueUtil.toString(st);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			return null;
-		});
+		String str = RequestUtil.req(url2, handler);
 
 		if (str == null)
 			return URLModel.empty();
 
 		return new URLModel(url2.toString(), str);
 	}
+
+	//	public static String reqeustSSL_JSONString(URL url, RequestHandler<String> response) throws Exception {
+	//		return RequestUtil.requestSSL(url, (is, code) -> {
+	//			String dirtyConent = "";
+	//			if (200 == code) {
+	//				// 버퍼로 그냥 읽어봐도 되지만 인코딩 변환을 추후 쉽게 처리하기 위해 ByteArrayOutputStream을
+	//				// 사용
+	//
+	//				try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+	//					// int read = -1;
+	//					byte[] b = new byte[4096];
+	//					while (is.read(b) != -1) {
+	//						out.write(b);
+	//					}
+	//					out.flush();
+	//					dirtyConent = out.toString("UTF-8");
+	//				} catch (Exception e) {
+	//					LOGGER.error(ValueUtil.toString(e));
+	//				}
+	//			} else {
+	//				LOGGER.warn("not unnomal response code");
+	//			}
+	//			return dirtyConent;
+	//
+	//		});
+	//	}
 
 	private URL toURL(RealtimeSearchItemVO userData) throws MalformedURLException {
 		return toURL(userData.getLink());
