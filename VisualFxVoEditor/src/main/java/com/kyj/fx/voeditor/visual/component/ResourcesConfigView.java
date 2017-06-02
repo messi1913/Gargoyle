@@ -138,6 +138,8 @@ public class ResourcesConfigView extends BorderPane {
 
 		observableArrayList = loadResource();
 		tbDatabase.getItems().addAll(observableArrayList);
+		
+		FxUtil.installClipboardKeyEvent(tbDatabase);
 	}
 
 	/**
