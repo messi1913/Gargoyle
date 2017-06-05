@@ -7,7 +7,6 @@
 package com.kyj.fx.voeditor.visual.component.nrch.realtime;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -26,9 +25,11 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +47,9 @@ import com.kyj.fx.voeditor.visual.framework.RealtimeSearchItemVO;
 import com.kyj.fx.voeditor.visual.framework.URLModel;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
-import com.kyj.fx.voeditor.visual.util.ResponseHandler;
+import com.kyj.fx.voeditor.visual.util.IOUtil;
 import com.kyj.fx.voeditor.visual.util.RequestUtil;
+import com.kyj.fx.voeditor.visual.util.ResponseHandler;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
@@ -360,31 +362,75 @@ public class ArticleExtractorComposite extends BorderPane {
 			URLModel model = URLModel.empty();
 			try {
 
-				BiFunction<InputStream, Charset, URLModel> response = (is, charset) -> {
+				BiFunction<InputStream, Charset, URLModel> response = new BiFunction<InputStream, Charset, URLModel>() {
+					@Override
+					public URLModel apply(InputStream is, Charset charset) {
 
-					URLModel urlModel = URLModel.empty();
-					try {
+						URLModel urlModel = URLModel.empty();
 
-						String content = ValueUtil.toString(is, charset);
-						if (content == null)
-							return URLModel.empty();
-
-						Document parse = Jsoup.parse(content, "http");
-						Element head = parse.head();
-						Elements title = head.getElementsByTag("title");
-
-						urlModel = new URLModel(link, content);
-						urlModel.setTitle(title.text());
-					} finally {
 						try {
-							is.close();
-						} catch (Exception e) {
-							LOGGER.error(ValueUtil.toString(e));
+
+							byte[] byteArray = IOUtils.toByteArray(is);
+							String content = ValueUtil.toString(byteArray, charset);
+							if (content == null)
+								return URLModel.empty();
+
+							Document parse = Jsoup.parse(content, "http");
+							Element head = parse.head();
+							Elements title = head.getElementsByTag("title");
+
+							List<Node> childNodes = head.childNodes();
+
+							//						Charset contentCharset = charset;
+							for (Node n : childNodes) {
+								if ("meta".equals(n.nodeName())) {
+
+									String attr = n.attr("content");
+									//text/html; charset=utf-8
+									if (ValueUtil.isNotEmpty(attr)) {
+										String[] split = attr.split(";");
+										if (split != null && split.length == 2) {
+											String[] split2 = split[1].split("=");
+											if (split2 != null && split2.length == 2) {
+												Charset forName = Charset.forName(split2[1]);
+												if (!charset.equals(forName)) {
+													content = new String(byteArray, forName);
+													break;
+												}
+											}
+
+										}
+									}
+								}
+							}
+
+							//						String content = ValueUtil.toString(is, charset);
+							//						if (content == null)
+							//							return URLModel.empty();
+							//
+							//						Document parse = Jsoup.parse(content, "http");
+							//						Element head = parse.head();
+							//						Elements title = head.getElementsByTag("title");
+							//						Elements children = head.children();
+							//
+							//						List<Node> childNodes = head.childNodes();
+
+							urlModel = new URLModel(link, content);
+							urlModel.setTitle(title.text());
+
+						} catch (IOException e) {
+							e.printStackTrace();
+						} finally {
+							try {
+								is.close();
+							} catch (Exception e) {
+								LOGGER.error(ValueUtil.toString(e));
+							}
 						}
+
+						return urlModel;
+
 					}
-
-					return urlModel;
-
 				};
 
 				model = RequestUtil.req200(new URL(link), response, false);
@@ -493,7 +539,7 @@ public class ArticleExtractorComposite extends BorderPane {
 					if (findAny.isPresent()) {
 						String wow = findAny.get().split(";")[1].split("=")[1];
 						charset = Charset.forName(wow);
-						LOGGER.debug("{}" , charset);
+						LOGGER.debug("{}", charset);
 					} else {
 						LOGGER.debug("empty encoding.. ");
 					}

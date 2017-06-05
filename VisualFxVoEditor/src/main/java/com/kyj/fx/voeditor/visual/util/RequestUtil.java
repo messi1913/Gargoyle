@@ -268,6 +268,7 @@ public class RequestUtil {
 
 			String contentType = conn.getContentType();
 			String contentEncoding = conn.getContentEncoding();
+//			int contentLength = conn.getContentLength();
 			Map<String, List<String>> headerFields = conn.getHeaderFields();
 			try {
 				Optional<String> findAny = headerFields.keySet().stream().filter(f -> f != null).filter(str -> {

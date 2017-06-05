@@ -514,10 +514,10 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 			color = "#EBCA2F"; // "#8F3F7E";
 			break;
 		case 1:
-			color = "#B5305F";
+			color = "#D1B0BD";
 			break;
 		case 2:
-			color = "#CE584A";
+			color = "#D98D83";
 			break;
 		case 3:
 			color = "#DB8D5C";

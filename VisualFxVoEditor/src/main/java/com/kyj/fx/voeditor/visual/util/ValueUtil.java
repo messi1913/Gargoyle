@@ -1849,4 +1849,15 @@ public class ValueUtil {
 		}
 		return null;
 	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 5. 
+	 * @param bytes
+	 * @param charset
+	 * @return
+	 */
+	public static String toString(byte[] bytes, Charset charset) {
+		return new String(bytes, charset);
+	}
 }
