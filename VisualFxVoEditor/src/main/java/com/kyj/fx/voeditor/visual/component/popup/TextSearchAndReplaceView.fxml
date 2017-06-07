@@ -24,7 +24,7 @@
 			<center>
 				<TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
 					<tabs>
-						<Tab text="찾기">
+						<Tab fx:id="tabFind" text="찾기">
 							<content>
 								<BorderPane prefHeight="200.0" prefWidth="200.0">
 									<center>
@@ -84,12 +84,12 @@
 															</rowConstraints>
 															<children>
 																<Label text="방향" />
-																<RadioButton mnemonicParsing="false" selected="true" text="위" GridPane.rowIndex="1">
+																<RadioButton fx:id="rboUp" mnemonicParsing="false" selected="true" text="위" GridPane.rowIndex="1">
 																	<toggleGroup>
 																		<ToggleGroup fx:id="Direction" />
 																	</toggleGroup>
 																</RadioButton>
-																<RadioButton mnemonicParsing="false" selected="true" text="아래" toggleGroup="$Direction" GridPane.rowIndex="2" />
+																<RadioButton fx:id="rboDown" mnemonicParsing="false" selected="true" text="아래" toggleGroup="$Direction" GridPane.rowIndex="2" />
 															</children>
 														</GridPane>
 													</children>
@@ -131,7 +131,7 @@
 								</BorderPane>
 							</content>
 						</Tab>
-						<Tab text="바꾸기">
+						<Tab fx:id="tabReplace" text="바꾸기">
 							<content>
 								<GridPane hgap="5.0" vgap="5.0">
 									<children>
