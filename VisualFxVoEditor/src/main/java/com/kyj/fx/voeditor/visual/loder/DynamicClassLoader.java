@@ -270,7 +270,7 @@ public class DynamicClassLoader {
 				}).map(pram -> pram.getPath()).distinct().parallel().flatMap(new Function<String, Stream<ProjectInfo>>() {
 					@Override
 					public Stream<ProjectInfo> apply(String entry) {
-						LOGGER.debug(String.format("entry : %s", entry));
+						LOGGER.debug("projroot : {}  entry : {} "  , projectFile.getName(), entry);
 						File compiledFilePath = new File(projectFile, entry);
 						int length = compiledFilePath.getAbsolutePath().length() + 1;
 						List<String> findJavaSources = findSource(projectFile.getAbsolutePath(), compiledFilePath, length);
@@ -379,21 +379,12 @@ public class DynamicClassLoader {
 			return absolutePath;
 		};
 
+
+
 		FileSearcher fileSearcher = new FileSearcher(filePathName, -1, new String[] { JAVA_FILE_EXTENSION, FXML_FILE_EXTENSION },
-				new Predicate<File>() {
-
-					// 탐색하지않을 파일명을 기입한다.
-					List<String> exceptNames = ConfigResourceLoader.getInstance()
-							.getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME_CLASS_TYPE, ",");
-
-					@Override
-					public boolean test(File file) {
-						return !exceptNames.contains(file.getName());
-					}
-				});
-
+				FileSearcher.DEFAULT_FILTER
+				);
 		List<String> find = fileSearcher.find(toPackageName);
-
 		return find.stream().distinct().collect(Collectors.toList());
 	}
 
@@ -531,7 +522,7 @@ public class DynamicClassLoader {
 
 					final Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
 					method.setAccessible(true);
-					method.invoke(systemClassLoader, new Object[] {urls[i]  });
+					method.invoke(systemClassLoader, new Object[] { urls[i] });
 				}
 
 			}
@@ -557,41 +548,6 @@ public class DynamicClassLoader {
 
 		return loader;
 	}
-
-	// static class RuntimeJarLoader {
-	//
-	// public static void loadJarIndDir(String dir) {
-	// final URLClassLoader loader = (URLClassLoader)
-	// ClassLoader.getSystemClassLoader();
-	// loadJarIndDir(loader, dir);
-	// }
-	//
-	// public static void loadJarIndDir(ClassLoader loader, String dir) {
-	// try {
-	// final Method method = URLClassLoader.class.getDeclaredMethod("addURL",
-	// new Class[] { URL.class });
-	// method.setAccessible(true);
-	//
-	// new File(dir).listFiles(new FileFilter() {
-	// public boolean accept(File jar) {
-	// // jar 파일인 경우만 로딩
-	// if (jar.toString().toLowerCase().contains(".jar")) {
-	// try {
-	// // URLClassLoader.addURL(URL url) 메소드 호출
-	// method.invoke(loader, new Object[] { jar.toURI().toURL() });
-	// System.out.println(jar.getName() + " is loaded.");
-	// } catch (Exception e) {
-	// System.out.println(jar.getName() + " can't load.");
-	// }
-	// }
-	// return false;
-	// }
-	// });
-	// } catch (Exception e) {
-	// throw new RuntimeException(e);
-	// }
-	// }
-	// }
 
 	/**
 	 * classPath의 정보를 파싱하여 데이터셋으로 반환
@@ -677,18 +633,18 @@ class FileSearcher {
 	private String[] fileExtensions;
 	private Predicate<File> filter;
 
-	private static final Predicate<File> DEFAULT_FILTER = new Predicate<File>() {
+	public static final Predicate<File> DEFAULT_FILTER = new Predicate<File>() {
 
 		/*
 		 *  탐색하지않을 파일명을 기입한다.
 		 *  디폴트로는 소스 디렉토리가 존재하는 위치에 있는 대상은 필터링된다.
 		 */
-		List<String> exceptNames = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME_SOURCE_TYPE,
-				",");
+//		List<String> exceptNames = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME_SOURCE_TYPE,
+//				",");
 
 		@Override
 		public boolean test(File file) {
-			return !exceptNames.contains(file.getName());
+			return  true; //!exceptNames.contains(file.getName());
 		}
 	};
 
