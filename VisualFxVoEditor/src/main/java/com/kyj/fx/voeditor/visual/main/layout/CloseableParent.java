@@ -40,22 +40,37 @@ public abstract class CloseableParent<T extends Parent> implements Closeable {
 	private Thread hook;
 
 	public CloseableParent(T parent) {
+		this(parent, true);
+	}
+
+	/**
+	 * @param parent
+	 *            UI에 표현되는 레이아웃
+	 * 
+	 * @param registShutdownhook
+	 *            어플리케이션이 종료될때 한번 더 리소스 해제작업 수행 여부 디폴트값 true
+	 * 
+	 */
+	public CloseableParent(T parent, boolean registShutdownhook) {
 		super();
 		this.parent = parent;
 
-		// 반환되지 않은 리소스가 있을지를 대비해, 프로그램이 종료되기 전에 한번더 close요청처리를 한다.
-		hook = new Thread(() -> {
-			try {
-				if (parent != null) {
-					LOGGER.debug("Request Close  Resource ... : " + parent.getClass());
-					CloseableParent.this.close();
+		if (registShutdownhook) {
+			// 반환되지 않은 리소스가 있을지를 대비해, 프로그램이 종료되기 전에 한번더 close요청처리를 한다.
+			hook = new Thread(() -> {
+				try {
+					if (parent != null) {
+						LOGGER.debug("Request Close  Resource ... : " + parent.getClass());
+						CloseableParent.this.close();
+					}
+				} catch (IOException e) {
+					LOGGER.error(ValueUtil.toString(e));
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				LOGGER.error(ValueUtil.toString(e));
-				e.printStackTrace();
-			}
-		} , "CloseableParent");
-		RuntimeClassUtil.addShutdownHook(hook);
+			}, "CloseableParent");
+			RuntimeClassUtil.addShutdownHook(hook);
+		}
+
 	}
 
 	public T getParent() {
@@ -66,7 +81,9 @@ public abstract class CloseableParent<T extends Parent> implements Closeable {
 		this.parent = parent;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
