@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -803,5 +804,31 @@ public class FileUtil implements GargoyleExtensionFilters {
 			out.flush();
 		}
 
+	}
+
+	/**
+	 * 파일을 정렬하는 Comparator를 리턴한다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 8. 
+	 * @param isAscending
+	 * @return
+	 */
+	public static Comparator<? super File> sortByName(boolean isAscending) {
+		int flag = isAscending ? 1 : -1;
+		return new Comparator<File>() {
+
+			@Override
+			public int compare(File o1, File o2) {
+
+				if (o1 == null && o2 != null)
+					return flag * 1;
+				else if (o1 != null && o2 == null)
+					return flag * -1;
+				else if(o1 == null && o2 == null)
+					return 0;
+				return flag * (o1.getName().compareTo(o2.getName()));
+
+			}
+		};
 	}
 }
