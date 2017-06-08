@@ -7,7 +7,6 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.awt.image.BufferedImage;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -44,6 +43,7 @@ import com.kyj.fx.voeditor.visual.component.bar.GargoyleLoadBar;
 import com.kyj.fx.voeditor.visual.component.bar.GargoyleSynchLoadBar;
 import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
+import com.kyj.fx.voeditor.visual.component.notifycation.GargoyleNotification;
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
 import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
@@ -74,6 +74,7 @@ import javafx.concurrent.Worker.State;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.print.PageLayout;
 import javafx.print.PageOrientation;
@@ -1616,8 +1617,8 @@ public class FxUtil {
 	public static WebView openBrowser(Node parent, String content) {
 		return openBrowser(parent, content, true);
 	}
-	
-	public static WebView openBrowser(Node parent, String content , boolean isLink) {
+
+	public static WebView openBrowser(Node parent, String content, boolean isLink) {
 
 		WebView view = new WebView();
 		WebEngine engine = view.getEngine();
@@ -1680,11 +1681,11 @@ public class FxUtil {
 		engine.setOnAlert((WebEvent<String> wEvent) -> {
 			System.out.println("Alert Event  -  Message:  " + wEvent.getData());
 		});
-		if(isLink)
+		if (isLink)
 			engine.load(content);
 		else
 			engine.loadContent(content);
-		
+
 		BorderPane root = new BorderPane(view);
 		TextField txtLink = new TextField(content);
 		txtLink.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
@@ -1890,7 +1891,7 @@ public class FxUtil {
 			}
 		}
 
-		if(saveAs.exists())
+		if (saveAs.exists())
 			FileUtil.writeFile(saveAs, model.getContent(), model.getEncoding(), model.onError());
 
 	}
@@ -1969,4 +1970,61 @@ public class FxUtil {
 			return createTransition(node, AnimationType.BOUNCE_IN);
 		}
 	}
+
+	/**
+	 * [start notifycation]
+	 * 2017-06-08 kyj 
+	 * notifycation
+	 * */
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 8. 
+	 * @param cont
+	 */
+	public static void showNotification(final String cont) {
+		showNotification("", cont);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 8. 
+	 * @param title
+	 * @param cont
+	 */
+	public static void showNotification(final String title, final String cont) {
+		showNotification(null, title, cont, Pos.BOTTOM_RIGHT);
+	}
+
+	public static void showNotification(final String title, final String cont, Pos pos) {
+		showNotification(null, title, cont, pos);
+	}
+
+	public static void showNotification(Node graphics, final String title, final String cont, Pos pos) {
+		showNotification(() -> {
+			return GargoyleNotification.create().darkStyle();
+		} , n -> {
+
+			if (graphics != null)
+				n.graphic(graphics);
+
+			n.text(cont);
+			n.title(title);
+			n.position(pos);
+		});
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 8. 
+	 * @param suppl
+	 * @param action
+	 */
+	public static void showNotification(Supplier<GargoyleNotification> suppl, Consumer<GargoyleNotification> action) {
+		GargoyleNotification create = suppl.get();
+		action.accept(create);
+		create.show();
+	}
+	/**
+	 * [end notifycation]
+	 * */
 }
