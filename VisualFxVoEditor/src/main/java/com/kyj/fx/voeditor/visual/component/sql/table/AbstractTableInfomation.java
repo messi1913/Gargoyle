@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.table;
 
+import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.scene.layout.BorderPane;
@@ -36,5 +37,8 @@ public abstract class AbstractTableInfomation extends BorderPane implements Itab
 	public void setParentFrame(TableInformationFrameView parent) {
 		this.parent = parent;
 	}
+	
+	@FxPostInitialize
+	public abstract void postInit();
 
 }

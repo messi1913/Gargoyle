@@ -26,14 +26,16 @@ import javafx.fxml.FXML;
 public abstract class AbstractTableCreateCodeInformationController<T> extends AbstractTableInfomation {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(AbstractTableCreateCodeInformationController.class);
-	private TableInformationFrameView parent;
+	private TableInformationFrameView frame;
 
 	@FXML
-	private SqlKeywords txtSql;
+	protected SqlKeywords txtSql;
 	/**
 	 * 테이블 create문에 대한 텍스트를 보여주는 fxml이자 키값
 	 */
 	public static final String KEY_TABLE_CREATE_CODE_INFORMATION = TableInformationFrameView.KEY_TABLE_CREATE_CODE_INFORMATION;
+	private String databaseName;
+	private String tableName;
 
 	/**
 	 * 생성자
@@ -44,37 +46,63 @@ public abstract class AbstractTableCreateCodeInformationController<T> extends Ab
 	}
 
 	@Override
-	public void setParentFrame(TableInformationFrameView parent) {
-		this.parent = parent;
+	public void setParentFrame(TableInformationFrameView frame) {
+		this.frame = frame;
 
 	}
 
 	@Override
 	public void init() throws Exception {
 
-		TableInformationUserMetadataVO metadata = this.parent.getMetadata();
-		String databaseName = metadata.getDatabaseName();
-		String tableName = metadata.getTableName();
+		TableInformationUserMetadataVO metadata = this.frame.getMetadata();
+		databaseName = metadata.getDatabaseName();
+		tableName = metadata.getTableName();
 
-		if (ValueUtil.isEmpty( tableName)) {
+		if (ValueUtil.isEmpty(tableName)) {
 			throw new NullPointerException("tableName 이 비었습니다.");
 		}
 
-		String sql = getCreateTableSQL(databaseName, tableName);
-		if(sql.trim().isEmpty())
-			return;
+		if (isEmbeddedSupport()) {
+			T embeddedScript = getEmbeddedScript();
+			txtSql.setContent(convertString(embeddedScript));
+		} else {
+			String sql = getCreateTableSQL(databaseName, tableName);
+			if (sql.trim().isEmpty())
+				return;
 
-		try {
-			List<T> query = this.parent.query(sql, mapper());
-			T content = applyContent(query);
-			txtSql.setContent(convertString(content));
+			try {
+				List<T> query = this.frame.query(sql, mapper());
+				T content = applyContent(query);
+				txtSql.setContent(convertString(content));
 
-		} catch (Exception e) {
-			txtSql.appendContent(String.format("###### error #######\n%s", e.getMessage()));
-			LOGGER.error(ValueUtil.toString(e));
+			} catch (Exception e) {
+				txtSql.appendContent(String.format("###### error #######\n%s", e.getMessage()));
+				LOGGER.error(ValueUtil.toString(e));
+			}
 		}
+//		txtSql.moveToLine(1);
 		txtSql.setEditable(false);
 	}
+
+	@Override
+	public void postInit() {
+
+	}
+
+	/**
+	 * 특화처리하여 SQL문을 제공하는 경우 true
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 13. 
+	 */
+	protected abstract boolean isEmbeddedSupport();
+
+	/**
+	 * 특화처리하여 SQL문을 제공
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 13. 
+	 * @return
+	 */
+	protected abstract T getEmbeddedScript();
 
 	public T applyContent(List<T> result) {
 		return result.get(0);
@@ -114,9 +142,27 @@ public abstract class AbstractTableCreateCodeInformationController<T> extends Ab
 	public void clear() throws Exception {
 		txtSql.setContent("");
 	}
+	
+	public void setTextSql(String sql){
+		txtSql.setContent(sql);
+	}
+	
+	
 
 	@Override
 	public String getDbmsDriver() {
-		return this.parent.getDbmsDriver();
+		return this.frame.getDbmsDriver();
+	}
+
+	public String getDatabaseName() {
+		return databaseName;
+	}
+
+	public String getTableName() {
+		return tableName;
+	}
+
+	public TableInformationFrameView getFrame() {
+		return this.frame;
 	}
 }
