@@ -30,6 +30,11 @@ public class CommonTableColumnInformationController extends AbstractTableColumnI
 		super();
 	}
 
+	@Override
+	public void postInit() {
+
+	}
+	
 	private ConstraintKeyTypeFactory fac = new ConstraintKeyTypeFactory((str) -> {
 		// TODO 다른 DBMS에서도 적용가능하게 수정해야할부분임.
 
@@ -46,9 +51,9 @@ public class CommonTableColumnInformationController extends AbstractTableColumnI
 
 		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COLUMNS_WRAPPER, getDbmsDriver());
 
-//		if (ValueUtil.isNotEmpty(databaseName))
-//			sql = sql.replaceAll(":databaseName", databaseName);
-//		sql = sql.replaceAll(":tableName", tableName);
+		//		if (ValueUtil.isNotEmpty(databaseName))
+		//			sql = sql.replaceAll(":databaseName", databaseName);
+		//		sql = sql.replaceAll(":tableName", tableName);
 
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("databaseName", databaseName);

@@ -26,6 +26,11 @@ public class CommonTableIndexInformationController extends AbstractTableIndexInf
 		super();
 	}
 
+	@Override
+	public void postInit() {
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 *
@@ -37,9 +42,9 @@ public class CommonTableIndexInformationController extends AbstractTableIndexInf
 	public String getIndexSQL(String databaseName, String tableName) throws Exception {
 
 		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_INDEX_WRAPPER, getDbmsDriver());
-//		if(ValueUtil.isNotEmpty(databaseName))
-//			sql = sql.replaceAll(":databaseName", databaseName);
-//		sql = sql.replaceAll(":tableName", tableName);
+		//		if(ValueUtil.isNotEmpty(databaseName))
+		//			sql = sql.replaceAll(":databaseName", databaseName);
+		//		sql = sql.replaceAll(":tableName", tableName);
 
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("databaseName", databaseName);

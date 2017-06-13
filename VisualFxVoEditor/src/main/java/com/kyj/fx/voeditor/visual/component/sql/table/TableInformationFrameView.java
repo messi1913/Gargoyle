@@ -13,10 +13,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -30,7 +30,9 @@ import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableBaseInformationC
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableColumnInformationController;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableCreateCodeInformationController;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableIndexInformationController;
+import com.kyj.fx.voeditor.visual.component.sql.view.PostgreTableCreateCodeInformationController;
 import com.kyj.fx.voeditor.visual.exceptions.NotSupportException;
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -199,6 +201,13 @@ public class TableInformationFrameView extends BorderPane {
 		// 테이블에 대한 CREATE문에 대한 정보
 		{
 			AbstractTableInfomation createCodePane = new CommonTableCreateCodeInformationController();
+
+
+			if (ResourceLoader.ORG_POSTGRESQL_DRIVER.equals(getDbmsDriver())) {
+				createCodePane = new PostgreTableCreateCodeInformationController();
+			} else {
+				createCodePane = new CommonTableCreateCodeInformationController();
+			}
 			createCodePane.setParentFrame(this);
 
 			try {

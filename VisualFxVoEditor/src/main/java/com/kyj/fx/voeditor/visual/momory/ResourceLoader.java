@@ -136,6 +136,12 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	 */
 	public static final String UTUBE_LAST_DOUWNLOAD_LOCATION = "utube.last.download.location";
 
+	/**
+	 * postgre pgadmin 설치 경로
+	 * @최초생성일 2017. 6. 13.
+	 */
+	public static final String POSTGRE_PGADMIN_BASE_DIR = "postgre.pgadmin.base.dir"; 
+	
 	private String[] baseKeys = { BASE_KEY_JDBC_INFO, BASE_KEY_JDBC_DRIVER, BASE_KEY_JDBC_URL, BASE_KEY_JDBC_ID, BASE_KEY_JDBC_PASS,
 			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES };
 

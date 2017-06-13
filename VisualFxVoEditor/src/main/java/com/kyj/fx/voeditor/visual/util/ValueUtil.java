@@ -24,11 +24,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
@@ -1859,5 +1861,23 @@ public class ValueUtil {
 	 */
 	public static String toString(byte[] bytes, Charset charset) {
 		return new String(bytes, charset);
+	}
+
+	public static String toString(Properties prop) {
+		Iterator<Object> iterator = prop.keySet().iterator();
+		StringBuffer sb = new StringBuffer();
+		while (iterator.hasNext()) {
+			Object next = iterator.next();
+			Object object = prop.get(next);
+
+			String key = next.toString();
+			String value = "null";
+			if (ValueUtil.isNotEmpty(object)) {
+				value = object.toString();
+			}
+			
+			sb.append(String.format("%s : %s", key, value)).append("\n");
+		}
+		return sb.toString();
 	}
 }

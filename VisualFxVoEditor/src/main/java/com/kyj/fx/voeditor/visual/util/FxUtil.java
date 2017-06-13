@@ -447,7 +447,7 @@ public class FxUtil {
 		//  findfirst로 수정. @FxPostInitialize가 여러건있는경우를 잘못된 로직 유도를 방지.
 		Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null).forEach(m -> {
 			//				.ifPresent((m -> {
-			if (m.getModifiers() == Modifier.PUBLIC) {
+			if (   ( (m.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC)  ) {
 				try {
 					if (instanceController != null) {
 						// Lazy Run.

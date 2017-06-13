@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +31,6 @@ public class CommonTableCreateCodeInformationController extends AbstractTableCre
 
 	@Override
 	public String getCreateTableSQL(String databaseName, String tableName) {
-
 		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_CREATE_WRAPPER, getDbmsDriver());
 //		if(ValueUtil.isNotEmpty(databaseName))
 //			sql = sql.replaceAll(":databaseName", databaseName);
@@ -43,6 +43,8 @@ public class CommonTableCreateCodeInformationController extends AbstractTableCre
 			return "`" + str + "`"; 
 		});
 	}
+
+
 
 	@Override
 	public RowMapper<String> mapper() {
@@ -64,6 +66,16 @@ public class CommonTableCreateCodeInformationController extends AbstractTableCre
 	@Override
 	public String convertString(String t) {
 		return t;
+	}
+
+	@Override
+	protected boolean isEmbeddedSupport() {
+		return false;
+	}
+
+	@Override
+	protected String getEmbeddedScript() {
+		return null;
 	}
 
 }

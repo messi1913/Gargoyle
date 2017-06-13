@@ -17,6 +17,7 @@ import com.kyj.fx.voeditor.visual.component.SceneBuilderLocationComposite;
 import com.kyj.fx.voeditor.visual.component.SkinConfigView;
 import com.kyj.fx.voeditor.visual.component.config.skin.CustomSkinConfigView;
 import com.kyj.fx.voeditor.visual.component.config.skin.InstalledJresComposte;
+import com.kyj.fx.voeditor.visual.component.config.view.PostgrePgAdminConfigComposite;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseConfigView;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseUrlManagementView;
 import com.kyj.fx.voeditor.visual.component.scm.SVNConfigView;
@@ -103,7 +104,14 @@ public class ConfigurationViewController {
 				children4.setContentNode(SVNConfigView.class);
 				resourcesChildrens.add(children4);
 			}
-
+			
+			{
+				ConfigurationLeafNodeItem children4 = new ConfigurationLeafNodeItem();
+				children4.setItemName("Postgre Configuration");
+				children4.setContentNode(PostgrePgAdminConfigComposite.class);
+				resourcesChildrens.add(children4);
+			}
+			
 			{
 				ConfigurationGraphicsNodeItem children3 = new ConfigurationGraphicsNodeItem();
 				children3.setItemName("Skin Configuration");

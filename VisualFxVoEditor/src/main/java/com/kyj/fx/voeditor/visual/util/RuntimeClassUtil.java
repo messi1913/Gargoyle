@@ -72,7 +72,7 @@ public class RuntimeClassUtil {
 		Process p = null;
 		try {
 			p = pb.start();
-			p.waitFor();
+			p.waitFor(100, TimeUnit.MILLISECONDS);
 			i = p.getInputStream();
 			isr = new InputStreamReader(i, encode);
 			br = new BufferedReader(isr);
@@ -229,6 +229,7 @@ public class RuntimeClassUtil {
 	static class TThread extends Thread implements Closeable {
 		protected Process p;
 		protected OutputStream out;
+		protected boolean closed;
 
 		public TThread(Process p, OutputStream out) {
 			this.p = p;
@@ -241,6 +242,10 @@ public class RuntimeClassUtil {
 
 		public InputStream getErrorStream() {
 			return this.p.getErrorStream();
+		}
+
+		public boolean isClosed() {
+			return closed;
 		}
 
 		/* (non-Javadoc)
@@ -270,7 +275,6 @@ public class RuntimeClassUtil {
 		pb.redirectErrorStream(true);
 
 		Process p = null;
-
 		TThread outThread = null;
 		TThread errThread = null;
 		try {
@@ -288,16 +292,19 @@ public class RuntimeClassUtil {
 						InputStream inputStream = p.getInputStream();
 						p.waitFor(10, TimeUnit.SECONDS);
 
-						byte[] b = new byte[1024];
+						byte[] b = new byte[4096];
 
 						while (inputStream.read(b) != -1) {
-							out.write(b);
-							out.flush();
+							this.out.write(b);
 						}
+
+						this.out.flush();
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
+					} finally {
+						closed = true;
 					}
 				}
 
@@ -315,16 +322,18 @@ public class RuntimeClassUtil {
 						InputStream inputStream = p.getErrorStream();
 						p.waitFor(10, TimeUnit.SECONDS);
 
-						byte[] b = new byte[1024];
+						byte[] b = new byte[4096];
 
 						while (inputStream.read(b) != -1) {
 							out.write(b);
-							out.flush();
 						}
+						out.flush();
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
+					} finally {
+						closed = true;
 					}
 				}
 
@@ -334,6 +343,9 @@ public class RuntimeClassUtil {
 			errThread.start();
 
 			while (p.isAlive()) {
+				Thread.sleep(1000);
+			}
+			while (!outThread.isClosed() && !outThread.isClosed()) {
 				Thread.sleep(1000);
 			}
 

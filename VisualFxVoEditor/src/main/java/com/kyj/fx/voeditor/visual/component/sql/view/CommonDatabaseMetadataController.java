@@ -21,4 +21,10 @@ public class CommonDatabaseMetadataController extends AbstractDatabaseMetaDataCo
 		super();
 	}
 
+	@Override
+	public void postInit() {
+
+		
+	}
+
 }
