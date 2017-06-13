@@ -6,12 +6,8 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,8 +17,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.kyj.fx.voeditor.visual.component.sql.table.AbstractTableCreateCodeInformationController;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
-import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
-import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
+import com.kyj.fx.voeditor.visual.util.PogstgreUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
@@ -75,7 +70,7 @@ public class PostgreTableCreateCodeInformationController extends AbstractTableCr
 
 	@Override
 	protected boolean isEmbeddedSupport() {
-		pgadminBasedir = ResourceLoader.getInstance().get(ResourceLoader.POSTGRE_PGADMIN_BASE_DIR);
+		pgadminBasedir = PogstgreUtil.getPgdumpLocation();
 		return ValueUtil.isNotEmpty(pgadminBasedir);
 	}
 
@@ -94,8 +89,8 @@ public class PostgreTableCreateCodeInformationController extends AbstractTableCr
 	}
 
 	private void getScript() {
-
-		File pgDumpFile = new File(pgadminBasedir);
+		if (ValueUtil.isEmpty(pgadminBasedir))
+			return;
 
 		Service<String> service = new Service<String>() {
 
@@ -106,45 +101,16 @@ public class PostgreTableCreateCodeInformationController extends AbstractTableCr
 
 					@Override
 					protected String call() throws Exception {
-						Connection connection = getFrame().getConnection();
-						ByteArrayOutputStream out = new ByteArrayOutputStream();
-						ByteArrayOutputStream error = new ByteArrayOutputStream();
-						try {
-							DatabaseMetaData metaData = connection.getMetaData();
-
-							String url = metaData.getURL();
-							String replace = url.replace("jdbc:postgresql://", "");
-							String[] split = replace.split(":");
-							String ip = split[0];
-							String[] split2 = split[1].split("/");
-							String port = split2[0];
-							String dbName = split2[1];
-
-							String userName = metaData.getUserName();
-
+						try (Connection connection = getFrame().getConnection()) {
 							String databaseName = getDatabaseName();
 							String tableName = getTableName();
-							String path = pgDumpFile.getAbsolutePath();
-							String argUserName = "--username=" + userName;
-							String argHost = "--host=" + ip;
-							String argPort = "--port=" + port;
-							String argNoPasswd = "--no-password";
-							String argDbName = "--dbname=" + dbName;
-
-							String argSchema = databaseName + "." + tableName;
-							if (ValueUtil.isEmpty(databaseName))
-								argSchema = tableName;
-
-							RuntimeClassUtil.exe(Arrays.asList(path, argUserName, argHost, argPort, argNoPasswd, argDbName, "-t", argSchema,
-									"--schema-only"), out, error);
-
-							return out.toString("UTF-8");
+							return PogstgreUtil.dumpTable(connection, databaseName, tableName);
 						} catch (SQLException e) {
 							LOGGER.error(ValueUtil.toString(e));
 						} catch (Exception e) {
 							LOGGER.error(ValueUtil.toString(e));
 						}
-						return error.toString();
+						return "";
 					}
 				};
 			}
@@ -154,7 +120,6 @@ public class PostgreTableCreateCodeInformationController extends AbstractTableCr
 		service.setOnSucceeded(ev -> {
 
 			Platform.runLater(() -> {
-				//				String message = ev.getSource().getMessage();
 				Object value = ev.getSource().getValue();
 				setTextSql(value.toString());
 				txtSql.moveToLine(1, 1);
