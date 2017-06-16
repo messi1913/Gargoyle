@@ -1,0 +1,7 @@
+#timer-root-borderpane
+{
+	-fx-max-width : 1200px;
+}
+.timer-label-controls{
+	-fx-font-size : 120px;
+}
