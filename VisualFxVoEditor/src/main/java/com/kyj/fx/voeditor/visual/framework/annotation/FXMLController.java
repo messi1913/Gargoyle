@@ -33,6 +33,14 @@ public @interface FXMLController {
 	 ********************************/
 	String value();
 
+	/**
+	 * css 파일이 존재한다면 위치기록
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 16. 
+	 * @return
+	 */
+	String css() default "";
+
 	/********************************
 	 * 작성일 : 2016. 5. 22. 작성자 : KYJ
 	 *

@@ -347,6 +347,13 @@ public class FxUtil {
 		return controller.value();
 	}
 
+	private static String getCss(FXMLController controller) {
+		if (controller == null) {
+			return null;
+		}
+		return controller.css();
+	}
+
 	/********************************
 	 * 작성일 : 2016. 5. 21. 작성자 : KYJ
 	 *
@@ -375,6 +382,8 @@ public class FxUtil {
 
 		String fxml = getFxml(controller);//controller.value();
 
+		String css = getCss(controller);//controller.value();
+
 		if (ValueUtil.isEmpty(fxml))
 			throw new IllegalArgumentException("value is empty..");
 
@@ -386,7 +395,8 @@ public class FxUtil {
 
 			Node node = FxMemory.get(fullClassName);
 			if (node == null) {
-				newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, option, controllerAction);
+				newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, css, option,
+						controllerAction);
 				FxMemory.put(fullClassName, (Node) newInstance);
 			} else {
 				newInstance = (N) node;
@@ -395,23 +405,29 @@ public class FxUtil {
 			break;
 
 		case RequireNew:
-			newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, option, controllerAction);
+			newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, css, option, controllerAction);
 			break;
 		}
 
 		return newInstance;
 	}
 
-	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml) throws Exception {
-		return newInstance(controllerClass, rootInstance, isSelfController, fxml, null, null);
+	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, String css)
+			throws Exception {
+		return newInstance(controllerClass, rootInstance, isSelfController, fxml, css, null, null);
 	}
 
 	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, Consumer<T> option,
 			Consumer<C> controllerAction) throws Exception {
-		return newInstance(controllerClass, rootInstance, isSelfController, fxml, option, controllerAction);
+		return newInstance(controllerClass, rootInstance, isSelfController, fxml, null, option, controllerAction);
 	}
 
-	private static <T, C> T newInstance(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String _fxml,
+	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, String css,
+			Consumer<T> option, Consumer<C> controllerAction) throws Exception {
+		return newInstance(controllerClass, rootInstance, isSelfController, fxml, css, option, controllerAction);
+	}
+
+	private static <T, C> T newInstance(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String _fxml, String _css,
 			Consumer<T> option, Consumer<C> controllerAction) throws Exception {
 
 		String fxml = _fxml;
@@ -427,10 +443,16 @@ public class FxUtil {
 
 		FXMLLoader loader = createNewFxmlLoader();
 		loader.setLocation(resource);
+
 		if (isSelfController && rootInstance != null) {
 			try {
 				loader.setRoot(rootInstance);
 				loader.setController(rootInstance);
+
+				if (rootInstance instanceof Parent) {
+					((Parent) rootInstance).getStylesheets().add(_css);
+				}
+
 			} catch (Exception e) {
 				throw new GargoyleException(e);
 			}
