@@ -73,7 +73,7 @@ public class ExecutorDemons {
 	private static ExecutorService gargoyleSystemExecutorService;
 
 	static {
-		gargoyleSystemExecutorService = newFixedThreadExecutor(4);
+		gargoyleSystemExecutorService = newFixedThreadExecutor(Runtime.getRuntime().availableProcessors());
 	}
 
 	public static ExecutorService getGargoyleSystemExecutorSerivce() {

@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.undo.UndoManager;
+import org.fxmisc.undo.impl.UndoManagerImpl;
 
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.SqlFormatter;
@@ -247,7 +249,6 @@ public class CodeAreaHelper<T extends CodeArea> {
 	 */
 	public void codeAreaKeyClick(KeyEvent e) {
 
-
 		//CTRL + F
 		if (KeyCode.F == e.getCode() && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
 			if (!e.isConsumed()) {
@@ -327,7 +328,6 @@ public class CodeAreaHelper<T extends CodeArea> {
 		else {
 			codeArea.getUndoManager().mark();
 		}
-
 
 	}
 

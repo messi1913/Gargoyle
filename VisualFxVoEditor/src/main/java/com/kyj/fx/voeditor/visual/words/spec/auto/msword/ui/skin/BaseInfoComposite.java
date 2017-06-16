@@ -26,7 +26,7 @@ import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.kyj.fx.voeditor.visual.component.FileWrapper;
+import com.kyj.fx.voeditor.visual.component.JavaProjectFileWrapper;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
@@ -153,7 +153,7 @@ public class BaseInfoComposite extends BorderPane {
 	 * @param treeItem
 	 * @return
 	 ********************************/
-	public JavaProjectFileTreeItem getJavaProjectFileTreeItem(TreeItem<FileWrapper> treeItem) {
+	public JavaProjectFileTreeItem getJavaProjectFileTreeItem(TreeItem<JavaProjectFileWrapper> treeItem) {
 
 		if (treeItem != null) {
 

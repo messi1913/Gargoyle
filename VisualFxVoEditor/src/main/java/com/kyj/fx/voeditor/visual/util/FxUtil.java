@@ -36,6 +36,7 @@ import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 
 import org.controlsfx.control.PopOver;
+import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
 import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
 import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
+import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.InstanceTypes;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
@@ -447,7 +449,7 @@ public class FxUtil {
 		//  findfirst로 수정. @FxPostInitialize가 여러건있는경우를 잘못된 로직 유도를 방지.
 		Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null).forEach(m -> {
 			//				.ifPresent((m -> {
-			if (   ( (m.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC)  ) {
+			if (((m.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC)) {
 				try {
 					if (instanceController != null) {
 						// Lazy Run.
@@ -1184,6 +1186,19 @@ public class FxUtil {
 
 	public static void createSimpleTextAreaAndShow(String content, Consumer<Stage> option) {
 		createStageAndShow(new TextArea(content), option);
+	}
+
+	public static void createCodeAreaAndShow(String content) {
+		SimpleTextView parent = new SimpleTextView(content);
+
+		createStageAndShow(parent, stage -> {
+			stage.setWidth(1200d);
+			stage.setHeight(800d);
+		});
+	}
+
+	public static void createCodeAreaAndShow(String content, Consumer<Stage> option) {
+		createStageAndShow(new CodeArea(content), option);
 	}
 
 	/********************************
@@ -2027,4 +2042,5 @@ public class FxUtil {
 	/**
 	 * [end notifycation]
 	 * */
+
 }

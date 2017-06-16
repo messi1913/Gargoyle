@@ -17,6 +17,7 @@ import org.fxmisc.richtext.NavigationActions.SelectionPolicy;
 import org.fxmisc.richtext.Paragraph;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
+import org.fxmisc.undo.UndoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,8 +98,10 @@ public class JavaTextArea extends BorderPane {
 			}
 		}
 	};
-
 	public JavaTextArea() {
+		this("");
+	}
+	public JavaTextArea(String content) {
 
 
 		//
@@ -173,7 +176,15 @@ public class JavaTextArea extends BorderPane {
 
 		//		this.getStylesheets().add(JavaKeywordsAsync.class.getResource("java-keywords.css").toExternalForm());
 		this.getStylesheets().add(JavaTextArea.class.getResource("java-keywords.css").toExternalForm());
+		
+		
+		this.codeArea.appendText(content);
 
+		
+		UndoManager undoManager = codeArea.getUndoManager();
+		undoManager.forgetHistory();
+		undoManager.mark();
+		this.codeArea.selectRange(0, 0);
 	}
 
 	public IntFunction<Node> getLineFactory() {
@@ -209,6 +220,10 @@ public class JavaTextArea extends BorderPane {
 	public void setContent(String content) {
 		codeHelperDeligator.setContent(content);
 	}
+	
+	
+
+    
 
 	public void setEditable(boolean editable) {
 		this.codeArea.setEditable(editable);

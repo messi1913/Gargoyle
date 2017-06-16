@@ -23,17 +23,17 @@ import javafx.scene.layout.HBox;
  * @author KYJ
  *
  */
-public class JavaProjectFileTreeItem extends FileTreeItem {
+public class JavaProjectFileTreeItem extends FileTreeItem<JavaProjectFileWrapper> {
 
-	public JavaProjectFileTreeItem(FileWrapper fileWrapper) {
+	public JavaProjectFileTreeItem(JavaProjectFileWrapper fileWrapper) {
 		super(fileWrapper);
 	}
 
 	@Override
-	protected Node createGraphcis(FileWrapper fileWrapper) {
+	protected Node createGraphcis(JavaProjectFileWrapper fileWrapper) {
 		InputStream imageStream = ClassLoader.getSystemClassLoader().getResourceAsStream("META-INF/images/eclipse/project.gif");
 		ImageView createImageView = FxUtil.createImageView(imageStream);
-//		String meta = String.format("[%b][%b]", fileWrapper.isJavaProjectFile(), fileWrapper.isSVNConnected());
+		//		String meta = String.format("[%b][%b]", fileWrapper.isJavaProjectFile(), fileWrapper.isSVNConnected());
 		return new HBox(createImageView, new Label(fileWrapper.getFile().getName()), new Label(getMetadata()));
 	}
 
@@ -47,9 +47,8 @@ public class JavaProjectFileTreeItem extends FileTreeItem {
 			//e.printStackTrace();
 		}
 		return "";
-//		return String.format("[%b][%b]", getValue().isJavaProjectFile(), getValue().isSVNConnected());
-		
-		
+		//		return String.format("[%b][%b]", getValue().isJavaProjectFile(), getValue().isSVNConnected());
+
 	}
 
 }

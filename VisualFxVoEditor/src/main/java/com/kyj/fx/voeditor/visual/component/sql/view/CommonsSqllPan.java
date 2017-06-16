@@ -965,7 +965,8 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 				List<Object> values = new ArrayList<>();
 				while (iterator.hasNext()) {
 					String columnName = iterator.next();
-					Object value = v.get(columnName);
+					String value = v.get(columnName).getAsString();
+//					Object value = v.get(columnName);
 					values.add(value);
 				}
 				return values;
@@ -976,7 +977,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 						return null;
 					else {
 						String convert = str.toString();
-						convert = convert.substring(1, convert.length() - 1);
+//						convert = convert.substring(1, convert.length() - 1);
 						if (convert.indexOf("'") >= 0) {
 							try {
 								convert = StringUtils.replace(convert, "'", "''");

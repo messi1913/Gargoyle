@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.base.Objects;
-import com.kyj.fx.voeditor.visual.component.FileWrapper;
+import com.kyj.fx.voeditor.visual.component.JavaProjectFileWrapper;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
 import com.kyj.fx.voeditor.visual.framework.FileCheckHandler;
@@ -92,6 +92,9 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 */
 	private static final String XML = ".xml";
 
+	private static final String ZIP = ".zip";
+
+	private static final String JAR = ".jar";
 	/**
 	 * 이미지 파일 확장자들을 정의
 	 *
@@ -306,6 +309,32 @@ public class FileUtil implements GargoyleExtensionFilters {
 		return false;
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 15. 
+	 * @param file
+	 * @return
+	 */
+	public static boolean isZip(File file) {
+		if (file != null && file.exists()) {
+			return isZip(file.getName());
+		}
+		return false;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 15. 
+	 * @param file
+	 * @return
+	 */
+	public static boolean isJar(File file) {
+		if (file != null && file.exists()) {
+			return isJar(file.getName());
+		}
+		return false;
+	}
+
 	/********************************
 	 * 작성일 : 2016. 8. 19. 작성자 : KYJ
 	 *
@@ -316,7 +345,14 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 ********************************/
 	public static boolean isXML(String fileName) {
 		return ValueUtil.isEmpty(fileName) ? false : fileName.endsWith(XML);
+	}
 
+	private static boolean isZip(String fileName) {
+		return ValueUtil.isEmpty(fileName) ? false : fileName.endsWith(ZIP);
+	}
+
+	private static boolean isJar(String fileName) {
+		return ValueUtil.isEmpty(fileName) ? false : fileName.endsWith(JAR);
 	}
 
 	/**
@@ -656,7 +692,7 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 * @param treeItem
 	 * @return
 	 ********************************/
-	public static JavaProjectFileTreeItem toJavaProjectFileTreeItem(TreeItem<FileWrapper> treeItem) {
+	public static JavaProjectFileTreeItem toJavaProjectFileTreeItem(TreeItem<JavaProjectFileWrapper> treeItem) {
 		if (treeItem != null) {
 			if (treeItem instanceof JavaProjectFileTreeItem) {
 				return (JavaProjectFileTreeItem) treeItem;
@@ -824,11 +860,12 @@ public class FileUtil implements GargoyleExtensionFilters {
 					return flag * 1;
 				else if (o1 != null && o2 == null)
 					return flag * -1;
-				else if(o1 == null && o2 == null)
+				else if (o1 == null && o2 == null)
 					return 0;
 				return flag * (o1.getName().compareTo(o2.getName()));
 
 			}
 		};
 	}
+
 }

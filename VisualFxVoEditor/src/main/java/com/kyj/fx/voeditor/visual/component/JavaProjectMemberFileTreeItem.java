@@ -12,9 +12,9 @@ package com.kyj.fx.voeditor.visual.component;
  * @author KYJ
  *
  */
-public class JavaProjectMemberFileTreeItem extends FileTreeItem {
+public class JavaProjectMemberFileTreeItem extends FileTreeItem<JavaProjectFileWrapper> {
 
-	public JavaProjectMemberFileTreeItem(FileWrapper fileWrapper) {
+	public JavaProjectMemberFileTreeItem(JavaProjectFileWrapper fileWrapper) {
 		super(fileWrapper);
 	}
 
@@ -23,11 +23,9 @@ public class JavaProjectMemberFileTreeItem extends FileTreeItem {
 		return "";
 	}
 
-//	@Override
-//	protected List<Node> createAttachNodes() {
-//		return Arrays.asList(new Label("Connected"));
-//	}
-	
-	
+	//	@Override
+	//	protected List<Node> createAttachNodes() {
+	//		return Arrays.asList(new Label("Connected"));
+	//	}
 
 }

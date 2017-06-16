@@ -106,18 +106,18 @@ public class ProjectFileTreeItemCreator {
 	 * @param f
 	 * @return
 	 ********************************/
-	public TreeItem<FileWrapper> createNode(final File f) {
+	public TreeItem<JavaProjectFileWrapper> createNode(final File f) {
 		return createDefaultNode(createFileWrapper(f));
 	}
 
-	public TreeItem<FileWrapper> createJavaProjectNode(final FileWrapper f) {
+	public TreeItem<JavaProjectFileWrapper> createJavaProjectNode(final JavaProjectFileWrapper f) {
 		return new JavaProjectFileTreeItem(f) {
 			private boolean isLeaf;
 			private boolean isFirstTimeChildren = true;
 			private boolean isFirstTimeLeaf = true;
 
 			@Override
-			public ObservableList<TreeItem<FileWrapper>> getChildren() {
+			public ObservableList<TreeItem<JavaProjectFileWrapper>> getChildren() {
 				if (isFirstTimeChildren) {
 					isFirstTimeChildren = false;
 					super.getChildren().setAll(buildChildren(this, FILE_TREE_TYPE.JAVA_PROJECT));
@@ -129,7 +129,7 @@ public class ProjectFileTreeItemCreator {
 			public boolean isLeaf() {
 				if (isFirstTimeLeaf) {
 					isFirstTimeLeaf = false;
-					FileWrapper f = (FileWrapper) getValue();
+					JavaProjectFileWrapper f = (JavaProjectFileWrapper) getValue();
 					File file = f.getFile();
 
 					if(file.isDirectory())
@@ -146,14 +146,14 @@ public class ProjectFileTreeItemCreator {
 		};
 	}
 
-	public TreeItem<FileWrapper> createJavaProjectMemberNode(final FileWrapper f) {
-		TreeItem<FileWrapper> treeItem =  new JavaProjectMemberFileTreeItem(f) {
+	public TreeItem<JavaProjectFileWrapper> createJavaProjectMemberNode(final JavaProjectFileWrapper f) {
+		TreeItem<JavaProjectFileWrapper> treeItem =  new JavaProjectMemberFileTreeItem(f) {
 			private boolean isLeaf;
 			private boolean isFirstTimeChildren = true;
 			private boolean isFirstTimeLeaf = true;
 
 			@Override
-			public ObservableList<TreeItem<FileWrapper>> getChildren() {
+			public ObservableList<TreeItem<JavaProjectFileWrapper>> getChildren() {
 				if (isFirstTimeChildren) {
 					isFirstTimeChildren = false;
 					super.getChildren().setAll(buildChildren(this, FILE_TREE_TYPE.JAVA_PROJECT_MEMBER));
@@ -165,7 +165,7 @@ public class ProjectFileTreeItemCreator {
 			public boolean isLeaf() {
 				if (isFirstTimeLeaf) {
 					isFirstTimeLeaf = false;
-					FileWrapper f = (FileWrapper) getValue();
+					JavaProjectFileWrapper f = (JavaProjectFileWrapper) getValue();
 					File file = f.getFile();
 
 					if(file.isDirectory())
@@ -182,7 +182,7 @@ public class ProjectFileTreeItemCreator {
 		};
 
 		treeItem.expandedProperty().addListener((oba, oldval, newval) -> {
-			FileWrapper value = f;
+			JavaProjectFileWrapper value = f;
 			File file = value.getFile();
 
 			if (newval) {
@@ -199,14 +199,14 @@ public class ProjectFileTreeItemCreator {
 		return treeItem;
 	}
 
-	public TreeItem<FileWrapper> createFileNode(final FileWrapper f) {
+	public TreeItem<JavaProjectFileWrapper> createFileNode(final JavaProjectFileWrapper f) {
 		return new FileTreeItem(f) {
 			private boolean isLeaf;
 			private boolean isFirstTimeChildren = true;
 			private boolean isFirstTimeLeaf = true;
 
 			@Override
-			public ObservableList<TreeItem<FileWrapper>> getChildren() {
+			public ObservableList<TreeItem<JavaProjectFileWrapper>> getChildren() {
 				if (isFirstTimeChildren) {
 					isFirstTimeChildren = false;
 					super.getChildren().setAll(buildChildren(this, FILE_TREE_TYPE.NOMAL));
@@ -218,7 +218,7 @@ public class ProjectFileTreeItemCreator {
 			public boolean isLeaf() {
 				if (isFirstTimeLeaf) {
 					isFirstTimeLeaf = false;
-					FileWrapper f = (FileWrapper) getValue();
+					JavaProjectFileWrapper f = (JavaProjectFileWrapper) getValue();
 					File file = f.getFile();
 
 					if(file.isDirectory())
@@ -245,8 +245,8 @@ public class ProjectFileTreeItemCreator {
 	 * @return
 	 * @User KYJ
 	 */
-	public TreeItem<FileWrapper> createDefaultNode(final FileWrapper f) {
-		TreeItem<FileWrapper> treeItem = null;
+	public TreeItem<JavaProjectFileWrapper> createDefaultNode(final JavaProjectFileWrapper f) {
+		TreeItem<JavaProjectFileWrapper> treeItem = null;
 
 		if (f.isJavaProjectFile()) {
 			treeItem = createJavaProjectNode(f);
@@ -255,7 +255,7 @@ public class ProjectFileTreeItemCreator {
 		}
 
 		treeItem.expandedProperty().addListener((oba, oldval, newval) -> {
-			FileWrapper value = f;
+			JavaProjectFileWrapper value = f;
 			File file = value.getFile();
 
 			if (newval) {
@@ -277,9 +277,9 @@ public class ProjectFileTreeItemCreator {
 		NOMAL, JAVA_PROJECT, JAVA_PROJECT_MEMBER
 	}
 
-	private ObservableList<TreeItem<FileWrapper>> buildChildren(TreeItem<FileWrapper> treeItem, FILE_TREE_TYPE type) {
+	private ObservableList<TreeItem<JavaProjectFileWrapper>> buildChildren(TreeItem<JavaProjectFileWrapper> treeItem, FILE_TREE_TYPE type) {
 
-		FileWrapper f = treeItem.getValue();
+		JavaProjectFileWrapper f = treeItem.getValue();
 		boolean isParentSvnConnected = f.isSVNConnected();
 		File parentWcDbFile = f.getWcDbFile();
 		if (f == null) {
@@ -292,13 +292,13 @@ public class ProjectFileTreeItemCreator {
 
 		File[] files = f.listFiles();
 		if (files != null) {
-			ObservableList<TreeItem<FileWrapper>> children = FXCollections.observableArrayList();
+			ObservableList<TreeItem<JavaProjectFileWrapper>> children = FXCollections.observableArrayList();
 
 			switch (type) {
 			case NOMAL:
 
 				for (File childFile : files) {
-					TreeItem<FileWrapper> createNode = createDefaultNode(createFileWrapper(childFile));
+					TreeItem<JavaProjectFileWrapper> createNode = createDefaultNode(createFileWrapper(childFile));
 					children.add(createNode);
 				}
 				break;
@@ -306,7 +306,7 @@ public class ProjectFileTreeItemCreator {
 			case JAVA_PROJECT:
 
 				for (File childFile : files) {
-					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile, fw -> {
+					TreeItem<JavaProjectFileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile, fw -> {
 						fw.setWcDbFile(parentWcDbFile);
 						fw.setSVNConnected(isParentSvnConnected);
 					}));
@@ -317,7 +317,7 @@ public class ProjectFileTreeItemCreator {
 			case JAVA_PROJECT_MEMBER:
 
 				for (File childFile : files) {
-					TreeItem<FileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile, fw -> {
+					TreeItem<JavaProjectFileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile, fw -> {
 						fw.setWcDbFile(parentWcDbFile);
 						fw.setSVNConnected(isParentSvnConnected);
 					}));
@@ -341,7 +341,7 @@ public class ProjectFileTreeItemCreator {
 	//	private FileWrapper createFileWrapper(File childFile) {
 	//		return createFileWrapper(childFile, false);
 	//	}
-	private FileWrapper createFileWrapper(File childFile) {
+	private JavaProjectFileWrapper createFileWrapper(File childFile) {
 		return createFileWrapper(childFile, fileWrapper -> operate(fileWrapper));
 	}
 
@@ -349,8 +349,8 @@ public class ProjectFileTreeItemCreator {
 	//		return createFileWrapper(childFile,  andThanOperate);
 	//	}
 
-	private FileWrapper createFileWrapper(File childFile, Consumer<FileWrapper> operator) {
-		FileWrapper fileWrapper = new FileWrapper(childFile);
+	private JavaProjectFileWrapper createFileWrapper(File childFile, Consumer<JavaProjectFileWrapper> operator) {
+		JavaProjectFileWrapper fileWrapper = new JavaProjectFileWrapper(childFile);
 
 		if (operator != null)
 			operator.accept(fileWrapper);
@@ -380,7 +380,7 @@ public class ProjectFileTreeItemCreator {
 	 *
 	 * @param fileWrapper
 	 ********************************/
-	void operate(FileWrapper fileWrapper) {
+	void operate(JavaProjectFileWrapper fileWrapper) {
 		File check = fileWrapper.getFile();
 		if (check != null && check.isDirectory()) {
 			File[] listFiles = check.listFiles();

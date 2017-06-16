@@ -6,12 +6,15 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
 import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
@@ -26,6 +29,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
@@ -105,6 +109,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	@FXML
 	public void initialize() {
 		codeArea = new CodeArea();
+		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 		initHelpers();
 		initGraphics();
 
@@ -185,7 +190,6 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		String content = codeArea.getText();
 
 		try {
-			WebView webView = new WebView();
 
 			//			new ContentMimeHtmlAdapter(content)
 
@@ -212,20 +216,33 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			//			byte[] decode = Base64.getMimeDecoder().decode(content.getBytes("UTF-8"));
 			//			String string = new String(decode);
 
-			FxUtil.createStageAndShow(webView, stage -> {
-				stage.setAlwaysOnTop(true);
-				stage.initOwner(getScene().getWindow());
-				stage.focusedProperty().addListener((oba, o, n) -> {
-					if (!n)
-						stage.close();
-
-				});
-			});
-
 			javafx.application.Platform.runLater(() -> {
 				try {
+					WebView webView = new WebView();
 					MimeToHtmlAdapter adapter = new MimeToHtmlAdapter(content);
-					webView.getEngine().loadContent(adapter.getContent());
+					//					FileWriter fileWriter = new FileWriter(new File("sample.html"));
+					String content2 = adapter.getContent();
+					//					fileWriter.write(content2);
+					//					fileWriter.close();
+					webView.getEngine().loadContent(content2);
+
+					webView.setOnKeyPressed(ev -> {
+						if (ev.getCode() == KeyCode.F12) {
+							WebViewConsole webViewConsole = new WebViewConsole(webView);
+							FxUtil.createStageAndShow(webViewConsole, stage -> {
+							});
+						}
+					});
+					FxUtil.createStageAndShow(webView, stage -> {
+						stage.setAlwaysOnTop(true);
+						stage.initOwner(getScene().getWindow());
+						stage.focusedProperty().addListener((oba, o, n) -> {
+							if (!n)
+								stage.close();
+
+						});
+					});
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -305,7 +322,28 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			codeArea.replaceText(new String(b));
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
-			DialogUtil.showMessageDialog("Invalide Content.");
+			DialogUtil.showMessageDialog("Invalide Base64 Content.");
+		}
+
+	}
+
+	/**
+	 * Mime 텍스트를 HTML 텍스트로 변환
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 14. 
+	 */
+	@FXML
+	public void miToHtmlCodeOnAction() {
+
+		try {
+			MimeToHtmlAdapter adapter = new MimeToHtmlAdapter(content);
+			String content = adapter.getContent();
+			codeArea.clear();
+			codeArea.appendText(content);
+
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}

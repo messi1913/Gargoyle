@@ -18,14 +18,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
 /**
- * 자바프로젝트 트리Item 처리 기반 Tree
+ * 자바프로젝트 트리Item 처리 기반 TreeItem.. 이름을 수정할 필요성이 있음.
  *
  * @author KYJ
  *
  */
-public class FileTreeItem extends TreeItem<FileWrapper> {
+public class FileTreeItem<T extends FileWrapper> extends TreeItem<T> {
 
-	public FileTreeItem(FileWrapper fileWrapper) {
+	public FileTreeItem(T fileWrapper) {
 		super(fileWrapper);
 		updateGraphics(fileWrapper);
 	}
@@ -37,7 +37,7 @@ public class FileTreeItem extends TreeItem<FileWrapper> {
 	 *
 	 * @param fileWrapper
 	 ********************************/
-	private void updateGraphics(FileWrapper fileWrapper) {
+	private void updateGraphics(T fileWrapper) {
 		Node value = createGraphcis(fileWrapper);
 		value.getStyleClass().add(graphicsCssId());
 		setGraphic(value);
@@ -51,16 +51,15 @@ public class FileTreeItem extends TreeItem<FileWrapper> {
 	 * @param fileWrapper
 	 * @return
 	 ********************************/
-	protected Node createGraphcis(FileWrapper fileWrapper) {
+	protected Node createGraphcis(T fileWrapper) {
 		String meta = getMetadata();
 		ImageView createImageView = getImage(fileWrapper);
-		HBox value = new HBox(createImageView, new Label(fileWrapper.getFile().getName()), new Label(meta) );
+		HBox value = new HBox(createImageView, new Label(fileWrapper.getFile().getName()), new Label(meta));
 		List<Node> createAttachLabels = createAttachNodes();
-		if(createAttachLabels !=null && !createAttachLabels.isEmpty())
+		if (createAttachLabels != null && !createAttachLabels.isEmpty())
 			value.getChildren().addAll(createAttachLabels);
 		return value;
 	}
-
 
 	/********************************
 	 * 작성일 :  2016. 7. 27. 작성자 : KYJ
@@ -69,9 +68,10 @@ public class FileTreeItem extends TreeItem<FileWrapper> {
 	 *
 	 * @return
 	 ********************************/
-	protected List<Node> createAttachNodes(){
+	protected List<Node> createAttachNodes() {
 		return Collections.emptyList();
 	}
+
 	/********************************
 	 * 작성일 :  2016. 7. 27. 작성자 : KYJ
 	 *

@@ -21,11 +21,11 @@ import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.component.FileWrapper;
 import com.kyj.fx.voeditor.visual.component.ImageViewPane;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
+import com.kyj.fx.voeditor.visual.component.JavaProjectFileWrapper;
 import com.kyj.fx.voeditor.visual.component.JavaProjectMemberFileTreeItem;
-import com.kyj.fx.voeditor.visual.component.PDFImageBasePane;
+import com.kyj.fx.voeditor.visual.component.PDFImageBasePaneWrapper;
 import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.component.bci.view.JavaProcessMonitor;
@@ -47,6 +47,7 @@ import com.kyj.fx.voeditor.visual.component.popup.GagoyleWorkspaceOpenResourceVi
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.popup.SelectWorkspaceView;
 import com.kyj.fx.voeditor.visual.component.popup.XMLTextView;
+import com.kyj.fx.voeditor.visual.component.popup.ZipFileViewerComposite;
 import com.kyj.fx.voeditor.visual.component.proxy.ProxyServerComposite;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
@@ -192,7 +193,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * 파일트리 마스터 노드
 	 */
 	@FXML
-	private TreeView<FileWrapper> treeProjectFile;
+	private TreeView<JavaProjectFileWrapper> treeProjectFile;
 
 	@FXML
 	private DockTabPane tabPanWorkspace;
@@ -203,7 +204,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	private Tab tabPackageExplorer;
 
 	private File selectDirFile;
-	private FileWrapper tmpSelectFileWrapper = null;
+	private JavaProjectFileWrapper tmpSelectFileWrapper = null;
 
 	/**
 	 * 플러그인 메뉴가 등록되는 최상위 메뉴
@@ -441,6 +442,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					openFXML(file);
 				else if (FileUtil.isXML(file)) {
 					openXML(file);
+				} else if (FileUtil.isZip(file) || FileUtil.isJar(file)) {
+					openZip(file);
 				} else {
 					openBigText(file);
 				}
@@ -528,15 +531,17 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	private void openPdf(File file) throws Exception {
 		try {
 
-			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(new PDFImageBasePane(file)) {
-
-				@Override
-				public void close() throws IOException {
-					LOGGER.debug("Close doc . reuqest ");
-					getParent().close();
-				}
-			};
-			loadNewSystemTab(file.getName(), pdfPane);
+//			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(new PDFImageBasePane(file)) {
+//
+//				@Override
+//				public void close() throws IOException {
+//					LOGGER.debug("Close doc . reuqest ");
+//					getParent().close();
+//				}
+//			};
+			
+			PDFImageBasePaneWrapper pane = new PDFImageBasePaneWrapper(file);
+			loadNewSystemTab(file.getName(), pane);
 
 		} catch (Exception e) {
 			LOGGER.debug(ValueUtil.toString(e));
@@ -586,6 +591,18 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	}
 
 	/**
+	 * 
+	 * ZIP 파일을 연다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 15. 
+	 * @param file
+	 */
+	private void openZip(File file) {
+		ZipFileViewerComposite view = new ZipFileViewerComposite(file);
+		loadNewSystemTab(file.getName(), view);
+	}
+
+	/**
 	 * 자바파일을 연다.
 	 *
 	 * @작성자 : KYJ
@@ -628,11 +645,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param e
 	 ********************************/
 	private void daoWizardMenuItemOnActionEvent(ActionEvent e) {
-		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 		if (selectedItem == null)
 			return;
 
-		FileWrapper value = selectedItem.getValue();
+		JavaProjectFileWrapper value = selectedItem.getValue();
 		File file = value.getFile();
 		if (file.isFile()) {
 			String fileName = file.getName();
@@ -671,11 +688,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 			/*[시작]씬빌더 열기 기능 처리*/
 			String sceneBuilderLocation = ResourceLoader.getInstance().get(ResourceLoader.SCENEBUILDER_LOCATION);
-			TreeItem<FileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
+			TreeItem<JavaProjectFileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
 			boolean isRemoveOpenWidthSceneBuilderMenuItem = true;
 
 			if (selectedTreeItem != null) {
-				FileWrapper fileWrapper = selectedTreeItem.getValue();
+				JavaProjectFileWrapper fileWrapper = selectedTreeItem.getValue();
 				File selectedTree = fileWrapper.getFile();
 				if (FileUtil.isFXML(selectedTree)) {
 
@@ -705,14 +722,14 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		Menu menuPMD = new Menu("PMD");
 
 		fileTreeContextMenu.setOnShowing(ev -> {
-			TreeItem<FileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
+			TreeItem<JavaProjectFileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
 
 			/*[시작] SVN Graph 관련 Disable 여부 체크*/
 			boolean isDisableSCMGraphsMenuItem = true;
 			if (selectedTreeItem != null) {
 				menuRunAs.getItems().clear();
 				menuPMD.getItems().clear();
-				FileWrapper fileWrapper = selectedTreeItem.getValue();
+				JavaProjectFileWrapper fileWrapper = selectedTreeItem.getValue();
 				File file = fileWrapper.getFile();
 				if (fileWrapper.isSVNConnected())
 					isDisableSCMGraphsMenuItem = false;
@@ -855,7 +872,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		});
 
 		refleshMenuItem.setOnAction(event -> {
-			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 			refleshWorkspaceTreeItem(selectedItem);
 		});
 
@@ -880,7 +897,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		makeProgramSpecMenuItem.setOnAction(event -> {
 
-			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 			if (selectedItem != null) {
 				File sourceFile = selectedItem.getValue().getFile();
 				if (sourceFile != null && sourceFile.exists()) {
@@ -922,7 +939,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @작성일 : 2016. 12. 14.
 	 * @param selectedItem
 	 */
-	private void refleshWorkspaceTreeItem(final TreeItem<FileWrapper> selectedItem) {
+	private void refleshWorkspaceTreeItem(final TreeItem<JavaProjectFileWrapper> selectedItem) {
 		selectedItem.getChildren().clear();
 		selectedItem.getChildren().addAll(createNewTree(selectedItem.getValue().getFile()).getChildren());
 	}
@@ -937,7 +954,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @return
 	 * @User KYJ
 	 */
-	private TreeItem<FileWrapper> createNewTree(File dir) {
+	private TreeItem<JavaProjectFileWrapper> createNewTree(File dir) {
 		return projectFileTreeCreator.createNode(dir);
 	}
 
@@ -1095,9 +1112,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param e
 	 ********************************/
 	public void openSystemExplorerMenuItemOnAction(ActionEvent e) {
-		TreeItem<FileWrapper> selectedItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
+		TreeItem<JavaProjectFileWrapper> selectedItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
 		NullExpresion.ifNotNullDo(selectedItem, item -> {
-			FileWrapper fw = item.getValue();
+			JavaProjectFileWrapper fw = item.getValue();
 			File file = fw.getFile();
 			if (file != null && file.exists()) {
 				FileUtil.openFile(file);
@@ -1114,9 +1131,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param e
 	 ********************************/
 	public void newDirOnAction(ActionEvent e) {
-		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
-			FileWrapper value = selectedItem.getValue();
+			JavaProjectFileWrapper value = selectedItem.getValue();
 			File file = value.getFile();
 			if (file.isDirectory()) {
 				Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Directory Name", "Input New Dir Name");
@@ -1126,7 +1143,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					boolean mkdir = createdNewFile.mkdir();
 					if (mkdir) {
 
-						TreeItem<FileWrapper> createDefaultNode = projectFileTreeCreator.createDefaultNode(new FileWrapper(createdNewFile));
+						TreeItem<JavaProjectFileWrapper> createDefaultNode = projectFileTreeCreator
+								.createDefaultNode(new JavaProjectFileWrapper(createdNewFile));
 						createDefaultNode.setExpanded(true);
 						selectedItem.getChildren().add(createDefaultNode);
 					}
@@ -1145,7 +1163,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 ********************************/
 	public void deleteFileMenuItemOnAction(ActionEvent e) {
 
-		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
 			File file = selectedItem.getValue().getFile();
 			if (file != null && file.exists()) {
@@ -1160,7 +1178,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						else
 							file.delete();
 
-						TreeItem<FileWrapper> root = selectedItem.getParent();//treeProjectFile.getRoot();
+						TreeItem<JavaProjectFileWrapper> root = selectedItem.getParent();//treeProjectFile.getRoot();
 						root.getChildren().remove(selectedItem);
 
 					}
@@ -1195,9 +1213,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param e
 	 ********************************/
 	public void menuItemCodeAnalysisMenuItemOnAction(ActionEvent e) {
-		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
-			FileWrapper value = selectedItem.getValue();
+			JavaProjectFileWrapper value = selectedItem.getValue();
 			File sourceFile = value.getFile();
 			// if(selectedItem instanceof JavaProjectMemberFileTreeItem)
 			{
@@ -1253,9 +1271,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 ********************************/
 	public void voEditorMenuItemOnAction(ActionEvent e) {
 
-		TreeItem<FileWrapper> selectedItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
+		TreeItem<JavaProjectFileWrapper> selectedItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
-			FileWrapper value = selectedItem.getValue();
+			JavaProjectFileWrapper value = selectedItem.getValue();
 			File file = value.getFile();
 
 			try {
@@ -1283,7 +1301,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		if (event.getSource() == treeProjectFile) {
 			fileTreeContextMenu.hide();
-			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 			if (selectedItem == null)
 				return;
 
@@ -1309,7 +1327,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				ResultDialog<File> show = resourceView.show();
 				File data = show.getData();
 				if (data != null && data.exists()) {
-					TreeItem<FileWrapper> search = search(data);
+					TreeItem<JavaProjectFileWrapper> search = search(data);
 
 					treeProjectFile.getSelectionModel().select(search);
 					treeProjectFile.getFocusModel().focus(treeProjectFile.getSelectionModel().getSelectedIndex());
@@ -1330,27 +1348,27 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			}), new ActionEvent());
 
 		} else if (KeyCode.F5 == event.getCode()) {
-			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 			if (selectedItem != null)
 				refleshWorkspaceTreeItem(selectedItem);
 		}
 
 	}
 
-	public TreeItem<FileWrapper> search(File f) {
-		TreeItem<FileWrapper> root = treeProjectFile.getRoot();
+	public TreeItem<JavaProjectFileWrapper> search(File f) {
+		TreeItem<JavaProjectFileWrapper> root = treeProjectFile.getRoot();
 
 		Path p = FileUtil.toRelativizeForGagoyle(f);
 		String[] split = StringUtils.split(p.toString(), File.separator);
 
 		boolean isFound = false;
-		ObservableList<TreeItem<FileWrapper>> children = root.getChildren();
+		ObservableList<TreeItem<JavaProjectFileWrapper>> children = root.getChildren();
 		int sliding = 0;
-		TreeItem<FileWrapper> treeItem = null;
+		TreeItem<JavaProjectFileWrapper> treeItem = null;
 		for (int i = 0; i < split.length; i++) {
 			isFound = false;
 
-			for (TreeItem<FileWrapper> w : children) {
+			for (TreeItem<JavaProjectFileWrapper> w : children) {
 				treeItem = w;
 				String name = treeItem.getValue().getFile().getName();
 
@@ -1386,11 +1404,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		/* 탭 추가 기능. */
 		if (event.getClickCount() == 2) {
-			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 			if (selectedItem == null)
 				return;
 
-			FileWrapper value = selectedItem.getValue();
+			JavaProjectFileWrapper value = selectedItem.getValue();
 			if (value != null) {
 				File file = value.getFile();
 				LOGGER.debug(String.format(" file : %s ", file.toPath()));
@@ -1419,7 +1437,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 ********************************/
 	public void menuPropertiesOnAction(ActionEvent e) {
 
-		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 		NullExpresion.ifNotNullDo(selectedItem, item -> {
 			File file = item.getValue().getFile();
 			if (file.exists()) {
@@ -1840,7 +1858,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param e
 	 ********************************/
 	public void menuItemOpenWithSceneBuilderOnAction(ActionEvent event) {
-		TreeItem<FileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
+		TreeItem<JavaProjectFileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
 
 		if (selectedTreeItem != null) {
 			File selectedTree = selectedTreeItem.getValue().getFile();
@@ -1873,9 +1891,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param event
 	 */
 	public void menuItemSCMGraphsOnAction(ActionEvent event) {
-		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
-			FileWrapper value = selectedItem.getValue();
+			JavaProjectFileWrapper value = selectedItem.getValue();
 			if (value.isSVNConnected()) {
 				File wcDbFile = value.getWcDbFile();
 				if (wcDbFile.exists()) {
@@ -2002,7 +2020,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 *
 	 * @return
 	 ********************************/
-	public final MultipleSelectionModel<TreeItem<FileWrapper>> getTreeProjectFileSelectionModel() {
+	public final MultipleSelectionModel<TreeItem<JavaProjectFileWrapper>> getTreeProjectFileSelectionModel() {
 		return treeProjectFile.getSelectionModel();
 	}
 
@@ -2062,13 +2080,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 * @param e
 	 */
 	public void miRunJavaAppOnAction(ActionEvent e) {
-		TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
 		if (selectedItem instanceof JavaProjectMemberFileTreeItem) {
 			JavaProjectMemberFileTreeItem ti = (JavaProjectMemberFileTreeItem) selectedItem;
 
 		}
 		if (selectedItem != null) {
-			FileWrapper value = selectedItem.getValue();
+			JavaProjectFileWrapper value = selectedItem.getValue();
 			//			new EclipseJavaCompiler(value);
 		}
 	}

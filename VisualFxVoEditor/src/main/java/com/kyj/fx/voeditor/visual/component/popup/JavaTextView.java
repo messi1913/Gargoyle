@@ -71,9 +71,9 @@ public class JavaTextView extends BorderPane {
 		LOGGER.debug("JavaTextView Constructor called");
 		//		this.content = content;
 		this.showButtons = showButtons;
-		javaTextArea = new JavaTextArea();
+		javaTextArea = new JavaTextArea(content);
 //		javaTextArea.setEditable(false);
-		javaTextArea.setContent(content);
+
 
 
 		/*
