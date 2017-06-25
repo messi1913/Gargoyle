@@ -4,16 +4,21 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
-<fx:root id="timer-root-borderpane" maxWidth="721.0" prefHeight="141.0" prefWidth="721.0" stylesheets="@TimerView.css" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <HBox alignment="CENTER" BorderPane.alignment="CENTER">
-         <children>
-            <Label fx:id="lblHour" styleClass="timer-label-controls" text="00" HBox.hgrow="ALWAYS" />
-            <Label styleClass="timer-label-controls" text=":" />
-            <Label fx:id="lblMin" styleClass="timer-label-controls" text="00" HBox.hgrow="ALWAYS" />
-            <Label styleClass="timer-label-controls" text=":" />
-            <Label fx:id="lblSec" styleClass="timer-label-controls" text="00" HBox.hgrow="ALWAYS" />
-         </children>
-      </HBox>
-   </center>
+<fx:root id="timer-root-borderpane" maxWidth="721.0" prefHeight="141.0"
+	prefWidth="721.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60"
+	xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<HBox alignment="CENTER" BorderPane.alignment="CENTER">
+			<children>
+				<Label fx:id="lblHour" styleClass="timer-label-controls" text="00"
+					HBox.hgrow="ALWAYS" />
+				<Label styleClass="timer-label-controls" text=":" />
+				<Label fx:id="lblMin" styleClass="timer-label-controls" text="00"
+					HBox.hgrow="ALWAYS" />
+				<Label styleClass="timer-label-controls" text=":" />
+				<Label fx:id="lblSec" styleClass="timer-label-controls" text="00"
+					HBox.hgrow="ALWAYS" />
+			</children>
+		</HBox>
+	</center>
 </fx:root>

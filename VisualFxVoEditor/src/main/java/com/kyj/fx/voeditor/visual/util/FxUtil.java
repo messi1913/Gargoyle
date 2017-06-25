@@ -347,6 +347,16 @@ public class FxUtil {
 		return controller.value();
 	}
 
+	private static String getCss(Class<?> res, FXMLController controller) {
+		if (res != null) {
+			try{
+				return res.getResource(getCss(controller)).toExternalForm();	
+			}catch(Exception e)
+			{LOGGER.error(ValueUtil.toString(e));}
+		}
+		return null;
+	}
+
 	private static String getCss(FXMLController controller) {
 		if (controller == null) {
 			return null;
@@ -382,7 +392,7 @@ public class FxUtil {
 
 		String fxml = getFxml(controller);//controller.value();
 
-		String css = getCss(controller);//controller.value();
+		String css = getCss(controllerClass, controller);//controller.value();
 
 		if (ValueUtil.isEmpty(fxml))
 			throw new IllegalArgumentException("value is empty..");
