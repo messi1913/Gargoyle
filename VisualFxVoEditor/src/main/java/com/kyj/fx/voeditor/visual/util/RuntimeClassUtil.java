@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -398,6 +399,52 @@ public class RuntimeClassUtil {
 		return result;
 	}
 
+	public static void pipe(String[] args, AtomicBoolean forceStop, Consumer<String> messageReceiver)
+			throws InterruptedException, IOException {
+		pipe(args, Charset.forName("UTF-8"), forceStop, messageReceiver);
+	}
+
+	public static void pipe(String[] args, Charset encoding, AtomicBoolean forceStop, Consumer<String> messageReceiver)
+			throws InterruptedException, IOException {
+		ProcessBuilder pb = new ProcessBuilder(args);
+		pb.redirectErrorStream(true);
+
+		Process p = null;
+		BufferedReader br = null;
+
+		p = pb.start();
+
+		br = new BufferedReader(new InputStreamReader(p.getInputStream(), encoding));
+		p.waitFor(10, TimeUnit.SECONDS);
+		String temp = null;
+
+		//Monitor 수행을 중단하기 위한 스레드
+		new Thread(new PipeSteop(p, forceStop), "Stop-monitor").start();
+		
+		while ((temp = br.readLine()) != null) {
+			messageReceiver.accept(temp);
+		}
+		
+	}
+
+	static class PipeSteop implements Runnable {
+		Process p;
+		AtomicBoolean forceStop;
+
+		PipeSteop(Process p, AtomicBoolean forceStop) {
+			this.p = p;
+			this.forceStop = forceStop;
+		}
+
+		@Override
+		public void run() {
+			if (forceStop.get()) {
+				p.destroy();
+			}
+		}
+
+	}
+
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 22.
@@ -518,4 +565,5 @@ public class RuntimeClassUtil {
 		}
 
 	}
+
 }

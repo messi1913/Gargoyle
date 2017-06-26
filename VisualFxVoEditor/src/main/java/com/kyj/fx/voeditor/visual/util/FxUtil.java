@@ -349,10 +349,21 @@ public class FxUtil {
 
 	private static String getCss(Class<?> res, FXMLController controller) {
 		if (res != null) {
-			try{
-				return res.getResource(getCss(controller)).toExternalForm();	
-			}catch(Exception e)
-			{LOGGER.error(ValueUtil.toString(e));}
+			try {
+				String css = getCss(controller);
+		
+				if (ValueUtil.isEmpty(css))
+					return null;
+
+				URL resource = res.getResource(css);
+				
+				if (resource == null)
+					return null;
+				
+				return resource.toExternalForm();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
@@ -459,7 +470,7 @@ public class FxUtil {
 				loader.setRoot(rootInstance);
 				loader.setController(rootInstance);
 
-				if (rootInstance instanceof Parent) {
+				if (rootInstance instanceof Parent && ValueUtil.isNotEmpty(_css)) {
 					((Parent) rootInstance).getStylesheets().add(_css);
 				}
 

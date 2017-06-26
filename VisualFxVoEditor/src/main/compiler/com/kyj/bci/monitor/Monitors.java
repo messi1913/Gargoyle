@@ -8,11 +8,14 @@ package com.kyj.bci.monitor;
 
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,8 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
+
 import javafx.collections.FXCollections;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
+import sun.jvmstat.monitor.Monitor;
 import sun.jvmstat.monitor.MonitorException;
 import sun.jvmstat.monitor.MonitoredHost;
 import sun.jvmstat.monitor.MonitoredVm;
@@ -32,6 +37,12 @@ import sun.jvmstat.monitor.event.HostEvent;
 import sun.jvmstat.monitor.event.HostListener;
 import sun.jvmstat.monitor.event.VmStatusChangeEvent;
 import sun.tools.jstack.JStack;
+import sun.tools.jstat.Arguments;
+import sun.tools.jstat.JStatLogger;
+import sun.tools.jstat.OptionFormat;
+import sun.tools.jstat.OptionOutputFormatter;
+import sun.tools.jstat.OutputFormatter;
+import sun.tools.jstat.RawOutputFormatter;
 
 /**
  * @author KYJ
@@ -60,6 +71,15 @@ public class Monitors {
 		}
 	};
 
+	static Thread removeMonitorThread = new Thread(() -> {
+		try {
+			LOGGER.debug("Shutdown hook!");
+			monitoredHost.removeHostListener(hostListener);
+		} catch (MonitorException e) {
+			LOGGER.error(e.toString());
+		}
+	});
+
 	static {
 		try {
 			monitoredHost = MonitoredHost.getMonitoredHost(new sun.tools.jps.Arguments(new String[] {}).hostId());
@@ -76,14 +96,7 @@ public class Monitors {
 
 			if (monitoredHost != null) {
 				// Listen 해지 작업
-				Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-					try {
-						LOGGER.debug("Shutdown hook!");
-						monitoredHost.removeHostListener(hostListener);
-					} catch (MonitorException e) {
-						LOGGER.error(e.toString());
-					}
-				}));
+				Runtime.getRuntime().addShutdownHook(removeMonitorThread);
 			}
 		} catch (MonitorException e) {
 			LOGGER.error(e.toString());
@@ -102,6 +115,7 @@ public class Monitors {
 	 * @param javaProcessViewController
 	 */
 	public static boolean removeListener(MonitorListener listener) {
+
 		return listeners.remove(listener);
 	}
 
@@ -277,6 +291,19 @@ public class Monitors {
 		ThreadDumpUtil.runStackTool(pid, out);
 	}
 
+	/**
+	 * Java PID에 해당하는 메모리 덤프를 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 26. 
+	 * @param pid
+	 * @param out
+	 * @throws MonitorException 
+	 */
+	public static void runMemoryDump(final int pid, OutputStream out) {
+		//		MemoryUtil.printInformation(pid, out);
+		MemoryUtil.logSnapShot(pid, out);
+	}
+
 	public void closeMonitor() {
 
 	}
@@ -289,7 +316,7 @@ public class Monitors {
 	private static class ThreadDumpUtil {
 
 		// Returns sun.jvm.hotspot.tools.JStack if available, otherwise null.
-		private static Class loadSAClass() {
+		static Class loadSAClass() {
 			//
 			// Attempt to load JStack class - we specify the system class
 			// loader so as to cater for development environments where
@@ -300,12 +327,13 @@ public class Monitors {
 			try {
 				return JStack.class; //Class.forName("sun.jvm.hotspot.tools.JStack" /*, true, ClassLoader.getSystemClassLoader()*/);
 			} catch (Exception x) {
+				x.printStackTrace();
 			}
 			return null;
 		}
 
 		// SA JStack tool
-		private static void runJStackTool(boolean mixed, boolean locks, String args[]) throws Exception {
+		static void runJStackTool(boolean mixed, boolean locks, String args[]) throws Exception {
 			Class<?> cl = loadSAClass();
 
 			if (cl == null) {
@@ -392,4 +420,166 @@ public class Monitors {
 		}
 	}
 
+	private static class MemoryUtil {
+
+		public static void logSnapShot(int pid, OutputStream out) {
+			logSnapShot(pid, 0, out);
+		}
+
+		static void logSnapShot(int pid, int intervalSectound, OutputStream out) {
+			logSnapShot(pid, intervalSectound, 1, out);
+		}
+
+		static void logSnapShot(int pid, int intervalSectound, int repeat, OutputStream out) {
+			String[] args = new String[] { "-gcutil", String.valueOf(pid), String.valueOf(intervalSectound), String.valueOf(repeat) };
+			logSnapShot(new Arguments(args), out);
+		}
+
+		static void logSnapShot(Arguments arguments, OutputStream out) {
+			logSnapShot(arguments, new PrintStream(out));
+		}
+
+		static void logSnapShot(Arguments arguments, PrintStream out) {
+			logSamples(arguments, out);
+		}
+
+		static class TerminateListener implements HostListener {
+			VmIdentifier vmId;
+			JStatLogger logger;
+
+			public TerminateListener(VmIdentifier vmId, JStatLogger logger) {
+				this.vmId = vmId;
+				this.logger = logger;
+			}
+
+			public void vmStatusChanged(VmStatusChangeEvent ev) {
+				Integer lvmid = new Integer(vmId.getLocalVmId());
+				if (ev.getTerminated().contains(lvmid)) {
+					logger.stopLogging();
+				} else if (!ev.getActive().contains(lvmid)) {
+					logger.stopLogging();
+				}
+			}
+
+			public void disconnected(HostEvent ev) {
+				if (monitoredHost == ev.getMonitoredHost()) {
+					logger.stopLogging();
+				}
+			}
+		}
+
+		static void logSamples(Arguments arguments, PrintStream out) {
+			VmIdentifier vmId = arguments.vmId();
+			int interval = arguments.sampleInterval();
+			MonitoredVm monitoredVm = null;
+			JStatLogger logger = null;
+			HostListener terminator = null;
+			try {
+				monitoredVm = monitoredHost.getMonitoredVm(vmId, interval);
+				logger = new JStatLogger(monitoredVm);
+				terminator = new TerminateListener(vmId, logger);
+			} catch (MonitorException e1) {
+
+				try {
+					if (monitoredVm != null)
+						monitoredHost.detach(monitoredVm);
+				} catch (MonitorException e) {
+				}
+
+				return;
+			}
+
+			try {
+				OutputFormatter formatter = null;
+
+//				if (arguments.isSpecialOption()) {
+					OptionFormat format = arguments.optionFormat();
+					formatter = new JstatOutputFormat(monitoredVm, format);
+//				} 
+				
+				/****** Not Support. this program**********************************************************
+				else {
+					List<Monitor> logged = monitoredVm.findByPattern(arguments.counterNames());
+					Collections.sort(logged, arguments.comparator());
+					List<Monitor> constants = new ArrayList<Monitor>();
+
+					for (Iterator i = logged.iterator(); i.hasNext();) {
+						Monitor m = (Monitor) i.next();
+						if (!(m.isSupported() || arguments.showUnsupported())) {
+							i.remove();
+							continue;
+						}
+						sun.jvmstat.monitor.Variability variability = m.getVariability();
+						if (variability == sun.jvmstat.monitor.Variability.CONSTANT) {
+							i.remove();
+							if (arguments.printConstants())
+								constants.add(m);
+						} else if ((m.getUnits() == sun.jvmstat.monitor.Units.STRING) && !arguments.printStrings()) {
+							i.remove();
+						}
+					}
+
+					if (logged.isEmpty()) {
+						monitoredHost.detach(monitoredVm);
+						return;
+					}
+
+					formatter = new RawOutputFormatter(logged, arguments.printStrings());
+				}
+				***************************************************************/
+				// handle user termination requests by stopping sampling loops
+				//				Runtime.getRuntime().addShutdownHook(new Thread() {
+				//					public void run() {
+				//						logger.stopLogging();
+				//					}
+				//				});
+
+				// handle target termination events for targets other than ourself
+
+				if (vmId.getLocalVmId() != 0) {
+					monitoredHost.addHostListener(terminator);
+				}
+
+				StringBuffer sb = new StringBuffer();
+				/**print help.*/
+				sb.append("/**  Help *********************************\n");
+				sb.append("S0C : Displays the current size of Survior0 area in KB\n");
+				sb.append("S1C : Displays the current size of Suvivor1 area in KB\n");
+				sb.append("S0U : Displays the current usage of Survivor0 area in KB\n");
+				sb.append("S1U : Displays the current usage of Survivor1 area in KB\n");
+				sb.append("EC : Displays the current size of Eden area in KB\n");
+				sb.append("EU : Displays the current usage of Eden area in KB\n");
+				sb.append("OC : Current old space capacity KB \n");
+				sb.append("OU: Displays the current size of old area in KB\n");
+				sb.append("PC : Displays the current size of permanent area in KB\n");
+				sb.append("PU : Displays the current usage of permanent area in KB\n");
+				sb.append("YGC : The number of GC event occured in young area\n");
+				sb.append("YGCT : The accumulated time for GC operations of Young area\n");
+				sb.append("FGC : The numberof full GC event occured\n");
+				sb.append("FGCT: The acculated time for full GC operations.\n");
+				sb.append("GCT : The total accmulated time for GC operations.\n");
+				sb.append("*****************************************/\n\n\n");
+				try {
+					out.write(sb.toString().getBytes());
+				} catch (IOException e) {
+				}
+
+				logger.logSamples(formatter, arguments.headerRate(), arguments.sampleInterval(), arguments.sampleCount(), out);
+
+				// detach from host events and from the monitored target jvm
+				if (terminator != null) {
+					monitoredHost.removeHostListener(terminator);
+				}
+
+				monitoredHost.detach(monitoredVm);
+			} catch (MonitorException e) {
+				e.printStackTrace();
+			} finally {
+				if (logger != null) {
+					logger.stopLogging();
+				}
+			}
+
+		}
+	}
 }

@@ -281,9 +281,9 @@ public class DialogUtil {
 		installDefaultPath(chooser);
 		if (option != null)
 			option.accept(chooser);
-		
+
 		File showDialog = chooser.showDialog(ownerWindow);
-		
+
 		applyLastPath(showDialog);
 		return showDialog;
 	}
@@ -511,6 +511,14 @@ public class DialogUtil {
 	 */
 	public static void showMessageDialog(String message) {
 		showMessageDialog(SharedMemory.getPrimaryStage(), message);
+	}
+
+	public static void showMessageDialog(Window initOwner, String title, String message) {
+		showMessageDialog((Stage) initOwner, title , "", message, alert -> {
+			alert.initModality(Modality.APPLICATION_MODAL);
+			alert.initOwner(initOwner);
+			alert.showAndWait();
+		});
 	}
 
 	/**

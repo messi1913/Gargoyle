@@ -4,10 +4,11 @@
  *	작성일   : 2016. 5. 28.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.component.bci.view;
+package com.kyj.fx.voeditor.visual.component.monitor.bci.view;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.function.Function;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -20,6 +21,7 @@ import com.kyj.fx.voeditor.visual.component.text.ThreadDumpTextArea;
 import com.kyj.fx.voeditor.visual.framework.JavaLauncher;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -33,7 +35,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 /***************************
@@ -49,9 +50,9 @@ public class JavaProcessMonitor extends CloseableParent<SplitPane> {
 	private InjectionItemListComposite injectionItemListComposite;
 	private ScheduleTimeLineComposite chart;
 	private JavaProcessViewController controller;
+
 	public JavaProcessMonitor() throws Exception {
 		super(new SplitPane());
-
 
 		FXMLLoader loader = new FXMLLoader(JavaProcessMonitor.class.getResource("JavaProcessView.fxml"));
 		Node load = loader.load();
@@ -66,16 +67,19 @@ public class JavaProcessMonitor extends CloseableParent<SplitPane> {
 		MenuItem menuTaskkill = new MenuItem("task kill");
 		MenuItem menuForceTaskkill = new MenuItem("fource task kill");
 		MenuItem menuThreadDump = new MenuItem("thread dump");
+		MenuItem menuMemoryDump = new MenuItem("memory dump");
 
 		menu.getItems().add(menuInjection);
 		menu.getItems().add(menuTaskkill);
 		menu.getItems().add(menuForceTaskkill);
 		menu.getItems().add(menuThreadDump);
+		menu.getItems().add(menuMemoryDump);
 
 		menuInjection.setOnAction(this::menuInjectionOnAction);
 		menuTaskkill.setOnAction(this::menuTaskkillOnAction);
 		menuForceTaskkill.setOnAction(this::menuForceTaskkillOnAction);
 		menuThreadDump.setOnAction(this::menuThreadDumpOnAction);
+		menuMemoryDump.setOnAction(this::menuMemoryDumpOnAction);
 		tbJavaApplication.setContextMenu(new ContextMenu(menu));
 
 		splitPane.setOrientation(Orientation.VERTICAL);
@@ -93,14 +97,14 @@ public class JavaProcessMonitor extends CloseableParent<SplitPane> {
 	 * @return
 	 */
 	private Integer getSelectedProcessId() {
-//		ApplicationModel selectedItem = tbJavaApplication.getSelectionModel().getSelectedItem();
-//		if (selectedItem != null) {
-//			return selectedItem.getProcessId();
-//		}
-//		return -1;
-//
-		return getSelectedItem(item ->{
-			if(item == null)
+		//		ApplicationModel selectedItem = tbJavaApplication.getSelectionModel().getSelectedItem();
+		//		if (selectedItem != null) {
+		//			return selectedItem.getProcessId();
+		//		}
+		//		return -1;
+		//
+		return getSelectedItem(item -> {
+			if (item == null)
 				return -1;
 			return item.getProcessId();
 		});
@@ -117,7 +121,6 @@ public class JavaProcessMonitor extends CloseableParent<SplitPane> {
 		ApplicationModel selectedItem = tbJavaApplication.getSelectionModel().getSelectedItem();
 		return convert.apply(selectedItem);
 	}
-
 
 	public void menuInjectionOnAction(ActionEvent e) {
 		CodeItem selectedItem = injectionItemListComposite.getSelectedItem();
@@ -158,11 +161,9 @@ public class JavaProcessMonitor extends CloseableParent<SplitPane> {
 	 */
 	public void menuThreadDumpOnAction(ActionEvent e) {
 
-
 		ApplicationModel selectedItem = getSelectedItem(item -> item);
-		if(selectedItem == null)
-		{
-			Window window = FxUtil.getWindow(this.getParent(), ()->{
+		if (selectedItem == null) {
+			Window window = FxUtil.getWindow(this.getParent(), () -> {
 				return SharedMemory.getPrimaryStage();
 			});
 
@@ -177,18 +178,39 @@ public class JavaProcessMonitor extends CloseableParent<SplitPane> {
 
 		ThreadDumpTextArea parent = new ThreadDumpTextArea();
 		parent.setContent(out.toString());
-		FxUtil.createStageAndShow(parent, stage ->{
+		FxUtil.createStageAndShow(parent, stage -> {
 			stage.initOwner(getParent().getScene().getWindow());
 			stage.setWidth(1200d);
 			stage.setHeight(800d);
-			stage.setTitle("App - "+applicationName);
+			String title = DateUtil.toString(new Date(), DateUtil.SYSTEM_DATEFORMAT_YYYY_MM_DD_HH_MM_SS_SSS);
+			stage.setTitle(String.format(" Dump App : %s  [Time : %s] ", applicationName, title));
 		});
+	}
 
-//		FxUtil.createSimpleTextAreaAndShow(out.toString(), stage -> {
-//
-//
-//		});
+	public void menuMemoryDumpOnAction(ActionEvent e) {
+		ApplicationModel selectedItem = getSelectedItem(item -> item);
+		if (selectedItem == null) {
+			Window window = FxUtil.getWindow(this.getParent(), () -> {
+				return SharedMemory.getPrimaryStage();
+			});
 
+			DialogUtil.showMessageDialog(window, "덤프를 출력할 프로세스를 선택.");
+			return;
+		}
+
+		Integer selectedProcessId = selectedItem.getProcessId();
+		String applicationName = selectedItem.getApplicationName();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Monitors.runMemoryDump(selectedProcessId, out);
+		ThreadDumpTextArea parent = new ThreadDumpTextArea();
+		parent.setContent(out.toString());
+		FxUtil.createStageAndShow(parent, stage -> {
+			stage.initOwner(getParent().getScene().getWindow());
+			stage.setWidth(1200d);
+			stage.setHeight(800d);
+			String title = DateUtil.toString(new Date(), DateUtil.SYSTEM_DATEFORMAT_YYYY_MM_DD_HH_MM_SS_SSS);
+			stage.setTitle(String.format(" Dump App : %s  [Time : %s] ", applicationName, title));
+		});
 	}
 
 	/* (non-Javadoc)
@@ -199,7 +221,7 @@ public class JavaProcessMonitor extends CloseableParent<SplitPane> {
 		if (chart != null)
 			chart.closeRequest();
 
-		if(controller!=null)
+		if (controller != null)
 			controller.closeRequest();
 	}
 

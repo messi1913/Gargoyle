@@ -4,7 +4,7 @@
  *	작성일   : 2016. 5. 28.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.component.bci.view;
+package com.kyj.fx.voeditor.visual.component.monitor.bci.view;
 
 import java.io.File;
 

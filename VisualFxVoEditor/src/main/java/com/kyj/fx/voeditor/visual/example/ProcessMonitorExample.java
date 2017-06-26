@@ -6,7 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
-import com.kyj.fx.voeditor.visual.component.bci.view.JavaProcessMonitor;
+import com.kyj.fx.voeditor.visual.component.monitor.bci.view.JavaProcessMonitor;
 
 import javafx.application.Application;
 import javafx.scene.Scene;

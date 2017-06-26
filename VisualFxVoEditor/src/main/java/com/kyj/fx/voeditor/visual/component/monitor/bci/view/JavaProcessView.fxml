@@ -9,7 +9,7 @@
 
 <BorderPane prefHeight="417.0" prefWidth="937.0"
 	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="com.kyj.fx.voeditor.visual.component.bci.view.JavaProcessViewController">
+	fx:controller="com.kyj.fx.voeditor.visual.component.monitor.bci.view.JavaProcessViewController">
 	<top>
 		<Label text="Java Process on your PC" BorderPane.alignment="CENTER" />
 	</top>

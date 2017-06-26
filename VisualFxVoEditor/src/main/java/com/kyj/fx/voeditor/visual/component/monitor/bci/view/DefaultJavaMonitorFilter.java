@@ -5,7 +5,7 @@
  *	프로젝트 : BATCH 프로젝트
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.component.bci.view;
+package com.kyj.fx.voeditor.visual.component.monitor.bci.view;
 
 import java.util.function.Predicate;
 
