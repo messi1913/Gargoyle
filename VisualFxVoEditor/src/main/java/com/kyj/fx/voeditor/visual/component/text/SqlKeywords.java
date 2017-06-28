@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,6 +14,7 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
+import org.fxmisc.wellbehaved.event.EventHandlerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +22,7 @@ import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
@@ -105,6 +108,9 @@ public class SqlKeywords extends BorderPane {
 
 		// 마우스 클릭이벤트 정의
 		codeArea.addEventHandler(KeyEvent.KEY_PRESSED, this::codeAreaKeyClick);
+		/**CodeArea 'Tab' Size handler *************************************************************/
+		codeArea.addEventHandler(KeyEvent.KEY_PRESSED, new CodeAreaTabSizeHandler(codeArea));
+
 		codeArea.setOnKeyPressed(this::codeAreaKeyClick);
 		//
 		//		codeArea.setOnMouseClicked(defaultSelectionHandler);
@@ -183,11 +189,11 @@ public class SqlKeywords extends BorderPane {
 		return codeHelperDeligator.getText();
 	}
 
-	public IndexRange getSelection(){
+	public IndexRange getSelection() {
 		return codeHelperDeligator.getSelection();
 	}
 
-	public Integer getCurrentLine(){
+	public Integer getCurrentLine() {
 		return codeHelperDeligator.getCurrentLine();
 	}
 
