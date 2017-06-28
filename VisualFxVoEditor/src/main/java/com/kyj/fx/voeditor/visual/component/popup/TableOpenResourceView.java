@@ -102,7 +102,11 @@ public class TableOpenResourceView {
 		case ResourceLoader.ORG_MARIADB_JDBC_DRIVER:
 			tableName = "table_name";
 			break;
-
+			
+		case ResourceLoader.ORG_APACHE_DERBY_JDBC:
+			tableName = "TABLENAME";
+			break;
+			
 		case ResourceLoader.ORACLE_JDBC_DRIVER_ORACLEDRIVER:
 
 			break;
@@ -133,7 +137,9 @@ public class TableOpenResourceView {
 		case ResourceLoader.ORG_MARIADB_JDBC_DRIVER:
 
 			break;
-
+		case ResourceLoader.ORG_APACHE_DERBY_JDBC:
+			schemaName = "TABLETYPE";
+			break;
 		case ResourceLoader.ORACLE_JDBC_DRIVER_ORACLEDRIVER:
 
 			break;

@@ -70,6 +70,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static final String DBMS_SUPPORT_MY_SQL = "Mysql";
 	public static final String DBMS_SUPPORT_H2 = "H2";
 	public static final String DBMS_SUPPORT_Sqlite = "Sqlite";
+	public static final String DBMS_SUPPORT_DERBY = "Derby";
 
 	/* Database Driver */
 	public static final String ORG_MARIADB_JDBC_DRIVER = "org.mariadb.jdbc.Driver";
@@ -77,6 +78,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static final String ORACLE_JDBC_DRIVER_ORACLEDRIVER = "oracle.jdbc.driver.OracleDriver";
 	public static final String ORG_H2_DRIVER = "org.h2.Driver";
 	public static final String ORG_SQLITE_JDBC = "org.sqlite.JDBC";
+	public static final String ORG_APACHE_DERBY_JDBC = "org.apache.derby.jdbc.ClientDriver";
 
 	public static final String START_URL = "start.url";
 

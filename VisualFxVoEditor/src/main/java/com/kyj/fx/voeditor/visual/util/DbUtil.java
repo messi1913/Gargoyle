@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javax.management.RuntimeErrorException;
+
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.slf4j.Logger;
@@ -91,8 +93,8 @@ public class DbUtil extends ConnectionManager {
 		try {
 			return c.prepareStatement(sql);
 		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(e));
-			return null;
+			throw new RuntimeException(e);
+//			return null;
 		}
 	};
 
@@ -210,7 +212,7 @@ public class DbUtil extends ConnectionManager {
 	public static <T> List<Map<String, T>> select(final Connection con, final String sql, int fetchCount, int limitedSize,
 			BiFunction<Connection, String, PreparedStatement> prestatementConvert,
 			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, T>>> convert) throws Exception {
-		List<Map<String, T>> arrayList = null;
+		List<Map<String, T>> arrayList = Collections.emptyList();
 
 		try {
 
@@ -225,19 +227,22 @@ public class DbUtil extends ConnectionManager {
 			prepareStatement = prestatementConvert.apply(con, sql); // con.prepareStatement(sql);
 			// postgre-sql can't
 			// prepareStatement.setQueryTimeout(queryTimeout);
+			if(prepareStatement!=null)
+			{
+				if (!(limitedSize <= 0)) {
+					prepareStatement.setMaxRows(limitedSize);
+				}
 
-			if (!(limitedSize <= 0)) {
-				prepareStatement.setMaxRows(limitedSize);
+				if (fetchCount > 0) {
+					prepareStatement.setFetchSize(fetchCount);
+				}
+				executeQuery = prepareStatement.executeQuery();
+
+				ResultSetMetaData metaData = executeQuery.getMetaData();
+
+				arrayList = convert.apply(metaData, executeQuery);
 			}
-
-			if (fetchCount > 0) {
-				prepareStatement.setFetchSize(fetchCount);
-			}
-			executeQuery = prepareStatement.executeQuery();
-
-			ResultSetMetaData metaData = executeQuery.getMetaData();
-
-			arrayList = convert.apply(metaData, executeQuery);
+			
 		} catch (Throwable e) {
 			throw e;
 		}
@@ -743,12 +748,15 @@ public class DbUtil extends ConnectionManager {
 				// }
 				ResultSet executeQuery = connection.createStatement().executeQuery(pingSQL);
 				result = executeQuery.next();
+				onSuccess.accept(result);
 			}
+			else
+				exHandler.accept(new Exception("Connection create fail."));
 		} catch (Throwable e) {
 			exHandler.accept(e);
 		}
 
-		onSuccess.accept(result);
+	
 
 	}
 

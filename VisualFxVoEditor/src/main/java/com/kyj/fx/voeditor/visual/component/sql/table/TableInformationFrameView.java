@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -30,6 +29,7 @@ import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableBaseInformationC
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableColumnInformationController;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableCreateCodeInformationController;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableIndexInformationController;
+import com.kyj.fx.voeditor.visual.component.sql.view.DerbyTableCreateCodeInformationController;
 import com.kyj.fx.voeditor.visual.component.sql.view.PostgreTableCreateCodeInformationController;
 import com.kyj.fx.voeditor.visual.exceptions.NotSupportException;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
@@ -202,9 +202,10 @@ public class TableInformationFrameView extends BorderPane {
 		{
 			AbstractTableInfomation createCodePane = new CommonTableCreateCodeInformationController();
 
-
 			if (ResourceLoader.ORG_POSTGRESQL_DRIVER.equals(getDbmsDriver())) {
 				createCodePane = new PostgreTableCreateCodeInformationController();
+			} else if (ResourceLoader.ORG_APACHE_DERBY_JDBC.equals(getDbmsDriver())) {
+				createCodePane = new DerbyTableCreateCodeInformationController();
 			} else {
 				createCodePane = new CommonTableCreateCodeInformationController();
 			}

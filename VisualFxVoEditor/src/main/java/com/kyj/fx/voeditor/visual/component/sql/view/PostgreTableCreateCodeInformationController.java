@@ -41,6 +41,12 @@ public class PostgreTableCreateCodeInformationController extends AbstractTableCr
 
 	}
 
+	/* 
+	 * use embedded
+	 * (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.table.AbstractTableCreateCodeInformationController#getCreateTableSQL(java.lang.String, java.lang.String)
+	 */
+	@Deprecated
 	@Override
 	public String getCreateTableSQL(String databaseName, String tableName) {
 		return "";
@@ -54,13 +60,13 @@ public class PostgreTableCreateCodeInformationController extends AbstractTableCr
 	}
 
 	@Override
-	public String applyContent(List<String> result) {
+	public String fromQuery(List<String> result) {
 		Optional<String> reduce = result.stream().reduce((a, b) -> {
 			return a.concat(b).concat("\n");
 		});
 		if (reduce.isPresent())
 			return reduce.get();
-		return super.applyContent(result);
+		return super.fromQuery(result);
 	}
 
 	@Override

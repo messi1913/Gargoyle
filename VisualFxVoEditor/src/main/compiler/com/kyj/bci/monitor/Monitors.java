@@ -301,7 +301,7 @@ public class Monitors {
 	 */
 	public static void runMemoryDump(final int pid, OutputStream out) {
 		//		MemoryUtil.printInformation(pid, out);
-		MemoryUtil.logSnapShot(pid, out);
+		MemoryUtil.snapShotCapacity(pid, out);
 	}
 
 	public void closeMonitor() {
@@ -422,16 +422,46 @@ public class Monitors {
 
 	private static class MemoryUtil {
 
-		public static void logSnapShot(int pid, OutputStream out) {
-			logSnapShot(pid, 0, out);
+		static enum Type {
+			
+			gcutil("-gcutil"), 
+			gc("-gc");
+			
+			private String name;
+
+			Type(String name) {
+				this.name = name;
+			}
 		}
 
-		static void logSnapShot(int pid, int intervalSectound, OutputStream out) {
-			logSnapShot(pid, intervalSectound, 1, out);
+		/**
+		 * 메모리 사용량의 데이터를 표시한다. KB
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 6. 26. 
+		 * @param pid
+		 * @param out
+		 */
+		public static void snapShotCapacity(int pid, OutputStream out) {
+			logSnapShot(Type.gc, pid, 0, out);
 		}
 
-		static void logSnapShot(int pid, int intervalSectound, int repeat, OutputStream out) {
-			String[] args = new String[] { "-gcutil", String.valueOf(pid), String.valueOf(intervalSectound), String.valueOf(repeat) };
+		/**
+		 * 차지하는 사용량의 데이터를 퍼센트로 표시한다.
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 6. 26. 
+		 * @param pid
+		 * @param out
+		 */
+		public static void snapShotPercentage(int pid, OutputStream out) {
+			logSnapShot(Type.gcutil, pid, 0, out);
+		}
+
+		static void logSnapShot(Type type, int pid, int intervalSectound, OutputStream out) {
+			logSnapShot(type, pid, intervalSectound, 1, out);
+		}
+
+		static void logSnapShot(Type type, int pid, int intervalSectound, int repeat, OutputStream out) {
+			String[] args = new String[] { type.name , String.valueOf(pid), String.valueOf(intervalSectound), String.valueOf(repeat) };
 			logSnapShot(new Arguments(args), out);
 		}
 
@@ -492,17 +522,17 @@ public class Monitors {
 			try {
 				OutputFormatter formatter = null;
 
-//				if (arguments.isSpecialOption()) {
-					OptionFormat format = arguments.optionFormat();
-					formatter = new JstatOutputFormat(monitoredVm, format);
-//				} 
-				
+				//				if (arguments.isSpecialOption()) {
+				OptionFormat format = arguments.optionFormat();
+				formatter = new JstatOutputFormat(monitoredVm, format);
+				//				} 
+
 				/****** Not Support. this program**********************************************************
 				else {
 					List<Monitor> logged = monitoredVm.findByPattern(arguments.counterNames());
 					Collections.sort(logged, arguments.comparator());
 					List<Monitor> constants = new ArrayList<Monitor>();
-
+				
 					for (Iterator i = logged.iterator(); i.hasNext();) {
 						Monitor m = (Monitor) i.next();
 						if (!(m.isSupported() || arguments.showUnsupported())) {
@@ -518,12 +548,12 @@ public class Monitors {
 							i.remove();
 						}
 					}
-
+				
 					if (logged.isEmpty()) {
 						monitoredHost.detach(monitoredVm);
 						return;
 					}
-
+				
 					formatter = new RawOutputFormatter(logged, arguments.printStrings());
 				}
 				***************************************************************/

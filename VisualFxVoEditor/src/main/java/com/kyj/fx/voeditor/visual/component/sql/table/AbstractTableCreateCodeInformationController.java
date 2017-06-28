@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.table;
 
+import java.sql.Connection;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -72,7 +73,7 @@ public abstract class AbstractTableCreateCodeInformationController<T> extends Ab
 
 			try {
 				List<T> query = this.frame.query(sql, mapper());
-				T content = applyContent(query);
+				T content = fromQuery(query);
 				txtSql.setContent(convertString(content));
 
 			} catch (Exception e) {
@@ -104,7 +105,7 @@ public abstract class AbstractTableCreateCodeInformationController<T> extends Ab
 	 */
 	protected abstract T getEmbeddedScript();
 
-	public T applyContent(List<T> result) {
+	public T fromQuery(List<T> result) {
 		return result.get(0);
 	}
 
@@ -147,7 +148,15 @@ public abstract class AbstractTableCreateCodeInformationController<T> extends Ab
 		txtSql.setContent(sql);
 	}
 	
-	
+	/**
+	 * Connection 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 6. 28. 
+	 * @return
+	 */
+	public Connection getConnection(){
+		return this.frame.getConnection();
+	}
 
 	@Override
 	public String getDbmsDriver() {

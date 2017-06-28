@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +17,7 @@ import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 /**
- * MYSQL용 테이블 CREATE문 조회 컨트롤러
+ * 공통 테이블 CREATE문 조회 컨트롤러
  *
  * @author KYJ
  *
@@ -39,9 +38,7 @@ public class CommonTableCreateCodeInformationController extends AbstractTableCre
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("databaseName", databaseName);
 		map.put("tableName", tableName);
-		return ValueUtil.getVelocityToText(sql, map, true, null, str ->{
-			return "`" + str + "`"; 
-		});
+		return ValueUtil.getVelocityToText(sql, map, true, null);
 	}
 
 
@@ -54,13 +51,13 @@ public class CommonTableCreateCodeInformationController extends AbstractTableCre
 	}
 
 	@Override
-	public String applyContent(List<String> result) {
+	public String fromQuery(List<String> result) {
 		Optional<String> reduce = result.stream().reduce((a, b) -> {
 			return a.concat(b).concat("\n");
 		});
 		if (reduce.isPresent())
 			return reduce.get();
-		return super.applyContent(result);
+		return super.fromQuery(result);
 	}
 
 	@Override
@@ -68,11 +65,17 @@ public class CommonTableCreateCodeInformationController extends AbstractTableCre
 		return t;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.table.AbstractTableCreateCodeInformationController#isEmbeddedSupport()
+	 */
 	@Override
 	protected boolean isEmbeddedSupport() {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.table.AbstractTableCreateCodeInformationController#getEmbeddedScript()
+	 */
 	@Override
 	protected String getEmbeddedScript() {
 		return null;

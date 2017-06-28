@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -72,7 +73,14 @@ abstract class ConnectionManager {
 		}
 		Class.forName(driver);
 		DriverManager.setLoginTimeout(loginTimeoutSec);
-		Connection connection = DriverManager.getConnection(url, id, password);
+		//		Driver d = DriverManager.getDriver(url);
+
+		Connection connection = null;
+		if (ValueUtil.isEmpty(id, password)) {
+			connection = DriverManager.getConnection(url);
+		} else
+			connection = DriverManager.getConnection(url, id, password);
+
 		return connection;
 	}
 
@@ -190,7 +198,7 @@ abstract class ConnectionManager {
 	public static String getPassword() {
 		try {
 			String str = ResourceLoader.getInstance().get(ResourceLoader.BASE_KEY_JDBC_PASS);
-			if(ValueUtil.isEmpty(str))
+			if (ValueUtil.isEmpty(str))
 				return "";
 			return EncrypUtil.decryp(str);
 		} catch (Exception e) {

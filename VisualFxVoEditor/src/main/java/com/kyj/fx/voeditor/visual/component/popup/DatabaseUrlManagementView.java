@@ -464,6 +464,7 @@ public class DatabaseUrlManagementView extends BorderPane {
 			DialogUtil.showMessageDialog(msg);
 		} , ex -> {
 			LOGGER.info(ValueUtil.toString("ping test", ex));
+			DialogUtil.showExceptionDailog((Exception)ex, ex.getMessage());
 		});
 
 		// LOGGER.debug(map.toString());
