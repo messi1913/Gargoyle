@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * 파일트리를 표현하기 위한 기본단위 래퍼클래스
  *
@@ -81,17 +83,15 @@ public class FileWrapper implements Serializable {
 			return true;
 		});
 
-		//		File[] listFiles = this.file.listFiles();
 		Arrays.sort(listFiles, new Comparator<File>() {
 
 			@Override
 			public int compare(File o1, File o2) {
 
-				if (o1.isDirectory() == !o2.isDirectory())
-					return -1;
-
-				if (!o1.isDirectory() == o2.isDirectory())
+				if (o1.isFile() && !o2.isFile())
 					return 1;
+				else if (!o1.isFile() && o2.isFile())
+					return -1;
 
 				return o1.getName().compareTo(o2.getName());
 			}
