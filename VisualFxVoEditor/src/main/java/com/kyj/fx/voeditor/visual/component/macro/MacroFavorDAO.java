@@ -37,7 +37,7 @@ public class MacroFavorDAO extends AbstractMacroFavorDAO {
 		List<MacroItemVO> select = Collections.emptyList();
 		try (Connection connection = getConnection()) {
 			String sql = "select * from  meerkat.tbm_sys_fav_macro_sql where parent_macro_id is null";
-			select = DbUtil.select(connection, sql, 10, new BeanPropertyRowMapper<>(MacroItemVO.class));
+			select = DbUtil.selectBeans(connection, sql, 10, new BeanPropertyRowMapper<>(MacroItemVO.class));
 		}
 		System.out.println(select);
 		return select;
@@ -56,7 +56,7 @@ public class MacroFavorDAO extends AbstractMacroFavorDAO {
 			//parentId가 파라미터로 넘어온 id인, 자식 노드 데이터들을 리턴한다.
 			String sql = "select * from  meerkat.tbm_sys_fav_macro_sql where parent_macro_id = :macroId";
 			String velocityToText = ValueUtil.getVelocityToText(sql, map, true);
-			return DbUtil.select(connection, velocityToText, 10, new BeanPropertyRowMapper<>(MacroItemVO.class));
+			return DbUtil.selectBeans(connection, velocityToText, 10, new BeanPropertyRowMapper<>(MacroItemVO.class));
 		}
 
 	}

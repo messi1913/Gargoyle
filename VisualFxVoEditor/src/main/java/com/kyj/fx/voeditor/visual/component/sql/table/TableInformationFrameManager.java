@@ -55,7 +55,7 @@ class TableInformationFrameManager {
 	}
 
 	public <T> List<T> query(Connection connection, String sql, RowMapper<T> mapper) throws Exception {
-		return DbUtil.select(connection, sql, 10, mapper);
+		return DbUtil.selectBeans(connection, sql, 10, mapper);
 	}
 
 	public <T> T queryForMeta(DatabaseMetaData metaData, Function<DatabaseMetaData, T> converter) {

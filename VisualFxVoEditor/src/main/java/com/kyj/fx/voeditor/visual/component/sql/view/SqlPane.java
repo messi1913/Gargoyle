@@ -822,7 +822,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				map.put("tableName", tableName);
 
 				sql = ValueUtil.getVelocityToText(sql, map, true);
-				columns = DbUtil.select(connection, sql, 10, (RowMapper<String>) (rs, rowNum) -> rs.getString(1));
+				columns = DbUtil.selectBeans(connection, sql, 10, (RowMapper<String>) (rs, rowNum) -> rs.getString(1));
 			}
 
 			redueceAction(columns, ",\n",
