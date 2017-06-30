@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.management.RuntimeErrorException;
-
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.slf4j.Logger;
@@ -94,7 +92,7 @@ public class DbUtil extends ConnectionManager {
 			return c.prepareStatement(sql);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-//			return null;
+			//			return null;
 		}
 	};
 
@@ -192,6 +190,11 @@ public class DbUtil extends ConnectionManager {
 		return select.isEmpty() ? Collections.emptyMap() : select.get(0);
 	}
 
+	public static <T> T findOne(Connection con, String sql, Class<T> clazz) throws Exception {
+		List<T> select = selectBeans(con, sql, 1, 1, createBeanRowMapper(clazz));
+		return select.isEmpty() ? null : select.get(0);
+	}
+
 	public static List<Map<String, Object>> selectCursor(final Connection con, final String sql, int startRow) throws Exception {
 		return selectCursor(con, sql, startRow, -1);
 	}
@@ -202,6 +205,11 @@ public class DbUtil extends ConnectionManager {
 		properties.put(ResultSetToMapConverter.START_ROW, --startRow);
 		return select(con, sql, DEFAULT_FETCH_SIZE, limitRow, READ_ONLY_CURSOR_PREPAREDSTATEMENT_CONVERTER,
 				new ResultSetToMapConverter(properties));
+	}
+
+	public static <T> List<Map<String, T>> select(final Connection con, final String sql, int fetchCount,
+			BiFunction<ResultSetMetaData, ResultSet, List<Map<String, T>>> convert) throws Exception {
+		return select(con, sql, fetchCount, -1, DEFAULT_PREPAREDSTATEMENT_CONVERTER, convert);
 	}
 
 	public static <T> List<Map<String, T>> select(final Connection con, final String sql, int fetchCount, int limitedSize,
@@ -227,8 +235,7 @@ public class DbUtil extends ConnectionManager {
 			prepareStatement = prestatementConvert.apply(con, sql); // con.prepareStatement(sql);
 			// postgre-sql can't
 			// prepareStatement.setQueryTimeout(queryTimeout);
-			if(prepareStatement!=null)
-			{
+			if (prepareStatement != null) {
 				if (!(limitedSize <= 0)) {
 					prepareStatement.setMaxRows(limitedSize);
 				}
@@ -242,7 +249,7 @@ public class DbUtil extends ConnectionManager {
 
 				arrayList = convert.apply(metaData, executeQuery);
 			}
-			
+
 		} catch (Throwable e) {
 			throw e;
 		}
@@ -253,12 +260,22 @@ public class DbUtil extends ConnectionManager {
 		return arrayList;
 	}
 
-	public static <T> List<T> select(final Connection con, String sql, final Class<T> bean) throws Exception {
+	public static <T> List<T> selectBeans(final Connection con, String sql, final Class<T> bean) throws Exception {
 		RowMapper<T> createBeanRowMapper = createBeanRowMapper(bean);
-		return select(con, sql, 30, createBeanRowMapper);
+		return selectBeans(con, sql, 30, -1, createBeanRowMapper);
 	}
 
-	public static <T> List<T> select(final Connection con, final String sql, int fetchCount, RowMapper<T> mapper) throws Exception {
+	public static <T> List<T> selectBeans(final Connection con, String sql, int fetchCount, final Class<T> bean) throws Exception {
+		RowMapper<T> createBeanRowMapper = createBeanRowMapper(bean);
+		return selectBeans(con, sql, fetchCount, -1, createBeanRowMapper);
+	}
+
+	public static <T> List<T> selectBeans(final Connection con, final String sql, int fetchCount, RowMapper<T> mapper) throws Exception {
+		return selectBeans(con, sql, fetchCount, -1,  mapper);
+	}
+
+	public static <T> List<T> selectBeans(final Connection con, final String sql, int fetchCount, int limitedSize, RowMapper<T> mapper)
+			throws Exception {
 		List<T> resultList = Collections.emptyList();
 
 		try {
@@ -274,6 +291,9 @@ public class DbUtil extends ConnectionManager {
 			LOGGER.debug(sql);
 			// postgre-sql can't
 			// prepareStatement.setQueryTimeout(queryTimeout);
+			if (!(limitedSize <= 0)) {
+				prepareStatement.setMaxRows(limitedSize);
+			}
 
 			if (fetchCount > 0) {
 				prepareStatement.setFetchSize(fetchCount);
@@ -749,14 +769,11 @@ public class DbUtil extends ConnectionManager {
 				ResultSet executeQuery = connection.createStatement().executeQuery(pingSQL);
 				result = executeQuery.next();
 				onSuccess.accept(result);
-			}
-			else
+			} else
 				exHandler.accept(new Exception("Connection create fail."));
 		} catch (Throwable e) {
 			exHandler.accept(e);
 		}
-
-	
 
 	}
 

@@ -700,7 +700,8 @@ public abstract class SqlMultiplePane<T, K> extends DockPane implements ISchemaT
 			map.put("tableName", tableName);
 
 			sql = ValueUtil.getVelocityToText(sql, map, true);
-			List<String> select = DbUtil.select(connection, sql, 10, (RowMapper<String>) (rs, rowNum) -> rs.getString(1));
+			List<String> select = DbUtil.selectBeans(connection, sql, 10, (RowMapper<String>) (rs, rowNum) -> rs.getString(1));
+
 			redueceAction(select, ",",
 					v -> selectedTab.appendTextSql(String.format("select %s \nfrom %s ", v.substring(0, v.length()), tableName)));
 
