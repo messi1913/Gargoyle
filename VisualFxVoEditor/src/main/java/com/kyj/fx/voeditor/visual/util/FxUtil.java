@@ -1765,6 +1765,9 @@ public class FxUtil {
 
 		FxUtil.createStageAndShow(new Scene(root, BROWSER_WIDTH, BROWSER_HEIGHT), stage -> {
 			stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
+			stage.setOnCloseRequest(ev ->{
+				engine.load("about:blank");
+			});
 		});
 
 		return view;
