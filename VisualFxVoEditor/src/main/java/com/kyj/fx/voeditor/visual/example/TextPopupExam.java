@@ -1,7 +1,10 @@
 package com.kyj.fx.voeditor.visual.example;
 
+import java.sql.Connection;
+
 import org.fxmisc.richtext.CodeArea;
 
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.text.ASTSqlCodeAreaHelper;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
@@ -38,13 +41,18 @@ public class TextPopupExam extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		CodeArea textArea = new CodeArea("select * from ");
 
-		new ASTSqlCodeAreaHelper(textArea, () -> {
-			try {
-				return DbUtil.getConnection();
-			} catch (Exception e) {
-				e.printStackTrace();
+		new ASTSqlCodeAreaHelper(textArea, new ConnectionSupplier() {
+
+			@Override
+			public Connection get() {
+				try {
+					return DbUtil.getConnection();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return null;
 			}
-			return null;
+
 		});
 		//		//		UnaryOperator<Point2D> unaryOperator = textArea.popupAnchorAdjustmentProperty().get();
 		//		//		unaryOperator.

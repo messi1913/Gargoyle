@@ -11,13 +11,13 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -46,7 +46,7 @@ public class TableOpenResourceView {
 	 * @최초생성일 2016. 6. 14.
 	 */
 	private ResourceView<Map<String, Object>> delegator;
-	private Supplier<Connection> conSupplier;
+	private ConnectionSupplier conSupplier;
 	/**
 	 * 데이터베이스 드라이버
 	 *
@@ -54,7 +54,7 @@ public class TableOpenResourceView {
 	 */
 	private String driver;
 
-	public TableOpenResourceView(Supplier<Connection> conSupplier) {
+	public TableOpenResourceView(ConnectionSupplier conSupplier) {
 		this.conSupplier = conSupplier;
 		this.delegator = new TableResourceView(this);
 		this.delegator.setTitle("TableResourceView");

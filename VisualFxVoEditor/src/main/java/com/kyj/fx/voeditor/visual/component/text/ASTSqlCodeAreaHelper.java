@@ -6,19 +6,16 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
-import java.sql.Connection;
-import java.util.Collection;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import org.controlsfx.control.PopOver;
 import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.Paragraph;
 import org.fxmisc.richtext.PopupAlignment;
 
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.component.popup.ResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -33,11 +30,11 @@ import javafx.scene.input.KeyEvent;
 public class ASTSqlCodeAreaHelper extends ASTCodeAreaHelper {
 
 	private CodeArea codeArea;
-	private Supplier<Connection> connectionSupplier;
+	private ConnectionSupplier connectionSupplier;
 	private ResourceView<Map<String, Object>> view;
 	private StringProperty replaceTarget = new SimpleStringProperty();
 
-	public ASTSqlCodeAreaHelper(CodeArea codeArea, Supplier<Connection> connectionSupplier) {
+	public ASTSqlCodeAreaHelper(CodeArea codeArea, ConnectionSupplier connectionSupplier) {
 		this.codeArea = codeArea;
 		this.connectionSupplier = connectionSupplier;
 		view = createResourceView();

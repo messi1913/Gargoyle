@@ -9,9 +9,9 @@ package com.kyj.fx.voeditor.visual.component.sql.dbtree.sqlite;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,7 +26,7 @@ import javafx.scene.control.TreeItem;
  */
 public class SqliteDatabaseItemTree extends DatabaseItemTree<String> {
 
-	public SqliteDatabaseItemTree(String name, Supplier<Connection> conSupplier) throws Exception {
+	public SqliteDatabaseItemTree(String name, ConnectionSupplier conSupplier) throws Exception {
 		super(name, conSupplier);
 	}
 

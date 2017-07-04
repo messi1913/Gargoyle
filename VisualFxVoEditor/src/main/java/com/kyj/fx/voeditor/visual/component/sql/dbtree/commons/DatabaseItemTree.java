@@ -9,8 +9,8 @@ package com.kyj.fx.voeditor.visual.component.sql.dbtree.commons;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
@@ -25,13 +25,13 @@ import javafx.scene.control.TreeItem;
 public abstract class DatabaseItemTree<T> implements IConnectionByChildrens<T> {
 
 	private String name;
-	public Supplier<Connection> conSupplier;
+	public ConnectionSupplier conSupplier;
 	public ObservableList<TreeItem<DatabaseItemTree<T>>> childrens = FXCollections.observableArrayList();
 
 	public DatabaseItemTree() throws Exception {
 	}
 
-	public DatabaseItemTree(String name, Supplier<Connection> conSupplier) throws Exception {
+	public DatabaseItemTree(String name, ConnectionSupplier conSupplier) throws Exception {
 		this.name = name;
 		this.conSupplier = conSupplier;
 	}

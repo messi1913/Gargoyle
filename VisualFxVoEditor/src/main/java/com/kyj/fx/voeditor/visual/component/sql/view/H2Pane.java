@@ -6,12 +6,10 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
-import java.sql.Connection;
-import java.util.function.Supplier;
-
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.H2.H2DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 
@@ -39,7 +37,7 @@ public class H2Pane extends CommonsSqllPan {
 	}
 
 	@Override
-	public TreeItem<DatabaseItemTree<String>> apply(String t, Supplier<Connection> conSupplier) {
+	public TreeItem<DatabaseItemTree<String>> apply(String t, ConnectionSupplier conSupplier) {
 		try {
 			DatabaseItemTree<String> databaseItemTree = new H2DatabaseItemTree("databases", conSupplier);
 			TreeItem<DatabaseItemTree<String>> createNode = new DatabaseTreeNode().createNode(databaseItemTree);

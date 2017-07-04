@@ -7,12 +7,10 @@
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
 import java.io.File;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -24,6 +22,7 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.postgre.PostgreDatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.postgre.PostgreTableItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SaveSQLFileFunction;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
@@ -61,7 +60,7 @@ public class PostgreSqlPane extends CommonsSqllPan {
 	}
 
 	@Override
-	public TreeItem<DatabaseItemTree<String>> apply(String t, Supplier<Connection> conSupplier) {
+	public TreeItem<DatabaseItemTree<String>> apply(String t, ConnectionSupplier conSupplier) {
 		try {
 			DatabaseItemTree<String> databaseItemTree = new PostgreDatabaseItemTree("databases", conSupplier);
 			TreeItem<DatabaseItemTree<String>> createNode = new DatabaseTreeNode().createNode(databaseItemTree);

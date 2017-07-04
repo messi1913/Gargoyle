@@ -34,6 +34,7 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ColumnItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationFrameView;
 import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationUserMetadataVO;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
@@ -88,7 +89,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	 * 스키마 트리를 보여주기위한 TreeItem을 정의한다.
 	 */
 	@Override
-	public abstract TreeItem<DatabaseItemTree<String>> apply(String t, Supplier<Connection> conSupplier);
+	public abstract TreeItem<DatabaseItemTree<String>> apply(String t, ConnectionSupplier conSupplier);
 
 	@Override
 	public void schemaTreeOnMouseClick(MouseEvent e) {
@@ -753,7 +754,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	 * java.util.function.Supplier, java.lang.Object)
 	 */
 	@Override
-	public void showProperties(Supplier<Connection> connectionSupplier, DatabaseItemTree<String> value) {
+	public void showProperties(ConnectionSupplier connectionSupplier, DatabaseItemTree<String> value) {
 		if (value == null)
 			return;
 
@@ -772,7 +773,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	 * @inheritDoc
 	 */
 	@Override
-	public void showProperties(Supplier<Connection> connectionSupplier, String databaseName, String tableName) {
+	public void showProperties(ConnectionSupplier connectionSupplier, String databaseName, String tableName) {
 		try {
 
 			// 팝업씬 생성.
@@ -966,7 +967,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 				while (iterator.hasNext()) {
 					String columnName = iterator.next();
 					String value = v.get(columnName).getAsString();
-//					Object value = v.get(columnName);
+					//					Object value = v.get(columnName);
 					values.add(value);
 				}
 				return values;
@@ -977,7 +978,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 						return null;
 					else {
 						String convert = str.toString();
-//						convert = convert.substring(1, convert.length() - 1);
+						//						convert = convert.substring(1, convert.length() - 1);
 						if (convert.indexOf("'") >= 0) {
 							try {
 								convert = StringUtils.replace(convert, "'", "''");

@@ -6,16 +6,15 @@
  */
 package com.kyj.fx.voeditor.visual.component.sql.dbtree.H2;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
+
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
-
-import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 
 /**
  * 데이터베이스 세션정보 출력
@@ -25,7 +24,7 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
  */
 public class H2DatabaseItemTree extends DatabaseItemTree<String> {
 
-	public H2DatabaseItemTree(String name, Supplier<Connection> conSupplier) throws Exception {
+	public H2DatabaseItemTree(String name, ConnectionSupplier conSupplier) throws Exception {
 		super(name, conSupplier);
 	}
 

@@ -7,9 +7,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.functions;
 
-import java.sql.Connection;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 import javafx.scene.control.TreeItem;
 
@@ -17,12 +15,12 @@ import javafx.scene.control.TreeItem;
  * @author KYJ
  *
  */
-public interface ISchemaTreeItem<T, K> extends BiFunction<T, Supplier<Connection>, TreeItem<K>> {
+public interface ISchemaTreeItem<T, K> extends BiFunction<T, ConnectionSupplier, TreeItem<K>> {
 
 	/*
 	 * 스키마 트리에 적용할 아이템을 반환한다. (non-Javadoc)
 	 * 
 	 * @see java.util.function.Function#apply(java.lang.Object)
 	 */
-	TreeItem<K> apply(T t, Supplier<Connection> conSupplier);
+	TreeItem<K> apply(T t, ConnectionSupplier conSupplier);
 }

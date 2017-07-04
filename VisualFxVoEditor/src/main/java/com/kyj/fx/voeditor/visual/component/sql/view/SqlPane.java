@@ -39,6 +39,7 @@ import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
 import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SQLPaneMotionable;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
@@ -194,25 +195,47 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	/**
 	 * 데이터베이스와 접속한 커넥션을 반환해준다.
 	 */
-	public Supplier<Connection> connectionSupplier = () -> {
-		Connection con = null;
-		try {
+	//	public Supplier<Connection> connectionSupplier = () -> {
+	//		Connection con = null;
+	//		try {
+	//
+	//			if (url == null || username == null || password == null) {
+	//				con = DbUtil.getConnection();
+	//			} else {
+	//				con = DbUtil.getConnection(driver, url, username, password);
+	//			}
+	//			// Class.forName(driver);
+	//			// con = DriverManager.getConnection(url, username, password);
+	//		} catch (Exception e)
+	//
+	//		{
+	//			lblStatus.setText(e.getMessage());
+	//			LOGGER.error(ValueUtil.toString(e));
+	//		}
+	//		return con;
+	//
+	//	};
 
-			if (url == null || username == null || password == null) {
-				con = DbUtil.getConnection();
-			} else {
-				con = DbUtil.getConnection(driver, url, username, password);
-			}
-			// Class.forName(driver);
-			// con = DriverManager.getConnection(url, username, password);
-		} catch (Exception e)
-
-		{
-			lblStatus.setText(e.getMessage());
-			LOGGER.error(ValueUtil.toString(e));
+	public ConnectionSupplier connectionSupplier = new ConnectionSupplier() {
+		@Override
+		public String getUrl() {
+			return url;
 		}
-		return con;
 
+		@Override
+		public String getUsername() {
+			return username;
+		}
+
+		@Override
+		public String getPassword() {
+			return password;
+		}
+
+		@Override
+		public String getDriver() {
+			return driver;
+		}
 	};
 
 	public String getDriver() {
@@ -580,9 +603,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						// } catch (Exception e) {
 						// LOGGER.error(ValueUtil.toString(e));
 						// }
-					}
-					else if( item instanceof String)
-					{
+					} else if (item instanceof String) {
 						FxUtil.createStageAndShow(new SimpleTextView(item.toString()), stage -> {
 							stage.setAlwaysOnTop(true);
 							stage.initModality(Modality.APPLICATION_MODAL);
@@ -619,10 +640,10 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			}
 
 			if (ValueUtil.isNotEmpty(userColor)) {
-//				String backGroundColor = String.format("#%02X%02X%02X", (int) (userColor.getRed() * 255),
-//						(int) (userColor.getGreen() * 255), (int) (userColor.getBlue() * 255));
-//				String textColor = String.format("#%02X%02X%02X", 255 - (int) (userColor.getRed() * 255),
-//						255 - (int) (userColor.getGreen() * 255), 255 - (int) (userColor.getBlue() * 255));
+				//				String backGroundColor = String.format("#%02X%02X%02X", (int) (userColor.getRed() * 255),
+				//						(int) (userColor.getGreen() * 255), (int) (userColor.getBlue() * 255));
+				//				String textColor = String.format("#%02X%02X%02X", 255 - (int) (userColor.getRed() * 255),
+				//						255 - (int) (userColor.getGreen() * 255), 255 - (int) (userColor.getBlue() * 255));
 				String textColor = FxUtil.toWebString(userColor);
 				String backGroundColor = FxUtil.toWebString(userColor);
 
@@ -630,6 +651,9 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				sqlEditPane.getTitleLabel().getGraphic().setStyle("-fx-background-color:" + backGroundColor);
 
 			}
+
+			//ConnectionSupplier 생성
+			connectionSupplier = new ConnectionSupplier(map);
 		} catch (Exception e) {
 			DialogUtil.showExceptionDailog(this, e, "초기화 실패....");
 		}
@@ -736,7 +760,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			sqlValues.setLength(sqlValues.length() - 1);
 		}
 
-		selectedTab.appendTextSql(String.format("insert into %s ( %s ) \nvalues ( %s )", tableName, sqlColumns.toString(), sqlValues.toString()));
+		selectedTab.appendTextSql(
+				String.format("insert into %s ( %s ) \nvalues ( %s )", tableName, sqlColumns.toString(), sqlValues.toString()));
 	}
 
 	/**
@@ -979,12 +1004,12 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		/* CTRL + ENTER */
 		// case ENTER:
 		if ((e.getCode() == KeyCode.ENTER) && e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
-			if(e.isConsumed())
+			if (e.isConsumed())
 				return;
 			execute();
 			e.consume();
 		} else if ((e.getCode() == KeyCode.ENTER) && e.isAltDown()) {
-			if(e.isConsumed())
+			if (e.isConsumed())
 				return;
 			try {
 				String selectedSQLText = sqlTab.getSelectedSQLText().trim();
@@ -1003,7 +1028,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		/* CTRL + P (Properties) */
 		// case P:
 		else if ((e.getCode() == KeyCode.P) && e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
-			if(e.isConsumed())
+			if (e.isConsumed())
 				return;
 
 			String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
@@ -1015,15 +1040,13 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			}
 		}
 
-		else if(KeyCode.F1 == e.getCode())
-		{
-			if(e.isConsumed())
+		else if (KeyCode.F1 == e.getCode()) {
+			if (e.isConsumed())
 				return;
 
 			String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
 			List<TreeItem<K>> searchPattern = searchPattern(null, selectedSQLText);
-			if(ValueUtil.isNotEmpty(searchPattern))
-			{
+			if (ValueUtil.isNotEmpty(searchPattern)) {
 				TreeItem<K> treeItem = searchPattern.get(0);
 				schemaTree.getSelectionModel().select(treeItem);
 				schemaTree.scrollTo(schemaTree.getSelectionModel().getSelectedIndex());
@@ -1335,7 +1358,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		}
 
-		if(colSize < 27)
+		if (colSize < 27)
 			colSize = 27;
 
 		String putString = new StringBuffer().append(columnBuf).append(dataBuf).toString();
@@ -1464,7 +1487,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	public List<TreeItem<K>> searchSchemaTreeItemPattern(String _schema) {
 		String schema = _schema;
-		if(schema == null)
+		if (schema == null)
 			schema = "";
 		else
 			schema = _schema.toLowerCase();

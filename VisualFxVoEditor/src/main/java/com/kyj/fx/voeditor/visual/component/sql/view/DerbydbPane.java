@@ -6,14 +6,12 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +21,7 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ColumnItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.derby.DerbyDatabaseItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
@@ -55,7 +54,7 @@ public class DerbydbPane extends CommonsSqllPan {
 	}
 
 	@Override
-	public TreeItem<DatabaseItemTree<String>> apply(String t, Supplier<Connection> conSupplier) {
+	public TreeItem<DatabaseItemTree<String>> apply(String t, ConnectionSupplier conSupplier) {
 		try {
 			DatabaseItemTree<String> databaseItemTree = new DerbyDatabaseItemTree("databases", conSupplier);
 			TreeItem<DatabaseItemTree<String>> createNode = new DatabaseTreeNode().createNode(databaseItemTree);

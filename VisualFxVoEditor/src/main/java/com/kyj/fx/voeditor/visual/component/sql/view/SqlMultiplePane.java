@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.SystemUtils;
@@ -28,6 +27,7 @@ import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPane;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockPos;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SQLPaneMotionable;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
@@ -152,26 +152,7 @@ public abstract class SqlMultiplePane<T, K> extends DockPane implements ISchemaT
 	/**
 	 * 데이터베이스와 접속한 커넥션을 반환해준다.
 	 */
-	public Supplier<Connection> connectionSupplier = () -> {
-		Connection con = null;
-		try {
-
-			if (url == null || username == null || password == null) {
-				con = DbUtil.getConnection();
-			} else {
-				con = DbUtil.getConnection(driver, url, username, password);
-			}
-			// Class.forName(driver);
-			// con = DriverManager.getConnection(url, username, password);
-		} catch (Exception e)
-
-		{
-			lblStatus.setText(e.getMessage());
-			LOGGER.error(ValueUtil.toString(e));
-		}
-		return con;
-
-	};
+	public ConnectionSupplier connectionSupplier;
 
 	public String getDriver() {
 		return driver;
@@ -560,6 +541,9 @@ public abstract class SqlMultiplePane<T, K> extends DockPane implements ISchemaT
 
 			this.userColor = map.get("color") == null ? null : Color.web(map.get("color").toString());
 			this.setTitle(this.url);
+			
+			//ConnectionSupplier 생성
+			connectionSupplier = new ConnectionSupplier(map);
 		} catch (Exception e) {
 			DialogUtil.showExceptionDailog(this, e, "초기화 실패....");
 		}

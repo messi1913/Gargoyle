@@ -6,12 +6,10 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.functions;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.TreeItem;
@@ -55,7 +53,7 @@ public interface SQLPaneMotionable<K> {
 	 * @param connectionSupplier
 	 * @param selectedItem
 	 */
-	abstract void showProperties(Supplier<Connection> connectionSupplier, K selectedItem);
+	abstract void showProperties(ConnectionSupplier connectionSupplier, K selectedItem);
 
 	/********************************
 	 * 작성일 : 2016. 5. 1. 작성자 : KYJ
@@ -65,7 +63,7 @@ public interface SQLPaneMotionable<K> {
 	 * @param schema
 	 * @param tableName
 	 ********************************/
-	abstract void showProperties(Supplier<Connection> connectionSupplier, String schema, String tableName);
+	abstract void showProperties(ConnectionSupplier connectionSupplier, String schema, String tableName);
 
 	/**
 	 * 테이블뷰 키클릭 이벤트

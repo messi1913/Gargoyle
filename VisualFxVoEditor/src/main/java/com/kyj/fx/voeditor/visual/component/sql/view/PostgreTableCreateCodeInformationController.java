@@ -17,6 +17,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.kyj.fx.voeditor.visual.component.sql.table.AbstractTableCreateCodeInformationController;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
+import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.util.PogstgreUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -110,6 +111,7 @@ public class PostgreTableCreateCodeInformationController extends AbstractTableCr
 						try (Connection connection = getFrame().getConnection()) {
 							String databaseName = getDatabaseName();
 							String tableName = getTableName();
+
 							return PogstgreUtil.dumpTable(connection, databaseName, tableName);
 						} catch (SQLException e) {
 							LOGGER.error(ValueUtil.toString(e));
