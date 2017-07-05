@@ -48,25 +48,16 @@
 										<MenuItem fx:id="miOpenHtmlWevView" mnemonicParsing="false" onAction="#miOpenHtmlWevViewOnAction" text="WebView" />
 									</items>
 								</Menu>
-							</items>
-						</Menu>
-					</items>
-				</Menu>
-            <Menu mnemonicParsing="false" text="Edit">
-               <items>
 								<Menu mnemonicParsing="false" text="Base64">
 									<items>
 										<MenuItem mnemonicParsing="false" onAction="#miBase64EncodeOnAction" text="Encode" />
 										<MenuItem mnemonicParsing="false" onAction="#miBase64DecodeOnAction" text="Decode" />
 									</items>
 								</Menu>
-                  <Menu mnemonicParsing="false" text="JSON">
-                    <items>
-                      <MenuItem mnemonicParsing="false" onAction="#miPrettyFormatOnAction" text="Pretty Format" />
-                    </items>
-                  </Menu>
-               </items>
-            </Menu>
+							</items>
+						</Menu>
+					</items>
+				</Menu>
 			</menus>
 		</MenuBar>
 	</top>

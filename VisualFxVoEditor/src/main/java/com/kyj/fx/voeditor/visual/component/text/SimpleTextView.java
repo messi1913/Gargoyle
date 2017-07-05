@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
 import com.kyj.fx.voeditor.visual.framework.word.HtmlTextToMimeAdapter;
@@ -44,7 +43,6 @@ import javafx.scene.web.WebView;
  * @author KYJ
  *
  */
-@FXMLController(value = "SimpleTextView.fxml", isSelfController = true)
 public class SimpleTextView extends BorderPane implements PrimaryStageCloseable {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(SimpleTextView.class);
@@ -83,27 +81,20 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		this.content = content;
 		this.showButtons = showButtons;
 
-		FxUtil.loadRoot(SimpleTextView.class, this, e -> {
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(getClass().getResource("SimpleTextView.fxml"));
+		loader.setRoot(this);
+		loader.setController(this);
+
+		try {
+			loader.load();
+		} catch (Exception e) {
 			if (handler == null) {
 				e.printStackTrace();
 			} else {
 				handler.handle(e);
 			}
-		});
-		//		FXMLLoader loader = new FXMLLoader();
-		//		loader.setLocation(getClass().getResource("SimpleTextView.fxml"));
-		//		loader.setRoot(this);
-		//		loader.setController(this);
-
-		//		try {
-		//			loader.load();
-		//		} catch (Exception e) {
-		//			if (handler == null) {
-		//				e.printStackTrace();
-		//			} else {
-		//				handler.handle(e);
-		//			}
-		//		}
+		}
 
 	}
 
@@ -320,7 +311,6 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miBase64EncodeOnAction() {
 		String text = codeArea.getText();
 		String encodeToString = Base64.getEncoder().encodeToString(text.getBytes());
-		codeArea.getUndoManager().mark();
 		codeArea.replaceText(encodeToString);
 	}
 
@@ -329,11 +319,10 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		try {
 			String text = codeArea.getText();
 			byte[] b = Base64.getDecoder().decode(text.getBytes());
-			codeArea.getUndoManager().mark();
 			codeArea.replaceText(new String(b));
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
-			DialogUtil.showMessageDialog(FxUtil.getWindow(this), "Invalide Base64 Content.");
+			DialogUtil.showMessageDialog("Invalide Base64 Content.");
 		}
 
 	}
@@ -357,16 +346,5 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			e.printStackTrace();
 		}
 
-	}
-
-	/**
-	 * JSON 텍스트를 보기 편한 포멧으로 변경한다.
-	 * @작성자 : KYJ
-	 * @작성일 : 2017. 7. 5. 
-	 */
-	@FXML
-	public void miPrettyFormatOnAction() {
-		codeArea.getUndoManager().mark();
-		codeArea.replaceText(ValueUtil.toStringPrettyFormat(codeArea.getText()));
 	}
 }
