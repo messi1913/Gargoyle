@@ -311,6 +311,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miBase64EncodeOnAction() {
 		String text = codeArea.getText();
 		String encodeToString = Base64.getEncoder().encodeToString(text.getBytes());
+		codeArea.getUndoManager().mark();
 		codeArea.replaceText(encodeToString);
 	}
 
@@ -319,10 +320,11 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		try {
 			String text = codeArea.getText();
 			byte[] b = Base64.getDecoder().decode(text.getBytes());
+			codeArea.getUndoManager().mark();
 			codeArea.replaceText(new String(b));
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
-			DialogUtil.showMessageDialog("Invalide Base64 Content.");
+			DialogUtil.showMessageDialog(FxUtil.getWindow(this), "Invalide Base64 Content.");
 		}
 
 	}
@@ -338,13 +340,19 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		try {
 			MimeToHtmlAdapter adapter = new MimeToHtmlAdapter(content);
 			String content = adapter.getContent();
-			codeArea.clear();
-			codeArea.appendText(content);
+			codeArea.getUndoManager().mark();
+			codeArea.replaceText(content);
 
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(ValueUtil.toString(e));
+			DialogUtil.showMessageDialog(FxUtil.getWindow(this), "Unsupported Encoding. ");
 		}
 
+	}
+
+	@FXML
+	public void prettyFormatOnAction() {
+		codeArea.getUndoManager().mark();
+		codeArea.replaceText(ValueUtil.toStringPrettyFormat(codeArea.getText()));
 	}
 }
