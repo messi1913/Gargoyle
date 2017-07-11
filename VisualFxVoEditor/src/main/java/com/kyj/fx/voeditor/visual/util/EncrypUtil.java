@@ -10,34 +10,23 @@ import java.security.Key;
 
 /**
  * 
- *
  * @author KYJ
  *
+ * @Deprecated
+ *   삭제
  */
+@Deprecated
 public class EncrypUtil {
 
-	private static String keySource = "rO0ABXNyABRqYXZhLnNlY3VyaXR5LktleVJlcL35T7OImqVDAgAETAAJYWxnb3JpdGhtdAASTGphdmEvbGFuZy9TdHJpbmc7WwAHZW5jb2RlZHQAAltCTAAGZm9ybWF0cQB+AAFMAAR0eXBldAAbTGphdmEvc2VjdXJpdHkvS2V5UmVwJFR5cGU7eHB0AAZERVNlZGV1cgACW0Ks8xf4BghU4AIAAHhwAAAAGJK8H55rwSanxHX0vweneQcH5hqF2hZ5FnQAA1JBV35yABlqYXZhLnNlY3VyaXR5LktleVJlcCRUeXBlAAAAAAAAAAASAAB4cgAOamF2YS5sYW5nLkVudW0AAAAAAAAAABIAAHhwdAAGU0VDUkVU";
-	private static Key key;
-
-	static {
-		try {
-			key = LocalEncrypter.readKey(keySource);
-		} catch (Exception e) {
-			try {
-				key = LocalEncrypter.readKey(keySource);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-		}
-	}
-
 	public static String encryp(String str) throws Exception {
-		return LocalEncrypter.encrypt(str, key);
+		
+		throw new RuntimeException("not used.");
+//		return LocalEncrypter.encrypt(str, key);
 	}
 
-	
 	public static String decryp(String str) throws Exception {
-		return LocalEncrypter.decrypt(str, key);
+		throw new RuntimeException("not used.");
+//		return LocalEncrypter.decrypt(str, key);
 	}
 
 }
