@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>kyj.encryp</groupId>
+	<artifactId>encryp</artifactId>
+	<version>0.0.1</version>
+
+
+	<properties>
+
+		<!-- Generic properties -->
+		<java.version>1.8</java.version>
+
+	</properties>
+
+
+	<build>
+		<!-- <sourceDirectory>src/main/java</sourceDirectory> <testSourceDirectory>src/main/test</testSourceDirectory> -->
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+
+			<!-- h2 db 접속컨트롤러 실행방법 mvn exec:java 참조사이트 : https://github.com/benelog/web-db-console -->
+			<!-- <plugin> -->
+			<!-- <groupId>org.codehaus.mojo</groupId> -->
+			<!-- <artifactId>exec-maven-plugin</artifactId> -->
+			<!-- <version>1.1</version> -->
+			<!-- <configuration> -->
+			<!-- <mainClass>org.h2.tools.Console</mainClass> -->
+			<!-- <arguments> -->
+			<!-- <argument>-browser</argument> -->
+			<!-- </arguments> -->
+			<!-- </configuration> -->
+			<!-- </plugin> -->
+
+		</plugins>
+	</build>
+
+</project>
