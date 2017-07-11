@@ -625,23 +625,30 @@
 		</dependency>
 
 		<dependency>
+			<groupId>kyj.encryp</groupId>
+			<artifactId>encryp</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+
+
+		<dependency>
 			<groupId>ojdbc14</groupId>
 			<artifactId>ojdbc14</artifactId>
 			<version>0.0.1</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/db/oracle/ojdbc14.jar</systemPath>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derbyclient</artifactId>
-			<version>10.13.1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<version>10.13.1.1</version>
-		</dependency>
+
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.derby</groupId> -->
+		<!-- <artifactId>derbyclient</artifactId> -->
+		<!-- <version>10.12.1.1</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.derby</groupId> -->
+		<!-- <artifactId>derby</artifactId> -->
+		<!-- <version>10.12.1.1</version> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>tools</groupId>
