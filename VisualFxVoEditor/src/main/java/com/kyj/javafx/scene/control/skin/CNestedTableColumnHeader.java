@@ -105,6 +105,7 @@ public class CNestedTableColumnHeader extends NestedTableColumnHeader {
 		double hbarValue = tbSkin.getHBar().getValue();
 
 		final int labelHeight = (int) getChildren().get(0).prefHeight(-1);
+		//fixed컬럼 시작 위치. 헤더만 정의됨
 		double fixedColumnWidth = 0;
 		double x = snappedLeftInset();
 		int max = getColumnHeaders().size();

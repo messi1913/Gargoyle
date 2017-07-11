@@ -7,16 +7,10 @@
  *******************************/
 package com.kyj.javafx.scene.control.skin;
 
-import java.util.BitSet;
-
-import org.controlsfx.control.spreadsheet.SpreadsheetColumn;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ListChangeListener.Change;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
