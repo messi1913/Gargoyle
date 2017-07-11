@@ -58,6 +58,8 @@ public class BaseColumnMapper<T> implements IColumnMapper<T> {
 		tableColumn.setEditable(false);
 
 		tableColumn.setVisible(options.visible(columnName));
+		
+		tableColumn.setText(options.convert(columnName));
 
 		return tableColumn;
 	}

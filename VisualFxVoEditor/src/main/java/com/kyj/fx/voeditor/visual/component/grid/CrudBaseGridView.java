@@ -17,9 +17,6 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.momory.SharedMemory;
-import com.kyj.fx.voeditor.visual.util.DialogUtil;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
