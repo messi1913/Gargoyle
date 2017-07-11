@@ -7,7 +7,6 @@
 package com.kyj.fx.voeditor.visual.util;
 
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -18,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+import com.kyj.utils.EncrypUtil;
 
 /**
  * @author KYJ

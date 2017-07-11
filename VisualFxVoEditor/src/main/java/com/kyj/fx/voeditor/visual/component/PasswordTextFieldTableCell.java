@@ -9,7 +9,7 @@ package com.kyj.fx.voeditor.visual.component;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import com.kyj.fx.voeditor.visual.util.EncrypUtil;
+import com.kyj.utils.EncrypUtil;
 
 import javafx.scene.Node;
 import javafx.scene.control.Cell;

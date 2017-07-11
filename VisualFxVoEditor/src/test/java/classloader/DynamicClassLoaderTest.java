@@ -96,7 +96,7 @@ public class DynamicClassLoaderTest {
 				System.out.println(classesLocation);
 
 				List<ProjectInfo> listClases = DynamicClassLoader.listClases(classesLocation);
-				if(listClases.isEmpty())
+				if (listClases.isEmpty())
 					return;
 				ProjectInfo projectInfo = listClases.get(0);
 				List<String> classes = projectInfo.getClasses();
@@ -177,4 +177,26 @@ public class DynamicClassLoaderTest {
 		entryFilter.forEach(System.out::println);
 	}
 
+	/**
+	 * src성격을 갖는 메타데이터들을 출력.
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 12. 13. 
+	 * @throws Exception
+	 */
+	@Test
+	public void printSrcPaths() throws Exception {
+		File file = new File(ValueUtil.getBaseDir(), ".classpath");
+		ClassPath parsingClassPath = DynamicClassLoader.parsingClassPath(file.getAbsolutePath());
+		List<ClassPathEntry> entryFilter = parsingClassPath.entryFilter(entry -> {
+			return "src".equals(entry.getKind());
+		});
+		entryFilter.forEach(entry -> {
+			try {
+				System.out.println(entry);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+	}
 }

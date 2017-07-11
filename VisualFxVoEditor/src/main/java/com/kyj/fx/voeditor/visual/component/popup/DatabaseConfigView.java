@@ -30,9 +30,9 @@ import com.kyj.fx.voeditor.visual.main.model.vo.Code;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.EncrypUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.utils.EncrypUtil;
 import com.sun.star.uno.RuntimeException;
 
 import javafx.beans.property.SimpleObjectProperty;

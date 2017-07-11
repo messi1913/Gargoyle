@@ -19,7 +19,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<BorderPane prefHeight="733.0" prefWidth="905.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane prefHeight="733.0" prefWidth="905.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<top>
 		<GridPane BorderPane.alignment="CENTER">
 			<columnConstraints>
@@ -52,7 +52,6 @@
 				</HBox>
 				<HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="198.0" spacing="5.0" GridPane.columnIndex="6" GridPane.columnSpan="3">
 					<children>
-						<Button mnemonicParsing="false" text="Button" />
 						<Button fx:id="btnSend" mnemonicParsing="false" onAction="#btnSendOnAction" text="Send" />
 						<Button mnemonicParsing="false" text="Close" />
 					</children>

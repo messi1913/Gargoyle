@@ -90,7 +90,7 @@ public class WebViewExam extends Application {
 		engine.setOnAlert((WebEvent<String> wEvent) -> {
 			System.out.println("Alert Event  -  Message:  " + wEvent.getData());
 		});
-		engine.load("http://localhost:15501/MemoWebapp/SmartEditor2.html");
+		engine.load("http://blog.daum.net/photoon/7920766");
 		primaryStage.setScene(new Scene(new BorderPane(view), 1200, 700));
 		primaryStage.show();
 

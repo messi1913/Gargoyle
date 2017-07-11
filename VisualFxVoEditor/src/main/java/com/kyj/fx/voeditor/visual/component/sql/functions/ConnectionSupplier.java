@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
-import com.kyj.fx.voeditor.visual.util.EncrypUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.utils.EncrypUtil;
 
 /**
  * 데이터베이스 커넥션정보를 리턴해주는 객체

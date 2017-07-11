@@ -51,6 +51,7 @@ public class VidioDownloader {
 					downloadedSize += read;
 					System.out.printf("total : %s downloaded : %d \n", length, downloadedSize);
 					out.write(b);
+					out.flush();
 				}
 			}
 		}

@@ -18,8 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
-import com.kyj.fx.voeditor.visual.util.EncrypUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.utils.EncrypUtil;
 
 /**
  * @author KYJ

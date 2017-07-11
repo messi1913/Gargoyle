@@ -19,9 +19,9 @@ import java.util.function.Function;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
-import com.kyj.fx.voeditor.visual.util.EncrypUtil;
 import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.utils.EncrypUtil;
 
 /**
  *

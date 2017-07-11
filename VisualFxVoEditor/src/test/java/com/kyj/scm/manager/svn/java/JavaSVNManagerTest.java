@@ -23,7 +23,7 @@ import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
 
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
-import com.kyj.fx.voeditor.visual.util.EncrypUtil;
+import com.kyj.utils.EncrypUtil;
 
 /**
  * SVN 접속 테스트 코드
