@@ -6,11 +6,24 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.popup;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import com.kyj.fx.voeditor.visual.component.popup.DatabaseURLSelectView.DabaseInfo;
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
+import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.momory.SkinManager;
+import com.kyj.fx.voeditor.visual.util.DbUtil;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.fx.voeditor.visual.util.VoWizardUtil;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -25,21 +38,10 @@ import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kyj.Fx.dao.wizard.core.model.vo.TableDVO;
 import kyj.Fx.dao.wizard.core.model.vo.TableMasterDVO;
 import kyj.Fx.dao.wizard.core.model.vo.TableModelDVO;
-
-import org.springframework.jdbc.core.RowMapper;
-
-import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
-import com.kyj.fx.voeditor.visual.momory.SharedMemory;
-import com.kyj.fx.voeditor.visual.momory.SkinManager;
-import com.kyj.fx.voeditor.visual.util.DbUtil;
-import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.kyj.fx.voeditor.visual.util.VoWizardUtil;
 
 /**
  * @author KYJ
@@ -73,6 +75,20 @@ public class DatabaseTableView extends BorderPane {
 
 	private TableDVO tableDVO;
 
+	private ConnectionSupplier conSupplier = new ConnectionSupplier() {
+
+		@Override
+		public Connection get() {
+			try {
+				return DbUtil.getConnection();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+	};
+
 	public DatabaseTableView() {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("DatabaseTableView.fxml"));
 		// loader.setLocation();
@@ -80,8 +96,8 @@ public class DatabaseTableView extends BorderPane {
 		loader.setController(this);
 		try {
 			loader.load();
-//			String skin = SkinManager.getInstance().getSkin();
-//			load.getStylesheets().add(skin);
+			//			String skin = SkinManager.getInstance().getSkin();
+			//			load.getStylesheets().add(skin);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -101,7 +117,7 @@ public class DatabaseTableView extends BorderPane {
 		stage = new Stage();
 		stage.setTitle(TITLE);
 		stage.setScene(scene);
-//		stage.initModality(Modality.APPLICATION_MODAL);
+		//		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.initOwner(SharedMemory.getPrimaryStage());
 		stage.showAndWait();
 		return tableDVO;
@@ -248,7 +264,9 @@ public class DatabaseTableView extends BorderPane {
 	 * @User KYJ
 	 */
 	private List<TableModelDVO> listColumns(TableMasterDVO selectedItem) throws Exception {
-		return VoWizardUtil.listColumns(selectedItem);
+		try (Connection con = this.conSupplier.get()) {
+			return VoWizardUtil.listColumns(con, selectedItem);
+		}
 	}
 
 	/**
@@ -261,11 +279,13 @@ public class DatabaseTableView extends BorderPane {
 	 * @User KYJ
 	 */
 	private List<TableMasterDVO> listTable(String tableName) throws Exception {
-		return VoWizardUtil.listTable(tableName);
+		try (Connection con = this.conSupplier.get()) {
+			return VoWizardUtil.listTable(con, tableName);
+		}
 	}
 
 	/**
-	 * TODO 테이블 조회
+	 * TODO 뷰 조회
 	 *
 	 * @Date 2015. 10. 16.
 	 * @param tableName
@@ -274,24 +294,67 @@ public class DatabaseTableView extends BorderPane {
 	 * @User KYJ
 	 */
 	private List<TableMasterDVO> listView(String viewName) throws Exception {
-		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_VIEWS);
+		try (Connection con = this.conSupplier.get()) {
+			String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_VIEWS);
 
-		Map<String, Object> hashMap = new HashMap<String, Object>();
-		hashMap.put("viewName", viewName);
-		return DbUtil.select(sql, hashMap, new RowMapper<TableMasterDVO>() {
+			Map<String, Object> hashMap = new HashMap<String, Object>();
+			hashMap.put("viewName", viewName);
 
-			@Override
-			public TableMasterDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
-				TableMasterDVO tableMasterDVO = new TableMasterDVO();
-				String tableName = rs.getString("TABLE_NAME");
-				tableMasterDVO.setTableName(tableName);
-				String className = ValueUtil.toDVOName(tableName);
-				tableMasterDVO.setClassName(className);
-				// tableMasterDVO.setDescription(rs.getString("COMMENTS"));
-				return tableMasterDVO;
+			String csql = ValueUtil.getVelocityToText(sql, hashMap);
+			return DbUtil.selectBeans(con, csql, 10, -1, new RowMapper<TableMasterDVO>() {
 
-			}
-		});
+				@Override
+				public TableMasterDVO mapRow(ResultSet rs, int rowNum) throws SQLException {
+					TableMasterDVO tableMasterDVO = new TableMasterDVO();
+					String tableName = rs.getString("TABLE_NAME");
+					tableMasterDVO.setTableName(tableName);
+					String className = ValueUtil.toDVOName(tableName);
+					tableMasterDVO.setClassName(className);
+					// tableMasterDVO.setDescription(rs.getString("COMMENTS"));
+					return tableMasterDVO;
+
+				}
+			});
+
+			//			return DbUtil.select(con , sql, hashMap, n);
+		}
+
 	}
 
+	static class DynamicConnectionSupplier extends ConnectionSupplier {
+		private DabaseInfo d;
+
+		public DynamicConnectionSupplier(DabaseInfo d) {
+			this.d = d;
+		}
+
+		@Override
+		public String getUrl() {
+			return d.getUrl();
+		}
+
+		@Override
+		public String getUsername() {
+			return d.getId();
+		}
+
+		@Override
+		public String getPassword() {
+			return d.getPassword();
+		}
+
+		@Override
+		public String getDriver() {
+			return d.getDriver();
+		}
+
+	}
+
+	@FXML
+	public void btnDatabaseOnAction() {
+		DabaseInfo showAndWait = DatabaseURLSelectView.showAndWait();
+		if (showAndWait != null) {
+			conSupplier = new DynamicConnectionSupplier(showAndWait);
+		}
+	}
 }

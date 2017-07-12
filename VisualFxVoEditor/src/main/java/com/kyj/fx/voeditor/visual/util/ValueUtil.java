@@ -68,10 +68,12 @@ import com.kohlschutter.boilerpipe.document.TextDocument;
 import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
 import com.kohlschutter.boilerpipe.extractors.KeepEverythingWithMinKWordsExtractor;
 import com.kohlschutter.boilerpipe.sax.BoilerpipeSAXInput;
+import com.kyj.fx.voeditor.visual.exceptions.NotYetSupportException;
 import com.kyj.fx.voeditor.visual.exceptions.ProgramSpecSourceNullException;
 import com.kyj.fx.voeditor.visual.framework.KeyValue;
 import com.kyj.fx.voeditor.visual.framework.URLModel;
 import com.kyj.fx.voeditor.visual.framework.velocity.ExtensionDateFormatVelocityContext;
+import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.sun.star.lang.IllegalArgumentException;
 
@@ -727,6 +729,25 @@ public class ValueUtil {
 		}
 
 		return dbmsName;
+	}
+
+	/**
+	 * dbms 명으로 드라이버클래스이름을 리턴
+	 * 
+	 * 대신 Gargoyle에서 허용하는 dbms명만 리턴해줌.
+	 * 
+	 * config.properties 파일에 기술되어있음.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 12. 
+	 * @param dbms
+	 * @return 
+	 * @throws NotYetSupportException
+	 */
+	public static String getDbmsNameToDriver(String dbms) {
+		String panePropertyValue = "dbms.".concat(dbms);
+		String drvierClassName = ConfigResourceLoader.getInstance().get(panePropertyValue);
+		return drvierClassName;
 	}
 
 	public static String getDriverToDBMSName(org.apache.tomcat.jdbc.pool.DataSource dataSource) {
@@ -1875,9 +1896,10 @@ public class ValueUtil {
 			if (ValueUtil.isNotEmpty(object)) {
 				value = object.toString();
 			}
-			
+
 			sb.append(String.format("%s : %s", key, value)).append("\n");
 		}
 		return sb.toString();
 	}
+
 }

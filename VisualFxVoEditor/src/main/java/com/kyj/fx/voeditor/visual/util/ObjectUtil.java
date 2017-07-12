@@ -11,6 +11,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,5 +83,27 @@ public class ObjectUtil {
 			}
 		}
 		return hashMap;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 5. 
+	 * @param value
+	 * @param name
+	 * @return
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	public static Object getDeclaredFieldValue(Object value, String name)
+			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		Field field = value.getClass().getDeclaredField(name);
+		if (field == null)
+			return null;
+		if (!field.isAccessible()) {
+			field.setAccessible(true);
+		}
+		return field.get(value);
 	}
 }

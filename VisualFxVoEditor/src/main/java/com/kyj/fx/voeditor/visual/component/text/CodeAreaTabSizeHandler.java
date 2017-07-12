@@ -37,7 +37,22 @@ public class CodeAreaTabSizeHandler implements EventHandler<KeyEvent> {
 
 	@Override
 	public void handle(KeyEvent event) {
+
+		
 		if (event.getCode() == KeyCode.TAB) {
+
+			/*
+			 * 2017-07-02
+			 *  bug fix
+			 *  shift + tab , tab기능과 중복되기 때문에 tab키만 눌렀을때 
+			 *  기능이 처리되게 한다. 
+			 */
+			if (event.isAltDown() || event.isControlDown() || event.isShiftDown() || event.isShortcutDown()) {
+				return;
+			}
+
+			if (event.isConsumed())
+				return;
 			codeArea.replaceSelection("   ");
 			event.consume();
 		}

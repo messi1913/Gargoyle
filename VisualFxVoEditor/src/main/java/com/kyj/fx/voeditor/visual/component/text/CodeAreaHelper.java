@@ -8,10 +8,9 @@ package com.kyj.fx.voeditor.visual.component.text;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.undo.UndoManager;
-import org.fxmisc.undo.impl.UndoManagerImpl;
 
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.SqlFormatter;
@@ -317,9 +316,38 @@ public class CodeAreaHelper<T extends CodeArea> {
 				replaceSelection(tabbing);
 				codeArea.selectRange(selection.getStart(), selection.getStart());
 			} else {
-				String tabbing = ValueUtil.reverseTapping(selectedText);
-				replaceSelection(tabbing);
-				codeArea.selectRange(selection.getStart(), selection.getEnd());
+				
+				/*
+				 * 2017-07-02
+				 * 
+				 * 더이상 탭이 진행될수 없는 상태의 텍스트인경우
+				 * 불필요한 부분까지 selection되는 부분을 해결한다.
+				 * 라인갯수를 추가적으로 알아야하기때문에 
+				 * ValueUtil.tabpping 함수를 사용하지않는다.
+				 * */
+				String tabbing = selectedText;
+				/**/
+				
+				String[] split = tabbing.split("\n");
+				if (split != null) {
+					Optional<String> reduce = Stream.of(split).map(str -> {
+
+						return str.replaceAll("^(\t|[ ]{1,3})", "");
+
+						// return str;
+					}).reduce((str1, str2) -> str1.concat("\n").concat(str2));
+					if (reduce.isPresent()) {
+						tabbing =  reduce.get();
+					}
+				}
+				
+				//원본텍스트와 다른경우에만 변화를 준다.
+				if(!selectedText.equals(tabbing))
+				{
+					replaceSelection(tabbing);
+					codeArea.selectRange(selection.getStart(), selection.getEnd() - split.length);	
+				}
+				
 			}
 			e.consume();
 		}

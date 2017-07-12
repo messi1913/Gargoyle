@@ -71,10 +71,12 @@ abstract class ConnectionManager {
 		if (con != null) {
 			close(con);
 		}
-		Class.forName(driver);
+//		if(ValueUtil.isNotEmpty(driver))
+			Class.forName(driver);
+		
 		DriverManager.setLoginTimeout(loginTimeoutSec);
 		//		Driver d = DriverManager.getDriver(url);
-
+		
 		Connection connection = null;
 		if (ValueUtil.isEmpty(id, password)) {
 			connection = DriverManager.getConnection(url);

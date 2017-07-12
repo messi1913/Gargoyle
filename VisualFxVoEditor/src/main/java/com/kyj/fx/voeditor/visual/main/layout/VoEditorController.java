@@ -206,31 +206,30 @@ public class VoEditorController {
 
 		btnSelect.setOnMouseClicked(this::btnSelectOnMouseClick);
 
-		btnDatabase.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		btnDatabase.setOnMouseClicked(this::btnDatabaseOnClick);
+	}
 
-			@Override
-			public void handle(MouseEvent event) {
+	public void btnDatabaseOnClick(MouseEvent e) {
 
-				DatabaseTableView databaseTableView = new DatabaseTableView();
-				TableDVO show = databaseTableView.show();
-				if (show != null) {
+		DatabaseTableView databaseTableView = new DatabaseTableView();
+		TableDVO show = databaseTableView.show();
+		if (show != null) {
 
-					TableMasterDVO tableMasterDVO = show.getTableMasterDVO();
-					List<TableModelDVO> tableModelDVOList = show.getTableModelDVOList();
-					ObservableList<TableModelDVO> items = tbVoEditor.getItems();
+			TableMasterDVO tableMasterDVO = show.getTableMasterDVO();
+			List<TableModelDVO> tableModelDVOList = show.getTableModelDVOList();
+			ObservableList<TableModelDVO> items = tbVoEditor.getItems();
 
-					if (tableMasterDVO != null) {
-						txtClassName.setText(tableMasterDVO.getClassName());
-						txtAreaDesc.setText(tableMasterDVO.getDescription());
-					}
-					if (tableModelDVOList != null) {
-						items.clear();
-						items.addAll(tableModelDVOList);
-					}
-
-				}
+			if (tableMasterDVO != null) {
+				txtClassName.setText(tableMasterDVO.getClassName());
+				txtAreaDesc.setText(tableMasterDVO.getDescription());
 			}
-		});
+			if (tableModelDVOList != null) {
+				items.clear();
+				items.addAll(tableModelDVOList);
+			}
+
+		}
+
 	}
 
 	/********************************
@@ -624,7 +623,7 @@ public class VoEditorController {
 						return;
 
 					//static 필드는 처리하지않음.
-					if(Modifier.isStatic(modifiers))
+					if (Modifier.isStatic(modifiers))
 						return;
 
 					FieldMeta fieldMeta = ClassTypeResourceLoader.getInstance().get(cOrInterfaceType.getName(),

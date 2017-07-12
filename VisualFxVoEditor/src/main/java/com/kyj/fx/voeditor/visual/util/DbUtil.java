@@ -271,7 +271,7 @@ public class DbUtil extends ConnectionManager {
 	}
 
 	public static <T> List<T> selectBeans(final Connection con, final String sql, int fetchCount, RowMapper<T> mapper) throws Exception {
-		return selectBeans(con, sql, fetchCount, -1,  mapper);
+		return selectBeans(con, sql, fetchCount, -1, mapper);
 	}
 
 	public static <T> List<T> selectBeans(final Connection con, final String sql, int fetchCount, int limitedSize, RowMapper<T> mapper)
@@ -678,6 +678,9 @@ public class DbUtil extends ConnectionManager {
 	 * @throws NotSupportException
 	 */
 	public static String getDriverNameByConnection(Connection connection) throws SQLException, NotSupportException {
+		if(connection == null)
+			throw new NullPointerException("Connection is null");
+		
 		if (connection != null) {
 			Driver dbmsDriver = DriverManager.getDriver(connection.getMetaData().getURL());
 			if (dbmsDriver != null) {
@@ -818,32 +821,60 @@ public class DbUtil extends ConnectionManager {
 	 * @throws Exception
 	 ********************************/
 	public static <T> List<T> tables(String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
+		try (Connection connection = getConnection()) {
+			return tables(connection, tableNamePattern, converter);
+		}
+	}
+
+	/********************************
+	 * 작성일 : 2016. 8. 11. 작성자 : KYJ
+	 *
+	 * 2016-11-10
+	 * 모든 테이블탐색후 대소문자무시 검색으로 수정
+	 * 2017-07-12
+	 * Connection을 파라미터로 넣어 동적으로 찾을 수 있게 수정
+	 *</br>
+	 *</br>
+	 		1.TABLE_CAT String => table catalog (may be null)  </br>
+			2.TABLE_SCHEM String => table schema (may be null) </br>
+			3.TABLE_NAME String => table name </br>
+			4.TABLE_TYPE String => table type. Typical types are "TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM". </br>
+			5.REMARKS String => explanatory comment on the table </br>
+			6.TYPE_CAT String => the types catalog (may be null) </br>
+			7.TYPE_SCHEM String => the types schema (may be null) </br>
+			8.TYPE_NAME String => type name (may be null) </br>
+			9.SELF_REFERENCING_COL_NAME String => name of the designated "identifier" column of a typed table (may be null) </br>
+			10.REF_GENERATION String => specifies how values in SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER", "DERIVED". (may be null) </br>
+	    @param connection
+	 * @param converter
+	 * @return
+	 * @throws Exception
+	 ********************************/
+	public static <T> List<T> tables(Connection connection, String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
 		if (converter == null)
 			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
 
 		List<T> tables = new ArrayList<>();
-		try (Connection connection = getConnection()) {
 
-			DatabaseMetaData metaData = connection.getMetaData();
-			ResultSet rs = metaData.getTables(null, null, "%"/* + tableNamePattern + "%"*/, new String[] { "TABLE" });
+		DatabaseMetaData metaData = connection.getMetaData();
+		ResultSet rs = metaData.getTables(null, null, "%"/* + tableNamePattern + "%"*/, new String[] { "TABLE" });
 
-			String tableNamePatternUpperCase = tableNamePattern.toUpperCase();
-			while (rs.next()) {
+		String tableNamePatternUpperCase = tableNamePattern.toUpperCase();
+		while (rs.next()) {
 
-				// 2016-08-18 특정데이터베이스(sqlite)에서는 인덱스 트리거정보도 동시에 출력된다.
-				String tableType = rs.getString(4);
-				if ("TABLE".equals(tableType)) {
+			// 2016-08-18 특정데이터베이스(sqlite)에서는 인덱스 트리거정보도 동시에 출력된다.
+			String tableType = rs.getString(4);
+			if ("TABLE".equals(tableType)) {
 
-					String tableName = rs.getString(3);
-					if (tableName.toUpperCase().indexOf(tableNamePatternUpperCase) != -1) {
-						T apply = converter.apply(rs);
-						if (apply != null)
-							tables.add(apply);
-					}
-
+				String tableName = rs.getString(3);
+				if (tableName.toUpperCase().indexOf(tableNamePatternUpperCase) != -1) {
+					T apply = converter.apply(rs);
+					if (apply != null)
+						tables.add(apply);
 				}
 
 			}
+
 		}
 
 		return tables;
