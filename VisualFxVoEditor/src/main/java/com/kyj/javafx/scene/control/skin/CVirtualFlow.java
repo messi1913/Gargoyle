@@ -47,16 +47,21 @@ public class CVirtualFlow<T extends IndexedCell> extends VirtualFlow<T> {
 	@Override
 	protected void layoutChildren() {
 		super.layoutChildren();
-
+		
 		//이부분이 중요
-//		if (tableView != null) {
-//			for (CTableRow<T> cell : (List<CTableRow<T>>) getCells()) {
+		if (tableView != null) {
+			/*
+			 * 이 부분은 테이블 row를 의미함. fixed를 사용하기 위해선 갱신시켜줘야되는것으로 보임.
+			 * 
+			 */
+			for (CTableRow<T> cell : (List<CTableRow<T>>) getCells()) {
 //				int index = cell.getIndex();
 //				System.out.println(index);
-//				cell.requestLayout();
-//			}
-//		}
 
+				cell.requestLayout();
+			}
+		}
+		
 	}
 
 	/**
@@ -69,24 +74,24 @@ public class CVirtualFlow<T extends IndexedCell> extends VirtualFlow<T> {
 	 *
 	 * FIXME The best would be to put a TreeList of something like that in order not to sort the rows everytime, need investigation..
 	 */
-	private static final Comparator<GridRow> ROWCMP = new Comparator<GridRow>() {
-		@Override
-		public int compare(GridRow firstRow, GridRow secondRow) {
-			// o1.getIndex() < o2.getIndex() ? -1 : +1;
-			return secondRow.getIndex() - firstRow.getIndex();
-		}
-	};
+//	private static final Comparator<GridRow> ROWCMP = new Comparator<GridRow>() {
+//		@Override
+//		public int compare(GridRow firstRow, GridRow secondRow) {
+//			// o1.getIndex() < o2.getIndex() ? -1 : +1;
+//			return secondRow.getIndex() - firstRow.getIndex();
+//		}
+//	};
 
 	/**
 	 * Sort the rows so that they stay in order for layout
 	 */
-	private void sortRows() {
-		final List<GridRow> temp = (List<GridRow>) getCells();
-		final List<GridRow> tset = new ArrayList<>(temp);
-		Collections.sort(tset, ROWCMP);
-		for (final TableRow<ObservableList<SpreadsheetCell>> r : tset) {
-			r.toFront();
-		}
-	}
+//	private void sortRows() {
+//		final List<GridRow> temp = (List<GridRow>) getCells();
+//		final List<GridRow> tset = new ArrayList<>(temp);
+//		Collections.sort(tset, ROWCMP);
+//		for (final TableRow<ObservableList<SpreadsheetCell>> r : tset) {
+//			r.toFront();
+//		}
+//	}
 
 }

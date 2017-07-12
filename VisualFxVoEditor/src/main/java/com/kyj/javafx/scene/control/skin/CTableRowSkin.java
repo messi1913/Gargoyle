@@ -97,25 +97,25 @@ public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehav
 			return false;
 
 		return true;
-		//		double scrollX = flow.getHbar().getValue();
+		// double scrollX = flow.getHbar().getValue();
 		//
-		//		// work out where this column header is, and it's width (start -> end)
-		//		double start = 0;
-		//		ObservableList<TableColumn<T, ?>> visibleLeafColumns = tableView.getVisibleLeafColumns();
+		// // work out where this column header is, and it's width (start -> end)
+		// double start = 0;
+		// ObservableList<TableColumn<T, ?>> visibleLeafColumns = tableView.getVisibleLeafColumns();
 		//
-		//		for (int i = 0, max = visibleLeafColumns.size(); i < max; i++) {
-		//			TableColumnBase<T, ?> c = visibleLeafColumns.get(i);
-		//			if (c.equals(col))
-		//				break;
-		//			start += c.getWidth();
-		//		}
-		//		double end = start + col.getWidth();
+		// for (int i = 0, max = visibleLeafColumns.size(); i < max; i++) {
+		// TableColumnBase<T, ?> c = visibleLeafColumns.get(i);
+		// if (c.equals(col))
+		// break;
+		// start += c.getWidth();
+		// }
+		// double end = start + col.getWidth();
 		//
-		//		// determine the width of the table
-		//		final Insets padding = getSkinnable().getPadding();
-		//		double headerWidth = getSkinnable().getWidth() - padding.getLeft() + padding.getRight();
+		// // determine the width of the table
+		// final Insets padding = getSkinnable().getPadding();
+		// double headerWidth = getSkinnable().getWidth() - padding.getLeft() + padding.getRight();
 		//
-		//		return (start >= scrollX || end > scrollX) && (start < (headerWidth + scrollX) || end <= (headerWidth + scrollX));
+		// return (start >= scrollX || end > scrollX) && (start < (headerWidth + scrollX) || end <= (headerWidth + scrollX));
 	}
 
 	@Override
@@ -196,7 +196,7 @@ public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehav
 
 	@Override
 	protected void layoutChildren(double x, final double y, final double w, final double h) {
-		System.out.println("layout childrem");
+		System.out.println("`````````");
 		checkState();
 		if (cellsMap.isEmpty())
 			return;
@@ -278,26 +278,24 @@ public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehav
 		final double hbarValue = tableViewSkin.getHBar().getValue();
 
 		/**
-		 * RT-26743:TreeTableView: Vertical Line looks unfinished.
-		 * We used to not do layout on cells whose row exceeded the number
-		 * of items, but now we do so as to ensure we get vertical lines
-		 * where expected in cases where the vertical height exceeds the
-		 * number of items.
+		 * RT-26743:TreeTableView: Vertical Line looks unfinished. We used to not do layout on cells whose row exceeded the number of items,
+		 * but now we do so as to ensure we get vertical lines where expected in cases where the vertical height exceeds the number of
+		 * items.
 		 */
 		int index = control.getIndex();
 
 		double fixedColumnWidth = 0;
-		List<TableCell<T, ?>> fixedCells = new ArrayList<>();
+		// List<TableCell<T, ?>> fixedCells = new ArrayList<>();
 
-		if (index < 0/* || row >= itemsProperty().get().size()*/)
+		if (index < 0/* || row >= itemsProperty().get().size() */)
 			return;
 
 		for (int column = 0, max = cells.size(); column < max; column++) {
 			TableCell<T, ?> tableCell = cells.get(column);
 			TableColumnBase<T, ?> tableColumn = getTableColumnBase(tableCell);
 
-			//			if(column == 2 || column == 3)
-			//				continue;
+			// if(column == 2 || column == 3)
+			// continue;
 			boolean isVisible = true;
 			if (fixedCellSizeEnabled) {
 				// we determine if the cell is visible, and if not we have the
@@ -318,32 +316,18 @@ public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehav
 			}
 
 			/**
-			* FOR FIXED COLUMNS
-			*/
+			 * FOR FIXED COLUMNS
+			 */
+			boolean isFixedCell = false;
 			double tableCellX = 0;
-			/**
-			* We need to update the fixedColumnWidth only on visible cell and
-			* we need to add the full width including the span.
-			*
-			* If we fail to do so, we may be in the situation where x will grow
-			* with the correct width and not fixedColumnWidth. Thus some cell
-			* that should be shifted will not because the computation based on
-			* fixedColumnWidth will be wrong.
-			*/
-			boolean increaseFixedWidth = false;
-			//Virtualization of column
-			// We translate that column by the Hbar Value if it's fixed
-			
-			if (tableView.getFixedColumns().contains(tableColumn)/*columns.get(indexColumn).isFixed()*/ /*column <= 1*/) {
-				if (hbarValue + fixedColumnWidth > x && tableCell.getIndex() == column) {
-					double fixedWidth = snapSize(tableCell.prefWidth(-1)) - snapSize(horizontalPadding);
-					increaseFixedWidth = true;
-					tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
-					//                	 tableCell.toFront();
-					fixedColumnWidth += fixedWidth;
-					//                    isVisible = true; // If in fixedColumn, it's obviously visible
-					fixedCells.add(tableCell);
-				}
+			if (tableView.getFixedColumns().contains(tableColumn)) {
+
+				double fixedWidth = snapSize(tableCell.prefWidth(-1)) - snapSize(horizontalPadding);
+				tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
+				fixedColumnWidth += fixedWidth;
+				isVisible = true;
+				isFixedCell = true;
+//				x += fixedWidth;
 			}
 
 			if (isVisible) {
@@ -417,8 +401,25 @@ public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehav
 
 				tableCell.resize(width, height);
 
-				tableCell.relocate(x + tableCellX, snappedTopInset());
+				// if(increaseFixedWidth)
+				System.out.println(x + " " + (x + tableCellX) + " " + fixedColumnWidth);
+				if (isFixedCell && x < fixedColumnWidth) {
 
+//					System.out.println("hidden");
+
+					// tableCell.setPrefWidth(0);
+				}
+				
+
+				// else
+				// {
+				tableCell.relocate(x + tableCellX, snappedTopInset());
+				// }
+
+				// else
+				// tableCell.relocate(x , snappedTopInset());
+
+				// tableCell.toFront();
 				// Request layout is here as (partial) fix for RT-28684.
 				// This does not appear to impact performance...
 				tableCell.requestLayout();
@@ -430,85 +431,18 @@ public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehav
 					getChildren().remove(tableCell);
 				}
 
-				if (!isVisible) {
-					if (tableView.getFixedColumns().get(column) != null)
-						isVisible = true;
-				}
+//				if (!isVisible) {
+//					if (tableView.getFixedColumns().get(column) != null)
+//						isVisible = true;
+//				}
 
-				width = snapSize(tableCell.prefWidth(-1)) - snapSize(horizontalPadding);
+				width =  snapSize(tableCell.prefWidth(-1)) - snapSize(horizontalPadding);
 			}
 
 			x += width;
 		}
 		tableViewSkin.fixedColumnWidth = fixedColumnWidth;
-		handleFixedCell(fixedCells, index);
-	}
-
-	private Number getFixedRowShift(int index) {
-		//		double tableCellY = 0;
-		//		TableView<T> tableView = getSkinnable().getTableView();
-		//		tableView.getfix
-		//		int positionY = spreadsheetView.getFixedRows().indexOf(index);
-		//
-		//		//FIXME Integrate if fixedCellSize is enabled
-		//		//Computing how much space we need to translate
-		//		//because each row has different space.
-		//		double space = 0;
-		//		for (int o = 0; o < positionY; ++o) {
-		//			space += handle.getCellsViewSkin().getRowHeight(spreadsheetView.getFixedRows().get(o));
-		//		}
-		//
-		//		//If true, this row is fixed
-		//		if (positionY != -1 && getSkinnable().getLocalToParentTransform().getTy() <= space) {
-		//			//This row is a bit hidden on top so we translate then for it to be fully visible
-		//			tableCellY = space - getSkinnable().getLocalToParentTransform().getTy();
-		//			handle.getCellsViewSkin().getCurrentlyFixedRow().add(index);
-		//		} else {
-		//			handle.getCellsViewSkin().getCurrentlyFixedRow().remove(index);
-		//		}
-		return 1;
-	}
-
-	private void handleFixedCell(List<TableCell<T, ?>> fixedCells, int index) {
-		if (fixedCells.isEmpty()) {
-			return;
-		}
-
-		/**
-		 * If we have a fixedCell (in column) and that cell may be recovered by
-		 * a rowSpan, we want to put that tableCell ahead in term of z-order. So
-		 * we need to put it in another row.
-		 */
-
-		//		if (tableViewSkin.rowToLayout.get(index)) {
-		//			GridRow gridRow = tableViewSkin.getFlow().getTopRow();
-		//			if (gridRow != null) {
-		//				for (TableCell<T, ?> cell : fixedCells) {
-		//					final double originalLayoutY = getSkinnable().getLayoutY() + cell.getLayoutY();
-		//					gridRow.removeCell(cell);
-		//					gridRow.addCell(cell);
-		//					if (tableViewSkin.deportedCells.containsKey(gridRow)) {
-		//						tableViewSkin.deportedCells.get(gridRow).add(cell);
-		//					} else {
-		//						Set<CellView> temp = new HashSet<>();
-		//						temp.add(cell);
-		//						tableViewSkin.deportedCells.put(gridRow, temp);
-		//					}
-		//					/**
-		//					 * I need to have the layoutY of the original row, but also
-		//					 * to remove the layoutY of the row I'm adding in. Because
-		//					 * if the first row is fixed and is undergoing a bit of
-		//					 * translate in order to be visible, we need to remove that
-		//					 * "bit of translate".
-		//					 */
-		//					cell.relocate(cell.getLayoutX(), originalLayoutY - gridRow.getLayoutY());
-		//				}
-		//			}
-		//		} else {
-		for (TableCell<T, ?> cell : fixedCells) {
-			cell.toFront();
-		}
-		//		}
+		// handleFixedCell(fixedCells, index);
 	}
 
 	private VirtualFlow<TableRow<T>> getVirtualFlow() {
@@ -575,7 +509,7 @@ public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehav
 			cellsMap.clear();
 		}
 
-		ObservableList<? extends TableColumnBase/*<T,?>*/> columns = getVisibleLeafColumns();
+		ObservableList<? extends TableColumnBase/* <T,?> */> columns = getVisibleLeafColumns();
 
 		cellsMap = new WeakHashMap<TableColumnBase, Reference<TableCell<T, ?>>>(columns.size());
 		fullRefreshCounter = DEFAULT_FULL_REFRESH_COUNTER;
@@ -611,7 +545,7 @@ public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehav
 
 		TableRow<T> skinnable = getSkinnable();
 		final int skinnableIndex = skinnable.getIndex();
-		final List<? extends TableColumnBase/*<T,?>*/> visibleLeafColumns = getVisibleLeafColumns();
+		final List<? extends TableColumnBase/* <T,?> */> visibleLeafColumns = getVisibleLeafColumns();
 
 		for (int i = 0, max = visibleLeafColumns.size(); i < max; i++) {
 			TableColumnBase<T, ?> col = visibleLeafColumns.get(i);
