@@ -40,56 +40,56 @@ public class CNestedTableColumnHeader extends NestedTableColumnHeader {
 	public CNestedTableColumnHeader(final TableViewSkinBase skin, final TableColumnBase tc) {
 		super(skin, tc);
 		this.skin = skin;
-		((CTableView) skin.getSkinnable()).fixingColumnsAllowedProperty().addListener(new ChangeListener<Boolean>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				CellView.getValue(() -> {
-					if (tc != null) {
-						tc.setContextMenu(getColumnContextMenu());
-					}
-
-				});
-			}
-		});
+//		((CTableView) skin.getSkinnable()).fixingColumnsAllowedProperty().addListener(new ChangeListener<Boolean>() {
+//
+//			@Override
+//			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+//				CellView.getValue(() -> {
+//					if (tc != null) {
+//						tc.setContextMenu(getColumnContextMenu());
+//					}
+//
+//				});
+//			}
+//		});
 	}
 
 	private MenuItem fixItem;
 
-	protected ContextMenu getColumnContextMenu() {
-		if (isColumnFixable()) {
-			final ContextMenu contextMenu = new ContextMenu();
-
-			this.fixItem = new MenuItem(localize(asKey("spreadsheet.column.menu.fix"))); //$NON-NLS-1$
-			contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
-
-				@Override
-				public void handle(WindowEvent event) {
-					if (!isFixed()) {
-						fixItem.setText(localize(asKey("spreadsheet.column.menu.fix"))); //$NON-NLS-1$
-					} else {
-						fixItem.setText(localize(asKey("spreadsheet.column.menu.unfix"))); //$NON-NLS-1$
-					}
-				}
-			});
-			fixItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("pinSpreadsheetView.png")))); //$NON-NLS-1$
-			fixItem.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent arg0) {
-					if (!isFixed()) {
-						setFixed(true);
-					} else {
-						setFixed(false);
-					}
-				}
-			});
-			contextMenu.getItems().addAll(fixItem);
-
-			return contextMenu;
-		} else {
-			return new ContextMenu();
-		}
-	}
+//	protected ContextMenu getColumnContextMenu() {
+//		if (isColumnFixable()) {
+//			final ContextMenu contextMenu = new ContextMenu();
+//
+//			this.fixItem = new MenuItem(localize(asKey("spreadsheet.column.menu.fix"))); //$NON-NLS-1$
+//			contextMenu.setOnShowing(new EventHandler<WindowEvent>() {
+//
+//				@Override
+//				public void handle(WindowEvent event) {
+//					if (!isFixed()) {
+//						fixItem.setText(localize(asKey("spreadsheet.column.menu.fix"))); //$NON-NLS-1$
+//					} else {
+//						fixItem.setText(localize(asKey("spreadsheet.column.menu.unfix"))); //$NON-NLS-1$
+//					}
+//				}
+//			});
+//			fixItem.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("pinSpreadsheetView.png")))); //$NON-NLS-1$
+//			fixItem.setOnAction(new EventHandler<ActionEvent>() {
+//				@Override
+//				public void handle(ActionEvent arg0) {
+//					if (!isFixed()) {
+//						setFixed(true);
+//					} else {
+//						setFixed(false);
+//					}
+//				}
+//			});
+//			contextMenu.getItems().addAll(fixItem);
+//
+//			return contextMenu;
+//		} else {
+//			return new ContextMenu();
+//		}
+//	}
 
 	@Override
 	protected void layoutChildren() {
@@ -107,10 +107,11 @@ public class CNestedTableColumnHeader extends NestedTableColumnHeader {
 		final int labelHeight = (int) getChildren().get(0).prefHeight(-1);
 		//fixed컬럼 시작 위치. 헤더만 정의됨
 		double fixedColumnWidth = 0;
-		double x = snappedLeftInset();
+		double x = snappedLeftInset() ;
 		int max = getColumnHeaders().size();
 
-		ObservableList fixedColumns = view.getFixedColumns();
+//		ObservableList fixedColumns = view.getFixedColumns();
+		int fixedColumnIndex = view.getFixedColumnIndex();
 		ObservableList columns = view.getColumns();
 		max = max > columns.size() ? columns.size() : max;
 		for (int j = 0; j < max; j++) {
@@ -118,7 +119,7 @@ public class CNestedTableColumnHeader extends NestedTableColumnHeader {
 			final double prefWidth = snapSize(n.prefWidth(-1));
 			n.setPrefHeight(24.0);
 			//If the column is fixed
-			if (fixedColumns.indexOf(columns.get(j)) != -1) {
+			if (fixedColumnIndex >= j /*fixedColumns.indexOf(columns.get(j)) != -1*/) {
 				double tableCellX = 0;
 				//If the column is hidden we have to translate it
 				if (hbarValue + fixedColumnWidth > x) {
@@ -128,7 +129,7 @@ public class CNestedTableColumnHeader extends NestedTableColumnHeader {
 					n.toFront();
 					fixedColumnWidth += prefWidth;
 				}
-				n.relocate(x + tableCellX, labelHeight + snappedTopInset());
+				n.relocate(x + tableCellX , labelHeight + snappedTopInset());
 			}
 
 			x += prefWidth;
@@ -147,25 +148,25 @@ public class CNestedTableColumnHeader extends NestedTableColumnHeader {
 	 *
 	 * @param fixed
 	 */
-	public void setFixed(boolean fixed) {
-		if (fixed) {
-
-			((CTableView) skin.getSkinnable()).getFixedColumns().add(this);
-		} else {
-			((CTableView) skin.getSkinnable()).getFixedColumns().removeAll(this);
-		}
-	}
+//	public void setFixed(boolean fixed) {
+//		if (fixed) {
+//
+//			((CTableView) skin.getSkinnable()).getFixedColumns().add(this);
+//		} else {
+//			((CTableView) skin.getSkinnable()).getFixedColumns().removeAll(this);
+//		}
+//	}
 
 	/**
 	 * Return whether this column is fixed or not.
 	 * 
 	 * @return true if this column is fixed.
 	 */
-	public boolean isFixed() {
-		return ((CTableView) skin.getSkinnable()).getFixedColumns().contains(this);
-	}
-
-	private boolean canFix;
+//	public boolean isFixed() {
+//		return ((CTableView) skin.getSkinnable()).getFixedColumns().contains(this);
+//	}
+//
+//	private boolean canFix;
 
 	//
 	//	/**
@@ -178,10 +179,10 @@ public class CNestedTableColumnHeader extends NestedTableColumnHeader {
 	//	*
 	//	* @return true if this column is fixable.
 	//	*/
-	public boolean isColumnFixable() {
-		CTableViewSkin skin = (CTableViewSkin) getTableViewSkin();
-		return canFix && ((CTableView) skin.getSkinnable()).isFixingColumnsAllowed();
-	}
+//	public boolean isColumnFixable() {
+//		CTableViewSkin skin = (CTableViewSkin) getTableViewSkin();
+//		return canFix && ((CTableView) skin.getSkinnable()).isFixingColumnsAllowed();
+//	}
 	
 	
 }

@@ -36,6 +36,9 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableView.TableViewFocusModel;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehaviorBase<TableRow<T>>, TableCell<T, ?>> {
@@ -196,7 +199,7 @@ public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehav
 
 	@Override
 	protected void layoutChildren(double x, final double y, final double w, final double h) {
-		System.out.println("`````````");
+		System.out.println("`````````" + x + " " + y + " " + w + " " + h);
 		checkState();
 		if (cellsMap.isEmpty())
 			return;
@@ -320,14 +323,14 @@ public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehav
 			 */
 			boolean isFixedCell = false;
 			double tableCellX = 0;
-			if (tableView.getFixedColumns().contains(tableColumn)) {
-
-				double fixedWidth = snapSize(tableCell.prefWidth(-1)) - snapSize(horizontalPadding);
-				tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
-				fixedColumnWidth += fixedWidth;
-				isVisible = true;
-				isFixedCell = true;
-//				x += fixedWidth;
+			if ( /*tableView.getFixedColumns().contains(tableColumn)*/  tableView.getFixedColumnIndex() >= column ) {
+				if (tableColumn.isVisible()) {
+					double fixedWidth = snapSize(tableCell.prefWidth(-1)) - snapSize(horizontalPadding);
+					tableCellX = Math.abs(hbarValue - x + fixedColumnWidth);
+					fixedColumnWidth += fixedWidth;
+					isVisible = true;
+					isFixedCell = true;
+				}
 			}
 
 			if (isVisible) {
@@ -400,49 +403,35 @@ public class CTableRowSkin<T> extends TableRowSkinBase<T, TableRow<T>, CellBehav
 				///////////////////////////////////////////
 
 				tableCell.resize(width, height);
+//				tableCell.requestLayout();
 
-				// if(increaseFixedWidth)
 				System.out.println(x + " " + (x + tableCellX) + " " + fixedColumnWidth);
+//				tableCell.setBackground(new Background(new BackgroundFill(Color.WHITESMOKE, null, null)));
 				if (isFixedCell && x < fixedColumnWidth) {
 
-//					System.out.println("hidden");
-
-					// tableCell.setPrefWidth(0);
+//					tableCell.getStyleClass().clear();
+					
+					
+					System.out.println("hidden -- " + x);
+//					tableCell.setBackground(tableCell.getTableRow().getBackground());
+//					tableCell.setStyle(tableCell.getTableRow().getStyle());
+					tableCell.toFront();
+					
+					
 				}
 				
-
-				// else
-				// {
 				tableCell.relocate(x + tableCellX, snappedTopInset());
-				// }
-
-				// else
-				// tableCell.relocate(x , snappedTopInset());
-
-				// tableCell.toFront();
-				// Request layout is here as (partial) fix for RT-28684.
-				// This does not appear to impact performance...
 				tableCell.requestLayout();
 			} else {
 				if (fixedCellSizeEnabled) {
-					// we only add/remove to the scenegraph if the fixed cell
-					// length support is enabled - otherwise we keep all
-					// TableCells in the scenegraph
 					getChildren().remove(tableCell);
 				}
-
-//				if (!isVisible) {
-//					if (tableView.getFixedColumns().get(column) != null)
-//						isVisible = true;
-//				}
-
-				width =  snapSize(tableCell.prefWidth(-1)) - snapSize(horizontalPadding);
+				width = snapSize(tableCell.prefWidth(-1)) - snapSize(horizontalPadding);
 			}
 
 			x += width;
 		}
 		tableViewSkin.fixedColumnWidth = fixedColumnWidth;
-		// handleFixedCell(fixedCells, index);
 	}
 
 	private VirtualFlow<TableRow<T>> getVirtualFlow() {

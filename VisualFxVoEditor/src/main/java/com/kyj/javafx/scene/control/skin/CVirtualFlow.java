@@ -7,20 +7,17 @@
  *******************************/
 package com.kyj.javafx.scene.control.skin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-
-import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.sun.javafx.scene.control.skin.VirtualScrollBar;
 
-import impl.org.controlsfx.spreadsheet.GridRow;
-import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.control.IndexedCell;
-import javafx.scene.control.TableRow;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
 
 /**
  * @author KYJ
@@ -47,7 +44,7 @@ public class CVirtualFlow<T extends IndexedCell> extends VirtualFlow<T> {
 	@Override
 	protected void layoutChildren() {
 		super.layoutChildren();
-		
+
 		//이부분이 중요
 		if (tableView != null) {
 			/*
@@ -55,13 +52,14 @@ public class CVirtualFlow<T extends IndexedCell> extends VirtualFlow<T> {
 			 * 
 			 */
 			for (CTableRow<T> cell : (List<CTableRow<T>>) getCells()) {
-//				int index = cell.getIndex();
-//				System.out.println(index);
-
+				//				int index = cell.getIndex();
+				//				System.out.println(index);
 				cell.requestLayout();
+
+//				cell.requestFocus();
 			}
 		}
-		
+
 	}
 
 	/**
@@ -74,24 +72,24 @@ public class CVirtualFlow<T extends IndexedCell> extends VirtualFlow<T> {
 	 *
 	 * FIXME The best would be to put a TreeList of something like that in order not to sort the rows everytime, need investigation..
 	 */
-//	private static final Comparator<GridRow> ROWCMP = new Comparator<GridRow>() {
-//		@Override
-//		public int compare(GridRow firstRow, GridRow secondRow) {
-//			// o1.getIndex() < o2.getIndex() ? -1 : +1;
-//			return secondRow.getIndex() - firstRow.getIndex();
-//		}
-//	};
+	//	private static final Comparator<GridRow> ROWCMP = new Comparator<GridRow>() {
+	//		@Override
+	//		public int compare(GridRow firstRow, GridRow secondRow) {
+	//			// o1.getIndex() < o2.getIndex() ? -1 : +1;
+	//			return secondRow.getIndex() - firstRow.getIndex();
+	//		}
+	//	};
 
 	/**
 	 * Sort the rows so that they stay in order for layout
 	 */
-//	private void sortRows() {
-//		final List<GridRow> temp = (List<GridRow>) getCells();
-//		final List<GridRow> tset = new ArrayList<>(temp);
-//		Collections.sort(tset, ROWCMP);
-//		for (final TableRow<ObservableList<SpreadsheetCell>> r : tset) {
-//			r.toFront();
-//		}
-//	}
+	//	private void sortRows() {
+	//		final List<GridRow> temp = (List<GridRow>) getCells();
+	//		final List<GridRow> tset = new ArrayList<>(temp);
+	//		Collections.sort(tset, ROWCMP);
+	//		for (final TableRow<ObservableList<SpreadsheetCell>> r : tset) {
+	//			r.toFront();
+	//		}
+	//	}
 
 }

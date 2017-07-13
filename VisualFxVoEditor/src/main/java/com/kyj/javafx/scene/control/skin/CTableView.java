@@ -8,7 +8,9 @@
 package com.kyj.javafx.scene.control.skin;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Skin;
@@ -21,27 +23,37 @@ import javafx.scene.control.TableView;
  */
 public class CTableView<T> extends TableView<T> {
 
-	private final BooleanProperty fixingColumnsAllowedProperty = new SimpleBooleanProperty(true);
+//	private final BooleanProperty fixingColumnsAllowedProperty = new SimpleBooleanProperty(true);
 
 	/**
 	* Return whether change to Fixed columns are allowed.
 	*
 	* @return whether change to Fixed columns are allowed.
 	*/
-	public boolean isFixingColumnsAllowed() {
-		return fixingColumnsAllowedProperty.get();
+//	public boolean isFixingColumnsAllowed() {
+//		return fixingColumnsAllowedProperty.get();
+//	}
+
+//	public BooleanProperty fixingColumnsAllowedProperty() {
+//		return fixingColumnsAllowedProperty;
+//	}
+
+//	private ObservableList<TableColumn<T, ?>> fixedColumns = FXCollections.observableArrayList();
+//
+//	public ObservableList<TableColumn<T, ?>> getFixedColumns() {
+//		return fixedColumns;
+//	}
+	
+	private IntegerProperty fixedColumnIndex = new SimpleIntegerProperty(-1);
+
+	public int getFixedColumnIndex(){
+		return fixedColumnIndex.get();
 	}
-
-	public BooleanProperty fixingColumnsAllowedProperty() {
-		return fixingColumnsAllowedProperty;
+	
+	public void setFixedColumnIndex(int colIndex){
+		fixedColumnIndex.set(colIndex);
 	}
-
-	private ObservableList<TableColumn<T, ?>> fixedColumns = FXCollections.observableArrayList();
-
-	public ObservableList<TableColumn<T, ?>> getFixedColumns() {
-		return fixedColumns;
-	}
-
+	
 	@Override
 	protected Skin<?> createDefaultSkin() {
 		return new CTableViewSkin<>(this);

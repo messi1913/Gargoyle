@@ -21,7 +21,6 @@ public class CTableHeaderRow extends TableHeaderRow {
 	@Override
 	protected void updateScrollX() {
 		super.updateScrollX();
-
 		requestLayout();
 		CNestedTableColumnHeader rootHeader = (CNestedTableColumnHeader) getRootHeader();
 		rootHeader.layoutFixedColumns();
