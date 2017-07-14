@@ -11,6 +11,12 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
+/********************************
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.component.grid
+ *	작성일   : 
+ *	작성자   : KYJ
+ *******************************/
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 /**

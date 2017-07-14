@@ -4,8 +4,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /********************************
- *	프로젝트 : meerkat-core
- *	패키지   : com.samsung.sds.meerkat.core.ano
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.component.grid
  *	작성일   : 2017. 04. 04.
  *	작성자   : KYJ
  *******************************/

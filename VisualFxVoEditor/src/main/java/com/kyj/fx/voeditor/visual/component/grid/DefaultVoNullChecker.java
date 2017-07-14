@@ -1,6 +1,6 @@
 /********************************
- *	프로젝트 : sos-client
- *	패키지   : com.samsung.sds.sos.client.component.grid
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.component.grid
  *	작성일   : 2016. 12. 8.
  *	프로젝트 : OPERA
  *	작성자   : KYJ

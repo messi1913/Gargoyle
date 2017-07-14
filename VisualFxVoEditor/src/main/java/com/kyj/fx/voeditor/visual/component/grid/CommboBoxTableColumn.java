@@ -1,6 +1,6 @@
 /**
- * package : com.kyj.fx.voeditor.visual.component
- *	fileName : CommboBoxTableColumn.java
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.component.grid
  *	date      : 2015. 11. 11.
  *	user      : KYJ
  */

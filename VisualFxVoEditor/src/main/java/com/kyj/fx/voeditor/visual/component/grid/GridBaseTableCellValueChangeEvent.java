@@ -1,4 +1,6 @@
 /**
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.component.grid
  * KYJ
  * 2015. 10. 10.
  */
