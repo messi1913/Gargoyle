@@ -17,7 +17,6 @@ import com.kyj.javafx.scene.control.skin.CTableView;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
@@ -44,7 +43,7 @@ public class FixedTableViewExam extends Application {
 	public void start(Stage primaryStage) throws Exception {
 
 		CTableView<TbmSysDaoDVO> root = new CTableView<TbmSysDaoDVO>();
-		
+
 		CTableColumn e = new CTableColumn("packageName");
 		root.getColumns().add(e);
 		root.getColumns().add(new CTableColumn("className"));
@@ -53,8 +52,8 @@ public class FixedTableViewExam extends Application {
 		root.getColumns().add(new CTableColumn("tableName"));
 		root.getColumns().add(new CTableColumn("extendsClassName"));
 
-		
-		root.getFixedColumns().add(e);
+		root.setFixedColumnIndex(1);
+		//		root.getFixedColumns().add(e);
 		root.setFixedCellSize(80.d);
 		//		
 		List<TbmSysDaoDVO> select = DbUtil.select("select * from tbm_sys_dao", Collections.emptyMap(),
@@ -77,27 +76,18 @@ public class FixedTableViewExam extends Application {
 
 		public CTableColumn(String text, String fieldName) {
 			super(text);
-			setCellFactory(new Callback<TableColumn<TbmSysDaoDVO, String>, TableCell<TbmSysDaoDVO, String>>() {
-
-				@Override
-				public TableCell<TbmSysDaoDVO, String> call(TableColumn<TbmSysDaoDVO, String> param) {
-					return new TextFieldTableCell<TbmSysDaoDVO, String>();
+			setCellFactory(param -> new TextFieldTableCell<TbmSysDaoDVO, String>());
+			
+			Callback<javafx.scene.control.TableColumn.CellDataFeatures<TbmSysDaoDVO, String>, ObservableValue<String>> value = param -> {
+				try {
+					Object fieldValue = ObjectUtil.getDeclaredFieldValue(param.getValue(), fieldName);
+					return (ObservableValue<String>) fieldValue;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			});
-			setCellValueFactory(new Callback<TableColumn.CellDataFeatures<TbmSysDaoDVO, String>, ObservableValue<String>>() {
-
-				@Override
-				public ObservableValue<String> call(CellDataFeatures<TbmSysDaoDVO, String> param) {
-
-					try {
-						Object fieldValue = ObjectUtil.getDeclaredFieldValue(param.getValue(), fieldName);
-						return (ObservableValue<String>) fieldValue;
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					return param.getValue().classNameProperty();
-				}
-			});
+				return param.getValue().classNameProperty();
+			};
+			setCellValueFactory(value);
 		}
 
 	}
