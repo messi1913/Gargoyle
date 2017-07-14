@@ -10,9 +10,11 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.controlsfx.control.PopOver;
 import org.fxmisc.richtext.CodeArea;
 
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.SqlFormatter;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -276,8 +278,27 @@ public class CodeAreaHelper<T extends CodeArea> {
 				toLowercaseEvent(new ActionEvent());
 				e.consume();
 			}
-		}
+		} else if (KeyCode.V == e.getCode() && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
+			if (e.isConsumed())
+				return;
 
+			if (codeArea == null)
+				return;
+
+			IndexRange selection = codeArea.getSelection();
+			CodeAreaClipboardItemListView view = new CodeAreaClipboardItemListView();
+			view.onClose(str -> {
+				codeArea.replaceText(selection, str);
+			});
+			view.getItems().addAll(codeArea.getClipBoardItems());
+
+			PopOver popOver = new PopOver(view);
+			view.setPopOver(popOver);
+			popOver.show(codeArea);
+
+			e.consume();
+
+		}
 		//////////////////////////////////////////////////////////////////////////////////////
 		/*선택된 행의 selection을 이동시키기 위한 처리  tab, shift + tab*/
 		//Tab
@@ -316,7 +337,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 				replaceSelection(tabbing);
 				codeArea.selectRange(selection.getStart(), selection.getStart());
 			} else {
-				
+
 				/*
 				 * 2017-07-02
 				 * 
@@ -327,7 +348,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 				 * */
 				String tabbing = selectedText;
 				/**/
-				
+
 				String[] split = tabbing.split("\n");
 				if (split != null) {
 					Optional<String> reduce = Stream.of(split).map(str -> {
@@ -337,17 +358,16 @@ public class CodeAreaHelper<T extends CodeArea> {
 						// return str;
 					}).reduce((str1, str2) -> str1.concat("\n").concat(str2));
 					if (reduce.isPresent()) {
-						tabbing =  reduce.get();
+						tabbing = reduce.get();
 					}
 				}
-				
+
 				//원본텍스트와 다른경우에만 변화를 준다.
-				if(!selectedText.equals(tabbing))
-				{
+				if (!selectedText.equals(tabbing)) {
 					replaceSelection(tabbing);
-					codeArea.selectRange(selection.getStart(), selection.getEnd() - split.length);	
+					codeArea.selectRange(selection.getStart(), selection.getEnd() - split.length);
 				}
-				
+
 			}
 			e.consume();
 		}
