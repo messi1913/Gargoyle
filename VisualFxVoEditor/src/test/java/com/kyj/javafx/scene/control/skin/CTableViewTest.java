@@ -42,8 +42,9 @@ public class CTableViewTest extends Application {
 
 		});
 
-		view.getFixedColumns().add(view.getColumns().get(0));
-		view.getFixedColumns().add(view.getColumns().get(1));
+		view.setFixedColumnIndex(1);
+//		view.getFixedColumns().add(view.getColumns().get(0));
+//		view.getFixedColumns().add(view.getColumns().get(1));
 		
 		for(int i=0; i< 5; i++)
 		{
