@@ -29,6 +29,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
@@ -91,21 +92,24 @@ public class EditableTableViewComposite extends BorderPane {
 			}
 		});
 
-//		editableTableView.setOnTransactionSucessListener(lblStatus::setText);
+		// editableTableView.setOnTransactionSucessListener(lblStatus::setText);
 		editableTableView.setOnFailListener(lblStatus::setText);
 
-		//		editableTableView.setOnMouseClicked(ev -> {
-		//			Map<ColumnExpression, ObjectProperty<ValueExpression>> selectedItem = editableTableView.getSelectionModel().getSelectedItem();
-		//			System.out.println(selectedItem);
+		// editableTableView.setOnMouseClicked(ev -> {
+		// Map<ColumnExpression, ObjectProperty<ValueExpression>> selectedItem = editableTableView.getSelectionModel().getSelectedItem();
+		// System.out.println(selectedItem);
 		//
-		//		});
+		// });
 
 		FxUtil.installClipboardKeyEvent(editableTableView);
-		//		editableTableView.addEventHandler(KeyEvent.KEY_RELEASED, this::editableTableViewOnKeyReleased);
+		// editableTableView.addEventHandler(KeyEvent.KEY_RELEASED, this::editableTableViewOnKeyReleased);
 		setTop(hBox);
 		setCenter(editableTableView);
 		setBottom(lblStatus);
 
+//		editableTableView.getSelectionModel().selectedItemProperty().addListener((oba, o, n) -> {
+//			System.out.println(n);
+//		});
 		addStyle();
 
 	}
@@ -116,7 +120,8 @@ public class EditableTableViewComposite extends BorderPane {
 	 * @param buttons2
 	 */
 	private void addStyle() {
-		Button[] buttons = new Button[] { btnExec, btnAdd, btnRemove, btnSave };;
+		Button[] buttons = new Button[] { btnExec, btnAdd, btnRemove, btnSave };
+		;
 		for (Button btn : buttons) {
 			btn.getStyleClass().add("button-gargoyle");
 		}
@@ -144,8 +149,7 @@ public class EditableTableViewComposite extends BorderPane {
 	public int execute() throws Exception {
 		String tableName = txtTableName.getText();
 
-		if(ValueUtil.isNotEmpty(tableName))
-		{
+		if (ValueUtil.isNotEmpty(tableName)) {
 			if (!sql.get().isEmpty()) {
 				editableTableView.readByTableName(sql.get(), tableName);
 			}
@@ -186,6 +190,14 @@ public class EditableTableViewComposite extends BorderPane {
 		return editableTableView.getColumns();
 	}
 
+	/**
+	 * 읽기전용으로 처리하면 사용하는데 무리는없는데.
+	 * 
+	 * 데이터를 추가하고 편집하는 목적으로 사용하는건 권장하지않음.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 16. 
+	 * @return
+	 */
 	public ObservableList<Map<ColumnExpression, ObjectProperty<ValueExpression>>> getItems() {
 		return editableTableView.getItems();
 	}
@@ -263,6 +275,30 @@ public class EditableTableViewComposite extends BorderPane {
 	 */
 	public final void setBtnSave(Button btnSave) {
 		this.btnSave = btnSave;
+	}
+
+	public TableViewSelectionModel<Map<ColumnExpression, ObjectProperty<ValueExpression>>> getSelectionModel() {
+		return this.editableTableView.getSelectionModel();
+	}
+
+//	/**
+//	 * 새로운 아이템을 추가한다.
+//	 * @작성자 : KYJ
+//	 * @작성일 : 2017. 7. 16.
+//	 * @param newValue
+//	 */
+//	public void addNewItem(Map<ColumnExpression, ObjectProperty<ValueExpression>> newValue) {
+//		this.editableTableView.addNewItem(newValue);
+//	}
+
+	/**
+	 * 컬럼과 데이터를 비움.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 16. 
+	 */
+	public void clear() {
+		this.editableTableView.getColumns().clear();
+		this.editableTableView.getItems().clear();
 	}
 
 }

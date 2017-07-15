@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -89,7 +91,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 	 */
 	private StringProperty tableName = new SimpleStringProperty();
 
-	//	private ObservableList<Map<ColumnExpression, ObjectProperty<ValueExpression>>> addedList = FXCollections.observableArrayList();
+	// private ObservableList<Map<ColumnExpression, ObjectProperty<ValueExpression>>> addedList = FXCollections.observableArrayList();
 	private ObservableList<Map<ColumnExpression, ObjectProperty<ValueExpression>>> removedList = FXCollections.observableArrayList();
 
 	private Map<String, ColumnExpression> columnMap = new ConcurrentHashMap<>();
@@ -108,7 +110,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 		this.connectionSupplier = connectionSupplier;
 		this.setEditable(true);
 
-		//		new ConcurrentLinkedQueue<>();
+		// new ConcurrentLinkedQueue<>();
 		getItems().addListener(itemChangeListener);
 
 	}
@@ -128,13 +130,25 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 						for (TableColumn<Map<ColumnExpression, ObjectProperty<ValueExpression>>, ?> tc : getColumns()) {
 							ColumnExpression _col = (ColumnExpression) tc.getUserData();
 							ValueExpression valueExpression = new ValueExpression();
+							
 							valueExpression.setRealValue(null);
 							valueExpression.setDisplayText("");
+							
 							valueExpression.isNew = true;
 							valueExpression.isPrimaryKey = _col.isPrimaryColumn;
 							valueExpression.setColumnExpression(_col);
 							m.put(_col, new SimpleObjectProperty<>(valueExpression));
 						}
+						
+//						Iterator<ColumnExpression> iterator = m.keySet().iterator();
+//						while(iterator.hasNext())
+//						{
+//							ColumnExpression next = iterator.next();
+//							ObjectProperty<ValueExpression> objectProperty = m.get(next);
+//							ValueExpression valueExpression = objectProperty.get();
+//							
+//						}
+					
 					}
 				} else if (c.wasRemoved()) {
 					removedList.addAll(c.getRemoved());
@@ -173,11 +187,12 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 					return null;
 				}
 
-			} , rs -> {
+			}, rs -> {
 				try {
-					//					18. IS_NULLABLE String => ISO rules are used to determine the nullability for a column. ◦ YES --- if the column can include NULLs
-					//							◦ NO --- if the column cannot include NULLs
-					//							◦ empty string --- if the nullability for the column is unknown
+					// 18. IS_NULLABLE String => ISO rules are used to determine the nullability for a column. ◦ YES --- if the column can
+					// include NULLs
+					// ◦ NO --- if the column cannot include NULLs
+					// ◦ empty string --- if the nullability for the column is unknown
 
 					return Boolean.valueOf("YES".equals(rs.getString(18)));
 				} catch (Exception e) {
@@ -224,7 +239,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 									for (int i = 1; i <= columnCount; i++) {
 										String columnName = t.getColumnName(i);
-										ColumnExpression columnExp = columnMap.get(columnName);//new ColumnExpression(columnName);
+										ColumnExpression columnExp = columnMap.get(columnName);// new ColumnExpression(columnName);
 
 										ValueExpression valueExp = new ValueExpression();
 										valueExp.displayText.set(u.getString(columnName));
@@ -262,6 +277,11 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 	}
 
+	public void addNewItem(Map<ColumnExpression, ObjectProperty<ValueExpression>> newValue){
+		getItems().removeListener(itemChangeListener);
+		getItems().add(newValue);
+		getItems().addListener(itemChangeListener);
+	}
 	/**
 	 * 저장 기능을 구현
 	 *
@@ -272,7 +292,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 	 */
 	public void save() throws Exception {
 
-		//		List<String> saveSqlList = new ArrayList<>();
+		// List<String> saveSqlList = new ArrayList<>();
 
 		List<String> saveList = new ArrayList<String>();
 		STATUS statements1 = getStatements(DML.INSERT, (status, list) -> {
@@ -296,12 +316,12 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 				if (!saveList.isEmpty()) {
 					int transactionedScope = DbUtil.getTransactionedScope(con, saveList, (list) -> {
 						return list;
-					} , ex -> {
+					}, ex -> {
 						throw new RuntimeException(ex);
 					});
 					if (transactionedScope == -1) {
 						sendFailMessage("트랜잭션 처리중 에러 발생");
-						//						throw new GargoyleException("Execute Fail.");
+						// throw new GargoyleException("Execute Fail.");
 					} else {
 						readByTableName(history.getLast(), tableName.getValue(), false);
 						sendTransactionSuccesslMessage("작업 성공 - " + saveList.size() + " 건");
@@ -312,7 +332,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			}
 
 		} else {
-			//throw new GargoyleException("Invalide status.");
+			// throw new GargoyleException("Invalide status.");
 			sendFailMessage("데이터 처리중 에러 발생");
 		}
 
@@ -362,20 +382,20 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 		int modifiedCnt = 0;
 
-		//키값이 존재하지않는 테이블인경우 where조건은 수정되지않는 컬럼으로 사용.
+		// 키값이 존재하지않는 테이블인경우 where조건은 수정되지않는 컬럼으로 사용.
 		boolean isNotContainsPrimaryTable = false;
 
-		//키값도 존재하지않을뿐더러 변경된 컬럼도 없는경우
+		// 키값도 존재하지않을뿐더러 변경된 컬럼도 없는경우
 		boolean isNotContainsModifiedTable = false;
 
 		if (items != null && !items.isEmpty()) {
 			long count = items.get(0).values().stream().filter(vo -> vo.getValue().isPrimaryKey).count();
 
-			//키값 존재유무에 따른 플래그 update
+			// 키값 존재유무에 따른 플래그 update
 			if (count == 0)
 				isNotContainsPrimaryTable = true;
 
-			//키값이 없는 상태에서 수정된 컬럼도 없는 경우 상태 update
+			// 키값이 없는 상태에서 수정된 컬럼도 없는 경우 상태 update
 			if (count == 0) {
 				long modifiedCount = items.get(0).values().stream().filter(vo -> vo.getValue().isModified).count();
 				if (modifiedCount == 0)
@@ -403,21 +423,22 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 				if (colummExp.isMetadata)
 					continue;
 
-				//				else {
+				// else {
 				ObjectProperty<ValueExpression> value = m.get(colummExp);
 				ValueExpression valueExp = value.get();
 
 				if (valueExp.isPrimaryKey) {
 
-					//기본키값이 빈 경우 메세지.
-					if (valueExp.getDisplayText() == null /*|| valueExp.getDisplayText().isEmpty()*/) {
+					// 기본키값이 빈 경우 메세지.
+					if (valueExp.getDisplayText() == null /* || valueExp.getDisplayText().isEmpty() */) {
 						return function.apply(STATUS.PK_VAL_IS_EMPTY, Collections.emptyList());
 					}
 					whereStatement.append(String.format("and %s  = '%s'", colummExp, valueExp.getRealValue()));
 				}
 
 				if (valueExp.isModified) {
-					setStatement.append(String.format("%s  = %s,", colummExp, getValue(colummExp, valueExp) /*valueExp.getDisplayText()*/));
+					setStatement
+							.append(String.format("%s  = %s,", colummExp, getValue(colummExp, valueExp) /* valueExp.getDisplayText() */));
 					modifiedCnt++;
 
 					if (isNotContainsPrimaryTable) {
@@ -432,7 +453,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 				columnsStatement.append(String.format("%s,", colummExp));
 				valuesStatement.append(String.format("'%s',", valueExp.getDisplayText()));
-				//				}
+				// }
 
 			}
 			int setStatementLength = setStatement.length();
@@ -504,7 +525,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 		String displayText = ve.getDisplayText();
 		String returnValue = "";
 		switch (type) {
-		/*[시작]  문자열*/
+		/* [시작] 문자열 */
 		case java.sql.Types.CHAR:
 			returnValue = singleDot(displayText);
 			break;
@@ -527,7 +548,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			returnValue = singleDot(displayText);
 			break;
 
-		/*[시작]  정수 or 실수 */
+		/* [시작] 정수 or 실수 */
 		case java.sql.Types.NUMERIC:
 			returnValue = displayText;
 			break;
@@ -537,7 +558,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 		case java.sql.Types.DOUBLE:
 			returnValue = displayText;
 			break;
-		/*[끝]  정수 or 실수 */
+		/* [끝] 정수 or 실수 */
 
 		case java.sql.Types.BOOLEAN:
 			returnValue = displayText;
@@ -571,7 +592,8 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 		@Override
 		public ValueExpression fromString(String string) {
 
-			//   Map<ColumnExpression, ObjectProperty<ColumnExpression>> selectedItem = EditableTableView.this.getSelectionModel().getSelectedItem();
+			// Map<ColumnExpression, ObjectProperty<ColumnExpression>> selectedItem =
+			// EditableTableView.this.getSelectionModel().getSelectedItem();
 			ObservableList<TablePosition> selectedCells = EditableTableView.this.getSelectionModel().getSelectedCells();
 			TablePosition tablePosition = selectedCells.get(0);
 			TableColumn tableColumn = tablePosition.getTableColumn();
@@ -579,7 +601,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 			Map<ColumnExpression, ObjectProperty<ValueExpression>> map = getItems().get(tablePosition.getRow());
 
-			//신규 추가된 로우
+			// 신규 추가된 로우
 			ObjectProperty<ValueExpression> objectProperty = map.get(new ColumnExpression(columnName));
 			if (objectProperty == null) {
 				ColumnExpression userData = (ColumnExpression) tableColumn.getUserData();
@@ -595,15 +617,15 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 				return initialValue;
 			}
 
-			//변경처리되는 로우
+			// 변경처리되는 로우
 			ValueExpression cellData = objectProperty.get();
-			//			Object cellData = tableColumn.getCellData(tablePosition.getRow());
+			// Object cellData = tableColumn.getCellData(tablePosition.getRow());
 
-			if (cellData != null /*cellData instanceof ValueExpression*/) {
+			if (cellData != null /* cellData instanceof ValueExpression */) {
 				ValueExpression cExp = (ValueExpression) cellData;
 				cExp.setDisplayText(string);
 
-				//신규로우의 경우는 isModified 처리를 하지않는다. 그렇지않으면 update구문으로 인식한다.
+				// 신규로우의 경우는 isModified 처리를 하지않는다. 그렇지않으면 update구문으로 인식한다.
 				if (!ColumnExpression.isContainsNewRowMeata(map)) {
 					cExp.isModified = true;
 				}
@@ -630,8 +652,8 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 
 				protected boolean isChangedValue(ValueExpression oldItem, ValueExpression newItem) {
 
-					//     System.out.println(oldItem.getRealValue());
-					//     System.out.println(newItem.getDisplayText());
+					// System.out.println(oldItem.getRealValue());
+					// System.out.println(newItem.getDisplayText());
 					String realValueString = (oldItem == null || oldItem.getRealValue() == null) ? "" : oldItem.getRealValue().toString();
 					String displayString = (newItem == null || newItem.getDisplayText() == null) ? "" : newItem.getDisplayText();
 
@@ -641,9 +663,11 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 					return !Objects.equal(realValueString, displayString);
 				}
 
-				/* (non-Javadoc)
-				  * @see javafx.scene.control.TableCell#commitEdit(java.lang.Object)
-				  */
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see javafx.scene.control.TableCell#commitEdit(java.lang.Object)
+				 */
 				@Override
 				public void commitEdit(ValueExpression newValue) {
 
@@ -656,7 +680,9 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 					super.commitEdit(newValue);
 				}
 
-				/* (non-Javadoc)
+				/*
+				 * (non-Javadoc)
+				 * 
 				 * @see javafx.scene.control.cell.TextFieldTableCell#updateItem(java.lang.Object, boolean)
 				 */
 				@Override
@@ -685,9 +711,9 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			if (userData != null && userData.isPrimaryColumn) {
 				cell.setStyle(STYLE_PRIMARYKEY);
 			}
-			//			else {
-			//				cell.setStyle(null);
-			//			}
+			// else {
+			// cell.setStyle(null);
+			// }
 			return cell;
 		}
 	};
@@ -732,14 +758,12 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			return this.columnType;
 		}
 
-
 		/**
 		 * @return the columnName
 		 */
 		public final String getColumnName() {
 			return columnName;
 		}
-
 
 		private static ColumnExpression NEW_ROW_META;
 
@@ -778,9 +802,11 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			return this.isMetadata && $_NEW_ROW$.equals(this.columnName);
 		}
 
-		/* (non-Javadoc)
-		  * @see java.lang.Object#hashCode()
-		  */
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Object#hashCode()
+		 */
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -789,9 +815,11 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			return result;
 		}
 
-		/* (non-Javadoc)
-		  * @see java.lang.Object#equals(java.lang.Object)
-		  */
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj)
@@ -809,13 +837,17 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			return true;
 		}
 
-		/* (non-Javadoc)
-		  * @see java.lang.Object#toString()
-		  */
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Object#toString()
+		 */
 		@Override
 		public String toString() {
 			return columnName;
 		}
+
+		
 
 	}
 
@@ -825,7 +857,7 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 	 * @author KYJ
 	 *
 	 */
-	public class ValueExpression implements Comparable<ValueExpression> {
+	public class ValueExpression implements Comparable<ValueExpression>, Cloneable {
 
 		private StringProperty displayText = new SimpleStringProperty();
 		private ObjectProperty<Object> realValue = new SimpleObjectProperty<>();
@@ -837,6 +869,14 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 		@Override
 		public String toString() {
 			return displayText.get();
+		}
+
+		public boolean isNew() {
+			return isNew;
+		}
+
+		public void setNew(boolean isNew) {
+			this.isNew = isNew;
 		}
 
 		/**
@@ -885,10 +925,16 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 		public final boolean isModified() {
 			return isModified;
 		}
+		
+		public void setModified(boolean f){
+			this.isModified = f;
+		}
 
-		/* (non-Javadoc)
-		  * @see java.lang.Comparable#compareTo(java.lang.Object)
-		  */
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Comparable#compareTo(java.lang.Object)
+		 */
 		@Override
 		public int compareTo(ValueExpression o) {
 
@@ -901,6 +947,18 @@ public class EditableTableView extends TableView<Map<ColumnExpression, ObjectPro
 			return Strings.compareTo(this.displayText.get(), o.displayText.get());
 		}
 
+		@Override
+		public ValueExpression clone() throws CloneNotSupportedException {
+
+			ValueExpression valueExpression = new ValueExpression();
+			valueExpression.isModified = this.isModified;
+			valueExpression.isNew = this.isNew;
+			valueExpression.displayText.set(this.displayText.get());
+			valueExpression.columnExp = this.columnExp;
+			valueExpression.displayText.set(this.displayText.get());
+			valueExpression.realValue.set(this.realValue.get());
+			return valueExpression; // super.clone();
+		}
 	}
 
 	/**

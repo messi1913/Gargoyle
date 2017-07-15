@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -194,26 +195,26 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	/**
 	 * 데이터베이스와 접속한 커넥션을 반환해준다.
 	 */
-	//	public Supplier<Connection> connectionSupplier = () -> {
-	//		Connection con = null;
-	//		try {
+	// public Supplier<Connection> connectionSupplier = () -> {
+	// Connection con = null;
+	// try {
 	//
-	//			if (url == null || username == null || password == null) {
-	//				con = DbUtil.getConnection();
-	//			} else {
-	//				con = DbUtil.getConnection(driver, url, username, password);
-	//			}
-	//			// Class.forName(driver);
-	//			// con = DriverManager.getConnection(url, username, password);
-	//		} catch (Exception e)
+	// if (url == null || username == null || password == null) {
+	// con = DbUtil.getConnection();
+	// } else {
+	// con = DbUtil.getConnection(driver, url, username, password);
+	// }
+	// // Class.forName(driver);
+	// // con = DriverManager.getConnection(url, username, password);
+	// } catch (Exception e)
 	//
-	//		{
-	//			lblStatus.setText(e.getMessage());
-	//			LOGGER.error(ValueUtil.toString(e));
-	//		}
-	//		return con;
+	// {
+	// lblStatus.setText(e.getMessage());
+	// LOGGER.error(ValueUtil.toString(e));
+	// }
+	// return con;
 	//
-	//	};
+	// };
 
 	public ConnectionSupplier connectionSupplier = new ConnectionSupplier() {
 		@Override
@@ -639,10 +640,10 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			}
 
 			if (ValueUtil.isNotEmpty(userColor)) {
-				//				String backGroundColor = String.format("#%02X%02X%02X", (int) (userColor.getRed() * 255),
-				//						(int) (userColor.getGreen() * 255), (int) (userColor.getBlue() * 255));
-				//				String textColor = String.format("#%02X%02X%02X", 255 - (int) (userColor.getRed() * 255),
-				//						255 - (int) (userColor.getGreen() * 255), 255 - (int) (userColor.getBlue() * 255));
+				// String backGroundColor = String.format("#%02X%02X%02X", (int) (userColor.getRed() * 255),
+				// (int) (userColor.getGreen() * 255), (int) (userColor.getBlue() * 255));
+				// String textColor = String.format("#%02X%02X%02X", 255 - (int) (userColor.getRed() * 255),
+				// 255 - (int) (userColor.getGreen() * 255), 255 - (int) (userColor.getBlue() * 255));
 				String textColor = FxUtil.toWebString(userColor);
 				String backGroundColor = FxUtil.toWebString(userColor);
 
@@ -651,7 +652,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 			}
 
-			//ConnectionSupplier 생성
+			// ConnectionSupplier 생성
 			connectionSupplier = new ConnectionSupplier(map);
 		} catch (Exception e) {
 			DialogUtil.showExceptionDailog(this, e, "초기화 실패....");
@@ -661,6 +662,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	private void createResultTableContextMenu(TableView<?> tableView) {
 
+		/**/
 		MenuItem menuExportExcel = new MenuItem("Export Excel File");
 		menuExportExcel.setOnAction(this::menuExportExcelOnAction);
 
@@ -678,8 +680,12 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		Menu menuExportExcelFile = new Menu("Export", null, menuExportExcel, menuExportSpreadSheet, menuExportInsertScript,
 				menuExportMergeScript, menuExportJson);
+		/**/
 
-		ContextMenu contextMenu = new ContextMenu(menuExportExcelFile);
+		MenuItem rowCopy = new MenuItem("row copy");
+		rowCopy.setOnAction(this::rowCopyOnAction);
+
+		ContextMenu contextMenu = new ContextMenu(menuExportExcelFile, rowCopy);
 		tableView.setContextMenu(contextMenu);
 	}
 
@@ -687,8 +693,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * 컨텍스트 메뉴 생성 및 기능 적용
 	 *
 	 *
-	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
-	 * setAccelerator에 등록된 이벤트가 호출안됨
+	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
 	 *
 	 * @param schemaTree2
 	 */
@@ -885,8 +890,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 *
 	 * 2016-12-09 CodeAssistHelper 기능 추가.
 	 *
-	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
-	 * setAccelerator에 등록된 이벤트가 호출안됨
+	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
 	 *
 	 * @return
 	 */
@@ -895,7 +899,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		SqlKeywords sqlNode = sqlTab.getSqlNode();
 
-		//코드 AreaHelper 설치.
+		// 코드 AreaHelper 설치.
 		new ASTSqlCodeAreaHelper(sqlNode.getCodeArea(), connectionSupplier);
 
 		ContextMenu contextMenu = sqlTab.getTxtSqlPaneContextMenu();
@@ -1087,7 +1091,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		List<String> asList = Arrays.asList(split);
 		queryAll(asList, cnt -> {
 			DialogUtil.showMessageDialog(String.format("%d 건 success", cnt));
-		} , (e, bool) -> {
+		}, (e, bool) -> {
 			if (bool)
 				DialogUtil.showExceptionDailog(e);
 		});
@@ -1162,7 +1166,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 			List<Map<String, Object>> query = query(sql, param, success -> {
 				lblStatus.setText(success.size() + " row");
-			} , (exception, showDialog) -> {
+			}, (exception, showDialog) -> {
 				lblStatus.setText(exception.toString());
 				if (showDialog)
 					DialogUtil.showExceptionDailog(this, exception);
@@ -1177,8 +1181,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	}
 
 	protected void execiteEdit(String sql) {
-		editableComposite.getColumns().clear();
-		editableComposite.getItems().clear();
+		// editableComposite.getColumns().clear();
+		editableComposite.clear();
 
 		editableComposite.setSql(sql);
 
@@ -1274,6 +1278,44 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		toExcelFileFunction.generate0(saveFile, columns, items);
 		DialogUtil.showMessageDialog("complete...");
 
+	}
+
+	/**
+	 * 
+	 * 새로운 로우를 추가하지만 선택된 행에 대산 값들도 복사한다.
+	 * 
+	 * 
+	 * #### #### 값을 새롭게 추가한다음에 그 값에대한 값을 변경하는 형태로 로직구성이되야한다.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 16.
+	 * @param e
+	 */
+	public void rowCopyOnAction(ActionEvent e) {
+
+		TableViewSelectionModel<Map<ColumnExpression, ObjectProperty<ValueExpression>>> selectionModel = this.editableComposite
+				.getSelectionModel();
+		Map<ColumnExpression, ObjectProperty<ValueExpression>> selectedItem = selectionModel.getSelectedItem();
+		if (selectedItem != null && !selectedItem.isEmpty()) {
+
+			Map<ColumnExpression, ObjectProperty<ValueExpression>> newVal = new HashMap<>();
+
+			// 값을 새롭게 추가한다음에 그 값에대한 값을 변경하는 형태로 로직구성이되야한다.
+			this.editableComposite.getItems().add(newVal);
+
+			// 값 복사
+			{
+				for (ObjectProperty<ValueExpression> value : selectedItem.values()) {
+					try {
+						ValueExpression cloneValueExp = value.get().clone();
+						cloneValueExp.setNew(true);
+						newVal.put(cloneValueExp.getColumnExpression(), new SimpleObjectProperty<>(cloneValueExp));
+					} catch (CloneNotSupportedException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -1533,13 +1575,13 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		String defaultSchema = "";
 		try (Connection con = connectionSupplier.get()) {
 			//
-			//			String catalog = con.getCatalog();
-			//			String schema = con.getSchema();
-			//			ResultSet schemas = con.getMetaData().getCatalogs();
-			//			if (schemas.next()) {
-			//				String string = schemas.getString(1);
-			//				System.out.println(string);
-			//			}
+			// String catalog = con.getCatalog();
+			// String schema = con.getSchema();
+			// ResultSet schemas = con.getMetaData().getCatalogs();
+			// if (schemas.next()) {
+			// String string = schemas.getString(1);
+			// System.out.println(string);
+			// }
 
 			Map<String, Object> findOne = DbUtil.findOne(con, "select current_schema() as currentschema");
 			if (findOne != null && !findOne.isEmpty()) {
@@ -1617,6 +1659,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	/**
 	 * 선택된 ResultTab의 데이터리스트를 반환
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 1.
 	 * @return
