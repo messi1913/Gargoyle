@@ -44,6 +44,8 @@ import com.kyj.fx.voeditor.visual.component.bar.GargoyleLoadBar;
 import com.kyj.fx.voeditor.visual.component.bar.GargoyleSynchLoadBar;
 import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
+import com.kyj.fx.voeditor.visual.component.grid.AbstractDVO;
+import com.kyj.fx.voeditor.visual.component.grid.IOptions;
 import com.kyj.fx.voeditor.visual.component.notifycation.GargoyleNotification;
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.scm.FxSVNHistoryDataSupplier;
@@ -351,15 +353,15 @@ public class FxUtil {
 		if (res != null) {
 			try {
 				String css = getCss(controller);
-		
+
 				if (ValueUtil.isEmpty(css))
 					return null;
 
 				URL resource = res.getResource(css);
-				
+
 				if (resource == null)
 					return null;
-				
+
 				return resource.toExternalForm();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1426,6 +1428,19 @@ public class FxUtil {
 	}
 
 	/**
+	 * 테이블뷰의 컬럼모델을 쉽게 생성하기 위한 api.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 17. 
+	 * @param baseModel
+	 * @param view
+	 * @param option
+	 */
+	public static <T extends AbstractDVO> void installCommonsTableView(Class<T> baseModel, TableView<T> view, IOptions option) {
+		FxTableViewUtil.installCommonsTableView(baseModel, view, option);
+	}
+
+	/**
 	 * TextField에 텍스트Auto Binding 설치
 	 *
 	 * @작성자 : KYJ
@@ -1765,7 +1780,7 @@ public class FxUtil {
 
 		FxUtil.createStageAndShow(new Scene(root, BROWSER_WIDTH, BROWSER_HEIGHT), stage -> {
 			stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
-			stage.setOnCloseRequest(ev ->{
+			stage.setOnCloseRequest(ev -> {
 				engine.load("about:blank");
 			});
 		});
@@ -1793,10 +1808,21 @@ public class FxUtil {
 		tbMetadata.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
 
 			if (MouseButton.PRIMARY == ev.getButton() && ev.getClickCount() == 2) {
+				if (ev.isConsumed())
+					return;
+
 				ObservableList<TablePosition> selectedCells = tbMetadata.getSelectionModel().getSelectedCells();
+				if (selectedCells == null || selectedCells.isEmpty())
+					return;
+
 				TablePosition tablePosition = selectedCells.get(0);
 				int column = tablePosition.getColumn();
 				int row = tablePosition.getRow();
+
+				if (column == -1)
+					return;
+				if (row == -1)
+					return;
 
 				// tablePosition.getTableColumn().
 				Object valueByConverter = FxTableViewUtil.getValue(tbMetadata, column, row);

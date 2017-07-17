@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.bci.monitor.ApplicationModel;
 import com.kyj.bci.monitor.Monitors;
+import com.kyj.fx.voeditor.visual.component.monitor.jstat.view.JStateCompositeWrapper;
 import com.kyj.fx.voeditor.visual.component.text.ThreadDumpTextArea;
 import com.kyj.fx.voeditor.visual.framework.JavaLauncher;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
@@ -199,11 +200,14 @@ public class JavaProcessMonitor extends CloseableParent<SplitPane> {
 		}
 
 		Integer selectedProcessId = selectedItem.getProcessId();
+		JStateCompositeWrapper parent = new JStateCompositeWrapper(selectedProcessId);
+		
 		String applicationName = selectedItem.getApplicationName();
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		Monitors.runMemoryDump(selectedProcessId, out);
-		ThreadDumpTextArea parent = new ThreadDumpTextArea();
-		parent.setContent(out.toString());
+//		ByteArrayOutputStream out = new ByteArrayOutputStream();
+//		Monitors.runMemoryDump(selectedProcessId, out);
+//		ThreadDumpTextArea parent = new ThreadDumpTextArea();
+//		parent.setContent(out.toString());
+		
 		FxUtil.createStageAndShow(parent, stage -> {
 			stage.initOwner(getParent().getScene().getWindow());
 			stage.setWidth(1200d);

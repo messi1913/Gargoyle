@@ -31,7 +31,6 @@ public class CommonsBaseGridView<T extends AbstractDVO> extends TableView<T> {
 	public static final String COMMONS_CLICKED = CommonConst.COMMONS_FILEDS_COMMONS_CLICKED;
 	private Class<T> clazz;
 
-	private ObservableList<TableColumn<T, ?>> tableColumns;
 	private IColumnMapper<T> columnMapper;
 	private IOptions options;
 
@@ -60,58 +59,13 @@ public class CommonsBaseGridView<T extends AbstractDVO> extends TableView<T> {
 		this.getItems().addAll(items);
 		this.columnMapper = createColumnMapper();
 		this.options = options;
-		tableColumns = FXCollections.observableArrayList();
+		//		tableColumns = FXCollections.observableArrayList();
 
-		extracted(clazz, columns);
+		List<TableColumn<T, ?>> tableColumns = extracted(clazz, columns, this, this.columnMapper, this.options);
 
 		this.setEditable(true);
 
 		this.getColumns().addAll(tableColumns);
-	}
-
-	private void extracted(Class<T> clazz, List<String> columns) {
-
-		// options속성중 showRowNumber값이 true일경우 No.컬럼을 추가하고 로우개수를 표시한다.
-		if (options.showRowNumber()) {
-			TableColumn<T, Integer> numberColumn = new TableColumn<T, Integer>();
-			numberColumn.setCellValueFactory(new NumberingCellValueFactory<>(this.getItems()));
-			numberColumn.setText("No.");
-			numberColumn.setPrefWidth(40);
-			this.getColumns().add(numberColumn);
-		}
-
-		for (String column : columns) {
-
-			if (!options.useCommonCheckBox() && CommonConst.COMMONS_FILEDS_COMMONS_CLICKED.equals(column)) {
-				continue;
-			}
-
-			if (!options.isCreateColumn(column))
-				continue;
-
-			try {
-				try {
-					Field declaredField = this.clazz.getDeclaredField(column);
-					if (declaredField != null) {
-						Class<?> type = declaredField.getType();
-						tableColumns.add(generateTableColumns(type, column));
-					}
-				} catch (NoSuchFieldException e) {
-					if (AbstractDVO.class.isAssignableFrom(clazz)) {
-						Field superClassField = AbstractDVO.class.getDeclaredField(column);
-						if (superClassField != null) {
-							Class<?> type = superClassField.getType();
-							tableColumns.add(generateTableColumns(type, column));
-						}
-					}
-				}
-
-			} catch (NoSuchFieldException | SecurityException e) {
-				LOGGER.error(ValueUtil.toString(e));
-			}
-
-		}
-
 	}
 
 	public IColumnMapper<T> createColumnMapper() {
@@ -182,8 +136,13 @@ public class CommonsBaseGridView<T extends AbstractDVO> extends TableView<T> {
 		}
 	}
 
-	private TableColumn<T, ?> generateTableColumns(Class<?> classType, String columnName) {
-		return columnMapper.generateTableColumns(classType, columnName, options);
+	private TableColumn<T, ?> generateTableColumns(Class<?> classType, IColumnMapper<T> mapper, String columnName) {
+		return generateTableColumns(classType, this.columnMapper, columnName, this.options);
+	}
+
+	private static <T extends AbstractDVO> TableColumn<T, ?> generateTableColumns(Class<?> classType, IColumnMapper<T> mapper,
+			String columnName, IOptions options) {
+		return mapper.generateTableColumns(classType, columnName, options);
 	}
 
 	public IColumnMapper<T> getColumnMapper() {
@@ -209,6 +168,71 @@ public class CommonsBaseGridView<T extends AbstractDVO> extends TableView<T> {
 	 */
 	public Class<T> getClazz() {
 		return this.clazz;
+	}
+
+	private static <T extends AbstractDVO> List<TableColumn<T, ?>> extracted(Class<T> clazz, List<String> columns, TableView<T> view,
+			IColumnMapper<T> columnMapper, IOptions options) {
+
+		List<TableColumn<T, ?>> tableColumns = FXCollections.observableArrayList();
+		// options속성중 showRowNumber값이 true일경우 No.컬럼을 추가하고 로우개수를 표시한다.
+		if (options.showRowNumber()) {
+			TableColumn<T, Integer> numberColumn = new TableColumn<T, Integer>();
+			numberColumn.setCellValueFactory(new NumberingCellValueFactory<>(view.getItems()));
+			numberColumn.setText("No.");
+			numberColumn.setPrefWidth(40);
+			tableColumns.add(numberColumn);
+		}
+
+		for (String column : columns) {
+
+			if (!options.useCommonCheckBox() && CommonConst.COMMONS_FILEDS_COMMONS_CLICKED.equals(column)) {
+				continue;
+			}
+
+			if (!options.isCreateColumn(column))
+				continue;
+
+			try {
+				try {
+					Field declaredField = clazz.getDeclaredField(column);
+					if (declaredField != null) {
+						Class<?> type = declaredField.getType();
+						tableColumns.add(generateTableColumns(type, columnMapper, column, options));
+					}
+				} catch (NoSuchFieldException e) {
+					if (AbstractDVO.class.isAssignableFrom(clazz)) {
+						Field superClassField = AbstractDVO.class.getDeclaredField(column);
+						if (superClassField != null) {
+							Class<?> type = superClassField.getType();
+							tableColumns.add(generateTableColumns(type, columnMapper, column, options));
+						}
+					}
+				}
+
+			} catch (NoSuchFieldException | SecurityException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+
+		}
+		return tableColumns;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 17. 
+	 * @param model
+	 * @param view
+	 * @param options
+	 */
+	public static <T extends AbstractDVO> void install(Class<T> model, TableView<T> view, IOptions options) {
+		List<String> createColumns = createColumns(model);
+		if (view.getItems() == null) {
+			view.getItems().addAll(FXCollections.observableArrayList());
+		}
+
+		List<TableColumn<T, ?>> columns = extracted(model, createColumns, view, new BaseColumnMapper<>(), options);
+
+		view.getColumns().addAll(columns);
 	}
 
 }

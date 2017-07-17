@@ -664,6 +664,12 @@ public class ValueUtil {
 		JSONObject fromJson = gson.fromJson(str, JSONObject.class);
 		return fromJson == null ? new JSONObject() : fromJson;
 	}
+	
+//	public static JSONArray toJSONArray(String str) {
+//		Gson gson = new Gson();
+//		JSONArray fromJson = gson.fromJson(str, JSONArray.class);
+//		return fromJson == null ? new JSONArray() : fromJson;
+//	}
 
 	public static String toJSONString(Object obj) {
 		Gson gson = new Gson();

@@ -10,8 +10,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
+import com.kyj.fx.voeditor.visual.component.grid.AbstractDVO;
+import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
+import com.kyj.fx.voeditor.visual.component.grid.IOptions;
+
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
@@ -390,5 +393,16 @@ class FxTableViewUtil {
 		}
 
 		return tc.getCellData(row);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 17. 
+	 * @param baseModel
+	 * @param view
+	 * @param option
+	 */
+	public static <T extends AbstractDVO> void installCommonsTableView(Class<T> baseModel, TableView<T> view, IOptions option) {
+		CommonsBaseGridView.install(baseModel, view, option);
 	}
 }
