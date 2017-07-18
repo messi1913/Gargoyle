@@ -92,6 +92,7 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.SnapshotResult;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
@@ -2111,8 +2112,17 @@ public class FxUtil {
 		action.accept(create);
 		create.show();
 	}
-	/**
-	 * [end notifycation]
-	 * */
 
+	
+
+	/**
+	 * excel Export 기능이 있는 메뉴 아이템을 리턴.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 18. 
+	 * @param target
+	 * @return
+	 */
+	public static <T> MenuItem createMenuItemExcelExport(TableView<T> target) {
+		return FxTableViewUtil.EasyMenuItem.createExcelExportMenuItem(target);
+	}
 }

@@ -2073,6 +2073,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		loadNewSystemTab(ProxyServerComposite.class.getSimpleName(), javaProcessMonitor);
 	}
 
+	@FXML
+	public void miSimpleTextViewOnAction(){
+		loadNewSystemTab("SimpleTextView", new SimpleTextView(""));
+	}
 	/**
 	 * Java Application 실행처리.
 	 * @작성자 : KYJ

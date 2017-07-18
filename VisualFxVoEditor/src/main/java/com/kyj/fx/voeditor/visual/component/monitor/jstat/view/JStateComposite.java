@@ -29,6 +29,7 @@ import com.kyj.fx.voeditor.visual.component.grid.AbstractDVO;
 import com.kyj.fx.voeditor.visual.component.grid.BaseOptions;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.voeditor.visual.framework.excel.IExcelScreenHandler;
 import com.kyj.fx.voeditor.visual.framework.thread.DemonTimerFactory;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -49,6 +50,9 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -61,7 +65,7 @@ import javafx.util.StringConverter;
  *
  */
 @FXMLController(value = "JStateView.fxml", isSelfController = true)
-public class JStateComposite extends BorderPane implements Closeable {
+public class JStateComposite extends BorderPane implements Closeable, IExcelScreenHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JStateComposite.class);
 
 	@FXML
@@ -128,6 +132,24 @@ public class JStateComposite extends BorderPane implements Closeable {
 
 		FxUtil.installDoubleClickPopup(POPUP_STYLE.POPUP.POP_OVER, tbPrevStat);
 		FxUtil.installClipboardKeyEvent(tbPrevStat);
+		//tableView ContextMenu
+		{
+			ContextMenu contextMenu = new ContextMenu();//tbPrevStat.getContextMenu();
+			//export 
+			{
+				Menu meExport = new Menu("Export");
+				contextMenu.getItems().add(meExport);
+
+				//excel export
+				{
+					MenuItem miExportExcel = FxUtil.createMenuItemExcelExport(tbPrevStat);
+					meExport.getItems().add(miExportExcel);
+				}
+
+			}
+
+			tbPrevStat.setContextMenu(contextMenu);
+		}
 
 		comSnapShotType.setCellFactory(TextFieldListCell.forListView(new StringConverter<SnapShotType>() {
 
@@ -314,4 +336,7 @@ public class JStateComposite extends BorderPane implements Closeable {
 	public void close() throws IOException {
 		cancel();
 	}
+
+	private static final String FILE_OVERWIRTE_MESSAGE = "파일이 이미 존재합니다. 덮어씌우시겠습니까? ";
+
 }
