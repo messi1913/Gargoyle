@@ -65,6 +65,12 @@
                       <MenuItem mnemonicParsing="false" onAction="#prettyFormatOnAction" text="Pretty Format" />
                     </items>
                   </Menu>
+                  <Menu mnemonicParsing="false" text="Hex">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#toHexOnAction" text="String -&gt; Hex" />
+                        <MenuItem mnemonicParsing="false" onAction="#toStringOnAction" text="Hex -&gt; String" />
+                    </items>
+                  </Menu>
               </items>
             </Menu>
 			</menus>

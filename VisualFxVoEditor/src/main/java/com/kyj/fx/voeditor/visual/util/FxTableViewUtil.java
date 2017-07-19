@@ -6,13 +6,25 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Optional;
 
+import org.apache.commons.lang.SystemUtils;
+
+import com.kyj.fx.voeditor.visual.component.grid.AbstractDVO;
+import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
+import com.kyj.fx.voeditor.visual.component.grid.IOptions;
+import com.kyj.fx.voeditor.visual.framework.excel.IExcelScreenHandler;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -24,7 +36,9 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Callback;
+import javafx.util.Pair;
 import javafx.util.StringConverter;
 
 /**
@@ -391,4 +405,71 @@ class FxTableViewUtil {
 
 		return tc.getCellData(row);
 	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 17. 
+	 * @param baseModel
+	 * @param view
+	 * @param option
+	 */
+	public static <T extends AbstractDVO> void installCommonsTableView(Class<T> baseModel, TableView<T> view, IOptions option) {
+		CommonsBaseGridView.install(baseModel, view, option);
+	}
+
+	private static final String FILE_OVERWIRTE_MESSAGE = "파일이 이미 존재합니다. 덮어씌우시겠습니까? ";
+
+	public static class EasyMenuItem {
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 7. 18. 
+		 * @param target
+		 * @return
+		 */
+		public static <T> MenuItem createExcelExportMenuItem(TableView<T> target) {
+			MenuItem miExportExcel = new MenuItem("Export Excel");
+
+			miExportExcel.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					File saveFile = DialogUtil.showFileSaveDialog(SharedMemory.getPrimaryStage().getOwner(), option -> {
+						option.setInitialFileName(DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSS));
+						option.getExtensionFilters().add(new ExtensionFilter("Excel files (*.xlsx)", "*.xlsx"));
+						option.getExtensionFilters().add(new ExtensionFilter("Excel files (*.xls)", "*.xls"));
+						option.getExtensionFilters().add(new ExtensionFilter("All files", "*.*"));
+						option.setTitle("Save Excel");
+						option.setInitialDirectory(new File(SystemUtils.USER_HOME));
+					});
+
+					if (saveFile == null) {
+						return;
+					}
+
+					if (saveFile.exists()) {
+						Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("overwrite ?? ",
+								FILE_OVERWIRTE_MESSAGE);
+						showYesOrNoDialog.ifPresent(consume -> {
+							String key = consume.getKey();
+							String value = consume.getValue();
+
+							if (!("RESULT".equals(key) && "Y".equals(value))) {
+								return;
+							}
+						});
+
+					}
+
+					try {
+						FxExcelUtil.createExcel(new IExcelScreenHandler() {
+						}, saveFile, Arrays.asList(target), true);
+					} catch (Exception e1) {
+						DialogUtil.showExceptionDailog(e1);
+					}
+				}
+			});
+			return miExportExcel;
+		}
+	}
+
 }

@@ -13,6 +13,7 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.codec.Hex;
 
 import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
@@ -354,5 +355,19 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void prettyFormatOnAction() {
 		codeArea.getUndoManager().mark();
 		codeArea.replaceText(ValueUtil.toStringPrettyFormat(codeArea.getText()));
+	}
+	
+	@FXML
+	public void toStringOnAction(){
+		codeArea.getUndoManager().mark();
+		byte[] decode = Hex.decode(codeArea.getText());
+		codeArea.replaceText(new String(decode));
+	}
+	
+	@FXML
+	public void toHexOnAction(){
+		codeArea.getUndoManager().mark();
+		String str = codeArea.getText();
+		codeArea.replaceText(String.valueOf(Hex.encode(str.getBytes())));
 	}
 }

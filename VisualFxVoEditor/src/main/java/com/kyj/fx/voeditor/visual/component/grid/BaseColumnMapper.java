@@ -34,9 +34,17 @@ public class BaseColumnMapper<T> implements IColumnMapper<T> {
 		TableColumn tableColumn = new TableColumn<>();
 
 		// 2015.11.18 커스텀 컬럼은 cellFactory를 가져다 쓰지않음.
+
 		tableColumn.setCellFactory(cell -> {
 			TextFieldTableCell<T, Object> textFieldTableCell = new TextFieldTableCell<>();
-			textFieldTableCell.setConverter(converter(classType));
+
+			StringConverter<Object> stringConverter = options.stringConverter(columnName);
+			if (stringConverter != null) {
+				textFieldTableCell.setConverter(stringConverter);
+			} else {
+				textFieldTableCell.setConverter(converter(classType));
+			}
+
 			return textFieldTableCell;
 		});
 
@@ -45,6 +53,7 @@ public class BaseColumnMapper<T> implements IColumnMapper<T> {
 		if (customTableColumn != null) {
 			tableColumn = customTableColumn;
 		}
+		tableColumn.setStyle(options.style(columnName));
 
 		// 2015.11.18 커스텀 컬럼은 ValueFactory는 기본적으로 사용
 		PropertyValueFactory<T, ?> value = new PropertyValueFactory<>(columnName);
@@ -57,8 +66,10 @@ public class BaseColumnMapper<T> implements IColumnMapper<T> {
 		tableColumn.setResizable(true);
 		tableColumn.setEditable(false);
 
-		tableColumn.setVisible(options.visible(columnName));
 		
+		
+		tableColumn.setVisible(options.visible(columnName));
+
 		tableColumn.setText(options.convert(columnName));
 
 		return tableColumn;
