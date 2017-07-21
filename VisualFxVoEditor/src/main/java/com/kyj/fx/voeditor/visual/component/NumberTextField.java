@@ -17,17 +17,18 @@ import javafx.scene.control.TextField;
  ***************************/
 public class NumberTextField extends TextField {
 
-	public NumberTextField(String text) {
-
+	public NumberTextField() {
 		//값의 유효성을 판단해서 결과 처리
 		this.textProperty().addListener((oba, o, n) -> {
 			if (!isValid(n)) {
 				setText(o);
 			}
 		});
+	}
 
+	public NumberTextField(String text) {
+		this();
 		this.setText(text);
-
 	}
 
 	/********************************

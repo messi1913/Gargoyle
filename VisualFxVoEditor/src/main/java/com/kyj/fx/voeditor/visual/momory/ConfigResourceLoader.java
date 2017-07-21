@@ -153,6 +153,8 @@ public final class ConfigResourceLoader implements IFileBaseConfiguration {
 
 	public static final String FILE_ENCODING = "file.encoding";
 	public static final String SUN_JNU_ENCODING = "sun.jnu.encoding";
+	public static final String APP_NAME = "app.name";
+	public static final String GARGOYLE_APP = "gargoyleApp";
 
 	/**
 	 * 운영체제 기반 파일 오픈처리

@@ -11,7 +11,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -270,7 +269,7 @@ public class DynamicClassLoader {
 				}).map(pram -> pram.getPath()).distinct().parallel().flatMap(new Function<String, Stream<ProjectInfo>>() {
 					@Override
 					public Stream<ProjectInfo> apply(String entry) {
-						LOGGER.debug("projroot : {}  entry : {} "  , projectFile.getName(), entry);
+						LOGGER.debug("projroot : {}  entry : {} ", projectFile.getName(), entry);
 						File compiledFilePath = new File(projectFile, entry);
 						int length = compiledFilePath.getAbsolutePath().length() + 1;
 						List<String> findJavaSources = findSource(projectFile.getAbsolutePath(), compiledFilePath, length);
@@ -379,11 +378,8 @@ public class DynamicClassLoader {
 			return absolutePath;
 		};
 
-
-
 		FileSearcher fileSearcher = new FileSearcher(filePathName, -1, new String[] { JAVA_FILE_EXTENSION, FXML_FILE_EXTENSION },
-				FileSearcher.DEFAULT_FILTER
-				);
+				FileSearcher.DEFAULT_FILTER);
 		List<String> find = fileSearcher.find(toPackageName);
 		return find.stream().distinct().collect(Collectors.toList());
 	}
@@ -468,7 +464,7 @@ public class DynamicClassLoader {
 
 	public static Class<?> loadFromJarFile(File jarFile, String classForName, String jarInClasspath) throws Exception {
 
-		URLClassLoader loader = createLoader(jarFile, jarInClasspath);//URLClassLoader.newInstance(urls, DynamicClassLoader.class.getClassLoader());
+		URLClassLoader loader = (URLClassLoader) createLoader(jarFile, jarInClasspath);//URLClassLoader.newInstance(urls, DynamicClassLoader.class.getClassLoader());
 		Class<?> forName = null;
 
 		try {
@@ -489,10 +485,11 @@ public class DynamicClassLoader {
 		return forName;
 	}
 
-	public static URLClassLoader createLoader(File jarFile, String jarInClasspath) throws Exception {
+	public static ClassLoader createLoader(File jarFile, String jarInClasspath) throws Exception {
 		URL url = jarFile.toURI().toURL();
 
 		URL[] urls = null;
+		ClassLoader classLoader = null;
 		if (ValueUtil.isNotEmpty(jarInClasspath)) {
 
 			String name = jarFile.getName();
@@ -502,33 +499,39 @@ public class DynamicClassLoader {
 			dir.mkdirs();
 
 			ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+
 			if (dir.exists()) {
 
 				ZipUtil.unzip(jarFile, dir);
 
-				String[] split = jarInClasspath.split(";");
+				String[] split = Stream.of(jarInClasspath.split(";")).filter(ValueUtil::isNotEmpty).toArray(String[]::new);
 
 				int length = split.length + 1;
 				urls = new URL[length + 1];
 				urls[0] = url;
 				for (int i = 1; i < length; i++ /*String res : split*/) {
 					String res = split[i - 1];
-					if (ValueUtil.isEmpty(res))
-						continue;
+					//					if (ValueUtil.isEmpty(res))
+					//						continue;
 
 					File file = new File(dir, res);
 					urls[i] = file.toURI().toURL();
-					LOGGER.debug("append url : {} ", urls[i].toExternalForm());
+					LOGGER.debug("{} append url : {} ", i, urls[i].toExternalForm());
 
-					final Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
-					method.setAccessible(true);
-					method.invoke(systemClassLoader, new Object[] { urls[i] });
+					//					final Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
+					//					method.setAccessible(true);
+					//					method.invoke(classLoader, new Object[] { urls[i] });
 				}
-
+				classLoader = new URLClassLoader(urls, systemClassLoader);
+//				if ("GargoyleMusic.jar".equals(jarFile.getName())) {
+//					Class<?> loadClass = classLoader.loadClass("org.apache.catalina.loader.WebappClassLoader");
+//					Constructor<?> constructor = loadClass.getConstructor(ClassLoader.class);
+//					classLoader = (ClassLoader) constructor.newInstance(classLoader);
+//				}
 			}
-
 		} else {
 			urls = new URL[] { url };
+			classLoader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
 		}
 
 		/*
@@ -544,9 +547,9 @@ public class DynamicClassLoader {
 		 */
 		// if (loader == null)
 
-		URLClassLoader loader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
+		//		URLClassLoader loader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
 
-		return loader;
+		return classLoader;
 	}
 
 	/**
@@ -639,12 +642,12 @@ class FileSearcher {
 		 *  탐색하지않을 파일명을 기입한다.
 		 *  디폴트로는 소스 디렉토리가 존재하는 위치에 있는 대상은 필터링된다.
 		 */
-//		List<String> exceptNames = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME_SOURCE_TYPE,
-//				",");
+		//		List<String> exceptNames = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME_SOURCE_TYPE,
+		//				",");
 
 		@Override
 		public boolean test(File file) {
-			return  true; //!exceptNames.contains(file.getName());
+			return true; //!exceptNames.contains(file.getName());
 		}
 	};
 

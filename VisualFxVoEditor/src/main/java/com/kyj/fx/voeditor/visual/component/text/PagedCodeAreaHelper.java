@@ -8,7 +8,6 @@ package com.kyj.fx.voeditor.visual.component.text;
 
 import org.fxmisc.richtext.CodeArea;
 
-import com.kyj.fx.voeditor.visual.component.popup.BigTextView;
 import com.sun.star.uno.RuntimeException;
 
 import javafx.event.ActionEvent;

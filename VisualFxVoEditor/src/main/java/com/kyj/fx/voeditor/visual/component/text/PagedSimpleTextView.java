@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
-import com.kyj.fx.voeditor.visual.component.popup.BigTextView;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 
 /**

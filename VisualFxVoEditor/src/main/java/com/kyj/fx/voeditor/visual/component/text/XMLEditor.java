@@ -18,12 +18,12 @@ public class XMLEditor extends BorderPane {
 	/**
 	 * @최초생성일 2016. 10. 12.
 	 */
-	private static final String REGEX = "(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))" + "|(?<COMMENT><!--[^<>]+-->)";
+//	private static final String REGEX = "(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))" + "|(?<COMMENT><!--[^<>]+-->)";
 	private static final String REGEX2 = "(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))" + "|(?<COMMENT><!--[^!]+-->)";
 
 	private static final Pattern XML_TAG = Pattern.compile(REGEX2);
 
-	private static final Pattern ATTRIBUTES = Pattern.compile("(\\w+\\h*)(=)(\\h*\"[^\"]+\")");
+	private static final Pattern ATTRIBUTES = Pattern.compile("([\\w+|]\\h*)(=)(\\h*\"[^\"]+\")");
 
 	private static final int GROUP_OPEN_BRACKET = 2;
 	private static final int GROUP_ELEMENT_NAME = 3;

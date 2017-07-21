@@ -41,7 +41,6 @@ import com.kyj.fx.voeditor.visual.component.monitor.bci.view.JavaProcessMonitor;
 import com.kyj.fx.voeditor.visual.component.nrch.realtime.NrchRealtimeSrchFlowComposite;
 import com.kyj.fx.voeditor.visual.component.pmd.DesignerFxComposite;
 import com.kyj.fx.voeditor.visual.component.pmd.PMDCheckedListComposite;
-import com.kyj.fx.voeditor.visual.component.popup.BigTextView;
 import com.kyj.fx.voeditor.visual.component.popup.FXMLTextView;
 import com.kyj.fx.voeditor.visual.component.popup.GagoyleWorkspaceOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
@@ -51,9 +50,11 @@ import com.kyj.fx.voeditor.visual.component.popup.ZipFileViewerComposite;
 import com.kyj.fx.voeditor.visual.component.proxy.ProxyServerComposite;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
+import com.kyj.fx.voeditor.visual.component.text.BigTextView;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.LogViewComposite;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
+import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
 import com.kyj.fx.voeditor.visual.component.utube.UtubeDownloaderComposite;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
@@ -531,15 +532,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	private void openPdf(File file) throws Exception {
 		try {
 
-//			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(new PDFImageBasePane(file)) {
-//
-//				@Override
-//				public void close() throws IOException {
-//					LOGGER.debug("Close doc . reuqest ");
-//					getParent().close();
-//				}
-//			};
-			
+			//			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(new PDFImageBasePane(file)) {
+			//
+			//				@Override
+			//				public void close() throws IOException {
+			//					LOGGER.debug("Close doc . reuqest ");
+			//					getParent().close();
+			//				}
+			//			};
+
 			PDFImageBasePaneWrapper pane = new PDFImageBasePaneWrapper(file);
 			loadNewSystemTab(file.getName(), pane);
 
@@ -2073,10 +2074,26 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		loadNewSystemTab(ProxyServerComposite.class.getSimpleName(), javaProcessMonitor);
 	}
 
+	/**
+	 * text viewer
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 19. 
+	 */
 	@FXML
-	public void miSimpleTextViewOnAction(){
-		loadNewSystemTab("SimpleTextView", new SimpleTextView(""));
+	public void miSimpleTextViewOnAction() {
+		loadNewSystemTab("Text Viewer", new SimpleTextView(""));
 	}
+
+	/**
+	 * xml viewer
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 19. 
+	 */
+	@FXML
+	public void miXmlViewOnAction() {
+		loadNewSystemTab("XML Viewer", new XMLEditor());
+	}
+
 	/**
 	 * Java Application 실행처리.
 	 * @작성자 : KYJ

@@ -160,9 +160,9 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	/**
 	 * @return the helper
 	 */
-	public final CodeAreaHelper<CodeArea> getHelper() {
-		return helper;
-	}
+//	public final CodeAreaHelper<CodeArea> getHelper() {
+//		return helper;
+//	}
 
 	/**
 	 * 마임 형태를 웹형태로 바꿔서 뷰를 보여줌

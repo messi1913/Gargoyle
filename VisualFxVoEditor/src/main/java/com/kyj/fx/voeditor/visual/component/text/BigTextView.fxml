@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+
+<fx:root prefHeight="733.0" prefWidth="932.0" type="BorderPane"
+	xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<!-- <TextArea fx:id="txtVoEditor" prefHeight="600.0" prefWidth="800.0" 
+			BorderPane.alignment="CENTER" /> -->
+	</center>
+	<bottom>
+		<Accordion BorderPane.alignment="CENTER">
+			<panes>
+				<TitledPane animated="false" prefHeight="264.0"
+					prefWidth="932.0" text="Find All">
+					<content>
+						<HBox style="-fx-padding: 5; -fx-spacing: 5;">
+							<children>
+								<VBox>
+									<children>
+										<HBox>
+											<children>
+												<TextField fx:id="txtSrch" prefHeight="23.0"
+													prefWidth="319.0" />
+												<Button mnemonicParsing="false" onAction="#btnSrchOnAction"
+													prefWidth="80.0" text=" Search All" />
+											</children>
+										</HBox>
+										<HBox>
+											<children>
+												<Label text="Move to page" />
+												<TextField fx:id="txtMovePage" onKeyPressed="#txtMovePageOnKeyPress"
+													prefHeight="23.0" prefWidth="90.0" />
+											</children>
+										</HBox>
+									</children>
+								</VBox>
+								<ListView fx:id="lvFindRslt" HBox.hgrow="ALWAYS" />
+							</children>
+						</HBox>
+					</content>
+				</TitledPane>
+			</panes>
+		</Accordion>
+	</bottom>
+</fx:root>

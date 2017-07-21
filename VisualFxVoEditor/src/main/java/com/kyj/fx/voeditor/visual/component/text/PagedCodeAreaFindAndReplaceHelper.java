@@ -10,7 +10,6 @@ import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.component.popup.BigTextView;
 import com.kyj.fx.voeditor.visual.component.popup.TextSearchAndReplaceView;
 
 import javafx.beans.value.ObservableValue;
@@ -21,6 +20,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 /**
  *
@@ -39,6 +40,14 @@ public class PagedCodeAreaFindAndReplaceHelper {
 
 	public PagedCodeAreaFindAndReplaceHelper(BigTextView view) {
 		this.view = view;
+		createMenus();
+		view.addEventHandler(MouseEvent.MOUSE_PRESSED, ev -> {
+			if (ev.getButton() == MouseButton.SECONDARY) {
+				if (ev.isConsumed())
+					return;
+				menuSearch.show();
+			}
+		});
 		//		defaultSelectionHandler = new CodeAreaDefaultSelectionHandler(codeArea);
 	}
 
@@ -118,7 +127,7 @@ public class PagedCodeAreaFindAndReplaceHelper {
 			}
 		});
 
-		textSearchView.setOnSelectionMoveListener(vo ->{
+		textSearchView.setOnSelectionMoveListener(vo -> {
 			codeArea.selectRange(vo.getStartIndex(), vo.getEndIndex());
 		});
 

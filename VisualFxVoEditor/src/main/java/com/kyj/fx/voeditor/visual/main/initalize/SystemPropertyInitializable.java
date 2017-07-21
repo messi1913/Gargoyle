@@ -27,6 +27,7 @@ public class SystemPropertyInitializable implements Initializable {
 	@Override
 	public void initialize() throws Exception {
 
+		registAppName();
 		LOGGER.debug("Show System Properties");
 		setFileEncoingInit();
 
@@ -38,15 +39,24 @@ public class SystemPropertyInitializable implements Initializable {
 			Object value = properties.get(key);
 			LOGGER.debug(String.format("Key : %s Value : %s", key.toString(), value.toString()));
 		}
-		
+
 		networkSettings();
 
 	}
 
+	/**
+	 * 어플리케이션 이름 등록
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 21. 
+	 */
+	private void registAppName() {
+		System.setProperty(ConfigResourceLoader.APP_NAME, ConfigResourceLoader.GARGOYLE_APP);
+	}
+
 	private void networkSettings() {
 		//1.7 부터는 SNI support의 부분이 기본적으로 enable 되어 있다
-		System.setProperty("jsse.enableSNIExtension", "false") ;
-		
+		System.setProperty("jsse.enableSNIExtension", "false");
+
 	}
 
 	void setFileEncoingInit() {
@@ -55,8 +65,7 @@ public class SystemPropertyInitializable implements Initializable {
 		String jnu_encoding = ConfigResourceLoader.getInstance().getOrDefault(ConfigResourceLoader.SUN_JNU_ENCODING, "UTF-8");
 		System.setProperty(ConfigResourceLoader.FILE_ENCODING, file_encoding);
 		System.setProperty(ConfigResourceLoader.SUN_JNU_ENCODING, jnu_encoding);
-		
-		
+
 		// System.setProperty("client.encoding.override", "UTF-8");
 
 	}

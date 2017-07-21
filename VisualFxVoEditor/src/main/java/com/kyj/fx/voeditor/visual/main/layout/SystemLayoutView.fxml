@@ -280,6 +280,8 @@
 									<items>
 										<MenuItem fx:id="miSimpleTextView" mnemonicParsing="false"
 											onAction="#miSimpleTextViewOnAction" text="Simple Text Viwer" />
+										<MenuItem fx:id="miXmlView" mnemonicParsing="false"
+											onAction="#miXmlViewOnAction" text="XML Viwer" />
 									</items>
 								</Menu>
 

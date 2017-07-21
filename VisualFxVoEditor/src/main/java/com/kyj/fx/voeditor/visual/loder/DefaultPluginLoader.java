@@ -116,8 +116,8 @@ class DefaultPluginLoader implements IPluginLoader {
 		}).filter(/* 유효한 정보만 다시 필터링하고 클래스 로딩 */ zipWrapper -> {
 
 			try {
-				URLClassLoader createLoader = DynamicClassLoader.createLoader(zipWrapper.location, zipWrapper.classpath);
-				zipWrapper.loader = createLoader;
+				ClassLoader createLoader = DynamicClassLoader.createLoader(zipWrapper.location, zipWrapper.classpath);
+				zipWrapper.loader = (URLClassLoader) createLoader;
 				Class<?> loadFromJarFile = createLoader.loadClass(zipWrapper.clazz);
 				
 				
