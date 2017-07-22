@@ -57,6 +57,7 @@ public class CodeAreaMoveLineHelper {
 		Paragraph<Collection<String>, Collection<String>> paragraph = paragraphs.get(row);
 		int length = paragraph.length();
 		codeArea.selectRange(position, (position + length));
+
 	}
 
 	@SuppressWarnings("rawtypes")
