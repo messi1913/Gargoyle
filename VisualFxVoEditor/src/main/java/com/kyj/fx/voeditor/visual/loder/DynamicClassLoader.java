@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -490,6 +491,9 @@ public class DynamicClassLoader {
 
 		URL[] urls = null;
 		ClassLoader classLoader = null;
+		
+		
+		//jar 파일이 참고하는 다른 라이브러리를 동적으로 추가되는 경우라면 시스템 클래스 로더를 사용.
 		if (ValueUtil.isNotEmpty(jarInClasspath)) {
 
 			String name = jarFile.getName();
@@ -498,7 +502,7 @@ public class DynamicClassLoader {
 			File dir = new File(jarFile.getParentFile(), name.substring(0, indexOf));
 			dir.mkdirs();
 
-//			ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+			ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
 
 			if (dir.exists()) {
 
@@ -511,16 +515,15 @@ public class DynamicClassLoader {
 				urls[0] = url;
 				for (int i = 1; i < length; i++ /*String res : split*/) {
 					String res = split[i - 1];
-					//					if (ValueUtil.isEmpty(res))
-					//						continue;
+				
 
 					File file = new File(dir, res);
 					urls[i] = file.toURI().toURL();
 					LOGGER.debug("{} append url : {} ", i, urls[i].toExternalForm());
 
-					//					final Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
-					//					method.setAccessible(true);
-					//					method.invoke(classLoader, new Object[] { urls[i] });
+										final Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
+										method.setAccessible(true);
+										method.invoke(systemClassLoader, new Object[] { urls[i] });
 				}
 //				classLoader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
 //				if ("GargoyleMusic.jar".equals(jarFile.getName())) {
