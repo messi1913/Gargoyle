@@ -7,10 +7,12 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root prefHeight="733.0" prefWidth="932.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="733.0" prefWidth="932.0" stylesheets="@BigTextView.css"
+	type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
 		<!-- <TextArea fx:id="txtVoEditor" prefHeight="600.0" prefWidth="800.0" 
 			BorderPane.alignment="CENTER" /> -->
@@ -18,7 +20,8 @@
 	<bottom>
 		<Accordion BorderPane.alignment="CENTER">
 			<panes>
-				<TitledPane animated="false" prefHeight="264.0" prefWidth="932.0" text="Find All">
+				<TitledPane animated="false" prefHeight="264.0"
+					prefWidth="932.0" text="Find All">
 					<content>
 						<HBox style="-fx-padding: 5; -fx-spacing: 5;">
 							<children>
@@ -26,19 +29,35 @@
 									<children>
 										<HBox style="-fx-spacing: 5;">
 											<children>
-												<TextField fx:id="txtSrch" onKeyPressed="#txtSrchOnKeyPress" prefHeight="23.0" prefWidth="319.0" />
-												<Button mnemonicParsing="false" onAction="#btnSrchOnAction" prefWidth="80.0" text=" Search All" />
+												<TextField fx:id="txtSrch" onKeyPressed="#txtSrchOnKeyPress"
+													prefHeight="23.0" prefWidth="319.0" />
+												<Button mnemonicParsing="false" onAction="#btnSrchOnAction"
+													prefWidth="80.0" text=" Search All" />
 											</children>
 										</HBox>
-										<HBox style="-fx-spacing: 5;">
+										<HBox style="-fx-spacing: 5; -fx-alignment: CENTER_LEFT;">
 											<children>
-												<Label text="Move to page" />
-												<TextField fx:id="txtMovePage" onKeyPressed="#txtMovePageOnKeyPress" prefHeight="23.0" prefWidth="90.0" />
+												<Label style="-fx-alignment: center;" text="Move to page" />
+												<TextField fx:id="txtMovePage" onKeyPressed="#txtMovePageOnKeyPress"
+													prefHeight="23.0" prefWidth="90.0" />
 											</children>
 										</HBox>
 									</children>
 								</VBox>
-								<ListView fx:id="lvFindRslt" HBox.hgrow="ALWAYS" />
+								<VBox style="-fx-spacing: 5;">
+									<children>
+										<Label text="Page Numbers" />
+										<ListView fx:id="lvFindRslt" prefHeight="230.0"
+											prefWidth="228.0" styleClass="bigtextview-listview" />
+									</children>
+								</VBox>
+								<VBox style="-fx-spacing: 5;" HBox.hgrow="ALWAYS">
+									<children>
+										<Label text="Line Numbers" />
+										<FlowPane fx:id="fpLines" prefHeight="200.0"
+											prefWidth="200.0" style="-fx-border-color: gray;" VBox.vgrow="ALWAYS" />
+									</children>
+								</VBox>
 							</children>
 						</HBox>
 					</content>

@@ -712,7 +712,7 @@ public class DialogUtil {
 	}
 
 	public static Optional<Pair<String, String>> showInputDialog(Node owner, String title, String message, Predicate<String> satisfied) {
-		return showInputDialog(owner.getScene().getWindow(), title, message, "", satisfied);
+		return showInputDialog(FxUtil.getWindow(owner), title, message, "", satisfied);
 	}
 
 	public static Optional<Pair<String, String>> showInputDialog(Window owner, String title, String message) {

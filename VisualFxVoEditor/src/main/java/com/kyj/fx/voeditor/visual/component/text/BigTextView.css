@@ -1,0 +1,10 @@
+.bigtextview-listview .list-cell:odd {
+	-fx-text-fill: blue;
+	-fx-underline:true;
+	-fx-cursor : HAND;
+}
+.bigtextview-listview .list-cell:even {
+	-fx-text-fill: blue;
+	-fx-underline:true;
+	-fx-cursor : HAND;
+}

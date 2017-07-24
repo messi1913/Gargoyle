@@ -6,20 +6,26 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,25 +36,22 @@ import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.text.TextFlow;
+import javafx.scene.layout.FlowPane;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
@@ -65,7 +68,7 @@ import kyj.Fx.dao.wizard.core.util.ValueUtil;
  * @author KYJ
  *
  */
-@FXMLController(value = "BigTextView.fxml", isSelfController = true)
+@FXMLController(value = "BigTextView.fxml", isSelfController = true, css = "BigTextView.css")
 public class BigTextView extends BorderPane implements Closeable {
 	private static Logger LOGGER = LoggerFactory.getLogger(BigTextView.class);
 
@@ -89,6 +92,9 @@ public class BigTextView extends BorderPane implements Closeable {
 	// private HBox hboxButtons;
 	@FXML
 	private ListView<FindModel> lvFindRslt;
+	@FXML
+	private FlowPane fpLines;
+
 	// @FXML
 	// private Button btnClose;
 
@@ -196,6 +202,7 @@ public class BigTextView extends BorderPane implements Closeable {
 		};
 
 		pagination.setCache(true);
+
 		pagination.setPageFactory(new Callback<Integer, Node>() {
 
 			@Override
@@ -219,59 +226,79 @@ public class BigTextView extends BorderPane implements Closeable {
 		});
 		pagination.setPrefSize(Pagination.USE_COMPUTED_SIZE, Pagination.USE_COMPUTED_SIZE);
 		this.setCenter(pagination);
-
-		lvFindRslt.setCellFactory(new Callback<ListView<FindModel>, ListCell<FindModel>>() {
+		//
+		lvFindRslt.setCellFactory(TextFieldListCell.forListView(new StringConverter<FindModel>() {
 
 			@Override
-			public ListCell<FindModel> call(ListView<FindModel> param) {
-
-				return new ListCell<FindModel>() {
-
-					@Override
-					public void updateItem(FindModel item, boolean empty) {
-						super.updateItem(item, empty);
-
-						if (empty) {
-							setGraphic(null);
-						} else {
-							if (item != null) {
-
-								// String data = String.format("page : %d lines : { %s }", (this.page + 1), v);
-
-								List<Node> collect = IntStream.of(item.getLines()).mapToObj(idx -> {
-
-									Hyperlink hyperlink = new Hyperlink(String.format("%d", idx));
-									hyperlink.setOnAction(ev -> {
-
-										int page = item.getPage();
-
-										pagination.setCurrentPageIndex(page);
-
-										SimpleTextView call = (SimpleTextView) pagination.getPageFactory().call(page);
-										call.getHelper().moveToLine(idx + 1);
-
-									});
-									return hyperlink;
-
-								}).collect(Collectors.toCollection(LinkedList::new));
-
-								Node label = new Label(String.format("page : %d lines : ", (item.page + 1)));
-								collect.add(0, label);
-
-								TextFlow textFlow = new TextFlow();
-								textFlow.getChildren().addAll(collect);
-								setGraphic(textFlow);
-
-							}
-							// new Hyperlink(text)
-
-						}
-
-					}
-
-				};
+			public String toString(FindModel object) {
+				return String.format("%d   ( Count : %d )", object.getPage() + 1, object.lines.size());
 			}
-		});
+
+			@Override
+			public FindModel fromString(String string) {
+				return null;
+			}
+		}));
+
+		lvFindRslt.setOnMouseClicked(this::lvFindRsltOnMouseClick);
+
+		//		lvFindRslt.setCellFactory(new Callback<ListView<FindModel>, ListCell<FindModel>>() {
+		//
+		//			@Override
+		//			public ListCell<FindModel> call(ListView<FindModel> param) {
+		//
+		//				return new ListCell<FindModel>() {
+		//
+		//					@Override
+		//					public void updateItem(FindModel item, boolean empty) {
+		//						super.updateItem(item, empty);
+		//
+		//						if (empty) {
+		//							setGraphic(null);
+		//							setText("");
+		//						} else {
+		//							if (item != null) {
+		//								TextFlow textFlow = new TextFlow();
+		//								//  페이지 정보
+		//								Node label = new Label(String.format("page : %d lines : ", (item.page + 1)));
+		//								textFlow.getChildren().add(label);
+		//								setGraphic(textFlow);
+		//
+		//								//상세 라인정보
+		//								List<Node> collect = IntStream.of(item.getLines()).mapToObj(idx -> {
+		//
+		//									Hyperlink hyperlink = new Hyperlink(String.format("%d", idx));
+		//									hyperlink.setOnAction(ev -> {
+		//
+		//										int page = item.getPage();
+		//
+		//										pagination.setCurrentPageIndex(page);
+		//
+		//										Platform.runLater(() -> {
+		//											CPagenationSkin skin = (CPagenationSkin) pagination.getSkin();
+		//											SimpleTextView view = (SimpleTextView) skin.getCurrentPage();
+		//											view.getHelper().moveToLine(idx);
+		//
+		//										});
+		//
+		//									});
+		//									return hyperlink;
+		//
+		//								}).collect(Collectors.toCollection(LinkedList::new));
+		//
+		//								textFlow.getChildren().addAll(collect);
+		//
+		//							} else {
+		//								setGraphic(null);
+		//								setText("");
+		//							}
+		//						}
+		//
+		//					}
+		//
+		//				};
+		//			}
+		//		});
 	}
 
 	@Deprecated
@@ -279,6 +306,23 @@ public class BigTextView extends BorderPane implements Closeable {
 		FindModel selectedItem = lvFindRslt.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
 			this.pagination.setCurrentPageIndex(selectedItem.getPage());
+
+			List<Hyperlink> collect = IntStream.iterate(0, a -> a + 1).limit(selectedItem.getLines().size()).mapToObj(idx -> {
+				Line line = selectedItem.getLines().get(idx);
+
+				Hyperlink hyperlink = new Hyperlink(String.format("%d", line.getLine()));
+				hyperlink.setOnAction(ev -> {
+					CPagenationSkin skin = (CPagenationSkin) pagination.getSkin();
+					SimpleTextView view = (SimpleTextView) skin.getCurrentPage();
+					view.getHelper().moveToLine(line.getLine(), line.getStartCol() - 1, line.getEndCol() - 1);
+
+				});
+				return hyperlink;
+
+			}).collect(Collectors.toCollection(LinkedList::new));
+
+			this.fpLines.getChildren().setAll(collect);
+
 		}
 	}
 
@@ -344,6 +388,18 @@ public class BigTextView extends BorderPane implements Closeable {
 	public void close() throws IOException {
 		if (randomAccessFile != null)
 			randomAccessFile.close();
+
+		if (!executor.isShutdown())
+			executor.shutdownNow();
+
+		if (!executor.isTerminated()) {
+			try {
+				executor.awaitTermination(100, TimeUnit.MILLISECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	@FXML
@@ -356,10 +412,14 @@ public class BigTextView extends BorderPane implements Closeable {
 				return;
 
 			String text = txtMovePage.getText();
-			int nextPage = Integer.parseInt(text);
 
-			pagination.setCurrentPageIndex(nextPage - 1);
-			e.consume();
+			try {
+				int nextPage = Integer.parseInt(text);
+				pagination.setCurrentPageIndex(nextPage - 1);
+				e.consume();
+			} catch (NumberFormatException ex) {
+			}
+
 		}
 	}
 
@@ -373,7 +433,27 @@ public class BigTextView extends BorderPane implements Closeable {
 	@FXML
 	private TextField txtSrch;
 
-	private static final ExecutorService newFixedThreadExecutor = ExecutorDemons.newFixedThreadExecutor(3);
+	//	ListChangeListener<FindModel> listener = new ListChangeListener<FindModel>() {
+	//
+	//		@Override
+	//		public void onChanged(javafx.collections.ListChangeListener.Change<? extends FindModel> c) {
+	//			if (c.next()) {
+	//				if (c.wasAdded()) {
+	//
+	//					// String data = String.format("page : %d lines : { %s }", (this.page + 1), v);
+	//					// LOGGER.debug("page : {} , lines : {}", this.page, v);
+	//					Platform.runLater(() -> {
+	//						List<? extends FindModel> addedSubList = c.getAddedSubList();
+	//						lvFindRslt.getItems().addAll(addedSubList);
+	//					});
+	//
+	//				}
+	//			}
+	//
+	//		}
+	//
+	//	};
+	private ExecutorService executor = ExecutorDemons.newFixedThreadExecutor("Gargoyle-Big-Text-Search-Thread", 3);
 
 	@FXML
 	public void btnSrchOnAction() {
@@ -381,37 +461,30 @@ public class BigTextView extends BorderPane implements Closeable {
 		lvFindRslt.getItems().clear();
 		// Stream.
 
-		Finder finder = new Finder(newFixedThreadExecutor, srch);
-		finder.getModels().addListener(new ListChangeListener<FindModel>() {
+		Finder finder = new Finder(srch, item -> {
 
-			@Override
-			public void onChanged(javafx.collections.ListChangeListener.Change<? extends FindModel> c) {
-				if (c.next()) {
-					if (c.wasAdded()) {
-
-						// String data = String.format("page : %d lines : { %s }", (this.page + 1), v);
-						// LOGGER.debug("page : {} , lines : {}", this.page, v);
-						Platform.runLater(() -> {
-							lvFindRslt.getItems().addAll(c.getAddedSubList());
-						});
-
-					}
-				}
-
-			}
+			Platform.runLater(() -> {
+				lvFindRslt.getItems().add(item);
+			});
 
 		});
+
 		finder.run();
+
 	}
 
 	interface FireNext {
 		void nextJob();
 	}
 
-	class FindModel {
+	interface Option {
+
+	}
+
+	class FindModel implements Comparable<FindModel> {
 		String keyword;
 		int page;
-		int[] lines;
+		List<Line> lines = Collections.emptyList();
 		String printText;
 
 		public int getPage() {
@@ -422,11 +495,11 @@ public class BigTextView extends BorderPane implements Closeable {
 			this.page = page;
 		}
 
-		public int[] getLines() {
+		public List<Line> getLines() {
 			return lines;
 		}
 
-		public void setLines(int[] lines) {
+		public void setLines(List<Line> lines) {
 			this.lines = lines;
 		}
 
@@ -446,23 +519,60 @@ public class BigTextView extends BorderPane implements Closeable {
 			this.keyword = keyword;
 		}
 
+		@Override
+		public int compareTo(FindModel o) {
+			return Integer.compare(this.page, o.page);
+		}
+
+	}
+
+	class Line {
+		private int line;
+		private int startCol;
+		private int endCol;
+
+		public int getLine() {
+			return line;
+		}
+
+		public void setLine(int line) {
+			this.line = line;
+		}
+
+		public int getStartCol() {
+			return startCol;
+		}
+
+		public void setStartCol(int startCol) {
+			this.startCol = startCol;
+		}
+
+		public int getEndCol() {
+			return endCol;
+		}
+
+		public void setEndCol(int endCol) {
+			this.endCol = endCol;
+		}
+
 	}
 
 	class Finder implements Runnable {
 
-		private ExecutorService executor;
 		private String keyword;
-		private ObservableList<FindModel> models = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
+		//		private ObservableList<FindModel> models = FXCollections.observableArrayList();//FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
+		private Consumer<FindModel> action;
+		private int keywordSize;
 
-		public Finder(ExecutorService executor, String keyword) {
-			this.executor = executor;
+		public Finder(String keyword, Consumer<FindModel> action) {
 			this.keyword = keyword;
-
+			this.keywordSize = keyword.length();
+			this.action = action;
 		}
 
-		public ObservableList<FindModel> getModels() {
-			return models;
-		}
+		//		public ObservableList<FindModel> getModels() {
+		//			return models;
+		//		}
 
 		@Override
 		public void run() {
@@ -486,7 +596,9 @@ public class BigTextView extends BorderPane implements Closeable {
 					randomAccessFile.seek(this.page * SEEK_SIZE);
 					randomAccessFile.read(data);
 
-					LOGGER.debug("page : {} ", page);
+					//					new BufferedLineReaderInputStream(new ByteArrayInputStream(data), 1024);
+
+					//					LOGGER.debug("page : {} ", page);
 
 					nextJob();
 				} catch (IOException e) {
@@ -496,9 +608,7 @@ public class BigTextView extends BorderPane implements Closeable {
 			}
 
 			public boolean canNext() {
-
 				return (this.page + 1) < TOTAL_PAGE;
-
 			}
 
 			public void nextJob() {
@@ -507,7 +617,7 @@ public class BigTextView extends BorderPane implements Closeable {
 					executor.execute(new Transform(this.page, this.data));
 
 					if (this.canNext()) {
-						executor.execute(new Extract(this.page + 1));
+						executor.execute(new Extract(this.page + 1 /* extract next page */));
 					}
 				}
 
@@ -518,7 +628,7 @@ public class BigTextView extends BorderPane implements Closeable {
 		class Transform implements Runnable, FireNext {
 			int page;
 			byte[] b;
-			int[] lines;
+			List<Line> lines;
 
 			Transform(int page, byte[] b) {
 				this.page = page;
@@ -528,29 +638,37 @@ public class BigTextView extends BorderPane implements Closeable {
 			@Override
 			public void run() {
 
-				String[] cont = new String(b).split(System.lineSeparator());
+				LineNumberReader reader = new LineNumberReader(new InputStreamReader(new ByteArrayInputStream(b)));
+				String cont = null;
+				ArrayList<Line> arrayList = new ArrayList<>();
+				try {
 
-				lines = IntStream.iterate(0, a -> a + 1).limit(cont.length).mapToObj(idx -> {
+					while ((cont = reader.readLine()) != null) {
 
-					String link = "";
-					int col = 0;
-					while (col != -1) {
-						col = cont[idx].indexOf(keyword, col);
+						int line = reader.getLineNumber();
+						int col = 0;
 
-						if (col == -1)
-							break;
+						while (col != -1) {
+							col = cont.indexOf(keyword, col);
 
-						col = col + keyword.length();
-						link += (idx + 1) + ";";
+							if (col == -1)
+								break;
+
+							Line l = new Line();
+							l.setLine(line);
+							l.setStartCol(col + 1);
+							l.setEndCol(col + 1 + keywordSize);
+							arrayList.add(l);
+							col = col + keywordSize;
+
+						}
 					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				lines = arrayList;
 
-					return link;
-
-				}).filter(v -> !"".equals(v)).flatMap(v -> {
-					return Stream.of(v.split(";"));
-				}).mapToInt(Integer::parseInt).toArray();
-
-				LOGGER.debug("page : {} find count : {} ", (this.page + 1), this.lines.length);
+				LOGGER.debug("page : {} find count : {} ", (this.page + 1), this.lines.size());
 				nextJob();
 			}
 
@@ -566,9 +684,9 @@ public class BigTextView extends BorderPane implements Closeable {
 
 		class Loder implements Runnable {
 			int page;
-			int[] lines;
+			List<Line> lines;
 
-			public Loder(int page, int[] lines) {
+			public Loder(int page, List<Line> lines) {
 				this.page = page;
 				this.lines = lines;
 			}
@@ -576,13 +694,17 @@ public class BigTextView extends BorderPane implements Closeable {
 			@Override
 			public void run() {
 
+				if (this.lines == null || this.lines.size() == 0) {
+					return;
+				}
+
 				FindModel findModel = new FindModel();
 				findModel.setPage(this.page);
 				findModel.setLines(this.lines);
 				// findModel.setPrintText(data);
 				findModel.setKeyword(keyword);
 
-				models.add(findModel);
+				action.accept(findModel);
 
 			}
 

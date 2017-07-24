@@ -361,6 +361,10 @@ public class CPagenationSkin extends BehaviorSkinBase<Pagination, PaginationBeha
 		}
 		return false;
 	}
+	
+	public Node getCurrentPage(){
+		return currentStackPane.getChildren().get(0);
+	}
 
 	private int getPageCount() {
 		if (getSkinnable().getPageCount() < 1) {
@@ -408,7 +412,8 @@ public class CPagenationSkin extends BehaviorSkinBase<Pagination, PaginationBeha
 		nextStackPane.setCache(true);
 		currentStackPane.setCache(true);
 
-		// wait one pulse then animate
+		// wait one pulse then animate 
+
 		Platform.runLater(() -> {
 			// We are handling a touch event if nextPane's translateX is not 0
 			boolean useTranslateX = nextStackPane.getTranslateX() != 0;

@@ -498,7 +498,7 @@ public class DynamicClassLoader {
 			File dir = new File(jarFile.getParentFile(), name.substring(0, indexOf));
 			dir.mkdirs();
 
-			ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+//			ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
 
 			if (dir.exists()) {
 
@@ -522,7 +522,7 @@ public class DynamicClassLoader {
 					//					method.setAccessible(true);
 					//					method.invoke(classLoader, new Object[] { urls[i] });
 				}
-				classLoader = new URLClassLoader(urls, systemClassLoader);
+//				classLoader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
 //				if ("GargoyleMusic.jar".equals(jarFile.getName())) {
 //					Class<?> loadClass = classLoader.loadClass("org.apache.catalina.loader.WebappClassLoader");
 //					Constructor<?> constructor = loadClass.getConstructor(ClassLoader.class);
@@ -531,7 +531,6 @@ public class DynamicClassLoader {
 			}
 		} else {
 			urls = new URL[] { url };
-			classLoader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
 		}
 
 		/*
@@ -546,7 +545,7 @@ public class DynamicClassLoader {
 		 * 로드하려고 시도하는경우 클래스를 못찾는 버그가 있었다. 그래서 전역에 있던걸 다시 로컬로 빼서 처리함.
 		 */
 		// if (loader == null)
-
+		classLoader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
 		//		URLClassLoader loader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
 
 		return classLoader;
