@@ -663,7 +663,8 @@ public class TextSearchAndReplaceView extends BorderPane {
 		stage.setResizable(false);
 		// stage.setAlwaysOnTop(true);
 		stage.initModality(Modality.NONE);
-		stage.initOwner(parent.getScene().getWindow());
+		
+		stage.initOwner(/*parent.getScene().getWindow()*/ FxUtil.getWindow(parent));
 		stage.setTitle(tabPane.getSelectionModel().getSelectedItem().getText());
 		tabPane.getSelectionModel().selectedItemProperty().addListener((oba, oldval, newval) -> {
 			String text = newval.getText();
