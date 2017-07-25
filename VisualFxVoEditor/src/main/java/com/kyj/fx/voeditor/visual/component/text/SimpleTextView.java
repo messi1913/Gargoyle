@@ -9,6 +9,7 @@ package com.kyj.fx.voeditor.visual.component.text;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
@@ -119,8 +120,8 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	protected void initHelpers() {
 		this.helper = new CodeAreaHelper<>(codeArea);
 	}
-	
-	public final CodeAreaHelper<CodeArea> getHelper(){
+
+	public final CodeAreaHelper<CodeArea> getHelper() {
 		return this.helper;
 	}
 
@@ -164,9 +165,9 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	/**
 	 * @return the helper
 	 */
-//	public final CodeAreaHelper<CodeArea> getHelper() {
-//		return helper;
-//	}
+	//	public final CodeAreaHelper<CodeArea> getHelper() {
+	//		return helper;
+	//	}
 
 	/**
 	 * 마임 형태를 웹형태로 바꿔서 뷰를 보여줌
@@ -360,18 +361,33 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		codeArea.getUndoManager().mark();
 		codeArea.replaceText(ValueUtil.toStringPrettyFormat(codeArea.getText()));
 	}
-	
+
 	@FXML
-	public void toStringOnAction(){
+	public void toStringOnAction() {
 		codeArea.getUndoManager().mark();
 		byte[] decode = Hex.decode(codeArea.getText());
 		codeArea.replaceText(new String(decode));
 	}
-	
+
 	@FXML
-	public void toHexOnAction(){
+	public void toHexOnAction() {
 		codeArea.getUndoManager().mark();
 		String str = codeArea.getText();
 		codeArea.replaceText(String.valueOf(Hex.encode(str.getBytes())));
 	}
+
+	@FXML
+	public void miEncodeOnAction() {
+		codeArea.getUndoManager().mark();
+		String str = codeArea.getText();
+		codeArea.replaceText(StringEscapeUtils.escapeJava(str));
+	}
+
+	@FXML
+	public void miDecodeOnAction() {
+		codeArea.getUndoManager().mark();
+		String str = codeArea.getText();
+		codeArea.replaceText(StringEscapeUtils.unescapeJava(str));
+	}
+
 }

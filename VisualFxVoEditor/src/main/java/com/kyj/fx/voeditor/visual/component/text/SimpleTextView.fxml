@@ -71,6 +71,12 @@
                         <MenuItem mnemonicParsing="false" onAction="#toStringOnAction" text="Hex -&gt; String" />
                     </items>
                   </Menu>
+                  <Menu mnemonicParsing="false" text="UniCode">
+                    <items>
+                      <MenuItem fx:id="miEncode" mnemonicParsing="false" onAction="#miEncodeOnAction" text="encode" />
+                        <MenuItem fx:id="miDecode" mnemonicParsing="false" onAction="#miDecodeOnAction" text="decode" />
+                    </items>
+                  </Menu>
               </items>
             </Menu>
 			</menus>

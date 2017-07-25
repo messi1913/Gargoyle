@@ -34,10 +34,12 @@ import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Pagination;
@@ -52,7 +54,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  *
@@ -72,9 +73,10 @@ import kyj.Fx.dao.wizard.core.util.ValueUtil;
 public class BigTextView extends BorderPane implements Closeable {
 	private static Logger LOGGER = LoggerFactory.getLogger(BigTextView.class);
 
+	/*대용량 파일*/
 	private File file;
 	private RandomAccessFile randomAccessFile;
-	private boolean showButtons;
+
 	// private TextArea javaTextArea;
 
 	// private Map<String, String> pageBuffer;
@@ -95,8 +97,17 @@ public class BigTextView extends BorderPane implements Closeable {
 	@FXML
 	private FlowPane fpLines;
 
-	// @FXML
-	// private Button btnClose;
+	@FXML
+	private TextField txtMovePage;
+
+	@FXML
+	private TextField txtSrch;
+
+	/**
+	 * Thread-Pool
+	 * @최초생성일 2017. 7. 25.
+	 */
+	private ExecutorService executor = ExecutorDemons.newFixedThreadExecutor("Gargoyle-Big-Text-Search-Thread", 3);
 
 	public BigTextView(File file) {
 		this(file, true);
@@ -114,8 +125,6 @@ public class BigTextView extends BorderPane implements Closeable {
 
 			randomAccessFile = new RandomAccessFile(file, "r");
 			TOTAL_SIZE = randomAccessFile.length();
-			this.showButtons = showButtons;
-			// pageBuffer = new HashMap<>();
 
 			FxUtil.loadRoot(getClass(), this);
 
@@ -137,6 +146,9 @@ public class BigTextView extends BorderPane implements Closeable {
 		return file;
 	}
 
+	/**
+	 * @최초생성일 2017. 7. 25.
+	 */
 	private Map<Integer, SimpleTextView> pageCache = new HashMap<Integer, SimpleTextView>() {
 
 		int size;
@@ -186,19 +198,12 @@ public class BigTextView extends BorderPane implements Closeable {
 
 	@FXML
 	public void initialize() {
-		// javaTextArea = new TextArea();
-		// javaTextArea.setPrefSize(TextArea.USE_COMPUTED_SIZE, Double.MAX_VALUE);
-		// hboxButtons.setVisible(showButtons);
-
 		pagination = new Pagination(TOTAL_PAGE) {
-
 			@Override
 			protected Skin<?> createDefaultSkin() {
 				return new CPagenationSkin(this) {
-
 				};
 			}
-			//
 		};
 
 		pagination.setCache(true);
@@ -208,18 +213,18 @@ public class BigTextView extends BorderPane implements Closeable {
 			@Override
 			public Node call(Integer param) {
 
-				if (isUsePageCache && pageCache.containsKey(param)) {
-					SimpleTextView simpleTextView = pageCache.get(param);
-					if (simpleTextView != null)
-						return simpleTextView;
-				}
+//				if (isUsePageCache && pageCache.containsKey(param)) {
+//					SimpleTextView simpleTextView = pageCache.get(param);
+//					if (simpleTextView != null)
+//						return simpleTextView;
+//				}
 
 				String readContent = readPage(param);
 				SimpleTextView simpleTextView = new SimpleTextView(readContent, false);
 				simpleTextView.setPrefSize(TextArea.USE_COMPUTED_SIZE, Double.MAX_VALUE);
 
-				if (isUsePageCache)
-					pageCache.put(param, simpleTextView);
+//				if (isUsePageCache)
+//					pageCache.put(param, simpleTextView);
 
 				return simpleTextView;
 			}
@@ -241,67 +246,14 @@ public class BigTextView extends BorderPane implements Closeable {
 		}));
 
 		lvFindRslt.setOnMouseClicked(this::lvFindRsltOnMouseClick);
-
-		//		lvFindRslt.setCellFactory(new Callback<ListView<FindModel>, ListCell<FindModel>>() {
-		//
-		//			@Override
-		//			public ListCell<FindModel> call(ListView<FindModel> param) {
-		//
-		//				return new ListCell<FindModel>() {
-		//
-		//					@Override
-		//					public void updateItem(FindModel item, boolean empty) {
-		//						super.updateItem(item, empty);
-		//
-		//						if (empty) {
-		//							setGraphic(null);
-		//							setText("");
-		//						} else {
-		//							if (item != null) {
-		//								TextFlow textFlow = new TextFlow();
-		//								//  페이지 정보
-		//								Node label = new Label(String.format("page : %d lines : ", (item.page + 1)));
-		//								textFlow.getChildren().add(label);
-		//								setGraphic(textFlow);
-		//
-		//								//상세 라인정보
-		//								List<Node> collect = IntStream.of(item.getLines()).mapToObj(idx -> {
-		//
-		//									Hyperlink hyperlink = new Hyperlink(String.format("%d", idx));
-		//									hyperlink.setOnAction(ev -> {
-		//
-		//										int page = item.getPage();
-		//
-		//										pagination.setCurrentPageIndex(page);
-		//
-		//										Platform.runLater(() -> {
-		//											CPagenationSkin skin = (CPagenationSkin) pagination.getSkin();
-		//											SimpleTextView view = (SimpleTextView) skin.getCurrentPage();
-		//											view.getHelper().moveToLine(idx);
-		//
-		//										});
-		//
-		//									});
-		//									return hyperlink;
-		//
-		//								}).collect(Collectors.toCollection(LinkedList::new));
-		//
-		//								textFlow.getChildren().addAll(collect);
-		//
-		//							} else {
-		//								setGraphic(null);
-		//								setText("");
-		//							}
-		//						}
-		//
-		//					}
-		//
-		//				};
-		//			}
-		//		});
 	}
 
-	@Deprecated
+	/**
+	 * 리스트뷰를 클릭했을때 이벤트
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 25. 
+	 * @param e
+	 */
 	public void lvFindRsltOnMouseClick(MouseEvent e) {
 		FindModel selectedItem = lvFindRslt.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
@@ -361,10 +313,6 @@ public class BigTextView extends BorderPane implements Closeable {
 
 	public String readPage(int page) {
 		try {
-			// String currentPage = String.valueOf(page);
-			// if (pageBuffer.containsKey(currentPage)) {
-			// return pageBuffer.get(currentPage);
-			// }
 
 			LOGGER.debug(String.format("Load file ... page %d ", page));
 			int iwantReadPage = page;
@@ -375,7 +323,7 @@ public class BigTextView extends BorderPane implements Closeable {
 			/* pointer : %02d str : */
 			/* randomAccessFile.getFilePointer(), */
 			// pageBuffer.put(currentPage, String.format("%s \n", new String(data).trim()));
-			return new String(data);// pageBuffer.get(currentPage);
+			return new String(data);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -403,9 +351,6 @@ public class BigTextView extends BorderPane implements Closeable {
 	}
 
 	@FXML
-	private TextField txtMovePage;
-
-	@FXML
 	public void txtMovePageOnKeyPress(KeyEvent e) {
 		if (e.getCode() == KeyCode.ENTER) {
 			if (e.isConsumed())
@@ -431,45 +376,27 @@ public class BigTextView extends BorderPane implements Closeable {
 	}
 
 	@FXML
-	private TextField txtSrch;
-
-	//	ListChangeListener<FindModel> listener = new ListChangeListener<FindModel>() {
-	//
-	//		@Override
-	//		public void onChanged(javafx.collections.ListChangeListener.Change<? extends FindModel> c) {
-	//			if (c.next()) {
-	//				if (c.wasAdded()) {
-	//
-	//					// String data = String.format("page : %d lines : { %s }", (this.page + 1), v);
-	//					// LOGGER.debug("page : {} , lines : {}", this.page, v);
-	//					Platform.runLater(() -> {
-	//						List<? extends FindModel> addedSubList = c.getAddedSubList();
-	//						lvFindRslt.getItems().addAll(addedSubList);
-	//					});
-	//
-	//				}
-	//			}
-	//
-	//		}
-	//
-	//	};
-	private ExecutorService executor = ExecutorDemons.newFixedThreadExecutor("Gargoyle-Big-Text-Search-Thread", 3);
+	private Button btnSrch;
 
 	@FXML
 	public void btnSrchOnAction() {
-		String srch = txtSrch.getText();
+		String keyword = txtSrch.getText();
 		lvFindRslt.getItems().clear();
 		// Stream.
 
-		Finder finder = new Finder(srch, item -> {
+		//17.7.25 keyword가 없는경우 검색하지않음.
+		if (ValueUtil.isNotEmpty(keyword)) {
+			Finder finder = new Finder(keyword, item -> {
 
-			Platform.runLater(() -> {
-				lvFindRslt.getItems().add(item);
+				Platform.runLater(() -> {
+					lvFindRslt.getItems().add(item);
+				});
+
 			});
 
-		});
-
-		finder.run();
+			btnSrch.setDisable(true);
+			finder.run();
+		}
 
 	}
 
@@ -591,15 +518,9 @@ public class BigTextView extends BorderPane implements Closeable {
 
 			@Override
 			public void run() {
-
 				try {
 					randomAccessFile.seek(this.page * SEEK_SIZE);
 					randomAccessFile.read(data);
-
-					//					new BufferedLineReaderInputStream(new ByteArrayInputStream(data), 1024);
-
-					//					LOGGER.debug("page : {} ", page);
-
 					nextJob();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -614,7 +535,7 @@ public class BigTextView extends BorderPane implements Closeable {
 			public void nextJob() {
 				if (!(executor.isShutdown() || executor.isTerminated())) {
 
-					executor.execute(new Transform(this.page, this.data));
+					executor.execute(new Transform(this.page /*조회용*/, this.data));
 
 					if (this.canNext()) {
 						executor.execute(new Extract(this.page + 1 /* extract next page */));
@@ -668,7 +589,7 @@ public class BigTextView extends BorderPane implements Closeable {
 				}
 				lines = arrayList;
 
-				LOGGER.debug("page : {} find count : {} ", (this.page + 1), this.lines.size());
+				//				LOGGER.debug("page : {} find count : {} ", (this.page + 1), this.lines.size());
 				nextJob();
 			}
 
@@ -694,6 +615,11 @@ public class BigTextView extends BorderPane implements Closeable {
 			@Override
 			public void run() {
 
+				if (page >= TOTAL_PAGE - 1) {
+					Platform.runLater(() -> {
+						btnSrch.setDisable(false);
+					});
+				}
 				if (this.lines == null || this.lines.size() == 0) {
 					return;
 				}
