@@ -364,7 +364,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			codeArea.getUndoManager().mark();
 			codeArea.replaceText(stringPrettyFormat);
 		} catch (JsonSyntaxException e) {
-			LOGGER.debug(ValueUtil.toString(e));
+//			LOGGER.debug(ValueUtil.toString(e));
 		}
 
 	}
