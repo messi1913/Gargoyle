@@ -147,6 +147,15 @@ public class CPagenationSkin extends BehaviorSkinBase<Pagination, PaginationBeha
 		}
 	}
 
+	public void selectPreviousPage() {
+		int currentPageIndex = getCurrentPageIndex() + 1;
+		int previousPageStart = (currentPageIndex / 10 - 1) * 10 ;
+		if (previousPageStart >= 0) {
+			pagination.setCurrentPageIndex(previousPageStart);
+
+		}
+	}
+
 	public void selectPrevious() {
 		int currentPageIndex = getCurrentPageIndex();
 		if (currentPageIndex > 0) {
@@ -769,19 +778,18 @@ public class CPagenationSkin extends BehaviorSkinBase<Pagination, PaginationBeha
 	class NavigationControl extends StackPane {
 
 		private HBox controlBox;
-		
-		
+
 		private Button leftArrowButton;
 		private StackPane leftArrow;
-		
+
 		private Button leftNextPageArrowButton;
-//		private StackPane leftNextPageArrow;
-		
+		//		private StackPane leftNextPageArrow;
+
 		private Button rightArrowButton;
 		private StackPane rightArrow;
 
 		private Button rightNextPageArrowButton;
-//		private StackPane rightNextPageArrow;
+		//		private StackPane rightNextPageArrow;
 
 		private ToggleGroup indicatorButtons;
 		private Label pageInformation;
@@ -835,6 +843,9 @@ public class CPagenationSkin extends BehaviorSkinBase<Pagination, PaginationBeha
 			rightArrowButton.setGraphic(rightArrow);
 			rightArrow.getStyleClass().add("right-arrow");
 
+			/*******************************************************************************************************/
+			// 추가 컨트롤 아이템
+
 			rightNextPageArrowButton = new Button("▶▶");
 			//			rightNextPageArrowButton.setAccessibleText(getString("Accessibility.title.Pagination.NextButton"));
 			rightNextPageArrowButton.setMinSize(minButtonSize, minButtonSize);
@@ -855,17 +866,17 @@ public class CPagenationSkin extends BehaviorSkinBase<Pagination, PaginationBeha
 			//			rightNextPageArrowButton.prefWidthProperty().bind(rightNextPageArrowButton.minWidthProperty());
 			//			rightNextPageArrowButton.prefHeightProperty().bind(rightNextPageArrowButton.minHeightProperty());
 			//			rightNextPageArrowButton.prefWidth(40);
-			leftNextPageArrowButton.getStyleClass().add("right-next-arrow-button");
+			leftNextPageArrowButton.getStyleClass().add("left-next-arrow-button");
 			leftNextPageArrowButton.setFocusTraversable(false);
 			HBox.setMargin(leftNextPageArrowButton, new Insets(0, 0, 0, snapSize(arrowButtonGap.get())));
 			//			rightNextPageArrow = new StackPane();
 			//			rightNextPageArrow.setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
 			//			rightNextPageArrowButton.setGraphic(rightNextPageArrow);
 			//			rightNextPageArrow.getStyleClass().add("right-next-page-arrow");
-			
-//			leftNextPageArrow;
-			
-			
+
+			/*******************************************************************************************************/
+			//			leftNextPageArrow;
+
 			indicatorButtons = new ToggleGroup();
 
 			pageInformation = new Label();
@@ -907,6 +918,11 @@ public class CPagenationSkin extends BehaviorSkinBase<Pagination, PaginationBeha
 				requestLayout();
 			});
 
+			leftNextPageArrowButton.setOnAction(arg0 -> {
+				selectPreviousPage();
+				requestLayout();
+			});
+
 			pagination.currentPageIndexProperty().addListener((arg0, arg1, arg2) -> {
 				previousIndex = arg1.intValue();
 				currentIndex = arg2.intValue();
@@ -926,6 +942,7 @@ public class CPagenationSkin extends BehaviorSkinBase<Pagination, PaginationBeha
 			controlBox.getChildren().clear();
 			clearIndicatorButtons();
 
+			controlBox.getChildren().add(leftNextPageArrowButton);
 			controlBox.getChildren().add(leftArrowButton);
 
 			for (int i = fromIndex; i <= toIndex; i++) {
@@ -997,12 +1014,14 @@ public class CPagenationSkin extends BehaviorSkinBase<Pagination, PaginationBeha
 			final double rightArrowWidth = snapSize(
 					Utils.boundedSize(rightArrowButton.prefWidth(-1), rightArrowButton.minWidth(-1), rightArrowButton.maxWidth(-1)));
 
+			final double leftNextPageArrowWidth = snapSize(Utils.boundedSize(leftNextPageArrowButton.prefWidth(-1),
+					leftNextPageArrowButton.minWidth(-1), leftNextPageArrowButton.maxWidth(-1)));
 			final double rightNextPageArrowWidth = snapSize(Utils.boundedSize(rightNextPageArrowButton.prefWidth(-1),
 					rightNextPageArrowButton.minWidth(-1), rightNextPageArrowButton.maxWidth(-1)));
 
 			final double spacing = snapSize(controlBox.getSpacing());
-			double w = width - (controlBoxleft + leftArrowWidth + 2 * arrowButtonGap.get() + spacing + rightArrowWidth
-					+ rightNextPageArrowWidth + controlBoxRight);
+			double w = width - (leftNextPageArrowWidth + controlBoxleft + leftArrowWidth + 2 * arrowButtonGap.get() + spacing
+					+ rightArrowWidth + rightNextPageArrowWidth + controlBoxRight);
 
 			if (isPageInformationVisible()
 					&& (Side.LEFT.equals(getPageInformationAlignment()) || Side.RIGHT.equals(getPageInformationAlignment()))) {
@@ -1186,6 +1205,8 @@ public class CPagenationSkin extends BehaviorSkinBase<Pagination, PaginationBeha
 					Utils.boundedSize(rightArrowButton.prefWidth(-1), rightArrowButton.minWidth(-1), rightArrowButton.maxWidth(-1)));
 			double rightNextPageArrowWidth = snapSize(Utils.boundedSize(rightNextPageArrowButton.prefWidth(-1),
 					rightNextPageArrowButton.minWidth(-1), rightNextPageArrowButton.maxWidth(-1)));
+			double leftNextPageArrowWidth = snapSize(Utils.boundedSize(leftNextPageArrowButton.prefWidth(-1),
+					leftNextPageArrowButton.minWidth(-1), leftNextPageArrowButton.maxWidth(-1)));
 
 			double spacing = snapSize(controlBox.getSpacing());
 			double pageInformationWidth = 0;
@@ -1195,7 +1216,7 @@ public class CPagenationSkin extends BehaviorSkinBase<Pagination, PaginationBeha
 			}
 			double arrowGap = arrowButtonGap.get();
 
-			return left + leftArrowWidth + 2 * arrowGap + minButtonSize /*at least one button*/
+			return left + leftNextPageArrowWidth + leftArrowWidth + 2 * arrowGap + minButtonSize /*at least one button*/
 					+ 2 * spacing + rightArrowWidth + right + rightNextPageArrowWidth + pageInformationWidth;
 		}
 

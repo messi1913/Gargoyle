@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.codec.Hex;
 
+import com.google.gson.JsonSyntaxException;
 import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
@@ -358,8 +359,14 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 	@FXML
 	public void prettyFormatOnAction() {
-		codeArea.getUndoManager().mark();
-		codeArea.replaceText(ValueUtil.toStringPrettyFormat(codeArea.getText()));
+		try {
+			String stringPrettyFormat = ValueUtil.toStringPrettyFormat(codeArea.getText());
+			codeArea.getUndoManager().mark();
+			codeArea.replaceText(stringPrettyFormat);
+		} catch (JsonSyntaxException e) {
+			LOGGER.debug(ValueUtil.toString(e));
+		}
+
 	}
 
 	@FXML

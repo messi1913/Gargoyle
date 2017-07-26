@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -213,18 +214,18 @@ public class BigTextView extends BorderPane implements Closeable {
 			@Override
 			public Node call(Integer param) {
 
-//				if (isUsePageCache && pageCache.containsKey(param)) {
-//					SimpleTextView simpleTextView = pageCache.get(param);
-//					if (simpleTextView != null)
-//						return simpleTextView;
-//				}
+				//				if (isUsePageCache && pageCache.containsKey(param)) {
+				//					SimpleTextView simpleTextView = pageCache.get(param);
+				//					if (simpleTextView != null)
+				//						return simpleTextView;
+				//				}
 
 				String readContent = readPage(param);
 				SimpleTextView simpleTextView = new SimpleTextView(readContent, false);
 				simpleTextView.setPrefSize(TextArea.USE_COMPUTED_SIZE, Double.MAX_VALUE);
 
-//				if (isUsePageCache)
-//					pageCache.put(param, simpleTextView);
+				//				if (isUsePageCache)
+				//					pageCache.put(param, simpleTextView);
 
 				return simpleTextView;
 			}
@@ -337,6 +338,16 @@ public class BigTextView extends BorderPane implements Closeable {
 		if (randomAccessFile != null)
 			randomAccessFile.close();
 
+		stopPool();
+
+	}
+
+	/**
+	 * 동작 초기화
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 7. 26. 
+	 */
+	private void stopPool() {
 		if (!executor.isShutdown())
 			executor.shutdownNow();
 
@@ -347,7 +358,6 @@ public class BigTextView extends BorderPane implements Closeable {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	@FXML
@@ -371,7 +381,9 @@ public class BigTextView extends BorderPane implements Closeable {
 	@FXML
 	public void txtSrchOnKeyPress(KeyEvent e) {
 		if (e.getCode() == KeyCode.ENTER) {
-			btnSrchOnAction();
+
+			if (!btnSrch.isDisabled())
+				btnSrchOnAction();
 		}
 	}
 
@@ -381,11 +393,12 @@ public class BigTextView extends BorderPane implements Closeable {
 	@FXML
 	public void btnSrchOnAction() {
 		String keyword = txtSrch.getText();
-		lvFindRslt.getItems().clear();
+		
 		// Stream.
 
 		//17.7.25 keyword가 없는경우 검색하지않음.
 		if (ValueUtil.isNotEmpty(keyword)) {
+			lvFindRslt.getItems().clear();
 			Finder finder = new Finder(keyword, item -> {
 
 				Platform.runLater(() -> {
@@ -397,7 +410,11 @@ public class BigTextView extends BorderPane implements Closeable {
 			btnSrch.setDisable(true);
 			finder.run();
 		}
-
+		else
+		{
+			DialogUtil.showMessageDialog(FxUtil.getWindow(this), "검색어를 입력하십시요.");
+			return;
+		}
 	}
 
 	interface FireNext {
