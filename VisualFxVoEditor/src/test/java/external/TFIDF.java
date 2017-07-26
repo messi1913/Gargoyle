@@ -173,7 +173,7 @@ public class TFIDF {
 			InputSource source = new InputSource(new StringReader(content));
 			source.setEncoding("UTF-8");
 			try {
-				content = ValueUtil.HTML.getNewsContent(instance, source);
+				content = ValueUtil.TFIDF.getNewsContent(instance, source);
 				v.setContent(content);
 			} catch (Exception e) {
 				v = URLModel.empty();
@@ -231,7 +231,7 @@ public class TFIDF {
 		String reqeustSSL = RequestUtil.request(new URL("http://view.asiae.co.kr/news/view.htm?idxno=2016120314584743535"),
 				RequestUtil.DEFAULT_REQUEST_HANDLER);
 
-		System.out.println(ValueUtil.HTML.escapeHtml(reqeustSSL));
+		System.out.println(ValueUtil.TFIDF.escapeHtml(reqeustSSL));
 
 	}
 
