@@ -11,19 +11,28 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
+import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.util.ByteSequence;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
+import org.jsoup.select.Elements;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -34,30 +43,29 @@ import scala.collection.mutable.StringBuilder;
  * @author KYJ
  *
  */
-public class MimeToHtmlAdapter extends AbstractMimeAdapter {
+public class NamoMimeToHtmlAdapter extends AbstractMimeAdapter {
 
-	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(MimeToHtmlAdapter.class);
+	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(NamoMimeToHtmlAdapter.class);
 
 	private byte[] content;
 
-	/**
-	 * @param mimeFile
-	 */
-	private MimeToHtmlAdapter() {
-		super(null);
+	public NamoMimeToHtmlAdapter(String content) {
+		this(content.getBytes());
 	}
 
-	public MimeToHtmlAdapter(String content, String charset) throws UnsupportedEncodingException {
-		this(content.getBytes(charset));
-	}
-
-	public MimeToHtmlAdapter(String content) throws UnsupportedEncodingException {
-		this(content, "UTF-8");
-	}
-
-	public MimeToHtmlAdapter(byte[] content) {
+	public NamoMimeToHtmlAdapter(byte[] content) {
 		super(null);
 		this.content = content;
+	}
+
+	private Map<String, LinkedTag> binaryMap = new HashMap<>();
+
+	private class LinkedTag {
+
+		String mimeType;
+		String contentId;
+		String val;
+
 	}
 
 	/*
@@ -112,8 +120,9 @@ public class MimeToHtmlAdapter extends AbstractMimeAdapter {
 								buffer.append(temp);
 							}
 							byte[] decode = Base64.getMimeDecoder().decode(buffer.toString());
-							String string = new String(decode);
-							sb.append(string);
+							String element = new String(decode);
+							sb.append(element);
+
 							sb.append("</div>");
 						}
 
@@ -123,11 +132,20 @@ public class MimeToHtmlAdapter extends AbstractMimeAdapter {
 
 				} else if (poll instanceof BinaryBody) {
 					BinaryBody bBody = (BinaryBody) poll;
-					
+
 					//example : image/jpeg , image/png
 					String mimeType = bBody.getParent().getMimeType();
 					//					String contentTransferEncoding = bBody.getParent().getContentTransferEncoding();
 
+					Header header = bBody.getParent().getHeader();
+					Field fContentId = header.getField("Content-ID");
+
+					ByteSequence raw = fContentId.getRaw();
+					String key = fContentId.getName();
+					String val = new String(raw.toByteArray());
+					String contentId = val.replaceAll(key + "[ ]{0,}:", "").trim();
+					contentId = "cid:" + contentId.replace("<", "").replace(">", "");
+					
 					String charset = bBody.getParent().getCharset();
 					String mimeValue = "";
 					if (ValueUtil.isNotEmpty(charset)) {
@@ -137,7 +155,7 @@ public class MimeToHtmlAdapter extends AbstractMimeAdapter {
 						InputStream is = bBody.getInputStream();
 						BufferedReader r = new BufferedReader(new InputStreamReader(is, forName));
 						StringBuilder buffer = new StringBuilder();
-String temp = null;
+						String temp = null;
 						while ((temp = r.readLine()) != null) {
 							buffer.append(temp);
 						}
@@ -152,8 +170,21 @@ String temp = null;
 						mimeValue = ValueUtil.toString(bBody.getInputStream());
 					}
 
-					String imgeformat = String.format("<image src=\"data:%s/;%s,%s \"> </image> ", mimeType, "base64", mimeValue); /*   */
-					sb.append(imgeformat);
+					if (ValueUtil.isNotEmpty(key)) {
+						LinkedTag linkedTag = new LinkedTag();
+						linkedTag.contentId = contentId;
+						linkedTag.mimeType = mimeType;
+						linkedTag.val = mimeValue;
+						binaryMap.put(contentId, linkedTag);
+//						System.out.println();
+					}
+
+					//					else
+					//					{
+//					String imgeformat = String.format("<image src=\"data:%s/;%s,%s \"> </image> ", mimeType, "base64", mimeValue); /*   */
+//					sb.append(imgeformat);
+					//					}
+
 				} else if (poll instanceof Multipart) {
 					Multipart mbody = (Multipart) poll;
 					for (Entity part : mbody.getBodyParts()) {
@@ -175,112 +206,31 @@ String temp = null;
 				}
 			}
 
-			//			append(sb, body);
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		sb.append("</html>");
-		return sb.toString();
-	}
 
-	/***************************************************************************/
-	/*  sb에 번역된 텍스트데이터를 덧붙임 */
-	/***************************************************************************/
-	//	private void append(StringBuilder sb, Body body) {
-	//		if (body instanceof TextBody) {
-	//			/*
-	//			 * A text body. Display its contents.
-	//			 */
-	//			TextBody textBody = (TextBody) body;
-	//			try {
-	//				Reader r = textBody.getReader();
-	//				int c;
-	//				while ((c = r.read()) != -1) {
-	//					sb.append((char) c);
-	//				}
-	//			} catch (IOException ex) {
-	//				ex.printStackTrace();
-	//			}
-	//
-	//		} else if (body instanceof BinaryBody) {
-	//			BinaryBody bBody = (BinaryBody) body;
-	//			append(sb, bBody);
-	//		} else if (body instanceof Multipart) {
-	//			Multipart mbody = (Multipart) body;
-	//			for (Entity part : mbody.getBodyParts()) {
-	//				Body bBody = to(part);
-	//				append(sb, part);
-	//			}
-	//		}
-	//
-	//		/*
-	//		 * Ignore Fields </br>
-	//		 * 
-	//		 * ContentTypeField,AddressListField,DateTimeField UnstructuredField,
-	//		 * Field
-	//		 * 
-	//		 */
-	//		else {
-	//			LOGGER.debug("{}" , body);
-	//			sb.append(body.toString());
-	//		}
-	//	}
+		Document parse = Jsoup.parse(sb.toString());
+		Elements select = parse.select("img");
+		for (Element e : select) {
+			Tag tag = e.tag();
+			//ex cid:EWXXYKENUIXH@namo.co.kr
+			String id = e.attr("src");
+			if (binaryMap.containsKey(id)) {
+				LinkedTag tagdata = binaryMap.get(id);
+				e.attr("src", String.format("data:%s/;%s,%s", tagdata.mimeType, "base64", tagdata.val));
+			}
+		}
+		return parse.html();
+		//		String attr = select.attr("src");
+
+//		return sb.toString();
+	}
 
 	private Body to(Entity body) {
 		return body.getBody();
 	}
-
-	//	static class CustomMessageBuilder extends DefaultMessageBuilder {
-	//
-	//		public Header parseHeader(final InputStream is) throws IOException, MimeIOException {
-	//			//	        final MimeConfig cfg = config != null ? config : new MimeConfig();
-	//			final MimeConfig cfg = new MimeConfig();
-	//			boolean strict = cfg.isStrictParsing();
-	//
-	//			//	        final DecodeMonitor mon = monitor != null ? monitor :
-	//			//	            strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT;
-	//
-	//			final DecodeMonitor mon = DecodeMonitor.SILENT;
-	//
-	//			//	        final FieldParser<? extends ParsedField> fp = fieldParser != null ? fieldParser :
-	//			//	            strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser();
-	//
-	//			final FieldParser<? extends ParsedField> fp = LenientFieldParser.getParser();
-	//
-	//			final HeaderImpl header = new HeaderImpl();
-	//			final MimeStreamParser parser = new MimeStreamParser();
-	//			parser.setContentHandler(new AbstractContentHandler() {
-	//				@Override
-	//				public void endHeader() {
-	//					parser.stop();
-	//				}
-	//
-	//				@Override
-	//				public void field(Field field) throws MimeException {
-	//					ParsedField parsedField;
-	//					if (field instanceof ParsedField) {
-	//						parsedField = (ParsedField) field;
-	//					} else {
-	//						parsedField = fp.parse(field, mon);
-	//					}
-	//					header.addField(parsedField);
-	//				}
-	//			});
-	//			try {
-	//				parser.parse(is);
-	//			} catch (MimeException ex) {
-	//				throw new MimeIOException(ex);
-	//			}
-	//			return header;
-	//		}
-	//	}
-	//
-	//	static class CustomMimeStreamParser extends MimeStreamParser {
-	//		public CustomMimeStreamParser() {
-	//			super(new MimeTokenStream(new MimeConfig(), null, null));
-	//		}
-	//	}
 
 }

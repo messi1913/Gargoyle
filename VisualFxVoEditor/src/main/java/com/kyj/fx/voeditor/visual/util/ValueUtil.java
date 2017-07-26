@@ -1451,9 +1451,9 @@ public class ValueUtil {
 		return concatedTables;
 	}
 
-	public static class HTML {
+	public static class TFIDF {
 
-		private HTML() {
+		private TFIDF() {
 		}
 
 		static class AlgorismExtractor {

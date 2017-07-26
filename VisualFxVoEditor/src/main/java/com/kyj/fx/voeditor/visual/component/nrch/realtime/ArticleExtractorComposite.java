@@ -112,7 +112,7 @@ public class ArticleExtractorComposite extends BorderPane {
 	@FXML
 	public void initialize() {
 
-		cbAlgorisms.getItems().addAll(ValueUtil.HTML.getAvaliablesExtractorBase());
+		cbAlgorisms.getItems().addAll(ValueUtil.TFIDF.getAvaliablesExtractorBase());
 		cbAlgorisms.getSelectionModel().select(ArticleExtractor.class);
 		cbAlgorisms.setCellFactory(new Callback<ListView<Class<? extends ExtractorBase>>, ListCell<Class<? extends ExtractorBase>>>() {
 
@@ -463,7 +463,7 @@ public class ArticleExtractorComposite extends BorderPane {
 			InputSource source = new InputSource(new StringReader(content));
 			source.setEncoding("UTF-8");
 			try {
-				content = ValueUtil.HTML.getNewsContent(instance, source);
+				content = ValueUtil.TFIDF.getNewsContent(instance, source);
 				// v.setContent(content);
 
 				model.setUrl(v.getUrl());
@@ -639,7 +639,7 @@ public class ArticleExtractorComposite extends BorderPane {
 			final BoilerpipeSAXInput in = new BoilerpipeSAXInput(inputSource);
 			final TextDocument doc = in.getTextDocument();
 
-			content = ValueUtil.HTML.newInsntance(algorism).getText(doc);
+			content = ValueUtil.TFIDF.newInsntance(algorism).getText(doc);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -17,12 +17,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.codec.Hex;
 
 import com.google.gson.JsonSyntaxException;
-import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
+import com.kyj.fx.voeditor.visual.framework.word.AbstractMimeAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
 import com.kyj.fx.voeditor.visual.framework.word.HtmlTextToMimeAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.MimeToHtmlAdapter;
+import com.kyj.fx.voeditor.visual.framework.word.NamoMimeToHtmlAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.SimpleWordAdapter;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
@@ -32,7 +33,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
@@ -225,30 +225,35 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 			javafx.application.Platform.runLater(() -> {
 				try {
-					WebView webView = new WebView();
-					MimeToHtmlAdapter adapter = new MimeToHtmlAdapter(content);
+					
+					AbstractMimeAdapter adapter = new NamoMimeToHtmlAdapter(content);
 					//					FileWriter fileWriter = new FileWriter(new File("sample.html"));
-					String content2 = adapter.getContent();
-					//					fileWriter.write(content2);
-					//					fileWriter.close();
-					webView.getEngine().loadContent(content2);
-
-					webView.setOnKeyPressed(ev -> {
-						if (ev.getCode() == KeyCode.F12) {
-							WebViewConsole webViewConsole = new WebViewConsole(webView);
-							FxUtil.createStageAndShow(webViewConsole, stage -> {
-							});
-						}
-					});
-					FxUtil.createStageAndShow(webView, stage -> {
-						stage.setAlwaysOnTop(true);
-						stage.initOwner(getScene().getWindow());
-						stage.focusedProperty().addListener((oba, o, n) -> {
-							if (!n)
-								stage.close();
-
-						});
-					});
+					String html = adapter.getContent();
+					
+					FxUtil.openBrowser(codeArea, html , false);
+//					WebView webView = new WebView();
+//
+//					webView.getEngine().loadContent(content2);
+//
+//					webView.setOnKeyPressed(ev -> {
+//						if (ev.getCode() == KeyCode.F12) {
+//							WebViewConsole webViewConsole = new WebViewConsole(webView);
+//							FxUtil.createStageAndShow(webViewConsole, stage -> {
+//
+//								stage.initOwner(FxUtil.getWindow(codeArea));
+//
+//							});
+//						}
+//					});
+//					FxUtil.createStageAndShow(webView, stage -> {
+//						stage.setAlwaysOnTop(true);
+//						stage.initOwner(getScene().getWindow());
+//						stage.focusedProperty().addListener((oba, o, n) -> {
+//							if (!n)
+//								stage.close();
+//
+//						});
+//					});
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -364,7 +369,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			codeArea.getUndoManager().mark();
 			codeArea.replaceText(stringPrettyFormat);
 		} catch (JsonSyntaxException e) {
-//			LOGGER.debug(ValueUtil.toString(e));
+			//			LOGGER.debug(ValueUtil.toString(e));
 		}
 
 	}

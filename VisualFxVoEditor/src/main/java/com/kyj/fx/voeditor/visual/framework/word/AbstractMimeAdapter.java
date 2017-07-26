@@ -52,9 +52,10 @@ public abstract class AbstractMimeAdapter {
 		return simpleTemplFileName;
 	}
 
-	protected File createNewTempFile(){
+	protected File createNewTempFile() {
 		return new File(parentFile(), tmpFileName());
 	}
+
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 26.
@@ -65,10 +66,7 @@ public abstract class AbstractMimeAdapter {
 		try {
 			FileUtil.writeFile(mimeFile, getContent(), Charset.forName("UTF-8"));
 
-
 			FileUtil.openFile(mimeFile);
-//			if (mimeFile.exists())
-//				mimeFile.deleteOnExit();
 
 		} catch (IOException e) {
 			LOGGER.error(ValueUtil.toString(e));

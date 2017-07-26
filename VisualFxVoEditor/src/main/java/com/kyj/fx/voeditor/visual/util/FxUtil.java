@@ -53,6 +53,7 @@ import com.kyj.fx.voeditor.visual.component.scm.ScmCommitComposite;
 import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
+import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.InstanceTypes;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
@@ -77,6 +78,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker.State;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -92,6 +94,8 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.SnapshotResult;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -112,6 +116,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -131,6 +136,7 @@ import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import jfxtras.scene.layout.HBox;
 import jidefx.animation.AnimationType;
 import jidefx.animation.AnimationUtils;
 
@@ -1695,6 +1701,7 @@ public class FxUtil {
 	public static WebView openBrowser(Node parent, String content, boolean isLink) {
 
 		WebView view = new WebView();
+		view.setContextMenuEnabled(false);
 		WebEngine engine = view.getEngine();
 
 		engine.setOnError(err -> {
@@ -1704,9 +1711,52 @@ public class FxUtil {
 
 		view.setOnKeyPressed(key -> {
 
-			if (key.getCode() == KeyCode.F12) {
+			switch (key.getCode()) {
+			case F5:
+				if (key.isConsumed())
+					return;
+				view.getEngine().reload();
+				break;
+
+			case F12:
+				if (key.isConsumed())
+					return;
+
 				FxUtil.createStageAndShow("Simple Web Console", new WebViewConsole(view));
+				key.consume();
+				break;
+
+			default:
+				break;
 			}
+
+		});
+
+		view.setOnContextMenuRequested(ev -> {
+
+			MenuItem miReload = new MenuItem("Reload");
+			miReload.setOnAction(e -> {
+				view.getEngine().reload();
+			});
+
+			MenuItem miSource = new MenuItem("Source");
+			miSource.setOnAction(e -> {
+				Object executeScript = view.getEngine().executeScript("document.documentElement.innerHTML");
+				String htmlCoded = executeScript.toString();
+
+				XMLEditor fxmlTextArea = new XMLEditor();
+				fxmlTextArea.setContent(htmlCoded);
+				FxUtil.createStageAndShow(fxmlTextArea, stage -> {
+					stage.setWidth(1200d);
+					stage.setHeight(800d);
+				});
+				//				FxUtil.createStageAndShow("Source", new WebViewConsole(view));
+
+			});
+
+			ContextMenu contextMenu = new ContextMenu(miReload, miSource);
+
+			contextMenu.show(FxUtil.getWindow(view), ev.getScreenX(), ev.getScreenY());
 
 		});
 
@@ -1753,7 +1803,7 @@ public class FxUtil {
 		});
 
 		engine.setOnAlert((WebEvent<String> wEvent) -> {
-			System.out.println("Alert Event  -  Message:  " + wEvent.getData());
+			LOGGER.debug("Alert Event  -  Message: {}  ", wEvent.getData());
 		});
 		if (isLink)
 			engine.load(content);
@@ -1761,12 +1811,21 @@ public class FxUtil {
 			engine.loadContent(content);
 
 		BorderPane root = new BorderPane(view);
+
+		HBox linkGroup = new HBox(5);
+		linkGroup.setAlignment(Pos.CENTER_LEFT);
+		linkGroup.setPadding(new Insets(5));
 		TextField txtLink = new TextField(content);
+		HBox.setHgrow(txtLink, Priority.ALWAYS);
 		txtLink.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
 			if (KeyCode.ENTER == ev.getCode())
 				engine.load(txtLink.getText());
 		});
-		root.setTop(txtLink);
+
+		linkGroup.getChildren().add(new Label("URL : "));
+		linkGroup.getChildren().add(txtLink);
+
+		root.setTop(linkGroup);
 
 		engine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
 
@@ -1782,6 +1841,8 @@ public class FxUtil {
 		FxUtil.createStageAndShow(new Scene(root, BROWSER_WIDTH, BROWSER_HEIGHT), stage -> {
 			stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
 			stage.setOnCloseRequest(ev -> {
+
+				//메모리 릭 방지.
 				engine.load("about:blank");
 			});
 		});
@@ -2112,8 +2173,6 @@ public class FxUtil {
 		action.accept(create);
 		create.show();
 	}
-
-	
 
 	/**
 	 * excel Export 기능이 있는 메뉴 아이템을 리턴.

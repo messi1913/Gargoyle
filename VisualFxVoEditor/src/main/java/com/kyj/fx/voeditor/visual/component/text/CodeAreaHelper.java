@@ -147,7 +147,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 	public void replaceSelection(String selection) {
 		codeArea.getUndoManager().mark();
 		codeArea.replaceSelection(selection);
-		codeArea.getUndoManager().mark();
+//		codeArea.getUndoManager().mark();
 	}
 
 	public void appendContent(String content) {
