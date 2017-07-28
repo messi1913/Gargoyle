@@ -20,6 +20,8 @@ public class DrawItem extends Control {
 	 * 
 	 */
 	public DrawItem() {
+		setMouseTransparent(false);
+		setFocusTraversable(false);
 	}
 
 	@Override

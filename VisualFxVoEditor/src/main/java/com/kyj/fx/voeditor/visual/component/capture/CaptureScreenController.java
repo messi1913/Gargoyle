@@ -47,7 +47,7 @@ public class CaptureScreenController {
 	//	private ImageView ivPicture;
 	@FXML
 	private ScrollPane spPic;
-
+	@FXML
 	private AnchorPane anchorBoard;
 
 	private IntegerProperty itemCount = new SimpleIntegerProperty();
@@ -76,7 +76,7 @@ public class CaptureScreenController {
 		itemHandler = new CaptureItemHandler(this);
 
 		flowItems.getChildren().addAll(itemHandler.getItems());
-		anchorBoard = new AnchorPane();
+		
 
 		//아이템 카운트 수를 핸들링하는 이벤트 리스너
 		anchorBoard.getChildren().addListener((ListChangeListener) c -> {
@@ -93,10 +93,19 @@ public class CaptureScreenController {
 			}
 		});
 
-		spPic.setContent(anchorBoard);
-
+//		spPic.setContent(anchorBoard);
+		//this.anchorBoard.setPrefSize(spPic.getPrefWidth(), spPic.getPrefHeight());
+		//spPic.prefWidthProperty().bind(this.anchorBoard.prefWidthProperty());
+		//spPic.prefHeightProperty().bind(this.anchorBoard.prefHeightProperty());
+		
+		
+//		spPic.prefHeightProperty().bind(this.anchorBoard.prefHeightProperty());
+		
 		anchorBoard.setOnScroll(ev -> {
-
+			
+			if(ev.isConsumed())
+				return;
+			
 			if (ev.isControlDown()) {
 				//				ObservableList<Transform> transforms = ivPicture.getTransforms();
 
@@ -123,6 +132,8 @@ public class CaptureScreenController {
 				}
 
 				lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), ev.getY(), itemCount.get()));
+				
+				ev.consume();
 			}
 		});
 
@@ -204,17 +215,22 @@ public class CaptureScreenController {
 			//if new position do not exceeds borders of the rectangle, translate to this position
 			newNode.setTranslateX(newXPosition);
 			newNode.setTranslateY(newYPosition);
-
+			
+//			newNode.requestFocus();
 			ev.consume();
 		});
 
 		newNode.setOnMousePressed(ev -> {
-
+			
+			if(ev.isConsumed())
+				return;
+			
 			Location location = initLocation.get(newNode);
 			location.setInitX(newNode.getTranslateX());
 			location.setInitY(newNode.getTranslateY());
 			location.setDragAnchor(new Point2D(ev.getSceneX(), ev.getSceneY()));
-
+//			System.out.println(newNode);
+			newNode.requestFocus();
 			ev.consume();
 
 		});
