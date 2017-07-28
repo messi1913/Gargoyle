@@ -218,6 +218,8 @@ public class CaptureScreenController {
 			ev.consume();
 
 		});
+		
+		
 	}
 
 	protected void addChildren(Node n) {
