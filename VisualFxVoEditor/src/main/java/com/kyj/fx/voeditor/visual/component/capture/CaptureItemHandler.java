@@ -12,8 +12,8 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
@@ -31,7 +31,7 @@ public class CaptureItemHandler {
 
 	private CaptureScreenController controller;
 
-	protected ObservableList<Node> items;
+	protected ObservableList<Control> items;
 
 	/**
 	 * @param captureScreenController
@@ -151,6 +151,34 @@ public class CaptureItemHandler {
 			});
 			items.add(btn);
 		}
+		
+		{
+			Button btn = new Button("테이블 샘플");
+			btn.setOnAction(e -> {
+
+				//				Rectangle rectangle = new Rectangle(200d, 200d);
+				//				rectangle.setStrokeLineJoin(StrokeLineJoin.ROUND);
+//				Group g = new Group();
+//				DropShadow ds = new DropShadow();
+//			    ds.setOffsetY(3.0);
+//			    ds.setColor(Color.color(0.4, 0.4, 0.4));
+
+			    DrawItem d = new DrawItem();
+			    
+//			    d.setCenterX(50.0f);
+//			    d.setCenterY(50.0f);
+//			    d.setRadiusX(50.0f);
+//			    d.setRadiusY(25.0f);
+//			    d.setFill(Color.RED);
+//			    d.setStroke(Color.BLACK);
+//			    d.setEffect(ds);
+//			    g.getChildren().add(d);
+
+				controller.addItemEvent(d);
+				controller.addChildren(d);
+			});
+			items.add(btn);
+		}
 
 	}
 
@@ -159,7 +187,7 @@ public class CaptureItemHandler {
 	 * @작성일 : 2016. 9. 28.
 	 * @return
 	 */
-	public ObservableList<Node> getItems() {
+	public ObservableList<Control> getItems() {
 
 		createLaledItems();
 

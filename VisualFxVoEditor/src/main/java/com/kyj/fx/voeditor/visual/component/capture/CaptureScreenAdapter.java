@@ -11,8 +11,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
@@ -22,38 +26,51 @@ import javafx.scene.layout.BorderPane;
  * @author KYJ
  *
  ***************************/
-public class CaptureScreenComposite {
 
+public class CaptureScreenAdapter extends BorderPane{
+	private static final Logger LOGGER = LoggerFactory.getLogger(CaptureScreenAdapter.class);
 	private BorderPane root;
 	private Node targetNode;
 
-	public CaptureScreenComposite(Node targetNode, Consumer<Exception> errorHandler) {
+	public CaptureScreenAdapter() {
+		this(null);
+	}
+
+	public CaptureScreenAdapter(Node targetNode) {
+		this(targetNode, err -> LOGGER.error(ValueUtil.toString(err)));
+	}
+
+	public CaptureScreenAdapter(Node targetNode, Consumer<Exception> errorHandler) {
 		this.targetNode = targetNode;
 		try {
 			root = FxUtil.loadAndControllerAction(CaptureScreenController.class, c -> {
 
-				File snapShotDir = FileUtil.getTempSnapShotDir();
+				if (this.targetNode != null) {
+					File snapShotDir = FileUtil.getTempSnapShotDir();
 
-				File file = new File(snapShotDir, "tmpImage.png");
-				boolean isWriteSuccess = false;
-				try (FileOutputStream out = new FileOutputStream(file)) {
+					File file = new File(snapShotDir, "tmpImage.png");
+					boolean isWriteSuccess = false;
+					try (FileOutputStream out = new FileOutputStream(file)) {
 
-					FxUtil.snapShot(targetNode, out, System.err::println);
+						FxUtil.snapShot(this.targetNode, out, System.err::println);
 
-					isWriteSuccess = true;
-				} catch (Exception e) {
-					errorHandler.accept(e);
-				}
+						isWriteSuccess = true;
+					} catch (Exception e) {
+						errorHandler.accept(e);
+					}
 
-				if (isWriteSuccess) {
-					try {
-						c.createPicutre("tmpImage.png");
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
+					if (isWriteSuccess) {
+						try {
+							c.createPicutre("tmpImage.png");
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 
 			});
+			
+			this.setCenter(this.root);
 		} catch (Exception e) {
 			errorHandler.accept(e);
 		}
