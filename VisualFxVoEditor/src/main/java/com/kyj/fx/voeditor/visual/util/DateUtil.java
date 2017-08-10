@@ -254,6 +254,8 @@ public class DateUtil {
 	 * @return
 	 */
 	public static long calcTime(Date end, Date start, int calendarField) {
+		if(end == null || start == null)
+			return 0;
 		long diff = end.getTime() - start.getTime();
 
 		switch (calendarField) {
