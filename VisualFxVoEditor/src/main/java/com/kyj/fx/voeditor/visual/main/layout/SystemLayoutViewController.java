@@ -1941,7 +1941,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	public void lblCaptureOnAction() {
 		DockTab selectedItem = this.tabPanWorkspace.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
-			new CaptureScreenAdapter(selectedItem.getContent(), System.err::println).show();
+			new CaptureScreenAdapter(selectedItem.getContent(), System.err::println).load().show();
 		}
 
 	}

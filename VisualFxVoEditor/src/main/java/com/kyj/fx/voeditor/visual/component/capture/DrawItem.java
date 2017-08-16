@@ -14,7 +14,7 @@ import javafx.scene.control.Skin;
  * @author KYJ
  *
  */
-public class DrawItem extends Control {
+public abstract class DrawItem extends Control implements ColorChange {
 
 	/**
 	 * 
@@ -25,8 +25,6 @@ public class DrawItem extends Control {
 	}
 
 	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new DrawItemSkin<>(this);
-	}
+	protected abstract Skin<?> createDefaultSkin();
 
 }

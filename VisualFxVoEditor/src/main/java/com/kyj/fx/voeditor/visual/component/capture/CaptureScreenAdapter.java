@@ -19,6 +19,7 @@ import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 
 /***************************
@@ -27,10 +28,12 @@ import javafx.scene.layout.BorderPane;
  *
  ***************************/
 
-public class CaptureScreenAdapter extends BorderPane{
+public class CaptureScreenAdapter extends BorderPane {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CaptureScreenAdapter.class);
 	private BorderPane root;
+
 	private Node targetNode;
+	private Consumer<Exception> errorHandler;
 
 	public CaptureScreenAdapter() {
 		this(null);
@@ -42,8 +45,14 @@ public class CaptureScreenAdapter extends BorderPane{
 
 	public CaptureScreenAdapter(Node targetNode, Consumer<Exception> errorHandler) {
 		this.targetNode = targetNode;
+		this.errorHandler = errorHandler;
+	}
+
+	public CaptureScreenAdapter load() {
+
 		try {
-			root = FxUtil.loadAndControllerAction(CaptureScreenController.class, c -> {
+			
+			Parent p = FxUtil.loadAndControllerAction(CaptureScreenController.class, c -> {
 
 				if (this.targetNode != null) {
 					File snapShotDir = FileUtil.getTempSnapShotDir();
@@ -69,24 +78,29 @@ public class CaptureScreenAdapter extends BorderPane{
 				}
 
 			});
-			
-			this.setCenter(this.root);
-		} catch (Exception e) {
-			errorHandler.accept(e);
-		}
 
+			this.setCenter(p);
+		} catch (Exception e) {
+			if (errorHandler != null)
+				errorHandler.accept(e);
+			else
+				LOGGER.error(ValueUtil.toString(e));
+		}
+		
+		
+		return this;
 	}
 
 	public void show() {
 
-		FxUtil.createStageAndShow(root, stage -> {
+		FxUtil.createStageAndShow(this, stage -> {
 			stage.setTitle("Captured Image Editor[Experiment]");
-			//			double width = targetNode.getBoundsInParent().getWidth();
-			//			double height = targetNode.getBoundsInParent().getHeight();
-			//			stage.setMaxWidth(width);
-			//			stage.setMaxHeight(height);
-			//			stage.setWidth(width);
-			//			stage.setHeight(height);
+			// double width = targetNode.getBoundsInParent().getWidth();
+			// double height = targetNode.getBoundsInParent().getHeight();
+			// stage.setMaxWidth(width);
+			// stage.setMaxHeight(height);
+			// stage.setWidth(width);
+			// stage.setHeight(height);
 		});
 
 	}

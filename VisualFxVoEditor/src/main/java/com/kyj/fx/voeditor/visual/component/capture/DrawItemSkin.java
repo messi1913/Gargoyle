@@ -26,17 +26,19 @@ import javafx.scene.paint.Color;
  * @author KYJ
  *
  */
-public class DrawItemSkin<T extends DrawItem> extends BehaviorSkinBase<DrawItem, DrawItemBehavior> {
+public abstract class DrawItemSkin<T extends DrawItem> extends BehaviorSkinBase<DrawItem, DrawItemBehavior>
+		implements ColorChange {
 
 	private VBox container;
+	private T control;
 
-	protected DrawItemSkin(DrawItem control) {
+	protected DrawItemSkin(T control) {
 		super(control, new DrawItemBehavior(control));
+		this.control = control;
 		container = new VBox();
 		container.setPickOnBounds(true);
-		container.getChildren().add(new Label("Table-Name"));
-		container.getChildren().add(new Label("Column-Name"));
-		container.getChildren().add(new Label("Column-Name"));
+
+		draw(container);
 
 		getSkinnable().focusedProperty().addListener(new ChangeListener<Boolean>() {
 
@@ -55,8 +57,9 @@ public class DrawItemSkin<T extends DrawItem> extends BehaviorSkinBase<DrawItem,
 				System.out.println(newValue);
 
 				if (newValue) {
-					BorderStroke bs = new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN);
-					Border border = new Border(bs);//Border.EMPTY;
+					BorderStroke bs = new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY,
+							BorderStroke.THIN);
+					Border border = new Border(bs);// Border.EMPTY;
 					container.setPadding(new Insets(5));
 					container.setBorder(border);
 				} else {
@@ -67,14 +70,38 @@ public class DrawItemSkin<T extends DrawItem> extends BehaviorSkinBase<DrawItem,
 
 		getChildren().add(container);
 
-		//		getChildren().forEach(n ->{
-		//			n.setMouseTransparent(true);
-		//		});
+		// getChildren().forEach(n ->{
+		// n.setMouseTransparent(true);
+		// });
 	}
+
+	public final T getControl() {
+		return control;
+	}
+
+	public abstract void draw(VBox container);
 
 	@Override
 	protected void layoutChildren(double contentX, double contentY, double contentWidth, double contentHeight) {
 		super.layoutChildren(contentX, contentY, contentWidth, contentHeight);
+	}
+
+	@Override
+	public void requestBackgroundColorChange(Color newColor) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void requestTextFillChange(Color newColor) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void requestBorderColorChange(Color newColor) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
