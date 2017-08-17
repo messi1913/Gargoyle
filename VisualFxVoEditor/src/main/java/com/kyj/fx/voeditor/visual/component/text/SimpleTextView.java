@@ -402,4 +402,8 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		codeArea.replaceText(StringEscapeUtils.unescapeJava(str));
 	}
 
+	@FXML
+	public void miShowAppCodeOnAction() {
+		FxUtil.EasyFxUtils.showApplicationCode(this.getCodeArea().getText());
+	}
 }
