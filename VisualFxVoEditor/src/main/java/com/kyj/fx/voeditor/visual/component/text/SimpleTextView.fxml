@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
-<fx:root prefHeight="733.0" prefWidth="932.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="733.0" prefWidth="932.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
 	<bottom>
 		<HBox fx:id="hboxButtons" alignment="CENTER" BorderPane.alignment="CENTER">
 			<children>
@@ -39,7 +39,7 @@
 									<items>
 										<MenuItem fx:id="miOpenNamoMsWord" mnemonicParsing="false" onAction="#miOpenNamoMsWordOnAction" text="MsWord" />
 										<MenuItem fx:id="miOpenNamoWebView" mnemonicParsing="false" onAction="#miOpenNamoWebViewOnAction" text="WebView" />
-                              <MenuItem fx:id="miToHtmlCode" mnemonicParsing="false" onAction="#miToHtmlCodeOnAction" text="To Html" />
+										<MenuItem fx:id="miToHtmlCode" mnemonicParsing="false" onAction="#miToHtmlCodeOnAction" text="To Html" />
 									</items>
 								</Menu>
 								<Menu fx:id="menuHtml" mnemonicParsing="false" text="Html &gt; ">
@@ -48,37 +48,38 @@
 										<MenuItem fx:id="miOpenHtmlWevView" mnemonicParsing="false" onAction="#miOpenHtmlWevViewOnAction" text="WebView" />
 									</items>
 								</Menu>
+                        <MenuItem mnemonicParsing="false" onAction="#miShowAppCodeOnAction" text="Show Application Code" />
 							</items>
 						</Menu>
 					</items>
 				</Menu>
-            <Menu mnemonicParsing="false" text="Edit">
-              <items>
-								<Menu mnemonicParsing="false" text="Base64">
-									<items>
-										<MenuItem mnemonicParsing="false" onAction="#miBase64EncodeOnAction" text="Encode" />
-										<MenuItem mnemonicParsing="false" onAction="#miBase64DecodeOnAction" text="Decode" />
-									</items>
-								</Menu>
-                  <Menu mnemonicParsing="false" text="JSON">
-                    <items>
-                      <MenuItem mnemonicParsing="false" onAction="#prettyFormatOnAction" text="Pretty Format" />
-                    </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Hex">
-                    <items>
-                      <MenuItem mnemonicParsing="false" onAction="#toHexOnAction" text="String -&gt; Hex" />
-                        <MenuItem mnemonicParsing="false" onAction="#toStringOnAction" text="Hex -&gt; String" />
-                    </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="UniCode">
-                    <items>
-                      <MenuItem fx:id="miEncode" mnemonicParsing="false" onAction="#miEncodeOnAction" text="encode" />
-                        <MenuItem fx:id="miDecode" mnemonicParsing="false" onAction="#miDecodeOnAction" text="decode" />
-                    </items>
-                  </Menu>
-              </items>
-            </Menu>
+				<Menu mnemonicParsing="false" text="Edit">
+					<items>
+						<Menu mnemonicParsing="false" text="Base64">
+							<items>
+								<MenuItem mnemonicParsing="false" onAction="#miBase64EncodeOnAction" text="Encode" />
+								<MenuItem mnemonicParsing="false" onAction="#miBase64DecodeOnAction" text="Decode" />
+							</items>
+						</Menu>
+						<Menu mnemonicParsing="false" text="JSON">
+							<items>
+								<MenuItem mnemonicParsing="false" onAction="#prettyFormatOnAction" text="Pretty Format" />
+							</items>
+						</Menu>
+						<Menu mnemonicParsing="false" text="Hex">
+							<items>
+								<MenuItem mnemonicParsing="false" onAction="#toHexOnAction" text="String -&gt; Hex" />
+								<MenuItem mnemonicParsing="false" onAction="#toStringOnAction" text="Hex -&gt; String" />
+							</items>
+						</Menu>
+						<Menu mnemonicParsing="false" text="UniCode">
+							<items>
+								<MenuItem fx:id="miEncode" mnemonicParsing="false" onAction="#miEncodeOnAction" text="encode" />
+								<MenuItem fx:id="miDecode" mnemonicParsing="false" onAction="#miDecodeOnAction" text="decode" />
+							</items>
+						</Menu>
+					</items>
+				</Menu>
 			</menus>
 		</MenuBar>
 	</top>
