@@ -1839,7 +1839,8 @@ public class FxUtil {
 		});
 
 		FxUtil.createStageAndShow(new Scene(root, BROWSER_WIDTH, BROWSER_HEIGHT), stage -> {
-			stage.initOwner(parent == null ? (Window) null : parent.getScene().getWindow());
+			
+			stage.initOwner(parent == null ? (Window) null : parent.getScene() == null ? null : parent.getScene().getWindow());
 			stage.setOnCloseRequest(ev -> {
 
 				//메모리 릭 방지.
