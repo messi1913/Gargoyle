@@ -19,9 +19,9 @@ import com.kyj.fx.voeditor.visual.loder.DynamicClassLoader;
 import com.kyj.fx.voeditor.visual.loder.ProjectInfo;
 import com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController;
 
+import javafx.application.Application;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 
 /**
@@ -235,6 +235,15 @@ public class SharedMemory {
 
 	public static final SystemLayoutViewController getSystemLayoutViewController() {
 		return systemLayoutViewController;
+	}
+
+	private static Application app;
+	public static void setApplication(Application application) {
+		app = application;
+	}
+
+	public static Application getApplication() {
+		return app;
 	}
 
 }
