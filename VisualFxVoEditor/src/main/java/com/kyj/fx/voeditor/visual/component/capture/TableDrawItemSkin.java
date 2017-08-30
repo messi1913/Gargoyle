@@ -5,13 +5,15 @@ package com.kyj.fx.voeditor.visual.component.capture;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 /**
@@ -19,6 +21,8 @@ import javafx.scene.layout.VBox;
  *
  */
 public class TableDrawItemSkin extends DrawItemSkin<TableDrawItem> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TableDrawItemSkin.class);
 
 	protected TableDrawItemSkin(TableDrawItem control) {
 		super(control);
@@ -63,9 +67,11 @@ public class TableDrawItemSkin extends DrawItemSkin<TableDrawItem> {
 			}
 
 		} catch (IOException e) {
-			ValueUtil.toString(e);
+			LOGGER.error(ValueUtil.toString(e));
+
 		}
 
 	}
+
 
 }
