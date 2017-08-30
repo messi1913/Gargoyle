@@ -6,6 +6,7 @@ package com.kyj.fx.voeditor.visual.component.capture;
 import java.util.List;
 
 import javafx.scene.control.Skin;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 /**
@@ -53,4 +54,7 @@ public class TableDrawItem extends DrawItem {
 		// TODO Auto-generated method stub
 
 	}
+
+
+
 }

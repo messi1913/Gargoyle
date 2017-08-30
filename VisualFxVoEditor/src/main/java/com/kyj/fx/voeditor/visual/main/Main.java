@@ -186,6 +186,7 @@ public class Main extends Application {
 
 		try {
 
+			SharedMemory.setApplication(this);
 			// 예상치 못한 에외에 대한 대비 로직구현.
 			setApplicationUncaughtExceptionHandler();
 

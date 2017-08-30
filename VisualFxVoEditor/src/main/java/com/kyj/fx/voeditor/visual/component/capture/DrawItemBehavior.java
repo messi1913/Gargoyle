@@ -21,7 +21,7 @@ import javafx.scene.input.KeyCode;
  */
 public class DrawItemBehavior extends BehaviorBase<DrawItem> {
 
-	protected static final List<KeyBinding> DRAW_ITEM_BINDINGS = new ArrayList<KeyBinding>();
+	static final List<KeyBinding> DRAW_ITEM_BINDINGS = new ArrayList<KeyBinding>();
 
 	static {
 		DRAW_ITEM_BINDINGS.add(new KeyBinding(KeyCode.DOWN, "down").shortcut());
@@ -29,6 +29,16 @@ public class DrawItemBehavior extends BehaviorBase<DrawItem> {
 		DRAW_ITEM_BINDINGS.add(new KeyBinding(KeyCode.LEFT, "left").shortcut());
 		DRAW_ITEM_BINDINGS.add(new KeyBinding(KeyCode.RIGHT, "right").shortcut());
 	}
+
+	// @SuppressWarnings("restriction")
+	// public DrawItemBehavior(DrawItem control, List<KeyBinding> keyBindings) {
+	// super(control, keyBindings);
+	// // TODO Auto-generated constructor stub
+	// }
+	//
+	// public DrawItemBehavior(DrawItem control, List<KeyBinding> keyBindings) {
+	// super(control, keyBindings);
+	// }
 
 	public DrawItemBehavior(DrawItem control) {
 		super(control, DRAW_ITEM_BINDINGS);

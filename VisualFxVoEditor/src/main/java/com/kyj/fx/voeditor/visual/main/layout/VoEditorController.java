@@ -48,13 +48,16 @@ import com.kyj.fx.voeditor.util.EditorUtil;
 import com.kyj.fx.voeditor.visual.component.ClassTypeCheckBoxCellFactory;
 import com.kyj.fx.voeditor.visual.component.CommonsContextMenu;
 import com.kyj.fx.voeditor.visual.component.Menus;
+import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseTableView;
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
+import com.kyj.fx.voeditor.visual.component.popup.MeerketAbstractVoOpenClassResourceView;
 import com.kyj.fx.voeditor.visual.events.CommonContextMenuEvent;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleFileAlreadyExistException;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.momory.ClassTypeResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ExcelUtil;
@@ -65,7 +68,6 @@ import com.kyj.fx.voeditor.visual.util.VoWizardUtil;
 
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -107,10 +109,7 @@ public class VoEditorController {
 	private Button btnDatabase;
 
 	@FXML
-	private TextField txtPackageName;
-
-	@FXML
-	private TextField txtClassName;
+	private TextField txtPackageName, txtClassName, txtParentClassName;
 
 	@FXML
 	private TextField txtLocation;
@@ -141,6 +140,8 @@ public class VoEditorController {
 	 */
 	@FXML
 	public void initialize() {
+		txtParentClassName.setText(ConfigResourceLoader.getInstance().get(ConfigResourceLoader.VOEDITOR_DEFAULT_EXTENDS_CLASS));
+		
 		colType.setCellFactory(new ClassTypeCheckBoxCellFactory());
 		colName.setCellFactory(TextFieldTableCell.forTableColumn());
 		colSize.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -247,7 +248,8 @@ public class VoEditorController {
 			String className = txtClassName.getText();
 			String location = txtLocation.getText();
 			String packageName = txtPackageName.getText();
-			String extendsBaseClass = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.VOEDITOR_DEFAULT_EXTENDS_CLASS);
+			// ConfigResourceLoader에서 변경 17.8.26
+			String extendsBaseClass = this.txtParentClassName.getText();//ResourceLoader.getInstance().get(ConfigResourceLoader.VOEDITOR_DEFAULT_EXTENDS_CLASS);
 
 			ObservableList<TableModelDVO> items = tbVoEditor.getItems();
 			ClassMeta classMeta = EditorUtil.extractedClassMeta(className, packageName, extendsBaseClass);
@@ -467,9 +469,9 @@ public class VoEditorController {
 			@Override
 			public void accept(FileChooser choser) {
 				String fileName = txtClassName.getText();
-				//				File dir = SystemUtils.getUserDir();
+				// File dir = SystemUtils.getUserDir();
 				choser.setInitialFileName(fileName);
-				//				choser.setInitialDirectory(dir);
+				// choser.setInitialDirectory(dir);
 				choser.getExtensionFilters().add(new ExtensionFilter(GargoyleExtensionFilters.XLSX_NAME, GargoyleExtensionFilters.XLSX,
 						GargoyleExtensionFilters.XLS));
 			}
@@ -622,7 +624,7 @@ public class VoEditorController {
 					if (fieldName == null)
 						return;
 
-					//static 필드는 처리하지않음.
+					// static 필드는 처리하지않음.
 					if (Modifier.isStatic(modifiers))
 						return;
 
@@ -672,6 +674,22 @@ public class VoEditorController {
 
 			return arrayList;
 		}
+	}
+
+	@FXML
+	public void btnSelectClassOnAction() {
+		MeerketAbstractVoOpenClassResourceView view;
+
+		try {
+			view = new MeerketAbstractVoOpenClassResourceView("");
+			
+			ResultDialog<String> show = view.show(true);
+			this.txtParentClassName.setText(show.getData());
+			
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
+
 	}
 
 }

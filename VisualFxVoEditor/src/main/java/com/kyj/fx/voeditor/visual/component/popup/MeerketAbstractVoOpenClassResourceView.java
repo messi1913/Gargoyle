@@ -46,7 +46,8 @@ public class MeerketAbstractVoOpenClassResourceView extends BaseOpenClassResourc
 	}
 
 	/**
-	 * @param data
+	 * @param data 
+	 *    필드에 기본적으로 입력할 텍스트
 	 * @throws Exception
 	 */
 	public MeerketAbstractVoOpenClassResourceView(String data) throws Exception {
