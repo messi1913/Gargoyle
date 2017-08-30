@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+	minWidth="-Infinity" prefHeight="243.0" prefWidth="169.0"
+	 xmlns="http://javafx.com/javafx/8.0.60"
+	xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="com.kyj.fx.voeditor.visual.component.capture.ErdBaseTemplateController">
+	<children>
+		<Label fx:id="lblTableName" alignment="CENTER" contentDisplay="CENTER"
+			maxWidth="1.7976931348623157E308" minHeight="25.0" prefHeight="25.0"
+			prefWidth="169.0" styleClass="lbl-tableName" text="TableName" />
+		<ListView fx:id="lvColumns" mouseTransparent="true"
+	</children>
+			pickOnBounds="false" styleClass="lv-columns" VBox.vgrow="ALWAYS" />
+</VBox>
