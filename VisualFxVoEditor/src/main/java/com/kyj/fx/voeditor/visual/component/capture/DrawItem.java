@@ -19,10 +19,11 @@ public abstract class DrawItem extends Control implements ColorChange {
 	/**
 	 * 
 	 */
-	public DrawItem() {
-		setMouseTransparent(false);
-		setFocusTraversable(false);
-	}
+//	public DrawItem() {
+
+		// setMouseTransparent(false);
+		// setFocusTraversable(false);
+//	}
 
 	@Override
 	protected abstract Skin<?> createDefaultSkin();
