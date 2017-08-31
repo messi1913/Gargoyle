@@ -71,6 +71,8 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static final String DBMS_SUPPORT_H2 = "H2";
 	public static final String DBMS_SUPPORT_Sqlite = "Sqlite";
 	public static final String DBMS_SUPPORT_DERBY = "Derby";
+	/*17.08.30 ADD */
+	public static final String DBMS_SUPPORT_MS_SQL = "Mssql";
 
 	/* Database Driver */
 	public static final String ORG_MARIADB_JDBC_DRIVER = "org.mariadb.jdbc.Driver";
