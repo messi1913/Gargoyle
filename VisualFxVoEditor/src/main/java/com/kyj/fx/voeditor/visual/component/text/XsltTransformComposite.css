@@ -1,0 +1,12 @@
+.root-container{
+	-fx-padding : 5.0px;
+}
+
+.button-area{
+	-fx-spacing : 5.0px;
+	-fx-padding : 5.0px;
+}
+
+#btnConvert{
+	-fx-pref-width : 80.0px;
+}

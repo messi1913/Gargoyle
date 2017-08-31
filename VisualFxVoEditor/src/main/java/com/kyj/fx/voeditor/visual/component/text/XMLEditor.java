@@ -18,7 +18,9 @@ public class XMLEditor extends BorderPane {
 	/**
 	 * @최초생성일 2016. 10. 12.
 	 */
-//	private static final String REGEX = "(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))" + "|(?<COMMENT><!--[^<>]+-->)";
+	// private static final String REGEX =
+	// "(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))" +
+	// "|(?<COMMENT><!--[^<>]+-->)";
 	private static final String REGEX2 = "(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))" + "|(?<COMMENT><!--[^!]+-->)";
 
 	private static final Pattern XML_TAG = Pattern.compile(REGEX2);
@@ -51,8 +53,17 @@ public class XMLEditor extends BorderPane {
 
 	}
 
+	public String getText() {
+		return this.codeArea.getText();
+	}
+
+	public void setText(String text) {
+		this.codeArea.insertText(0, text);
+	}
+
 	/**
 	 * 키클릭 이벤트 처리
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 6.
 	 * @param e
@@ -79,8 +90,10 @@ public class XMLEditor extends BorderPane {
 				if (matcher.group("ELEMENT") != null) {
 					String attributesText = matcher.group(GROUP_ATTRIBUTES_SECTION);
 
-					spansBuilder.add(Collections.singleton("tagmark"), matcher.end(GROUP_OPEN_BRACKET) - matcher.start(GROUP_OPEN_BRACKET));
-					spansBuilder.add(Collections.singleton("anytag"), matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));
+					spansBuilder.add(Collections.singleton("tagmark"),
+							matcher.end(GROUP_OPEN_BRACKET) - matcher.start(GROUP_OPEN_BRACKET));
+					spansBuilder.add(Collections.singleton("anytag"),
+							matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));
 
 					if (!attributesText.isEmpty()) {
 
@@ -120,6 +133,7 @@ public class XMLEditor extends BorderPane {
 	 * 특정라인으로 이동처리하는 메소드
 	 *
 	 * 특정라인블록 전체를 선택처리함.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param moveToLine
@@ -135,4 +149,5 @@ public class XMLEditor extends BorderPane {
 	public void moveToLine(int moveToLine, int startCol, int endCol) {
 		codeHelperDeligator.moveToLine(moveToLine, startCol, endCol);
 	}
+
 }
