@@ -282,6 +282,8 @@
 											onAction="#miSimpleTextViewOnAction" text="Simple Text Viwer" />
 										<MenuItem fx:id="miXmlView" mnemonicParsing="false"
 											onAction="#miXmlViewOnAction" text="XML Viwer" />
+										<MenuItem fx:id="miXlstConvert" mnemonicParsing="false"
+											onAction="#miXlstConvertViewOnAction" text="XLST-Convert" />
 									</items>
 								</Menu>
 

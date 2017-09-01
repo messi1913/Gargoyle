@@ -55,6 +55,7 @@ import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.LogViewComposite;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
+import com.kyj.fx.voeditor.visual.component.text.XsltTransformComposite;
 import com.kyj.fx.voeditor.visual.component.utube.UtubeDownloaderComposite;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
@@ -2093,7 +2094,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	public void miXmlViewOnAction() {
 		loadNewSystemTab("XML Viewer", new XMLEditor());
 	}
-
+	
+	/**
+	 * 
+	 */
+	@FXML
+	public void miXlstConvertViewOnAction(){
+		loadNewSystemTab("XLST-Convert", new XsltTransformComposite());
+	}
+	
 	/**
 	 * Java Application 실행처리.
 	 * @작성자 : KYJ

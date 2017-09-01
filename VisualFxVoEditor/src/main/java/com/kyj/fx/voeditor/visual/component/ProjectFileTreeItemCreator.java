@@ -4,6 +4,7 @@
  */
 package com.kyj.fx.voeditor.visual.component;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -53,10 +54,12 @@ public class ProjectFileTreeItemCreator {
 	 * @최초생성일 2016. 7. 18.
 	 */
 	private static final String WCDB_FILE_NAME = "wc.db";
-	private static final FilenameFilter SVN_WC_DB_FILTER = (FilenameFilter) (dir1, name1) -> WCDB_FILE_NAME.equals(name1);
-	private static final FilenameFilter IS_CONTAINS_SVN_FILE_FILTER = (FilenameFilter) (dir, name) -> ".svn".equals(name)
-			&& isContainsWcDB(dir);
-	private static final FilenameFilter IS_JAVA_PROJECT_FILTER = (FilenameFilter) (dir, name) -> ".classpath".equals(name);
+	private static final FilenameFilter SVN_WC_DB_FILTER = (FilenameFilter) (dir1, name1) -> WCDB_FILE_NAME
+			.equals(name1);
+	private static final FilenameFilter IS_CONTAINS_SVN_FILE_FILTER = (FilenameFilter) (dir,
+			name) -> ".svn".equals(name) && isContainsWcDB(dir);
+	private static final FilenameFilter IS_JAVA_PROJECT_FILTER = (FilenameFilter) (dir, name) -> ".classpath"
+			.equals(name);
 
 	static {
 		if (!load()) {
@@ -90,6 +93,13 @@ public class ProjectFileTreeItemCreator {
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(OPEND_HISTORY_FILE_NAME))) {
 			cacheExpaned = (Set<File>) ois.readObject();
 			return true;
+		} catch (EOFException e) {
+//			try {
+//				ois.close();
+//			} catch (Exception ex) {}
+			if (file.exists()) {
+				file.delete();
+			}
 		} catch (IOException e) {
 			LOGGER.error(ValueUtil.toString(e));
 		} catch (ClassNotFoundException e) {
@@ -132,12 +142,9 @@ public class ProjectFileTreeItemCreator {
 					JavaProjectFileWrapper f = (JavaProjectFileWrapper) getValue();
 					File file = f.getFile();
 
-					if(file.isDirectory())
-					{
+					if (file.isDirectory()) {
 						isLeaf = file.list().length == 0 ? true : false;
-					}
-					else
-					{
+					} else {
 						isLeaf = f.isFile();
 					}
 				}
@@ -147,7 +154,7 @@ public class ProjectFileTreeItemCreator {
 	}
 
 	public TreeItem<JavaProjectFileWrapper> createJavaProjectMemberNode(final JavaProjectFileWrapper f) {
-		TreeItem<JavaProjectFileWrapper> treeItem =  new JavaProjectMemberFileTreeItem(f) {
+		TreeItem<JavaProjectFileWrapper> treeItem = new JavaProjectMemberFileTreeItem(f) {
 			private boolean isLeaf;
 			private boolean isFirstTimeChildren = true;
 			private boolean isFirstTimeLeaf = true;
@@ -168,12 +175,9 @@ public class ProjectFileTreeItemCreator {
 					JavaProjectFileWrapper f = (JavaProjectFileWrapper) getValue();
 					File file = f.getFile();
 
-					if(file.isDirectory())
-					{
+					if (file.isDirectory()) {
 						isLeaf = file.list().length == 0 ? true : false;
-					}
-					else
-					{
+					} else {
 						isLeaf = f.isFile();
 					}
 				}
@@ -221,12 +225,9 @@ public class ProjectFileTreeItemCreator {
 					JavaProjectFileWrapper f = (JavaProjectFileWrapper) getValue();
 					File file = f.getFile();
 
-					if(file.isDirectory())
-					{
+					if (file.isDirectory()) {
 						isLeaf = file.list().length == 0 ? true : false;
-					}
-					else
-					{
+					} else {
 						isLeaf = f.isFile();
 					}
 
@@ -277,7 +278,8 @@ public class ProjectFileTreeItemCreator {
 		NOMAL, JAVA_PROJECT, JAVA_PROJECT_MEMBER
 	}
 
-	private ObservableList<TreeItem<JavaProjectFileWrapper>> buildChildren(TreeItem<JavaProjectFileWrapper> treeItem, FILE_TREE_TYPE type) {
+	private ObservableList<TreeItem<JavaProjectFileWrapper>> buildChildren(TreeItem<JavaProjectFileWrapper> treeItem,
+			FILE_TREE_TYPE type) {
 
 		JavaProjectFileWrapper f = treeItem.getValue();
 		boolean isParentSvnConnected = f.isSVNConnected();
@@ -306,10 +308,11 @@ public class ProjectFileTreeItemCreator {
 			case JAVA_PROJECT:
 
 				for (File childFile : files) {
-					TreeItem<JavaProjectFileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile, fw -> {
-						fw.setWcDbFile(parentWcDbFile);
-						fw.setSVNConnected(isParentSvnConnected);
-					}));
+					TreeItem<JavaProjectFileWrapper> createNode = createJavaProjectMemberNode(
+							createFileWrapper(childFile, fw -> {
+								fw.setWcDbFile(parentWcDbFile);
+								fw.setSVNConnected(isParentSvnConnected);
+							}));
 					children.add(createNode);
 				}
 				break;
@@ -317,10 +320,11 @@ public class ProjectFileTreeItemCreator {
 			case JAVA_PROJECT_MEMBER:
 
 				for (File childFile : files) {
-					TreeItem<JavaProjectFileWrapper> createNode = createJavaProjectMemberNode(createFileWrapper(childFile, fw -> {
-						fw.setWcDbFile(parentWcDbFile);
-						fw.setSVNConnected(isParentSvnConnected);
-					}));
+					TreeItem<JavaProjectFileWrapper> createNode = createJavaProjectMemberNode(
+							createFileWrapper(childFile, fw -> {
+								fw.setWcDbFile(parentWcDbFile);
+								fw.setSVNConnected(isParentSvnConnected);
+							}));
 					children.add(createNode);
 				}
 				break;
@@ -338,16 +342,17 @@ public class ProjectFileTreeItemCreator {
 	 * @param childFile
 	 * @return
 	 ********************************/
-	//	private FileWrapper createFileWrapper(File childFile) {
-	//		return createFileWrapper(childFile, false);
-	//	}
+	// private FileWrapper createFileWrapper(File childFile) {
+	// return createFileWrapper(childFile, false);
+	// }
 	private JavaProjectFileWrapper createFileWrapper(File childFile) {
 		return createFileWrapper(childFile, fileWrapper -> operate(fileWrapper));
 	}
 
-	//	private FileWrapper createFileWrapper(File childFile, UnaryOperator<FileWrapper> andThanOperate) {
-	//		return createFileWrapper(childFile,  andThanOperate);
-	//	}
+	// private FileWrapper createFileWrapper(File childFile,
+	// UnaryOperator<FileWrapper> andThanOperate) {
+	// return createFileWrapper(childFile, andThanOperate);
+	// }
 
 	private JavaProjectFileWrapper createFileWrapper(File childFile, Consumer<JavaProjectFileWrapper> operator) {
 		JavaProjectFileWrapper fileWrapper = new JavaProjectFileWrapper(childFile);
@@ -401,8 +406,8 @@ public class ProjectFileTreeItemCreator {
 					}
 				}
 
-				//				if (isNotJavaProject && isNotSVNConnected)
-				//					return;
+				// if (isNotJavaProject && isNotSVNConnected)
+				// return;
 			}
 		}
 	}

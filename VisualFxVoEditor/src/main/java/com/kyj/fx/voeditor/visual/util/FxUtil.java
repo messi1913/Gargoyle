@@ -167,18 +167,16 @@ public class FxUtil {
 		try {
 
 			/*
-			 * 2017-04-24
-			 * Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임.
-			 * 관련된 버그수정을 위해
-			 * Font를 임시디렉토리로 복사한후 읽어옴.
-			 * */
+			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된 버그수정을 위해 Font를
+			 * 임시디렉토리로 복사한후 읽어옴.
+			 */
 			File parentFile = new File(FileUtil.getTempGagoyle(), "font");
 			if (!parentFile.exists())
 				parentFile.mkdirs();
 
 			File fontFile = new File(parentFile, DEFAULT_FONT);
 
-			//복사.
+			// 복사.
 			try (InputStream is = ClassLoader.getSystemResource(FONTS_NANUMBARUNGOTHIC_TTF).openStream()) {
 				FileUtil.copy(is, fontFile);
 			}
@@ -225,12 +223,12 @@ public class FxUtil {
 	}
 
 	/********************************
-	 * 작성일 : 2016. 5. 21. 작성자 : KYJ
-	 *<br/>
-	 * FXMLController에 정의된 내용을 기준으로 FXML을 로드한다.
-	 *<br/>
+	 * 작성일 : 2016. 5. 21. 작성자 : KYJ <br/>
+	 * FXMLController에 정의된 내용을 기준으로 FXML을 로드한다. <br/>
+	 * 
 	 * @param controllerClass
-	 * @param N - Node option <br/>
+	 * @param N
+	 *            - Node option <br/>
 	 *            FXML을 로드한후 후처리할 내용을 기입한다. <br/>
 	 * @return
 	 * @throws GargoyleException
@@ -267,7 +265,8 @@ public class FxUtil {
 	 * @throws NullPointerException
 	 * @throws IOException
 	 */
-	public static <N, C> N loadAndControllerAction(Class<C> controllerClass, Consumer<C> controllerAction) throws Exception {
+	public static <N, C> N loadAndControllerAction(Class<C> controllerClass, Consumer<C> controllerAction)
+			throws Exception {
 		return load(controllerClass, null, null, controllerAction);
 	}
 
@@ -399,8 +398,8 @@ public class FxUtil {
 	 * @throws NullPointerException
 	 * @throws IOException
 	 ********************************/
-	public static <N, C> N load(Class<C> controllerClass, Object rootInstance, Consumer<N> option, Consumer<C> controllerAction)
-			throws Exception {
+	public static <N, C> N load(Class<C> controllerClass, Object rootInstance, Consumer<N> option,
+			Consumer<C> controllerAction) throws Exception {
 		if (controllerClass == null)
 			throw new NullPointerException("controller is null.");
 
@@ -410,9 +409,9 @@ public class FxUtil {
 			throw new GargoyleException("this is not FXMLController. check @FXMLController");
 		}
 
-		String fxml = getFxml(controller);//controller.value();
+		String fxml = getFxml(controller);// controller.value();
 
-		String css = getCss(controllerClass, controller);//controller.value();
+		String css = getCss(controllerClass, controller);// controller.value();
 
 		if (ValueUtil.isEmpty(fxml))
 			throw new IllegalArgumentException("value is empty..");
@@ -425,8 +424,8 @@ public class FxUtil {
 
 			Node node = FxMemory.get(fullClassName);
 			if (node == null) {
-				newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, css, option,
-						controllerAction);
+				newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, css,
+						option, controllerAction);
 				FxMemory.put(fullClassName, (Node) newInstance);
 			} else {
 				newInstance = (N) node;
@@ -435,30 +434,31 @@ public class FxUtil {
 			break;
 
 		case RequireNew:
-			newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, css, option, controllerAction);
+			newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, css, option,
+					controllerAction);
 			break;
 		}
 
 		return newInstance;
 	}
 
-	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, String css)
-			throws Exception {
+	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml,
+			String css) throws Exception {
 		return newInstance(controllerClass, rootInstance, isSelfController, fxml, css, null, null);
 	}
 
-	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, Consumer<T> option,
-			Consumer<C> controllerAction) throws Exception {
+	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml,
+			Consumer<T> option, Consumer<C> controllerAction) throws Exception {
 		return newInstance(controllerClass, rootInstance, isSelfController, fxml, null, option, controllerAction);
 	}
 
-	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, String css,
-			Consumer<T> option, Consumer<C> controllerAction) throws Exception {
+	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml,
+			String css, Consumer<T> option, Consumer<C> controllerAction) throws Exception {
 		return newInstance(controllerClass, rootInstance, isSelfController, fxml, css, option, controllerAction);
 	}
 
-	private static <T, C> T newInstance(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String _fxml, String _css,
-			Consumer<T> option, Consumer<C> controllerAction) throws Exception {
+	private static <T, C> T newInstance(Class<?> controllerClass, Object rootInstance, boolean isSelfController,
+			String _fxml, String _css, Consumer<T> option, Consumer<C> controllerAction) throws Exception {
 
 		String fxml = _fxml;
 		if (fxml == null) {
@@ -466,7 +466,7 @@ public class FxUtil {
 			if (controller == null) {
 				throw new GargoyleException("this is not FXMLController. check @FXMLController");
 			}
-			fxml = getFxml(controller);//controller.value();
+			fxml = getFxml(controller);// controller.value();
 		}
 
 		URL resource = controllerClass.getResource(fxml);
@@ -487,8 +487,15 @@ public class FxUtil {
 				throw new GargoyleException(e);
 			}
 		}
-
-		T load = loader.load();
+//		T _load = null;
+		// fix load error.
+//		if (resource != null) {
+			T load = loader.load();
+//		} else {
+//			_load = loader.load(controllerClass.getResourceAsStream(fxml));
+//		}
+//
+//		T load = _load;
 		C instanceController = loader.getController();
 
 		// show warning...
@@ -497,30 +504,32 @@ public class FxUtil {
 		}
 		Method[] declaredMethods = controllerClass.getDeclaredMethods();
 
-		//  2017-02-07 findfirst에서 어노테이션으로 선언된 다건의 함수를 호출하게 다시 유도.
-		//  findfirst로 수정. @FxPostInitialize가 여러건있는경우를 잘못된 로직 유도를 방지.
-		Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null).forEach(m -> {
-			//				.ifPresent((m -> {
-			if (((m.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC)) {
-				try {
-					if (instanceController != null) {
-						// Lazy Run.
-						Platform.runLater(() -> {
-							try {
+		// 2017-02-07 findfirst에서 어노테이션으로 선언된 다건의 함수를 호출하게 다시 유도.
+		// findfirst로 수정. @FxPostInitialize가 여러건있는경우를 잘못된 로직 유도를 방지.
+		Stream.of(declaredMethods)
+				.filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null)
+				.forEach(m -> {
+					// .ifPresent((m -> {
+					if (((m.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC)) {
+						try {
+							if (instanceController != null) {
+								// Lazy Run.
+								Platform.runLater(() -> {
+									try {
 
-								m.setAccessible(true);
-								m.invoke(instanceController);
+										m.setAccessible(true);
+										m.invoke(instanceController);
 
-							} catch (Exception e) {
-								LOGGER.error(ValueUtil.toString(e));
+									} catch (Exception e) {
+										LOGGER.error(ValueUtil.toString(e));
+									}
+								});
 							}
-						});
+						} catch (Exception e) {
+							LOGGER.error(ValueUtil.toString(e));
+						}
 					}
-				} catch (Exception e) {
-					LOGGER.error(ValueUtil.toString(e));
-				}
-			}
-		});
+				});
 
 		if (option != null) {
 			option.accept(load);
@@ -534,7 +543,7 @@ public class FxUtil {
 			List<Node> findAllByNodes = FxUtil.findAllByNodes(parent, v -> v instanceof Button);
 			findAllByNodes.forEach(v -> {
 				GargoyleButtonBuilder.applyStyleClass((Button) v, SkinManager.BUTTON_STYLE_CLASS_NAME);
-				//				LOGGER.debug("Button :  {}", v);
+				// LOGGER.debug("Button : {}", v);
 			});
 		});
 
@@ -921,7 +930,8 @@ public class FxUtil {
 		snapShot(target, out, -1, -1, errorCallback);
 	}
 
-	public static void snapShot(Scene target, OutputStream out, int requestWidth, int requestHeight, Consumer<Exception> errorCallback) {
+	public static void snapShot(Scene target, OutputStream out, int requestWidth, int requestHeight,
+			Consumer<Exception> errorCallback) {
 		if (target == null)
 			throw new NullPointerException("target Node is empty.");
 
@@ -947,7 +957,8 @@ public class FxUtil {
 		}
 	}
 
-	public static void snapShot(Node target, OutputStream out, int requestWidth, int requestHeight, Consumer<Exception> errorCallback) {
+	public static void snapShot(Node target, OutputStream out, int requestWidth, int requestHeight,
+			Consumer<Exception> errorCallback) {
 
 		if (target == null)
 			throw new NullPointerException("target Node is empty.");
@@ -1045,7 +1056,8 @@ public class FxUtil {
 			FileSystemView fileSystemView = FileSystemView.getFileSystemView();
 			Icon icon = fileSystemView.getSystemIcon(file);
 
-			BufferedImage bufferedImage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+			BufferedImage bufferedImage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(),
+					BufferedImage.TYPE_INT_ARGB);
 			icon.paintIcon(null, bufferedImage.getGraphics(), 0, 0);
 			fxImage = SwingFXUtils.toFXImage(bufferedImage, null);
 		} else {
@@ -1085,7 +1097,8 @@ public class FxUtil {
 		if (color == null)
 			return "BLACK";
 
-		return String.format("#%02X%02X%02X", (int) (color.getRed() * 255), (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+		return String.format("#%02X%02X%02X", (int) (color.getRed() * 255), (int) (color.getGreen() * 255),
+				(int) (color.getBlue() * 255));
 	}
 
 	/**
@@ -1203,7 +1216,8 @@ public class FxUtil {
 		SvnChagnedCodeComposite svnChagnedCodeComposite = new SvnChagnedCodeComposite(svnDataSupplier);
 		ScmCommitComposite scmCommitComposite = new ScmCommitComposite(svnDataSupplier);
 		TabPane tabPane = new TabPane();
-		tabPane.getTabs().addAll(new Tab("Chagned Codes.", svnChagnedCodeComposite), new Tab("Commit Hist.", scmCommitComposite));
+		tabPane.getTabs().addAll(new Tab("Chagned Codes.", svnChagnedCodeComposite),
+				new Tab("Commit Hist.", scmCommitComposite));
 		return tabPane;
 
 	}
@@ -1287,17 +1301,17 @@ public class FxUtil {
 	 * @param tb
 	 ********************************/
 	public static void installClipboardKeyEvent(TableView<?> tb) {
-		//		FxTableViewUtil.installCopyPasteHandler(tb);
+		// FxTableViewUtil.installCopyPasteHandler(tb);
 		FxTableViewUtil.installCopyHandler(tb);
-		//2017.05.26 사용안함.
-		//		ClipboardKeyEventInstaller.install(tb);
+		// 2017.05.26 사용안함.
+		// ClipboardKeyEventInstaller.install(tb);
 	}
 
 	/**
-	 * 컨텐스트 메뉴를 추가하기 위한
-	 * 유틸리티성 클래스
+	 * 컨텐스트 메뉴를 추가하기 위한 유틸리티성 클래스
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 4. 10. 
+	 * @작성일 : 2017. 4. 10.
 	 * @param contextManager
 	 */
 	public static void installContextMenu(FxContextManager contextManager) {
@@ -1438,12 +1452,13 @@ public class FxUtil {
 	 * 테이블뷰의 컬럼모델을 쉽게 생성하기 위한 api.
 	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 7. 17. 
+	 * @작성일 : 2017. 7. 17.
 	 * @param baseModel
 	 * @param view
 	 * @param option
 	 */
-	public static <T extends AbstractDVO> void installCommonsTableView(Class<T> baseModel, TableView<T> view, IOptions option) {
+	public static <T extends AbstractDVO> void installCommonsTableView(Class<T> baseModel, TableView<T> view,
+			IOptions option) {
 		FxTableViewUtil.installCommonsTableView(baseModel, view, option);
 	}
 
@@ -1459,10 +1474,11 @@ public class FxUtil {
 		if (suggestions == null || suggestions.get() == null)
 			return;
 
-		AutoCompletionTextFieldBinding<String> autoCompletionTextFieldBinding = new AutoCompletionTextFieldBinding<>(textField, param -> {
-			String userText = param.getUserText();
-			return suggestions.get().stream().filter(v -> v.startsWith(userText)).collect(Collectors.toList());
-		});
+		AutoCompletionTextFieldBinding<String> autoCompletionTextFieldBinding = new AutoCompletionTextFieldBinding<>(
+				textField, param -> {
+					String userText = param.getUserText();
+					return suggestions.get().stream().filter(v -> v.startsWith(userText)).collect(Collectors.toList());
+				});
 		autoCompletionTextFieldBinding.setVisibleRowCount(10);
 
 	}
@@ -1608,43 +1624,45 @@ public class FxUtil {
 
 	}
 
-	//	public static void createDockStageAndShow(CloseableParent<DockNode> node) {
-	//		createDockStageAndShow(null, node, null, true);
-	//	}
+	// public static void createDockStageAndShow(CloseableParent<DockNode> node) {
+	// createDockStageAndShow(null, node, null, true);
+	// }
 
-	//	public static void createDockStageAndShow(Window owner, CloseableParent<DockNode> node) {
-	//		createDockStageAndShow(owner, node, null, true);
-	//	}
+	// public static void createDockStageAndShow(Window owner,
+	// CloseableParent<DockNode> node) {
+	// createDockStageAndShow(owner, node, null, true);
+	// }
 	//
-	//	public static void createDockStageAndShow(Window owner, CloseableParent<DockNode> node, Point2D initLocation, boolean center) {
+	// public static void createDockStageAndShow(Window owner,
+	// CloseableParent<DockNode> node, Point2D initLocation, boolean center) {
 	//
-	//		//		DockNode p = node.getParent();
-	//		//		createDockStageAndShow(owner, p, initLocation, center);
+	// // DockNode p = node.getParent();
+	// // createDockStageAndShow(owner, p, initLocation, center);
 	//
-	//		DockNode dockNode = node.getParent();
-	//		Parent p = node.getParent();
-	//		p.getStylesheets().add(SkinManager.getInstance().getSkin());
-	//		p.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
+	// DockNode dockNode = node.getParent();
+	// Parent p = node.getParent();
+	// p.getStylesheets().add(SkinManager.getInstance().getSkin());
+	// p.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
 	//
-	//		dockNode.setOwner(owner);
+	// dockNode.setOwner(owner);
 	//
-	//		dockNode.setFloating(true, initLocation);
-	//		if (center)
-	//			dockNode.getStage().centerOnScreen();
+	// dockNode.setFloating(true, initLocation);
+	// if (center)
+	// dockNode.getStage().centerOnScreen();
 	//
-	//		Platform.runLater(() -> {
-	//			//			Window window = p.getScene().getWindow();
+	// Platform.runLater(() -> {
+	// // Window window = p.getScene().getWindow();
 	//
-	//			owner.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, ev -> {
-	//				try {
-	//					node.close();
-	//				} catch (Exception e) {
-	//					e.printStackTrace();
-	//				}
-	//			});
-	//		});
+	// owner.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, ev -> {
+	// try {
+	// node.close();
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	// });
+	// });
 	//
-	//	}
+	// }
 
 	/**
 	 * 로딩바가 뜨면서 액션 처리.
@@ -1750,7 +1768,7 @@ public class FxUtil {
 					stage.setWidth(1200d);
 					stage.setHeight(800d);
 				});
-				//				FxUtil.createStageAndShow("Source", new WebViewConsole(view));
+				// FxUtil.createStageAndShow("Source", new WebViewConsole(view));
 
 			});
 
@@ -1839,11 +1857,12 @@ public class FxUtil {
 		});
 
 		FxUtil.createStageAndShow(new Scene(root, BROWSER_WIDTH, BROWSER_HEIGHT), stage -> {
-			
-			stage.initOwner(parent == null ? (Window) null : parent.getScene() == null ? null : parent.getScene().getWindow());
+
+			stage.initOwner(
+					parent == null ? (Window) null : parent.getScene() == null ? null : parent.getScene().getWindow());
 			stage.setOnCloseRequest(ev -> {
 
-				//메모리 릭 방지.
+				// 메모리 릭 방지.
 				engine.load("about:blank");
 			});
 		});
@@ -1989,6 +2008,7 @@ public class FxUtil {
 
 	/**
 	 * 다른이름으로 저장처리를 하기위한 형식을 정의한 클래스
+	 * 
 	 * @author KYJ
 	 *
 	 */
@@ -2000,13 +2020,14 @@ public class FxUtil {
 		public abstract String getContent();
 
 		public default Consumer<FileChooser> getFileChooserOption() {
-			//FileChooset에 대한 정의처리.
+			// FileChooset에 대한 정의처리.
 			return chooser -> {
 			};
 		}
 
 		/**
 		 * 파일 쓰기 처리중 에러가 발생한경우
+		 * 
 		 * @작성자 : KYJ
 		 * @작성일 : 2017. 1. 13.
 		 * @return
@@ -2018,6 +2039,7 @@ public class FxUtil {
 
 	/**
 	 * 다른이름으로 저장 처리에 대한 공통 API
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 13.
 	 * @param owner
@@ -2048,8 +2070,9 @@ public class FxUtil {
 
 	/**
 	 * tableView의 item을 엑셀파일로 전환
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 3. 31. 
+	 * @작성일 : 2017. 3. 31.
 	 * @param saveFile
 	 * @param tableView
 	 */
@@ -2062,7 +2085,7 @@ public class FxUtil {
 			return (Map<String, Object>) ObjectUtil.toMap(v);
 		}).collect(Collectors.toList());
 
-		//		ObservableList<Map<String, Object>> items = this.tbResult.getItems();
+		// ObservableList<Map<String, Object>> items = this.tbResult.getItems();
 		ToExcelFileFunction toExcelFileFunction = new ToExcelFileFunction();
 		List<String> columns = tableView.getColumns().stream().map(col -> col.getText()).collect(Collectors.toList());
 		toExcelFileFunction.generate0(saveFile, columns, items);
@@ -2071,8 +2094,9 @@ public class FxUtil {
 
 	/**
 	 * 테이블컬럼에서 화면에 보여주는 텍스트를 리턴한다.
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 3. 31. 
+	 * @작성일 : 2017. 3. 31.
 	 * @param tc
 	 * @param row
 	 * @return
@@ -2122,13 +2146,11 @@ public class FxUtil {
 	}
 
 	/**
-	 * [start notifycation]
-	 * 2017-06-08 kyj 
-	 * notifycation
-	 * */
+	 * [start notifycation] 2017-06-08 kyj notifycation
+	 */
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 6. 8. 
+	 * @작성일 : 2017. 6. 8.
 	 * @param cont
 	 */
 	public static void showNotification(final String cont) {
@@ -2137,7 +2159,7 @@ public class FxUtil {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 6. 8. 
+	 * @작성일 : 2017. 6. 8.
 	 * @param title
 	 * @param cont
 	 */
@@ -2152,7 +2174,7 @@ public class FxUtil {
 	public static void showNotification(Node graphics, final String title, final String cont, Pos pos) {
 		showNotification(() -> {
 			return GargoyleNotification.create().darkStyle();
-		} , n -> {
+		}, n -> {
 
 			if (graphics != null)
 				n.graphic(graphics);
@@ -2165,7 +2187,7 @@ public class FxUtil {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 6. 8. 
+	 * @작성일 : 2017. 6. 8.
 	 * @param suppl
 	 * @param action
 	 */
@@ -2177,8 +2199,9 @@ public class FxUtil {
 
 	/**
 	 * excel Export 기능이 있는 메뉴 아이템을 리턴.
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 7. 18. 
+	 * @작성일 : 2017. 7. 18.
 	 * @param target
 	 * @return
 	 */

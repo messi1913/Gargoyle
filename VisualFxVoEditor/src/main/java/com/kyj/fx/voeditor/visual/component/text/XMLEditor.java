@@ -10,6 +10,11 @@ import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
 
+import com.kyj.fx.voeditor.visual.util.XMLFormatter;
+
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 
@@ -36,11 +41,21 @@ public class XMLEditor extends BorderPane {
 	private static final int GROUP_ATTRIBUTE_VALUE = 3;
 
 	private CodeArea codeArea;
-	private CodeAreaHelper codeHelperDeligator;
+	private CodeAreaHelper<CodeArea> codeHelperDeligator;
 
 	public XMLEditor() {
 		codeArea = new CodeArea();
 		codeHelperDeligator = new CodeAreaHelper(codeArea);
+		codeHelperDeligator.customMenuHandler(new CodeAreaCustomMenusHandler<CodeArea>() {
+
+			@Override
+			public void customMenus(CodeArea codeArea, ContextMenu contextMenu) {
+				MenuItem e = new MenuItem("Format");
+				e.setOnAction(evt -> doformat());
+				contextMenu.getItems().add(e);
+			}
+		});
+
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 		codeArea.setOnKeyPressed(this::codeAreaKeyClick);
 
@@ -61,6 +76,8 @@ public class XMLEditor extends BorderPane {
 		this.codeArea.insertText(0, text);
 	}
 
+	private XMLFormatter formatter = new XMLFormatter();;
+
 	/**
 	 * 키클릭 이벤트 처리
 	 * 
@@ -70,6 +87,16 @@ public class XMLEditor extends BorderPane {
 	 */
 	public void codeAreaKeyClick(KeyEvent e) {
 		codeHelperDeligator.codeAreaKeyClick(e);
+
+		if (e.getCode() == KeyCode.F && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
+			doformat();
+			e.consume();
+		}
+	}
+
+	private void doformat() {
+		String text = this.codeArea.getText();
+		setContent(formatter.format(text));
 	}
 
 	public void setContent(String content) {
