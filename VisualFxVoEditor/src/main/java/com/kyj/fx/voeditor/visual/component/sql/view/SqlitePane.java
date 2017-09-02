@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.component.sql.view;
 
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.sqlite.SqliteDatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
@@ -49,12 +50,36 @@ public class SqlitePane extends CommonsSqllPan {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#menuExportMergeScriptOnAction(javafx.event.ActionEvent)
 	 */
 	@Override
 	public void menuExportMergeScriptOnAction(ActionEvent e) {
 		DialogUtil.showMessageDialog((Stage) this.getScene().getWindow(), "Not yet support");
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 09. 02.
+	 */
+	@Override
+	public void showEditableDataAction() {
+		// Default TableName
+		TreeItem<DatabaseItemTree<String>> selectedItem = getSchemaTree().getSelectionModel().getSelectedItem();
+		if (null != selectedItem) {
+			DatabaseItemTree<String> value = selectedItem.getValue();
+			if (value instanceof TableItemTree) {
+
+				TableItemTree<String> tableItemTree = (TableItemTree<String>) value;
+				//sqlite no schema name.
+//				String schemaName = tableItemTree.getParent().getName();
+				String tableName = tableItemTree.getName();
+				String sql = String.format("edit %s", tableName);
+				execiteEdit(sql);
+			}
+		}
 	}
 
 }
