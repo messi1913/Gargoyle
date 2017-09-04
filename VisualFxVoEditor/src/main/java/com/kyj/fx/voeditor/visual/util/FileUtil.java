@@ -311,7 +311,7 @@ public class FileUtil implements GargoyleExtensionFilters {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 6. 15. 
+	 * @작성일 : 2017. 6. 15.
 	 * @param file
 	 * @return
 	 */
@@ -324,7 +324,7 @@ public class FileUtil implements GargoyleExtensionFilters {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 6. 15. 
+	 * @작성일 : 2017. 6. 15.
 	 * @param file
 	 * @return
 	 */
@@ -574,7 +574,7 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 * @throws IOException
 	 */
 	public static void writeFile(File file, String str, Charset charset) throws IOException {
-		try (FileOutputStream out = new FileOutputStream(file)) {
+		try (FileOutputStream out = new FileOutputStream(file, false)) {
 			try (OutputStreamWriter writer = new OutputStreamWriter(out, charset)) {
 				writer.write(str);
 				writer.flush();
@@ -844,8 +844,9 @@ public class FileUtil implements GargoyleExtensionFilters {
 
 	/**
 	 * 파일을 정렬하는 Comparator를 리턴한다.
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 6. 8. 
+	 * @작성일 : 2017. 6. 8.
 	 * @param isAscending
 	 * @return
 	 */

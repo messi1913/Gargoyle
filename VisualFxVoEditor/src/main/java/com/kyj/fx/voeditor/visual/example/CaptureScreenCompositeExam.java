@@ -7,11 +7,12 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
-import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenAdapter;
+import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenController;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.application.Application;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 /**
@@ -32,8 +33,10 @@ public class CaptureScreenCompositeExam extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		CaptureScreenAdapter c = new CaptureScreenAdapter();
-		primaryStage.setScene(new Scene(c));
+		
+		Parent load = FxUtil.load(CaptureScreenController.class);
+//		CaptureScreenAdapter c = new CaptureScreenAdapter();
+		primaryStage.setScene(new Scene(load));
 		primaryStage.show();
 
 	}

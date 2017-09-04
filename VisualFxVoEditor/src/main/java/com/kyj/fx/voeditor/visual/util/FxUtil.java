@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -1025,6 +1026,58 @@ public class FxUtil {
 			final double scaleX = pageLayout.getPrintableWidth() / imageView.getBoundsInParent().getWidth();
 			final double scaleY = pageLayout.getPrintableHeight() / imageView.getBoundsInParent().getHeight();
 			imageView.getTransforms().add(new Scale(scaleX, scaleY));
+
+			return null;
+		};
+
+		target.snapshot(callback, null, null);
+
+		if (printerJob.showPrintDialog(window) && printerJob.printPage(pageLayout, imageView))
+			printerJob.endJob();
+	}
+
+	public static void printDefefaultJob(Window window, Node target) {
+		printJob(window, target, (param, imageView) -> {
+
+			// ImageView imageView = new ImageView();
+			final WritableImage image = param.getImage();
+			imageView.setImage(image);
+
+//			final double scaleX = pageLayout.getPrintableWidth() / imageView.getBoundsInParent().getWidth();
+//			final double scaleY = pageLayout.getPrintableHeight() / imageView.getBoundsInParent().getHeight();
+			imageView.getTransforms().add(new Scale(1, 1));
+			
+		});
+	}
+
+	public static void printJob(Window window, Node target, BiConsumer<SnapshotResult, ImageView> draw) {
+		Printer printer = Printer.getDefaultPrinter();
+		// PrinterAttributes printerAttributes = printer.getPrinterAttributes();
+		//
+		Paper a4 = Paper.A4;
+
+		// Paper a4 = PrintHelper.createPaper("Rotate A4", Paper.A4.getHeight(),
+		// Paper.A4.getWidth(), Units.MM);
+		PageLayout pageLayout = printer.createPageLayout(a4, PageOrientation.REVERSE_PORTRAIT, MarginType.DEFAULT);
+
+		PrinterJob printerJob = PrinterJob.createPrinterJob();
+
+		// JobSettings jobSettings = printerJob.getJobSettings();
+		// jobSettings.setPrintSides(PrintSides.TUMBLE);
+		ImageView imageView = new ImageView();
+
+		
+		
+		Callback<SnapshotResult, Void> callback = param -> {
+			
+			draw.accept(param, imageView);
+			
+//			final WritableImage image = param.getImage();
+//			imageView.setImage(image);
+
+//			final double scaleX = pageLayout.getPrintableWidth() / imageView.getBoundsInParent().getWidth();
+//			final double scaleY = pageLayout.getPrintableHeight() / imageView.getBoundsInParent().getHeight();
+//			imageView.getTransforms().add(new Scale(scaleX, scaleY));
 
 			return null;
 		};
@@ -2209,7 +2262,7 @@ public class FxUtil {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 9. 1. 
+	 * @작성일 : 2017. 9. 1.
 	 * @param owner
 	 * @param option
 	 * @return

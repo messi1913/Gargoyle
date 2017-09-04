@@ -73,7 +73,8 @@ public class XMLEditor extends BorderPane {
 	}
 
 	public void setText(String text) {
-		this.codeArea.insertText(0, text);
+//		this.codeArea.insertText(0, text);
+		this.codeArea.replaceText(text);
 	}
 
 	private XMLFormatter formatter = new XMLFormatter();;
@@ -88,17 +89,28 @@ public class XMLEditor extends BorderPane {
 	public void codeAreaKeyClick(KeyEvent e) {
 		codeHelperDeligator.codeAreaKeyClick(e);
 
+		//do xml format.
 		if (e.getCode() == KeyCode.F && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
 			doformat();
 			e.consume();
 		}
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 1. 
+	 */
 	private void doformat() {
 		String text = this.codeArea.getText();
 		setContent(formatter.format(text));
 	}
 
+	/**
+	 * setContent
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 1. 
+	 * @param content
+	 */
 	public void setContent(String content) {
 		codeHelperDeligator.setContent(content);
 	}
