@@ -78,6 +78,10 @@ public class XsltTransformComposite extends BorderPane {
 		spXmlData.getChildren().add(xeXmlData);
 		spXlstData.getChildren().add(xeXsltData);
 		spTransfromResult.getChildren().add(xeTransform);
+		wbOpenWith.getEngine().setJavaScriptEnabled(true);
+		wbOpenWith.getEngine().setOnAlert(ev -> {
+			DialogUtil.showMessageDialog(ev.getData());
+		});
 
 		cmiOpenWithWebView.selectedProperty().addListener((oba, o, n) -> {
 			if (n) {
@@ -141,26 +145,7 @@ public class XsltTransformComposite extends BorderPane {
 		map.put("xsltData", xeXsltData.getText());
 
 		FileUtil.writeFile(f, ValueUtil.toJSONString(map), StandardCharsets.UTF_8, err -> LOGGER.error(ValueUtil.toString(err)));
-		// FxUtil.saveAsFx(FxUtil.getWindow(this), new SaveAsModel() {
-		//
-		// @Override
-		// public Consumer<FileChooser> getFileChooserOption() {
-		// // TODO Auto-generated method stub
-		// return c -> {
-		// c.getExtensionFilters()
-		// .add(new ExtensionFilter("XLST Template files (*.gxml)", GargoyleExtensionFilters.EXTENSION_COMMONS + "gxml"));
-		// };
-		// }
-		//
-		// @Override
-		// public String getContent() {
-		// Map<String, String> map = new HashMap<>();
-		// map.put("xmlData", xeXmlData.getText());
-		// map.put("xsltData", xeXsltData.getText());
-		// return ValueUtil.toJSONString(map);
-		// // return xeTransform.getText();
-		// }
-		// });
+
 	}
 
 	/**

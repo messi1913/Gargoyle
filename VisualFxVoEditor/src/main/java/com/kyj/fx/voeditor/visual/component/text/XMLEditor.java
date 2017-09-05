@@ -10,6 +10,7 @@ import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
 
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.XMLFormatter;
 
 import javafx.scene.control.ContextMenu;
@@ -50,9 +51,17 @@ public class XMLEditor extends BorderPane {
 
 			@Override
 			public void customMenus(CodeArea codeArea, ContextMenu contextMenu) {
+				{
 				MenuItem e = new MenuItem("Format");
 				e.setOnAction(evt -> doformat());
 				contextMenu.getItems().add(e);
+				}
+				
+				{
+					MenuItem e = new MenuItem("Show Application Code");
+					e.setOnAction(evt -> FxUtil.EasyFxUtils.showApplicationCode(codeArea.getText()));
+					contextMenu.getItems().add(e);
+				}
 			}
 		});
 

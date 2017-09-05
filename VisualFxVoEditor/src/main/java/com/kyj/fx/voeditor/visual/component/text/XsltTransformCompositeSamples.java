@@ -3,6 +3,10 @@
  */
 package com.kyj.fx.voeditor.visual.component.text;
 
+import java.io.File;
+
+import com.google.common.io.Files;
+
 /**
  * 
  * xlst convert program.
@@ -228,29 +232,77 @@ public class XsltTransformCompositeSamples {
 	}
 
 	static String xsltSample() {
-		StringBuffer sbTemp = new StringBuffer();
-		sbTemp.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-		sbTemp.append("<xsl:stylesheet version=\"1.0\"\n");
-		sbTemp.append("xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n");
-		sbTemp.append("<xsl:template match=\"/\">\n");
-		sbTemp.append("  <html>\n");
-		sbTemp.append("  <body>\n");
-		sbTemp.append("    <table border=\"1\">\n");
-		sbTemp.append("      <tr bgcolor=\"#9acd32\">\n");
-		sbTemp.append("        <th>Title</th>\n");
-		sbTemp.append("        <th>Artist</th>\n");
-		sbTemp.append("      </tr>\n");
-		sbTemp.append("      <xsl:for-each select=\"catalog/cd[artist='Bob Dylan']\">\n");
-		sbTemp.append("      <tr>\n");
-		sbTemp.append("        <td><xsl:value-of select=\"title\"/></td>\n");
-		sbTemp.append("        <td><xsl:value-of select=\"artist\"/></td>\n");
-		sbTemp.append("      </tr>\n");
-		sbTemp.append("      </xsl:for-each>\n");
-		sbTemp.append("    </table>\n");
-		sbTemp.append("  </body>\n");
-		sbTemp.append("  </html>\n");
-		sbTemp.append("</xsl:template>\n");
-		sbTemp.append("</xsl:stylesheet>\n");
-		return sbTemp.toString();
+		
+		String baseLocation = System.getProperty("user.dir");
+		baseLocation = baseLocation.replaceAll("\\\\", "/");
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		sb.append("<xsl:stylesheet version=\"1.0\"\n");
+		sb.append("xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n");
+		sb.append("<xsl:template match=\"/\">\n");
+		sb.append("  <html>\n");
+		sb.append("<header>\n");
+		sb.append("<script type=\"text/javascript\" src=\"file:///"+baseLocation+"/javascript/jqplot/jquery.min.js\"></script>\n");
+		sb.append("<script type=\"text/javascript\" src=\"file:///"+baseLocation+"/javascript/jqplot/jquery.jqplot.js\"></script>\n");
+		sb.append("<script type=\"text/javascript\" src=\"file:///"+baseLocation+"/javascript/jqplot/plugins/jqplot.barRenderer.js\"></script>\n");
+		sb.append("<script type=\"text/javascript\" src=\"file:///"+baseLocation+"/javascript/jqplot/plugins/jqplot.pieRenderer.js\"></script>\n");
+		sb.append("<script type=\"text/javascript\" src=\"file:///"+baseLocation+"/javascript/jqplot/plugins/jqplot.categoryAxisRenderer.js\"></script>\n");
+		sb.append("<script class=\"include\" type=\"text/javascript\" src=\"file:///"+baseLocation+"/javascript/jqplot/plugins/jqplot.pointLabels.js\"></script>\n");
+		sb.append("<link  rel=\"stylesheet\" type=\"text/css\" href=\"file:///"+baseLocation+"/javascript/jqplot/jquery.jqplot.min.css\" />\n");
+		sb.append("<script type=\"text/javascript\">\n");
+		sb.append("\n");
+		sb.append("\n");
+		sb.append("$(document).ready(function(){\n");
+		sb.append("        var s1 = [<xsl:for-each select=\"catalog/cd\"><xsl:if test=\"position()&lt;=4\"><xsl:text>'</xsl:text><xsl:value-of select=\"year\"/><xsl:text>',</xsl:text></xsl:if></xsl:for-each>];\n");
+		sb.append("        var ticks = [ <xsl:for-each select=\"catalog/cd\"><xsl:if test=\"position()&lt;=4\"><xsl:text>'</xsl:text><xsl:value-of select=\"title\"/><xsl:text>',</xsl:text></xsl:if></xsl:for-each>];\n");
+		sb.append("\n");
+		sb.append("        plot7 = $.jqplot('chart3', [s1], {\n");
+		sb.append("            seriesDefaults:{\n");
+		sb.append("                renderer:$.jqplot.BarRenderer,\n");
+		sb.append("                rendererOptions: { fillToZero: true },\n");
+		sb.append("                    pointLabels: { show: true }\n");
+		sb.append("            },\n");
+		sb.append("            axes: {\n");
+		sb.append("                yaxis: { autoscale: true },\n");
+		sb.append("                xaxis: {\n");
+		sb.append("                    renderer: $.jqplot.CategoryAxisRenderer,\n");
+		sb.append("                    ticks: ticks\n");
+		sb.append("                }\n");
+		sb.append("            }\n");
+		sb.append("        });\n");
+		sb.append("    });\n");
+		sb.append("</script>\n");
+		sb.append("</header>\n");
+		sb.append("\n");
+		sb.append("  <body>\n");
+		sb.append("\n");
+		sb.append("\n");
+		sb.append("\n");
+		sb.append("<div id=\"chart3\">  </div>\n");
+		sb.append("<text>this is text field</text>\n");
+		sb.append("    <table border=\"1\">\n");
+		sb.append("      <tr bgcolor=\"#9acd32\">\n");
+		sb.append("        <th>Title</th>\n");
+		sb.append("        <th>Artist</th>\n");
+		sb.append("      </tr>\n");
+		sb.append("      <xsl:for-each select=\"catalog/cd\">\n");
+		sb.append("\n");
+		sb.append("<xsl:if test=\"position()&lt;=4\">\n");
+		sb.append("      <tr>\n");
+		sb.append("        <td><xsl:value-of select=\"title\"/></td>\n");
+		sb.append("        <td><xsl:value-of select=\"artist\"/></td>\n");
+		sb.append("      </tr>\n");
+		sb.append("</xsl:if>\n");
+		sb.append("\n");
+		sb.append("      </xsl:for-each>\n");
+		sb.append("    </table>\n");
+		sb.append("  </body>\n");
+		sb.append("  </html>\n");
+		sb.append("</xsl:template>\n");
+		sb.append("</xsl:stylesheet>\n");
+
+		
+		return sb.toString();
 	}
 }
