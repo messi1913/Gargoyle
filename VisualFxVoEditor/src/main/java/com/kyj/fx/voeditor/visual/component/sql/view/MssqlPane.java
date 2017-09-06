@@ -126,7 +126,7 @@ public class MssqlPane extends CommonsSqllPan {
 				 * 보여주는 SQL에 적용할지 여부를 결정한다.
 				 */
 				if (value.isApplySchemaName(schemaName)) {
-					tableName = String.format("`%s`.%s", schemaName, value.getName()); // schemaName.concat(".").concat(value.getName());
+					tableName = String.format("%s.%s", schemaName, value.getName()); // schemaName.concat(".").concat(value.getName());
 				} else {
 					tableName = value.getName();
 				}
@@ -155,7 +155,7 @@ public class MssqlPane extends CommonsSqllPan {
 				TableItemTree tableItemTree = (TableItemTree) value;
 				String schemaName = tableItemTree.getParent().getName();
 				String tableName = tableItemTree.getName();
-				String sql = String.format("edit `%s`.%s", schemaName, tableName);
+				String sql = String.format("edit %s.%s", schemaName, tableName);
 				execiteEdit(sql);
 			}
 		}
@@ -179,7 +179,7 @@ public class MssqlPane extends CommonsSqllPan {
 			String _tableName = op.getValue()[1];
 			String tableName = "";
 			if (ValueUtil.isNotEmpty(schemaName)) {
-				tableName = String.format("`%s`.%s", schemaName, _tableName);
+				tableName = String.format("%s.%s", schemaName, _tableName);
 			}
 
 			ObservableList<Map<String, Object>> items = getTbResult().getItems();

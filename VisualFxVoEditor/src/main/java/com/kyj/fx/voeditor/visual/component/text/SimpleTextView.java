@@ -32,7 +32,9 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
@@ -120,6 +122,19 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 	protected void initHelpers() {
 		this.helper = new CodeAreaHelper<>(codeArea);
+		this.helper.customMenuHandler(new CodeAreaCustomMenusHandler<CodeArea>() {
+
+			@Override
+			public void customMenus(CodeArea codeArea, ContextMenu contextMenu) {
+
+				MenuItem e = new MenuItem("Show ApplicatioN Code");
+				e.setOnAction(ev -> {
+					FxUtil.EasyFxUtils.showApplicationCode(codeArea.getSelectedText());
+				});
+				contextMenu.getItems().add(e);
+
+			}
+		});
 	}
 
 	public final CodeAreaHelper<CodeArea> getHelper() {
@@ -156,8 +171,11 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 	}
 
-	/* (non-Javadoc)
-	 * @see com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable#closeRequest()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable#closeRequest()
 	 */
 	@Override
 	public void closeRequest() {
@@ -166,12 +184,13 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	/**
 	 * @return the helper
 	 */
-	//	public final CodeAreaHelper<CodeArea> getHelper() {
-	//		return helper;
-	//	}
+	// public final CodeAreaHelper<CodeArea> getHelper() {
+	// return helper;
+	// }
 
 	/**
 	 * 마임 형태를 웹형태로 바꿔서 뷰를 보여줌
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 29.
 	 */
@@ -179,7 +198,8 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miOpenNamoMsWordOnAction() {
 		String content = codeArea.getText();
 		try {
-			AsynchWordExecutor executor = new AsynchWordExecutor(/*new HtmlTextToMimeAdapter(content)*/ new HtmlTextToMimeAdapter(content));
+			AsynchWordExecutor executor = new AsynchWordExecutor(
+					/* new HtmlTextToMimeAdapter(content) */ new HtmlTextToMimeAdapter(content));
 			executor.execute();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -188,6 +208,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 	/**
 	 * Mime 데이터타입을 Html컨텐츠형태로 조회하기 위한 웹 뷰를 오픈함.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 29.
 	 */
@@ -198,62 +219,70 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 		try {
 
-			//			new ContentMimeHtmlAdapter(content)
+			// new ContentMimeHtmlAdapter(content)
 
-			//			String encodeToString = Base64.getEncoder().encodeToString(content.getBytes());
+			// String encodeToString =
+			// Base64.getEncoder().encodeToString(content.getBytes());
 			//
-			//			byte[] decode = Base64.getDecoder().decode(encodeToString);
-			//			String string = new String(decode);
-			//			MimeBodyPart part = new MimeBodyPart(new ByteArrayInputStream(content.getBytes()));
-			//			Enumeration allHeaders = part.getAllHeaders();
-			//			while(allHeaders.hasMoreElements())
-			//			{
-			//				javax.mail.Header nextElement = (Header) allHeaders.nextElement();
+			// byte[] decode = Base64.getDecoder().decode(encodeToString);
+			// String string = new String(decode);
+			// MimeBodyPart part = new MimeBodyPart(new
+			// ByteArrayInputStream(content.getBytes()));
+			// Enumeration allHeaders = part.getAllHeaders();
+			// while(allHeaders.hasMoreElements())
+			// {
+			// javax.mail.Header nextElement = (Header)
+			// allHeaders.nextElement();
 			//
-			//				System.out.println(nextElement.getName());
-			//				System.out.println(nextElement.getValue());
-			//			}
+			// System.out.println(nextElement.getName());
+			// System.out.println(nextElement.getValue());
+			// }
 			//
-			//			DataHandler dataHandler = part.getDataHandler();
-			//			Object transferData = dataHandler.getTransferData(new DataFlavor("text/html"));
-			//			System.out.println(transferData);
-			//			ContentMimeHtmlAdapter adapter = new ContentMimeHtmlAdapter(content);
-			//			File tempFile = adapter.toTempFile();
+			// DataHandler dataHandler = part.getDataHandler();
+			// Object transferData = dataHandler.getTransferData(new
+			// DataFlavor("text/html"));
+			// System.out.println(transferData);
+			// ContentMimeHtmlAdapter adapter = new
+			// ContentMimeHtmlAdapter(content);
+			// File tempFile = adapter.toTempFile();
 
-			//			byte[] decode = Base64.getMimeDecoder().decode(content.getBytes("UTF-8"));
-			//			String string = new String(decode);
+			// byte[] decode =
+			// Base64.getMimeDecoder().decode(content.getBytes("UTF-8"));
+			// String string = new String(decode);
 
 			javafx.application.Platform.runLater(() -> {
 				try {
-					
+
 					AbstractMimeAdapter adapter = new NamoMimeToHtmlAdapter(content);
-					//					FileWriter fileWriter = new FileWriter(new File("sample.html"));
+					// FileWriter fileWriter = new FileWriter(new
+					// File("sample.html"));
 					String html = adapter.getContent();
-					
-					FxUtil.openBrowser(codeArea, html , false);
-//					WebView webView = new WebView();
-//
-//					webView.getEngine().loadContent(content2);
-//
-//					webView.setOnKeyPressed(ev -> {
-//						if (ev.getCode() == KeyCode.F12) {
-//							WebViewConsole webViewConsole = new WebViewConsole(webView);
-//							FxUtil.createStageAndShow(webViewConsole, stage -> {
-//
-//								stage.initOwner(FxUtil.getWindow(codeArea));
-//
-//							});
-//						}
-//					});
-//					FxUtil.createStageAndShow(webView, stage -> {
-//						stage.setAlwaysOnTop(true);
-//						stage.initOwner(getScene().getWindow());
-//						stage.focusedProperty().addListener((oba, o, n) -> {
-//							if (!n)
-//								stage.close();
-//
-//						});
-//					});
+
+					FxUtil.openBrowser(codeArea, html, false);
+					// WebView webView = new WebView();
+					//
+					// webView.getEngine().loadContent(content2);
+					//
+					// webView.setOnKeyPressed(ev -> {
+					// if (ev.getCode() == KeyCode.F12) {
+					// WebViewConsole webViewConsole = new
+					// WebViewConsole(webView);
+					// FxUtil.createStageAndShow(webViewConsole, stage -> {
+					//
+					// stage.initOwner(FxUtil.getWindow(codeArea));
+					//
+					// });
+					// }
+					// });
+					// FxUtil.createStageAndShow(webView, stage -> {
+					// stage.setAlwaysOnTop(true);
+					// stage.initOwner(getScene().getWindow());
+					// stage.focusedProperty().addListener((oba, o, n) -> {
+					// if (!n)
+					// stage.close();
+					//
+					// });
+					// });
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -301,6 +330,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 	/**
 	 * menuItem 다른이름으로 저장.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 27.
 	 */
@@ -308,11 +338,15 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miSaveAsOnAction() {
 		FxUtil.saveAsFx(getScene().getWindow(), () -> codeArea.getText());
 
-		//		File saveAs = DialogUtil.showFileSaveCheckDialog(getScene().getWindow(), chooser->{});
-		//		if(saveAs!=null && saveAs.exists())
-		//		{
-		//			FileUtil.writeFile(saveAs, codeArea.getText(), Charset.forName("UTF-8"), err -> LOGGER.error(ValueUtil.toString(err)));
-		//		}
+		// File saveAs =
+		// DialogUtil.showFileSaveCheckDialog(getScene().getWindow(),
+		// chooser->{});
+		// if(saveAs!=null && saveAs.exists())
+		// {
+		// FileUtil.writeFile(saveAs, codeArea.getText(),
+		// Charset.forName("UTF-8"), err ->
+		// LOGGER.error(ValueUtil.toString(err)));
+		// }
 	}
 
 	public CodeArea getCodeArea() {
@@ -343,8 +377,9 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 
 	/**
 	 * Mime 텍스트를 HTML 텍스트로 변환
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 6. 14. 
+	 * @작성일 : 2017. 6. 14.
 	 */
 	@FXML
 	public void miToHtmlCodeOnAction() {
@@ -369,7 +404,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			codeArea.getUndoManager().mark();
 			codeArea.replaceText(stringPrettyFormat);
 		} catch (JsonSyntaxException e) {
-			//			LOGGER.debug(ValueUtil.toString(e));
+			// LOGGER.debug(ValueUtil.toString(e));
 		}
 
 	}
