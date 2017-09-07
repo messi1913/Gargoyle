@@ -76,7 +76,8 @@ public class XMLFormatter implements Formatter {
 			xmlWriter = new XMLWriter(out, format);
 			xmlWriter.write(doc.getDocument());
 		} catch (DocumentException | IOException e) {
-			LOGGER.error(ValueUtil.toString(e));
+			//LOGGER.error(ValueUtil.toString(e));
+			throw new RuntimeException(e);
 		} finally {
 
 			try {
