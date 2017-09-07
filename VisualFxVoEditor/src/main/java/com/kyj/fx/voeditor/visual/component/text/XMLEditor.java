@@ -9,8 +9,11 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.util.XMLFormatter;
 
 import javafx.scene.control.ContextMenu;
@@ -52,11 +55,11 @@ public class XMLEditor extends BorderPane {
 			@Override
 			public void customMenus(CodeArea codeArea, ContextMenu contextMenu) {
 				{
-				MenuItem e = new MenuItem("Format");
-				e.setOnAction(evt -> doformat());
-				contextMenu.getItems().add(e);
+					MenuItem e = new MenuItem("Format");
+					e.setOnAction(evt -> doformat());
+					contextMenu.getItems().add(e);
 				}
-				
+
 				{
 					MenuItem e = new MenuItem("Show Application Code");
 					e.setOnAction(evt -> FxUtil.EasyFxUtils.showApplicationCode(codeArea.getText()));
@@ -82,7 +85,7 @@ public class XMLEditor extends BorderPane {
 	}
 
 	public void setText(String text) {
-//		this.codeArea.insertText(0, text);
+		// this.codeArea.insertText(0, text);
 		this.codeArea.replaceText(text);
 	}
 
@@ -98,26 +101,38 @@ public class XMLEditor extends BorderPane {
 	public void codeAreaKeyClick(KeyEvent e) {
 		codeHelperDeligator.codeAreaKeyClick(e);
 
-		//do xml format.
+		// do xml format.
 		if (e.getCode() == KeyCode.F && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
 			doformat();
 			e.consume();
 		}
 	}
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(XMLEditor.class);
+	
 	/**
+	 * 
+	 * 17.09.07 포멧팅을 시도하면서 에러가 발생하는 경우 기존 텍스트에 대한 상태를 변경하지않게 하기위해 
+	 * try ~ catch문을 추가적으로 작성. 
+	 *   
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 9. 1. 
+	 * @작성일 : 2017. 9. 1.
 	 */
 	private void doformat() {
-		String text = this.codeArea.getText();
-		setContent(formatter.format(text));
+		try {
+			String text = this.codeArea.getText();
+			String format = formatter.format(text);
+			setContent(format);
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
 	}
 
 	/**
 	 * setContent
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 9. 1. 
+	 * @작성일 : 2017. 9. 1.
 	 * @param content
 	 */
 	public void setContent(String content) {
@@ -138,10 +153,8 @@ public class XMLEditor extends BorderPane {
 				if (matcher.group("ELEMENT") != null) {
 					String attributesText = matcher.group(GROUP_ATTRIBUTES_SECTION);
 
-					spansBuilder.add(Collections.singleton("tagmark"),
-							matcher.end(GROUP_OPEN_BRACKET) - matcher.start(GROUP_OPEN_BRACKET));
-					spansBuilder.add(Collections.singleton("anytag"),
-							matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));
+					spansBuilder.add(Collections.singleton("tagmark"), matcher.end(GROUP_OPEN_BRACKET) - matcher.start(GROUP_OPEN_BRACKET));
+					spansBuilder.add(Collections.singleton("anytag"), matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));
 
 					if (!attributesText.isEmpty()) {
 
