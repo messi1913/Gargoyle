@@ -25,7 +25,8 @@ public class ExtendedStandardJavaFileManager extends ForwardingJavaFileManager<J
 		super(fileManager);
 		// this.compiledCode = compiledCode;
 		this.cl = cl;
-		this.cl.addCode(compiledCode);
+		if (compiledCode != null)
+			this.cl.addCode(compiledCode);
 	}
 
 	protected ExtendedStandardJavaFileManager(JavaFileManager fileManager, DynamicClassLoader cl) {

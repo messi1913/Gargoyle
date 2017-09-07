@@ -1,5 +1,9 @@
 package org.mdkt.compiler;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -20,6 +24,7 @@ import org.junit.Test;
 import com.kyj.compiler.CompiledCode;
 import com.kyj.compiler.DynamicClassLoader;
 import com.kyj.compiler.InMemoryJavaCompiler;
+import com.kyj.compiler.InMemoryJavaCompiler.Code;
 import com.kyj.compiler.SourceCode;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 
@@ -32,16 +37,35 @@ public class InMemoryJavaCompilerTest {
 
 	@Test
 	public void simple() throws Exception {
-		StringBuffer sourceCode = new StringBuffer();
+		// StringBuffer sourceCode = new StringBuffer();
+		//
+		// sourceCode.append("package org.mdkt;\n");
+		// sourceCode.append("public class HelloClass {\n");
+		// sourceCode.append(" public String hello() { return \"hello\"; }");
+		// sourceCode.append("}");
 
-		sourceCode.append("package org.mdkt;\n");
-		sourceCode.append("public class HelloClass {\n");
-		sourceCode.append("   public String hello() { return \"hello\"; }");
-		sourceCode.append("}");
+		File file = new File("C:\\Users\\KYJ\\git\\GargoylePlugins\\gargoyle-soap\\gen\\com\\samsungbiologics\\TEST");
+		File[] listFiles = file.listFiles(new FilenameFilter() {
 
-		Class<?> helloClass = InMemoryJavaCompiler.compile("org.mdkt.HelloClass", sourceCode.toString());
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(".java");
+			}
+		});
+		Code[] array = Stream.of(listFiles).map(f -> {
+			InMemoryJavaCompiler.Code code = new InMemoryJavaCompiler.Code();
+			code.setClassName(file.getName().replace(".java", ""));
+			try {
+				code.setSourceCode(FileUtil.readToString(new FileInputStream(f)));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			return code;
+		}).toArray(InMemoryJavaCompiler.Code[]::new);
 
-		Method declaredMethod = helloClass.getDeclaredMethod("hello");
+		Class<?> helloClass = InMemoryJavaCompiler.compile("com.samsungbiologics.TEST.MbrInfomationTransferApp_SOBindingImpl", array);
+
+		Method declaredMethod = helloClass.getDeclaredMethod("mbrInfomationTransferApp_SO");
 		Object invoke = declaredMethod.invoke(helloClass.newInstance());
 		System.out.println(invoke);
 	}
