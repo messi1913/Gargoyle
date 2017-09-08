@@ -28,6 +28,7 @@ import com.kyj.fx.voeditor.visual.framework.word.SimpleWordAdapter;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.fx.voeditor.visual.util.XMLFormatter;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -441,4 +442,46 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miShowAppCodeOnAction() {
 		FxUtil.EasyFxUtils.showApplicationCode(this.getCodeArea().getText());
 	}
+
+	@FXML
+	public void miRemoveSpaciesOnAction() {
+		codeArea.getUndoManager().mark();
+		String str = codeArea.getText();
+		char[] charArray = str.toCharArray();
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < charArray.length; i++) {
+
+			switch (charArray[i]) {
+			case '\t':
+				break;
+			case '\n':
+				break;
+			case Character.UNASSIGNED:
+				break;
+			default:
+				sb.append(charArray[i]);
+			}
+
+		}
+		codeArea.replaceText(sb.toString());
+	}
+
+	/**
+	 * XML 포멧 기능 확장
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 8.
+	 */
+	@FXML
+	public void prettyXmlFormatOnAction() {
+		try {
+			String format = XMLFormatter.newInstnace().format(codeArea.getText());
+			codeArea.getUndoManager().mark();
+			codeArea.replaceText(format);
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
+
+	}
+
 }
