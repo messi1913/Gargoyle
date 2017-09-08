@@ -3,6 +3,7 @@ package com.kyj.fx.voeditor.visual.util;
 
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -55,8 +56,8 @@ public class SqlFormatter implements Formatter {
 		BEGIN_VELOCITY.add("#if");
 
 		END_VELOCITY.add("#end");
-		//		LOGICAL.add("#if");
-		//		LOGICAL.add("#end");
+		// LOGICAL.add("#if");
+		// LOGICAL.add("#end");
 
 		QUANTIFIERS.add("in");
 		QUANTIFIERS.add("all");
@@ -118,8 +119,20 @@ public class SqlFormatter implements Formatter {
 				} else if ("\"".equals(token)) {
 					String t;
 					do {
-						t = tokens.nextToken();
-						token += t;
+						
+						/*
+						 * by kyj.
+						 * if occured error  than
+						 * system can not be controed.
+						 * so the try ~ catch block will be prevent the crush.  
+						*/
+						try {
+							t = tokens.nextToken();
+							token += t;
+						} catch (NoSuchElementException e) {
+							// token += "";
+							break;
+						}
 					} while (!"\"".equals(t));
 
 				}
@@ -154,21 +167,20 @@ public class SqlFormatter implements Formatter {
 					commaAfterOn();
 				}
 
-				else if (BEGIN_VELOCITY.contains(token) /*&& BEGIN_VELOCITY.contains(lastToken)*/) {
+				else if (BEGIN_VELOCITY.contains(
+						token) /* && BEGIN_VELOCITY.contains(lastToken) */) {
 					beginNewVelocity();
-				}
-				else if (END_VELOCITY.contains(lcToken)) {
+				} else if (END_VELOCITY.contains(lcToken)) {
 					endNewVelocity();
 				}
 
 				else if ("(".equals(token)) {
-					//					if(!VELOCITY.contains(lastToken))
+					// if(!VELOCITY.contains(lastToken))
 					openParen();
 				} else if (")".equals(token)) {
-					//					if(!VELOCITY.contains(lastToken))
+					// if(!VELOCITY.contains(lastToken))
 					closeParen();
 				}
-
 
 				else if (BEGIN_CLAUSES.contains(lcToken)) {
 					beginNewClause();
@@ -223,7 +235,7 @@ public class SqlFormatter implements Formatter {
 		 */
 		private void beginNewVelocity() {
 			inFunction++;
-//			beginLine = true;
+			// beginLine = true;
 			newline();
 			out();
 		}
@@ -233,25 +245,26 @@ public class SqlFormatter implements Formatter {
 		 * @작성일 : 2016. 9. 23.
 		 */
 		private void endNewVelocity() {
-//			beginLine = false;
+			// beginLine = false;
 			newline();
 			out();
-//			newline();
-			//			if (!afterBeginBeforeEnd) {
-			//				indent--;
-			//				if (afterOn) {
-			//					indent--;
-			//					afterOn = false;
-			//				}
-			//				newline();
-			//			}
-			//			out();
-			//			if (!"union".equals(lcToken)) {
-			//				indent++;
-			//			}
-			//			newline();
-			//			afterBeginBeforeEnd = false;
-			//			afterByOrSetOrFromOrSelect = "by".equals(lcToken) || "set".equals(lcToken) || "from".equals(lcToken);
+			// newline();
+			// if (!afterBeginBeforeEnd) {
+			// indent--;
+			// if (afterOn) {
+			// indent--;
+			// afterOn = false;
+			// }
+			// newline();
+			// }
+			// out();
+			// if (!"union".equals(lcToken)) {
+			// indent++;
+			// }
+			// newline();
+			// afterBeginBeforeEnd = false;
+			// afterByOrSetOrFromOrSelect = "by".equals(lcToken) ||
+			// "set".equals(lcToken) || "from".equals(lcToken);
 		}
 
 		private void commaAfterOn() {
@@ -464,8 +477,6 @@ public class SqlFormatter implements Formatter {
 		}
 	}
 
-	
-	
 	@Override
 	public String toUpperCase(String sql) {
 		return toUpperLowerCase(sql, true);
@@ -477,7 +488,7 @@ public class SqlFormatter implements Formatter {
 	}
 
 	private String toUpperLowerCase(String sql, boolean isUpper) {
-		return ValueUtil.toUpperLowerCase(sql,isUpper);
+		return ValueUtil.toUpperLowerCase(sql, isUpper);
 	}
 
 	@Override
