@@ -14,6 +14,10 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -60,15 +64,13 @@ public class XMLFormatter implements Formatter {
 		System.out.println(new XMLFormatter().format(sb.toString()));
 	}
 
-	/** 
+	/**
 	 * XML Formatting 기능 지원.
 	 * 
-	 * 17.09.08 by kyj.
-	 * XML 텍스트에 대한 인코딩때문에 에러 발생.
-	 * XML텍스트를 StringReader로 읽은후 포멧팅 처리. (인코딩 처리에 대한 옵션을 제공해줌.)
+	 * 17.09.08 by kyj. XML 텍스트에 대한 인코딩때문에 에러 발생. XML텍스트를 StringReader로 읽은후 포멧팅
+	 * 처리. (인코딩 처리에 대한 옵션을 제공해줌.)
 	 * 
-	 * 그후 원본 인코딩을 유지하기 위해 인코딩값이 있으면 그 인코딩값으로 재구성.
-	 * (out.toString(charset) 참조.)
+	 * 그후 원본 인코딩을 유지하기 위해 인코딩값이 있으면 그 인코딩값으로 재구성. (out.toString(charset) 참조.)
 	 * 
 	 */
 	@Override
@@ -81,18 +83,34 @@ public class XMLFormatter implements Formatter {
 		String xmlEncoding = null;
 		XMLWriter xmlWriter = null;
 		SAXReader reader = null;
+
+		// try {
+		// XMLStreamReader createXMLStreamReader =
+		// XMLInputFactory.newInstance().createXMLStreamReader(characterStream);
+		// xmlEncoding = createXMLStreamReader.getEncoding();
+		// } catch (XMLStreamException | FactoryConfigurationError e1) {
+		// //e1.printStackTrace();
+		// }
+
 		try {
 			reader = new SAXReader();
-			InputSource in = new InputSource(new StringReader(
-					str) /* new ByteArrayInputStream(str.getBytes("UTF-16"))) */);
+
+			// XMLStreamReader xsr =
+			StringReader characterStream = new StringReader(str);
+			InputSource in = new InputSource(characterStream);
 			xmlEncoding = in.getEncoding();
 
 			doc = reader.read(in);
+
+			// String en1 = in.getEncoding();
+			xmlEncoding = doc.getXMLEncoding();
+			
 			OutputFormat format = OutputFormat.createPrettyPrint();
 			xmlWriter = new XMLWriter(out, format);
 			xmlWriter.write(doc.getDocument());
 		} catch (DocumentException | IOException e) {
-			// LOGGER.error(ValueUtil.toString(e));
+			throw new RuntimeException(e);
+		} catch (FactoryConfigurationError e) {
 			throw new RuntimeException(e);
 		} finally {
 

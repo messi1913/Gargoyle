@@ -7,6 +7,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 
 <fx:root prefHeight="733.0" prefWidth="932.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
 	<bottom>
@@ -78,6 +79,14 @@
 								<MenuItem fx:id="miDecode" mnemonicParsing="false" onAction="#miDecodeOnAction" text="decode" />
 							</items>
 						</Menu>
+						<Menu mnemonicParsing="false" text="XML">
+							<items>
+								<MenuItem mnemonicParsing="false" onAction="#prettyXmlFormatOnAction" text="Pretty Format" />
+							</items>
+						</Menu>
+						
+						<SeparatorMenuItem />
+						<MenuItem fx:id="miRemoveSpacies" mnemonicParsing="false" onAction="#miRemoveSpaciesOnAction" text="removeSpacies" />
 					</items>
 				</Menu>
 			</menus>
