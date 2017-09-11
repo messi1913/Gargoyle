@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -131,7 +130,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	/**
 	 * 스키마 구조를 보여준다.
 	 */
-	private TreeView<K> schemaTree;
+	protected TreeView<K> schemaTree;
 	/**
 	 * SQL을 작성하는곳
 	 */
@@ -1496,7 +1495,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 */
 	protected void showTableResourceView() {
 		try {
-			TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier);
+			TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier, new Stage());
 			ResultDialog<Map<String, Object>> show = tableOpenResourceView.show(this);
 
 			Map<String, Object> data = show.getData();

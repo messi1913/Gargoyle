@@ -22,6 +22,7 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.control.IndexRange;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
 
 /**
  * @author KYJ
@@ -66,7 +67,7 @@ public class ASTSqlCodeAreaHelper extends ASTCodeAreaHelper {
 
 	@Override
 	public ResourceView<Map<String, Object>> createResourceView() {
-		TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier) {
+		TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier, new Stage()) {
 
 			/* (non-Javadoc)
 			 * @see com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView#close()

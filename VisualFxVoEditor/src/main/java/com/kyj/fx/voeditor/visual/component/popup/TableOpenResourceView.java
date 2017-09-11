@@ -28,6 +28,7 @@ import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
 
@@ -45,20 +46,30 @@ public class TableOpenResourceView {
 	 *
 	 * @최초생성일 2016. 6. 14.
 	 */
-	private ResourceView<Map<String, Object>> delegator;
-	private ConnectionSupplier conSupplier;
+	protected ResourceView<Map<String, Object>> delegator;
+	protected ConnectionSupplier conSupplier;
 	/**
 	 * 데이터베이스 드라이버
 	 *
 	 * @최초생성일 2016. 6. 14.
 	 */
-	private String driver;
+	protected String driver;
+	// private String title = "TableResourceView";
+	private Stage stage;
 
-	public TableOpenResourceView(ConnectionSupplier conSupplier) {
+	public TableOpenResourceView(ConnectionSupplier conSupplier, ResourceView<Map<String, Object>> deligator) {
 		this.conSupplier = conSupplier;
-		this.delegator = new TableResourceView(this);
-		this.delegator.setTitle("TableResourceView");
+		this.delegator = deligator;
 
+		// this.delegator.setTitle(title);
+		// this.stage = deligator.getStage();
+	}
+
+	public TableOpenResourceView(ConnectionSupplier conSupplier, Stage stage) {
+		this.conSupplier = conSupplier;
+		this.delegator = new TableResourceView(stage);
+		// this.delegator.setTitle(title);
+		this.stage = stage;
 	}
 
 	public ResourceView<Map<String, Object>> getView() {
@@ -75,11 +86,14 @@ public class TableOpenResourceView {
 	 * @return
 	 ********************************/
 	public ResultDialog<Map<String, Object>> show(Parent parent) {
-		Window window = null;
-		Scene scene = parent.getScene();
-		if (scene != null) {
-			window = scene.getWindow();
+		Window window = this.stage;
+		if (window == null) {
+			Scene scene = parent.getScene();
+			if (scene != null) {
+				window = scene.getWindow();
+			}
 		}
+
 		return delegator.show(window, true);
 	}
 
@@ -102,11 +116,11 @@ public class TableOpenResourceView {
 		case ResourceLoader.ORG_MARIADB_JDBC_DRIVER:
 			tableName = "table_name";
 			break;
-			
+
 		case ResourceLoader.ORG_APACHE_DERBY_JDBC:
 			tableName = "TABLENAME";
 			break;
-			
+
 		case ResourceLoader.ORACLE_JDBC_DRIVER_ORACLEDRIVER:
 
 			break;
@@ -150,7 +164,9 @@ public class TableOpenResourceView {
 
 		case ResourceLoader.ORG_SQLITE_JDBC:
 			return "";
-
+		case ResourceLoader.ORG_MSSQL_JDBC_DRIVER:
+			schemaName = "TABLE_CAT";
+			break;
 		default:
 			schemaName = "table_schema";
 			break;
@@ -192,6 +208,9 @@ public class TableOpenResourceView {
 		case ResourceLoader.ORG_SQLITE_JDBC:
 			return "";
 
+		case ResourceLoader.ORG_MSSQL_JDBC_DRIVER:
+			databaseName = "TABLE_SCHEM";
+			break;
 		default:
 			databaseName = "TABLE_SCHEMA";
 			break;
@@ -204,11 +223,15 @@ public class TableOpenResourceView {
 
 	}
 
-	class TableResourceView extends ResourceView<Map<String, Object>> {
+	private class TableResourceView extends ResourceView<Map<String, Object>> {
 
-		private TableOpenResourceView parent;
+		private Stage parent;
 
-		public TableResourceView(TableOpenResourceView parent) {
+		public Stage getStage() {
+			return this.parent;
+		}
+
+		public TableResourceView(Stage parent) {
 			super();
 			this.parent = parent;
 		}
@@ -237,7 +260,7 @@ public class TableOpenResourceView {
 		 * @param reload
 		 *            데이터베이스에서 다시 요청할지 유무.
 		 ********************************/
-		synchronized void loadTable(boolean reload) {
+		protected void loadTable(boolean reload) {
 
 			Connection connection = null;
 			try {
@@ -252,16 +275,15 @@ public class TableOpenResourceView {
 					lvResources.getItems().addAll(select);
 				} else {
 					ColumnMapRowMapper mapper = new ColumnMapRowMapper();
-					List<Map<String, Object>> tables = DbUtil.tables(null, rs -> {
-						
+					List<Map<String, Object>> tables = DbUtil.tables(connection, "", rs -> {
+
 						try {
 							Map<String, Object> mapRow = mapper.mapRow(rs, rs.getRow());
 							return mapRow;
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
-						
-						
+
 						return Collections.emptyMap();
 					});
 

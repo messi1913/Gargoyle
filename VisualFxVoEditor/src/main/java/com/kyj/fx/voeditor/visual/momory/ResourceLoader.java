@@ -81,7 +81,9 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static final String ORG_H2_DRIVER = "org.h2.Driver";
 	public static final String ORG_SQLITE_JDBC = "org.sqlite.JDBC";
 	public static final String ORG_APACHE_DERBY_JDBC = "org.apache.derby.jdbc.ClientDriver";
-
+	public static final String ORG_MSSQL_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+	
+	
 	public static final String START_URL = "start.url";
 
 	/**

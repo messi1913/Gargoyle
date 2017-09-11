@@ -15,12 +15,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.ResultDialog;
+import com.kyj.fx.voeditor.visual.component.popup.MssqlTableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.mssql.MSSQLDatabaseItemTree;
-import com.kyj.fx.voeditor.visual.component.sql.dbtree.mysql.MySQLDatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
@@ -32,6 +35,7 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -43,7 +47,7 @@ import javafx.util.Pair;
  */
 
 public class MssqlPane extends CommonsSqllPan {
-	// private static Logger LOGGER = LoggerFactory.getLogger(MysqlPane.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(MssqlPane.class);
 
 	public MssqlPane() {
 		super(ResourceLoader.DBMS_SUPPORT_MS_SQL);
@@ -56,7 +60,7 @@ public class MssqlPane extends CommonsSqllPan {
 	@Override
 	public TreeItem<DatabaseItemTree<String>> apply(String t, ConnectionSupplier conSupplier) {
 		try {
-			//TODO
+			// TODO
 			DatabaseItemTree<String> databaseItemTree = new MSSQLDatabaseItemTree("databases", conSupplier);
 			TreeItem<DatabaseItemTree<String>> createNode = new DatabaseTreeNode().createNode(databaseItemTree);
 			return createNode;
@@ -237,5 +241,44 @@ public class MssqlPane extends CommonsSqllPan {
 			});
 		});
 
+	}
+
+	/**
+	 * 테이블을 찾는 리소스 뷰를 오픈
+	 *
+	 * @작성자 : KYJ
+	 * @작성일 : 2016. 10. 20.
+	 */
+	protected void showTableResourceView() {
+		try {
+			MssqlTableOpenResourceView tableOpenResourceView = new MssqlTableOpenResourceView(connectionSupplier);
+			ResultDialog<Map<String, Object>> show = tableOpenResourceView.show(this);
+
+			Map<String, Object> data = show.getData();
+			if (ValueUtil.isNotEmpty(data)) {
+
+				String schema = tableOpenResourceView.getSchema(data);
+				String databaseName = tableOpenResourceView.getDatabaseName(data);
+				String tableName = tableOpenResourceView.getTableName(data);
+
+				TreeItem<DatabaseItemTree<String>> search = search(schema, databaseName, tableName);
+
+				if (search != null) {
+					// TreeView<DatabaseItemTree<String>> schemaTree2 =
+					// getSchemaTree();
+					schemaTree.getSelectionModel().select(search);
+					schemaTree.getFocusModel().focus(schemaTree.getSelectionModel().getSelectedIndex());
+					schemaTree.scrollTo(schemaTree.getSelectionModel().getSelectedIndex());
+
+					LOGGER.debug(search.toString());
+					LOGGER.debug(data.toString());
+				} else {
+					LOGGER.debug("search result empty.");
+				}
+
+			}
+		} catch (Exception e1) {
+			LOGGER.error(ValueUtil.toString(e1));
+		}
 	}
 }

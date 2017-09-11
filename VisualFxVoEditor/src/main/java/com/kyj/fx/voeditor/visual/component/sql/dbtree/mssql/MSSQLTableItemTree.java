@@ -31,6 +31,7 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.sqlite.SqliteColumnItemTr
 public class MSSQLTableItemTree extends TableItemTree<String> {
 
 	private static final int COLUMN_NAME = 4;
+
 	public MSSQLTableItemTree(SchemaItemTree<String> parent, String name) throws Exception {
 		super(parent, name);
 	}
@@ -44,7 +45,7 @@ public class MSSQLTableItemTree extends TableItemTree<String> {
 	public ObservableList<TreeItem<DatabaseItemTree<String>>> applyChildren(List<Map<String, Object>> items) throws Exception {
 		return FXCollections.observableArrayList();
 	}
-	
+
 	/**
 	 * 커넥션으로부터 스키마 정보 출력
 	 */
@@ -59,9 +60,10 @@ public class MSSQLTableItemTree extends TableItemTree<String> {
 		ObservableList<TreeItem<DatabaseItemTree<String>>> observableArrayList = FXCollections.observableArrayList();
 		while (tables.next()) {
 
-			/* 
-			 * references 
-			 * http://docs.oracle.com/javase/6/docs/api/java/sql/ DatabaseMetaData.html#getTables%28java.lang.String,%20java.lang. String,%20java.lang.String,%20java.lang.String%5b%5d%29 
+			/*
+			 * references http://docs.oracle.com/javase/6/docs/api/java/sql/
+			 * DatabaseMetaData.html#getTables%28java.lang.String,%20java.lang.
+			 * String,%20java.lang.String,%20java.lang.String%5b%5d%29
 			 */
 			String columnName = tables.getString(COLUMN_NAME);
 			SqliteColumnItemTree coumnItem = new SqliteColumnItemTree(this, columnName);
@@ -71,7 +73,7 @@ public class MSSQLTableItemTree extends TableItemTree<String> {
 		}
 		return observableArrayList;
 	}
-	
+
 	/********************************
 	 * 작성일 : 2016. 6. 27. 작성자 : KYJ
 	 *
@@ -89,40 +91,45 @@ public class MSSQLTableItemTree extends TableItemTree<String> {
 		}
 		return hashSet;
 	}
-	
-//	@Override
-//	public String getChildrenSQL(String... conditions) {
-//
-//		// return "";
-//		StringBuffer sb = new StringBuffer();
-//		sb.append("SELECT COLUMN_NAME,  \n");
-//		sb.append("CASE WHEN COLUMN_KEY = 'PRI' THEN 'Y' ELSE 'N' END PRIMARY_YN  \n");
-//		sb.append("FROM INFORMATION_SCHEMA.`COLUMNS`\n");
-//		sb.append("WHERE 1=1\n");
-//		sb.append("AND TABLE_SCHEMA = '" + conditions[0] + "'\n");
-//		sb.append("AND TABLE_NAME = '" + conditions[1] + "'\n");
-//		return sb.toString();
-//	}
-//
-//	@Override
-//	public ObservableList<TreeItem<DatabaseItemTree<String>>> applyChildren(List<Map<String, Object>> items) throws Exception {
-//
-//		ObservableList<TreeItem<DatabaseItemTree<String>>> observableArrayList = FXCollections.observableArrayList();
-//		for (Map<String, Object> map : items) {
-//			Object columnName = map.get("COLUMN_NAME");
-//			Object isPrimarykey = map.get("PRIMARY_YN");
-//			if (columnName == null)
-//				continue;
-//
-//			MSSQLColumnItemTree mysqlSchemaItemTree = new MSSQLColumnItemTree(this, columnName.toString());
-//			if (isPrimarykey != null)
-//				mysqlSchemaItemTree.setPrimaryKey("Y".equals(isPrimarykey.toString()));
-//
-//			TreeItem<DatabaseItemTree<String>> treeItem = new TreeItem<>(mysqlSchemaItemTree);
-//			observableArrayList.add(treeItem);
-//		}
-//
-//		return observableArrayList;
-//	}
+
+	// @Override
+	// public String getChildrenSQL(String... conditions) {
+	//
+	// // return "";
+	// StringBuffer sb = new StringBuffer();
+	// sb.append("SELECT COLUMN_NAME, \n");
+	// sb.append("CASE WHEN COLUMN_KEY = 'PRI' THEN 'Y' ELSE 'N' END PRIMARY_YN
+	// \n");
+	// sb.append("FROM INFORMATION_SCHEMA.`COLUMNS`\n");
+	// sb.append("WHERE 1=1\n");
+	// sb.append("AND TABLE_SCHEMA = '" + conditions[0] + "'\n");
+	// sb.append("AND TABLE_NAME = '" + conditions[1] + "'\n");
+	// return sb.toString();
+	// }
+	//
+	// @Override
+	// public ObservableList<TreeItem<DatabaseItemTree<String>>>
+	// applyChildren(List<Map<String, Object>> items) throws Exception {
+	//
+	// ObservableList<TreeItem<DatabaseItemTree<String>>> observableArrayList =
+	// FXCollections.observableArrayList();
+	// for (Map<String, Object> map : items) {
+	// Object columnName = map.get("COLUMN_NAME");
+	// Object isPrimarykey = map.get("PRIMARY_YN");
+	// if (columnName == null)
+	// continue;
+	//
+	// MSSQLColumnItemTree mysqlSchemaItemTree = new MSSQLColumnItemTree(this,
+	// columnName.toString());
+	// if (isPrimarykey != null)
+	// mysqlSchemaItemTree.setPrimaryKey("Y".equals(isPrimarykey.toString()));
+	//
+	// TreeItem<DatabaseItemTree<String>> treeItem = new
+	// TreeItem<>(mysqlSchemaItemTree);
+	// observableArrayList.add(treeItem);
+	// }
+	//
+	// return observableArrayList;
+	// }
 
 }

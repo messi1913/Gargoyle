@@ -192,7 +192,7 @@ public abstract class ResourceView<R> extends BorderPane {
 	protected void onInited() {
 		txtFilter.requestFocus();
 
-		//		Scene scene = getScene();
+		// Scene scene = getScene();
 
 		this.addEventHandler(KeyEvent.KEY_PRESSED, sceneKeyEvent);
 
@@ -230,6 +230,13 @@ public abstract class ResourceView<R> extends BorderPane {
 	 * @User KYJ
 	 */
 	public ResultDialog<R> show(Window owner, boolean modal) {
+//		if (stage != null) {
+//			if (modal) {
+//				stage.showAndWait();
+//			} else
+//				stage.show();
+//		}
+		
 		stage = new Stage();
 		Scene scene = new Scene(this);
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
@@ -321,6 +328,7 @@ public abstract class ResourceView<R> extends BorderPane {
 
 	/**
 	 * 텍스트 필터 텍스트 변경 리스너
+	 * 
 	 * @최초생성일 2016. 8. 5.
 	 */
 	private ChangeListener<? super String> txtFilterChangeListener = (oba, oldval, newval) -> {
@@ -343,6 +351,7 @@ public abstract class ResourceView<R> extends BorderPane {
 
 	/**
 	 * 텍스트필터 키 클릭 이벤트.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 5.
 	 * @param e
@@ -351,7 +360,7 @@ public abstract class ResourceView<R> extends BorderPane {
 
 		switch (e.getCode()) {
 		case DOWN: {
-			//			lvResources.getSelectionModel().select(0);
+			// lvResources.getSelectionModel().select(0);
 			lvResources.getSelectionModel().selectFirst();
 			lvResources.requestFocus();
 			e.consume();
@@ -373,6 +382,7 @@ public abstract class ResourceView<R> extends BorderPane {
 
 	/**
 	 * lvResources 그리드 키 이벤트
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 5.
 	 * @param ev
@@ -402,6 +412,7 @@ public abstract class ResourceView<R> extends BorderPane {
 
 	/**
 	 * 화면에 대한 전역선택 키 이벤트.
+	 * 
 	 * @최초생성일 2016. 8. 5.
 	 */
 	private EventHandler<? super KeyEvent> sceneKeyEvent = ev -> {
@@ -414,9 +425,9 @@ public abstract class ResourceView<R> extends BorderPane {
 				} else {
 					window.hide();
 				}
-				//				Stage window = (Stage) scene.getWindow();
-				//				if (window != null)
-				//					window.close();
+				// Stage window = (Stage) scene.getWindow();
+				// if (window != null)
+				// window.close();
 			}
 		}
 	};

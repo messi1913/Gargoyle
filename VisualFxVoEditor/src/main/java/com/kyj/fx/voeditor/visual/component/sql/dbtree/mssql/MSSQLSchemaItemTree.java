@@ -63,8 +63,8 @@ public class MSSQLSchemaItemTree extends SchemaItemTree<String> {
 			if ("TABLE".equals(tableType)) {
 				LOGGER.debug("TABLE_CAT: {} TABLE_SCHEM:  {}  TABLE_NAME : {} TABLE_TYPE : {} ", tables.getString(1),
 						tables.getString(2), tables.getString(3), tableType);
-				MSSQLTableItemTree mysqlSchemaItemTree = new MSSQLTableItemTree(this, tables.getString(2)+ "." + tables.getString(3));
-				TreeItem<DatabaseItemTree<String>> treeItem = new TreeItem<>(mysqlSchemaItemTree);
+				MSSQLTableItemTree mssqlTableItemTree = new MSSQLTableItemTree(this, tables.getString(2)+ "." + tables.getString(3));
+				TreeItem<DatabaseItemTree<String>> treeItem = new TreeItem<>(mssqlTableItemTree);
 				observableArrayList.add(treeItem);
 			}
 
