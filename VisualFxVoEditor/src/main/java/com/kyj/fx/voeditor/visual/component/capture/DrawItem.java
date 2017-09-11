@@ -16,16 +16,16 @@ import javafx.scene.control.Skin;
  */
 public abstract class DrawItem extends Control implements ColorChange {
 
-	/**
-	 * 
-	 */
-//	public DrawItem() {
-
-		// setMouseTransparent(false);
-		// setFocusTraversable(false);
-//	}
+	private ErdScreenController controller;
 
 	@Override
 	protected abstract Skin<?> createDefaultSkin();
 
+	public final void setController(ErdScreenController controller) {
+		this.controller = controller;
+	}
+
+	public ErdScreenController getController() {
+		return this.controller;
+	}
 }

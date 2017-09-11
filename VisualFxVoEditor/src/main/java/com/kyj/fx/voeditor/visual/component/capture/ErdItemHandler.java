@@ -35,16 +35,16 @@ import javafx.scene.transform.Scale;
  * @author KYJ
  *
  */
-public class CaptureItemHandler {
+public class ErdItemHandler {
 
-	private CaptureScreenController controller;
+	private ErdScreenController controller;
 
 	protected ObservableList<Control> items;
 
 	/**
 	 * @param captureScreenController
 	 */
-	public CaptureItemHandler(CaptureScreenController controller) {
+	public ErdItemHandler(ErdScreenController controller) {
 		this.controller = controller;
 		items = FXCollections.observableArrayList();
 	}
@@ -168,8 +168,7 @@ public class CaptureItemHandler {
 						picker.valueProperty().addListener(new ChangeListener<Color>() {
 
 							@Override
-							public void changed(ObservableValue<? extends Color> observable, Color oldValue,
-									Color newValue) {
+							public void changed(ObservableValue<? extends Color> observable, Color oldValue, Color newValue) {
 								ellipse.setFill(newValue);
 							}
 						});
@@ -207,7 +206,7 @@ public class CaptureItemHandler {
 				// ds.setColor(Color.color(0.4, 0.4, 0.4));
 
 				DrawItem d = new TableDrawItem("Table-Name", Arrays.asList("User-Name", "User-Age"));
-
+				d.setController(this.controller);
 				// d.setCenterX(50.0f);
 				// d.setCenterY(50.0f);
 				// d.setRadiusX(50.0f);

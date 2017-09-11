@@ -28,31 +28,31 @@ import javafx.scene.layout.BorderPane;
  *
  ***************************/
 
-public class CaptureScreenAdapter extends BorderPane {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CaptureScreenAdapter.class);
+public class ErdScreenAdapter extends BorderPane {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ErdScreenAdapter.class);
 	private BorderPane root;
 
 	private Node targetNode;
 	private Consumer<Exception> errorHandler;
 
-	public CaptureScreenAdapter() {
+	public ErdScreenAdapter() {
 		this(null);
 	}
 
-	public CaptureScreenAdapter(Node targetNode) {
+	public ErdScreenAdapter(Node targetNode) {
 		this(targetNode, err -> LOGGER.error(ValueUtil.toString(err)));
 	}
 
-	public CaptureScreenAdapter(Node targetNode, Consumer<Exception> errorHandler) {
+	public ErdScreenAdapter(Node targetNode, Consumer<Exception> errorHandler) {
 		this.targetNode = targetNode;
 		this.errorHandler = errorHandler;
 	}
 
-	public CaptureScreenAdapter load() {
+	public ErdScreenAdapter load() {
 
 		try {
 			
-			Parent p = FxUtil.loadAndControllerAction(CaptureScreenController.class, c -> {
+			Parent p = FxUtil.loadAndControllerAction(ErdScreenController.class, c -> {
 
 				if (this.targetNode != null) {
 					File snapShotDir = FileUtil.getTempSnapShotDir();

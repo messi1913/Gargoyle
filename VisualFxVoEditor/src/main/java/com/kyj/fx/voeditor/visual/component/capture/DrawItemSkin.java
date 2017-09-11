@@ -98,6 +98,11 @@ public abstract class DrawItemSkin<T extends DrawItem> extends SkinBase<DrawItem
 			e.setOnAction(ev -> this.toBack());
 			contextMenu.getItems().add(e);
 		}
+		{
+			MenuItem e = new MenuItem("Remove");
+			e.setOnAction(ev -> this.remove());
+			contextMenu.getItems().add(e);
+		}
 		return contextMenu;
 	}
 
@@ -190,4 +195,9 @@ public abstract class DrawItemSkin<T extends DrawItem> extends SkinBase<DrawItem
 		getControl().toBack();
 	}
 
+	@Override
+	public void remove() {
+		DrawItem di = getControl();
+		getControl().getController().remove(di);
+	}
 }

@@ -15,4 +15,6 @@ public interface ContainerAction {
 	public void toFront();
 
 	public void toBack();
+
+	public void remove();
 }

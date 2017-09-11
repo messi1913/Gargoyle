@@ -39,12 +39,12 @@ import javafx.scene.transform.Scale;
  *
  ***************************/
 @FXMLController(value = "CaptureScreenView.fxml")
-public class CaptureScreenController {
+public class ErdScreenController {
 
 	private File snapShotDir = FileUtil.getTempSnapShotDir();
 
-	//	@FXML
-	//	private ImageView ivPicture;
+	// @FXML
+	// private ImageView ivPicture;
 	@FXML
 	private ScrollPane spPic;
 	@FXML
@@ -61,24 +61,23 @@ public class CaptureScreenController {
 	private DoubleProperty scaleDeltaX = new SimpleDoubleProperty(1);
 	private DoubleProperty scaleDeltaY = new SimpleDoubleProperty(1);
 
-	//	private double initX;
-	//	private double initY;
+	// private double initX;
+	// private double initY;
 
-	//	private Point2D dragAnchor;
+	// private Point2D dragAnchor;
 
 	private static final String STATUS_FORMAT = "scale : %f  x : %f  y : %f items : %d";
 
-	private CaptureItemHandler itemHandler;
+	private ErdItemHandler itemHandler;
 
 	@FXML
 	public void initialize() {
 
-		itemHandler = new CaptureItemHandler(this);
+		itemHandler = new ErdItemHandler(this);
 
 		flowItems.getChildren().addAll(itemHandler.getItems());
-		
 
-		//아이템 카운트 수를 핸들링하는 이벤트 리스너
+		// 아이템 카운트 수를 핸들링하는 이벤트 리스너
 		anchorBoard.getChildren().addListener((ListChangeListener) c -> {
 			if (c.next()) {
 				if (c.wasAdded()) {
@@ -93,21 +92,20 @@ public class CaptureScreenController {
 			}
 		});
 
-//		spPic.setContent(anchorBoard);
-		//this.anchorBoard.setPrefSize(spPic.getPrefWidth(), spPic.getPrefHeight());
-		//spPic.prefWidthProperty().bind(this.anchorBoard.prefWidthProperty());
-		//spPic.prefHeightProperty().bind(this.anchorBoard.prefHeightProperty());
-		
-		
-//		spPic.prefHeightProperty().bind(this.anchorBoard.prefHeightProperty());
-		
+		// spPic.setContent(anchorBoard);
+		// this.anchorBoard.setPrefSize(spPic.getPrefWidth(), spPic.getPrefHeight());
+		// spPic.prefWidthProperty().bind(this.anchorBoard.prefWidthProperty());
+		// spPic.prefHeightProperty().bind(this.anchorBoard.prefHeightProperty());
+
+		// spPic.prefHeightProperty().bind(this.anchorBoard.prefHeightProperty());
+
 		anchorBoard.setOnScroll(ev -> {
-			
-			if(ev.isConsumed())
+
+			if (ev.isConsumed())
 				return;
-			
+
 			if (ev.isControlDown()) {
-				//				ObservableList<Transform> transforms = ivPicture.getTransforms();
+				// ObservableList<Transform> transforms = ivPicture.getTransforms();
 
 				if (ev.getDeltaY() > 0) {
 					scaleDeltaX.set(scaleDeltaX.get() + 0.1);
@@ -132,7 +130,7 @@ public class CaptureScreenController {
 				}
 
 				lblStatus.setText(String.format(STATUS_FORMAT, scaleDeltaX.get(), ev.getX(), ev.getY(), itemCount.get()));
-				
+
 				ev.consume();
 			}
 		});
@@ -164,38 +162,38 @@ public class CaptureScreenController {
 		}
 		addItemEvent(ivPicture);
 
-		//		ivPicture.getTransforms().add(scale);
+		// ivPicture.getTransforms().add(scale);
 		//
-		//		ivPicture.setOnMouseDragged(ev -> {
-		//			double dragX = ev.getSceneX() - dragAnchor.getX();
-		//			double dragY = ev.getSceneY() - dragAnchor.getY();
-		//			//calculate new position of the circle
+		// ivPicture.setOnMouseDragged(ev -> {
+		// double dragX = ev.getSceneX() - dragAnchor.getX();
+		// double dragY = ev.getSceneY() - dragAnchor.getY();
+		// //calculate new position of the circle
 		//
-		//			double newXPosition = initX + dragX;
-		//			double newYPosition = initY + dragY;
+		// double newXPosition = initX + dragX;
+		// double newYPosition = initY + dragY;
 		//
-		//			//if new position do not exceeds borders of the rectangle, translate to this position
-		//			ivPicture.setTranslateX(newXPosition);
-		//			ivPicture.setTranslateY(newYPosition);
+		// //if new position do not exceeds borders of the rectangle, translate to this position
+		// ivPicture.setTranslateX(newXPosition);
+		// ivPicture.setTranslateY(newYPosition);
 		//
-		//		});
+		// });
 		//
-		//		ivPicture.setOnMousePressed(ev -> {
-		//			initX = ivPicture.getTranslateX();
-		//			initY = ivPicture.getTranslateY();
-		//			dragAnchor = new Point2D(ev.getSceneX(), ev.getSceneY());
-		//		});
+		// ivPicture.setOnMousePressed(ev -> {
+		// initX = ivPicture.getTranslateX();
+		// initY = ivPicture.getTranslateY();
+		// dragAnchor = new Point2D(ev.getSceneX(), ev.getSceneY());
+		// });
 
 		anchorBoard.getChildren().add(ivPicture);
 
-		//		spPic.getcon
+		// spPic.getcon
 	}
 
 	private Map<Node, Location> initLocation = FXCollections.observableHashMap();
 
 	protected void addItemEvent(Node newNode) {
 
-		//		newNode.getTransforms().add(new Scale(1.3, 1.3));
+		// newNode.getTransforms().add(new Scale(1.3, 1.3));
 		initLocation.put(newNode, new Location());
 
 		newNode.getTransforms().add(scale);
@@ -207,38 +205,41 @@ public class CaptureScreenController {
 			Point2D dragAnchor = location.getDragAnchor();
 			double dragX = ev.getSceneX() - dragAnchor.getX();
 			double dragY = ev.getSceneY() - dragAnchor.getY();
-			//calculate new position of the circle
+			// calculate new position of the circle
 
 			double newXPosition = location.getInitX() + dragX;
 			double newYPosition = location.getInitY() + dragY;
 
-			//if new position do not exceeds borders of the rectangle, translate to this position
+			// if new position do not exceeds borders of the rectangle, translate to this position
 			newNode.setTranslateX(newXPosition);
 			newNode.setTranslateY(newYPosition);
-			
-//			newNode.requestFocus();
+
+			// newNode.requestFocus();
 			ev.consume();
 		});
 
 		newNode.setOnMousePressed(ev -> {
-			
-			if(ev.isConsumed())
+
+			if (ev.isConsumed())
 				return;
-			
+
 			Location location = initLocation.get(newNode);
 			location.setInitX(newNode.getTranslateX());
 			location.setInitY(newNode.getTranslateY());
 			location.setDragAnchor(new Point2D(ev.getSceneX(), ev.getSceneY()));
-//			System.out.println(newNode);
+			// System.out.println(newNode);
 			newNode.requestFocus();
 			ev.consume();
 
 		});
-		
-		
+
 	}
 
 	protected void addChildren(Node n) {
 		anchorBoard.getChildren().add(n);
+	}
+
+	public void remove(DrawItem drawItemSkin) {
+		anchorBoard.getChildren().remove(drawItemSkin);
 	}
 }

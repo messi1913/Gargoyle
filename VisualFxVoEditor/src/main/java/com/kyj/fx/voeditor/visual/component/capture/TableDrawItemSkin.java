@@ -13,7 +13,7 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
-import javafx.scene.input.MouseEvent;
+
 import javafx.scene.layout.VBox;
 
 /**
@@ -26,10 +26,11 @@ public class TableDrawItemSkin extends DrawItemSkin<TableDrawItem> {
 
 	protected TableDrawItemSkin(TableDrawItem control) {
 		super(control);
+
 	}
 
 	@Override
-	public void draw(VBox container) {
+	public void draw(VBox layoutItem) {
 		TableDrawItem control = getControl();
 
 		// container.getChildren().add(new Label(control.getTitle()));
@@ -63,7 +64,7 @@ public class TableDrawItemSkin extends DrawItemSkin<TableDrawItem> {
 					String col = items.get(i);
 					lvColumns.getItems().add(col);
 				}
-				container.getChildren().add(vbox);
+				layoutItem.getChildren().add(vbox);
 			}
 
 		} catch (IOException e) {
@@ -72,6 +73,5 @@ public class TableDrawItemSkin extends DrawItemSkin<TableDrawItem> {
 		}
 
 	}
-
 
 }
