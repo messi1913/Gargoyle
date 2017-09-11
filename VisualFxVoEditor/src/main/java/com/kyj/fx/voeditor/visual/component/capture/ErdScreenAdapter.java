@@ -51,7 +51,7 @@ public class ErdScreenAdapter extends BorderPane {
 	public ErdScreenAdapter load() {
 
 		try {
-			
+
 			Parent p = FxUtil.loadAndControllerAction(ErdScreenController.class, c -> {
 
 				if (this.targetNode != null) {
@@ -86,21 +86,14 @@ public class ErdScreenAdapter extends BorderPane {
 			else
 				LOGGER.error(ValueUtil.toString(e));
 		}
-		
-		
+
 		return this;
 	}
 
 	public void show() {
 
 		FxUtil.createStageAndShow(this, stage -> {
-			stage.setTitle("Captured Image Editor[Experiment]");
-			// double width = targetNode.getBoundsInParent().getWidth();
-			// double height = targetNode.getBoundsInParent().getHeight();
-			// stage.setMaxWidth(width);
-			// stage.setMaxHeight(height);
-			// stage.setWidth(width);
-			// stage.setHeight(height);
+			stage.setTitle("ERD Editor[Experiment]");
 		});
 
 	}
