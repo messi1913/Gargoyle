@@ -28,7 +28,7 @@ import com.kyj.fx.voeditor.visual.component.JavaProjectMemberFileTreeItem;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePaneWrapper;
 import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
-import com.kyj.fx.voeditor.visual.component.capture.CaptureScreenAdapter;
+import com.kyj.fx.voeditor.visual.component.capture.ErdScreenAdapter;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
 import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
@@ -1942,7 +1942,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	public void lblCaptureOnAction() {
 		DockTab selectedItem = this.tabPanWorkspace.getSelectionModel().getSelectedItem();
 		if (selectedItem != null) {
-			new CaptureScreenAdapter(selectedItem.getContent(), System.err::println).load().show();
+			new ErdScreenAdapter(selectedItem.getContent(), System.err::println).load().show();
 		}
 
 	}
