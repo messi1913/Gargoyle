@@ -888,7 +888,7 @@ public class DbUtil extends ConnectionManager {
 		List<T> tables = new ArrayList<>();
 
 		DatabaseMetaData metaData = connection.getMetaData();
-		ResultSet rs = metaData.getTables(null, null, "%"/* + tableNamePattern + "%" */, new String[] { "TABLE" });
+		ResultSet rs = metaData.getTables(null, null, "%"/* + tableNamePattern + "%" */, new String[] { "TABLE", });
 
 		String tableNamePatternUpperCase = tableNamePattern.toUpperCase();
 		while (rs.next()) {
