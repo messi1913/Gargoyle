@@ -869,4 +869,15 @@ public class FileUtil implements GargoyleExtensionFilters {
 		};
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 14. 
+	 * @param file
+	 * @return 
+	 * @throws IOException 
+	 */
+	public static byte[] toByteArray(File file) throws IOException {
+		return FileUtils.readFileToByteArray(file);
+	}
+
 }
