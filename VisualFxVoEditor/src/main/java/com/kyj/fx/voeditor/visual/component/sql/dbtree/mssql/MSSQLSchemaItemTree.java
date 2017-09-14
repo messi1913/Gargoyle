@@ -38,7 +38,8 @@ public class MSSQLSchemaItemTree extends SchemaItemTree<String> {
 
 	@Override
 	public String getChildrenSQL(String... conditions) {
-		// return "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.`TABLES` WHERE TABLE_SCHEMA
+		// return "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.`TABLES` WHERE
+		// TABLE_SCHEMA
 		// = '" + conditions[0] + "' ORDER BY TABLE_NAME";
 
 		return "";
@@ -50,8 +51,7 @@ public class MSSQLSchemaItemTree extends SchemaItemTree<String> {
 	 * 커넥션으로부터 스키마 정보 출력
 	 */
 	@Override
-	public ObservableList<TreeItem<DatabaseItemTree<String>>> applyChildren(Connection con, String... args)
-			throws Exception {
+	public ObservableList<TreeItem<DatabaseItemTree<String>>> applyChildren(Connection con, String... args) throws Exception {
 		DatabaseMetaData metaData = con.getMetaData();
 		ResultSet tables = metaData.getTables(args[0], null, "%", null);
 
@@ -61,9 +61,9 @@ public class MSSQLSchemaItemTree extends SchemaItemTree<String> {
 			String tableType = tables.getString(4);
 
 			if ("TABLE".equals(tableType)) {
-				LOGGER.debug("TABLE_CAT: {} TABLE_SCHEM:  {}  TABLE_NAME : {} TABLE_TYPE : {} ", tables.getString(1),
-						tables.getString(2), tables.getString(3), tableType);
-				MSSQLTableItemTree mssqlTableItemTree = new MSSQLTableItemTree(this, tables.getString(2)+ "." + tables.getString(3));
+				LOGGER.debug("TABLE_CAT: {} TABLE_SCHEM:  {}  TABLE_NAME : {} TABLE_TYPE : {} ", tables.getString(1), tables.getString(2),
+						tables.getString(3), tableType);
+				MSSQLTableItemTree mssqlTableItemTree = new MSSQLTableItemTree(this, tables.getString(2) + "." + tables.getString(3));
 				TreeItem<DatabaseItemTree<String>> treeItem = new TreeItem<>(mssqlTableItemTree);
 				observableArrayList.add(treeItem);
 			}
@@ -73,8 +73,30 @@ public class MSSQLSchemaItemTree extends SchemaItemTree<String> {
 	}
 
 	@Override
-	public ObservableList<TreeItem<DatabaseItemTree<String>>> applyChildren(List<Map<String, Object>> items)
-			throws Exception {
+	public ObservableList<TreeItem<DatabaseItemTree<String>>> applyChildren(List<Map<String, Object>> items) throws Exception {
 		return FXCollections.observableArrayList();
 	}
+
+	@Override
+	protected DatabaseItemTree<String> createProcedureItemTree(String cat, String schem, String name, String type, String remark)
+			throws Exception {
+
+		if (procedureFilter(cat, schem, name, type)) {
+			DatabaseItemTree<String> createProcedureItemTree = super.createProcedureItemTree(cat, schem, name, type, remark);
+			createProcedureItemTree.setName(toProcedureName(cat, schem, name, type));
+			return createProcedureItemTree;
+		}
+
+		return null;
+
+	}
+
+	protected boolean procedureFilter(String cat, String schem, String name, String type) {
+		return !"sys".equals(schem);
+	}
+
+	protected String toProcedureName(String cat, String schem, String name, String type) {
+		return String.format("%s.%s", schem, name);
+	}
+
 }

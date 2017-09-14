@@ -33,9 +33,10 @@ public class DerbySchemaItemTree extends SchemaItemTree<String> {
 	@Override
 	public String getChildrenSQL(String... conditions) {
 		return "select * from sys.systables where schemaid = '" + this.schemaId + "' order by tablename";
-		//		return "show tables in " + conditions[0] + " order by table_name";
+		// return "show tables in " + conditions[0] + " order by table_name";
 
-		//		return "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.`TABLES` WHERE TABLE_SCHEMA = '" + conditions[0] + "' ORDER BY TABLE_NAME";
+		// return "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.`TABLES` WHERE
+		// TABLE_SCHEMA = '" + conditions[0] + "' ORDER BY TABLE_NAME";
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public class DerbySchemaItemTree extends SchemaItemTree<String> {
 			mysqlSchemaItemTree.setTableId(tableId);
 
 			TreeItem<DatabaseItemTree<String>> treeItem = new TreeItem<>(mysqlSchemaItemTree);
-			//treeItem.setGraphic(graphicsNode(tableName.toString()));
+			// treeItem.setGraphic(graphicsNode(tableName.toString()));
 			observableArrayList.add(treeItem);
 		}
 
@@ -66,8 +67,8 @@ public class DerbySchemaItemTree extends SchemaItemTree<String> {
 		return schemaId;
 	}
 
-	//	public Node graphicsNode(String item) {
-	//		return new Label(item);
-	//	}
+	// public Node graphicsNode(String item) {
+	// return new Label(item);
+	// }
 
 }

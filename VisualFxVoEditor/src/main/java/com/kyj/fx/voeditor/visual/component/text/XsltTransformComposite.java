@@ -105,7 +105,12 @@ public class XsltTransformComposite extends BorderPane {
 			Transformer newTransformer = tFactory.newTransformer(xlstSource);
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			newTransformer.transform(dataSource, new XMLResult(out, OutputFormat.createPrettyPrint()));
+			OutputFormat format = OutputFormat.createPrettyPrint();
+			
+			//이 값은 false로 두어야 데이터 변경이 없음.
+			format.setTrimText(false);
+
+			newTransformer.transform(dataSource, new XMLResult(out, format));
 
 			String string = out.toString();
 			this.xeTransform.setText(string);

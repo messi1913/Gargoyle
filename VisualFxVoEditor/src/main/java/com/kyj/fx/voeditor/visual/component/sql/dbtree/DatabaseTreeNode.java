@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ColumnItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ProcedureItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
@@ -68,7 +69,6 @@ public class DatabaseTreeNode {
 			private boolean isLeaf;
 			private boolean isFirstTimeChildren = true;
 			private boolean isFirstTimeLeaf = true;
-
 
 			@Override
 			public ObservableList<TreeItem<DatabaseItemTree<String>>> getChildren() {
@@ -143,6 +143,8 @@ public class DatabaseTreeNode {
 				return getColumnImage();
 			} else if (f instanceof TableItemTree) {
 				return getTableImage();
+			} else if (f instanceof ProcedureItemTree) {
+				//Not yet.
 			} else if (f instanceof SchemaItemTree) {
 				return getDatabaseImage();
 			}

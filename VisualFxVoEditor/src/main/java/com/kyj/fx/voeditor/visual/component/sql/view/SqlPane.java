@@ -8,6 +8,8 @@ package com.kyj.fx.voeditor.visual.component.sql.view;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,6 +39,7 @@ import com.kyj.fx.voeditor.visual.component.grid.EditableTableViewComposite;
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
 import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
@@ -97,6 +100,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -639,10 +643,14 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			}
 
 			if (ValueUtil.isNotEmpty(userColor)) {
-				// String backGroundColor = String.format("#%02X%02X%02X", (int) (userColor.getRed() * 255),
-				// (int) (userColor.getGreen() * 255), (int) (userColor.getBlue() * 255));
-				// String textColor = String.format("#%02X%02X%02X", 255 - (int) (userColor.getRed() * 255),
-				// 255 - (int) (userColor.getGreen() * 255), 255 - (int) (userColor.getBlue() * 255));
+				// String backGroundColor = String.format("#%02X%02X%02X", (int)
+				// (userColor.getRed() * 255),
+				// (int) (userColor.getGreen() * 255), (int)
+				// (userColor.getBlue() * 255));
+				// String textColor = String.format("#%02X%02X%02X", 255 - (int)
+				// (userColor.getRed() * 255),
+				// 255 - (int) (userColor.getGreen() * 255), 255 - (int)
+				// (userColor.getBlue() * 255));
 				String textColor = FxUtil.toWebString(userColor);
 				String backGroundColor = FxUtil.toWebString(userColor);
 
@@ -692,7 +700,9 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * 컨텍스트 메뉴 생성 및 기능 적용
 	 *
 	 *
-	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
+	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
+	 * setAccelerator에 등록된 이벤트가 호출안됨
+	 * 
 	 *
 	 * @param schemaTree2
 	 */
@@ -732,7 +742,12 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		// menuReflesh.setOnAction(this::menuRefleshOnAction);
 		menuReflesh.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
-		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuEditShowData, menuFindTable, menuProperties,
+		MenuItem menuFindProcedure = new MenuItem("Find Procedure");
+		// menuFindProcedure.setAccelerator(new KeyCodeCombination(KeyCode.P,
+		// KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
+		menuFindProcedure.setOnAction(this::menuFindProcedureOnAction);
+
+		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuEditShowData, menuFindTable, menuFindProcedure, menuProperties,
 				new SeparatorMenuItem(), menuReflesh);
 		schemaTree.setContextMenu(contextMenu);
 
@@ -889,7 +904,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 *
 	 * 2016-12-09 CodeAssistHelper 기능 추가.
 	 *
-	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
+	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
+	 * setAccelerator에 등록된 이벤트가 호출안됨
 	 *
 	 * @return
 	 */
@@ -1476,6 +1492,60 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	}
 
 	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 12.
+	 * @param e
+	 */
+	public void menuFindProcedureOnAction(ActionEvent e) {
+		if (!e.isConsumed()) {
+			e.consume();
+
+			Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog(FxUtil.getWindow(this), "Find Procedure",
+					"Input Procedure Name");
+			showInputDialog.ifPresent(c -> {
+				String srchKey = c.getValue();
+				String rslt = findProcedure(srchKey);
+				if (ValueUtil.isNotEmpty(rslt)) {
+					getSelectedSqlTab().appendTextSql(rslt);
+				}
+			});
+
+		}
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 12.
+	 */
+	public void showFindProcedure() {
+		menuFindProcedureOnAction(new ActionEvent());
+	}
+
+	/**
+	 * find procedure.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 12.
+	 * @param srchKey
+	 * @return
+	 */
+	public String findProcedure(String srchKey) {
+		try (Connection connection = connectionSupplier.get()) {
+
+			List<String> rslts = DbUtil.findProcedure(connection, srchKey);
+			Optional<String> reduce = rslts.stream().reduce((str1, str2) -> {
+				return str1.concat("\n").concat(str2);
+			});
+			if (reduce.isPresent()) {
+				return reduce.get();
+			}
+		} catch (SQLException e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
+		return null;
+	}
+
+	/**
 	 * 검색 추상함수
 	 *
 	 * @작성자 : KYJ
@@ -1613,8 +1683,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						});
 
 						FxUtil.installAutoTextFieldBinding(txtTable, () -> {
-							return searchPattern(txtSchema.getText(), txtTable.getText()).stream()
-									.map(v -> stringConverter.apply(v.getValue())/* v.getValue().getName() */).collect(Collectors.toList());
+							return searchPattern(txtSchema.getText(), txtTable.getText()).stream().map(v -> stringConverter.apply(
+									v.getValue())/* v.getValue().getName() */).collect(Collectors.toList());
 						});
 						txtSchema.setText(_defaultSchema);
 
@@ -1623,7 +1693,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						if (null != selectedItem) {
 							K value = selectedItem.getValue();
 							if (value instanceof TableItemTree) {
-								txtTable.setText(stringConverter.apply(value) /* value.getName() */);
+								txtTable.setText(stringConverter
+										.apply(value) /* value.getName() */);
 							}
 						}
 

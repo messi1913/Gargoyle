@@ -118,27 +118,32 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			// 클립보드에 텍스트 복사.
 			FxClipboardUtil.putString(clipTarget);
 		}
-		//테이블을 찾는 리소스 뷰를 오픈한다.
+		// 테이블을 찾는 리소스 뷰를 오픈한다.
 		else if (KeyCode.R == e.getCode() && e.isControlDown() && e.isShiftDown()) {
 			showTableResourceView();
 			e.consume();
 		}
 
+		else if (KeyCode.P == e.getCode() && e.isControlDown() && e.isShiftDown()) {
+			showFindProcedure();
+		}
 		else if (KeyCode.F1 == e.getCode() && (!e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
 			show100RowAction();
 		}
-
 		else if (KeyCode.F1 == e.getCode() && (e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
 			showEditableDataAction();
 		}
-
 		else if (KeyCode.F5 == e.getCode() && (!e.isControlDown() && !e.isShiftDown() && !e.isAltDown())) {
 			menuRefleshOnAction(null);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#search(java.lang.String, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#search(java.lang.
+	 * String, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public TreeItem<DatabaseItemTree<String>> search(String schema, String databaseName, String tableName) {
@@ -192,7 +197,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			}
 		}
 
-		//아무것도 발견 못한상황에서 schema와 databaseName이 빈경우
+		// 아무것도 발견 못한상황에서 schema와 databaseName이 빈경우
 		if (!isFound) {
 			if (ValueUtil.isEmpty(schema) && ValueUtil.isEmpty(databaseName)) {
 
@@ -266,65 +271,67 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	public void tbResultOnKeyClick(KeyEvent e) {
 
 		/*
-		 * 2016-09-03 by kyj.
-		 * SqlPane에서 기본 기능이 되도록 재구현.
+		 * 2016-09-03 by kyj. SqlPane에서 기본 기능이 되도록 재구현.
 		 * FxUtil.installClipboardKeyEvent(tb);API를 사용.
 		 *
-		 * 	 2016-10-27 키 이벤트를  setAccelerator를 사용하지않고 이벤트 방식으로 변경
-		 *	이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
+		 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
+		 * setAccelerator에 등록된 이벤트가 호출안됨
 		 */
 		if (KeyCode.F == e.getCode() && e.isControlDown() && e.isShiftDown()) {
 			menuFormatterOnAction(null);
 			e.consume();
 		}
 
-		//		int type = -1;
-		//		if (e.isControlDown() && e.getCode() == KeyCode.C) {
-		//			if (e.isShiftDown()) {
-		//				type = 2;
-		//			} else {
-		//				type = 1;
-		//			}
-		//		}
+		// int type = -1;
+		// if (e.isControlDown() && e.getCode() == KeyCode.C) {
+		// if (e.isShiftDown()) {
+		// type = 2;
+		// } else {
+		// type = 1;
+		// }
+		// }
 		//
-		//		if (type == -1)
-		//			return;
+		// if (type == -1)
+		// return;
 		//
-		//		TableView<Map<String, Object>> tbResult = getTbResult();
-		//		ObservableList<TablePosition> selectedCells = tbResult.getSelectionModel().getSelectedCells();
+		// TableView<Map<String, Object>> tbResult = getTbResult();
+		// ObservableList<TablePosition> selectedCells =
+		// tbResult.getSelectionModel().getSelectedCells();
 		//
-		//		TablePosition tablePosition = selectedCells.get(0);
-		//		TableColumn tableColumn = tablePosition.getTableColumn();
-		//		int row = tablePosition.getRow();
-		//		int col = tbResult.getColumns().indexOf(tableColumn);
+		// TablePosition tablePosition = selectedCells.get(0);
+		// TableColumn tableColumn = tablePosition.getTableColumn();
+		// int row = tablePosition.getRow();
+		// int col = tbResult.getColumns().indexOf(tableColumn);
 		//
-		//		switch (type) {
-		//		case 1:
-		//			StringBuilder sb = new StringBuilder();
-		//			for (TablePosition cell : selectedCells) {
-		//				// TODO :: 첫번째 컬럼(행 선택 기능)도 빈값으로 복사됨..
-		//				// 행변경시
-		//				if (row != cell.getRow()) {
-		//					sb.append("\n");
-		//					row++;
-		//				}
-		//				// 열 변경시
-		//				else if (col != tbResult.getColumns().indexOf(cell.getTableColumn())) {
-		//					sb.append("\t");
-		//				}
-		//				Object cellData = cell.getTableColumn().getCellData(cell.getRow());
-		//				sb.append(ValueUtil.decode(cellData, cellData, "").toString());
-		//			}
-		//			FxClipboardUtil.putString(sb.toString());
+		// switch (type) {
+		// case 1:
+		// StringBuilder sb = new StringBuilder();
+		// for (TablePosition cell : selectedCells) {
+		// // TODO :: 첫번째 컬럼(행 선택 기능)도 빈값으로 복사됨..
+		// // 행변경시
+		// if (row != cell.getRow()) {
+		// sb.append("\n");
+		// row++;
+		// }
+		// // 열 변경시
+		// else if (col != tbResult.getColumns().indexOf(cell.getTableColumn()))
+		// {
+		// sb.append("\t");
+		// }
+		// Object cellData = cell.getTableColumn().getCellData(cell.getRow());
+		// sb.append(ValueUtil.decode(cellData, cellData, "").toString());
+		// }
+		// FxClipboardUtil.putString(sb.toString());
 		//
-		//			// Map<String, Object> map = tbResult.getItems().get(row);
-		//			// FxClipboardUtil.putString(ValueUtil.toCVSString(map));
-		//			break;
-		//		case 2:
-		//			Object cellData = tableColumn.getCellData(row);
-		//			FxClipboardUtil.putString(ValueUtil.decode(cellData, cellData, "").toString());
-		//			break;
-		//		}
+		// // Map<String, Object> map = tbResult.getItems().get(row);
+		// // FxClipboardUtil.putString(ValueUtil.toCVSString(map));
+		// break;
+		// case 2:
+		// Object cellData = tableColumn.getCellData(row);
+		// FxClipboardUtil.putString(ValueUtil.decode(cellData, cellData,
+		// "").toString());
+		// break;
+		// }
 
 	}
 
@@ -532,7 +539,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			result = DbUtil.getTransactionedScope(con, queryArray, arr -> {
 				List<String> collect = arr.stream().filter(str -> ValueUtil.isNotEmpty(str)).collect(Collectors.toList());
 				return collect;
-			} , ex -> {
+			}, ex -> {
 				LOGGER.error(ValueUtil.toString(ex));
 				exceptionHandler.accept(ex, true);
 			});
@@ -669,7 +676,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	 */
 	private String getDynmicSQL(String query, Map<String, Object> param, boolean appendQuote) {
 		String sql = query;
-		//		if (!param.isEmpty()) {
+		// if (!param.isEmpty()) {
 		HashMap<String, Object> reMapping = new HashMap<>();
 		Iterator<String> it = param.keySet().iterator();
 		while (it.hasNext()) {
@@ -680,9 +687,10 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			}
 		}
 		sql = ValueUtil.getVelocityToText(query, reMapping, true);
-		//		} else {
-		//			throw new RuntimeException(String.format("param is empty... \nparams :%s", param.keySet().toString()));
-		//		}
+		// } else {
+		// throw new RuntimeException(String.format("param is empty... \nparams
+		// :%s", param.keySet().toString()));
+		// }
 		return sql;
 	}
 
@@ -725,12 +733,12 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 			if (value instanceof TableItemTree) {
 				TreeItem<DatabaseItemTree<String>> schemaTree = selectedItem.getParent();
 				String schemaName = schemaTree.getValue().getName();
-				//				if(value.isValideSchemaName(schemaName))
+				// if(value.isValideSchemaName(schemaName))
 
 				String tableName = "";
 				/*
-				 * 2016-07-12 SQLite에서는 스키마라는 개념이 존재하지않는다.
-				 * Schema Name을 100개의로우를 보여주는 SQL에 적용할지 여부를 결정한다.
+				 * 2016-07-12 SQLite에서는 스키마라는 개념이 존재하지않는다. Schema Name을 100개의로우를
+				 * 보여주는 SQL에 적용할지 여부를 결정한다.
 				 */
 				if (value.isApplySchemaName(schemaName)) {
 					tableName = schemaName.concat(".").concat(value.getName());
@@ -880,7 +888,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 				sql = getDynmicSQL(sql, paramMap, false);
 				columnList = query(sql, paramMap, (param) -> {
 
-				} , (err, bool) -> {
+				}, (err, bool) -> {
 					if (bool)
 						DialogUtil.showExceptionDailog(err);
 				}).stream().map(m -> {
@@ -931,7 +939,8 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	public void menuExportInsertScriptOnAction(ActionEvent e) {
 		Optional<Pair<String, String[]>> showTableInputDialog = showTableInputDialog(f -> f.getName());
 
-		//		Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
+		// Optional<Pair<String, String>> showInputDialog =
+		// DialogUtil.showInputDialog("table Name", "테이블명을 입력하세요.");
 		if (showTableInputDialog == null)
 			return;
 
@@ -967,7 +976,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 				while (iterator.hasNext()) {
 					String columnName = iterator.next();
 					String value = v.get(columnName).getAsString();
-					//					Object value = v.get(columnName);
+					// Object value = v.get(columnName);
 					values.add(value);
 				}
 				return values;
@@ -978,7 +987,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 						return null;
 					else {
 						String convert = str.toString();
-						//						convert = convert.substring(1, convert.length() - 1);
+						// convert = convert.substring(1, convert.length() - 1);
 						if (convert.indexOf("'") >= 0) {
 							try {
 								convert = StringUtils.replace(convert, "'", "''");
