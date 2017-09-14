@@ -1,0 +1,16 @@
+.buttonbox
+{
+	-fx-padding : 5.0px;
+	-fx-spacing : 5.0px;
+}
+
+.labels
+{
+	-fx-padding : 5.0px;
+	-fx-underline : true;
+}
+
+.container-box
+{
+		-fx-padding : 5.0px;
+}

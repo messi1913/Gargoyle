@@ -286,7 +286,15 @@
 											onAction="#miXlstConvertViewOnAction" text="XLST-Convert" />
 									</items>
 								</Menu>
-
+								
+								<Menu mnemonicParsing="false" text="Image">
+									<items>
+										<MenuItem fx:id="miBase64Image" mnemonicParsing="false"
+											onAction="#miBase64ImageOnAction" text="Base64 - Image" />
+										
+									</items>
+								</Menu>
+								
 							</items>
 						</Menu>
 
