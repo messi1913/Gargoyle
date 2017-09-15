@@ -72,6 +72,13 @@ public class TableOpenResourceView {
 		this.stage = stage;
 	}
 
+	public TableOpenResourceView(ConnectionSupplier conSupplier) {
+		this.conSupplier = conSupplier;
+		this.stage = new Stage();
+		this.delegator = new TableResourceView(this.stage);
+		// this.delegator.setTitle(title);
+	}
+
 	public ResourceView<Map<String, Object>> getView() {
 		return this.delegator;
 	}
@@ -87,12 +94,12 @@ public class TableOpenResourceView {
 	 ********************************/
 	public ResultDialog<Map<String, Object>> show(Parent parent) {
 		Window window = this.stage;
-		if (window == null) {
-			Scene scene = parent.getScene();
-			if (scene != null) {
-				window = scene.getWindow();
-			}
-		}
+		// if (window == null) {
+		// Scene scene = parent.getScene();
+		// if (scene != null) {
+		// window = scene.getWindow();
+		// }
+		// }
 
 		return delegator.show(window, true);
 	}
@@ -219,13 +226,18 @@ public class TableOpenResourceView {
 		return value.get(databaseName) == null ? "" : value.get(databaseName).toString();
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 15.
+	 */
 	public void close() {
-
+		this.delegator.close();
 	}
 
 	private class TableResourceView extends ResourceView<Map<String, Object>> {
 
 		private Stage parent;
+		private int dutyCloseCount;
 
 		public Stage getStage() {
 			return this.parent;
@@ -238,8 +250,19 @@ public class TableOpenResourceView {
 
 		@Override
 		public void close() {
+
+			if (dutyCloseCount > 0) {
+				return;
+			}
+
 			super.close();
-			parent.close();
+
+			if (parent != null)
+				parent.close();
+
+			TableOpenResourceView.this.close();
+			dutyCloseCount++;
+
 		}
 
 		/*
@@ -295,8 +318,7 @@ public class TableOpenResourceView {
 				/*
 				 * TODO 추후 아래 메타정보를 이용하여 고칠 수 있게할것. REFERENCES.
 				 *
-				 * http://docs.oracle.com/javase/6/docs/api/java/sql/
-				 * DatabaseMetaData.html#getColumns(java.lang.String,%20java.
+				 * http://docs.oracle.com/javase/6/docs/api/java/sql/ DatabaseMetaData.html#getColumns(java.lang.String,%20java.
 				 * lang.String,%20java.lang.String,%20java.lang.String)
 				 *
 				 */

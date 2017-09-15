@@ -67,7 +67,9 @@ public class ASTSqlCodeAreaHelper extends ASTCodeAreaHelper {
 
 	@Override
 	public ResourceView<Map<String, Object>> createResourceView() {
-		TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier, new Stage()) {
+		
+
+		TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier) {
 
 			/* (non-Javadoc)
 			 * @see com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView#close()
@@ -75,7 +77,6 @@ public class ASTSqlCodeAreaHelper extends ASTCodeAreaHelper {
 			@Override
 			public void close() {
 
-				super.close();
 				codeArea.getPopupWindow().hide();
 
 				ResultDialog<Map<String, Object>> result = getResult();

@@ -1562,7 +1562,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 */
 	protected void showTableResourceView() {
 		try {
-			TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier, new Stage());
+			TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier);
 			ResultDialog<Map<String, Object>> show = tableOpenResourceView.show(this);
 
 			Map<String, Object> data = show.getData();

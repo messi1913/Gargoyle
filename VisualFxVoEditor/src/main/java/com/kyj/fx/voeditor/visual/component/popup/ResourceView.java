@@ -230,13 +230,13 @@ public abstract class ResourceView<R> extends BorderPane {
 	 * @User KYJ
 	 */
 	public ResultDialog<R> show(Window owner, boolean modal) {
-//		if (stage != null) {
-//			if (modal) {
-//				stage.showAndWait();
-//			} else
-//				stage.show();
-//		}
-		
+		// if (stage != null) {
+		// if (modal) {
+		// stage.showAndWait();
+		// } else
+		// stage.show();
+		// }
+
 		stage = new Stage();
 		Scene scene = new Scene(this);
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
@@ -269,8 +269,8 @@ public abstract class ResourceView<R> extends BorderPane {
 	 * @User KYJ
 	 */
 	public void close() {
-
-		this.stage.close();
+		if (this.stage != null)
+			this.stage.close();
 	}
 
 	/**
@@ -306,6 +306,7 @@ public abstract class ResourceView<R> extends BorderPane {
 		result.setClickButton(btnSelect);
 		result.setStatus(ResultDialog.SELECT);
 		result.setData(selectedItem);
+		
 		close();
 	}
 
@@ -404,6 +405,9 @@ public abstract class ResourceView<R> extends BorderPane {
 				txtFilter.requestFocus();
 			}
 		} else if (ev.getCode() == KeyCode.ENTER && !ev.isControlDown() && !ev.isShiftDown() && !ev.isAltDown()) {
+			if (ev.isConsumed())
+				return;
+
 			btnSelectOnMouseClick(null);
 		} else if (KeyCode.ESCAPE == ev.getCode()) {
 			sceneKeyEvent.handle(ev);
