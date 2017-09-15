@@ -5,4 +5,4 @@ top $maxRow
 #else
 top 100
 #end
-a.* from ($usersql ) a
+a.* from ($usersql nolock) a 
