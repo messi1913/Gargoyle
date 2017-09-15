@@ -7,26 +7,35 @@
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.RowMapper;
 
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.component.popup.MssqlTableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ColumnItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.mssql.MSSQLDatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
+import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
@@ -38,7 +47,6 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -250,9 +258,10 @@ public class MssqlPane extends CommonsSqllPan {
 	 * 테이블을 찾는 리소스 뷰를 오픈
 	 *
 	 * @작성자 : KYJ
-	 * @작성일 : 2016. 10. 20.
+	 * @작성일 : 2017. 09. 15.
 	 */
-	protected void showTableResourceView() {
+	@Override
+	public void showTableResourceView() {
 		try {
 			MssqlTableOpenResourceView tableOpenResourceView = new MssqlTableOpenResourceView(connectionSupplier);
 			ResultDialog<Map<String, Object>> show = tableOpenResourceView.show(this);
@@ -283,6 +292,119 @@ public class MssqlPane extends CommonsSqllPan {
 		} catch (Exception e1) {
 			LOGGER.error(ValueUtil.toString(e1));
 		}
+	}
+
+	/**
+	 * @최초생성일 2017. 9. 15.
+	 */
+	public static final BiFunction<String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (tableNamePattern, metaData) -> {
+		int cateIdx = tableNamePattern.indexOf('.');
+		int schemIdx = tableNamePattern.indexOf('.', cateIdx + 1);
+
+		try {
+			if (cateIdx >= 0 && schemIdx >= 0) {
+
+				String category = tableNamePattern.substring(0, cateIdx);
+				String schemaName = tableNamePattern.substring(cateIdx + 1, schemIdx);
+				String tableName = tableNamePattern.substring(schemIdx + 1);
+				return metaData.getColumns(category, schemaName, tableName, null);
+			}
+			return metaData.getColumns(null, null, tableNamePattern, null);
+		} catch (Exception e) {
+			//
+		}
+		return null;
+	};
+
+	/*
+	 * 테이블의 SELECT문을 리턴. (non-Javadoc)
+	 * 
+	 * @see
+	 * com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#applySelectScript(
+	 * javafx.event.ActionEvent)
+	 */
+	@Override
+	public void applySelectScript(ActionEvent e) {
+		TreeItem<DatabaseItemTree<String>> selectedItem = schemaTree.getSelectionModel().getSelectedItem();
+
+		SqlTab selectedTab = getSelectedSqlTab();
+		TreeItem<DatabaseItemTree<String>> schemaTreeItem = selectedItem.getParent();
+		String schema = schemaTreeItem.getValue().toString();
+		String tableName = String.format("%s.%s", schema, this.getSelectedTreeByTableName(selectedItem));
+
+		try (Connection connection = connectionSupplier.get()) {
+
+			List<String> columns = DbUtil.columns(connection, tableName, COLUMN_CONVERTER, t -> {
+				try {
+					return t.getString(4);
+				} catch (SQLException ex) {
+					LOGGER.error(ValueUtil.toString(ex));
+				}
+				return "";
+			});
+
+			if (columns == null || columns.isEmpty()) {
+				String driver = DbUtil.getDriverNameByConnection(connection);
+				String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COLUMNS_WRAPPER, driver);
+
+				Map<String, Object> map = new HashMap<>(2);
+				map.put("databaseName", schema);
+				map.put("tableName", tableName);
+
+				sql = ValueUtil.getVelocityToText(sql, map, true);
+				columns = DbUtil.selectBeans(connection, sql, 10, (RowMapper<String>) (rs, rowNum) -> rs.getString(1));
+			}
+
+			redueceAction(columns, ",\n",
+					v -> selectedTab.appendTextSql(String.format("select\n%s \nfrom %s ", v.substring(0, v.length()), tableName)));
+
+		} catch (Exception e1) {
+			LOGGER.error(ValueUtil.toString(e1));
+		}
+
+	}
+
+	/* 
+	 * 컬럼 트리 구성 함수 
+	 * (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan#getSelectedTreeByTableColumns(javafx.scene.control.TreeItem)
+	 */
+	@Override
+	public List<String> getSelectedTreeByTableColumns(TreeItem<DatabaseItemTree<String>> selectItem) {
+
+		List<String> columnList = Collections.emptyList();
+		if (selectItem != null) {
+
+			TreeItem<DatabaseItemTree<String>> schemaTree = selectItem.getParent();
+			DatabaseItemTree<String> schemaItem = schemaTree.getValue();
+			String databaseName = schemaItem.getName();
+			DatabaseItemTree<String> _tableTreeItem = selectItem.getValue();
+			String tableName = String.format("%s.%s", databaseName, _tableTreeItem.getName());
+
+			// 클래스타입이 TableItemTree타입만 처리
+			if (TableItemTree.class.isAssignableFrom(_tableTreeItem.getClass())
+					&& (!ColumnItemTree.class.isAssignableFrom(_tableTreeItem.getClass()))) {
+
+				try (Connection connection = connectionSupplier.get()) {
+
+					Function<ResultSet, String> converter = rs -> {
+						try {
+							return rs.getString(4);
+						} catch (SQLException ex) {
+							LOGGER.error(ValueUtil.toString(ex));
+						}
+						return "<<<<ERROR>>>>";
+					};
+
+					columnList = DbUtil.columns(connection, tableName, COLUMN_CONVERTER, converter);
+
+				} catch (Exception e) {
+					LOGGER.error(ValueUtil.toString(e));
+				}
+			}
+		}
+
+		return columnList;
 	}
 
 }

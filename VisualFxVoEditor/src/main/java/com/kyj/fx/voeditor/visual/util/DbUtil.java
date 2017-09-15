@@ -1120,6 +1120,20 @@ public class DbUtil extends ConnectionManager {
 	 * @throws Exception
 	 */
 	public static <T> List<T> columns(Connection connection, String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
+		return columns(connection, tableNamePattern, COLUMN_CONVERTER, converter);
+	}
+	
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 15. 
+	 * @param connection
+	 * @param tableNamePattern
+	 * @param columnNameConverter
+	 * @param converter
+	 * @return
+	 * @throws Exception
+	 */
+	public static <T> List<T> columns(Connection connection, String tableNamePattern, BiFunction<String, DatabaseMetaData, ResultSet> columnNameConverter, Function<ResultSet, T> converter) throws Exception {
 		if (converter == null)
 			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
 
@@ -1127,7 +1141,7 @@ public class DbUtil extends ConnectionManager {
 		// try (Connection connection = getConnection()) {
 
 		DatabaseMetaData metaData = connection.getMetaData();
-		ResultSet rs = COLUMN_CONVERTER.apply(tableNamePattern, metaData); // metaData.getColumns(null,
+		ResultSet rs = columnNameConverter.apply(tableNamePattern, metaData); // metaData.getColumns(null,
 																			// null,
 																			// tableNamePattern,
 																			// null);
@@ -1139,7 +1153,9 @@ public class DbUtil extends ConnectionManager {
 
 		return tables;
 	}
-
+	
+	
+	
 	public static <K, T> Map<K, T> columnsToMap(Connection connection, String tableNamePattern, Function<ResultSet, K> keyMapper,
 			Function<ResultSet, T> valueMapper) throws Exception {
 		if (keyMapper == null || valueMapper == null)

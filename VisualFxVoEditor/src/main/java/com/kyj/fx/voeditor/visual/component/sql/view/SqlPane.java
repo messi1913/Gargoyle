@@ -8,7 +8,6 @@ package com.kyj.fx.voeditor.visual.component.sql.view;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +38,6 @@ import com.kyj.fx.voeditor.visual.component.grid.EditableTableViewComposite;
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
 import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
-import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
@@ -100,7 +98,6 @@ import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -761,8 +758,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	public void applyInsertScript(ActionEvent e) {
 		TreeItem<K> selectedTableTreeItem = schemaTree.getSelectionModel().getSelectedItem();
 		String tableName = this.getSelectedTreeByTableName(selectedTableTreeItem);
-		TreeItem<K> schemaTreeItem = selectedTableTreeItem.getParent();
-		String schema = schemaTreeItem.getValue().toString();
+//		TreeItem<K> schemaTreeItem = selectedTableTreeItem.getParent();
+//		String schema = schemaTreeItem.getValue().toString();
 
 		List<String> tableColumns = this.getSelectedTreeByTableColumns(selectedTableTreeItem);
 		SqlTab selectedTab = getSelectedSqlTab();

@@ -53,9 +53,13 @@ public class MSSQLTableItemTree extends TableItemTree<String> {
 	public ObservableList<TreeItem<DatabaseItemTree<String>>> applyChildren(Connection con, String... args) throws Exception {
 
 		DatabaseMetaData metaData = con.getMetaData();
-		ResultSet tables = metaData.getColumns(args[0], null, args[1], "%");
+		
+		int indexOf = args[1].indexOf('.');
+		String schem = args[1].substring(0, indexOf);
+		String tb = args[1].substring(indexOf + 1);
+		ResultSet tables = metaData.getColumns(args[0], schem, tb, "%");
 
-		Set<String> primaryKeySet = toSet(metaData.getPrimaryKeys(args[0], null, args[1]), COLUMN_NAME);
+		Set<String> primaryKeySet = toSet(metaData.getPrimaryKeys(args[0], schem, tb), COLUMN_NAME);
 
 		ObservableList<TreeItem<DatabaseItemTree<String>>> observableArrayList = FXCollections.observableArrayList();
 		while (tables.next()) {
