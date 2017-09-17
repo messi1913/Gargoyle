@@ -55,7 +55,7 @@ public class TableOpenResourceView {
 	 */
 	protected String driver;
 	// private String title = "TableResourceView";
-	private Stage stage;
+	private Stage owner;
 
 	public TableOpenResourceView(ConnectionSupplier conSupplier, ResourceView<Map<String, Object>> deligator) {
 		this.conSupplier = conSupplier;
@@ -65,17 +65,17 @@ public class TableOpenResourceView {
 		// this.stage = deligator.getStage();
 	}
 
-	public TableOpenResourceView(ConnectionSupplier conSupplier, Stage stage) {
+	public TableOpenResourceView(ConnectionSupplier conSupplier, Stage owner) {
 		this.conSupplier = conSupplier;
-		this.delegator = new TableResourceView(stage);
+		this.delegator = new TableResourceView(owner);
 		// this.delegator.setTitle(title);
-		this.stage = stage;
+		this.owner = owner;
 	}
 
 	public TableOpenResourceView(ConnectionSupplier conSupplier) {
 		this.conSupplier = conSupplier;
-		this.stage = new Stage();
-		this.delegator = new TableResourceView(this.stage);
+		this.owner = new Stage();
+		this.delegator = new TableResourceView(this.owner);
 		// this.delegator.setTitle(title);
 	}
 
@@ -92,8 +92,8 @@ public class TableOpenResourceView {
 	 *            해당화면을 호출한 부모를 파라미터로 함.
 	 * @return
 	 ********************************/
-	public ResultDialog<Map<String, Object>> show(Parent parent) {
-		Window window = this.stage;
+	public ResultDialog<Map<String, Object>> show() {
+		Window owner = this.owner;
 		// if (window == null) {
 		// Scene scene = parent.getScene();
 		// if (scene != null) {
@@ -101,7 +101,7 @@ public class TableOpenResourceView {
 		// }
 		// }
 
-		return delegator.show(window, true);
+		return delegator.show(owner, true);
 	}
 
 	/********************************
@@ -255,13 +255,15 @@ public class TableOpenResourceView {
 				return;
 			}
 
+			dutyCloseCount++;
+			
 			super.close();
 
 			if (parent != null)
 				parent.close();
 
 			TableOpenResourceView.this.close();
-			dutyCloseCount++;
+			
 
 		}
 
