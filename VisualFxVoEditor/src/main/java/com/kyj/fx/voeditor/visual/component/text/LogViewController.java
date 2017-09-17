@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.voeditor.visual.framework.thread.DemonTimerFactory;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -40,6 +41,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
@@ -72,19 +74,26 @@ public class LogViewController implements Closeable {
 	private ToggleGroup ENCODING;
 	@FXML
 	private ToggleButton btnScrollLock;
+	@FXML
+	private Button btnStart;
+	@FXML
+	private Label lblStatus;
+
 	private CodeAreaFindAndReplaceHelper<CodeArea> findAndReplaceHelper;
 
 	private BooleanProperty isScrollLock = new SimpleBooleanProperty();
+
 	public LogViewController() throws Exception {
 
 	}
 
 	private ByteBuffer buffer;
-	//Default Encoding UTF-8
+	// Default Encoding UTF-8
 	private ObjectProperty<Charset> charset = new SimpleObjectProperty<>();
 
 	/**
 	 * 인코딩 변경.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 12.
 	 * @param charset
@@ -97,11 +106,26 @@ public class LogViewController implements Closeable {
 	public void initialize() {
 		findAndReplaceHelper = new CodeAreaFindAndReplaceHelper<>(txtLog);
 		txtLog.addEventHandler(KeyEvent.KEY_PRESSED, this::txtLogOnKeyPress);
+		this.isStared.addListener((oba, o, n) -> {
+			if (n) {
+				lblStatus.setText("Started");
+				btnStart.setDisable(true);
+			} else {
+				lblStatus.setText("Stopped");
+				btnStart.setDisable(false);
+			}
+
+		});
+
+		btnStart.setOnAction(ev -> {
+			start();
+		});
 
 	}
 
 	/**
 	 * txt 찾기 바꾸기 키 이벤트.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 24.
 	 * @param e
@@ -116,11 +140,7 @@ public class LogViewController implements Closeable {
 	}
 
 	@FxPostInitialize
-	public void onAfter() throws IOException {
-		File monitoringFile = composite.getMonitoringFile();
-		fileChannel = FileChannel.open(monitoringFile.toPath(), StandardOpenOption.READ);
-		buffer = ByteBuffer.allocate(seekSize);
-
+	public void after() {
 		String encoding = ResourceLoader.loadCharset();
 		if (Charset.isSupported(encoding)) {
 			charset.set(Charset.forName(encoding));
@@ -129,8 +149,7 @@ public class LogViewController implements Closeable {
 			encoding = "UTF-8";
 			charset.set(Charset.forName(encoding));
 		}
-
-		//설정에 저장된 인코딩셋을 불러와 디폴트로 선택되게함.
+		// 설정에 저장된 인코딩셋을 불러와 디폴트로 선택되게함.
 		ObservableList<Toggle> toggles = ENCODING.getToggles();
 		toggles.stream().map(tg -> {
 
@@ -145,7 +164,7 @@ public class LogViewController implements Closeable {
 			rmi.setSelected(true);
 		});
 
-		//캐릭터셋이 변경될때 환경변수에 등록하는 과정
+		// 캐릭터셋이 변경될때 환경변수에 등록하는 과정
 		this.charset.addListener((oba, o, newCharset) -> {
 			String name = newCharset.name();
 			if (ValueUtil.isEmpty(name)) {
@@ -154,11 +173,23 @@ public class LogViewController implements Closeable {
 			ResourceLoader.saveCharset(name);
 
 		});
+
 	}
 
 	/**
-	 * 마지막에 읽어들인 byte 위치를 임시저장한다.
-	 * 저장된 위치를 기준으로 파일이 변경되면 그 위치부터 새롭게 추가된 텍스트를 읽어온다.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 17. 
+	 * @throws IOException
+	 */
+	public void createChannel() throws IOException {
+		File monitoringFile = composite.getMonitoringFile();
+		fileChannel = FileChannel.open(monitoringFile.toPath(), StandardOpenOption.READ);
+		buffer = ByteBuffer.allocate(seekSize);
+	}
+
+	/**
+	 * 마지막에 읽어들인 byte 위치를 임시저장한다. 저장된 위치를 기준으로 파일이 변경되면 그 위치부터 새롭게 추가된 텍스트를 읽어온다.
+	 * 
 	 * @최초생성일 2017. 1. 11.
 	 */
 	private LongProperty mark = new SimpleLongProperty(-1L);
@@ -177,7 +208,7 @@ public class LogViewController implements Closeable {
 			else
 				fileChannel.position(lastMarkedPosition);
 
-			//미리 저장된 포지션이후의 모든 텍스트를 읽어들이기 위한 do~while문
+			// 미리 저장된 포지션이후의 모든 텍스트를 읽어들이기 위한 do~while문
 			do {
 				byteCount = fileChannel.read(buffer);
 
@@ -203,16 +234,19 @@ public class LogViewController implements Closeable {
 
 	/**
 	 * 파일이 변경되었는지 감시하기 위한 Timer , 디폴트값은 0.5초마다 체크.
+	 * 
 	 * @최초생성일 2017. 1. 12.
 	 */
 	private Timer fileWatcher;
 	/**
 	 * 파일의 내용을 읽어들일때 마지막으로 수정된 일자를 체크하기 위한 변수
+	 * 
 	 * @최초생성일 2017. 1. 12.
 	 */
 	private LongProperty lastModifiedTime = new SimpleLongProperty(-1L);
 	/**
 	 * 파일의 내용을 읽어들일때 마지막으로 읽은 파일의 크기를 체크하기위한 변수
+	 * 
 	 * @최초생성일 2017. 1. 12.
 	 */
 	private LongProperty lastLength = new SimpleLongProperty(-1L);
@@ -233,7 +267,7 @@ public class LogViewController implements Closeable {
 
 		if (null == fileWatcher) {
 
-			fileWatcher = new Timer();
+			fileWatcher = DemonTimerFactory.newInsance("Gargoyle Log Monitor Timer");// new Timer();
 
 			fileWatcher.scheduleAtFixedRate(new TimerTask() {
 				@Override
@@ -255,18 +289,17 @@ public class LogViewController implements Closeable {
 						e.printStackTrace();
 					}
 
-					//Debug.
-					//					LOGGER.debug(" file space : " + space + "  //  cached space : " + lastLength.get());
+					// Debug.
+					// LOGGER.debug(" file space : " + space + " // cached space : " + lastLength.get());
 
 					/*
-					 * 처음에는 수정된 일짜 정보 기준으로 처리하였으나, OS영역에서 파일 내용이 변경되어도 반영이 잘 이루어지지않음.
-					 * 그래서 파일 사이즈 기준으로 변경유무를 추가.
-					 *   lastReadTime == -1  의 조건은 최초에 읽어들인경우 파일 내용을 읽어들이기 위한 조건처리이다.
+					 * 처음에는 수정된 일짜 정보 기준으로 처리하였으나, OS영역에서 파일 내용이 변경되어도 반영이 잘 이루어지지않음. 그래서 파일 사이즈 기준으로 변경유무를 추가. lastReadTime == -1 의 조건은 최초에
+					 * 읽어들인경우 파일 내용을 읽어들이기 위한 조건처리이다.
 					 */
 					if (lastReadTime == -1 || (space != lastLength.get()) || (lastModified > lastReadTime)) {
 
-						//						Debug
-						//						System.out.println("work ## ");
+						// Debug
+						// System.out.println("work ## ");
 
 						readAction(lastModified);
 
@@ -283,8 +316,8 @@ public class LogViewController implements Closeable {
 	}
 
 	/**
-	 * 파일의 변화를 감지하기위해 대기하는 시간.
-	 * 단위 millsSecond
+	 * 파일의 변화를 감지하기위해 대기하는 시간. 단위 millsSecond
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 13.
 	 * @return
@@ -304,10 +337,10 @@ public class LogViewController implements Closeable {
 
 		Platform.runLater(() -> {
 
-//			int anchor = this.txtLog.getAnchor();
-//			int currentLength = this.txtLog.getLength();
-//			int caretPosition = this.txtLog.getCaretPosition();
-//			int caretColumn = this.txtLog.getCaretColumn();
+			// int anchor = this.txtLog.getAnchor();
+			// int currentLength = this.txtLog.getLength();
+			// int caretPosition = this.txtLog.getCaretPosition();
+			// int caretColumn = this.txtLog.getCaretColumn();
 			this.txtLog.appendText(string, !isScrollLock.get());
 
 		});
@@ -331,6 +364,7 @@ public class LogViewController implements Closeable {
 
 	/**
 	 * file close
+	 * 
 	 * @throws IOException
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 9.
@@ -339,7 +373,7 @@ public class LogViewController implements Closeable {
 	public void close() throws IOException {
 		isStared.set(false);
 		isRunning.set(false);
-		//		monitorFile.close();
+		// monitorFile.close();
 		if (fileWatcher != null)
 			fileWatcher.cancel();
 
@@ -352,7 +386,7 @@ public class LogViewController implements Closeable {
 			buffer.clear();
 			buffer = null;
 		}
-
+		fileWatcher = null;
 		LOGGER.debug("Close Complate!");
 	}
 
@@ -365,12 +399,26 @@ public class LogViewController implements Closeable {
 		if (isRunning.get())
 			throw new RuntimeException("Already started. ");
 
-		Thread thread = new Thread(() -> {
+		Platform.runLater(() -> {
+
+			try {
+				createChannel();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 			isStared.set(true);
 			watchFile();
+
 		});
-		thread.setDaemon(true);
-		thread.start();
+		// Thread thread = new Thread(() -> {
+		//
+		//
+		//
+		// });
+		//
+		// thread.setDaemon(true);
+		// thread.start();
 
 	}
 
@@ -391,6 +439,7 @@ public class LogViewController implements Closeable {
 
 	/**
 	 * 부모 Stage 리턴
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 13.
 	 * @return
@@ -415,7 +464,8 @@ public class LogViewController implements Closeable {
 		}
 
 		/**
-		 * @param content the content to set
+		 * @param content
+		 *            the content to set
 		 */
 		final void setContent(String content) {
 			this.content = content;
@@ -424,7 +474,7 @@ public class LogViewController implements Closeable {
 	}
 
 	@FXML
-	public void btnScrollLockOnAction(){
+	public void btnScrollLockOnAction() {
 		boolean value = !isScrollLock.get();
 		isScrollLock.set(value);
 	}

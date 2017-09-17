@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -16,13 +18,24 @@
 	<center>
       <VBox>
          <children>
-            <HBox alignment="CENTER_RIGHT" spacing="5.0">
+            <HBox maxWidth="1.7976931348623157E308">
                <children>
-                  <ToggleButton fx:id="btnScrollLock" mnemonicParsing="false" onAction="#btnScrollLockOnAction" text="Scroll Lock" />
+                  <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Status" />
+                        <Label fx:id="lblStatus" text="Stop" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" spacing="5.0">
+                     <children>
+                        <Button fx:id="btnStart" mnemonicParsing="false" prefWidth="80.0" text="Start" />
+                        <ToggleButton fx:id="btnScrollLock" mnemonicParsing="false" onAction="#btnScrollLockOnAction" prefWidth="80.0" text="Scroll Lock" />
+                     </children>
+                     <padding>
+                        <Insets bottom="3.0" right="5.0" top="3.0" />
+                     </padding>
+                  </HBox>
                </children>
-               <padding>
-                  <Insets bottom="3.0" right="5.0" top="3.0" />
-               </padding>
             </HBox>
       		<CodeArea fx:id="txtLog" VBox.vgrow="ALWAYS" />
          </children>
