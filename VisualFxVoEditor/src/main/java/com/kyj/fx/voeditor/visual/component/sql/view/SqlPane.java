@@ -36,6 +36,7 @@ import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpress
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableViewComposite;
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
+import com.kyj.fx.voeditor.visual.component.popup.ResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
@@ -911,6 +912,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		SqlKeywords sqlNode = sqlTab.getSqlNode();
 
+		//TODO
 		// 코드 AreaHelper 설치.
 		new ASTSqlCodeAreaHelper(sqlNode.getCodeArea(), connectionSupplier);
 
@@ -1414,7 +1416,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		if (colSize < 27)
 			colSize = 27;
 
-		String putString = new StringBuffer().append(columnBuf).append(dataBuf).toString();
+//		String putString = new StringBuffer().append(columnBuf).append(dataBuf).toString();
 		SchoolMgrerSpreadSheetView parent = new SchoolMgrerSpreadSheetView(colSize);
 		// parent.paste(putString, 0, 0);
 		parent.paste(items, 0, 0);
@@ -1555,6 +1557,15 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	public abstract TreeItem<K> search(String schema, String databaseName, String tableName);
 
 	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 16. 
+	 * @return
+	 */
+	protected TableOpenResourceView createTableResourceView(){
+		TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier);
+		return tableOpenResourceView;
+	}
+	/**
 	 * 테이블을 찾는 리소스 뷰를 오픈
 	 *
 	 * @작성자 : KYJ
@@ -1562,8 +1573,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 */
 	protected void showTableResourceView() {
 		try {
-			TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier);
-			ResultDialog<Map<String, Object>> show = tableOpenResourceView.show(this);
+			TableOpenResourceView tableOpenResourceView = createTableResourceView();
+			ResultDialog<Map<String, Object>> show = tableOpenResourceView.show();
 
 			Map<String, Object> data = show.getData();
 			if (ValueUtil.isNotEmpty(data)) {
