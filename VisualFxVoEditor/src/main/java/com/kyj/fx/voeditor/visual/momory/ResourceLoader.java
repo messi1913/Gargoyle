@@ -36,6 +36,10 @@ import kyj.Fx.dao.wizard.memory.IFileBaseConfiguration;
  * @author KYJ
  *
  */
+/**
+ * @author KYJ
+ *
+ */
 public class ResourceLoader implements IFileBaseConfiguration {
 
 	/* SVN 키 */
@@ -71,7 +75,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static final String DBMS_SUPPORT_H2 = "H2";
 	public static final String DBMS_SUPPORT_Sqlite = "Sqlite";
 	public static final String DBMS_SUPPORT_DERBY = "Derby";
-	/*17.08.30 ADD */
+	/* 17.08.30 ADD */
 	public static final String DBMS_SUPPORT_MS_SQL = "Mssql";
 
 	/* Database Driver */
@@ -82,8 +86,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static final String ORG_SQLITE_JDBC = "org.sqlite.JDBC";
 	public static final String ORG_APACHE_DERBY_JDBC = "org.apache.derby.jdbc.ClientDriver";
 	public static final String ORG_MSSQL_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-	
-	
+
 	public static final String START_URL = "start.url";
 
 	/**
@@ -131,23 +134,51 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 	/**
 	 * 로그뷰 화면에서 사용되는 텍스트 인코딩
+	 * 
 	 * @최초생성일 2017. 1. 12.
 	 */
 	public static final String LOGVIEW_ENCODING = "logview.encoding";
-	
-	
+
 	/**
-	 *  사용자가 마지막으로 설정했던 유튜브 다운로드 위치
+	 * 사용자가 마지막으로 설정했던 유튜브 다운로드 위치
+	 * 
 	 * @최초생성일 2017. 5. 26.
 	 */
 	public static final String UTUBE_LAST_DOUWNLOAD_LOCATION = "utube.last.download.location";
 
 	/**
 	 * postgre pgadmin 설치 경로
+	 * 
 	 * @최초생성일 2017. 6. 13.
 	 */
-	public static final String POSTGRE_PGADMIN_BASE_DIR = "postgre.pgadmin.base.dir"; 
-	
+	public static final String POSTGRE_PGADMIN_BASE_DIR = "postgre.pgadmin.base.dir";
+
+	/* 다국어 관련 프로퍼티 */
+	/**
+	 * 프로그램 시작시 다국어 정보를 요청할지 여부
+	 * 
+	 * @최초생성일 2017. 9. 17.
+	 */
+	public static final String LANGUAGE_RELOAD_ON_STARTUP_YN = "language.reload.on.startup.yn";
+	/**
+	 * 다국어 관련정보를 요청할 url 주소
+	 * 
+	 * @최초생성일 2017. 9. 17.
+	 */
+	public static final String LANGUAGE_REQUEST_URL = "language.request.url";
+	/**
+	 * 다국어 코드
+	 * 
+	 * @최초생성일 2017. 9. 17.
+	 */
+	public static final String LANGUAGE_CODE = "lang.code";
+	/**
+	 * 다국어 파일이 저장되는 위치
+	 * 
+	 * @최초생성일 2017. 9. 17.
+	 */
+	public static final String LANGUAGE_STORED_PROPERTIES_LOCATION = "language.store.properties.location";
+
 	private String[] baseKeys = { BASE_KEY_JDBC_INFO, BASE_KEY_JDBC_DRIVER, BASE_KEY_JDBC_URL, BASE_KEY_JDBC_ID, BASE_KEY_JDBC_PASS,
 			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES };
 
@@ -328,6 +359,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 	/**
 	 * 환경변수에 캐릭터셋 저장
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 24.
 	 * @param charset
@@ -338,6 +370,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 	/**
 	 * 환경변수에 저장된 캐릭터셋 로드
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 24.
 	 * @return
@@ -348,6 +381,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 	/**
 	 * 환경변수 캐릭터셋 관리.
+	 * 
 	 * @author KYJ
 	 *
 	 */
@@ -355,6 +389,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 		/**
 		 * 저장
+		 * 
 		 * @작성자 : KYJ
 		 * @작성일 : 2017. 1. 12.
 		 * @param charset
@@ -365,6 +400,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 		/**
 		 * 로드
+		 * 
 		 * @작성자 : KYJ
 		 * @작성일 : 2017. 1. 12.
 		 * @return
