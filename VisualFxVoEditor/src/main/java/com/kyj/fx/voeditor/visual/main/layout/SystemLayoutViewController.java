@@ -1468,8 +1468,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		tabPanWorkspace.getTabs().add(tab);
 		tab.setContextMenu(closeContextMenu());
 
-		//DragDrop 기능 설치.
-		new DefaultFileDragDropHelper(tab.getContent());
+		/*
+		 * 17.9.17 kyj 
+		 * 기능이 처리되지않음.
+		 * DragDrop 기능 설치.
+		 * 
+		 */
+//		new DefaultFileDragDropHelper(tab.getContent());
 
 	}
 
