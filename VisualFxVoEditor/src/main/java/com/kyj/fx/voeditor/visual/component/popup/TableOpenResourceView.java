@@ -257,6 +257,8 @@ public class TableOpenResourceView {
 		public void close() {
 
 			if (dutyCloseCount > 0) {
+				dutyCloseCount = 0;
+				TableOpenResourceView.this.close();
 				return;
 			}
 
