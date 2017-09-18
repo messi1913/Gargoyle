@@ -1043,10 +1043,10 @@ public class FxUtil {
 			final WritableImage image = param.getImage();
 			imageView.setImage(image);
 
-//			final double scaleX = pageLayout.getPrintableWidth() / imageView.getBoundsInParent().getWidth();
-//			final double scaleY = pageLayout.getPrintableHeight() / imageView.getBoundsInParent().getHeight();
+			// final double scaleX = pageLayout.getPrintableWidth() / imageView.getBoundsInParent().getWidth();
+			// final double scaleY = pageLayout.getPrintableHeight() / imageView.getBoundsInParent().getHeight();
 			imageView.getTransforms().add(new Scale(1, 1));
-			
+
 		});
 	}
 
@@ -1066,18 +1066,16 @@ public class FxUtil {
 		// jobSettings.setPrintSides(PrintSides.TUMBLE);
 		ImageView imageView = new ImageView();
 
-		
-		
 		Callback<SnapshotResult, Void> callback = param -> {
-			
-			draw.accept(param, imageView);
-			
-//			final WritableImage image = param.getImage();
-//			imageView.setImage(image);
 
-//			final double scaleX = pageLayout.getPrintableWidth() / imageView.getBoundsInParent().getWidth();
-//			final double scaleY = pageLayout.getPrintableHeight() / imageView.getBoundsInParent().getHeight();
-//			imageView.getTransforms().add(new Scale(scaleX, scaleY));
+			draw.accept(param, imageView);
+
+			// final WritableImage image = param.getImage();
+			// imageView.setImage(image);
+
+			// final double scaleX = pageLayout.getPrintableWidth() / imageView.getBoundsInParent().getWidth();
+			// final double scaleY = pageLayout.getPrintableHeight() / imageView.getBoundsInParent().getHeight();
+			// imageView.getTransforms().add(new Scale(scaleX, scaleY));
 
 			return null;
 		};
@@ -2269,5 +2267,32 @@ public class FxUtil {
 	 */
 	public static File showFileOpenDialog(Window owner, Consumer<FileChooser> option) {
 		return DialogUtil.showFileDialog(owner, option);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 18. 
+	 * @return
+	 */
+	public static MouseEvent mouseEventForDummy() {
+		// NamedArg("eventType") EventType<? extends MouseEvent> eventType,
+		// @NamedArg("x") double x, @NamedArg("y") double y,
+		// @NamedArg("screenX") double screenX, @NamedArg("screenY") double screenY,
+		// @NamedArg("button") MouseButton button,
+		// @NamedArg("clickCount") int clickCount,
+		// @NamedArg("shiftDown") boolean shiftDown,
+		// @NamedArg("controlDown") boolean controlDown,
+		// @NamedArg("altDown") boolean altDown,
+		// @NamedArg("metaDown") boolean metaDown,
+		// @NamedArg("primaryButtonDown") boolean primaryButtonDown,
+		// @NamedArg("middleButtonDown") boolean middleButtonDown,
+		// @NamedArg("secondaryButtonDown") boolean secondaryButtonDown,
+		// @NamedArg("synthesized") boolean synthesized,
+		// @NamedArg("popupTrigger") boolean popupTrigger,
+		// @NamedArg("stillSincePress") boolean stillSincePress,
+		// @NamedArg("pickResult") PickResult pickResult
+		
+		return new MouseEvent(MouseEvent.MOUSE_CLICKED, 0, 0, 0, 0, MouseButton.PRIMARY, 1, false, false, false, false, false, false, false,
+				false, false, false, null);
 	}
 }

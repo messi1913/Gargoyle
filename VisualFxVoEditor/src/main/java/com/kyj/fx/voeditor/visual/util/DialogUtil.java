@@ -35,7 +35,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.PickResult;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
@@ -514,7 +516,7 @@ public class DialogUtil {
 	}
 
 	public static void showMessageDialog(Window initOwner, String title, String message) {
-		showMessageDialog((Stage) initOwner, title , "", message, alert -> {
+		showMessageDialog((Stage) initOwner, title, "", message, alert -> {
 			alert.initModality(Modality.APPLICATION_MODAL);
 			alert.initOwner(initOwner);
 			alert.showAndWait();
@@ -739,6 +741,11 @@ public class DialogUtil {
 		composite.addButton(btnCancel);
 
 		TextField text = new TextField();
+		text.setOnAction(ev -> {
+
+			btnOk.fireEvent(FxUtil.mouseEventForDummy());
+
+		});
 
 		composite.setGraphic(text);
 		Optional<Pair<String, String>> empty = Optional.empty();
