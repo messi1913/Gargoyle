@@ -93,14 +93,19 @@ public class TableOpenResourceView {
 	 * @return
 	 ********************************/
 	public ResultDialog<Map<String, Object>> show() {
-		Window owner = this.owner;
-		// if (window == null) {
-		// Scene scene = parent.getScene();
-		// if (scene != null) {
-		// window = scene.getWindow();
-		// }
-		// }
+//		Window owner = this.owner;
+//		return delegator.show(owner, true);
+		return show(null);
+	}
 
+	public ResultDialog<Map<String, Object>> show(Parent parent) {
+		Window owner = this.owner;
+		if (parent != null) {
+			Scene scene = parent.getScene();
+			if (scene != null) {
+				owner = scene.getWindow();
+			}
+		}
 		return delegator.show(owner, true);
 	}
 
@@ -256,14 +261,13 @@ public class TableOpenResourceView {
 			}
 
 			dutyCloseCount++;
-			
+
 			super.close();
 
 			if (parent != null)
 				parent.close();
 
 			TableOpenResourceView.this.close();
-			
 
 		}
 
@@ -320,7 +324,8 @@ public class TableOpenResourceView {
 				/*
 				 * TODO 추후 아래 메타정보를 이용하여 고칠 수 있게할것. REFERENCES.
 				 *
-				 * http://docs.oracle.com/javase/6/docs/api/java/sql/ DatabaseMetaData.html#getColumns(java.lang.String,%20java.
+				 * http://docs.oracle.com/javase/6/docs/api/java/sql/
+				 * DatabaseMetaData.html#getColumns(java.lang.String,%20java.
 				 * lang.String,%20java.lang.String,%20java.lang.String)
 				 *
 				 */

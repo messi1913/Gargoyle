@@ -773,7 +773,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 		} else if (value instanceof TableItemTree) {
 			SchemaItemTree<String> schema = ((TableItemTree<String>) value).getParent();
 			final String databaseName = schema.getName();
-			showProperties(connectionSupplier, databaseName, name);
+			showProperties(connectionSupplier, null, databaseName, name);
 		}
 	}
 
@@ -781,12 +781,13 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	 * @inheritDoc
 	 */
 	@Override
-	public void showProperties(ConnectionSupplier connectionSupplier, String databaseName, String tableName) {
+	public void showProperties(ConnectionSupplier connectionSupplier, String catalog, String databaseName, String tableName) {
 		try {
 
 			// 팝업씬 생성.
 			TableInformationFrameView tableInformationFrameView = new TableInformationFrameView(connectionSupplier, () -> {
 				TableInformationUserMetadataVO meta = new TableInformationUserMetadataVO();
+				meta.setCatalog(catalog);
 				meta.setDatabaseName(databaseName);
 				meta.setTableName(tableName);
 				return meta;
@@ -858,6 +859,26 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 
 		return tableName;
 	}
+	
+	@Override
+	public String getCatalogName(TreeItem<DatabaseItemTree<String>> selectItem) {
+		
+		String catalogName = null;
+		if (selectItem != null) {
+			DatabaseItemTree<String> value = selectItem.getValue();
+			// 클래스타입이 TableItemTree타입만 처리
+
+			// System.out.println(DatabaseItemTree.class.isAssignableFrom(value.getClass()));
+			if (!(value instanceof TableItemTree) && !(value instanceof ColumnItemTree) && !(value instanceof SchemaItemTree)) {
+				return selectItem.getValue().getName();
+			} else {
+				TreeItem<DatabaseItemTree<String>> _tree = selectItem.getParent();
+				return getCatalogName(_tree);
+			}
+		}
+		return catalogName;
+	}
+	
 
 	/*
 	 * 선택된 테이블 트리아이템으로부터 DBMS, TABLE명을 받은후, 해당되는 테이블컬럼 목록을 반환받는다. (non-Javadoc)

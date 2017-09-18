@@ -39,7 +39,7 @@ import javafx.util.StringConverter;
  * @author KYJ
  *
  ***************************/
-public final class MssqlTableOpenResourceView extends TableOpenResourceView {
+public class MssqlTableOpenResourceView extends TableOpenResourceView {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(MssqlTableOpenResourceView.class);
 
@@ -52,6 +52,11 @@ public final class MssqlTableOpenResourceView extends TableOpenResourceView {
 		this.conSupplier = conSupplier;
 		this.delegator = new MssqlTableResourceView(window);
 		this.delegator.setTitle("MssqlTableOpenResourceView");
+	}
+
+	@Override
+	public void close() {
+		this.delegator.close();
 	}
 
 	class MssqlTableResourceView extends ResourceView<Map<String, Object>> {
@@ -67,10 +72,18 @@ public final class MssqlTableOpenResourceView extends TableOpenResourceView {
 			this.parent = parent;
 		}
 
+		int dutyCount;
+
 		@Override
 		public void close() {
 			super.close();
-			parent.close();
+			
+			if (dutyCount > 0) {
+				dutyCount = 0;
+				return;
+			}
+			dutyCount++;
+			MssqlTableOpenResourceView.this.close();
 		}
 
 		/*

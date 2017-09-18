@@ -90,7 +90,7 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 						this.startRow = Integer.parseInt(startRow.toString());
 					}
 				} catch (NumberFormatException e) {
-					/*Nothing.*/}
+					/* Nothing. */}
 
 			}
 		}
@@ -119,13 +119,14 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 					// 컬럼 크기가 큰 경우 데이터 맵핑을 생략할건지 유무
 
 					String value = u.getString(c);
+
 					boolean isEmptyValue = value == null || value.isEmpty();
-					//					String tmpColumnLabel = metaData.getColumnLabel(c);
+					// String tmpColumnLabel = metaData.getColumnLabel(c);
 					String columnLabel = metaData.getColumnLabel(c);
 
-					//2016-08-04 중복되는 컬럼이 씹혀 없어지지않도록 컬럼이름이 중복되면 인덱스를 붙임.
+					// 2016-08-04 중복되는 컬럼이 씹혀 없어지지않도록 컬럼이름이 중복되면 인덱스를 붙임.
 					int nextNameIdx = 1;
-					while (map.containsKey(columnLabel) && /*무한루핑 방지*/nextNameIdx < 1000) {
+					while (map.containsKey(columnLabel) && /* 무한루핑 방지 */nextNameIdx < 1000) {
 						columnLabel = String.format("%s_%d", metaData.getColumnLabel(c), nextNameIdx);
 						nextNameIdx++;
 					}
@@ -145,6 +146,8 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 							break;
 						default:
 							String columnTypeName = metaData.getColumnTypeName(c);
+							int cType = metaData.getColumnType(c);
+
 							// mysql big data type.
 							if ("text".equals(columnTypeName)) {
 								// map.put(metaData.getColumnLabel(c), new
@@ -160,12 +163,24 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 								map.put(columnLabel,
 										isEmptyValue ? new BigDataDVO("{data.bytea}", value) : new BigDataDVO("{DATA.BYTEA}", value));
 								break;
+							} 
+//							else if ("xml".equals(columnTypeName)) {
+//								map.put(columnLabel,
+//										isEmptyValue ? new BigDataDVO("{data.bytea}", value) : new BigDataDVO("{DATA.BYTEA}", value));
+//								break;
+//							} 
+							
+							else if (java.sql.Types.LONGNVARCHAR == cType) {
+								map.put(columnLabel,
+										isEmptyValue ? new BigDataDVO("{data.bytea}", value) : new BigDataDVO("{DATA.BYTEA}", value));
+								break;
 							}
 							map.put(columnLabel, value);
 							break;
 						}
 						if (firstRow) {
-							LOGGER.debug(String.format("column : %s type %s", columnLabel, metaData.getColumnTypeName(c)));
+							LOGGER.debug(String.format("column : %s type %s (%d)", columnLabel, metaData.getColumnTypeName(c),
+									metaData.getColumnType(c)));
 						}
 					} else {
 						map.put(columnLabel, value);

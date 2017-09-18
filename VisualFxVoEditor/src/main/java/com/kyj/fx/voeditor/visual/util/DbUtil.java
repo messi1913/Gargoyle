@@ -52,6 +52,7 @@ import com.kyj.fx.voeditor.visual.exceptions.NotSupportException;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.functions.BiTransactionScope;
 import com.kyj.fx.voeditor.visual.functions.ResultSetToMapConverter;
+import com.kyj.fx.voeditor.visual.functions.ThFunction;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 
 /**
@@ -882,25 +883,31 @@ public class DbUtil extends ConnectionManager {
 		List<T> tables = new ArrayList<>();
 
 		DatabaseMetaData metaData = connection.getMetaData();
-		ResultSet rs = metaData.getTables(null, null,
-				"%"/* + tableNamePattern + "%" */, new String[] { "TABLE", });
 
-		String tableNamePatternUpperCase = tableNamePattern.toUpperCase();
-		while (rs.next()) {
+		/* 17.9.19 catalog를 추가하여 조회할 수 있게 코드 수정 */
 
-			// 2016-08-18 특정데이터베이스(sqlite)에서는 인덱스 트리거정보도 동시에 출력된다.
-			String tableType = rs.getString(4);
-			if ("TABLE".equals(tableType)) {
+		ResultSet catalogs = metaData.getCatalogs();
+		while (catalogs.next()) {
+			String catal = catalogs.getString(1);
+			ResultSet rs = metaData.getTables(catal, null,
+					"%"/* + tableNamePattern + "%" */, new String[] { "TABLE" });
+			String tableNamePatternUpperCase = tableNamePattern.toUpperCase();
+			while (rs.next()) {
 
-				String tableName = rs.getString(3);
-				if (tableName.toUpperCase().indexOf(tableNamePatternUpperCase) != -1) {
-					T apply = converter.apply(rs);
-					if (apply != null)
-						tables.add(apply);
+				// 2016-08-18 특정데이터베이스(sqlite)에서는 인덱스 트리거정보도 동시에 출력된다.
+				String tableType = rs.getString(4);
+				if ("TABLE".equals(tableType)) {
+
+					String tableName = rs.getString(3);
+					if (tableName.toUpperCase().indexOf(tableNamePatternUpperCase) != -1) {
+						T apply = converter.apply(rs);
+						if (apply != null)
+							tables.add(apply);
+					}
+
 				}
 
 			}
-
 		}
 
 		return tables;
@@ -1120,12 +1127,27 @@ public class DbUtil extends ConnectionManager {
 	 * @throws Exception
 	 */
 	public static <T> List<T> columns(Connection connection, String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
-		return columns(connection, tableNamePattern, COLUMN_CONVERTER, converter);
+		return columns(connection, null, tableNamePattern, COLUMN_CONVERTER, converter);
 	}
-	
+
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 9. 15. 
+	 * @작성일 : 2017. 9. 18.
+	 * @param connection
+	 * @param catalog
+	 * @param tableNamePattern
+	 * @param converter
+	 * @return
+	 * @throws Exception
+	 */
+	public static <T> List<T> columns(Connection connection, String catalog, String tableNamePattern, Function<ResultSet, T> converter)
+			throws Exception {
+		return columns(connection, catalog, tableNamePattern, COLUMN_CONVERTER, converter);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 15.
 	 * @param connection
 	 * @param tableNamePattern
 	 * @param columnNameConverter
@@ -1133,7 +1155,9 @@ public class DbUtil extends ConnectionManager {
 	 * @return
 	 * @throws Exception
 	 */
-	public static <T> List<T> columns(Connection connection, String tableNamePattern, BiFunction<String, DatabaseMetaData, ResultSet> columnNameConverter, Function<ResultSet, T> converter) throws Exception {
+	public static <T> List<T> columns(Connection connection, String catalog, String tableNamePattern,
+			ThFunction<String, String, DatabaseMetaData, ResultSet> columnNameConverter, Function<ResultSet, T> converter)
+			throws Exception {
 		if (converter == null)
 			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
 
@@ -1141,10 +1165,10 @@ public class DbUtil extends ConnectionManager {
 		// try (Connection connection = getConnection()) {
 
 		DatabaseMetaData metaData = connection.getMetaData();
-		ResultSet rs = columnNameConverter.apply(tableNamePattern, metaData); // metaData.getColumns(null,
-																			// null,
-																			// tableNamePattern,
-																			// null);
+		ResultSet rs = columnNameConverter.apply(catalog, tableNamePattern, metaData); // metaData.getColumns(null,
+		// null,
+		// tableNamePattern,
+		// null);
 
 		while (rs.next()) {
 			tables.add(converter.apply(rs));
@@ -1153,9 +1177,7 @@ public class DbUtil extends ConnectionManager {
 
 		return tables;
 	}
-	
-	
-	
+
 	public static <K, T> Map<K, T> columnsToMap(Connection connection, String tableNamePattern, Function<ResultSet, K> keyMapper,
 			Function<ResultSet, T> valueMapper) throws Exception {
 		if (keyMapper == null || valueMapper == null)
@@ -1165,7 +1187,7 @@ public class DbUtil extends ConnectionManager {
 		// try (Connection connection = getConnection()) {
 
 		DatabaseMetaData metaData = connection.getMetaData();
-		ResultSet rs = COLUMN_CONVERTER.apply(tableNamePattern, metaData);
+		ResultSet rs = COLUMN_CONVERTER.apply(null, tableNamePattern, metaData);
 
 		while (rs.next()) {
 			K k = keyMapper.apply(rs);
@@ -1177,30 +1199,35 @@ public class DbUtil extends ConnectionManager {
 		return tables;
 	}
 
-	public static final BiFunction<String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (tableNamePattern, metaData) -> {
+	public static final ThFunction<String, String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (catalog, tableNamePattern,
+			metaData) -> {
 		int dotIdx = tableNamePattern.indexOf('.');
 		try {
+			String category = catalog; // tableNamePattern.substring(0,
 			if (dotIdx >= 0) {
-				String category = tableNamePattern.substring(0, dotIdx);
+
+				// dotIdx);
 				String tableName = tableNamePattern.substring(dotIdx + 1);
 				return metaData.getColumns(category, null, tableName, null);
 			}
-			return metaData.getColumns(null, null, tableNamePattern, null);
+			return metaData.getColumns(category, null, tableNamePattern, null);
 		} catch (Exception e) {
 			//
 		}
 		return null;
 	};
 
-	public static final BiFunction<String, DatabaseMetaData, ResultSet> PRIMARY_CONVERTER = (tableNamePattern, metaData) -> {
+	public static final ThFunction<String, String, DatabaseMetaData, ResultSet> PRIMARY_CONVERTER = (catalog, tableNamePattern,
+			metaData) -> {
 		int dotIdx = tableNamePattern.indexOf('.');
 		try {
+			String category = catalog; // tableNamePattern.substring(0, dotIdx);
 			if (dotIdx >= 0) {
-				String category = tableNamePattern.substring(0, dotIdx);
+
 				String tableName = tableNamePattern.substring(dotIdx + 1);
 				return metaData.getPrimaryKeys(category, null, tableName);
 			}
-			return metaData.getPrimaryKeys(null, null, tableNamePattern);
+			return metaData.getPrimaryKeys(category, null, tableNamePattern);
 		} catch (Exception e) {
 			//
 		}
@@ -1208,7 +1235,7 @@ public class DbUtil extends ConnectionManager {
 	};
 
 	public static List<String> pks(String tableNamePattern) throws Exception {
-		return pks(getConnection(), tableNamePattern, t -> {
+		return pks(getConnection(), null, tableNamePattern, t -> {
 			try {
 				return t.getString(4);
 			} catch (SQLException e) {
@@ -1219,7 +1246,7 @@ public class DbUtil extends ConnectionManager {
 	}
 
 	public static List<String> pks(Connection con, String tableNamePattern) throws Exception {
-		return pks(con, tableNamePattern, t -> {
+		return pks(con, null, tableNamePattern, t -> {
 			try {
 				return t.getString(4);
 			} catch (SQLException e) {
@@ -1232,12 +1259,13 @@ public class DbUtil extends ConnectionManager {
 	public static <T> List<T> pks(String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
 		List<T> tables = Collections.emptyList();
 		try (Connection connection = getConnection()) {
-			tables = pks(connection, tableNamePattern, converter);
+			tables = pks(connection, null, tableNamePattern, converter);
 		}
 		return tables;
 	}
 
-	public static <T> List<T> pks(Connection connection, String tableNamePattern, Function<ResultSet, T> converter) throws Exception {
+	public static <T> List<T> pks(Connection connection, String catalog, String tableNamePattern, Function<ResultSet, T> converter)
+			throws Exception {
 		if (converter == null)
 			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
 
@@ -1245,9 +1273,9 @@ public class DbUtil extends ConnectionManager {
 
 		DatabaseMetaData metaData = connection.getMetaData();
 
-		ResultSet rs = PRIMARY_CONVERTER.apply(tableNamePattern, metaData); // metaData.getPrimaryKeys(null,
-																			// null,
-																			// tableNamePattern);
+		ResultSet rs = PRIMARY_CONVERTER.apply(catalog, tableNamePattern, metaData); // metaData.getPrimaryKeys(null,
+		// null,
+		// tableNamePattern);
 
 		if (rs != null) {
 			while (rs.next()) {

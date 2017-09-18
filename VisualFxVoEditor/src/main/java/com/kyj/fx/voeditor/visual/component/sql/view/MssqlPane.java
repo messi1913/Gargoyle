@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -36,7 +35,11 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.mssql.MSSQLDatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
+import com.kyj.fx.voeditor.visual.component.text.ASTSqlCodeAreaHelper;
+import com.kyj.fx.voeditor.visual.component.text.MssqlASTSqlCodeAreaHelper;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
+import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
+import com.kyj.fx.voeditor.visual.functions.ThFunction;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -84,7 +87,8 @@ public class MssqlPane extends CommonsSqllPan {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane# menuExportMergeScriptOnAction(javafx.event.ActionEvent)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#
+	 * menuExportMergeScriptOnAction(javafx.event.ActionEvent)
 	 */
 	@Override
 	public void menuExportMergeScriptOnAction(ActionEvent e) {
@@ -95,7 +99,9 @@ public class MssqlPane extends CommonsSqllPan {
 	/*
 	 * 100개의 데이터 보여주기 위해 처리하는 메소드
 	 *
-	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#show100RowAction( javafx.event.ActionEvent)
+	 * @see
+	 * com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#show100RowAction(
+	 * javafx.event.ActionEvent)
 	 */
 	@Override
 	public List<Map<String, Object>> show100RowAction() {
@@ -133,7 +139,8 @@ public class MssqlPane extends CommonsSqllPan {
 
 				String tableName = "";
 				/*
-				 * 2016-07-12 SQLite에서는 스키마라는 개념이 존재하지않는다. Schema Name을 100개의로우를 보여주는 SQL에 적용할지 여부를 결정한다.
+				 * 2016-07-12 SQLite에서는 스키마라는 개념이 존재하지않는다. Schema Name을 100개의로우를
+				 * 보여주는 SQL에 적용할지 여부를 결정한다.
 				 */
 				if (value.isApplySchemaName(schemaName)) {
 					tableName = String.format("%s.%s", schemaName, value.getName()); // schemaName.concat(".").concat(value.getName());
@@ -253,26 +260,33 @@ public class MssqlPane extends CommonsSqllPan {
 	 * 
 	 * (non-Javadoc)
 	 * 
-	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#createTableResourceView()
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#
+	 * createTableResourceView()
 	 */
 	@Override
 	protected TableOpenResourceView createTableResourceView() {
 		return new MssqlTableOpenResourceView(connectionSupplier);
 	}
 
+	protected ASTSqlCodeAreaHelper installASTSqlCodeAreaHelper(SqlKeywords keyword) {
+		return new MssqlASTSqlCodeAreaHelper(keyword.getCodeArea(), connectionSupplier);
+	}
+
 	/**
 	 * 테이블을 찾는 리소스 뷰를 오픈
 	 * 
-	 * 아래 코드부분은 동일한처리를함. 
-	 * 리소스뷰를 오버라이드로 생성하도록 코드 변경유도
+	 * 아래 코드부분은 동일한처리를함. 리소스뷰를 오버라이드로 생성하도록 코드 변경유도
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 09. 15.
 	 */
 	// @Override
 	// public void showTableResourceView() {
 	// try {
-	// MssqlTableOpenResourceView tableOpenResourceView = new MssqlTableOpenResourceView(connectionSupplier);
-	// ResultDialog<Map<String, Object>> show = tableOpenResourceView.show(this);
+	// MssqlTableOpenResourceView tableOpenResourceView = new
+	// MssqlTableOpenResourceView(connectionSupplier);
+	// ResultDialog<Map<String, Object>> show =
+	// tableOpenResourceView.show(this);
 	//
 	// Map<String, Object> data = show.getData();
 	// if (ValueUtil.isNotEmpty(data)) {
@@ -281,7 +295,8 @@ public class MssqlPane extends CommonsSqllPan {
 	// String databaseName = tableOpenResourceView.getDatabaseName(data);
 	// String tableName = tableOpenResourceView.getTableName(data);
 	//
-	// TreeItem<DatabaseItemTree<String>> search = search(schema, databaseName, tableName);
+	// TreeItem<DatabaseItemTree<String>> search = search(schema, databaseName,
+	// tableName);
 	//
 	// if (search != null) {
 	// // TreeView<DatabaseItemTree<String>> schemaTree2 =
@@ -305,7 +320,8 @@ public class MssqlPane extends CommonsSqllPan {
 	/**
 	 * @최초생성일 2017. 9. 15.
 	 */
-	public static final BiFunction<String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (tableNamePattern, metaData) -> {
+	public static final ThFunction<String, String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (catalog, tableNamePattern,
+			metaData) -> {
 		int cateIdx = tableNamePattern.indexOf('.');
 		int schemIdx = tableNamePattern.indexOf('.', cateIdx + 1);
 
@@ -327,7 +343,9 @@ public class MssqlPane extends CommonsSqllPan {
 	/*
 	 * 테이블의 SELECT문을 리턴. (non-Javadoc)
 	 * 
-	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#applySelectScript( javafx.event.ActionEvent)
+	 * @see
+	 * com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#applySelectScript(
+	 * javafx.event.ActionEvent)
 	 */
 	@Override
 	public void applySelectScript(ActionEvent e) {
@@ -340,7 +358,7 @@ public class MssqlPane extends CommonsSqllPan {
 
 		try (Connection connection = connectionSupplier.get()) {
 
-			List<String> columns = DbUtil.columns(connection, tableName, COLUMN_CONVERTER, t -> {
+			List<String> columns = DbUtil.columns(connection, null, tableName, COLUMN_CONVERTER, t -> {
 				try {
 					return t.getString(4);
 				} catch (SQLException ex) {
@@ -373,7 +391,8 @@ public class MssqlPane extends CommonsSqllPan {
 	/*
 	 * 컬럼 트리 구성 함수 (non-Javadoc)
 	 * 
-	 * @see com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan#getSelectedTreeByTableColumns(javafx.scene.control.TreeItem)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan#
+	 * getSelectedTreeByTableColumns(javafx.scene.control.TreeItem)
 	 */
 	@Override
 	public List<String> getSelectedTreeByTableColumns(TreeItem<DatabaseItemTree<String>> selectItem) {
@@ -402,7 +421,7 @@ public class MssqlPane extends CommonsSqllPan {
 						return "<<<<ERROR>>>>";
 					};
 
-					columnList = DbUtil.columns(connection, tableName, COLUMN_CONVERTER, converter);
+					columnList = DbUtil.columns(connection, null, tableName, COLUMN_CONVERTER, converter);
 
 				} catch (Exception e) {
 					LOGGER.error(ValueUtil.toString(e));

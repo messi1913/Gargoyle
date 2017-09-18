@@ -8,79 +8,32 @@ package com.kyj.fx.voeditor.visual.component.text;
 
 import java.util.Map;
 
-import org.controlsfx.control.PopOver;
 import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.PopupAlignment;
 
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
+import com.kyj.fx.voeditor.visual.component.popup.MssqlTableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.ResourceView;
-import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.scene.control.IndexRange;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 /**
  * @author KYJ
  *
  */
-public class ASTSqlCodeAreaHelper extends ASTCodeAreaHelper {
+public class MssqlASTSqlCodeAreaHelper extends ASTSqlCodeAreaHelper {
 
-	private CodeArea codeArea;
-	private ConnectionSupplier connectionSupplier;
-	private ResourceView<Map<String, Object>> view;
-	private StringProperty replaceTarget = new SimpleStringProperty();
-
-	public ASTSqlCodeAreaHelper(CodeArea codeArea, ConnectionSupplier connectionSupplier) {
-		this.codeArea = codeArea;
-		this.connectionSupplier = connectionSupplier;
-		view = createResourceView();
-
-		codeArea.setPopupWindow(new PopOver(view));
-		codeArea.setPopupAlignment(PopupAlignment.SELECTION_TOP_CENTER);
-		codeArea.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
-
-			if (ev.isControlDown() && ev.getCode() == KeyCode.SPACE) {
-
-				if (ev.isConsumed())
-					return;
-
-				String string = markText(codeArea);
-				view.getTxtFilter().setText(string);
-				replaceTarget.set(string);
-
-				codeArea.getPopupWindow().show(codeArea.getScene().getWindow());
-				codeArea.getPopupWindow().requestFocus();
-
-				view.getTxtFilter().requestFocus();
-				view.getTxtFilter().selectEnd();
-
-				ev.consume();
-			}
-		});
-
-	}
-
-	public CodeArea getCodeArea() {
-		return codeArea;
-	}
-
-	public ConnectionSupplier getConnectionSupplier() {
-		return connectionSupplier;
-	}
-
-	public ResourceView<Map<String, Object>> getView() {
-		return view;
+	public MssqlASTSqlCodeAreaHelper(CodeArea codeArea, ConnectionSupplier connectionSupplier) {
+		super(codeArea, connectionSupplier);
 	}
 
 	@Override
 	public ResourceView<Map<String, Object>> createResourceView() {
+		ConnectionSupplier connectionSupplier = getConnectionSupplier();
 
-		TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier) {
+		MssqlTableOpenResourceView tableOpenResourceView = new MssqlTableOpenResourceView(connectionSupplier, new Stage()) {
 
 			/*
 			 * (non-Javadoc)
@@ -91,7 +44,7 @@ public class ASTSqlCodeAreaHelper extends ASTCodeAreaHelper {
 			 */
 			@Override
 			public void close() {
-
+				CodeArea codeArea = getCodeArea();
 				codeArea.getPopupWindow().hide();
 
 				ResultDialog<Map<String, Object>> result = getResult();
@@ -104,6 +57,13 @@ public class ASTSqlCodeAreaHelper extends ASTCodeAreaHelper {
 					String tableName = getTableName(data);
 					if (tableName == null)
 						return;
+					
+					Object _tbCat = data.get("TABLE_CAT");
+					if(ValueUtil.isNotEmpty(_tbCat))
+					{
+						tableName = String.format("%s.%s", _tbCat.toString(), tableName);
+					}
+					
 					// Object object = data.get("table_name");
 					// if (object == null)
 					// return;

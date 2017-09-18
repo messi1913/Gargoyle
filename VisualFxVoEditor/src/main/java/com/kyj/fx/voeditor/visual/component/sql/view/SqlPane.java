@@ -759,8 +759,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	public void applyInsertScript(ActionEvent e) {
 		TreeItem<K> selectedTableTreeItem = schemaTree.getSelectionModel().getSelectedItem();
 		String tableName = this.getSelectedTreeByTableName(selectedTableTreeItem);
-//		TreeItem<K> schemaTreeItem = selectedTableTreeItem.getParent();
-//		String schema = schemaTreeItem.getValue().toString();
+		// TreeItem<K> schemaTreeItem = selectedTableTreeItem.getParent();
+		// String schema = schemaTreeItem.getValue().toString();
 
 		List<String> tableColumns = this.getSelectedTreeByTableColumns(selectedTableTreeItem);
 		SqlTab selectedTab = getSelectedSqlTab();
@@ -897,6 +897,10 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		return schemaTree;
 	}
 
+	protected ASTSqlCodeAreaHelper installASTSqlCodeAreaHelper(SqlKeywords keyword) {
+		return new ASTSqlCodeAreaHelper(keyword.getCodeArea(), connectionSupplier);
+	}
+
 	/**
 	 * 탭추가.
 	 *
@@ -912,9 +916,10 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		SqlKeywords sqlNode = sqlTab.getSqlNode();
 
-		//TODO
+		// TODO
 		// 코드 AreaHelper 설치.
-		new ASTSqlCodeAreaHelper(sqlNode.getCodeArea(), connectionSupplier);
+		// new ASTSqlCodeAreaHelper(sqlNode.getCodeArea(), connectionSupplier);
+		installASTSqlCodeAreaHelper(sqlNode);
 
 		ContextMenu contextMenu = sqlTab.getTxtSqlPaneContextMenu();
 		Menu menuFunc = new Menu("Functions");
@@ -1034,7 +1039,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				// String driverName =
 				// DbUtil.getDriverNameByConnection(connection);
 				// String dbmsName = ValueUtil.getDriverToDBMSName(driverName);
-				showProperties(connectionSupplier, /* schemaName, */null, selectedSQLText);
+				showProperties(connectionSupplier, /* catalog */null,
+						/* schemaName */null, selectedSQLText);
 			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
 			}
@@ -1050,9 +1056,11 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 			String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
 			TreeItem<K> selectedItem = schemaTree.getSelectionModel().getSelectedItem();
+			
 			String selectedSchemName = getSchemaName(selectedItem);
+			String catalogName = getCatalogName(selectedItem);
 			if (selectedSchemName != null && selectedSQLText != null) {
-				showProperties(connectionSupplier, selectedSchemName, selectedSQLText);
+				showProperties(connectionSupplier, catalogName, selectedSchemName, selectedSQLText);
 				e.consume();
 			}
 		}
@@ -1416,7 +1424,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		if (colSize < 27)
 			colSize = 27;
 
-//		String putString = new StringBuffer().append(columnBuf).append(dataBuf).toString();
+		// String putString = new
+		// StringBuffer().append(columnBuf).append(dataBuf).toString();
 		SchoolMgrerSpreadSheetView parent = new SchoolMgrerSpreadSheetView(colSize);
 		// parent.paste(putString, 0, 0);
 		parent.paste(items, 0, 0);
@@ -1558,13 +1567,14 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 9. 16. 
+	 * @작성일 : 2017. 9. 16.
 	 * @return
 	 */
-	protected TableOpenResourceView createTableResourceView(){
+	protected TableOpenResourceView createTableResourceView() {
 		TableOpenResourceView tableOpenResourceView = new TableOpenResourceView(connectionSupplier);
 		return tableOpenResourceView;
 	}
+
 	/**
 	 * 테이블을 찾는 리소스 뷰를 오픈
 	 *
@@ -1574,7 +1584,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	protected void showTableResourceView() {
 		try {
 			TableOpenResourceView tableOpenResourceView = createTableResourceView();
-			ResultDialog<Map<String, Object>> show = tableOpenResourceView.show();
+			ResultDialog<Map<String, Object>> show = tableOpenResourceView.show(this);
 
 			Map<String, Object> data = show.getData();
 			if (ValueUtil.isNotEmpty(data)) {

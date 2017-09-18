@@ -636,6 +636,21 @@ public class ValueUtil {
 	}
 
 	/**
+	 * print stacktrace.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 18. 
+	 * @param stacks
+	 * @return
+	 */
+	public static String toString(StackTraceElement[] stacks) {
+		StringBuffer sb = new StringBuffer();
+		for (StackTraceElement s : stacks) {
+			sb.append(s.getClassName()).append(".").append(s.getMethodName()).append("[").append(s.getLineNumber()).append("]\n");
+		}
+		return sb.toString();
+	}
+
+	/**
 	 * 에러 메세지 상세화
 	 *
 	 * @param title
@@ -664,12 +679,12 @@ public class ValueUtil {
 		JSONObject fromJson = gson.fromJson(str, JSONObject.class);
 		return fromJson == null ? new JSONObject() : fromJson;
 	}
-	
-//	public static JSONArray toJSONArray(String str) {
-//		Gson gson = new Gson();
-//		JSONArray fromJson = gson.fromJson(str, JSONArray.class);
-//		return fromJson == null ? new JSONArray() : fromJson;
-//	}
+
+	// public static JSONArray toJSONArray(String str) {
+	// Gson gson = new Gson();
+	// JSONArray fromJson = gson.fromJson(str, JSONArray.class);
+	// return fromJson == null ? new JSONArray() : fromJson;
+	// }
 
 	public static String toJSONString(Object obj) {
 		Gson gson = new Gson();
@@ -745,9 +760,9 @@ public class ValueUtil {
 	 * config.properties 파일에 기술되어있음.
 	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 7. 12. 
+	 * @작성일 : 2017. 7. 12.
 	 * @param dbms
-	 * @return 
+	 * @return
 	 * @throws NotYetSupportException
 	 */
 	public static String getDbmsNameToDriver(String dbms) {
@@ -852,16 +867,19 @@ public class ValueUtil {
 	/**
 	 * from springframework
 	 *
-	 * Tokenize the given String into a String array via a StringTokenizer. Trims tokens and omits empty tokens.
+	 * Tokenize the given String into a String array via a StringTokenizer.
+	 * Trims tokens and omits empty tokens.
 	 * <p>
-	 * The given delimiters string is supposed to consist of any number of delimiter characters. Each of those characters can be used to
-	 * separate tokens. A delimiter is always a single character; for multi-character delimiters, consider using
-	 * {@code delimitedListToStringArray}
+	 * The given delimiters string is supposed to consist of any number of
+	 * delimiter characters. Each of those characters can be used to separate
+	 * tokens. A delimiter is always a single character; for multi-character
+	 * delimiters, consider using {@code delimitedListToStringArray}
 	 *
 	 * @param str
 	 *            the String to tokenize
 	 * @param delimiters
-	 *            the delimiter characters, assembled as String (each of those characters is individually considered as delimiter).
+	 *            the delimiter characters, assembled as String (each of those
+	 *            characters is individually considered as delimiter).
 	 * @return an array of the tokens
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
@@ -877,20 +895,24 @@ public class ValueUtil {
 	 *
 	 * Tokenize the given String into a String array via a StringTokenizer.
 	 * <p>
-	 * The given delimiters string is supposed to consist of any number of delimiter characters. Each of those characters can be used to
-	 * separate tokens. A delimiter is always a single character; for multi-character delimiters, consider using
-	 * {@code delimitedListToStringArray}
+	 * The given delimiters string is supposed to consist of any number of
+	 * delimiter characters. Each of those characters can be used to separate
+	 * tokens. A delimiter is always a single character; for multi-character
+	 * delimiters, consider using {@code delimitedListToStringArray}
 	 *
 	 * @param str
 	 *            the String to tokenize
 	 * @param delimiters
-	 *            the delimiter characters, assembled as String (each of those characters is individually considered as delimiter)
+	 *            the delimiter characters, assembled as String (each of those
+	 *            characters is individually considered as delimiter)
 	 * @param trimTokens
 	 *            trim the tokens via String's {@code trim}
 	 * @param ignoreEmptyTokens
-	 *            omit empty tokens from the result array (only applies to tokens that are empty after trimming; StringTokenizer will not
+	 *            omit empty tokens from the result array (only applies to
+	 *            tokens that are empty after trimming; StringTokenizer will not
 	 *            consider subsequent delimiters as token in the first place).
-	 * @return an array of the tokens ({@code null} if the input String was {@code null})
+	 * @return an array of the tokens ({@code null} if the input String was
+	 *         {@code null})
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
 	 * @see #delimitedListToStringArray
@@ -917,11 +939,13 @@ public class ValueUtil {
 	/**
 	 * from springframework.
 	 *
-	 * Copy the given Collection into a String array. The Collection must contain String elements only.
+	 * Copy the given Collection into a String array. The Collection must
+	 * contain String elements only.
 	 *
 	 * @param collection
 	 *            the Collection to copy
-	 * @return the String array ({@code null} if the passed-in Collection was {@code null})
+	 * @return the String array ({@code null} if the passed-in Collection was
+	 *         {@code null})
 	 */
 	public static String[] toStringArray(Collection<String> collection) {
 		if (collection == null) {
@@ -1079,7 +1103,8 @@ public class ValueUtil {
 	 * 단 객체가 테이블명 규칙에 준해야한다.
 	 *
 	 *
-	 * ex) TbmUser ::: TBM_USER 테이블을 찾는다. TbpSx ::: Tbp_Sx 테이블을 찾는다. ex) TbmMsMdDVO ::: TBM_MS_MD 테이블을 찾는다.
+	 * ex) TbmUser ::: TBM_USER 테이블을 찾는다. TbpSx ::: Tbp_Sx 테이블을 찾는다. ex)
+	 * TbmMsMdDVO ::: TBM_MS_MD 테이블을 찾는다.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 3. 29.
@@ -1265,7 +1290,8 @@ public class ValueUtil {
 				if ("*".equals(t)) {
 
 					/*
-					 * 2016-10-13 NoSuchElementException 예외처리 by kyj. 주석에 해당하는 내용은 대소문자 처리안함에 관련된 로직인데 예외에 걸림.
+					 * 2016-10-13 NoSuchElementException 예외처리 by kyj. 주석에 해당하는
+					 * 내용은 대소문자 처리안함에 관련된 로직인데 예외에 걸림.
 					 */
 					try {
 						do {
@@ -1881,7 +1907,7 @@ public class ValueUtil {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 6. 5. 
+	 * @작성일 : 2017. 6. 5.
 	 * @param bytes
 	 * @param charset
 	 * @return

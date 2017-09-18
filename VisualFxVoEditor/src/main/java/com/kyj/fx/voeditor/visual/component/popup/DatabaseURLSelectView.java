@@ -65,15 +65,20 @@ public class DatabaseURLSelectView extends BorderPane {
 
 			DabaseInfo dabaseInfo = new DabaseInfo();
 			String value = instance.get(key);
-			if ("jdbc.pass".equals(key))
-				value = decryp(value);
+//			if ("jdbc.pass".equals(key))
+//				value = decryp(value);
 
 			JSONObject json = ValueUtil.toJSONObject(value);
 
 			String dbms = ValueUtil.decode(json.get("dbms"), "").toString();
 			dabaseInfo.setDatabase(dbms);
 			dabaseInfo.setDriver(ValueUtil.getDbmsNameToDriver(dbms));
-			dabaseInfo.setPassword(value);
+//			
+			
+			String password = ValueUtil.decode(json.get("jdbc.pass"), "").toString();
+			if (ValueUtil.isNotEmpty(password))
+				password = decryp(password);
+			dabaseInfo.setPassword(password);
 			dabaseInfo.setUrl(ValueUtil.decode(json.get("jdbc.url"), "").toString());
 			dabaseInfo.setId(ValueUtil.decode(json.get("jdbc.id"), "").toString());
 			

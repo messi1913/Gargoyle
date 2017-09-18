@@ -53,7 +53,8 @@ public class SqlitePane extends CommonsSqllPan {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#menuExportMergeScriptOnAction(javafx.event.ActionEvent)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#
+	 * menuExportMergeScriptOnAction(javafx.event.ActionEvent)
 	 */
 	@Override
 	public void menuExportMergeScriptOnAction(ActionEvent e) {
@@ -73,8 +74,8 @@ public class SqlitePane extends CommonsSqllPan {
 			if (value instanceof TableItemTree) {
 
 				TableItemTree<String> tableItemTree = (TableItemTree<String>) value;
-				//sqlite no schema name.
-//				String schemaName = tableItemTree.getParent().getName();
+				// sqlite no schema name.
+				// String schemaName = tableItemTree.getParent().getName();
 				String tableName = tableItemTree.getName();
 				String sql = String.format("edit %s", tableName);
 				execiteEdit(sql);

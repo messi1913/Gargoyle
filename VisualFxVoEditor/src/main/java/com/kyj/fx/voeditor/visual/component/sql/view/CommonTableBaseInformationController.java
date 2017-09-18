@@ -39,7 +39,7 @@ public class CommonTableBaseInformationController extends AbstractTableBaseInfor
 	 * #getTableCommentSQL(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public String getTableCommentSQL(String databaseName, String tableName) throws Exception {
+	public String getTableCommentSQL(String catalog, String databaseName, String tableName) throws Exception {
 
 		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COMMENT_WRAPPER, getDbmsDriver());
 		if (sql != null) {
@@ -48,6 +48,7 @@ public class CommonTableBaseInformationController extends AbstractTableBaseInfor
 			//			sql = sql.replaceAll(":tableName", tableName);
 
 			HashMap<String, Object> map = new HashMap<>();
+			map.put("catalog", catalog);
 			map.put("databaseName", databaseName);
 			map.put("tableName", tableName);
 			return ValueUtil.getVelocityToText(sql, map, true);

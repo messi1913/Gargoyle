@@ -63,7 +63,7 @@ public interface SQLPaneMotionable<K> {
 	 * @param schema
 	 * @param tableName
 	 ********************************/
-	abstract void showProperties(ConnectionSupplier connectionSupplier, String schema, String tableName);
+	abstract void showProperties(ConnectionSupplier connectionSupplier, String catalog, String schema, String tableName);
 
 	/**
 	 * 테이블뷰 키클릭 이벤트
@@ -118,6 +118,14 @@ public interface SQLPaneMotionable<K> {
 	 ********************************/
 	abstract String getSchemaName(TreeItem<K> selectItem);
 
+	/**
+	 * catalog 명 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 18. 
+	 * @param selectItem
+	 * @return
+	 */
+	abstract String getCatalogName(TreeItem<K> selectItem);
 	/**
 	 * 선택된 트리로부터 컬럼명 리스트를 리턴
 	 *

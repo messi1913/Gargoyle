@@ -59,7 +59,7 @@ public abstract class AbstractTableBaseInformationController extends AbstractTab
 	 *
 	 * @return
 	 */
-	public abstract String getTableCommentSQL(String databaseName, String tableName) throws Exception;
+	public abstract String getTableCommentSQL(String catalog, String databaseName, String tableName) throws Exception;
 
 	/**
 	 * 데이터베이스 조회 결과를 파라미터로 넘겨주며 그중에서 테이블 코멘트의 내용을 리턴함.
@@ -76,6 +76,7 @@ public abstract class AbstractTableBaseInformationController extends AbstractTab
 	 */
 	public void init() throws Exception {
 		TableInformationUserMetadataVO metadata = this.parent.getMetadata();
+		String catalog = metadata.getCatalog();
 		String databaseName = metadata.getDatabaseName();
 		String tableName = metadata.getTableName();
 
@@ -85,7 +86,7 @@ public abstract class AbstractTableBaseInformationController extends AbstractTab
 
 		this.txtTableName.setText(tableName);
 
-		String sql = getTableCommentSQL(databaseName, tableName);
+		String sql = getTableCommentSQL(catalog, databaseName, tableName);
 		if (sql != null) {
 			List<Map<String, Object>> query = this.parent.query(sql);
 			String comment = getTableComment(query);

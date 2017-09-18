@@ -15,6 +15,7 @@ import javafx.beans.property.StringProperty;
  */
 public class TableInformationUserMetadataVO {
 
+	private StringProperty catalog;
 	/**
 	 * dbms
 	 */
@@ -25,6 +26,7 @@ public class TableInformationUserMetadataVO {
 	private StringProperty tableName;
 
 	public TableInformationUserMetadataVO() {
+		catalog = new SimpleStringProperty();
 		tableName = new SimpleStringProperty();
 		databaseName = new SimpleStringProperty();
 	}
@@ -51,6 +53,18 @@ public class TableInformationUserMetadataVO {
 
 	public final void setDatabaseName(final java.lang.String databaseName) {
 		this.databaseNameProperty().set(databaseName);
+	}
+
+	public final StringProperty catalogProperty() {
+		return this.catalog;
+	}
+
+	public final String getCatalog() {
+		return this.catalogProperty().get();
+	}
+
+	public final void setCatalog(final String catalog) {
+		this.catalogProperty().set(catalog);
 	}
 
 }
