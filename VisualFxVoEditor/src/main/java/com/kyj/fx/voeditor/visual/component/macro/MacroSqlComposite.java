@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.macro;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -14,7 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
@@ -45,12 +48,14 @@ public class MacroSqlComposite extends BorderPane {
 	@FXML
 	private BorderPane borContent;
 
-	private Supplier<Connection> connectionSupplier;
 	private String initText;
+	private Supplier<Connection> connectionSupplier;
+	private MacroTableGeneratorable createScript;
 
-	public MacroSqlComposite(Supplier<Connection> connectionSupplier, String initText) {
-		this.connectionSupplier = connectionSupplier;
+	public MacroSqlComposite(MacroTableGeneratorable createScript, String initText) {
 		this.initText = initText;
+		this.createScript = createScript;
+		this.connectionSupplier = createScript.connectionSupplier();
 		try {
 			FxUtil.loadRoot(MacroSqlComposite.class, this);
 		} catch (Exception e) {
@@ -60,6 +65,17 @@ public class MacroSqlComposite extends BorderPane {
 
 	@FxPostInitialize
 	public void post() {
+
+		// 스크립트 실행
+		ExecutorDemons.getGargoyleSystemExecutorSerivce().execute(() -> {
+			if (createScript != null) {
+				try {
+					createScript.execute();
+				} catch (Exception e1) {
+					LOGGER.error(ValueUtil.toString(e1));
+				}
+			}
+		});
 
 		MenuItem menuAddItem = new MenuItem("Add");
 		menuAddItem.setAccelerator(new KeyCodeCombination(KeyCode.INSERT, KeyCharacterCombination.CONTROL_DOWN));
@@ -81,7 +97,7 @@ public class MacroSqlComposite extends BorderPane {
 
 		MacroItemVO f = new MacroItemVO();
 		tvFavorite.setRoot(macroFavorTreeItem.createRoot(f));
-		tvFavorite.setShowRoot(false);
+		tvFavorite.setShowRoot(true);
 	}
 
 	@FXML
@@ -90,11 +106,11 @@ public class MacroSqlComposite extends BorderPane {
 	}
 
 	@FXML
-	public void modifyOnAction(){
-		
+	public void modifyOnAction() {
+
 	}
-	
-	public void removeOnAction(){
-		
+
+	public void removeOnAction() {
+
 	}
 }
