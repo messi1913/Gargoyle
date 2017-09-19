@@ -61,6 +61,8 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -600,13 +602,30 @@ public class DaoWizardViewController {
 		TableDVO tableDVO = view.show();
 		if (tableDVO != null) {
 			TableMasterDVO tableMasterDVO = tableDVO.getTableMasterDVO();
-			txtTableName.setText(tableMasterDVO.getTableName());
 
+			String tableName = tableMasterDVO.getTableName();
+			String catalog = tableMasterDVO.getCatalog();
+			String schemaName = tableMasterDVO.getSchemaName();
+			
+			if (ValueUtil.isNotEmpty(catalog)) {
+				tableName = tableMasterDVO.getCatalog();
+			}
+			if (ValueUtil.isNotEmpty(schemaName)) {
+				tableName = tableName.concat(".").concat(schemaName);
+			}
+			if (ValueUtil.isNotEmpty(tableMasterDVO.getTableName())) {
+				tableName = tableName.concat(".").concat(tableMasterDVO.getTableName());
+			}
+
+			txtTableName.setText(tableName);
 			// TbmSysDaoDVO tbmSysDaoDVO = new TbmSysDaoDVO();
-			tbmSysDaoDVOProperty.get().setTableName(tableMasterDVO.getTableName());
+			tbmSysDaoDVOProperty.get().setTableName(tableName);
+
 		}
 
 	}
+	// StringProperty catalog = new SimpleStringProperty();
+	// StringProperty schema = new SimpleStringProperty();
 
 	/**
 	 * 키보드를 작성하게될떄마다 Description의 부분을 마스터 데이터셋에 바인드
@@ -847,8 +866,8 @@ public class DaoWizardViewController {
 	public void btnBrowseMouseClick() {
 		String baseDir = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
 		File _baseDir = new File(baseDir);
-		
-		//2016.12.7 경로가 이미 존재하는경우 열리는 폴도 위치를 맞는경로에서 열릴수 있게 코드 수정 by kyj.
+
+		// 2016.12.7 경로가 이미 존재하는경우 열리는 폴도 위치를 맞는경로에서 열릴수 있게 코드 수정 by kyj.
 		File selectedDir = DialogUtil.showDirectoryDialog(SharedMemory.getPrimaryStage(), chooser -> {
 
 			String initDir = txtDaoLocation.getText();
