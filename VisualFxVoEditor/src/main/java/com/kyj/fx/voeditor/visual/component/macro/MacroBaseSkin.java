@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -33,6 +34,7 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -69,18 +71,21 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	private TableView<Map<String, String>> tbResult;
 
 	/**
-	 * 스레드가 실행중인지 여부에 따라 값이 TRUE/FALSE로 나뉘며
-	 * 이 값에 따라 버튼활성화 비활성화 및 스레드의 실행상태가 결정된다.
+	 * 스레드가 실행중인지 여부에 따라 값이 TRUE/FALSE로 나뉘며 이 값에 따라 버튼활성화 비활성화 및 스레드의 실행상태가
+	 * 결정된다.
+	 * 
 	 * @최초생성일 2016. 8. 31.
 	 */
 	private BooleanProperty isStarted = new SimpleBooleanProperty();
 	/**
 	 * 종료 요청이 성공적으로 진행된경우 호출되는 이벤트 내용이 기술된다.
+	 * 
 	 * @최초생성일 2016. 8. 31.
 	 */
 	public Consumer<Void> onStopSuccessed;
 	/**
 	 * 처리되는 코드블록에서 에러가 발생되 자동으로 멈춰야되는경우에 호출되는 이벤트 내용이 기술된다.
+	 * 
 	 * @최초생성일 2016. 8. 31.
 	 */
 	public Consumer<Void> onStopErrored;
@@ -92,7 +97,22 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	private AtomicInteger sleepSecond = new AtomicInteger(5);
 
 	/**
+	 * 쿼리실행후 데이터 결과 이벤트 인덱스 , 데이터
+	 * 
+	 * @최초생성일 2017. 9. 21.
+	 */
+	private ObjectProperty<BiConsumer<Integer, Map<String, String>>> onQueryDataUpdated = new SimpleObjectProperty<>();
+
+	/**
+	 * 실행되는 쿼리 처리 이벤트
+	 * 
+	 * @최초생성일 2017. 9. 21.
+	 */
+	private ObjectProperty<Consumer<String>> onExecutedQuery = new SimpleObjectProperty<>();
+
+	/**
 	 * 키 이벤트 정의
+	 * 
 	 * @최초생성일 2016. 8. 31.
 	 */
 	protected static final List<KeyBinding> DATE_CELL_BINDINGS = new ArrayList<KeyBinding>();
@@ -111,7 +131,10 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 			 * 이벤트 함수정의
 			 *
 			 * (non-Javadoc)
-			 * @see com.sun.javafx.scene.control.behavior.BehaviorBase#callAction(java.lang.String)
+			 * 
+			 * @see
+			 * com.sun.javafx.scene.control.behavior.BehaviorBase#callAction(
+			 * java.lang.String)
 			 */
 			@Override
 			protected void callAction(String name) {
@@ -125,6 +148,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 			}
 
 		});
+
 	}
 
 	/**
@@ -138,7 +162,8 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 		tbResult = new TableView<>();
 		tbResult.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		tbResult.getSelectionModel().setCellSelectionEnabled(true);
-		//		tbResult.addEventFilter(KeyEvent.KEY_RELEASED, this::tbResultOnKeyReleased);
+		// tbResult.addEventFilter(KeyEvent.KEY_RELEASED,
+		// this::tbResultOnKeyReleased);
 		textArea = new TextArea();
 		SplitPane splitPane = new SplitPane(textArea, tbResult);
 		splitPane.setOrientation(Orientation.VERTICAL);
@@ -246,8 +271,8 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 	/**
 	 * 스케줄링 정지 처리.
 	 *
-	 * 스케줄링 작업이 끝난 이후에 호출되기때문에
-	 * 리턴값이 바로출력되지않을 수 있다.
+	 * 스케줄링 작업이 끝난 이후에 호출되기때문에 리턴값이 바로출력되지않을 수 있다.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 31.
 	 */
@@ -294,6 +319,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 
 	/**
 	 * Stop요청이 들어온경우 성공적으로 정지되면 호출되는 이벤트 정의
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 31.
 	 * @param onStopSuccessed
@@ -304,6 +330,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 
 	/**
 	 * 에러가 발생되서 정지되는경우 호출되는 이벤트 정의
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 31.
 	 * @param onStopErrored
@@ -345,7 +372,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 					}
 					LOGGER.debug("Is Restart {} ", isStarted.get());
 
-					//				if (!updateStop.get()) {
+					// if (!updateStop.get()) {
 					synchronized (isStarted) {
 
 						if (isStarted.get()) {
@@ -363,7 +390,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 				}
 			};
 
-			//Javafx 스레드로 처리실행.
+			// Javafx 스레드로 처리실행.
 			Platform.runLater(new Runnable() {
 
 				@Override
@@ -373,7 +400,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 							start(tbResult, textArea.getText());
 					} catch (Exception e) {
 
-						//에러가 발생하면 중단함.
+						// 에러가 발생하면 중단함.
 
 						onFinished = null;
 						isStarted.set(false);
@@ -411,7 +438,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 		tbResult.getItems().clear();
 		tbResult.getColumns().clear();
 
-		//		try {
+		// try {
 
 		String[] split = param.split(";");
 
@@ -423,11 +450,15 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 					continue;
 
 				boolean dml = DbUtil.isDml(_sql);
+
+				if (onExecutedQuery.get() != null) {
+					onExecutedQuery.get().accept(_sql);
+				}
 				if (dml) {
-					LOGGER.debug("do update : {}", _sql);
+					// LOGGER.debug("do update : {}", _sql);
 					DbUtil.update(connection, _sql);
 				} else {
-					LOGGER.debug("do select : {}", _sql);
+					// LOGGER.debug("do select : {}", _sql);
 					DbUtil.select(connection, _sql, 30, 1000,
 							new BiFunction<ResultSetMetaData, ResultSet, List<Map<String, ObjectProperty<Object>>>>() {
 
@@ -443,24 +474,24 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 											tbCol.setCellFactory(
 													new Callback<TableColumn<Map<String, String>, String>, TableCell<Map<String, String>, String>>() {
 
-												@Override
-												public TableCell<Map<String, String>, String> call(
-														TableColumn<Map<String, String>, String> param) {
-													return new TableCell<Map<String, String>, String>() {
-
 														@Override
-														protected void updateItem(String item, boolean empty) {
-															super.updateItem(item, empty);
-															if (empty) {
-																setGraphic(null);
-															} else {
-																setGraphic(new Label(item));
-															}
-														}
+														public TableCell<Map<String, String>, String> call(
+																TableColumn<Map<String, String>, String> param) {
+															return new TableCell<Map<String, String>, String>() {
 
-													};
-												}
-											});
+																@Override
+																protected void updateItem(String item, boolean empty) {
+																	super.updateItem(item, empty);
+																	if (empty) {
+																		setGraphic(null);
+																	} else {
+																		setGraphic(new Label(item));
+																	}
+																}
+
+															};
+														}
+													});
 
 											tbCol.setCellValueFactory(param -> {
 												return new SimpleStringProperty(param.getValue().get(columnName));
@@ -469,7 +500,9 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 											tbResult.getColumns().add(tbCol);
 										}
 
+										int index = 0;
 										while (rs.next()) {
+
 											Map<String, String> hashMap = new HashMap<>();
 
 											for (int i = 1; i <= columnCount; i++) {
@@ -478,8 +511,13 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 												hashMap.put(columnName, value);
 
 											}
-											tbResult.getItems().add(hashMap);
 
+											if (onQueryDataUpdated.get() != null) {
+												onQueryDataUpdated.get().accept(index, hashMap);
+											}
+
+											tbResult.getItems().add(hashMap);
+											index++;
 										}
 
 									} catch (SQLException e) {
@@ -498,6 +536,30 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 		} finally {
 			DbUtil.close(connection);
 		}
+	}
+
+	public final ObjectProperty<BiConsumer<Integer, Map<String, String>>> onQueryDataUpdatedProperty() {
+		return this.onQueryDataUpdated;
+	}
+
+	public final BiConsumer<Integer, Map<String, String>> getOnQueryDataUpdated() {
+		return this.onQueryDataUpdatedProperty().get();
+	}
+
+	public final void setOnQueryDataUpdated(final BiConsumer<Integer, Map<String, String>> onQueryDataUpdated) {
+		this.onQueryDataUpdatedProperty().set(onQueryDataUpdated);
+	}
+
+	public final ObjectProperty<Consumer<String>> onExecutedQueryProperty() {
+		return this.onExecutedQuery;
+	}
+
+	public final Consumer<String> getOnExecutedQuery() {
+		return this.onExecutedQueryProperty().get();
+	}
+
+	public final void setOnExecutedQuery(final Consumer<String> onExecutedQuery) {
+		this.onExecutedQueryProperty().set(onExecutedQuery);
 	}
 
 }

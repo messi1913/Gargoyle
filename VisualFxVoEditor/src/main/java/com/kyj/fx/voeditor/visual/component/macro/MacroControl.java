@@ -65,6 +65,14 @@ public class MacroControl extends Control {
 
 		MacroBaseSkin macroBaseSkin = new MacroBaseSkin(this);
 		macroBaseSkin.setInitText(this.initText);
+		
+		//쿼리 실행시 로깅
+		macroBaseSkin.setOnExecutedQuery(str ->{
+			LOGGER.debug(str);
+		});
+		
+		//쿼리 실행결과 로깅
+		macroBaseSkin.setOnQueryDataUpdated((index, t) -> LOGGER.debug("{}, {}", index, t.toString()));
 		return macroBaseSkin;
 	}
 
