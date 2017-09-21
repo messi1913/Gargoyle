@@ -62,7 +62,7 @@ public class LogViewController implements Closeable {
 	 */
 	private static final Logger LOGGER = LoggerFactory.getLogger(LogViewController.class);
 
-	private int seekSize = 1024 * 1024;
+	private int seekSize = 3 * 1024 * 1024;
 
 	private LogViewComposite composite;
 	@FXML
