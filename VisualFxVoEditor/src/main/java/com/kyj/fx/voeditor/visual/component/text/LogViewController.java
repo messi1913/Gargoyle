@@ -336,21 +336,15 @@ public class LogViewController implements Closeable {
 	private void onModified(String string) {
 
 		Platform.runLater(() -> {
-
-			// int anchor = this.txtLog.getAnchor();
-			// int currentLength = this.txtLog.getLength();
-			// int caretPosition = this.txtLog.getCaretPosition();
-			// int caretColumn = this.txtLog.getCaretColumn();
 			this.txtLog.appendText(string, !isScrollLock.get());
-
 		});
 
 		/* Create Change Model */
-		Chagne chg = new Chagne();
-		chg.setContent(string);
-		onChangeListener.forEach(v -> {
-
-		});
+//		Chagne chg = new Chagne();
+//		chg.setContent(string);
+//		onChangeListener.forEach(v -> {
+//
+//		});
 	}
 
 	/**
