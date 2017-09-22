@@ -657,7 +657,11 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 
 			prop.put("pageIndex", 0);
 
-			arrayList = DbUtil.select(con, sql, 10, limitSize, new ResultSetToMapConverter(prop));
+			ResultSetToMapConverter convert = new ResultSetToMapConverter(prop);
+			convert.setExceptionHandler(ex->{
+				DialogUtil.showExceptionDailog(CommonsSqllPan.this, ex);
+			});
+			arrayList = DbUtil.select(con, sql, 10, limitSize, convert);
 		}
 		return arrayList;
 	}

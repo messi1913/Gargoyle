@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,8 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 
 	private int startRow = -1;
 
+	private Consumer<Exception> exceptionHandler;
+
 	public ResultSetToMapConverter(Properties prop) {
 		if (prop != null)
 			this.prop = prop;
@@ -66,6 +69,14 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 	public ResultSetToMapConverter() {
 		this.prop = getDefaultProperties();
 		initialize();
+	}
+
+	public Consumer<Exception> getExceptionHandler() {
+		return exceptionHandler;
+	}
+
+	public void setExceptionHandler(Consumer<Exception> exceptionHandler) {
+		this.exceptionHandler = exceptionHandler;
 	}
 
 	public Properties getDefaultProperties() {
@@ -163,13 +174,14 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 								map.put(columnLabel,
 										isEmptyValue ? new BigDataDVO("{data.bytea}", value) : new BigDataDVO("{DATA.BYTEA}", value));
 								break;
-							} 
-//							else if ("xml".equals(columnTypeName)) {
-//								map.put(columnLabel,
-//										isEmptyValue ? new BigDataDVO("{data.bytea}", value) : new BigDataDVO("{DATA.BYTEA}", value));
-//								break;
-//							} 
-							
+							}
+							// else if ("xml".equals(columnTypeName)) {
+							// map.put(columnLabel,
+							// isEmptyValue ? new BigDataDVO("{data.bytea}",
+							// value) : new BigDataDVO("{DATA.BYTEA}", value));
+							// break;
+							// }
+
 							else if (java.sql.Types.LONGNVARCHAR == cType) {
 								map.put(columnLabel,
 										isEmptyValue ? new BigDataDVO("{data.bytea}", value) : new BigDataDVO("{DATA.BYTEA}", value));
@@ -192,6 +204,8 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 			}
 		} catch (SQLException e) {
 			LOGGER.error(ValueUtil.toString(e));
+			if(exceptionHandler!=null)
+				exceptionHandler.accept(e);
 		}
 		return arrayList;
 	}
