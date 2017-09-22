@@ -7,17 +7,12 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -52,17 +47,39 @@ public class XMLFormatter implements Formatter {
 		return new XMLFormatter();
 	}
 
-	public static void main(String[] args) throws IOException, DocumentException {
-
-		StringBuffer sb = new StringBuffer();
-		sb.append(
-				"<MT_PP0032_LIMStoMESAsync_S xmlns=\"http://samsungbiologics.com/PP\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n");
-		sb.append(
-				"<requestString xmlns=\"\"><TransactionRequest><Header><PlantId></PlantId><SourceSystem>LIMS</SourceSystem><DestinationSystem>MES</DestinationSystem><TransactionId>0A3235DA-D1A2-4DDC-AA5C-5DDBAD3DD1DD</TransactionId><TransactionType>SampleInformationUpdate</TransactionType></Header><Data><BatchNo>3104367</BatchNo><BatchType>Routine</BatchType><Samples><Sample><SampleId>B00033010003</SampleId><SampleDescription>AEX Equilibration Buffer v2</SampleDescription><SampleFieldCode>S1B12FT</SampleFieldCode><SampleStatus>Prelogged</SampleStatus><Inventory><InventoryId>2301954</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>NovaSeptum Syringe</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Retain</PurposeOfSample></Inventory><Inventory><InventoryId>2301955</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>NovaSeptum Syringe</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Retain</PurposeOfSample></Inventory><Inventory><InventoryId>2301956</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>NovaSeptum Syringe</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Endotoxin</PurposeOfSample></Inventory><Inventory><InventoryId>2301957</InventoryId><TargetVolumeAmount>100</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>NovaSeptum Bag</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Spec Scan Blank</PurposeOfSample></Inventory><Inventory><InventoryId>2301958</InventoryId><TargetVolumeAmount>100</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>NovaSeptum Bag</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Spec Scan Blank</PurposeOfSample></Inventory></Sample><Sample><SampleId>B00033010004</SampleId><SampleDescription>UFDF Conditioning Buffer v2</SampleDescription><SampleFieldCode>S1B14PF</SampleFieldCode><SampleStatus>Started</SampleStatus><Inventory><InventoryId>2301963</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>Polystyrene Tube</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Endotoxin</PurposeOfSample></Inventory><Inventory><InventoryId>2301964</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>Polystyrene Tube</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Retain</PurposeOfSample></Inventory><Inventory><InventoryId>2301965</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>Polystyrene Tube</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Retain</PurposeOfSample></Inventory><Inventory><InventoryId>2301966</InventoryId><TargetVolumeAmount>100</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>Polystyrene Bottle</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Aliquot</PurposeOfSample></Inventory></Sample></Samples></Data></TransactionRequest></requestString>\n");
-		sb.append("</MT_PP0032_LIMStoMESAsync_S>\n");
-
-		System.out.println(new XMLFormatter().format(sb.toString()));
-	}
+	// public static void main(String[] args) throws IOException,
+	// DocumentException {
+	//
+	// StringBuffer sb = new StringBuffer();
+	// sb.append(
+	// "<MT_PP0032_LIMStoMESAsync_S xmlns=\"http://samsungbiologics.com/PP\"
+	// xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"
+	// xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"
+	// xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n");
+	// sb.append(
+	// "<requestString
+	// xmlns=\"\"><TransactionRequest><Header><PlantId></PlantId><SourceSystem>LIMS</SourceSystem><DestinationSystem>MES</DestinationSystem><TransactionId>0A3235DA-D1A2-4DDC-AA5C-5DDBAD3DD1DD</TransactionId><TransactionType>SampleInformationUpdate</TransactionType></Header><Data><BatchNo>3104367</BatchNo><BatchType>Routine</BatchType><Samples><Sample><SampleId>B00033010003</SampleId><SampleDescription>AEX
+	// Equilibration Buffer
+	// v2</SampleDescription><SampleFieldCode>S1B12FT</SampleFieldCode><SampleStatus>Prelogged</SampleStatus><Inventory><InventoryId>2301954</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>NovaSeptum
+	// Syringe</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Retain</PurposeOfSample></Inventory><Inventory><InventoryId>2301955</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>NovaSeptum
+	// Syringe</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Retain</PurposeOfSample></Inventory><Inventory><InventoryId>2301956</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>NovaSeptum
+	// Syringe</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Endotoxin</PurposeOfSample></Inventory><Inventory><InventoryId>2301957</InventoryId><TargetVolumeAmount>100</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>NovaSeptum
+	// Bag</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Spec
+	// Scan
+	// Blank</PurposeOfSample></Inventory><Inventory><InventoryId>2301958</InventoryId><TargetVolumeAmount>100</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>NovaSeptum
+	// Bag</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Spec
+	// Scan
+	// Blank</PurposeOfSample></Inventory></Sample><Sample><SampleId>B00033010004</SampleId><SampleDescription>UFDF
+	// Conditioning Buffer
+	// v2</SampleDescription><SampleFieldCode>S1B14PF</SampleFieldCode><SampleStatus>Started</SampleStatus><Inventory><InventoryId>2301963</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>Polystyrene
+	// Tube</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Endotoxin</PurposeOfSample></Inventory><Inventory><InventoryId>2301964</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>Polystyrene
+	// Tube</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Retain</PurposeOfSample></Inventory><Inventory><InventoryId>2301965</InventoryId><TargetVolumeAmount>5</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>Polystyrene
+	// Tube</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Retain</PurposeOfSample></Inventory><Inventory><InventoryId>2301966</InventoryId><TargetVolumeAmount>100</TargetVolumeAmount><TargetVolumeUOM>mL</TargetVolumeUOM><ContainerDescription>Polystyrene
+	// Bottle</ContainerDescription><StorageTemperature>2-8C</StorageTemperature><PurposeOfSample>Aliquot</PurposeOfSample></Inventory></Sample></Samples></Data></TransactionRequest></requestString>\n");
+	// sb.append("</MT_PP0032_LIMStoMESAsync_S>\n");
+	//
+	// System.out.println(new XMLFormatter().format(sb.toString()));
+	// }
 
 	/**
 	 * XML Formatting 기능 지원.
@@ -99,13 +116,15 @@ public class XMLFormatter implements Formatter {
 			StringReader characterStream = new StringReader(str);
 			InputSource in = new InputSource(characterStream);
 			xmlEncoding = in.getEncoding();
-
+			
 			doc = reader.read(in);
 
 			// String en1 = in.getEncoding();
 			xmlEncoding = doc.getXMLEncoding();
-			
+
 			OutputFormat format = OutputFormat.createPrettyPrint();
+			format.setSuppressDeclaration(true);
+//			format.setTrimText(true);
 			xmlWriter = new XMLWriter(out, format);
 			xmlWriter.write(doc.getDocument());
 		} catch (DocumentException | IOException e) {
@@ -113,13 +132,7 @@ public class XMLFormatter implements Formatter {
 		} catch (FactoryConfigurationError e) {
 			throw new RuntimeException(e);
 		} finally {
-
-			try {
-				if (xmlWriter != null)
-					xmlWriter.close();
-			} catch (IOException e) {
-			}
-
+			close(xmlWriter);
 		}
 		if (ValueUtil.isNotEmpty(xmlEncoding)) {
 			try {
@@ -132,6 +145,13 @@ public class XMLFormatter implements Formatter {
 		return out.toString();
 	}
 
+	private void close(XMLWriter xmlWriter) {
+		try {
+			if (xmlWriter != null)
+				xmlWriter.close();
+		} catch (IOException e) {
+		}
+	}
 	// test
 	// @Override
 	private String format2(String str) {
