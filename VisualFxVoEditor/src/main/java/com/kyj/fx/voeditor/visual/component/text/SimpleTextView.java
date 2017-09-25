@@ -8,6 +8,8 @@ package com.kyj.fx.voeditor.visual.component.text;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.fxmisc.richtext.CodeArea;
@@ -447,23 +449,30 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miRemoveSpaciesOnAction() {
 		codeArea.getUndoManager().mark();
 		String str = codeArea.getText();
-		char[] charArray = str.toCharArray();
+		
+		// remove lineSeparator.
+		String[] split = str.split("\n");
+
 		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < charArray.length; i++) {
+		for (String s : split) {
+			s = s.trim();
+			char[] charArray = s.toCharArray();
+			for (int i = 0; i < charArray.length; i++) {
 
-			switch (charArray[i]) {
-			case '\t':
-				break;
-			case '\n':
-				break;
-			case Character.UNASSIGNED:
-				break;
-			default:
-				sb.append(charArray[i]);
+				switch (charArray[i]) {
+				case '\t':
+					break;
+				case '\n':
+					break;
+				case Character.UNASSIGNED:
+					break;
+				default:
+					sb.append(charArray[i]);
+				}
 			}
-
 		}
-		codeArea.replaceText(sb.toString());
+
+		 codeArea.replaceText(sb.toString());
 	}
 
 	/**
