@@ -1,0 +1,19 @@
+.root{
+	-fx-padding : 5.0px;
+}
+
+.hbox-item{
+	-fx-padding : 5.0px;
+	-fx-spacing : 5.0px;
+}
+
+
+#btnSend{
+	-fx-pref-width : 80.0px;
+}
+
+.label-title-2
+{
+	-fx-padding : 5.0px;
+	-fx-font-weight:bold;
+}

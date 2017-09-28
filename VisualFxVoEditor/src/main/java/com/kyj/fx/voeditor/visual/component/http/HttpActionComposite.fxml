@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
@@ -7,63 +10,87 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<fx:root prefHeight="490.0" prefWidth="790.0" type="BorderPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.111">
-   <top>
-      <VBox BorderPane.alignment="CENTER">
-         <children>
-            <HBox alignment="CENTER_LEFT">
-               <children>
-                  <Label text="URL " />
-                  <TextField prefHeight="23.0" prefWidth="627.0" HBox.hgrow="ALWAYS" />
-               </children>
-            </HBox>
-            <Label text="Headers" />
-            <TableView prefHeight="132.0" prefWidth="790.0">
-              <columns>
-                <TableColumn prefWidth="231.0" text="Key" />
-                <TableColumn prefWidth="520.0" text="Value" />
-              </columns>
-            </TableView>
-         </children>
-      </VBox>
-   </top>
-   <center>
-      <VBox BorderPane.alignment="CENTER">
-         <children>
-            <HBox alignment="CENTER_LEFT">
-               <children>
-                  <Label text="Content Type" />
-                  <ComboBox prefWidth="150.0" />
-               </children>
-            </HBox>
-            <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
-               <items>
-                  <VBox>
-                     <children>
-                        <Label text="Request Message" />
-                        <TextArea prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                     </children>
-                  </VBox>
-                  <VBox>
-                     <children>
-                        <Label text="Response Message" />
-                        <HBox alignment="CENTER_LEFT">
-                           <children>
-                              <Label text="Receve Type" />
-                              <ComboBox prefWidth="150.0" />
-                           </children>
-                        </HBox>
-                        <TextArea prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                     </children>
-                  </VBox>
-               </items>
-            </SplitPane>
-         </children>
-      </VBox>
-   </center>
+<fx:root prefHeight="663.0" prefWidth="868.0" styleClass="root" stylesheets="@HttpActionComposite.css" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.component.http.HttpActionController">
+	<top>
+		<VBox BorderPane.alignment="CENTER">
+			<children>
+				<HBox alignment="CENTER_LEFT" styleClass="hbox-item">
+					<children>
+						<Label styleClass="label-title-2" text="URL " />
+						<TextField fx:id="txtReqUrl" prefHeight="23.0" prefWidth="627.0" HBox.hgrow="ALWAYS" />
+						<Button fx:id="btnSend" mnemonicParsing="false" onAction="#btnSendOnAction" text="Send" />
+					</children>
+				</HBox>
+				<TitledPane text="Headers">
+					<content>
+						<TableView prefHeight="132.0" prefWidth="790.0">
+							<columns>
+								<TableColumn prefWidth="231.0" text="Key" />
+								<TableColumn prefWidth="520.0" text="Value" />
+							</columns>
+						</TableView>
+					</content>
+				</TitledPane>
+			</children>
+		</VBox>
+	</top>
+	<center>
+		<VBox BorderPane.alignment="CENTER">
+			<children>
+				<HBox alignment="CENTER_LEFT" styleClass="hbox-item">
+					<children>
+						<Label text="Request Type" />
+						<ComboBox fx:id="cboReqType" prefWidth="150.0">
+							<items>
+								<FXCollections fx:factory="observableArrayList">
+									<String fx:value="GET" />
+									<String fx:value="POST" />
+								</FXCollections>
+							</items>
+							<value>
+								<String fx:value="GET" />
+							</value>
+						</ComboBox>
+					</children>
+				</HBox>
+				<SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
+					<items>
+						<VBox>
+							<children>
+								<Label styleClass="label-title-2" text="Request Message" />
+								<TextArea prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+							</children>
+						</VBox>
+						<VBox>
+							<children>
+								<Label styleClass="label-title-2" text="Response Message" />
+								<HBox alignment="CENTER_LEFT" styleClass="hbox-item">
+									<children>
+										<Label styleClass="label-title-2" text="ReceivedType" />
+										<ComboBox fx:id="cboReceivedType" prefWidth="150.0">
+											<items>
+												<FXCollections fx:factory="observableArrayList">
+													<String fx:value="TEXT" />
+													<String fx:value="XML" />
+												</FXCollections>
+											</items>
+											<value>
+												<String fx:value="TEXT" />
+											</value>
+										</ComboBox>
+									</children>
+								</HBox>
+								<TextArea prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+							</children>
+						</VBox>
+					</items>
+				</SplitPane>
+			</children>
+		</VBox>
+	</center>
 </fx:root>
