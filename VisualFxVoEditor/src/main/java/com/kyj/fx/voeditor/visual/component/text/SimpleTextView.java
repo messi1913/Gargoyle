@@ -36,6 +36,8 @@ import com.kyj.fx.voeditor.visual.util.FxUtil.SaveAsModel;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.util.XMLFormatter;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -132,6 +134,18 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 	public void initialize() {
 		codeArea = new CodeArea();
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+		codeArea.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if(SimpleTextView.this.tab.getText().charAt(0) == '*')
+				{
+					return;
+				}
+				String modifyTabName = "*".concat(SimpleTextView.this.tab.getText());
+				SimpleTextView.this.tab.setText(modifyTabName);
+			}
+		});
 		initHelpers();
 		initGraphics();
 
