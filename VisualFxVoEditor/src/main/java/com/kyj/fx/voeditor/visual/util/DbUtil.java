@@ -64,9 +64,10 @@ import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
  */
 public class DbUtil extends ConnectionManager {
 	/**
+	 * 
 	 * @최초생성일 2016. 8. 4.
 	 */
-	public static final int DEFAULT_FETCH_SIZE = 1000;
+	public static final int DEFAULT_FETCH_SIZE = 100;
 
 	/**
 	 * @최초생성일 2016. 9. 1.

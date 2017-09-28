@@ -6,10 +6,10 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.text;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.fxmisc.richtext.CodeArea;
@@ -19,6 +19,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.codec.Hex;
 
 import com.google.gson.JsonSyntaxException;
+import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab;
+import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
+import com.kyj.fx.voeditor.visual.framework.GargoyleTabPanable;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.word.AbstractMimeAdapter;
@@ -29,6 +32,7 @@ import com.kyj.fx.voeditor.visual.framework.word.NamoMimeToHtmlAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.SimpleWordAdapter;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil.SaveAsModel;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.util.XMLFormatter;
 
@@ -38,6 +42,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyCombination.Modifier;
+import javafx.scene.input.KeyCombination.ModifierValue;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
@@ -51,7 +62,7 @@ import javafx.scene.web.WebView;
  * @author KYJ
  *
  */
-public class SimpleTextView extends BorderPane implements PrimaryStageCloseable {
+public class SimpleTextView extends BorderPane implements PrimaryStageCloseable, GargoyleTabPanable {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(SimpleTextView.class);
 
@@ -66,6 +77,9 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	protected CodeArea codeArea;
 
 	protected CodeAreaHelper<CodeArea> helper;
+
+	@FXML
+	private MenuItem miSaveAs;
 	/**
 	 * 버튼박스
 	 */
@@ -120,6 +134,8 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 		initHelpers();
 		initGraphics();
+
+		miSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 
 	}
 
@@ -339,7 +355,25 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	 */
 	@FXML
 	public void miSaveAsOnAction() {
-		FxUtil.saveAsFx(getScene().getWindow(), () -> codeArea.getText());
+		FxUtil.saveAsFx(getScene().getWindow(), new SaveAsModel() {
+			@Override
+			public String getContent() {
+				return codeArea.getText();
+			}
+
+			@Override
+			public Consumer<Exception> onError() {
+				return ex -> {
+					DialogUtil.showExceptionDailog(ex);
+				};
+			}
+
+			@Override
+			public void onSuccess(File f) {
+				tab.setText(f.getName());
+			}
+
+		});
 
 		// File saveAs =
 		// DialogUtil.showFileSaveCheckDialog(getScene().getWindow(),
@@ -449,7 +483,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 	public void miRemoveSpaciesOnAction() {
 		codeArea.getUndoManager().mark();
 		String str = codeArea.getText();
-		
+
 		// remove lineSeparator.
 		String[] split = str.split("\n");
 
@@ -472,7 +506,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			}
 		}
 
-		 codeArea.replaceText(sb.toString());
+		codeArea.replaceText(sb.toString());
 	}
 
 	/**
@@ -491,6 +525,21 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable 
 			LOGGER.error(ValueUtil.toString(e));
 		}
 
+	}
+
+	private DockTabPane tabpane;
+
+	@Override
+	public void setTabPane(DockTabPane tabpane) {
+		this.tabpane = tabpane;
+
+	}
+
+	private DockTab tab;
+
+	@Override
+	public void setTab(DockTab tab) {
+		this.tab = tab;
 	}
 
 }

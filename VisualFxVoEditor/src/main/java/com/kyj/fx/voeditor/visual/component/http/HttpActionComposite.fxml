@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+<fx:root prefHeight="490.0" prefWidth="790.0" type="BorderPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.111">
+   <top>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <Label text="URL " />
+                  <TextField prefHeight="23.0" prefWidth="627.0" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <Label text="Headers" />
+            <TableView prefHeight="132.0" prefWidth="790.0">
+              <columns>
+                <TableColumn prefWidth="231.0" text="Key" />
+                <TableColumn prefWidth="520.0" text="Value" />
+              </columns>
+            </TableView>
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <Label text="Content Type" />
+                  <ComboBox prefWidth="150.0" />
+               </children>
+            </HBox>
+            <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
+               <items>
+                  <VBox>
+                     <children>
+                        <Label text="Request Message" />
+                        <TextArea prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <children>
+                        <Label text="Response Message" />
+                        <HBox alignment="CENTER_LEFT">
+                           <children>
+                              <Label text="Receve Type" />
+                              <ComboBox prefWidth="150.0" />
+                           </children>
+                        </HBox>
+                        <TextArea prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+               </items>
+            </SplitPane>
+         </children>
+      </VBox>
+   </center>
+</fx:root>

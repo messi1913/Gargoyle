@@ -97,13 +97,14 @@ public abstract class SchemaItemTree<T> extends DatabaseItemTree<T> {
 				String remark = rs.getString(7);
 				String type = rs.getString(8);
 
-				LOGGER.debug("cat {} schem {} name {} {}  ", cat, schem, name, type);
+//				LOGGER.debug("cat {} schem {} name {} {}  ", cat, schem, name, type);
 
 				DatabaseItemTree<T> procd = createProcedureItemTree(cat, schem, name, type, remark);
 				if (procd != null)
 					childrens.add(new TreeItem<>(procd));
 
 			}
+			
 
 			// Functions
 			childrens.addAll(getFunctions());

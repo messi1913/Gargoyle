@@ -61,6 +61,7 @@ import com.kyj.fx.voeditor.visual.component.utube.UtubeDownloaderComposite;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentOnLoaded;
+import com.kyj.fx.voeditor.visual.framework.GargoyleTabPanable;
 import com.kyj.fx.voeditor.visual.loder.JarWrapper;
 import com.kyj.fx.voeditor.visual.loder.PluginLoader;
 import com.kyj.fx.voeditor.visual.main.Main;
@@ -1514,7 +1515,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				onParentloaded.forEach(v -> {
 					v.onLoad(parent);
 				});
-
+				
+				if(parent instanceof GargoyleTabPanable)
+				{
+					GargoyleTabPanable _tabPanable = (GargoyleTabPanable) parent;
+					_tabPanable.setTab(tab);
+					_tabPanable.setTabPane(tabPanWorkspace);
+				}
 			} catch (IOException e1) {
 				DialogUtil.showExceptionDailog(e1);
 			}
@@ -1554,6 +1561,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				// 리스너 호출.
 				onParentloaded.forEach(v -> v.onLoad(parent));
 				// _parent.getStylesheets().clear();
+				
+				if(parent instanceof GargoyleTabPanable)
+				{
+					GargoyleTabPanable _tabPanable = (GargoyleTabPanable) parent;
+					_tabPanable.setTab(tab);
+					_tabPanable.setTabPane(tabPanWorkspace);
+				}
 			} catch (Exception e1) {
 				DialogUtil.showExceptionDailog(e1);
 			}
@@ -1587,6 +1601,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				Parent _parent = parent.getParent();
 
+				
+				
 				if (beforeParentLoad != null && beforeParentLoad.filter(_parent)) {
 					beforeParentLoad.beforeLoad(_parent);
 
@@ -1620,6 +1636,14 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				findAllByNodes.forEach(btn -> {
 					btn.getStyleClass().add("button-gargoyle");
 				});
+				
+				if(_parent instanceof GargoyleTabPanable)
+				{
+					GargoyleTabPanable _tabPanable = (GargoyleTabPanable) _parent;
+					_tabPanable.setTab(tab);
+					_tabPanable.setTabPane(tabPanWorkspace);
+				}
+				
 			} catch (Exception e1) {
 				DialogUtil.showExceptionDailog(e1);
 			}

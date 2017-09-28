@@ -168,7 +168,8 @@ public class FxUtil {
 		try {
 
 			/*
-			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
+			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된
+			 * 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
 			 */
 			File parentFile = new File(FileUtil.getTempGagoyle(), "font");
 			if (!parentFile.exists())
@@ -1043,8 +1044,10 @@ public class FxUtil {
 			final WritableImage image = param.getImage();
 			imageView.setImage(image);
 
-			// final double scaleX = pageLayout.getPrintableWidth() / imageView.getBoundsInParent().getWidth();
-			// final double scaleY = pageLayout.getPrintableHeight() / imageView.getBoundsInParent().getHeight();
+			// final double scaleX = pageLayout.getPrintableWidth() /
+			// imageView.getBoundsInParent().getWidth();
+			// final double scaleY = pageLayout.getPrintableHeight() /
+			// imageView.getBoundsInParent().getHeight();
 			imageView.getTransforms().add(new Scale(1, 1));
 
 		});
@@ -1073,8 +1076,10 @@ public class FxUtil {
 			// final WritableImage image = param.getImage();
 			// imageView.setImage(image);
 
-			// final double scaleX = pageLayout.getPrintableWidth() / imageView.getBoundsInParent().getWidth();
-			// final double scaleY = pageLayout.getPrintableHeight() / imageView.getBoundsInParent().getHeight();
+			// final double scaleX = pageLayout.getPrintableWidth() /
+			// imageView.getBoundsInParent().getWidth();
+			// final double scaleY = pageLayout.getPrintableHeight() /
+			// imageView.getBoundsInParent().getHeight();
 			// imageView.getTransforms().add(new Scale(scaleX, scaleY));
 
 			return null;
@@ -1663,7 +1668,8 @@ public class FxUtil {
 
 	}
 
-	// public static void createDockStageAndShow(CloseableParent<DockNode> node) {
+	// public static void createDockStageAndShow(CloseableParent<DockNode> node)
+	// {
 	// createDockStageAndShow(null, node, null, true);
 	// }
 
@@ -1807,7 +1813,8 @@ public class FxUtil {
 					stage.setWidth(1200d);
 					stage.setHeight(800d);
 				});
-				// FxUtil.createStageAndShow("Source", new WebViewConsole(view));
+				// FxUtil.createStageAndShow("Source", new
+				// WebViewConsole(view));
 
 			});
 
@@ -2064,6 +2071,10 @@ public class FxUtil {
 			};
 		}
 
+		public default void onSuccess(File f) {
+
+		}
+
 		/**
 		 * 파일 쓰기 처리중 에러가 발생한경우
 		 * 
@@ -2099,11 +2110,18 @@ public class FxUtil {
 				saveAs.createNewFile();
 			} catch (IOException e) {
 				LOGGER.error(ValueUtil.toString(e));
+				Consumer<Exception> onError = model.onError();
+				if (onError != null)
+					model.onError().accept(e);
+				else
+					throw new RuntimeException(e);
 			}
 		}
 
-		if (saveAs.exists())
+		if (saveAs.exists()) {
 			FileUtil.writeFile(saveAs, model.getContent(), model.getEncoding(), model.onError());
+			model.onSuccess(saveAs);
+		}
 
 	}
 
@@ -2271,13 +2289,14 @@ public class FxUtil {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 9. 18. 
+	 * @작성일 : 2017. 9. 18.
 	 * @return
 	 */
 	public static MouseEvent mouseEventForDummy() {
 		// NamedArg("eventType") EventType<? extends MouseEvent> eventType,
 		// @NamedArg("x") double x, @NamedArg("y") double y,
-		// @NamedArg("screenX") double screenX, @NamedArg("screenY") double screenY,
+		// @NamedArg("screenX") double screenX, @NamedArg("screenY") double
+		// screenY,
 		// @NamedArg("button") MouseButton button,
 		// @NamedArg("clickCount") int clickCount,
 		// @NamedArg("shiftDown") boolean shiftDown,
@@ -2291,7 +2310,7 @@ public class FxUtil {
 		// @NamedArg("popupTrigger") boolean popupTrigger,
 		// @NamedArg("stillSincePress") boolean stillSincePress,
 		// @NamedArg("pickResult") PickResult pickResult
-		
+
 		return new MouseEvent(MouseEvent.MOUSE_CLICKED, 0, 0, 0, 0, MouseButton.PRIMARY, 1, false, false, false, false, false, false, false,
 				false, false, false, null);
 	}
