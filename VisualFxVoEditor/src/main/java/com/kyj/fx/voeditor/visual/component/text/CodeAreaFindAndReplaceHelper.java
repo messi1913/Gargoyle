@@ -20,10 +20,12 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 
 /**
  *
- *  CodeArea의 FindAndReplace에 대한 공통기능을 처리할 수 있게 도와주는 클래스.
+ * CodeArea의 FindAndReplace에 대한 공통기능을 처리할 수 있게 도와주는 클래스.
+ * 
  * @author KYJ
  *
  */
@@ -34,15 +36,17 @@ public class CodeAreaFindAndReplaceHelper<T extends CodeArea> {
 	private CodeArea codeArea;
 	protected Menu menuSearch;
 	protected MenuItem miFindReplace;
-//	private EventHandler<? super MouseEvent> defaultSelectionHandler;;
+	// private EventHandler<? super MouseEvent> defaultSelectionHandler;;
 
 	public CodeAreaFindAndReplaceHelper(T codeArea) {
 		this.codeArea = codeArea;
-//		defaultSelectionHandler = new CodeAreaDefaultSelectionHandler(codeArea);
+		// defaultSelectionHandler = new
+		// CodeAreaDefaultSelectionHandler(codeArea);
 	}
 
 	/**
-	 *  FindAndReplace에 대한 메뉴를 정의.
+	 * FindAndReplace에 대한 메뉴를 정의.
+	 * 
 	 * @return
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 13.
@@ -50,7 +54,19 @@ public class CodeAreaFindAndReplaceHelper<T extends CodeArea> {
 	public Menu createMenus() {
 		menuSearch = new Menu("Search");
 		miFindReplace = new MenuItem("Find/Replace");
-		miFindReplace.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN));
+		
+		/*
+		 *  17.09.29 Fix unexpected Shown Dialog.
+		 * 
+		 */
+		
+		// miFindReplace.setAccelerator(new KeyCodeCombination(KeyCode.F,
+		// KeyCombination.CONTROL_DOWN));
+		this.codeArea.addEventHandler(KeyEvent.KEY_PRESSED, ev->{
+			if (ev.getCode() == KeyCode.F && ev.isControlDown()) {
+				findReplaceEvent(ev);
+			}
+		});
 		miFindReplace.setOnAction(this::findReplaceEvent);
 		menuSearch.getItems().add(miFindReplace);
 		return menuSearch;
@@ -114,10 +130,10 @@ public class CodeAreaFindAndReplaceHelper<T extends CodeArea> {
 			}
 		});
 
-		textSearchView.setOnSelectionMoveListener(vo ->{
+		textSearchView.setOnSelectionMoveListener(vo -> {
 			codeArea.selectRange(vo.getStartIndex(), vo.getEndIndex());
 		});
-		
+
 		textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
 			if (newval)
 				LOGGER.debug("User Select Locale Scope..");
@@ -135,7 +151,7 @@ public class CodeAreaFindAndReplaceHelper<T extends CodeArea> {
 
 		textSearchView.show();
 
-//		codeArea.setOnMouseClicked(defaultSelectionHandler);
+		// codeArea.setOnMouseClicked(defaultSelectionHandler);
 
 		e.consume();
 	}
@@ -153,23 +169,25 @@ public class CodeAreaFindAndReplaceHelper<T extends CodeArea> {
 		codeArea.getUndoManager().mark();
 	}
 
-//	// 선택 범위 지정
-//	EventHandler<? super MouseEvent> defaultSelectionHandler = event -> {
-//		if (event.getClickCount() == 1) {
-//			// codeArea.setStyleSpans(0,
-//			// groupBackgroundColor(codeArea.getText(),
-//			// codeArea.getCaretPosition()));
-//		} else if (event.getClickCount() == 2) {
-//			String selectedText = codeArea.getSelectedText();
-//			if (ValueUtil.isNotEmpty(selectedText)) {
-//				IndexRange selection = codeArea.getSelection();
-//				String ltrimText = selectedText.replaceAll("^\\s+", "");
-//				String firstStr = ltrimText.substring(0, 1).replaceAll(CHARACTERS_MATCH, "");
-//				int start = selection.getStart();
-//				int end = selection.getEnd();
-//				codeArea.selectRange(start + (selectedText.length() - ltrimText.length() + 1 - firstStr.length()), end);
-//			}
-//		}
-//	};
+	// // 선택 범위 지정
+	// EventHandler<? super MouseEvent> defaultSelectionHandler = event -> {
+	// if (event.getClickCount() == 1) {
+	// // codeArea.setStyleSpans(0,
+	// // groupBackgroundColor(codeArea.getText(),
+	// // codeArea.getCaretPosition()));
+	// } else if (event.getClickCount() == 2) {
+	// String selectedText = codeArea.getSelectedText();
+	// if (ValueUtil.isNotEmpty(selectedText)) {
+	// IndexRange selection = codeArea.getSelection();
+	// String ltrimText = selectedText.replaceAll("^\\s+", "");
+	// String firstStr = ltrimText.substring(0, 1).replaceAll(CHARACTERS_MATCH,
+	// "");
+	// int start = selection.getStart();
+	// int end = selection.getEnd();
+	// codeArea.selectRange(start + (selectedText.length() - ltrimText.length()
+	// + 1 - firstStr.length()), end);
+	// }
+	// }
+	// };
 
 }

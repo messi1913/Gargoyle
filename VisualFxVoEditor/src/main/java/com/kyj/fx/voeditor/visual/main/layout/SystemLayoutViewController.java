@@ -37,6 +37,7 @@ import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
 import com.kyj.fx.voeditor.visual.component.file.FilePropertiesComposite;
 import com.kyj.fx.voeditor.visual.component.google.trend.GoogleTrendComposite;
+import com.kyj.fx.voeditor.visual.component.http.HttpActionComposite;
 import com.kyj.fx.voeditor.visual.component.image.Base64ImageConvertComposte;
 import com.kyj.fx.voeditor.visual.component.monitor.bci.view.JavaProcessMonitor;
 import com.kyj.fx.voeditor.visual.component.nrch.realtime.NrchRealtimeSrchFlowComposite;
@@ -2136,6 +2137,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	@FXML
 	public void miBase64ImageOnAction(){
 		loadNewSystemTab("Base64 <-> Image", new Base64ImageConvertComposte());
+	}
+	
+	@FXML
+	public void miHttpRequestOnAction(){
+		loadNewSystemTab("HttpUtil", new HttpActionComposite());
 	}
 	
 	/**

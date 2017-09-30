@@ -43,6 +43,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -91,8 +92,15 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 	@FXML
 	private Button btnClose;
 
+	@FXML
+	private MenuBar mb;
+	
 	private Label lblLineInfo = new Label();
 
+	public SimpleTextView() {
+		this("", true, null);
+	}
+	
 	public SimpleTextView(String content) {
 		this(content, true, null);
 	}
@@ -151,6 +159,16 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 
 		miSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 
+	}
+	
+	/**
+	 * 메뉴바 보임여부 결정
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 9. 29. 
+	 * @param visible
+	 */
+	public void setMenubarVisible(boolean visible) {
+		this.mb.setVisible(visible);
 	}
 
 	protected void initHelpers() {
