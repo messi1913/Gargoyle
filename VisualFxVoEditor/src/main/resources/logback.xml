@@ -53,12 +53,32 @@
 			</pattern>
 		</encoder>
 	</appender>
-
+	
+	<appender name="dbutil-fileForLoginInterceptor"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>log\fxeditor-dbutil.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- d:\ testRollingFile 2015-04-07-15.log 파일 생성 -->
+			<fileNamePattern>log\fxeditor-dbutil-%d{yyyy-MM-dd}.log</fileNamePattern>
+			<!-- keep 30 days' worth of history -->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>
+				▷ %-5level %d{YYYY-MM-dd HH:mm:ss} %logger[%method:%line] - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	
 	<!-- 이 아래에 있는 애들 다 log로 찍겠다. -->
 	<logger name="com.kyj" level="DEBUG">
 		<appender-ref ref="console" />
 	</logger>
-
+	
+	<logger name="DB - LOGGER" level="DEBUG">
+		<appender-ref ref="dbutil-fileForLoginInterceptor" />
+	</logger>
+	
 	<!-- 이 아래에 있는 애들 다 log로 찍겠다. -->
 	<logger name="org.apache.pdfbox" level="error">
 		<appender-ref ref="console" />
