@@ -583,7 +583,7 @@
 		</copy>
 
 		<copy todir="externalLibs">
-			<fileset dir="${m2.dir}\kyj\Fx\dao\wizard\kyj.Fx.dao.wizard\0.0.4-SNAPSHOT">
+			<fileset dir="${m2.dir}\kyj\Fx\dao\wizard\kyj.Fx.dao.wizard\0.0.5-SNAPSHOT">
 				<filename name="kyj.Fx.dao.wizard-0.0.5-SNAPSHOT.jar" />
 			</fileset>
 		</copy>
@@ -652,7 +652,7 @@
 				<filename name="boilerpipe-common-2.0-SNAPSHOT.jar" />
 			</fileset>
 		</copy>
-		<!--
+
 		<copy todir="externalLibs">
 			<fileset dir="${basedir}\..\lib\boilerpipe">
 				<filename name="nekohtml-1.9.13.jar" />
@@ -664,7 +664,7 @@
 				<filename name="nekohtml-relocated-1.9.13.jar" />
 			</fileset>
 		</copy>
-		-->
+
 		
 		<copy todir="externalLibs">
 			<fileset dir="${m2.dir}\xerces\xercesImpl\2.11.0">
@@ -914,7 +914,7 @@
 				<include name="sqlite-jdbc-3.19.3.jar" />
 				<include name="javaparser-core-2.4.0.jar" />
 				<include name="encryp-0.0.1.jar"/>
-				<include name="kyj.Fx.dao.wizard-0.0.4-SNAPSHOT.jar" />
+				<include name="kyj.Fx.dao.wizard-0.0.5-SNAPSHOT.jar" />
 				<include name="kyj.FxVoEditor-0.0.1-SNAPSHOT.jar" />
 				<include name="pmd.core-0.0.1-SNAPSHOT.jar" />
 
@@ -928,11 +928,10 @@
 				<include name="jsoup-1.10.1.jar" />
 
 
-				<!--<include name="boilerpipe-common-2.0-SNAPSHOT.jar" />-->
-				<!--<include name="nekohtml-relocated-1.9.13.jar" />-->
+				<include name="boilerpipe-common-2.0-SNAPSHOT.jar" />
+				<include name="nekohtml-relocated-1.9.13.jar" />
 				<include name="xercesImpl-2.11.0.jar" />
-				<!--<include name="nekohtml-relocated-1.9.13.jar" />-->
-				<!--<include name="nekohtml-1.9.13.jar" />-->
+				<include name="nekohtml-1.9.13.jar" />
 
 				<include name="apache-mime4j-benchmark-0.7.2.jar" />
 				<include name="apache-mime4j-core-0.7.2.jar" />
