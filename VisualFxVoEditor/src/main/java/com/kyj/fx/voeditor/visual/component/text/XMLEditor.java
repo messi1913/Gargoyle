@@ -103,6 +103,8 @@ public class XMLEditor extends BorderPane {
 
 		// do xml format.
 		if (e.getCode() == KeyCode.F && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
+			if(e.isConsumed())
+				return;
 			doformat();
 			e.consume();
 		}
