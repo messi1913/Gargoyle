@@ -18,8 +18,6 @@ import javafx.scene.control.IndexRange;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 /**
@@ -63,7 +61,7 @@ public class CodeAreaFindAndReplaceHelper<T extends CodeArea> {
 		// miFindReplace.setAccelerator(new KeyCodeCombination(KeyCode.F,
 		// KeyCombination.CONTROL_DOWN));
 		this.codeArea.addEventHandler(KeyEvent.KEY_PRESSED, ev->{
-			if (ev.getCode() == KeyCode.F && ev.isControlDown()) {
+			if (ev.getCode() == KeyCode.F && ev.isControlDown() && !ev.isAltDown() && !ev.isShiftDown()) {
 				findReplaceEvent(ev);
 			}
 		});
