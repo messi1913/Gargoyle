@@ -104,17 +104,18 @@ public class Main extends Application {
 
 	public static void main(String[] args) throws Exception {
 
+		GargoyleArgumentParser argumentParser = new GargoyleArgumentParser(args);
 		if (args != null && args.length > 0) {
 			LOGGER.debug("#### print argus ######");
 			Stream.of(args).forEach(LOGGER::debug);
-
+			
 			// first param is version
 			version = args[0];
 		}
 
 		// 어플리케이션 중복 실행 방지처리 로직 구현
 		try {
-			new AppDuplDepenceInitializer() {
+			new AppDuplDepenceInitializer(argumentParser.checkAppDupl()) {
 
 				@Override
 				public void handle(Exception e) {

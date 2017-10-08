@@ -32,22 +32,30 @@ public abstract class AppDuplDepenceInitializer implements Initializable, Except
 	int port = 54545;
 	private ServerSocket local;
 	private DemonThreadFactory<Boolean> fac = new DemonThreadFactory<>();
+	private boolean enable;
 
 	/**
 	 * @throws IOException
 	 */
-	public AppDuplDepenceInitializer(int port) {
+	public AppDuplDepenceInitializer(int port, boolean enable) {
 		this.port = port;
+		this.enable = enable;
 		try {
-			local = new ServerSocket(port);
+			if (enable)
+				local = new ServerSocket(port);
 		} catch (Exception e) {
 			handle(e);
 		}
 
 	}
 
+	public AppDuplDepenceInitializer(boolean enable) throws IOException {
+		this(54545, enable);
+
+	}
+
 	public AppDuplDepenceInitializer() throws IOException {
-		this(54545);
+		this(54545, true);
 	}
 
 	/**
@@ -64,10 +72,14 @@ public abstract class AppDuplDepenceInitializer implements Initializable, Except
 
 		@Override
 		public Boolean call() throws Exception {
+			if (local != null) {
+				LOGGER.debug("중복실행 방지처리 시작.");
+				local.accept(); // Infinity Blocking..
+				return true;
+			} else {
+				return false;
+			}
 
-			LOGGER.debug("중복실행 방지처리 시작.");
-			local.accept(); // Infinity Blocking..
-			return true;
 		}
 
 		@Override
@@ -86,7 +98,7 @@ public abstract class AppDuplDepenceInitializer implements Initializable, Except
 				LOGGER.debug("Keep Going...");
 			}
 
-		} , e -> handle(e));
+		}, e -> handle(e));
 
 		newThread.setName("Application Duplication Check Thread - Gargoyle");
 		// Thread thread = new Thread(new Runnable() {
