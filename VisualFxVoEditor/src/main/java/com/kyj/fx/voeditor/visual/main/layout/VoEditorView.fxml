@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.main.layout.VoEditorController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.main.layout.VoEditorController">
 	<top>
 		<GridPane BorderPane.alignment="CENTER">
 			<columnConstraints>
@@ -46,34 +46,23 @@
 				<TextArea fx:id="txtAreaDesc" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="4" GridPane.rowSpan="2" />
 				<Label text="Location" GridPane.rowIndex="3" />
 				<TextField fx:id="txtLocation" prefHeight="23.0" prefWidth="164.0" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="3" />
-            <HBox GridPane.columnIndex="7" GridPane.rowIndex="3">
-               <GridPane.margin>
-                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
-               </GridPane.margin>
-               <children>
-      				<Button fx:id="btnSelect" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Select" HBox.hgrow="ALWAYS" />
-               </children>
-            </HBox>
+				<Button fx:id="btnSelect" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Select" GridPane.columnIndex="7" GridPane.rowIndex="3" />
 				<Label fx:id="lblClassName1" text="Package Name" />
 				<TextField fx:id="txtPackageName" GridPane.columnIndex="1" GridPane.columnSpan="6" />
-            <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="833.0" spacing="5.0" style="-fx-background-color: inherite;" styleClass="hbox-buttons" GridPane.columnIndex="1" GridPane.columnSpan="9" GridPane.rowIndex="6">
+            <HBox alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: inherite;" styleClass="hbox-buttons" GridPane.columnIndex="1" GridPane.columnSpan="9" GridPane.rowIndex="6">
                <children>
-      				<Button fx:id="btnGenerate" mnemonicParsing="false" prefWidth="100.0" text="Generate" />
-      				<Button fx:id="btnDatabase" mnemonicParsing="false" prefWidth="100.0" text="DataBase" />
-      				<Button mnemonicParsing="false" onMouseClicked="#btnExcelImporOnMouseClick" prefWidth="100.0" text="Import Excel" />
-      				<Button mnemonicParsing="false" onMouseClicked="#btnExcelExportOnMouseClick" prefWidth="100.0" text="Export Excel" />
-                  <Button fx:id="btnUp" mnemonicParsing="false" onMouseClicked="#btnUpOnMouseClick" prefWidth="100.0" text="Up" />
-                  <Button fx:id="btnDown" mnemonicParsing="false" onMouseClicked="#btnDownOnMouseClick" prefWidth="100.0" text="Down" />
-                  <CheckBox fx:id="chkWriteThenOpen" mnemonicParsing="false" prefHeight="16.0" prefWidth="154.0" selected="true" text="Export후 열기" />
+      				<Button fx:id="btnGenerate" mnemonicParsing="false" prefWidth="120.0" text="Generate" />
+      				<Button fx:id="btnDatabase" mnemonicParsing="false" prefWidth="120.0" text="DataBase" />
+      				<Button mnemonicParsing="false" onMouseClicked="#btnExcelImporOnMouseClick" prefWidth="120.0" text="Import Excel" />
+      				<Button mnemonicParsing="false" onMouseClicked="#btnExcelExportOnMouseClick" prefWidth="120.0" text="Export Excel" />
+                  <Button fx:id="btnUp" mnemonicParsing="false" onMouseClicked="#btnUpOnMouseClick" prefWidth="120.0" text="Up" />
+                  <Button fx:id="btnDown" mnemonicParsing="false" onMouseClicked="#btnDownOnMouseClick" prefWidth="120.0" text="Down" />
+                  <CheckBox fx:id="chkWriteThenOpen" mnemonicParsing="false" selected="true" text="Export후 열기" />
                </children>
             </HBox>
             <Label text="Parent Class" GridPane.rowIndex="2" />
             <TextField fx:id="txtParentClassName" prefHeight="23.0" prefWidth="261.0" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="2" />
-            <HBox GridPane.columnIndex="7" GridPane.rowIndex="2">
-               <children>
-                  <Button fx:id="btnSelectClass" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnSelectClassOnAction" text="Select" HBox.hgrow="ALWAYS" />
-               </children>
-            </HBox>
+            <Button fx:id="btnSelectClass" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnSelectClassOnAction" text="Select" GridPane.columnIndex="7" GridPane.rowIndex="2" />
 			</children>
          <BorderPane.margin>
             <Insets bottom="3.0" />

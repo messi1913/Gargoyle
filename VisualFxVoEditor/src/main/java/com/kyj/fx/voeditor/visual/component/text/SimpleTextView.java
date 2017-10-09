@@ -8,6 +8,8 @@ package com.kyj.fx.voeditor.visual.component.text;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.function.Consumer;
 
@@ -45,13 +47,9 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyCombination.Modifier;
-import javafx.scene.input.KeyCombination.ModifierValue;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
@@ -558,7 +556,35 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 		}
 
 	}
-
+	
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 9. 
+	 */
+	@FXML
+	public void miURLEncodeOnAction(){
+		try {
+			String encode = URLEncoder.encode(codeArea.getText(), "UTF-8");
+			codeArea.getUndoManager().mark();
+			codeArea.replaceText(encode);
+		} catch (UnsupportedEncodingException e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
+	}
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 9. 
+	 */
+	@FXML
+	public void miURLDecodeOnAction(){
+		try {
+			String decode = URLDecoder.decode(codeArea.getText(), "UTF-8");
+			codeArea.getUndoManager().mark();
+			codeArea.replaceText(decode);
+		} catch (UnsupportedEncodingException e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
+	}
 	private DockTabPane tabpane;
 
 	@Override
