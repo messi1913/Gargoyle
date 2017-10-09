@@ -739,11 +739,11 @@ public class FxUtil {
 	 * @param parent
 	 * @param isModal
 	 */
-	public static void createStageAndShow(String title, Node parent, boolean isModal) {
+	public static <N extends Node> void createStageAndShow(String title, N parent, boolean isModal) {
 		createStageAndShow(title, new Scene(new BorderPane(parent)), isModal);
 	}
 
-	public static void createStageAndShow(String title, Node parent, Consumer<Stage> option) {
+	public static <N extends Node> void createStageAndShow(String title, N parent, Consumer<Stage> option) {
 		createStageAndShow(title, new Scene(new BorderPane(parent)), option);
 	}
 
@@ -774,7 +774,7 @@ public class FxUtil {
 	 * @param parent
 	 * @param option
 	 */
-	public static void createStageAndShow(Parent parent, Consumer<Stage> option) {
+	public static <P extends Parent> void createStageAndShow(P parent, Consumer<Stage> option) {
 		Scene scene = new Scene(parent);
 		createStageAndShow(scene, option);
 	}
@@ -1310,8 +1310,19 @@ public class FxUtil {
 	}
 
 	public static void createCodeAreaAndShow(String content, Consumer<Stage> option) {
-		createStageAndShow(new CodeArea(content), option);
+		createCodeAreaAndShow(content, null , option);
 	}
+	
+	public static void createCodeAreaAndShow(String content, Consumer<CodeArea> add, Consumer<Stage> option) {
+		CodeArea parent = new CodeArea(content);
+		
+		if(add!=null)
+			add.accept(parent);
+		
+		createStageAndShow(parent, option);
+	}
+
+	
 
 	/********************************
 	 * 작성일 : 2016. 8. 23. 작성자 : KYJ
