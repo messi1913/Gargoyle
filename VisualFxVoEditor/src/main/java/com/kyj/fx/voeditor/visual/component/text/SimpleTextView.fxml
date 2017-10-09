@@ -84,7 +84,14 @@
 								<MenuItem mnemonicParsing="false" onAction="#prettyXmlFormatOnAction" text="Pretty Format" />
 							</items>
 						</Menu>
-
+						
+						<Menu mnemonicParsing="false" text="URL En/Decoder">
+							<items>
+								<MenuItem fx:id="miEncode" mnemonicParsing="false" onAction="#miURLEncodeOnAction" text="encode" />
+								<MenuItem fx:id="miDecode" mnemonicParsing="false" onAction="#miURLDecodeOnAction" text="decode" />
+							</items>
+						</Menu>
+						
 						<SeparatorMenuItem />
 						<MenuItem fx:id="miRemoveSpacies" mnemonicParsing="false" onAction="#miRemoveSpaciesOnAction" text="removeSpacies">
 						</MenuItem>
