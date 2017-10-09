@@ -38,6 +38,7 @@ import javax.swing.filechooser.FileSystemView;
 
 import org.controlsfx.control.PopOver;
 import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1310,7 +1311,11 @@ public class FxUtil {
 	}
 
 	public static void createCodeAreaAndShow(String content, Consumer<Stage> option) {
-		createCodeAreaAndShow(content, null , option);
+		createCodeAreaAndShow(content, c ->{
+
+			c.setParagraphGraphicFactory(LineNumberFactory.get(c));
+			
+		} , option);
 	}
 	
 	public static void createCodeAreaAndShow(String content, Consumer<CodeArea> add, Consumer<Stage> option) {
@@ -1321,8 +1326,6 @@ public class FxUtil {
 		
 		createStageAndShow(parent, option);
 	}
-
-	
 
 	/********************************
 	 * 작성일 : 2016. 8. 23. 작성자 : KYJ
