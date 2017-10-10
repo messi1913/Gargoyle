@@ -44,7 +44,9 @@ public class GargoyleArgumentParser {
 				}
 
 			}
-
+			
+			if(value == null)
+				value = "";
 			prop.put(key, value);
 		}
 	}
@@ -65,5 +67,15 @@ public class GargoyleArgumentParser {
 	 */
 	public boolean checkAppDupl() {
 		return "true".equals(prop.get("enableAppDupledCheck"));
+	}
+	
+	/**
+	 * return version
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 9. 
+	 * @return
+	 */
+	public String getVersion() {
+		return prop.getProperty("version", "eclipse-run");
 	}
 }

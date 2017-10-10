@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.file;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,10 +15,15 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.filechooser.FileSystemView;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.bar.GargoyleSynchLoadBar;
+import com.kyj.fx.voeditor.visual.component.image.FileIconImageView;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
@@ -32,6 +38,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
@@ -103,6 +110,9 @@ public class FilesAnalysisComposite extends BorderPane {
 			return new SimpleStringProperty(v.getValue().getName());
 		});
 		tbFiles.setContextMenu(createTbFilesContextMenu());
+		
+		
+		FxUtil.installClipboardKeyEvent(tbFiles);
 	}
 
 	private ContextMenu createTbFilesContextMenu() {
@@ -143,7 +153,7 @@ public class FilesAnalysisComposite extends BorderPane {
 						setGraphic(null);
 					} else {
 						File file = item.getItems().get(0);
-						
+						setGraphic(new FileIconImageView(file));
 					}
 				}
 
@@ -322,7 +332,7 @@ public class FilesAnalysisComposite extends BorderPane {
 					String name = poll.getName();
 					String fileExtension = FileUtil.getFileExtension(name);
 
-					if (items.containsKey(fileExtension) || items.containsValue(fileExtension)) {
+					if (items.containsKey(fileExtension) /*|| items.containsValue(fileExtension)*/) {
 						items.get(fileExtension).add(poll);
 					} else {
 						ArrayList<File> value = new ArrayList<>();

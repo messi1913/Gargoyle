@@ -36,6 +36,7 @@ import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
 import com.kyj.fx.voeditor.visual.component.file.FilePropertiesComposite;
+import com.kyj.fx.voeditor.visual.component.file.FilesAnalysisComposite;
 import com.kyj.fx.voeditor.visual.component.google.trend.GoogleTrendComposite;
 import com.kyj.fx.voeditor.visual.component.http.HttpActionComposite;
 import com.kyj.fx.voeditor.visual.component.image.Base64ImageConvertComposte;
@@ -999,8 +1000,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 */
 	@FXML
 	public void miAboutOnAction(ActionEvent e) {
-		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
-		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s\nVersion : %s", url, Main.getVersion()));
+//		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
+//		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s\nVersion : %s", url, Main.getVersion()));
+		FxUtil.createStageAndShow(new GargoyleHelpComposite());
 	}
 
 	/**
@@ -2142,6 +2144,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	@FXML
 	public void miHttpRequestOnAction(){
 		loadNewSystemTab("HttpUtil", new HttpActionComposite());
+	}
+	
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 10. 
+	 */
+	@FXML
+	public void miFileAnalysisViewOnAction() {
+		loadNewSystemTab("File Analysis View", new FilesAnalysisComposite());
 	}
 	
 	/**

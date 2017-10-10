@@ -295,10 +295,17 @@
 									</items>
 								</Menu>
 
-								<Menu  text="Http Utils" mnemonicParsing="false">
+								<Menu text="Http Utils" mnemonicParsing="false">
 									<items>
 										<MenuItem mnemonicParsing="false" onAction="#miHttpRequestOnAction"
 											text="Http Request" />
+									</items>
+								</Menu>
+
+								<Menu text="File" mnemonicParsing="false">
+									<items>
+										<MenuItem mnemonicParsing="false" onAction="#miFileAnalysisViewOnAction"
+											text="FileAnalysisView" />
 									</items>
 								</Menu>
 

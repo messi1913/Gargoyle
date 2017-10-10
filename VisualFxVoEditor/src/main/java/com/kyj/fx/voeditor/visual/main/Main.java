@@ -110,7 +110,7 @@ public class Main extends Application {
 			Stream.of(args).forEach(LOGGER::debug);
 			
 			// first param is version
-			version = args[0];
+			version = argumentParser.getVersion();//args[0];
 		}
 
 		// 어플리케이션 중복 실행 방지처리 로직 구현
