@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.file;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,10 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.filechooser.FileSystemView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +33,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
@@ -124,7 +118,19 @@ public class FilesAnalysisComposite extends BorderPane {
 				FileUtil.browseFile(selectedItem);
 			}
 		});
-		return new ContextMenu(miShowInSystemExplor);
+		
+		MenuItem miProperties = new MenuItem("Properties");
+		miProperties.setOnAction(ev -> {
+			File selectedItem = tbFiles.getSelectionModel().getSelectedItem();
+			if (selectedItem != null) {
+				
+				FxUtil.createStageAndShow(new FilePropertiesComposite(selectedItem), stage->{
+					stage.initOwner(FxUtil.getWindow(FilesAnalysisComposite.this));
+					stage.setTitle(selectedItem.getName() + " Properties" );
+				});
+			}
+		});
+		return new ContextMenu(miShowInSystemExplor, miProperties);
 	}
 
 	private StringConverter<V> treeItemStringConverter = new StringConverter<V>() {
