@@ -11,16 +11,12 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<fx:root prefHeight="670.0" prefWidth="906.0" styleClass="borderpane-root"
-	stylesheets="@FilesAnalysisComposite.css" type="BorderPane"
-	xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.141">
+<fx:root prefHeight="670.0" prefWidth="906.0" styleClass="borderpane-root" stylesheets="@FilesAnalysisComposite.css" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
 	<top>
 		<HBox styleClass="hbox-item-container" BorderPane.alignment="CENTER">
 			<children>
-				<TextField id="txtFileLocation" fx:id="txtFileLocation"
-					prefHeight="23.0" prefWidth="472.0" HBox.hgrow="ALWAYS" />
-				<Button id="button" mnemonicParsing="false" text="Select" />
+				<TextField id="txtFileLocation" fx:id="txtFileLocation" onMouseClicked="#txtFileLocationOnMouseClick" prefHeight="23.0" prefWidth="472.0" HBox.hgrow="ALWAYS" />
+				<Button id="button" mnemonicParsing="false" onAction="#btnSearchOnAction" text="Search" />
 			</children>
 		</HBox>
 	</top>
@@ -30,18 +26,15 @@
 				<VBox styleClass="vbox-item-container">
 					<children>
 						<Label text="File Tree" />
-						<TreeView fx:id="tvFiles" prefHeight="200.0" prefWidth="200.0"
-	VBox.vgrow="ALWAYS" />
+						<TreeView fx:id="tvFiles" onMouseClicked="#tvFilesOnClick" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
 					</children>
 				</VBox>
 				<VBox styleClass="vbox-item-container">
 					<children>
-						<Label text="File Attribute" />
-						<TableView prefHeight="200.0" prefWidth="200.0"
-							VBox.vgrow="ALWAYS">
+						<Label text="Files" />
+						<TableView fx:id="tbFiles" onMouseClicked="#tbFilesOnMouseClick" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
 							<columns>
-								<TableColumn prefWidth="75.0" text="C1" />
-								<TableColumn prefWidth="75.0" text="C2" />
+								<TableColumn fx:id="colFileName" prefWidth="417.0" text="File Name" />
 							</columns>
 						</TableView>
 					</children>

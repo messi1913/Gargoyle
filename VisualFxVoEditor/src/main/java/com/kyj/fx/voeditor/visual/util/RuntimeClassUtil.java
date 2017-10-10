@@ -249,7 +249,9 @@ public class RuntimeClassUtil {
 			return closed;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.io.Closeable#close()
 		 */
 		@Override
@@ -283,7 +285,9 @@ public class RuntimeClassUtil {
 
 			outThread = new TThread(p, out) {
 
-				/* (non-Javadoc)
+				/*
+				 * (non-Javadoc)
+				 * 
 				 * @see java.lang.Thread#run()
 				 */
 				@Override
@@ -313,7 +317,9 @@ public class RuntimeClassUtil {
 
 			errThread = new TThread(p, err) {
 
-				/* (non-Javadoc)
+				/*
+				 * (non-Javadoc)
+				 * 
 				 * @see java.lang.Thread#run()
 				 */
 				@Override
@@ -418,13 +424,13 @@ public class RuntimeClassUtil {
 		p.waitFor(10, TimeUnit.SECONDS);
 		String temp = null;
 
-		//Monitor 수행을 중단하기 위한 스레드
+		// Monitor 수행을 중단하기 위한 스레드
 		new Thread(new PipeSteop(p, forceStop), "Stop-monitor").start();
-		
+
 		while ((temp = br.readLine()) != null) {
 			messageReceiver.accept(temp);
 		}
-		
+
 	}
 
 	static class PipeSteop implements Runnable {
@@ -450,12 +456,11 @@ public class RuntimeClassUtil {
 	 * @작성일 : 2016. 12. 22.
 	 * @param args
 	 * @param convert
-	 * 		Integer : exitCode
-	 * 		InputStream  : dataStream
+	 *            Integer : exitCode InputStream : dataStream
 	 * @return
 	 * @throws Exception
 	 */
-	/*@Deprecated 테스트를 더 해봐야함.*/
+	/* @Deprecated 테스트를 더 해봐야함. */
 
 	public static void exeAsynchLazy(List<String> args, BiConsumer<Integer, StringBuffer> convert) {
 		exeAsynchLazy(args, "UTF-8", convert, null);
@@ -467,6 +472,13 @@ public class RuntimeClassUtil {
 
 	public static void simpleExeAsynchLazy(List<String> args, Consumer<Exception> errorHandler) {
 		Thread thread = new SimpleAsynch(args, errorHandler);
+		thread.setDaemon(true);
+		thread.setName("simple-exeAsynchLazy");
+		thread.start();
+	}
+
+	public static void simpleExeAsynchLazy(List<String> args) {
+		Thread thread = new SimpleAsynch(args);
 		thread.setDaemon(true);
 		thread.setName("simple-exeAsynchLazy");
 		thread.start();
@@ -484,12 +496,18 @@ public class RuntimeClassUtil {
 		List<String> args;
 		Consumer<Exception> errorHandler;
 
+		public SimpleAsynch(List<String> args) {
+			this.args = args;
+		}
+
 		public SimpleAsynch(List<String> args, Consumer<Exception> errorHandler) {
 			this.args = args;
 			this.errorHandler = errorHandler;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Thread#run()
 		 */
 		@Override
@@ -499,8 +517,11 @@ public class RuntimeClassUtil {
 			} catch (Exception e) {
 				if (null != errorHandler)
 					errorHandler.accept(e);
-				else
+				else {
 					LOGGER.error(ValueUtil.toString(e));
+					throw new RuntimeException(e);
+				}
+
 			}
 		}
 
@@ -519,7 +540,9 @@ public class RuntimeClassUtil {
 			this.errorHandler = errorHandler;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Thread#run()
 		 */
 		@Override

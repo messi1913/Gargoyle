@@ -24,22 +24,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.base.Objects;
-import com.kyj.fx.voeditor.visual.component.JavaProjectFileWrapper;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
+import com.kyj.fx.voeditor.visual.component.JavaProjectFileWrapper;
 import com.kyj.fx.voeditor.visual.exceptions.GagoyleParamEmptyException;
 import com.kyj.fx.voeditor.visual.framework.FileCheckHandler;
 import com.kyj.fx.voeditor.visual.framework.collections.CachedMap;
@@ -114,9 +117,14 @@ public class FileUtil implements GargoyleExtensionFilters {
 		boolean isSuccess = false;
 		if (file != null) {
 			try {
-				if (file.exists() && file.isDirectory()) {
-					Desktop.getDesktop().open(file);
-					isSuccess = true;
+				if (file.exists()) {
+					if (file.isDirectory()) {
+						Desktop.getDesktop().open(file);
+						isSuccess = true;
+					} else if (file.isFile()) {
+						Desktop.getDesktop().open(file.getParentFile());
+						isSuccess = true;
+					}
 				}
 
 			} catch (IOException e) {
@@ -135,18 +143,116 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 * @return
 	 */
 	public static boolean openFile(File file) {
-		boolean isSuccess = false;
-		if (Desktop.isDesktopSupported()) {
-			if (file.exists()) {
-				try {
-					Desktop.getDesktop().open(file);
-				} catch (IOException e) {
-					isSuccess = false;
-				}
-			}
+		return openFile(file, err -> {
+			LOGGER.error(ValueUtil.toString(err));
+		});
+	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 10.
+	 * @param file
+	 * @param errorHandler
+	 * @return
+	 */
+	public static boolean openFile(File file, Consumer<Exception> errorHandler) {
+		return fileOpenAction(file, errorHandler);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 10.
+	 * @param file
+	 * @return
+	 */
+	public static boolean editFile(File file) {
+		return fileEditAction(file, err -> {
+			LOGGER.error(ValueUtil.toString(err));
+		});
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 10.
+	 * @param file
+	 * @param errorHandler
+	 * @return
+	 */
+	public static boolean editFile(File file, Consumer<Exception> errorHandler) {
+		return fileEditAction(file, errorHandler);
+	}
+
+	/**
+	 * @최초생성일 2017. 10. 10.
+	 */
+	private static BiFunction<File, Consumer<Exception>, Boolean> openAction = (file, errhandler) -> {
+		boolean isSuccess = false;
+		try {
+			Desktop.getDesktop().open(file);
+			isSuccess = true;
+		} catch (IOException e) {
+
+			String osName = SystemUtils.OS_NAME.toLowerCase();
+			LOGGER.debug(osName);
+			if (osName.contains("window")) {
+				RuntimeClassUtil.simpleExeAsynchLazy(Arrays.asList("explorer", file.getAbsolutePath()), errhandler);
+			} else
+				errhandler.accept(e);
 		}
 		return isSuccess;
+	};
+
+	/**
+	 * @최초생성일 2017. 10. 10.
+	 */
+	private static BiFunction<File, Consumer<Exception>, Boolean> editAction = (file, errhandler) -> {
+		boolean isSuccess = false;
+		try {
+			Desktop.getDesktop().edit(file);
+			isSuccess = true;
+		} catch (IOException e) {
+			errhandler.accept(e);
+		}
+		return isSuccess;
+	};
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 10.
+	 * @param file
+	 * @param errorHandler
+	 * @return
+	 */
+	private static boolean fileEditAction(File file, Consumer<Exception> errorHandler) {
+		return fileAction(file, editAction, errorHandler);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 10.
+	 * @param file
+	 * @param errorHandler
+	 * @return
+	 */
+	private static boolean fileOpenAction(File file, Consumer<Exception> errorHandler) {
+		return fileAction(file, openAction, errorHandler);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 10.
+	 * @param file
+	 * @param action
+	 * @param errorHandler
+	 * @return
+	 */
+	private static boolean fileAction(File file, BiFunction<File, Consumer<Exception>, Boolean> action, Consumer<Exception> errorHandler) {
+		if (Desktop.isDesktopSupported()) {
+			if (file.exists()) {
+				return action.apply(file, errorHandler);
+			}
+		}
+		return false;
 	}
 
 	private static final Map<File, String> cacheReadFile = new CachedMap<>(60000);
@@ -356,7 +462,8 @@ public class FileUtil implements GargoyleExtensionFilters {
 	}
 
 	/**
-	 * 파일 하위에 .project라는 파일이 존재하며 그 .project파일에 기술된 내용이 실제 디렉토리와 일치한다면 자바 project파일이다.
+	 * 파일 하위에 .project라는 파일이 존재하며 그 .project파일에 기술된 내용이 실제 디렉토리와 일치한다면 자바
+	 * project파일이다.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 3. 16.
@@ -454,7 +561,8 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 *
 	 * 디렉토리 삭제.
 	 *
-	 * 일반 delete 함수로는 디렉토리안에 파일들이 존재하는 삭제하는 허용되지않음. 그래서 하위파일들을 먼저 삭제하고 디렉토리삭제를 처리해야함. 이 함수는 그런 디렉토리 삭제를 지원해주기 위한 함수.
+	 * 일반 delete 함수로는 디렉토리안에 파일들이 존재하는 삭제하는 허용되지않음. 그래서 하위파일들을 먼저 삭제하고 디렉토리삭제를
+	 * 처리해야함. 이 함수는 그런 디렉토리 삭제를 지원해주기 위한 함수.
 	 *
 	 * @param path
 	 ********************************/
@@ -871,10 +979,10 @@ public class FileUtil implements GargoyleExtensionFilters {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 9. 14. 
+	 * @작성일 : 2017. 9. 14.
 	 * @param file
-	 * @return 
-	 * @throws IOException 
+	 * @return
+	 * @throws IOException
 	 */
 	public static byte[] toByteArray(File file) throws IOException {
 		return FileUtils.readFileToByteArray(file);
