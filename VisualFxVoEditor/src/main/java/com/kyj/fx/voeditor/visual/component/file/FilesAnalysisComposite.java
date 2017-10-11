@@ -32,6 +32,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker.State;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -72,6 +73,8 @@ public class FilesAnalysisComposite extends BorderPane {
 	@FXML
 	private TableColumn<File, String> colFileName;
 
+	private FileSearchService service;
+
 	/**
 	 * @param root
 	 */
@@ -91,7 +94,9 @@ public class FilesAnalysisComposite extends BorderPane {
 		FxUtil.loadRoot(FilesAnalysisComposite.class, this, err -> {
 			LOGGER.error(ValueUtil.toString(err));
 		});
-
+		service = new FileSearchService();
+		service.setExecutor(ExecutorDemons.getGargoyleSystemExecutorSerivce());
+		service.setOnSucceeded(serviceOnSuccessed);
 	}
 
 	@FXML
@@ -99,13 +104,13 @@ public class FilesAnalysisComposite extends BorderPane {
 		tvFiles.setCellFactory(treeCellCallback);
 
 		tvFiles.setShowRoot(false);
+		tvFiles.setCache(false);
 		txtFileLocation.setEditable(false);
 		colFileName.setCellValueFactory(v -> {
 			return new SimpleStringProperty(v.getValue().getName());
 		});
 		tbFiles.setContextMenu(createTbFilesContextMenu());
-		
-		
+
 		FxUtil.installClipboardKeyEvent(tbFiles);
 	}
 
@@ -118,15 +123,15 @@ public class FilesAnalysisComposite extends BorderPane {
 				FileUtil.browseFile(selectedItem);
 			}
 		});
-		
+
 		MenuItem miProperties = new MenuItem("Properties");
 		miProperties.setOnAction(ev -> {
 			File selectedItem = tbFiles.getSelectionModel().getSelectedItem();
 			if (selectedItem != null) {
-				
-				FxUtil.createStageAndShow(new FilePropertiesComposite(selectedItem), stage->{
+
+				FxUtil.createStageAndShow(new FilePropertiesComposite(selectedItem), stage -> {
 					stage.initOwner(FxUtil.getWindow(FilesAnalysisComposite.this));
-					stage.setTitle(selectedItem.getName() + " Properties" );
+					stage.setTitle(selectedItem.getName() + " Properties");
 				});
 			}
 		});
@@ -179,6 +184,7 @@ public class FilesAnalysisComposite extends BorderPane {
 
 			TreeItem<V> root = new TreeItem<>();
 			tvFiles.setRoot(root);
+			
 			if (obj != null) {
 				Map<String, List<File>> value = (Map<String, List<File>>) obj;
 
@@ -189,6 +195,7 @@ public class FilesAnalysisComposite extends BorderPane {
 					root.getChildren().add(new TreeItem<>(v));
 				}
 			}
+			service.reset();
 
 		}
 	};
@@ -197,10 +204,27 @@ public class FilesAnalysisComposite extends BorderPane {
 
 		if (this.root.get() != null) {
 
-			FileSearchService service = new FileSearchService(root.get());
-			service.setExecutor(ExecutorDemons.getGargoyleSystemExecutorSerivce());
-			service.setOnSucceeded(serviceOnSuccessed);
-			service.start();
+//			if (service.isRunning()) {
+//				
+//			} else {
+			
+				service.setFile(this.root.get());
+//				int count = 0;
+//				while (State.READY != service.getState()) {
+//					if(count > 3) {
+//						service.cancel();
+//						break;
+//					}
+//					try {
+//						Thread.sleep(1000);
+//						count ++;
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//				}
+			
+				service.start();
+//			}
 
 		}
 
@@ -285,9 +309,15 @@ public class FilesAnalysisComposite extends BorderPane {
 		private Queue<File> q = new LinkedList<>();
 		private Map<String, List<File>> items = new TreeMap<>();
 
+		FileSearchService() {
+		}
+
 		FileSearchService(File root) {
 			this.root = root;
+		}
 
+		public void setFile(File file) {
+			this.root = file;
 		}
 
 		@Override
@@ -298,7 +328,7 @@ public class FilesAnalysisComposite extends BorderPane {
 
 		@Override
 		protected Task<Map<String, List<File>>> createTask() {
-
+			items.clear();
 			Task<Map<String, List<File>>> task2 = new Task<Map<String, List<File>>>() {
 
 				@Override
@@ -338,7 +368,11 @@ public class FilesAnalysisComposite extends BorderPane {
 					String name = poll.getName();
 					String fileExtension = FileUtil.getFileExtension(name);
 
-					if (items.containsKey(fileExtension) /*|| items.containsValue(fileExtension)*/) {
+					if (items.containsKey(
+							fileExtension) /*
+											 * || items.containsValue(
+											 * fileExtension)
+											 */) {
 						items.get(fileExtension).add(poll);
 					} else {
 						ArrayList<File> value = new ArrayList<>();
