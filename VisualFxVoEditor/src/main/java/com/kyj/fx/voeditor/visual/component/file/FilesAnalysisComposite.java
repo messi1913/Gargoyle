@@ -8,7 +8,6 @@ package com.kyj.fx.voeditor.visual.component.file;
 
 import java.io.File;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
@@ -21,6 +20,7 @@ import com.kyj.fx.voeditor.visual.component.bar.GargoyleSynchLoadBar;
 import com.kyj.fx.voeditor.visual.component.image.FileIconImageView;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
+import com.kyj.fx.voeditor.visual.functions.LoadFileOptionHandler;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
@@ -39,6 +39,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
@@ -77,6 +78,8 @@ public class FilesAnalysisComposite extends BorderPane {
 
 	@FXML
 	private TableColumn<File, String> colFileName;
+	@FXML
+	private ComboBox<String> cbFilterType;
 
 	private FileSearchService service;
 
@@ -254,14 +257,15 @@ public class FilesAnalysisComposite extends BorderPane {
 
 	@FXML
 	public void tvFilesOnClick(MouseEvent e) {
-//		TreeItem<V> selectedItem = tvFiles.getSelectionModel().getSelectedItem();
-//		if (selectedItem != null) {
-//			V value = selectedItem.getValue();
-//			if (value != null) {
-//				ObservableList<File> items = value.getItems();
-//				tbFiles.setItems(items);
-//			}
-//		}
+		// TreeItem<V> selectedItem =
+		// tvFiles.getSelectionModel().getSelectedItem();
+		// if (selectedItem != null) {
+		// V value = selectedItem.getValue();
+		// if (value != null) {
+		// ObservableList<File> items = value.getItems();
+		// tbFiles.setItems(items);
+		// }
+		// }
 		nameFilterOnAction();
 	}
 
@@ -294,18 +298,31 @@ public class FilesAnalysisComposite extends BorderPane {
 			V value = selectedItem.getValue();
 			if (value != null) {
 				FilteredList<File> items = new FilteredList<>(value.getItems());
-				Predicate<? super File> predicate =  null;
+				Predicate<? super File> predicate = null;
 				if (text.isEmpty()) {
 					predicate = v -> {
 						return true;
 					};
 				} else {
-					predicate = v -> {
-						return v.getName().toUpperCase().contains(text.toUpperCase());
-					};
+					switch (cbFilterType.getValue()) {
+					case "File Name":
+						predicate = v -> {
+							return v.getName().toUpperCase().contains(text.toUpperCase());
+						};
+
+						break;
+					case "File Content":
+						predicate = v -> {
+							String readFile = FileUtil.readFile(v, LoadFileOptionHandler.getDefaultHandler());
+							return readFile.contains(text);
+						};
+
+						break;
+					}
 				}
+
 				items.setPredicate(predicate);
-				
+
 				SortedList<File> sortedList = new SortedList<>(items);
 				sortedList.comparatorProperty().bind(tbFiles.comparatorProperty());
 				tbFiles.setItems(sortedList);
