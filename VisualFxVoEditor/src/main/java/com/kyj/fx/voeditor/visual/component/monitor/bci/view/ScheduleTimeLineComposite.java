@@ -161,8 +161,10 @@ public class ScheduleTimeLineComposite extends BorderPane implements MonitorList
 			if (monitorService.isRunning()) {
 				monitorService.cancel();
 			}
+			
+			Monitors.removeListener(ScheduleTimeLineComposite.this);	
 		});
-
+		
 	}
 
 }

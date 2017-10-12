@@ -7,12 +7,12 @@
 package com.kyj.fx.voeditor.visual.component.file;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +30,11 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.concurrent.Worker.State;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -45,6 +47,8 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTreeCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
@@ -65,7 +69,7 @@ public class FilesAnalysisComposite extends BorderPane {
 	@FXML
 	private TreeView<V> tvFiles;
 	@FXML
-	private TextField txtFileLocation;
+	private TextField txtFileLocation, txtNameFilter;
 
 	@FXML
 	private TableView<File> tbFiles;
@@ -184,14 +188,15 @@ public class FilesAnalysisComposite extends BorderPane {
 
 			TreeItem<V> root = new TreeItem<>();
 			tvFiles.setRoot(root);
-			
+
 			if (obj != null) {
-				Map<String, List<File>> value = (Map<String, List<File>>) obj;
+				Map<String, ObservableList<File>> value = (Map<String, ObservableList<File>>) obj;
 
 				for (String key : value.keySet()) {
 					V v = new V();
 					v.setFileExtension(key);
-					v.setItems(value.get(key));
+					ObservableList<File> list = value.get(key);
+					v.setItems(list);
 					root.getChildren().add(new TreeItem<>(v));
 				}
 			}
@@ -204,27 +209,27 @@ public class FilesAnalysisComposite extends BorderPane {
 
 		if (this.root.get() != null) {
 
-//			if (service.isRunning()) {
-//				
-//			} else {
-			
-				service.setFile(this.root.get());
-//				int count = 0;
-//				while (State.READY != service.getState()) {
-//					if(count > 3) {
-//						service.cancel();
-//						break;
-//					}
-//					try {
-//						Thread.sleep(1000);
-//						count ++;
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//				}
-			
-				service.start();
-//			}
+			// if (service.isRunning()) {
+			//
+			// } else {
+
+			service.setFile(this.root.get());
+			// int count = 0;
+			// while (State.READY != service.getState()) {
+			// if(count > 3) {
+			// service.cancel();
+			// break;
+			// }
+			// try {
+			// Thread.sleep(1000);
+			// count ++;
+			// } catch (InterruptedException e) {
+			// e.printStackTrace();
+			// }
+			// }
+
+			service.start();
+			// }
 
 		}
 
@@ -248,13 +253,15 @@ public class FilesAnalysisComposite extends BorderPane {
 
 	@FXML
 	public void tvFilesOnClick(MouseEvent e) {
-		TreeItem<V> selectedItem = tvFiles.getSelectionModel().getSelectedItem();
-		if (selectedItem != null) {
-			V value = selectedItem.getValue();
-			if (value != null) {
-				tbFiles.getItems().setAll(value.getItems());
-			}
-		}
+//		TreeItem<V> selectedItem = tvFiles.getSelectionModel().getSelectedItem();
+//		if (selectedItem != null) {
+//			V value = selectedItem.getValue();
+//			if (value != null) {
+//				ObservableList<File> items = value.getItems();
+//				tbFiles.setItems(items);
+//			}
+//		}
+		nameFilterOnAction();
 	}
 
 	@FXML
@@ -269,6 +276,40 @@ public class FilesAnalysisComposite extends BorderPane {
 		}
 	}
 
+	@FXML
+	public void txtNameFilterOnKeyPress(KeyEvent e) {
+		if (e.getCode() == KeyCode.ENTER) {
+			nameFilterOnAction();
+		}
+	}
+
+	@FXML
+	public void nameFilterOnAction() {
+
+		String text = txtNameFilter.getText();
+
+		TreeItem<V> selectedItem = tvFiles.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			V value = selectedItem.getValue();
+			if (value != null) {
+				FilteredList<File> items = new FilteredList<>(value.getItems());
+				Predicate<? super File> predicate =  null;
+				if (text.isEmpty()) {
+					predicate = v -> {
+						return true;
+					};
+				} else {
+					predicate = v -> {
+						return v.getName().toUpperCase().contains(text.toUpperCase());
+					};
+				}
+				items.setPredicate(predicate);
+				tbFiles.setItems(items);
+			}
+		}
+
+	}
+
 	/**
 	 * 트리를 표현하기 위한 객체
 	 * 
@@ -277,7 +318,7 @@ public class FilesAnalysisComposite extends BorderPane {
 	 */
 	static class V {
 		private String fileExtension;
-		private List<File> items;
+		private ObservableList<File> items;
 
 		public String getFileExtension() {
 			return fileExtension;
@@ -287,11 +328,11 @@ public class FilesAnalysisComposite extends BorderPane {
 			this.fileExtension = fileExtension;
 		}
 
-		public List<File> getItems() {
+		public ObservableList<File> getItems() {
 			return items;
 		}
 
-		public void setItems(List<File> items) {
+		public void setItems(ObservableList<File> items) {
 			this.items = items;
 		}
 
@@ -303,11 +344,11 @@ public class FilesAnalysisComposite extends BorderPane {
 	 * @author KYJ
 	 *
 	 */
-	static class FileSearchService extends Service<Map<String, List<File>>> {
+	static class FileSearchService extends Service<Map<String, ObservableList<File>>> {
 
 		private File root;
 		private Queue<File> q = new LinkedList<>();
-		private Map<String, List<File>> items = new TreeMap<>();
+		private Map<String, ObservableList<File>> items = new TreeMap<>();
 
 		FileSearchService() {
 		}
@@ -321,19 +362,19 @@ public class FilesAnalysisComposite extends BorderPane {
 		}
 
 		@Override
-		protected void executeTask(Task<Map<String, List<File>>> task) {
-			GargoyleSynchLoadBar<Map<String, List<File>>> bar = new GargoyleSynchLoadBar<>(SharedMemory.getPrimaryStage(), task);
+		protected void executeTask(Task<Map<String, ObservableList<File>>> task) {
+			GargoyleSynchLoadBar<Map<String, ObservableList<File>>> bar = new GargoyleSynchLoadBar<>(SharedMemory.getPrimaryStage(), task);
 			bar.start();
 		}
 
 		@Override
-		protected Task<Map<String, List<File>>> createTask() {
+		protected Task<Map<String, ObservableList<File>>> createTask() {
 			items.clear();
-			Task<Map<String, List<File>>> task2 = new Task<Map<String, List<File>>>() {
+			Task<Map<String, ObservableList<File>>> task2 = new Task<Map<String, ObservableList<File>>>() {
 
 				@Override
 
-				protected Map<String, List<File>> call() throws Exception {
+				protected Map<String, ObservableList<File>> call() throws Exception {
 
 					recursive(root);
 
@@ -375,7 +416,7 @@ public class FilesAnalysisComposite extends BorderPane {
 											 */) {
 						items.get(fileExtension).add(poll);
 					} else {
-						ArrayList<File> value = new ArrayList<>();
+						ObservableList<File> value = FXCollections.observableArrayList();
 						value.add(poll);
 						items.put(fileExtension, value);
 					}
