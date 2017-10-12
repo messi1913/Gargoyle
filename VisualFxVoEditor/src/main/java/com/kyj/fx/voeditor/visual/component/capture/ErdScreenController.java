@@ -27,6 +27,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.transform.Scale;
@@ -200,6 +201,9 @@ public class ErdScreenController {
 
 		newNode.setOnMouseDragged(ev -> {
 
+			// if(ev.isConsumed())
+			// return;
+
 			Location location = initLocation.get(newNode);
 
 			Point2D dragAnchor = location.getDragAnchor();
@@ -210,7 +214,9 @@ public class ErdScreenController {
 			double newXPosition = location.getInitX() + dragX;
 			double newYPosition = location.getInitY() + dragY;
 
+			// System.out.println(newXPosition + " : " + location.getInitY());
 			// if new position do not exceeds borders of the rectangle, translate to this position
+
 			newNode.setTranslateX(newXPosition);
 			newNode.setTranslateY(newYPosition);
 
@@ -223,13 +229,49 @@ public class ErdScreenController {
 			if (ev.isConsumed())
 				return;
 
+//			if (newNode instanceof DrawItem) {
+//				((DrawItem)newNode).setSelected(true);
+//			}
+			
 			Location location = initLocation.get(newNode);
 			location.setInitX(newNode.getTranslateX());
 			location.setInitY(newNode.getTranslateY());
 			location.setDragAnchor(new Point2D(ev.getSceneX(), ev.getSceneY()));
-			// System.out.println(newNode);
-			newNode.requestFocus();
+			newNode.requestFocus();	
+			
 			ev.consume();
+
+		});
+
+		newNode.setOnKeyPressed(ev -> {
+
+			if (!(newNode instanceof DrawItem)) {
+				return;
+			}
+
+			switch (ev.getCode()) {
+			case DELETE:
+				remove((DrawItem) newNode);
+				break;
+
+			case A:
+
+				if (ev.isControlDown() && ev.isShiftDown()) {
+					anchorBoard.getChildren().forEach(n -> {
+						n.requestFocus();
+					});
+				}
+
+				break;
+
+			default:
+				break;
+			}
+
+			// if (ev.getCode() == KeyCode.DELETE) {
+			// if (newNode instanceof DrawItem)
+			// remove((DrawItem) newNode);
+			// }
 
 		});
 
