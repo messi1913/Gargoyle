@@ -6,8 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
-import java.io.File;
-
 import com.kyj.fx.voeditor.visual.component.file.FilesAnalysisComposite;
 
 import javafx.application.Application;
@@ -39,8 +37,7 @@ public class FileAnalysisExam extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
-		File f = new File("C:\\ph4net0m\\ph4net0m");
-		FilesAnalysisComposite view = new FilesAnalysisComposite(f);
+		FilesAnalysisComposite view = new FilesAnalysisComposite();
 
 		primaryStage.setScene(new Scene(view, 1200, 700));
 		primaryStage.show();
