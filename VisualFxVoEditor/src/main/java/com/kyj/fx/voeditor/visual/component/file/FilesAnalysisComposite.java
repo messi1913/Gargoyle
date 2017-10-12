@@ -33,6 +33,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -304,7 +305,11 @@ public class FilesAnalysisComposite extends BorderPane {
 					};
 				}
 				items.setPredicate(predicate);
-				tbFiles.setItems(items);
+				
+				SortedList<File> sortedList = new SortedList<>(items);
+				sortedList.comparatorProperty().bind(tbFiles.comparatorProperty());
+				tbFiles.setItems(sortedList);
+
 			}
 		}
 
