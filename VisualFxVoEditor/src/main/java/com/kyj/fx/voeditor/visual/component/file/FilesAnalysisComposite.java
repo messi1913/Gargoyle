@@ -146,35 +146,68 @@ public class FilesAnalysisComposite extends BorderPane {
 		return new ContextMenu(miShowInSystemExplor, miProperties);
 	}
 
-	private StringConverter<V> treeItemStringConverter=new StringConverter<V>(){
+	private StringConverter<V> treeItemStringConverter = new StringConverter<V>() {
 
-	@Override public String toString(V object){return String.format("%s (%d)",object.getFileExtension(),object.getItems().size());}
+		@Override
+		public String toString(V object) {
+			return String.format("%s (%d)", object.getFileExtension(), object.getItems().size());
+		}
 
-	@Override public V fromString(String string){return null;}};
-
-	private Callback<TreeView<V>, TreeCell<V>> treeCellCallback=new Callback<TreeView<V>,TreeCell<V>>(){
-
-	@Override public TreeCell<V>call(TreeView<V>param){TextFieldTreeCell<V>textFieldTreeCell=new TextFieldTreeCell<V>(treeItemStringConverter){
-
-	@Override public void updateItem(V item,boolean empty){super.updateItem(item,empty);if(empty){setGraphic(null);}else{File file=item.getItems().get(0);setGraphic(new FileIconImageView(file));}}
-
+		@Override
+		public V fromString(String string) {
+			return null;
+		}
 	};
 
-	return textFieldTreeCell;}};
+	private Callback<TreeView<V>, TreeCell<V>> treeCellCallback = new Callback<TreeView<V>, TreeCell<V>>() {
 
-	private EventHandler<WorkerStateEvent> serviceOnSuccessed=new EventHandler<WorkerStateEvent>(){
+		@Override
+		public TreeCell<V> call(TreeView<V> param) {
+			TextFieldTreeCell<V> textFieldTreeCell = new TextFieldTreeCell<V>(treeItemStringConverter) {
 
-	@Override public void handle(WorkerStateEvent event){
+				@Override
+				public void updateItem(V item, boolean empty) {
+					super.updateItem(item, empty);
+					if (empty) {
+						setGraphic(null);
+					} else {
+						File file = item.getItems().get(0);
+						setGraphic(new FileIconImageView(file));
+					}
+				}
 
-	LOGGER.debug("successed!");Object obj=event.getSource().getValue();
+			};
 
-	TreeItem<V>root=new TreeItem<>();tvFiles.setRoot(root);
+			return textFieldTreeCell;
+		}
+	};
 
-	if(obj!=null){Map<String,ObservableList<File>>value=(Map<String,ObservableList<File>>)obj;
+	private EventHandler<WorkerStateEvent> serviceOnSuccessed = new EventHandler<WorkerStateEvent>() {
 
-	for(String key:value.keySet()){V v=new V();v.setFileExtension(key);ObservableList<File>list=value.get(key);v.setItems(list);root.getChildren().add(new TreeItem<>(v));}}service.reset();
+		@Override
+		public void handle(WorkerStateEvent event) {
 
-	}};
+			LOGGER.debug("successed!");
+			Object obj = event.getSource().getValue();
+
+			TreeItem<V> root = new TreeItem<>();
+			tvFiles.setRoot(root);
+
+			if (obj != null) {
+				Map<String, ObservableList<File>> value = (Map<String, ObservableList<File>>) obj;
+
+				for (String key : value.keySet()) {
+					V v = new V();
+					v.setFileExtension(key);
+					ObservableList<File> list = value.get(key);
+					v.setItems(list);
+					root.getChildren().add(new TreeItem<>(v));
+				}
+			}
+			service.reset();
+
+		}
+	};
 
 	public void search() {
 
@@ -305,7 +338,7 @@ public class FilesAnalysisComposite extends BorderPane {
 
 	@FXML
 	public void txtFileLocationOnKeyPress(KeyEvent e) {
-		if(e.getCode() == KeyCode.ENTER)
+		if (e.getCode() == KeyCode.ENTER)
 			search();
 	}
 
