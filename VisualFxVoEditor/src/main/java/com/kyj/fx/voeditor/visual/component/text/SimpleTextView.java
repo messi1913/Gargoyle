@@ -32,6 +32,7 @@ import com.kyj.fx.voeditor.visual.framework.word.HtmlTextToMimeAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.MimeToHtmlAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.NamoMimeToHtmlAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.SimpleWordAdapter;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil.SaveAsModel;
@@ -92,13 +93,13 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 
 	@FXML
 	private MenuBar mb;
-	
+
 	private Label lblLineInfo = new Label();
 
 	public SimpleTextView() {
 		this("", true, null);
 	}
-	
+
 	public SimpleTextView(String content) {
 		this(content, true, null);
 	}
@@ -144,8 +145,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if(SimpleTextView.this.tab.getText().charAt(0) == '*')
-				{
+				if (SimpleTextView.this.tab.getText().charAt(0) == '*') {
 					return;
 				}
 				String modifyTabName = "*".concat(SimpleTextView.this.tab.getText());
@@ -158,11 +158,12 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 		miSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 
 	}
-	
+
 	/**
 	 * 메뉴바 보임여부 결정
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 9. 29. 
+	 * @작성일 : 2017. 9. 29.
 	 * @param visible
 	 */
 	public void setMenubarVisible(boolean visible) {
@@ -175,13 +176,32 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 
 			@Override
 			public void customMenus(CodeArea codeArea, ContextMenu contextMenu) {
+				{
+					MenuItem e = new MenuItem("Show Application Code");
+					e.setOnAction(ev -> {
+						FxUtil.EasyFxUtils.showApplicationCode(codeArea.getSelectedText());
+					});
 
-				MenuItem e = new MenuItem("Show ApplicatioN Code");
-				e.setOnAction(ev -> {
-					FxUtil.EasyFxUtils.showApplicationCode(codeArea.getSelectedText());
-				});
-				contextMenu.getItems().add(e);
+					contextMenu.getItems().add(e);
+				}
 
+				{
+					MenuItem e = new MenuItem("Open With XML Viewer");
+					e.setOnAction(ev -> {
+						// codeArea.getSelectedText()
+						XMLEditor xmlEditor = new XMLEditor();
+						SharedMemory.getSystemLayoutViewController().loadNewSystemTab("XML Viewer", xmlEditor);
+						String selectedText = codeArea.getSelectedText();
+						if (selectedText.isEmpty()) {
+							xmlEditor.setText(codeArea.getText());
+						} else {
+							xmlEditor.setText(selectedText);
+						}
+
+					});
+
+					contextMenu.getItems().add(e);
+				}
 			}
 		});
 	}
@@ -556,13 +576,13 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 		}
 
 	}
-	
+
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 10. 9. 
+	 * @작성일 : 2017. 10. 9.
 	 */
 	@FXML
-	public void miURLEncodeOnAction(){
+	public void miURLEncodeOnAction() {
 		try {
 			String encode = URLEncoder.encode(codeArea.getText(), "UTF-8");
 			codeArea.getUndoManager().mark();
@@ -571,12 +591,13 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 			LOGGER.error(ValueUtil.toString(e));
 		}
 	}
+
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 10. 9. 
+	 * @작성일 : 2017. 10. 9.
 	 */
 	@FXML
-	public void miURLDecodeOnAction(){
+	public void miURLDecodeOnAction() {
 		try {
 			String decode = URLDecoder.decode(codeArea.getText(), "UTF-8");
 			codeArea.getUndoManager().mark();
@@ -585,6 +606,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 			LOGGER.error(ValueUtil.toString(e));
 		}
 	}
+
 	private DockTabPane tabpane;
 
 	@Override
