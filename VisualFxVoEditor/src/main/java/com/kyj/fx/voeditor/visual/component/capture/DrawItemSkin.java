@@ -7,6 +7,8 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.capture;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
@@ -30,6 +32,11 @@ import javafx.scene.paint.Color;
 public abstract class DrawItemSkin<T extends DrawItem> extends SkinBase<DrawItem>
 		implements ColorChange, MouseAction, KeyAction, ContainerAction {
 
+	
+	//TODO 사용대기
+	@Deprecated
+	private BooleanProperty selected = new SimpleBooleanProperty();
+
 	private VBox container;
 	private T control;
 
@@ -41,6 +48,16 @@ public abstract class DrawItemSkin<T extends DrawItem> extends SkinBase<DrawItem
 		container.setPickOnBounds(true);
 
 		draw(container);
+
+//		selected.addListener(new ChangeListener<Boolean>() {
+//
+//			@Override
+//			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+//				if (newValue) {
+//					container.requestFocus();
+//				}
+//			}
+//		});
 
 		getSkinnable().focusedProperty().addListener(new ChangeListener<Boolean>() {
 
@@ -56,7 +73,7 @@ public abstract class DrawItemSkin<T extends DrawItem> extends SkinBase<DrawItem
 
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				System.out.println(newValue);
+				// System.out.println(newValue);
 
 				if (newValue) {
 					BorderStroke bs = new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN);
@@ -200,4 +217,17 @@ public abstract class DrawItemSkin<T extends DrawItem> extends SkinBase<DrawItem
 		DrawItem di = getControl();
 		getControl().getController().remove(di);
 	}
+
+	public final BooleanProperty selectedProperty() {
+		return this.selected;
+	}
+
+	public final boolean isSelected() {
+		return this.selectedProperty().get();
+	}
+
+	public final void setSelected(final boolean selected) {
+		this.selectedProperty().set(selected);
+	}
+
 }

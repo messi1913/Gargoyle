@@ -6,11 +6,17 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.capture;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Arrays;
 
 import com.jfoenix.controls.JFXColorPicker;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.value.ChangeListener;
@@ -22,6 +28,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -198,23 +205,8 @@ public class ErdItemHandler {
 			Button btn = new Button("테이블 샘플");
 			btn.setOnAction(e -> {
 
-				// Rectangle rectangle = new Rectangle(200d, 200d);
-				// rectangle.setStrokeLineJoin(StrokeLineJoin.ROUND);
-				// Group g = new Group();
-				// DropShadow ds = new DropShadow();
-				// ds.setOffsetY(3.0);
-				// ds.setColor(Color.color(0.4, 0.4, 0.4));
-
 				DrawItem d = new TableDrawItem("Table-Name", Arrays.asList("User-Name", "User-Age"));
 				d.setController(this.controller);
-				// d.setCenterX(50.0f);
-				// d.setCenterY(50.0f);
-				// d.setRadiusX(50.0f);
-				// d.setRadiusY(25.0f);
-				// d.setFill(Color.RED);
-				// d.setStroke(Color.BLACK);
-				// d.setEffect(ds);
-				// g.getChildren().add(d);
 
 				controller.addItemEvent(d);
 				controller.addChildren(d);
@@ -222,6 +214,29 @@ public class ErdItemHandler {
 			items.add(btn);
 		}
 
+		{
+			Button btn = new Button("이미지");
+			btn.setOnAction(e -> {
+
+				File showFileDialog = DialogUtil.showFileDialog(chooser -> {
+					chooser.getExtensionFilters().add(GargoyleExtensionFilters.PNG_EXTENSION_FILTER);
+				});
+				if (showFileDialog != null) {
+					try {
+//						Image image = new Image(new FileInputStream(showFileDialog));
+						DrawItem d = new ImageDrawItem(showFileDialog.toURI().toURL().openStream());
+						d.setController(this.controller);
+
+						controller.addItemEvent(d);
+						controller.addChildren(d);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+
+			});
+			items.add(btn);
+		}
 	}
 
 	/**

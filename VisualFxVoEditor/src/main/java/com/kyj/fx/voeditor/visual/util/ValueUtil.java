@@ -680,6 +680,12 @@ public class ValueUtil {
 		JSONObject fromJson = gson.fromJson(str, JSONObject.class);
 		return fromJson == null ? new JSONObject() : fromJson;
 	}
+	
+	public static Map<String,Object> toMap(String json)
+	{
+		Gson gson = new Gson();
+		return gson.fromJson(json, HashMap.class);
+	}
 
 	// public static JSONArray toJSONArray(String str) {
 	// Gson gson = new Gson();

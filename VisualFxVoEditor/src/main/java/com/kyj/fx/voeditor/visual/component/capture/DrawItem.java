@@ -28,4 +28,10 @@ public abstract class DrawItem extends Control implements ColorChange {
 	public ErdScreenController getController() {
 		return this.controller;
 	}
+
+//	public void setSelected(boolean selected) {
+//		DrawItemSkin s = (DrawItemSkin) getSkin();
+//		s.setSelected(selected);
+//	}
+
 }
