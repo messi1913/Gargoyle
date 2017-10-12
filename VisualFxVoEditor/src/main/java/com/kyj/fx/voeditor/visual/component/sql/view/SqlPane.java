@@ -60,6 +60,7 @@ import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil.CustomInputDialogAction;
 import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
@@ -1056,7 +1057,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 			String selectedSQLText = getSelectedSqlTab().getSelectedSQLText();
 			TreeItem<K> selectedItem = schemaTree.getSelectionModel().getSelectedItem();
-			
+
 			String selectedSchemName = getSchemaName(selectedItem);
 			String catalogName = getCatalogName(selectedItem);
 			if (selectedSchemName != null && selectedSQLText != null) {
@@ -1296,9 +1297,14 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		ObservableList<Map<String, Object>> items = this.tbResult.getItems();
 		ToExcelFileFunction toExcelFileFunction = new ToExcelFileFunction();
-		List<String> columns = this.tbResult.getColumns().stream().map(col -> col.getText()).collect(Collectors.toList());
+		//Bug Fix 
+		List<String> columns = this.tbResult.getColumns().stream().skip(1).map(col -> col.getText()).collect(Collectors.toList());
 		toExcelFileFunction.generate0(saveFile, columns, items);
-		DialogUtil.showMessageDialog("complete...");
+
+		if (saveFile.exists()) {
+			FileUtil.openFile(saveFile);
+		}
+		// DialogUtil.showMessageDialog("complete...");
 
 	}
 
