@@ -71,7 +71,7 @@ public class FilesAnalysisComposite extends BorderPane {
 	@FXML
 	private TreeView<V> tvFiles;
 	@FXML
-	private TextField txtFileLocation, txtNameFilter;
+	private TextField txtFileLocation, txtNameFilter, txtEncoding;
 
 	@FXML
 	private TableView<File> tbFiles;
@@ -146,68 +146,35 @@ public class FilesAnalysisComposite extends BorderPane {
 		return new ContextMenu(miShowInSystemExplor, miProperties);
 	}
 
-	private StringConverter<V> treeItemStringConverter = new StringConverter<V>() {
+	private StringConverter<V> treeItemStringConverter=new StringConverter<V>(){
 
-		@Override
-		public String toString(V object) {
-			return String.format("%s (%d)", object.getFileExtension(), object.getItems().size());
-		}
+	@Override public String toString(V object){return String.format("%s (%d)",object.getFileExtension(),object.getItems().size());}
 
-		@Override
-		public V fromString(String string) {
-			return null;
-		}
+	@Override public V fromString(String string){return null;}};
+
+	private Callback<TreeView<V>, TreeCell<V>> treeCellCallback=new Callback<TreeView<V>,TreeCell<V>>(){
+
+	@Override public TreeCell<V>call(TreeView<V>param){TextFieldTreeCell<V>textFieldTreeCell=new TextFieldTreeCell<V>(treeItemStringConverter){
+
+	@Override public void updateItem(V item,boolean empty){super.updateItem(item,empty);if(empty){setGraphic(null);}else{File file=item.getItems().get(0);setGraphic(new FileIconImageView(file));}}
+
 	};
 
-	private Callback<TreeView<V>, TreeCell<V>> treeCellCallback = new Callback<TreeView<V>, TreeCell<V>>() {
+	return textFieldTreeCell;}};
 
-		@Override
-		public TreeCell<V> call(TreeView<V> param) {
-			TextFieldTreeCell<V> textFieldTreeCell = new TextFieldTreeCell<V>(treeItemStringConverter) {
+	private EventHandler<WorkerStateEvent> serviceOnSuccessed=new EventHandler<WorkerStateEvent>(){
 
-				@Override
-				public void updateItem(V item, boolean empty) {
-					super.updateItem(item, empty);
-					if (empty) {
-						setGraphic(null);
-					} else {
-						File file = item.getItems().get(0);
-						setGraphic(new FileIconImageView(file));
-					}
-				}
+	@Override public void handle(WorkerStateEvent event){
 
-			};
+	LOGGER.debug("successed!");Object obj=event.getSource().getValue();
 
-			return textFieldTreeCell;
-		}
-	};
+	TreeItem<V>root=new TreeItem<>();tvFiles.setRoot(root);
 
-	private EventHandler<WorkerStateEvent> serviceOnSuccessed = new EventHandler<WorkerStateEvent>() {
+	if(obj!=null){Map<String,ObservableList<File>>value=(Map<String,ObservableList<File>>)obj;
 
-		@Override
-		public void handle(WorkerStateEvent event) {
+	for(String key:value.keySet()){V v=new V();v.setFileExtension(key);ObservableList<File>list=value.get(key);v.setItems(list);root.getChildren().add(new TreeItem<>(v));}}service.reset();
 
-			LOGGER.debug("successed!");
-			Object obj = event.getSource().getValue();
-
-			TreeItem<V> root = new TreeItem<>();
-			tvFiles.setRoot(root);
-
-			if (obj != null) {
-				Map<String, ObservableList<File>> value = (Map<String, ObservableList<File>>) obj;
-
-				for (String key : value.keySet()) {
-					V v = new V();
-					v.setFileExtension(key);
-					ObservableList<File> list = value.get(key);
-					v.setItems(list);
-					root.getChildren().add(new TreeItem<>(v));
-				}
-			}
-			service.reset();
-
-		}
-	};
+	}};
 
 	public void search() {
 
@@ -313,7 +280,11 @@ public class FilesAnalysisComposite extends BorderPane {
 						break;
 					case "File Content":
 						predicate = v -> {
-							String readFile = FileUtil.readFile(v, LoadFileOptionHandler.getDefaultHandler());
+							LoadFileOptionHandler defaultHandler = LoadFileOptionHandler.getDefaultHandler();
+							if (!txtEncoding.getText().trim().isEmpty()) {
+								defaultHandler.setEncoding(txtEncoding.getText());
+							}
+							String readFile = FileUtil.readFile(v, defaultHandler);
 							return readFile.contains(text);
 						};
 
@@ -330,6 +301,12 @@ public class FilesAnalysisComposite extends BorderPane {
 			}
 		}
 
+	}
+
+	@FXML
+	public void txtFileLocationOnKeyPress(KeyEvent e) {
+		if(e.getCode() == KeyCode.ENTER)
+			search();
 	}
 
 	/**
