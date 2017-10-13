@@ -1941,4 +1941,63 @@ public class ValueUtil {
 		return sb.toString();
 	}
 
+	/**
+	 * 
+	 * 두 번째 인수 문자열의 문자를 세 번째 인수 문자열에서 같은 위치에 있는 문자로 바꾼 첫 번째 인수 문자열을 반환합니다.
+	 * <br/>
+	 * 테스트 :: <br/>
+	 * translate("bar","abc","ABC") <br/>
+	 * 결과 :: <br/>
+	 * "BAr" <br/>
+	 * <br/>
+	 * 테스트 :: <br/>
+	 * translate("--aaa--","abc-","ABC") <br/>
+	 * 결과 :: <br/>
+	 * "AAA"
+	 * 
+	 * <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 13.
+	 * @param str
+	 * @param format
+	 * @param replaceFormat
+	 * @return
+	 */
+	public static String translate(String str, String format, String replaceFormat) {
+		char[] charArray = format.toCharArray();
+		char[] charArray2 = replaceFormat.toCharArray();
+		int replaceFormatSize = charArray2.length;
+
+		// format size
+		int formatSize = charArray.length;
+		// result data
+		StringBuffer sb = new StringBuffer();
+		boolean find = false;
+		char p = '\0';
+		for (int idx = 0, strsize = str.length(); idx < strsize; idx++) {
+
+			char a = str.charAt(idx);
+			find = false;
+			for (int srIdx = 0; srIdx < formatSize; srIdx++) {
+				p = charArray[srIdx];
+				if (a == p) {
+					if (srIdx > replaceFormatSize - 1) {
+						// Nothing.
+					} else {
+						sb.append(charArray2[srIdx]);
+					}
+
+					find = true;
+					break;
+				}
+
+			}
+			if (!find)
+				sb.append(a);
+
+		}
+
+		return sb.toString();
+	}
 }
