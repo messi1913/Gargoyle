@@ -150,7 +150,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 						return;
 
 					String link = obj.getLink();
-					LOGGER.debug("Link : {} " , link);
+					LOGGER.debug("Link : {} ", link);
 					FxUtil.openBrowser(this.getParent(), "http:" + link);
 					ev.consume();
 				}
@@ -257,7 +257,8 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 		Button btnReload = new Button("Reload");
 
-		HBox hboxItems = new HBox(5, /* choWaitItems, new Label("단위 (초)"), chkTimer, */btnReload, lblRequestTime);
+		HBox hboxItems = new HBox(5,
+				/* choWaitItems, new Label("단위 (초)"), chkTimer, */btnReload, lblRequestTime);
 		hboxItems.setAlignment(Pos.CENTER_LEFT);
 		hboxItems.setPadding(new Insets(5));
 
@@ -386,6 +387,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 					@Override
 					public void execute() {
+						LOGGER.debug("Execute.");
 						Platform.runLater(() -> {
 							if (isContinue())
 								service.restart();
@@ -402,6 +404,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 				waitThread.setDaemon(true);
 				waitThread.start();
+
 			}
 
 		});
@@ -413,8 +416,9 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 
 		private String waitSecond;
 
-		public WaitThread(ThreadGroup group, String name) {
-			super(group, name);
+		public WaitThread(ThreadGroup group, String waitSecond) {
+			super(group, "WaitThread");
+			this.waitSecond = waitSecond;
 		}
 
 		public WaitThread(String waitSecond) {
@@ -433,19 +437,16 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 			if (ValueUtil.isEmpty(waitSecond))
 				return;
 
-			// while (isRecycle()) {
 			int ws = Integer.parseInt(waitSecond, 10);
-			for (int i = 0; i < ws; i++) {
-				if (isContinue()) {
-					try {
-						Thread.sleep(1000);
-					} catch (Exception e) {
-					}
+
+			if (isContinue()) {
+				try {
+					Thread.sleep(ws * 1000);
+				} catch (Exception e) {
 				}
 
 			}
 			execute();
-			// }
 
 		}
 
@@ -563,6 +564,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 	@Override
 	public void close() throws IOException {
 		if (service != null) {
+			
 			isRecycle.set(false);
 			gargoyleThreadExecutors.shutdown();
 		}
