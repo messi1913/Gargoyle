@@ -109,11 +109,19 @@ public class DialogUtil {
 		return files;
 	}
 
+	public static File showFileDialog(Consumer<FileChooser> option) {
+		return showFileDialog(SharedMemory.getPrimaryStage(), option);
+	}
+
+	public static File showFileDialog() {
+		return showFileDialog(SharedMemory.getPrimaryStage(), option -> {
+		});
+	}
+	
 	public static File showFileDialog(final Window ownerWindow) {
 		return showFileDialog(ownerWindow, option -> {
 		});
 	}
-
 	/**
 	 * properties 파일 선택 다이얼로그
 	 *
