@@ -11,8 +11,10 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import org.apache.velocity.VelocityContext;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.kyj.fx.voeditor.visual.framework.word.AsynchWordExecutor;
@@ -71,8 +73,7 @@ public class ValueUtilTest {
 		}
 		/********************************************************/
 		/*
-		 * foreach문을 활용한 sql문 반복[2]
-		 * 상수 활용
+		 * foreach문을 활용한 sql문 반복[2] 상수 활용
 		 */
 		/********************************************************/
 		{
@@ -98,7 +99,7 @@ public class ValueUtilTest {
 		/********************************************************/
 		{
 			StringBuffer sb = new StringBuffer();
-			//선언
+			// 선언
 			sb.append("#macro(test) \n");
 			sb.append("	#foreach($a in [1..5]) ");
 			sb.append("$a");
@@ -106,7 +107,7 @@ public class ValueUtilTest {
 			sb.append("#end \n");
 			sb.append("\n");
 			sb.append("\n");
-			//사용
+			// 사용
 			sb.append("#test()  <br> ");
 			sb.toString();
 			String velocityToText = ValueUtil.getVelocityToText(sb.toString(), new HashMap<>());
@@ -149,11 +150,15 @@ public class ValueUtilTest {
 			sb.append("$date\n");
 			sb.toString();
 			HashMap<String, Object> hashMap = new HashMap<>();
-			//			hashMap.put("date", "someDate");
+			// hashMap.put("date", "someDate");
 			String velocityToText = ValueUtil.getVelocityToText(sb.toString(), hashMap, false, new VelocityContext() {
 
-				/* (non-Javadoc)
-				 * @see org.apache.velocity.VelocityContext#internalGet(java.lang.String)
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see
+				 * org.apache.velocity.VelocityContext#internalGet(java.lang.
+				 * String)
 				 */
 				@Override
 				public Object internalGet(String key) {
@@ -162,15 +167,21 @@ public class ValueUtilTest {
 					return super.internalGet(key);
 				}
 
-				/* (non-Javadoc)
-				 * @see org.apache.velocity.VelocityContext#internalContainsKey(java.lang.Object)
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see
+				 * org.apache.velocity.VelocityContext#internalContainsKey(java.
+				 * lang.Object)
 				 */
 				@Override
 				public boolean internalContainsKey(Object key) {
 					return super.internalContainsKey(key);
 				}
 
-				/* (non-Javadoc)
+				/*
+				 * (non-Javadoc)
+				 * 
 				 * @see org.apache.velocity.VelocityContext#internalGetKeys()
 				 */
 				@Override
@@ -190,20 +201,21 @@ public class ValueUtilTest {
 		Charset forName = Charset.forName("UTF-8");
 		String content = ("<html> <meta charset = 'utf-8'/><body><p>hi 하이</p> </body> </html>");
 
-		//		String mime = MimeHelper.toMime(content);
+		// String mime = MimeHelper.toMime(content);
 
 		try {
-			//			File file = new File("Sample.html");
-			//			FileUtil.writeFile(file, content, forName);
+			// File file = new File("Sample.html");
+			// FileUtil.writeFile(file, content, forName);
 
 			AsynchWordExecutor executor = new AsynchWordExecutor(new HtmlTextToMimeAdapter(content));
 			executor.execute();
 
-			//			if (file.exists()) {
-			//				List<String> asLis = Arrays.asList("C:\\Program Files\\Microsoft Office\\Office15\\WINWORD.exe", file.getAbsolutePath());
+			// if (file.exists()) {
+			// List<String> asLis = Arrays.asList("C:\\Program Files\\Microsoft
+			// Office\\Office15\\WINWORD.exe", file.getAbsolutePath());
 			//
-			//				RuntimeClassUtil.simpleExec(asLis);
-			//			}
+			// RuntimeClassUtil.simpleExec(asLis);
+			// }
 
 			Thread.sleep(200000);
 		} catch (Exception e) {
@@ -263,4 +275,9 @@ public class ValueUtilTest {
 
 	}
 
+	@Test
+	public void translate() {
+		Assert.assertEquals("BAr", ValueUtil.translate("bar", "abc", "ABC"));
+		Assert.assertEquals("AAA", ValueUtil.translate("--aaa--","abc-","ABC"));
+	}
 }
