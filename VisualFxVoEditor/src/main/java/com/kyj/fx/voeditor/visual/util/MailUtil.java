@@ -4,14 +4,16 @@
  */
 package com.kyj.fx.voeditor.visual.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -49,14 +51,40 @@ public class MailUtil {
 	 * @User KYJ
 	 */
 	public static boolean sendMail(List<Mail> mails, Map<String, Object> mailContent) throws Exception {
+		Mailer bean = BeanUtil.getBean("mailer", Mailer.class);
+		return sendMail(bean, mails, mailContent);
+	}
+
+	public static boolean sendMail(Mailer mailer, List<Mail> mails, Map<String, Object> mailContent) {
 		try {
-			Mailer bean = BeanUtil.getBean("mailer", Mailer.class);
 			VelocityContext merge = toVelocityContext(mailContent);
 			SenderMailInfo sender = BeanUtil.getBean("mailSenderInfo", SenderMailInfo.class);
-			bean.sendMail(sender, mails, merge);
-			
+			mailer.sendMail(sender, mails, merge);
+
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 14.
+	 * @param mailer
+	 * @param mails
+	 * @param mailContent
+	 * @param errorHandler
+	 * @return
+	 */
+	public static boolean sendMail(Mailer mailer, List<Mail> mails, Map<String, Object> mailContent, Consumer<Exception> errorHandler) {
+		try {
+			VelocityContext merge = toVelocityContext(mailContent);
+			SenderMailInfo sender = BeanUtil.getBean("mailSenderInfo", SenderMailInfo.class);
+			mailer.sendMail(sender, mails, merge);
+
+		} catch (Exception e) {
+			errorHandler.accept(e);
 			return false;
 		}
 		return true;
@@ -123,28 +151,44 @@ public class MailUtil {
 	}
 
 	/**
-	 * 파일로부터 템플릿 정보를 얻어온다.
-	 *
-	 * @Date 2015. 9. 13.
-	 * @param templateFileName
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 14.
+	 * @param url
 	 * @return
 	 * @throws Exception
-	 * @User KYJ
 	 */
-	public static Template getTemplateFromFile(final String templateFileName) throws Exception {
-		String readFileToString = "";
-		if(templateFileName.startsWith("classpath:"))
-		{
-			String res = templateFileName.replace("classpath:", "");
-			InputStream resourceAsStream = ClassLoader.getSystemClassLoader().getResourceAsStream(res);
-			readFileToString = ValueUtil.toString(resourceAsStream);
+	public static Template createTemplate(File url) throws Exception {
+		return createTemplate(url.toURI().toURL());
+	}
+
+	public static Template createTemplate(String templateCont) throws Exception {
+		return createTemplate(templateCont.getBytes());
+	}
+
+	public static Template createTemplate(byte[] templateCont) throws Exception {
+		return createTemplate(new ByteArrayInputStream(templateCont));
+	}
+	
+	public static Template createTemplate(URL url) throws Exception {
+		Template createTemplate = null;
+		try (InputStream openStream = url.openStream()) {
+			createTemplate = createTemplate(openStream);
 		}
-		else
-			readFileToString = FileUtils.readFileToString(new File(templateFileName));
-		
+		return createTemplate;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 14.
+	 * @param url
+	 * @return
+	 * @throws Exception
+	 */
+	public static Template createTemplate(InputStream is) throws Exception {
+		String readFileToString = ValueUtil.toString(is);
 		RuntimeServices runtimeServices = RuntimeSingleton.getRuntimeServices();
 		StringReader reader = new StringReader(readFileToString);
-		SimpleNode node = runtimeServices.parse(reader, templateFileName);
+		SimpleNode node = runtimeServices.parse(reader, "URLTemplate");
 		Template template = new Template();
 		template.setRuntimeServices(runtimeServices);
 		template.setData(node);
@@ -177,8 +221,7 @@ public class MailUtil {
 	 * @return
 	 * @User KYJ
 	 */
-	public static Template getTemplate(VelocityEngine velocityEngine, String templateName, String defaultTemplateName,
-			String encoding) {
+	public static Template getTemplate(VelocityEngine velocityEngine, String templateName, String defaultTemplateName, String encoding) {
 		Template template = null;
 		if (templateName == null) {
 			template = velocityEngine.getTemplate("./templates/" + defaultTemplateName, encoding);
