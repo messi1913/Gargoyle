@@ -3,6 +3,10 @@
  */
 package com.kyj.fx.voeditor.visual.framework.mail;
 
+import java.util.Properties;
+
+import javax.mail.Session;
+
 /**
  * @author user
  *
@@ -45,6 +49,25 @@ public class SenderMailInfo {
 	 */
 	public void setSendUserPassword(String sendUserPassword) {
 		this.sendUserPassword = sendUserPassword;
+	}
+
+	public String getDefaultEncoding() {
+		return "UTF-8";
+	}
+
+	public Session getSession() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Properties getJavaMailProperties() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getHost() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

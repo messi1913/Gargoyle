@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
-
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -16,20 +14,34 @@ import org.apache.velocity.app.VelocityEngine;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.MailUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.sun.star.lang.IllegalArgumentException;
 
+/**
+ * @author KYJ
+ *
+ */
 public class Mailer {
 	private JavaMailSenderImpl mailSender;
 
 	@Deprecated
 	private VelocityEngine velocityEngine;
-	private String mailFrom;
+
+	/**
+	 * @최초생성일 2017. 10. 14.
+	 */
 	private String mailTitle;
+	/**
+	 * @최초생성일 2017. 10. 14.
+	 */
 	private String mailTemplate;
+	/**
+	 * @최초생성일 2017. 10. 14.
+	 */
 	private String encoding;
+	/**
+	 * @최초생성일 2017. 10. 14.
+	 */
 	private String mailUseYn;
 
 	public void setMailSender(JavaMailSenderImpl mailSender) {
@@ -40,9 +52,9 @@ public class Mailer {
 		this.velocityEngine = velocityEngine;
 	}
 
-	public void setMailFrom(String mailFrom) {
-		this.mailFrom = mailFrom;
-	}
+	// public void setMailFrom(String mailFrom) {
+	// this.mailFrom = mailFrom;
+	// }
 
 	public void setMailTitle(String mailTitle) {
 		this.mailTitle = mailTitle;
@@ -85,16 +97,7 @@ public class Mailer {
 
 		SimpleMailMessage message = new SimpleMailMessage();
 
-		if (mail.getMailFrom() != null) {
-			message.setFrom(mail.getMailFrom());
-		} else if (ValueUtil.isNotEmpty(mailFrom)) {
-			message.setFrom(mailFrom);
-		} else {
-			String fromAddr = ResourceLoader.getInstance().get("mail.from.address");
-			message.setFrom(fromAddr);
-		}
-
-		message.setTo(mail.getMailTo());
+		message.setTo(mail.getMailTo().stream().toArray(String[]::new));
 
 		if (mail.getMailSubject() != null) {
 			message.setSubject(mail.getMailSubject());
@@ -102,21 +105,48 @@ public class Mailer {
 			message.setSubject(this.mailTitle);
 		}
 
-		if (encoding != null)
+		if (ValueUtil.isNotEmpty(encoding))
 			_encoding = encoding;
 
 		if (mailSenderInfo != null) {
 			String sendUserId = mailSenderInfo.getSendUserId();
 			String sendUserPassword = mailSenderInfo.getSendUserPassword();
-			if (ValueUtil.isEmpty(sendUserId) || ValueUtil.isEmpty(sendUserPassword)) {
-				throw new IllegalArgumentException("user id or password is empty...");
+			if (ValueUtil.isNotEmpty(sendUserId)) {
+				mailSender.setUsername(sendUserId);
+			}
+			message.setFrom(mailSender.getUsername());
+
+			if (ValueUtil.isNotEmpty(sendUserPassword)) {
+				mailSender.setPassword(sendUserPassword);
 			}
 
-			mailSender.setUsername(sendUserId);
-			mailSender.setPassword(sendUserPassword);
+			mailSender.setDefaultEncoding(mailSenderInfo.getDefaultEncoding());
+			String host = mailSenderInfo.getHost();
+			if (host != null)
+				mailSender.setHost(host);
+			Properties javaMailProperties = mailSenderInfo.getJavaMailProperties();
+			if (javaMailProperties != null)
+				mailSender.setJavaMailProperties(javaMailProperties);
+			Properties props = new Properties();
+
+			props.put("mail.smtp.host", "smtp.naver.com");
+			props.put("mail.smtp.user", "callakrsos");
+			props.put("SSL", "true");
+			props.put("mail.transport.protocol", "smtps");
+
+			// Session session = Session.getDefaultInstance(props, null);
+			// if (session != null)
+			// mailSender.setSession(session);
 		}
+
 		// MailUtil.getTemplate(velocityEngine,mail.getTemplateName(),this.mailTemplate);
-		Template template = MailUtil.getTemplateFromFile(mailTemplate);
+		Template template = null;
+		if (ValueUtil.isNotEmpty(mailTemplate)) {
+			template = MailUtil.createTemplate(mailTemplate);
+		} else {
+			template = MailUtil.createTemplate(ClassLoader.getSystemResource("templates/emailtemplate.vm"));
+		}
+
 		template.setEncoding(_encoding);
 
 		StringWriter stringWriter = new StringWriter();
