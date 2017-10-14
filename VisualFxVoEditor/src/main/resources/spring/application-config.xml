@@ -24,7 +24,8 @@
 		scope="prototype">
 		<property name="mailSender" ref="naverMailSender" />
 		<property name="velocityEngine" ref="velocityEngine" />
-		<property name="mailFrom" value="${mail.from.address}"></property>
+		<!-- remove property 17.10.14 -->
+<!-- 		<property name="mailFrom" value="${mail.from.address}"></property> -->
 		<property name="mailTitle" value="{mail.title}"></property>
 		<property name="mailTemplate" value="${mail.template}"></property>
 		<property name="encoding" value="${mail.default.encoding}"></property>
@@ -39,8 +40,10 @@
 	</bean>
 
 	<bean id="naverMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-		<property name="host" value="${mail.naver.host}" /><!-- smtp.naver.com -->
-		<property name="port" value="${mail.naver.port}" /><!-- 587 -->
+		<property name="host" value="${mail.naver.host}" />
+<!-- 		smtp.naver.com -->
+		<property name="port" value="${mail.naver.port}" />
+<!-- 		587 -->
 
 		<!-- 기본값 -->
 		<property name="username" value="${mail.from.address}" />
@@ -49,14 +52,17 @@
 		<property name="defaultEncoding" value="${mail.default.encoding}"></property>
 		<property name="javaMailProperties">
 			<props>
-				<prop key="mail.debug">true</prop>
-				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.debug">${mail.debug}</prop>
+				<prop key="mail.smtp.auth">${mail.smtp.auth}</prop>
 				<prop key="mail.smtp.starttls.enable">true</prop>
 				<prop key="mail.mime.charset">UTF-8</prop>
 				<prop key="mail.transport.protocol">${mail.naver.protocol}</prop>
-				<prop key="SSL">true</prop>
-				<prop key="mail.smtps.ssl.checkserveridentity">true</prop>
+				<prop key="SSL">${mail.use.ssl}</prop>
+				<prop key="mail.smtps.ssl.checkserveridentity">${mail.smtps.ssl.checkserveridentity}</prop>
 				<prop key="mail.smtps.ssl.trust">*</prop>
+<!-- 				<prop key="mail.smtp.socketFactory.class">javax.net.ssl/SSLSocketFactory</prop> -->
+				
+
 				<!-- <prop key="proxySet">true</prop> -->
 				<!-- <prop key="socksProxyHost">168.219.61.252</prop> -->
 				<!-- <prop key="socksProxyPort">8080</prop> -->
