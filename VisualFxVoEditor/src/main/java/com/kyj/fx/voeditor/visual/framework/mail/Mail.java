@@ -173,6 +173,10 @@ public class Mail {
 		this.attachmentItems.add(attachmentItem);
 	}
 
+	public final void setAttachmentItems(List<AttachmentItem> attachmentItems) {
+		this.attachmentItems = attachmentItems;
+	}
+
 	// public void setMailTo(String ... email) {
 	// setMailTo(email);
 	// }
