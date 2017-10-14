@@ -6,6 +6,8 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
+import javafx.stage.FileChooser.ExtensionFilter;
+
 /***************************
  *
  * @author KYJ
@@ -19,6 +21,11 @@ public interface GargoyleExtensionFilters {
 	public static final String ALL = "*.*";
 
 
+	public static final String PNG_NAME = "png files (*.png)";
+	public static final String PNG_EXTENSION = "png";
+	public static final String PNG = EXTENSION_COMMONS + PNG_EXTENSION;
+	public static final ExtensionFilter PNG_EXTENSION_FILTER = new ExtensionFilter(PNG_NAME, PNG);
+	
 	public static final String FX_CSS_NAME = "CSS files (*.css)";
 	public static final String FX_CSS_EXTENSION = "css";
 	public static final String FX_CSS = EXTENSION_COMMONS + FX_CSS_EXTENSION;
