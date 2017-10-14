@@ -6,13 +6,15 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Properties;
 
+import javax.mail.internet.MimeMessage;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import com.kyj.fx.voeditor.visual.util.MailUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -77,6 +79,7 @@ public class Mailer {
 		this.mailUseYn = mailUseYn;
 	}
 
+	@Deprecated
 	public void sendMail(SenderMailInfo mailSenderInfo, List<Mail> mails, VelocityContext velocityContext) throws Exception {
 
 		for (Mail mail : mails) {
@@ -95,14 +98,17 @@ public class Mailer {
 
 		String _encoding = MailConst.MAILER_DEFAULT_ENCODING;
 
-		SimpleMailMessage message = new SimpleMailMessage();
+		// new MimeMailMessage(new MimeMessage());
+		// SimpleMailMessage message = new SimpleMailMessage();
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-		message.setTo(mail.getMailTo().stream().toArray(String[]::new));
+		helper.setTo(mail.getMailTo().stream().toArray(String[]::new));
 
 		if (mail.getMailSubject() != null) {
-			message.setSubject(mail.getMailSubject());
+			helper.setSubject(mail.getMailSubject());
 		} else {
-			message.setSubject(this.mailTitle);
+			helper.setSubject(this.mailTitle);
 		}
 
 		if (ValueUtil.isNotEmpty(encoding))
@@ -114,7 +120,7 @@ public class Mailer {
 			if (ValueUtil.isNotEmpty(sendUserId)) {
 				mailSender.setUsername(sendUserId);
 			}
-			message.setFrom(mailSender.getUsername());
+			helper.setFrom(mailSender.getUsername());
 
 			if (ValueUtil.isNotEmpty(sendUserPassword)) {
 				mailSender.setPassword(sendUserPassword);
@@ -127,19 +133,8 @@ public class Mailer {
 			Properties javaMailProperties = mailSenderInfo.getJavaMailProperties();
 			if (javaMailProperties != null)
 				mailSender.setJavaMailProperties(javaMailProperties);
-			Properties props = new Properties();
-
-			props.put("mail.smtp.host", "smtp.naver.com");
-			props.put("mail.smtp.user", "callakrsos");
-			props.put("SSL", "true");
-			props.put("mail.transport.protocol", "smtps");
-
-			// Session session = Session.getDefaultInstance(props, null);
-			// if (session != null)
-			// mailSender.setSession(session);
 		}
 
-		// MailUtil.getTemplate(velocityEngine,mail.getTemplateName(),this.mailTemplate);
 		Template template = null;
 		if (ValueUtil.isNotEmpty(mailTemplate)) {
 			template = MailUtil.createTemplate(mailTemplate);
@@ -151,11 +146,13 @@ public class Mailer {
 
 		StringWriter stringWriter = new StringWriter();
 		template.merge(velocityContext, stringWriter);
-		message.setText(stringWriter.toString());
+		helper.setText(stringWriter.toString());
 
-		// MimeMessage createMimeMessage = mailSender.createMimeMessage();
-		// createMimeMessage.addHeader("text/html", stringWriter.toString());
-
+		// attachment
+		List<AttachmentItem> attachmentItems = mail.getAttachmentItems();
+		for (AttachmentItem item : attachmentItems) {
+			helper.addAttachment(item.getDisplayName(), item.getDataSource());
+		}
 		mailSender.send(message);
 
 	}

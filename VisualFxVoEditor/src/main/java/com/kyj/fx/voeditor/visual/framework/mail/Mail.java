@@ -1,5 +1,6 @@
 package com.kyj.fx.voeditor.visual.framework.mail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,8 @@ public class Mail {
 	private StringProperty templateName;
 
 	private StringProperty contentType;
+
+	private List<AttachmentItem> attachmentItems = new ArrayList<>();
 
 	public Mail() {
 		mailTo = FXCollections.observableArrayList();
@@ -61,12 +64,12 @@ public class Mail {
 	public void setMailTo(List<String> mailTo) {
 		mailTo.addAll(mailTo);
 	}
-	
-	public void setMailTo(String[] mailTo) {
+
+	public void setMailTo(String... mailTo) {
 		this.mailTo.addAll(Arrays.asList(mailTo));
 	}
-	
-	public void addMailTo(String mailTo){
+
+	public void addMailTo(String mailTo) {
 		this.mailTo.add(mailTo);
 	}
 
@@ -161,5 +164,17 @@ public class Mail {
 	public void setMailTo(String email) {
 		this.mailTo.add(email);
 	}
+
+	public final List<AttachmentItem> getAttachmentItems() {
+		return attachmentItems;
+	}
+
+	public final void addAttachmentItems(AttachmentItem attachmentItem) {
+		this.attachmentItems.add(attachmentItem);
+	}
+
+	// public void setMailTo(String ... email) {
+	// setMailTo(email);
+	// }
 
 }
