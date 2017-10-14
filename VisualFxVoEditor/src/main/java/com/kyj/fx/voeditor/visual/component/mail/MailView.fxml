@@ -10,7 +10,6 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -19,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<BorderPane prefHeight="733.0" prefWidth="905.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="936.0" prefWidth="917.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
 	<top>
 		<GridPane BorderPane.alignment="CENTER">
 			<columnConstraints>
@@ -178,16 +177,12 @@
 					</padding>
 				</VBox>
 			</bottom>
-			<top>
-				<AnchorPane>
-					<children>
-						<WebView fx:id="wbAprvCont" minHeight="-Infinity" minWidth="-Infinity" prefHeight="303.0" prefWidth="895.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-					</children>
-				</AnchorPane>
-			</top>
 			<BorderPane.margin>
 				<Insets left="5.0" right="5.0" />
 			</BorderPane.margin>
+         <center>
+						<WebView fx:id="wbAprvCont" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" BorderPane.alignment="CENTER" />
+         </center>
 		</BorderPane>
 	</center>
 	<bottom>
@@ -201,4 +196,4 @@
 			</padding>
 		</HBox>
 	</bottom>
-</BorderPane>
+</fx:root>
