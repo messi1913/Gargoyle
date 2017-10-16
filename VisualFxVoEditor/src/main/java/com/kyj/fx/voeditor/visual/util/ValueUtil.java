@@ -87,6 +87,12 @@ public class ValueUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValueUtil.class);
 
+	/**
+	 * Email Check REG Expression.
+	 * @최초생성일 2017. 10. 16.
+	 */
+	public static final String EMAIL_VALIDATION_EXP = "[\\w\\~\\-\\.]+@[\\w\\~\\-]+(\\.[\\w\\~\\-]+)+";
+	
 	public enum IndexCaseTypes {
 		UPPERCASE, LOWERCASE
 	}

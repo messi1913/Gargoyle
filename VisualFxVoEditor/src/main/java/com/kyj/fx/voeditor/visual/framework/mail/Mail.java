@@ -16,9 +16,9 @@ public class Mail {
 
 	private ObservableList<String> mailTo;
 
-	private StringProperty mailCc;
+	private ObservableList<String> mailCc;
 
-	private StringProperty mailBcc;
+	private ObservableList<String> mailBcc;
 
 	private StringProperty mailSubject;
 
@@ -33,8 +33,8 @@ public class Mail {
 	public Mail() {
 		mailTo = FXCollections.observableArrayList();
 		mailFrom = new SimpleStringProperty();
-		mailCc = new SimpleStringProperty();
-		mailBcc = new SimpleStringProperty();
+		mailCc = FXCollections.observableArrayList();
+		mailBcc = FXCollections.observableArrayList();
 		mailSubject = new SimpleStringProperty();
 		mailContent = new SimpleStringProperty();
 		templateName = new SimpleStringProperty();
@@ -46,8 +46,8 @@ public class Mail {
 		StringBuilder lBuilder = new StringBuilder();
 		lBuilder.append("Mail From:- ").append(getMailFrom());
 		lBuilder.append("Mail To:- ").append(getMailToString());
-		lBuilder.append("Mail Cc:- ").append(getMailCc());
-		lBuilder.append("Mail Bcc:- ").append(getMailBcc());
+		// lBuilder.append("Mail Cc:- ").append(getMailCc());
+		// lBuilder.append("Mail Bcc:- ").append(getMailBcc());
 		lBuilder.append("Mail Subject:- ").append(getMailSubject());
 		// lBuilder.append("Mail Send Date:- ").append(getMailSendDate());
 		lBuilder.append("Mail Content:- ").append(getMailContent());
@@ -59,6 +59,22 @@ public class Mail {
 		if (reduce.isPresent())
 			return reduce.get();
 		return "";
+	}
+
+	public void setMailCc(List<String> cc) {
+		this.mailCc.addAll(cc);
+	}
+
+	public ObservableList<String> getMailCc() {
+		return this.mailCc;
+	}
+	
+	public void setMailBcc(List<String> bcc){
+		this.mailBcc.addAll(bcc);
+	}
+	
+	public ObservableList<String> getBcc(){
+		return this.mailBcc;
 	}
 
 	public void setMailTo(List<String> mailTo) {
@@ -87,30 +103,6 @@ public class Mail {
 
 	public final void setMailFrom(final String mailFrom) {
 		this.mailFromProperty().set(mailFrom);
-	}
-
-	public final StringProperty mailCcProperty() {
-		return this.mailCc;
-	}
-
-	public final String getMailCc() {
-		return this.mailCcProperty().get();
-	}
-
-	public final void setMailCc(final String mailCc) {
-		this.mailCcProperty().set(mailCc);
-	}
-
-	public final StringProperty mailBccProperty() {
-		return this.mailBcc;
-	}
-
-	public final String getMailBcc() {
-		return this.mailBccProperty().get();
-	}
-
-	public final void setMailBcc(final String mailBcc) {
-		this.mailBccProperty().set(mailBcc);
 	}
 
 	public final StringProperty mailSubjectProperty() {

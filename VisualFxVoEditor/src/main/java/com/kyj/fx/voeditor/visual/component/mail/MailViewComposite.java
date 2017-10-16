@@ -14,19 +14,35 @@ import java.net.MalformedURLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.NumberingCellValueFactory;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.mail.Mail;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
 /**
+ * 
+ * 메일 보내기 기능을 지원하는 뷰
+ * 
  * @author KYJ
  *
  */
@@ -35,11 +51,35 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MailViewComposite.class);
 	@FXML
-	private TextField txtSubject;
+	private TextField txtSubject, txtRecipient;
 	@FXML
 	private WebView wbAprvCont;
+	@FXML
+	private TableView<MailReceiver> tbReceiver;
+	@FXML
+	private ListView<File> tbAttachment;
+	@FXML
+	private TableColumn<MailReceiver, Integer> tcNo;
+	@FXML
+	private TableColumn<MailReceiver, String> tcEmail, tcType;
+
+	@FXML
+	private RadioButton rbTo, rboCc, rboBcc;
+
+	@FXML
+	private CheckBox chkAttachments;
+
+	@FXML
+	private Button btnSearch, btnDel;
+
+	@FXML
+	private Label lblAttachmentCount;
 
 	private Mail mail;
+
+	enum Type {
+		TO, CC, BCC
+	}
 
 	private WebEngine engine;
 
@@ -48,6 +88,21 @@ class MailViewComposite extends BorderPane implements Closeable {
 		FxUtil.loadRoot(MailViewComposite.class, this, err -> {
 			LOGGER.error(ValueUtil.toString(err));
 		});
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 16.
+	 * @return
+	 */
+	private Type getSelectedType() {
+		if (rbTo.isSelected()) {
+			return Type.TO;
+		} else if (rboCc.isSelected())
+			return Type.CC;
+		else if (rboBcc.isSelected())
+			return Type.BCC;
+		return Type.TO;
 	}
 
 	@FXML
@@ -60,11 +115,66 @@ class MailViewComposite extends BorderPane implements Closeable {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
+
+		tcNo.setCellValueFactory(new NumberingCellValueFactory<>(tbReceiver));
+		tcEmail.setCellValueFactory(param -> {
+			return param.getValue().emailProperty();
+		});
+
+		tcType.setCellValueFactory(param -> {
+			return param.getValue().typeProperty();
+		});
+
+		chkAttachments.selectedProperty().addListener(chkAttachmentsListener);
+		tbAttachment.getItems().addListener(tbAttachmentListChangeListener);
+
 	}
+
+	private ListChangeListener<File> tbAttachmentListChangeListener = new ListChangeListener<File>() {
+
+		@Override
+		public void onChanged(javafx.collections.ListChangeListener.Change<? extends File> c) {
+			if (c.wasAdded() || c.wasRemoved() || c.wasUpdated()) {
+				lblAttachmentCount.setText(String.valueOf(c.getList().size()));
+			}
+		}
+	};
+
+	private ChangeListener<Boolean> chkAttachmentsListener = new ChangeListener<Boolean>() {
+
+		@Override
+		public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+			btnSearch.setDisable(newValue);
+			btnDel.setDisable(newValue);
+		}
+	};
 
 	@FXML
 	public void btnSendOnAction() {
+		Object executeScript = engine
+				.executeScript(" function outText(){ return tinymce.activeEditor.getContent({format: 'raw'}); } outText(); ");
+		mail.setContentType("text/html");
+		mail.setMailContent(executeScript.toString());
+	}
 
+	@FXML
+	public void btnAddRecipientOnAction() {
+		String email = txtRecipient.getText();
+		if (ValueUtil.isNotEmpty(email)) {
+			
+			String regexMatch = ValueUtil.regexMatch(ValueUtil.EMAIL_VALIDATION_EXP, email);
+			if (ValueUtil.isNotEmpty(regexMatch)) {
+				tbReceiver.getItems().add(new MailReceiver(email, getSelectedType().name()));
+				this.txtRecipient.setText("");
+			}
+		}
+	}
+
+	@FXML
+	public void txtRecipientOnKeyPress(KeyEvent e) {
+		if (e.getCode() == KeyCode.ENTER) {
+			btnAddRecipientOnAction();
+		}
 	}
 
 	@Override

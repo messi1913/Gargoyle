@@ -6,10 +6,12 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -46,7 +48,8 @@
 						<ChoiceBox prefHeight="23.0" prefWidth="120.0" />
 						<CheckBox mnemonicParsing="false" text="Urgent" />
 						<Label text="Atach File" />
-						<Label text="0 Unit(s)" />
+						<Label fx:id="lblAttachmentCount" text="0" />
+                  <Label text="Unit(s)" />
 					</children>
 				</HBox>
 				<HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="198.0" spacing="5.0" GridPane.columnIndex="6" GridPane.columnSpan="3">
@@ -65,7 +68,7 @@
 						<Insets left="5.0" right="5.0" />
 					</GridPane.margin>
 				</TextField>
-				<TextField fx:id="txtRecipient" prefHeight="23.0" prefWidth="623.0" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="2">
+				<TextField fx:id="txtRecipient" onKeyPressed="#txtRecipientOnKeyPress" prefHeight="23.0" prefWidth="623.0" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="2">
 					<GridPane.margin>
 						<Insets left="5.0" right="5.0" />
 					</GridPane.margin>
@@ -75,7 +78,7 @@
 						<Insets left="5.0" right="5.0" />
 					</GridPane.margin>
 					<children>
-						<Button fx:id="btnAddRecipient" minWidth="60.0" mnemonicParsing="false" text="Add" />
+						<Button fx:id="btnAddRecipient" minWidth="60.0" mnemonicParsing="false" onAction="#btnAddRecipientOnAction" text="Add" />
 						<Button disable="true" minWidth="126.0" mnemonicParsing="false" text="Recipients Search" />
 					</children>
 				</HBox>
@@ -91,24 +94,24 @@
 				</VBox>
 				<BorderPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="8" GridPane.rowIndex="4">
 					<center>
-						<TableView BorderPane.alignment="CENTER">
+						<TableView fx:id="tbReceiver" BorderPane.alignment="CENTER">
 							<columns>
-								<TableColumn prefWidth="60.0" text="No" />
-								<TableColumn prefWidth="100.0" text="Arroval Status" />
-								<TableColumn prefWidth="120.0" text="Company" />
-								<TableColumn prefWidth="120.0" text="Dept. Name" />
-								<TableColumn prefWidth="75.0" text="Position" />
-								<TableColumn prefWidth="160.0" text="Name" />
-								<TableColumn prefWidth="200.0" text="Email" />
+								<TableColumn fx:id="tcNo" prefWidth="60.0" text="No" />
+								<TableColumn fx:id="tcType" prefWidth="121.0" text="Type" />
+								<TableColumn fx:id="tcEmail" prefWidth="657.0" text="Email" />
 							</columns>
 						</TableView>
 					</center>
 				</BorderPane>
 				<HBox spacing="5.0" GridPane.columnIndex="1" GridPane.columnSpan="8" GridPane.rowIndex="3">
 					<children>
-						<RadioButton fx:id="rbTo" mnemonicParsing="false" text="To" />
-						<RadioButton fx:id="rboCc" mnemonicParsing="false" text="Cc" />
-						<RadioButton fx:id="rboBcc" mnemonicParsing="false" text="Bcc" />
+						<RadioButton fx:id="rbTo" mnemonicParsing="false" selected="true" text="To">
+							<toggleGroup>
+								<ToggleGroup fx:id="type" />
+							</toggleGroup>
+						</RadioButton>
+						<RadioButton fx:id="rboCc" mnemonicParsing="false" text="Cc" toggleGroup="$type" />
+						<RadioButton fx:id="rboBcc" mnemonicParsing="false" text="Bcc" toggleGroup="$type" />
 					</children>
 					<padding>
 						<Insets bottom="5.0" top="5.0" />
@@ -132,9 +135,9 @@
 							<children>
 								<HBox alignment="CENTER_LEFT" spacing="5.0">
 									<children>
-										<CheckBox mnemonicParsing="false" text="Attachments" />
-										<Button minWidth="80.0" mnemonicParsing="false" text="Search" />
-										<Button minWidth="80.0" mnemonicParsing="false" text="Del" />
+										<CheckBox fx:id="chkAttachments" mnemonicParsing="false" selected="true" text="Attachments" />
+										<Button fx:id="btnSearch" disable="true" minWidth="80.0" mnemonicParsing="false" text="Search" />
+										<Button fx:id="btnDel" disable="true" minWidth="80.0" mnemonicParsing="false" text="Del" />
 									</children>
 									<padding>
 										<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -150,7 +153,7 @@
 								<Insets />
 							</VBox.margin>
 						</HBox>
-						<TableView prefHeight="90.0" prefWidth="885.0" />
+                  <ListView fx:id="tbAttachment" prefHeight="126.0" prefWidth="897.0" />
 						<HBox>
 							<children>
 								<HBox alignment="CENTER_LEFT" spacing="5.0">
@@ -180,9 +183,9 @@
 			<BorderPane.margin>
 				<Insets left="5.0" right="5.0" />
 			</BorderPane.margin>
-         <center>
-						<WebView fx:id="wbAprvCont" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" BorderPane.alignment="CENTER" />
-         </center>
+			<center>
+				<WebView fx:id="wbAprvCont" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" BorderPane.alignment="CENTER" />
+			</center>
 		</BorderPane>
 	</center>
 	<bottom>
