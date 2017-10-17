@@ -24,7 +24,7 @@ public class Mail {
 
 	private StringProperty mailContent;
 
-	private StringProperty templateName;
+//	private StringProperty templateName;
 
 	private StringProperty contentType;
 
@@ -37,7 +37,7 @@ public class Mail {
 		mailBcc = FXCollections.observableArrayList();
 		mailSubject = new SimpleStringProperty();
 		mailContent = new SimpleStringProperty();
-		templateName = new SimpleStringProperty();
+//		templateName = new SimpleStringProperty();
 		contentType = new SimpleStringProperty("text/html");
 	}
 
@@ -129,17 +129,17 @@ public class Mail {
 		this.mailContentProperty().set(mailContent);
 	}
 
-	public final StringProperty templateNameProperty() {
-		return this.templateName;
-	}
-
-	public final String getTemplateName() {
-		return this.templateNameProperty().get();
-	}
-
-	public final void setTemplateName(final String templateName) {
-		this.templateNameProperty().set(templateName);
-	}
+//	public final StringProperty templateNameProperty() {
+//		return this.templateName;
+//	}
+//
+//	public final String getTemplateName() {
+//		return this.templateNameProperty().get();
+//	}
+//
+//	public final void setTemplateName(final String templateName) {
+//		this.templateNameProperty().set(templateName);
+//	}
 
 	public final StringProperty contentTypeProperty() {
 		return this.contentType;

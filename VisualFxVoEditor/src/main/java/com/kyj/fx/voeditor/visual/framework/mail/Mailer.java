@@ -135,18 +135,24 @@ public class Mailer {
 				mailSender.setJavaMailProperties(javaMailProperties);
 		}
 
-		Template template = null;
-		if (ValueUtil.isNotEmpty(mailTemplate)) {
-			template = MailUtil.createTemplate(mailTemplate);
-		} else {
-			template = MailUtil.createTemplate(ClassLoader.getSystemResource("templates/emailtemplate.vm"));
+		String mailContent = mail.getMailContent();
+
+		if (ValueUtil.isEmpty(mailContent)) {
+			Template template = null;
+			if (ValueUtil.isNotEmpty(mailTemplate)) {
+				template = MailUtil.createTemplate(mailTemplate);
+			} else {
+				template = MailUtil.createTemplate(ClassLoader.getSystemResource("templates/emailtemplate.vm"));
+			}
+			template.setEncoding(_encoding);
+			StringWriter stringWriter = new StringWriter();
+			template.merge(velocityContext, stringWriter);
+			helper.setText(stringWriter.toString());
 		}
 
-		template.setEncoding(_encoding);
-
-		StringWriter stringWriter = new StringWriter();
-		template.merge(velocityContext, stringWriter);
-		helper.setText(stringWriter.toString());
+		else {
+			helper.setText("", mailContent);
+		}
 
 		// attachment
 		List<AttachmentItem> attachmentItems = mail.getAttachmentItems();

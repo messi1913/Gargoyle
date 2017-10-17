@@ -10,6 +10,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,11 +78,10 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 	private Mail mail;
 
-	enum Type {
-		TO, CC, BCC
-	}
-
 	private WebEngine engine;
+	private AttachmentHandler attachmentHandler;
+	private SendMailHandler sendMailHandler;
+	private RecipientHandler recipientHandler;
 
 	public MailViewComposite() {
 		this.mail = new Mail();
@@ -95,19 +95,22 @@ class MailViewComposite extends BorderPane implements Closeable {
 	 * @작성일 : 2017. 10. 16.
 	 * @return
 	 */
-	private Type getSelectedType() {
+	private RecipientType getSelectedType() {
 		if (rbTo.isSelected()) {
-			return Type.TO;
+			return RecipientType.TO;
 		} else if (rboCc.isSelected())
-			return Type.CC;
+			return RecipientType.CC;
 		else if (rboBcc.isSelected())
-			return Type.BCC;
-		return Type.TO;
+			return RecipientType.BCC;
+		return RecipientType.TO;
 	}
 
 	@FXML
 	public void initialize() {
-		txtSubject.textProperty().bind(mail.mailSubjectProperty());
+		mail.mailSubjectProperty().bind(txtSubject.textProperty());
+		attachmentHandler = new AttachmentHandler(this);
+		sendMailHandler = new SendMailHandler(this);
+		recipientHandler = new RecipientHandler(this);
 
 		try {
 			engine = wbAprvCont.getEngine();
@@ -128,6 +131,25 @@ class MailViewComposite extends BorderPane implements Closeable {
 		chkAttachments.selectedProperty().addListener(chkAttachmentsListener);
 		tbAttachment.getItems().addListener(tbAttachmentListChangeListener);
 
+	}
+
+	/**
+	 * 첨부파일 리스트
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 17.
+	 * @return
+	 */
+	public List<File> getAttachments() {
+		return tbAttachment.getItems();
+	}
+
+	public List<MailReceiver> getRecipients() {
+		return tbReceiver.getItems();
+	}
+
+	public final Mail getMail() {
+		return mail;
 	}
 
 	private ListChangeListener<File> tbAttachmentListChangeListener = new ListChangeListener<File>() {
@@ -153,15 +175,25 @@ class MailViewComposite extends BorderPane implements Closeable {
 	public void btnSendOnAction() {
 		Object executeScript = engine
 				.executeScript(" function outText(){ return tinymce.activeEditor.getContent({format: 'raw'}); } outText(); ");
+
+		// 본문 타입
 		mail.setContentType("text/html");
+
+		// 본문
 		mail.setMailContent(executeScript.toString());
+
+		// 첨부파일 처리
+
+		this.attachmentHandler.build();
+		this.recipientHandler.build();
+		this.sendMailHandler.sendMail();
 	}
 
 	@FXML
 	public void btnAddRecipientOnAction() {
 		String email = txtRecipient.getText();
 		if (ValueUtil.isNotEmpty(email)) {
-			
+
 			String regexMatch = ValueUtil.regexMatch(ValueUtil.EMAIL_VALIDATION_EXP, email);
 			if (ValueUtil.isNotEmpty(regexMatch)) {
 				tbReceiver.getItems().add(new MailReceiver(email, getSelectedType().name()));
