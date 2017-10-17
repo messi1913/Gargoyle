@@ -648,7 +648,7 @@
 			<artifactId>sqljdbv4</artifactId>
 			<version>0.0.1</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/db/mssql/sqljdbc4.jar</systemPath>
+			<systemPath>${project.basedir}/lib/db/mssql/mssql-jdbc-6.2.1.jre8.jar</systemPath>
 		</dependency>
 
 
