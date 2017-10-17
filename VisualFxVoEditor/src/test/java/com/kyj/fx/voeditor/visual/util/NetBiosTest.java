@@ -31,6 +31,8 @@ public class NetBiosTest {
 	// final static String _FILE_SERVER_BASE_URL =
 	// "smb://접속ID:접속비번@넷바이오스IP/접속할디렉토리/";
 	final static String _FILE_SERVER_BASE_URL = "smb://mesman:mesman_dev1@192.168.20.64/Log2/";
+//	final static String _FILE_SERVER_BASE_URL = "smb://sbiologics\\kyjun.kim:Samsung\\@@182.198.160.100/";
+
 
 	public static void main(String[] args) throws Exception {
 		try {
