@@ -13,8 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.mail.Mail;
+import com.kyj.fx.voeditor.visual.framework.thread.DemonThreadFactory;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.MailUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+
+import javafx.concurrent.Task;
 
 /**
  * @author KYJ
@@ -33,14 +37,31 @@ public class SendMailHandler {
 		this.mailComposite = mailComposite;
 	}
 
+	/**
+	 * 메일보기
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 17.
+	 */
 	public void sendMail() {
-		Mail mail = this.mailComposite.getMail();
 
-		try {
-			MailUtil.sendMail(mail, Collections.emptyMap());
-		} catch (Exception e) {
-			if (errorHandler != null)
-				errorHandler.accept(e);
-		}
+		FxUtil.showLoading(new Task<Void>() {
+
+			@Override
+			protected Void call() throws Exception {
+
+				Mail mail = mailComposite.getMail();
+
+				try {
+					MailUtil.sendMail(mail, Collections.emptyMap());
+				} catch (Exception e) {
+					if (errorHandler != null)
+						errorHandler.accept(e);
+				}
+
+				return null;
+			}
+		});
+
 	}
 }

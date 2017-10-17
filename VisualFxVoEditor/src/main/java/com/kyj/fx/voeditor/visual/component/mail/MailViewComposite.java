@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.component.NumberingCellValueFactory;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.mail.Mail;
+import com.kyj.fx.voeditor.visual.functions.ListViewFileCellFactory;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -25,6 +27,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -112,6 +115,7 @@ class MailViewComposite extends BorderPane implements Closeable {
 		sendMailHandler = new SendMailHandler(this);
 		recipientHandler = new RecipientHandler(this);
 
+		tbAttachment.setCellFactory(new ListViewFileCellFactory());
 		try {
 			engine = wbAprvCont.getEngine();
 			engine.load(new File("tinymce/index.html").toURI().toURL().toExternalForm());
@@ -156,9 +160,12 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 		@Override
 		public void onChanged(javafx.collections.ListChangeListener.Change<? extends File> c) {
-			if (c.wasAdded() || c.wasRemoved() || c.wasUpdated()) {
-				lblAttachmentCount.setText(String.valueOf(c.getList().size()));
+			if (c.next()) {
+				if (c.wasAdded() || c.wasRemoved() || c.wasUpdated()) {
+					lblAttachmentCount.setText(String.valueOf(c.getList().size()));
+				}
 			}
+
 		}
 	};
 
@@ -210,11 +217,61 @@ class MailViewComposite extends BorderPane implements Closeable {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() {
 		Platform.runLater(() -> {
 			if (engine != null)
 				engine.load("about:blank");
 		});
 
+	}
+
+	@FXML
+	public void rbToOnAction() {
+		changeSelectedType();
+
+	}
+
+	private void changeSelectedType() {
+		MailReceiver selectedItem = tbReceiver.getSelectionModel().getSelectedItem();
+		if (selectedItem != null) {
+			selectedItem.setType(getSelectedType().toString());
+		}
+
+	}
+
+	@FXML
+	public void rboCcOnAction() {
+		changeSelectedType();
+	}
+
+	@FXML
+	public void rboBccOnAction() {
+		changeSelectedType();
+	}
+
+	@FXML
+	public void btnSearchOnAction() {
+		List<File> files = DialogUtil.showMultiFileDialog(FxUtil.getWindow(this), chooser -> {
+
+		});
+
+		tbAttachment.getItems().addAll(files);
+	}
+
+	@FXML
+	public void btnRemoveRecipientOnAction() {
+		ObservableList<MailReceiver> selectedItems = tbReceiver.getSelectionModel().getSelectedItems();
+		tbReceiver.getItems().removeAll(selectedItems);
+	}
+
+	@FXML
+	public void btnDeOnAction() {
+		ObservableList<File> selectedItems = tbAttachment.getSelectionModel().getSelectedItems();
+		tbAttachment.getItems().removeAll(selectedItems);
+	}
+
+	@FXML
+	public void btnCloseOnAction() {
+		this.close();
 	}
 }

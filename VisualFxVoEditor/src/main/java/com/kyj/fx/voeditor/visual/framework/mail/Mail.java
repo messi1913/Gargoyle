@@ -24,7 +24,7 @@ public class Mail {
 
 	private StringProperty mailContent;
 
-//	private StringProperty templateName;
+	// private StringProperty templateName;
 
 	private StringProperty contentType;
 
@@ -37,7 +37,7 @@ public class Mail {
 		mailBcc = FXCollections.observableArrayList();
 		mailSubject = new SimpleStringProperty();
 		mailContent = new SimpleStringProperty();
-//		templateName = new SimpleStringProperty();
+		// templateName = new SimpleStringProperty();
 		contentType = new SimpleStringProperty("text/html");
 	}
 
@@ -68,12 +68,12 @@ public class Mail {
 	public ObservableList<String> getMailCc() {
 		return this.mailCc;
 	}
-	
-	public void setMailBcc(List<String> bcc){
+
+	public void setMailBcc(List<String> bcc) {
 		this.mailBcc.addAll(bcc);
 	}
-	
-	public ObservableList<String> getBcc(){
+
+	public ObservableList<String> getBcc() {
 		return this.mailBcc;
 	}
 
@@ -129,17 +129,17 @@ public class Mail {
 		this.mailContentProperty().set(mailContent);
 	}
 
-//	public final StringProperty templateNameProperty() {
-//		return this.templateName;
-//	}
-//
-//	public final String getTemplateName() {
-//		return this.templateNameProperty().get();
-//	}
-//
-//	public final void setTemplateName(final String templateName) {
-//		this.templateNameProperty().set(templateName);
-//	}
+	// public final StringProperty templateNameProperty() {
+	// return this.templateName;
+	// }
+	//
+	// public final String getTemplateName() {
+	// return this.templateNameProperty().get();
+	// }
+	//
+	// public final void setTemplateName(final String templateName) {
+	// this.templateNameProperty().set(templateName);
+	// }
 
 	public final StringProperty contentTypeProperty() {
 		return this.contentType;
@@ -167,6 +167,18 @@ public class Mail {
 
 	public final void setAttachmentItems(List<AttachmentItem> attachmentItems) {
 		this.attachmentItems = attachmentItems;
+	}
+
+	/**
+	 * 수신자 리스트를 clear
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 17.
+	 */
+	public void clearAllRecipient() {
+		this.mailTo.clear();
+		this.mailCc.clear();
+		this.mailBcc.clear();
 	}
 
 	// public void setMailTo(String ... email) {

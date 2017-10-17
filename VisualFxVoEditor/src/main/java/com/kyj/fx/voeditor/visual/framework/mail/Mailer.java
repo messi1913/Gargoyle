@@ -105,6 +105,10 @@ public class Mailer {
 
 		helper.setTo(mail.getMailTo().stream().toArray(String[]::new));
 
+		helper.setCc(mail.getMailCc().stream().toArray(String[]::new));
+		
+		helper.setBcc(mail.getBcc().stream().toArray(String[]::new));
+		
 		if (mail.getMailSubject() != null) {
 			helper.setSubject(mail.getMailSubject());
 		} else {
