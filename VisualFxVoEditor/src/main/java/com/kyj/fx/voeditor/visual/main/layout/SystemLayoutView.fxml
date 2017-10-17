@@ -292,10 +292,17 @@
 								<Menu text="File" mnemonicParsing="false">
 									<items>
 										<MenuItem mnemonicParsing="false"
-											onAction="#miFileAnalysisViewOnAction" text="FileAnalysisView" />
+											onAction="#miFileAnalysisViewOnAction" text="File-Analysis-View" />
 									</items>
 								</Menu>
-
+								
+								<Menu text="Mail" mnemonicParsing="false">
+									<items>
+										<MenuItem mnemonicParsing="false"
+											onAction="#miMailOnAction" text="Mail" />
+									</items>
+								</Menu>
+								
 							</items>
 						</Menu>
 

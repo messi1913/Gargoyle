@@ -40,6 +40,7 @@ import com.kyj.fx.voeditor.visual.component.file.FilesAnalysisComposite;
 import com.kyj.fx.voeditor.visual.component.google.trend.GoogleTrendComposite;
 import com.kyj.fx.voeditor.visual.component.http.HttpActionComposite;
 import com.kyj.fx.voeditor.visual.component.image.Base64ImageConvertComposte;
+import com.kyj.fx.voeditor.visual.component.mail.MailViewCompositeWrapper;
 import com.kyj.fx.voeditor.visual.component.monitor.bci.view.JavaProcessMonitor;
 import com.kyj.fx.voeditor.visual.component.nrch.realtime.NrchRealtimeSrchFlowComposite;
 import com.kyj.fx.voeditor.visual.component.pmd.DesignerFxComposite;
@@ -66,7 +67,6 @@ import com.kyj.fx.voeditor.visual.framework.GagoyleParentOnLoaded;
 import com.kyj.fx.voeditor.visual.framework.GargoyleTabPanable;
 import com.kyj.fx.voeditor.visual.loder.JarWrapper;
 import com.kyj.fx.voeditor.visual.loder.PluginLoader;
-import com.kyj.fx.voeditor.visual.main.Main;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
@@ -2155,6 +2155,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		loadNewSystemTab("File Analysis View", new FilesAnalysisComposite());
 	}
 	
+	@FXML
+	public void miMailOnAction(){
+		loadNewSystemTab("Mail", new MailViewCompositeWrapper());
+	}
 	/**
 	 * Java Application 실행처리.
 	 * @작성자 : KYJ
