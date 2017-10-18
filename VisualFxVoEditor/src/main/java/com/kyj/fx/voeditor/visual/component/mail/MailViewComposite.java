@@ -6,10 +6,17 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.mail;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Base64;
 import java.util.List;
+import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +38,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker.State;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -41,6 +50,9 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -173,7 +185,7 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 			engine.getLoadWorker().stateProperty().addListener(listener);
 
-			engine.load(new File("tinymce/index.html").toURI().toURL().toExternalForm());
+			engine.load(new File("javascript/tinymce/index.html").toURI().toURL().toExternalForm());
 
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -193,6 +205,46 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 		choContentType.getItems().addAll(ContentType.values());
 		choContentType.getSelectionModel().select(ContentType.html);
+
+		wbAprvCont.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent ev) {
+
+				if (ev.isControlDown() && ev.getCode() == KeyCode.V) {
+
+					Clipboard systemClipboard = Clipboard.getSystemClipboard();
+					Set<DataFormat> contentTypes = systemClipboard.getContentTypes();
+					LOGGER.debug("{}", contentTypes);
+					Image image = systemClipboard.getImage();
+					if (image != null) {
+
+						try {
+
+							LOGGER.debug("image.");
+
+							BufferedImage in = SwingFXUtils.fromFXImage(image, null);
+
+							try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+								ImageIO.write(in, "png", out);
+//								File output = new File(FileUtil.getTempGagoyle(), DateUtil.getCurrentDateString() + ".png");
+//								ImageIO.write(in, "png", output);
+								String imageData = Base64.getEncoder().encodeToString(out.toByteArray());
+
+								setText(String.format("<img src=data:image/jpeg;base64,%s></img>", imageData));
+
+							}
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+
+					}
+
+					// Object content = systemClipboard.getContent(DataFormat.RTF);
+					// LOGGER.debug("{}", content.toString());
+					// LOGGER.debug("ctrl + v");
+				}
+			}
+		});
 	}
 
 	/**
@@ -273,6 +325,14 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 			webViewLoaded.addListener(listener);
 		} else {
+
+			// StringBuffer sb = new StringBuffer();
+			// sb.append("setTimeout(function(){\n");
+			// sb.append(String.format("tinymce.activeEditor.setContent('%s');", content));
+			// sb.append("tinymce.activeEditor.focus();\n");
+			// sb.append(" \n");
+			// sb.append("},100)\n");
+			// engine.executeScript(sb.toString());
 			engine.executeScript(String.format("tinymce.activeEditor.setContent('%s');", content));
 		}
 
@@ -285,8 +345,7 @@ class MailViewComposite extends BorderPane implements Closeable {
 		// tinymce.activeEditor.getContent({format: 'raw'}); } outText(); ");
 		Object executeScript = engine.executeScript("  tinymce.activeEditor.getContent({format: 'raw'}); ");
 		// 본문 타입
-		mail.setContentType(choContentType.getSelectionModel().getSelectedItem()
-				.toString() /* "text/html" */);
+		mail.setContentType(choContentType.getSelectionModel().getSelectedItem().toString() /* "text/html" */);
 
 		// 본문
 		mail.setMailContent(executeScript.toString());
