@@ -141,8 +141,12 @@ public class SkinPreviewViewComposite extends BorderPane {
 					//Hbox 배경.
 					{
 						Background background = hboxSample.getBackground();
-						Color fill = (Color) background.getFills().get(0).getFill();
-						colorHboxSample.setValue(fill);
+						if(background != null)
+						{
+							Color fill = (Color) background.getFills().get(0).getFill();
+							colorHboxSample.setValue(fill);	
+						}
+						
 					}
 
 					{
