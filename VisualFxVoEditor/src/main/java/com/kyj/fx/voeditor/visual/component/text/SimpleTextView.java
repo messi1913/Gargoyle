@@ -441,7 +441,8 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 
 			@Override
 			public void onSuccess(File f) {
-				tab.setText(f.getName());
+				if(tab!=null)
+					tab.setText(f.getName());
 			}
 
 		});
