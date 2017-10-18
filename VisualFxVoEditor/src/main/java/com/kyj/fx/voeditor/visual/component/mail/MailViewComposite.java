@@ -10,6 +10,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,8 @@ import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -46,6 +49,10 @@ import javafx.scene.web.WebView;
 /**
  * 
  * 메일 보내기 기능을 지원하는 뷰
+ * 
+ * 
+ * 
+ * 어떤 에러가 발생시 http://fiddle.tinymce.com/8Ffaab/1 아래 사이트에서 테스트 코드 작성해보고 시도해볼것.
  * 
  * @author KYJ
  *
@@ -78,6 +85,13 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 	@FXML
 	private Label lblAttachmentCount;
+
+	/**
+	 * 메일관련 webview가 로드되었는지 확인
+	 * 
+	 * @최초생성일 2017. 10. 18.
+	 */
+	private BooleanProperty webViewLoaded = new SimpleBooleanProperty();
 
 	private Mail mail;
 
@@ -128,7 +142,10 @@ class MailViewComposite extends BorderPane implements Closeable {
 		tbAttachment.setCellFactory(new ListViewFileCellFactory());
 		try {
 			engine = wbAprvCont.getEngine();
-			engine.load(new File("tinymce/index.html").toURI().toURL().toExternalForm());
+
+			engine.setOnError(ev -> {
+				LOGGER.error(ValueUtil.toString(ev.getException()));
+			});
 
 			ChangeListener<State> listener = new ChangeListener<State>() {
 
@@ -138,16 +155,17 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 						if (ValueUtil.isNotEmpty(initCont)) {
 							engine.executeScript(" document.getElementById('gargoyle-textarea').innerHTML= '" + initCont + "'; ");
-
 						}
-						LOGGER.debug("Loaded....");
-						engine.getLoadWorker().stateProperty().removeListener(this);
 
+						engine.getLoadWorker().stateProperty().removeListener(this);
+						webViewLoaded.set(true);
 					}
 				}
 			};
 
 			engine.getLoadWorker().stateProperty().addListener(listener);
+
+			engine.load(new File("tinymce/index.html").toURI().toURL().toExternalForm());
 
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -208,9 +226,39 @@ class MailViewComposite extends BorderPane implements Closeable {
 		}
 	};
 
-//	public void setText(String content) {
-//		engine.executeScript(String.format("tinymce.activeEditor.setContent('%s');", content));
-//	}
+	public boolean canWrite() {
+		return webViewLoaded.get();
+	}
+
+	public void setText(String content) {
+
+		if (!canWrite()) {
+			ChangeListener<Boolean> listener = new ChangeListener<Boolean>() {
+
+				@Override
+				public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+					if (newValue) {
+
+						StringBuffer sb = new StringBuffer();
+						sb.append("setTimeout(function(){\n");
+						sb.append(String.format("tinymce.activeEditor.setContent('%s');", content));
+						sb.append("tinymce.activeEditor.focus();\n");
+						sb.append(" \n");
+						sb.append("},100)\n");
+
+						// LOGGER.debug(sb.toString());
+						engine.executeScript(sb.toString());
+						webViewLoaded.removeListener(this);
+					}
+				}
+			};
+
+			webViewLoaded.addListener(listener);
+		} else {
+			engine.executeScript(String.format("tinymce.activeEditor.setContent('%s');", content));
+		}
+
+	}
 
 	@FXML
 	public void btnSendOnAction() {

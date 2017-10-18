@@ -32,6 +32,11 @@ public class MailViewCompositeWrapper extends CloseableParent<BorderPane> {
 		super(new MailViewComposite(initCont));
 	}
 
+	public void setText(String content) {
+		MailViewComposite composite = (MailViewComposite) getParent();
+		composite.setText(content);
+	}
+
 	@Override
 	public void close() throws IOException {
 		if (getParent() instanceof Closeable) {
