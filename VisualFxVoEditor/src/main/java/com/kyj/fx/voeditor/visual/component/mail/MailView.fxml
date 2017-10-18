@@ -43,11 +43,11 @@
 				<RowConstraints maxHeight="283.0" minHeight="10.0" prefHeight="120.0" vgrow="SOMETIMES" />
 			</rowConstraints>
 			<children>
-				<Label text="MailType" />
+				<Label text="ContentType" />
 				<HBox alignment="CENTER_LEFT" spacing="5.0" GridPane.columnIndex="1" GridPane.columnSpan="9">
 					<children>
-						<ChoiceBox prefHeight="23.0" prefWidth="120.0" />
-						<CheckBox mnemonicParsing="false" text="Urgent" />
+						<ChoiceBox fx:id="choContentType" prefHeight="23.0" prefWidth="120.0" />
+						<CheckBox disable="true" mnemonicParsing="false" text="Urgent" />
 						<Label text="Atach File" />
 						<Label fx:id="lblAttachmentCount" text="0" />
                   <Label text="Unit(s)" />
@@ -73,8 +73,8 @@
 				<VBox alignment="TOP_CENTER" spacing="1.0" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4">
 					<children>
 						<Button fx:id="btnRemoveRecipient" alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnRemoveRecipientOnAction" text="Delete" VBox.vgrow="ALWAYS" />
-						<Button fx:id="btnUpRecipient" alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Up" VBox.vgrow="ALWAYS" />
-						<Button fx:id="RecipientDownRecipient" alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Down" VBox.vgrow="ALWAYS" />
+						<Button fx:id="btnUpRecipient" alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnUpRecipientOnAction" text="Up" VBox.vgrow="ALWAYS" />
+						<Button fx:id="RecipientDownRecipient" alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#RecipientDownRecipientOnAction" text="Down" VBox.vgrow="ALWAYS" />
 					</children>
                <padding>
                   <Insets left="2.0" right="2.0" />
@@ -144,7 +144,7 @@
                   <ListView fx:id="tbAttachment" prefHeight="126.0" prefWidth="897.0" />
 						<HBox>
 							<children>
-								<HBox alignment="CENTER_LEFT" spacing="5.0">
+								<HBox alignment="CENTER_LEFT" disable="true" spacing="5.0">
 									<children>
 										<CheckBox mnemonicParsing="false" text="Schedule Sending" />
 										<DatePicker />

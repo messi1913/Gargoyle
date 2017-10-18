@@ -167,6 +167,8 @@ public class Mailer {
 		for (AttachmentItem item : attachmentItems) {
 			helper.addAttachment(item.getDisplayName(), item.getDataSource());
 		}
+		
+		
 		mailSender.send(message);
 
 	}

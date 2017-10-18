@@ -10,7 +10,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,7 @@ import javafx.concurrent.Worker.State;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
@@ -86,6 +86,8 @@ class MailViewComposite extends BorderPane implements Closeable {
 	@FXML
 	private Label lblAttachmentCount;
 
+	@FXML
+	private ChoiceBox<ContentType> choContentType;
 	/**
 	 * 메일관련 webview가 로드되었는지 확인
 	 * 
@@ -183,6 +185,8 @@ class MailViewComposite extends BorderPane implements Closeable {
 		chkAttachments.selectedProperty().addListener(chkAttachmentsListener);
 		tbAttachment.getItems().addListener(tbAttachmentListChangeListener);
 
+		choContentType.getItems().addAll(ContentType.values());
+		choContentType.getSelectionModel().select(ContentType.html);
 	}
 
 	/**
@@ -267,7 +271,7 @@ class MailViewComposite extends BorderPane implements Closeable {
 		// tinymce.activeEditor.getContent({format: 'raw'}); } outText(); ");
 		Object executeScript = engine.executeScript("  tinymce.activeEditor.getContent({format: 'raw'}); ");
 		// 본문 타입
-		mail.setContentType("text/html");
+		mail.setContentType(  choContentType.getSelectionModel().getSelectedItem().toString() /*    "text/html"*/);
 
 		// 본문
 		mail.setMailContent(executeScript.toString());
@@ -351,6 +355,38 @@ class MailViewComposite extends BorderPane implements Closeable {
 	public void btnDeOnAction() {
 		ObservableList<File> selectedItems = tbAttachment.getSelectionModel().getSelectedItems();
 		tbAttachment.getItems().removeAll(selectedItems);
+	}
+
+	@FXML
+	public void RecipientDownRecipientOnAction() {
+		int selectedIndex = tbReceiver.getSelectionModel().getSelectedIndex();
+		if (selectedIndex == -1)
+			return;
+
+		ObservableList<MailReceiver> items = tbReceiver.getItems();
+		if (selectedIndex < items.size() - 1) {
+
+			MailReceiver a = items.get(selectedIndex);
+			MailReceiver b = items.get(selectedIndex + 1);
+			items.set(selectedIndex + 1, a);
+			items.set(selectedIndex, b);
+		}
+	}
+
+	@FXML
+	public void btnUpRecipientOnAction() {
+		int selectedIndex = tbReceiver.getSelectionModel().getSelectedIndex();
+		if (selectedIndex == -1)
+			return;
+
+		if (selectedIndex >= 1) {
+			ObservableList<MailReceiver> items = tbReceiver.getItems();
+
+			MailReceiver a = items.get(selectedIndex);
+			MailReceiver b = items.get(selectedIndex - 1);
+			items.set(selectedIndex - 1, a);
+			items.set(selectedIndex, b);
+		}
 	}
 
 	@FXML
