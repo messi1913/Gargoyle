@@ -27,10 +27,13 @@ public class MailViewExam extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
-		BorderPane parent = new MailViewCompositeWrapper().getParent();
+		String initCont = "<p> hello world </p>";
+		MailViewCompositeWrapper w = new MailViewCompositeWrapper();
+		w.setText(initCont);
+		BorderPane parent = w.getParent();
 		primaryStage.setScene(new Scene(parent));
 		primaryStage.show();
-
+		
 	}
 
 	/**
