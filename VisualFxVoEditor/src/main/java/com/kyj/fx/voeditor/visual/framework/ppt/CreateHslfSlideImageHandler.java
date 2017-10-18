@@ -8,14 +8,13 @@ package com.kyj.fx.voeditor.visual.framework.ppt;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.function.Predicate;
 
+import org.apache.poi.hslf.usermodel.HSLFPictureData;
+import org.apache.poi.hslf.usermodel.HSLFPictureShape;
+import org.apache.poi.hslf.usermodel.HSLFSlide;
+import org.apache.poi.hslf.usermodel.HSLFSlideShow;
 import org.apache.poi.sl.usermodel.PictureData;
 import org.apache.poi.sl.usermodel.PictureData.PictureType;
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFPictureData;
-import org.apache.poi.xslf.usermodel.XSLFPictureShape;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
 
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 
@@ -23,19 +22,19 @@ import com.kyj.fx.voeditor.visual.util.FileUtil;
  * @author KYJ
  *
  */
-public abstract class PPTCreateImageHandler {
+public abstract class CreateHslfSlideImageHandler {
 
-	private XMLSlideShow ppt;
-	private XSLFSlide slide;
+	private HSLFSlideShow ppt;
+	private HSLFSlide slide;
 
-	public PPTCreateImageHandler(XMLSlideShow ppt) {
+	public CreateHslfSlideImageHandler(HSLFSlideShow ppt) {
 		this.ppt = ppt;
 		this.slide = createSlide(this.ppt);
 	}
 
-	protected abstract XSLFSlide createSlide(XMLSlideShow ppt);
+	protected abstract HSLFSlide createSlide(HSLFSlideShow ppt);
 
-	public XSLFPictureShape createImage(File imageFile) {
+	public HSLFPictureShape createImage(File imageFile) {
 		return createImage(imageFile, getType(imageFile));
 	}
 
@@ -51,11 +50,11 @@ public abstract class PPTCreateImageHandler {
 		return null;
 	}
 
-	public final XMLSlideShow getPpt() {
+	public final HSLFSlideShow getPpt() {
 		return ppt;
 	}
 
-	public final XSLFSlide getSlide() {
+	public final HSLFSlide getSlide() {
 		return slide;
 	}
 
@@ -72,11 +71,12 @@ public abstract class PPTCreateImageHandler {
 	 * @param format
 	 * @return
 	 */
-	public XSLFPictureShape createImage(File imageFile, PictureType format) {
+	public HSLFPictureShape createImage(File imageFile, PictureType format) {
 		if (format == null)
 			return null;
 		try {
-			XSLFPictureData addPicture = this.ppt.addPicture(FileUtil.getBytes(imageFile), format);
+
+			HSLFPictureData addPicture = this.ppt.addPicture(FileUtil.getBytes(imageFile), format);
 			return this.slide.createPicture(addPicture);
 		} catch (IOException e) {
 			e.printStackTrace();

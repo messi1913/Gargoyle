@@ -6,6 +6,8 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.framework.ppt;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.List;
@@ -19,14 +21,18 @@ import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xslf.usermodel.XSLFSlideLayout;
 import org.apache.poi.xslf.usermodel.XSLFSlideMaster;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author KYJ
  *
  */
-public class DefaultPPTCreateImageHandler extends PPTCreateImageHandler {
+public class DefaultXmlSlideCreateImageHandler extends CreateXmlSlideImageHandler {
 
-	public DefaultPPTCreateImageHandler(XMLSlideShow ppt) {
+	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultXmlSlideCreateImageHandler.class);
+
+	public DefaultXmlSlideCreateImageHandler(XMLSlideShow ppt) {
 		super(ppt);
 	}
 
@@ -40,6 +46,49 @@ public class DefaultPPTCreateImageHandler extends PPTCreateImageHandler {
 	@Override
 	public XSLFPictureShape createImage(File imageFile, PictureType format) {
 
+		{
+			XMLSlideShow ppt = getPpt();
+			Dimension pgsize = ppt.getPageSize();
+
+			try {
+
+				// LOGGER.debug("{} {} ", pgsize.width, pgsize.height);
+				// BufferedImage img = new BufferedImage(pgsize.width,
+				// pgsize.height, BufferedImage.TYPE_4BYTE_ABGR);
+				// Graphics2D graphics = img.createGraphics();
+
+				// BufferedImage background = ImageIO.read(new
+				// File("C:\\Users\\KYJ\\Pictures\\10.png"));
+				// background.Graphics graphics = background.getGraphics();
+				// Rectangle2D.Float s = new Rectangle2D.Float(0, 0,
+				// pgsize.width, pgsize.height);
+				// graphics.fill(s);
+
+				// graphics.drawImage(background, 0, 0, Color.black, new
+				// ImageObserver() {
+				//
+				// @Override
+				// public boolean imageUpdate(Image img, int infoflags, int x,
+				// int y, int width, int height) {
+				// LOGGER.debug(img.toString());
+				// return true;
+				// }
+				// });
+
+				// graphics.setColor(Color.BLACK);
+				XSLFSlide slide = getSlide();
+//				XSLFAutoShape createAutoShape = slide.createAutoShape();
+//				createAutoShape.setFillColor(Color.BLACK);
+				// slide.addShape(shape);
+
+				slide.getBackground().setFillColor(Color.BLACK);
+				// slide.draw(graphics);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
 		{
 			XSLFTextShape placeholder = getSlide().getPlaceholder(0);
 			placeholder.setText(imageFile.getName());
