@@ -147,11 +147,16 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if (SimpleTextView.this.tab.getText().charAt(0) == '*') {
-					return;
+				//Tab 없이 처리되는 클래스들도 있음.... 
+				DockTab tab2 = SimpleTextView.this.tab;
+				if (tab2 != null) {
+					if (tab2.getText().charAt(0) == '*') {
+						return;
+					}
+					String modifyTabName = "*".concat(tab2.getText());
+					tab2.setText(modifyTabName);
 				}
-				String modifyTabName = "*".concat(SimpleTextView.this.tab.getText());
-				SimpleTextView.this.tab.setText(modifyTabName);
+
 			}
 		});
 		initHelpers();
