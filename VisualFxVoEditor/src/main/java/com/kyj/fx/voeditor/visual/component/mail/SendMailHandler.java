@@ -12,8 +12,8 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.mail.Mail;
-import com.kyj.fx.voeditor.visual.framework.thread.DemonThreadFactory;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.MailUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -29,12 +29,32 @@ public class SendMailHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SendMailHandler.class);
 	private MailViewComposite mailComposite;
 
-	private Consumer<Exception> errorHandler = ex -> {
+	private ExceptionHandler errorHandler = ex -> {
 		LOGGER.error(ValueUtil.toString(ex));
+	};
+
+	private Consumer<String> onSuccessHandler = id -> {
+
 	};
 
 	public SendMailHandler(MailViewComposite mailComposite) {
 		this.mailComposite = mailComposite;
+	}
+
+	public ExceptionHandler getErrorHandler() {
+		return errorHandler;
+	}
+
+	public void setErrorHandler(ExceptionHandler errorHandler) {
+		this.errorHandler = errorHandler;
+	}
+
+	public Consumer<String> getOnSuccessHandler() {
+		return onSuccessHandler;
+	}
+
+	public void setOnSuccessHandler(Consumer<String> onSuccessHandler) {
+		this.onSuccessHandler = onSuccessHandler;
 	}
 
 	/**
@@ -53,10 +73,11 @@ public class SendMailHandler {
 				Mail mail = mailComposite.getMail();
 
 				try {
-					MailUtil.sendMail(mail, Collections.emptyMap());
+					/*String id = */MailUtil.sendMail(mail, Collections.emptyMap());
+					onSuccessHandler.accept(/*id*/ "");
 				} catch (Exception e) {
 					if (errorHandler != null)
-						errorHandler.accept(e);
+						errorHandler.handle(e);
 				}
 
 				return null;

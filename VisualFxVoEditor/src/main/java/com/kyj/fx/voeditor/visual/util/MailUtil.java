@@ -27,6 +27,8 @@ import com.kyj.fx.voeditor.visual.framework.mail.Mail;
 import com.kyj.fx.voeditor.visual.framework.mail.MailConst;
 import com.kyj.fx.voeditor.visual.framework.mail.Mailer;
 import com.kyj.fx.voeditor.visual.framework.mail.SenderMailInfo;
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+import com.sun.star.auth.InvalidArgumentException;
 
 /**
  * @author KYJ
@@ -50,22 +52,16 @@ public class MailUtil {
 	 * @throws Exception
 	 * @User KYJ
 	 */
-	public static boolean sendMail(List<Mail> mails, Map<String, Object> mailContent) throws Exception {
+	public static void sendMail(List<Mail> mails, Map<String, Object> mailContent) throws Exception {
 		Mailer bean = BeanUtil.getBean("mailer", Mailer.class);
-		return sendMail(bean, mails, mailContent);
+		sendMail(bean, mails, mailContent);
 	}
 
-	public static boolean sendMail(Mailer mailer, List<Mail> mails, Map<String, Object> mailContent) {
-		try {
-			VelocityContext merge = toVelocityContext(mailContent);
-			SenderMailInfo sender = BeanUtil.getBean("mailSenderInfo", SenderMailInfo.class);
-			mailer.sendMail(sender, mails, merge);
-
-		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(e));
-			return false;
-		}
-		return true;
+	@Deprecated
+	public static void sendMail(Mailer mailer, List<Mail> mails, Map<String, Object> mailContent) {
+		sendMail(mailer, mails, mailContent, err -> {
+			LOGGER.error(ValueUtil.toString(err));
+		});
 	}
 
 	/**
@@ -77,17 +73,56 @@ public class MailUtil {
 	 * @param errorHandler
 	 * @return
 	 */
-	public static boolean sendMail(Mailer mailer, List<Mail> mails, Map<String, Object> mailContent, Consumer<Exception> errorHandler) {
+	public static void sendMail(Mailer mailer, List<Mail> mails, Map<String, Object> mailContent, Consumer<Exception> errorHandler) {
 		try {
 			VelocityContext merge = toVelocityContext(mailContent);
 			SenderMailInfo sender = BeanUtil.getBean("mailSenderInfo", SenderMailInfo.class);
 			mailer.sendMail(sender, mails, merge);
 
 		} catch (Exception e) {
-			errorHandler.accept(e);
-			return false;
+			if (errorHandler != null)
+				errorHandler.accept(e);
+
 		}
-		return true;
+	}
+
+	/**
+	 * 메일전송 <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 18.
+	 * @param mail
+	 *            메일을 보내기 위한 정보가 담긴 객체
+	 * @param mailContent
+	 *            메일템플릿안에 들어갈 내용이 담기는 정보.
+	 * @return 메일전송 성공 여부
+	 * @throws InvalidArgumentException
+	 *             사용자 계정정보가 틀린경우
+	 * 
+	 * @throws Exception
+	 */
+	public static void sendMail(Mail mail, Map<String, Object> mailContent) throws InvalidArgumentException, Exception {
+
+		SenderMailInfo sender = null;
+
+		// 데이터베이스 관리 계정 존재하면 디비에 저장된 계정을 이용함.
+		if ("Y".equals(ResourceLoader.getInstance().get(ResourceLoader.SENDMAIL_CUSTOM_ACCOUNT_USE_YN))) {
+			String userId = ResourceLoader.getInstance().get(ResourceLoader.SENDMAIL_CUSTOM_USER_ID);
+			String userPwd = ResourceLoader.getInstance().get(ResourceLoader.SENDMAIL_CUSTOM_USER_PASSWORD);
+
+			if (ValueUtil.isEmpty(userId, userPwd)) {
+				throw new InvalidArgumentException("sender email id or password is null");
+			}
+
+			sender = new SenderMailInfo();
+			sender.setSendUserId(userId);
+			sender.setSendUserPassword(userPwd);
+
+		} else {
+			sender = BeanUtil.getBean("mailSenderInfo", SenderMailInfo.class);
+		}
+
+		sendMail(sender, mail, mailContent);
 	}
 
 	/**
@@ -101,33 +136,18 @@ public class MailUtil {
 	 * @throws Exception
 	 * @User KYJ
 	 */
-	public static boolean sendMail(Mail mail, Map<String, Object> mailContent) throws Exception {
-		SenderMailInfo sender = BeanUtil.getBean("mailSenderInfo", SenderMailInfo.class);
-		return sendMail(sender, mail, mailContent);
-	}
-
-	/**
-	 * 메일전송
-	 *
-	 * @Date 2015. 9. 13.
-	 * @param mail
-	 *            메일을 보내기 위한 정보가 담긴 객체
-	 * @param mailContent
-	 *            메일템플릿안에 들어갈 내용이 담기는 정보.
-	 * @throws Exception
-	 * @User KYJ
-	 */
-	public static boolean sendMail(SenderMailInfo sender, Mail mail, Map<String, Object> mailContent) throws Exception {
+	public static void sendMail(SenderMailInfo sender, Mail mail, Map<String, Object> mailContent) throws Exception {
 		try {
 			Mailer bean = BeanUtil.getBean("mailer", Mailer.class);
 
 			VelocityContext merge = toVelocityContext(mailContent);
 			bean.sendMail(sender, mail, merge);
 		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(e));
-			return false;
+			// LOGGER.error(ValueUtil.toString(e));
+			// return false;
+			throw e;
 		}
-		return true;
+		// return true;
 	}
 
 	/**
@@ -168,7 +188,7 @@ public class MailUtil {
 	public static Template createTemplate(byte[] templateCont) throws Exception {
 		return createTemplate(new ByteArrayInputStream(templateCont));
 	}
-	
+
 	public static Template createTemplate(URL url) throws Exception {
 		Template createTemplate = null;
 		try (InputStream openStream = url.openStream()) {

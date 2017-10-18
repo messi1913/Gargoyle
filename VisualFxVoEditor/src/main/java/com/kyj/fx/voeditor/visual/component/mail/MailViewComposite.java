@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.NumberingCellValueFactory;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.mail.Mail;
 import com.kyj.fx.voeditor.visual.functions.ListViewFileCellFactory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -139,6 +140,11 @@ class MailViewComposite extends BorderPane implements Closeable {
 		mail.mailSubjectProperty().bind(txtSubject.textProperty());
 		attachmentHandler = new AttachmentHandler(this);
 		sendMailHandler = new SendMailHandler(this);
+
+		sendMailHandler.setOnSuccessHandler(str -> {
+			DialogUtil.showMessageDialog(FxUtil.getWindow(MailViewComposite.this), "메일 전송 성공");
+		});
+		sendMailHandler.setErrorHandler(sendMailFailureHandler);
 		recipientHandler = new RecipientHandler(this);
 
 		tbAttachment.setCellFactory(new ListViewFileCellFactory());
@@ -208,6 +214,14 @@ class MailViewComposite extends BorderPane implements Closeable {
 		return mail;
 	}
 
+	/**
+	 * 메일 전송 실패시 처리할 내용 구현
+	 * 
+	 * @최초생성일 2017. 10. 18.
+	 */
+	private ExceptionHandler sendMailFailureHandler = err -> DialogUtil.showMessageDialog(FxUtil.getWindow(MailViewComposite.this),
+			"메일 전송 실패.", err.getMessage());
+
 	private ListChangeListener<File> tbAttachmentListChangeListener = new ListChangeListener<File>() {
 
 		@Override
@@ -271,7 +285,8 @@ class MailViewComposite extends BorderPane implements Closeable {
 		// tinymce.activeEditor.getContent({format: 'raw'}); } outText(); ");
 		Object executeScript = engine.executeScript("  tinymce.activeEditor.getContent({format: 'raw'}); ");
 		// 본문 타입
-		mail.setContentType(  choContentType.getSelectionModel().getSelectedItem().toString() /*    "text/html"*/);
+		mail.setContentType(choContentType.getSelectionModel().getSelectedItem()
+				.toString() /* "text/html" */);
 
 		// 본문
 		mail.setMailContent(executeScript.toString());
