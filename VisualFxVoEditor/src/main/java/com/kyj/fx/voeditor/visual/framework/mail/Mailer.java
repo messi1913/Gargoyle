@@ -3,6 +3,7 @@ package com.kyj.fx.voeditor.visual.framework.mail;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -108,6 +109,9 @@ public class Mailer {
 		helper.setCc(mail.getMailCc().stream().toArray(String[]::new));
 		
 		helper.setBcc(mail.getBcc().stream().toArray(String[]::new));
+		
+		helper.setSentDate(new Date());
+		
 		
 		if (mail.getMailSubject() != null) {
 			helper.setSubject(mail.getMailSubject());
