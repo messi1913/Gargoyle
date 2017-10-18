@@ -2157,7 +2157,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	
 	@FXML
 	public void miMailOnAction(){
-		loadNewSystemTab("Mail", new MailViewCompositeWrapper());
+		loadNewSystemTab(MailViewCompositeWrapper.getName(), new MailViewCompositeWrapper());
 	}
 	/**
 	 * Java Application 실행처리.

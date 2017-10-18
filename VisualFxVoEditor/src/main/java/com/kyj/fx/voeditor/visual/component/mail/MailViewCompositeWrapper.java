@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 
+import javafx.application.Platform;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -19,8 +20,16 @@ import javafx.scene.layout.BorderPane;
  */
 public class MailViewCompositeWrapper extends CloseableParent<BorderPane> {
 
+	public static String getName() {
+		return MailViewCompositeWrapper.class.getSimpleName();
+	}
+
 	public MailViewCompositeWrapper() {
 		super(new MailViewComposite());
+	}
+
+	public MailViewCompositeWrapper(String initCont) {
+		super(new MailViewComposite(initCont));
 	}
 
 	@Override

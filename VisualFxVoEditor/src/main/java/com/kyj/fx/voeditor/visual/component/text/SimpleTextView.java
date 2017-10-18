@@ -23,6 +23,7 @@ import org.springframework.security.crypto.codec.Hex;
 import com.google.gson.JsonSyntaxException;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab;
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
+import com.kyj.fx.voeditor.visual.component.mail.MailViewCompositeWrapper;
 import com.kyj.fx.voeditor.visual.framework.GargoyleTabPanable;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
@@ -46,6 +47,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
@@ -199,8 +201,22 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 						}
 
 					});
-
 					contextMenu.getItems().add(e);
+				}
+
+				{
+
+					Menu miMail = new Menu("Mail");
+					MenuItem miSmtpMail = new MenuItem("SMTP Mail");
+					miMail.getItems().add(miSmtpMail);
+
+					miSmtpMail.setOnAction(ev -> {
+						MailViewCompositeWrapper wrapper = new MailViewCompositeWrapper(codeArea.getSelectedText());
+						SharedMemory.getSystemLayoutViewController().loadNewSystemTab(MailViewCompositeWrapper.getName(), wrapper);
+
+					});
+					contextMenu.getItems().add(miMail);
+
 				}
 			}
 		});

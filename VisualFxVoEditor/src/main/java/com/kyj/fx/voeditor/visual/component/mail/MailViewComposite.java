@@ -8,7 +8,6 @@ package com.kyj.fx.voeditor.visual.component.mail;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
@@ -28,6 +27,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Worker.State;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -93,6 +93,16 @@ class MailViewComposite extends BorderPane implements Closeable {
 		});
 	}
 
+	private String initCont;
+
+	public MailViewComposite(String initCont) {
+		this.mail = new Mail();
+		this.initCont = initCont;
+		FxUtil.loadRoot(MailViewComposite.class, this, err -> {
+			LOGGER.error(ValueUtil.toString(err));
+		});
+	}
+
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 10. 16.
@@ -119,6 +129,26 @@ class MailViewComposite extends BorderPane implements Closeable {
 		try {
 			engine = wbAprvCont.getEngine();
 			engine.load(new File("tinymce/index.html").toURI().toURL().toExternalForm());
+
+			ChangeListener<State> listener = new ChangeListener<State>() {
+
+				@Override
+				public void changed(ObservableValue<? extends State> observable, State oldValue, State newValue) {
+					if (newValue == State.SUCCEEDED) {
+
+						if (ValueUtil.isNotEmpty(initCont)) {
+							engine.executeScript(" document.getElementById('gargoyle-textarea').innerHTML= '" + initCont + "'; ");
+
+						}
+						LOGGER.debug("Loaded....");
+						engine.getLoadWorker().stateProperty().removeListener(this);
+
+					}
+				}
+			};
+
+			engine.getLoadWorker().stateProperty().addListener(listener);
+
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -178,11 +208,16 @@ class MailViewComposite extends BorderPane implements Closeable {
 		}
 	};
 
+//	public void setText(String content) {
+//		engine.executeScript(String.format("tinymce.activeEditor.setContent('%s');", content));
+//	}
+
 	@FXML
 	public void btnSendOnAction() {
-		Object executeScript = engine
-				.executeScript(" function outText(){ return tinymce.activeEditor.getContent({format: 'raw'}); } outText(); ");
-
+		// Object executeScript = engine
+		// .executeScript(" function outText(){ return
+		// tinymce.activeEditor.getContent({format: 'raw'}); } outText(); ");
+		Object executeScript = engine.executeScript("  tinymce.activeEditor.getContent({format: 'raw'}); ");
 		// 본문 타입
 		mail.setContentType("text/html");
 
