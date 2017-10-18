@@ -8,13 +8,20 @@ package com.kyj.fx.voeditor.visual.component.mail;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.kyj.fx.voeditor.visual.framework.mail.Mail;
+
+import javafx.collections.ObservableList;
 
 /**
  * @author KYJ
  *
  */
 public class RecipientHandler {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(RecipientHandler.class);
 
 	private MailViewComposite mailComposite;
 
@@ -24,19 +31,27 @@ public class RecipientHandler {
 
 	public void build() {
 		Mail mail = this.mailComposite.getMail();
+		// 수신자 리스트를 비움
+		mail.clearAllRecipient();
+
 		List<MailReceiver> recipients = this.mailComposite.getRecipients();
 
 		for (MailReceiver r : recipients) {
+
+			LOGGER.debug("[{}] - {} ", r.getType(), r.getEmail());
 			switch (r.getType()) {
 			case "CC":
-				mail.getMailCc().add(r.getEmail());
+				ObservableList<String> mailCc = mail.getMailCc();
+
+				mailCc.add(r.getEmail());
 				break;
 			case "BCC":
-				mail.getBcc().add(r.getEmail());
+				ObservableList<String> bcc = mail.getBcc();
+				bcc.add(r.getEmail());
 				break;
 			default:
-
-				mail.getMailTo().add(r.getEmail());
+				ObservableList<String> mailTo = mail.getMailTo();
+				mailTo.add(r.getEmail());
 				break;
 			}
 
