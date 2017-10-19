@@ -49,6 +49,7 @@ public class AsynchJavaExecutor extends AbstractJavaExecutor {
 		public AsychTrhead(Runnable r, Action action) {
 			super(r);
 			this.action = action;
+			setName("AsynchJavaExecutor-AsynchThread");
 		}
 
 		/* (non-Javadoc)

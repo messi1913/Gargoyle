@@ -538,6 +538,7 @@ public class RuntimeClassUtil {
 			this.encoding = encoding;
 			this.convert = convert;
 			this.errorHandler = errorHandler;
+			setName("RuntimeClassUtil-AsynchThread");
 		}
 
 		/*
