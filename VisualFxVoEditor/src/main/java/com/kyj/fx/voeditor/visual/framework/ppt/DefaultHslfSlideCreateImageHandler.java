@@ -17,16 +17,16 @@ import org.apache.poi.hslf.usermodel.HSLFFill;
 import org.apache.poi.hslf.usermodel.HSLFPictureData;
 import org.apache.poi.hslf.usermodel.HSLFPictureShape;
 import org.apache.poi.hslf.usermodel.HSLFSlide;
-import org.apache.poi.hslf.usermodel.HSLFSlideMaster;
 import org.apache.poi.hslf.usermodel.HSLFSlideShow;
 import org.apache.poi.hslf.usermodel.HSLFTextBox;
 import org.apache.poi.hslf.usermodel.HSLFTextParagraph;
 import org.apache.poi.hslf.usermodel.HSLFTextRun;
-import org.apache.poi.sl.usermodel.PictureData;
 import org.apache.poi.sl.usermodel.PictureData.PictureType;
 import org.apache.poi.sl.usermodel.TextParagraph.TextAlign;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.kyj.fx.voeditor.visual.util.PPTUtil;
 
 /**
  * @author KYJ
@@ -36,6 +36,7 @@ public class DefaultHslfSlideCreateImageHandler extends CreateHslfSlideImageHand
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHslfSlideCreateImageHandler.class);
 
+	private File pptFile;
 	private File backgroundFile;
 
 	public DefaultHslfSlideCreateImageHandler(HSLFSlideShow ppt) {
@@ -43,9 +44,8 @@ public class DefaultHslfSlideCreateImageHandler extends CreateHslfSlideImageHand
 	}
 
 	@Override
-	protected HSLFSlide createSlide(HSLFSlideShow ppt) {
-		HSLFSlideMaster defaultMaster = ppt.getSlideMasters().get(0);
-
+	public HSLFSlide createSlide(HSLFSlideShow ppt) {
+		// HSLFSlideMaster defaultMaster = ppt.getSlideMasters().get(0);
 		return ppt.createSlide();
 	}
 
@@ -64,26 +64,7 @@ public class DefaultHslfSlideCreateImageHandler extends CreateHslfSlideImageHand
 	}
 
 	public void backgroundImage() {
-
-		try {
-			HSLFSlideShow ppt = getPpt();
-			HSLFSlide slide = getSlide();
-
-			// 이부분 반드시 호출
-			// This slide has its own background.
-			// Without this line it will use master's background.
-			slide.setFollowMasterBackground(false);
-
-			HSLFFill fill = slide.getBackground().getFill();
-			HSLFPictureData pd;
-			pd = ppt.addPicture(backgroundFile, PictureData.PictureType.PNG);
-			fill.setFillType(HSLFFill.FILL_PICTURE);
-			fill.setPictureData(pd);
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}
-
+		PPTUtil.backgroundImage(getPpt(), getSlide(), backgroundFile);
 	}
 
 	@Override
@@ -114,9 +95,9 @@ public class DefaultHslfSlideCreateImageHandler extends CreateHslfSlideImageHand
 				// get shape
 				HSLFPictureShape picShape = new HSLFPictureShape(picData);
 
-				int y = (int) pageSize.getHeight() / 2;
+				int y = (int) pageSize.getHeight() / 4;
 				int width = (int) (pageSize.getWidth() - 30.0);
-				int height = (int) (pageSize.getHeight() / 3.0);
+				int height = (int) (pageSize.getHeight() - y - 10.0);
 
 				int x = 15;
 
@@ -135,13 +116,20 @@ public class DefaultHslfSlideCreateImageHandler extends CreateHslfSlideImageHand
 
 	}
 
-	public File getBackgroundFile() {
+	public final File getBackgroundFile() {
 		return backgroundFile;
 	}
 
-	public void setBackgroundFile(File backgroundFile) {
+	public final void setBackgroundFile(File backgroundFile) {
 		this.backgroundFile = backgroundFile;
+	}
 
+	public final void setPptFile(File pptFile) {
+		this.pptFile = pptFile;
+	}
+
+	public final File getPptFile() {
+		return pptFile;
 	}
 
 }
