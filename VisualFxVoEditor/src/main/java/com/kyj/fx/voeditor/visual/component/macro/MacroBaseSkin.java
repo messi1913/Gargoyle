@@ -366,7 +366,7 @@ public class MacroBaseSkin extends BehaviorSkinBase<MacroControl, BehaviorBase<M
 				public void accept(Void t) {
 					try {
 						int second = sleepSecond.get() * 1000;
-						Thread.currentThread().sleep(second);
+						Thread.sleep(second);
 					} catch (InterruptedException e) {
 						LOGGER.error(ValueUtil.toString(e));
 					}
