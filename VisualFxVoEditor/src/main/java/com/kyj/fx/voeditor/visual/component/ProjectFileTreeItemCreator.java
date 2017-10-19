@@ -77,7 +77,7 @@ public class ProjectFileTreeItemCreator {
 					LOGGER.error(ValueUtil.toString(e));
 				}
 			}
-		}));
+		}, "ShutdownHook"));
 	}
 
 	public ProjectFileTreeItemCreator() {

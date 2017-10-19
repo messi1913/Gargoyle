@@ -41,6 +41,7 @@ public class DefaultCallableThreadFactory<R> implements CallableThreadFactory<R>
 				}
 			}
 		};
+		thread.setName("Default-Callable-Thread-Factory-Trhead");
 
 		return thread;
 	}
