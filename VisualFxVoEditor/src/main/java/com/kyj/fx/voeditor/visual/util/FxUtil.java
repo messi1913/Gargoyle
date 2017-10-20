@@ -1311,19 +1311,19 @@ public class FxUtil {
 	}
 
 	public static void createCodeAreaAndShow(String content, Consumer<Stage> option) {
-		createCodeAreaAndShow(content, c ->{
+		createCodeAreaAndShow(content, c -> {
 
 			c.setParagraphGraphicFactory(LineNumberFactory.get(c));
-			
-		} , option);
+
+		}, option);
 	}
-	
+
 	public static void createCodeAreaAndShow(String content, Consumer<CodeArea> add, Consumer<Stage> option) {
 		CodeArea parent = new CodeArea(content);
-		
-		if(add!=null)
+
+		if (add != null)
 			add.accept(parent);
-		
+
 		createStageAndShow(parent, option);
 	}
 
@@ -2105,19 +2105,21 @@ public class FxUtil {
 	 * 다른이름으로 저장 처리에 대한 공통 API
 	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 1. 13.
+	 * @작성일 : 2017. 1. 13.  <br/>
+	 * 				  2017. 10. 20  리턴값 추가. 
 	 * @param owner
 	 * @param model
+	 * @return 
 	 *
 	 */
-	public static <T> void saveAsFx(Window owner, SaveAsModel model) {
+	public static <T> File saveAsFx(Window owner, SaveAsModel model) {
 		if (model == null) {
 			throw new NullPointerException("SaveAsModel is null");
 		}
 
 		File saveAs = DialogUtil.showFileSaveCheckDialog(owner, model.getFileChooserOption());
 		if (saveAs == null)
-			return;
+			return null;
 
 		if (!saveAs.exists()) {
 			try {
@@ -2136,6 +2138,8 @@ public class FxUtil {
 			FileUtil.writeFile(saveAs, model.getContent(), model.getEncoding(), model.onError());
 			model.onSuccess(saveAs);
 		}
+		
+		return saveAs;
 
 	}
 
