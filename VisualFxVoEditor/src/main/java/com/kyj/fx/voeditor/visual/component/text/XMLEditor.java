@@ -12,12 +12,14 @@ import org.fxmisc.richtext.StyleSpansBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.tree.XMLTreeView;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.util.XMLFormatter;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -45,6 +47,7 @@ public class XMLEditor extends BorderPane {
 	private static final int GROUP_ATTRIBUTE_VALUE = 3;
 
 	private CodeArea codeArea;
+	// private XMLTreeView xmlTreeView;
 	private CodeAreaHelper<CodeArea> codeHelperDeligator;
 
 	public XMLEditor() {
@@ -65,6 +68,20 @@ public class XMLEditor extends BorderPane {
 					e.setOnAction(evt -> FxUtil.EasyFxUtils.showApplicationCode(codeArea.getText()));
 					contextMenu.getItems().add(e);
 				}
+
+				{
+					MenuItem e = new MenuItem("Show XML Structure");
+					e.setOnAction(evt -> {
+						XMLTreeView xmlTreeView = new XMLTreeView();
+						xmlTreeView.setXml(getText());
+						xmlTreeView.setPrefSize(1200d, 800d);
+						FxUtil.createStageAndShow(xmlTreeView, stage -> {
+							stage.setTitle("XML Structure");
+							stage.initOwner(FxUtil.getWindow(XMLEditor.this));
+						});
+					});
+					contextMenu.getItems().add(e);
+				}
 			}
 		});
 
@@ -75,7 +92,11 @@ public class XMLEditor extends BorderPane {
 			codeArea.setStyleSpans(0, computeHighlighting(newText));
 		});
 
+		// xmlTreeView = new XMLTreeView();
+		// SplitPane sp = new SplitPane(codeArea, xmlTreeView);
+
 		setCenter(codeArea);
+
 		this.getStylesheets().add(JavaTextArea.class.getResource("xml-highlighting.css").toExternalForm());
 
 	}
@@ -85,11 +106,10 @@ public class XMLEditor extends BorderPane {
 	}
 
 	public void setText(String text) {
-		// this.codeArea.insertText(0, text);
 		this.codeArea.replaceText(text);
 	}
 
-	private XMLFormatter formatter = new XMLFormatter();;
+	private XMLFormatter formatter = new XMLFormatter();
 
 	/**
 	 * 키클릭 이벤트 처리
@@ -101,9 +121,9 @@ public class XMLEditor extends BorderPane {
 	public void codeAreaKeyClick(KeyEvent e) {
 		codeHelperDeligator.codeAreaKeyClick(e);
 
-		// do xml format.
+		// CTRL + SHIFT + F do xml format.
 		if (e.getCode() == KeyCode.F && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
-			if(e.isConsumed())
+			if (e.isConsumed())
 				return;
 			doformat();
 			e.consume();
@@ -111,12 +131,12 @@ public class XMLEditor extends BorderPane {
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(XMLEditor.class);
-	
+
 	/**
 	 * 
-	 * 17.09.07 포멧팅을 시도하면서 에러가 발생하는 경우 기존 텍스트에 대한 상태를 변경하지않게 하기위해 
-	 * try ~ catch문을 추가적으로 작성. 
-	 *   
+	 * 17.09.07 포멧팅을 시도하면서 에러가 발생하는 경우 기존 텍스트에 대한 상태를 변경하지않게 하기위해 try ~ catch문을
+	 * 추가적으로 작성.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 9. 1.
 	 */

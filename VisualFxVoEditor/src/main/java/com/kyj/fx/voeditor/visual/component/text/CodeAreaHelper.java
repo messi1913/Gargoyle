@@ -131,13 +131,13 @@ public class CodeAreaHelper<T extends CodeArea> {
 		codeArea.getUndoManager().mark();
 		codeArea.clear();
 		codeArea.replaceText(0, 0, content);
-		codeArea.getUndoManager().mark();
+//		codeArea.getUndoManager().mark();
 	}
 
 	public void setContent(int start, int end, String text) {
 		codeArea.getUndoManager().mark();
 		codeArea.replaceText(start, end, text);
-		codeArea.getUndoManager().mark();
+//		codeArea.getUndoManager().mark();
 	}
 
 	public String getSqlFormat(String sql) {
@@ -153,7 +153,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 	public void appendContent(String content) {
 		codeArea.getUndoManager().mark();
 		codeArea.appendText(content);
-		codeArea.getUndoManager().mark();
+//		codeArea.getUndoManager().mark();
 	}
 
 	public String getSelectedText() {
@@ -278,7 +278,9 @@ public class CodeAreaHelper<T extends CodeArea> {
 				toLowercaseEvent(new ActionEvent());
 				e.consume();
 			}
-		} else if (KeyCode.V == e.getCode() && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
+		}
+		//CTRL + SHIFT + V
+		else if (KeyCode.V == e.getCode() && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
 			if (e.isConsumed())
 				return;
 

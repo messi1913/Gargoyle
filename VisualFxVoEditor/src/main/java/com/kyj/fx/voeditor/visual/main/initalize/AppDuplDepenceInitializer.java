@@ -101,20 +101,7 @@ public abstract class AppDuplDepenceInitializer implements Initializable, Except
 		}, e -> handle(e));
 
 		newThread.setName("Application Duplication Check Thread - Gargoyle");
-		// Thread thread = new Thread(new Runnable() {
-		// @Override
-		// public void run() {
-		//
-		// try {
-		// LOGGER.debug("중복실행 방지처리 시작.");
-		// local.accept();
-		// } catch (IOException e) {
-		// handle(e);
-		// }
-		//
-		// }
-		// }, "Application Duplication Check Thread - Gargoyle");
-		// thread.setDaemon(true);
+		newThread.setDaemon(true);
 		newThread.start();
 
 		Main.addPrimaryStageCloseListener(this);
