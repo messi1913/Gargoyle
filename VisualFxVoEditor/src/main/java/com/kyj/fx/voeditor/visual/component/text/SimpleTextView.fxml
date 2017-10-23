@@ -29,6 +29,9 @@
 			<menus>
 				<Menu mnemonicParsing="false" text="File">
 					<items>
+                  <MenuItem fx:id="miNew" mnemonicParsing="false" onAction="#miNewOnAction" text="New" />
+                  <MenuItem fx:id="miOpen" mnemonicParsing="false" onAction="#miOpenOnAction" text="Open" />
+                  <MenuItem fx:id="miSave" mnemonicParsing="false" onAction="#miSaveOnAction" text="Save" />
 						<MenuItem fx:id="miSaveAs" mnemonicParsing="false" onAction="#miSaveAsOnAction" text="Save As" />
 					</items>
 				</Menu>

@@ -7,9 +7,11 @@
 package com.kyj.fx.voeditor.visual.component.text;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.function.Consumer;
 
@@ -33,13 +35,17 @@ import com.kyj.fx.voeditor.visual.framework.word.HtmlTextToMimeAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.MimeToHtmlAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.NamoMimeToHtmlAdapter;
 import com.kyj.fx.voeditor.visual.framework.word.SimpleWordAdapter;
+import com.kyj.fx.voeditor.visual.functions.LoadFileOptionHandler;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil.SaveAsModel;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.util.XMLFormatter;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -51,8 +57,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
@@ -71,11 +75,15 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 	private static Logger LOGGER = LoggerFactory.getLogger(SimpleTextView.class);
 
 	/**
+	 * @최초생성일 2017. 10. 20.
+	 */
+	public static final String APP_NAME = "SimpleTextView";
+	/**
 	 * @최초생성일 2016. 10. 6.
 	 */
 	private static final String POSISION_FORMAT = "line : %d selectionStart : %d selectionEnd : %d column : %d  anchor : %d caret : %d";
 
-	private String content;
+	// private String content;
 	private boolean showButtons;
 	// private TextArea javaTextArea;
 	protected CodeArea codeArea;
@@ -111,7 +119,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 	}
 
 	public SimpleTextView(String content, boolean showButtons, ExceptionHandler handler) {
-		this.content = content;
+		// this.content = content;
 		this.showButtons = showButtons;
 
 		FXMLLoader loader = new FXMLLoader();
@@ -121,6 +129,8 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 
 		try {
 			loader.load();
+			codeArea.appendText(content);
+
 		} catch (Exception e) {
 			if (handler == null) {
 				e.printStackTrace();
@@ -147,7 +157,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				//Tab 없이 처리되는 클래스들도 있음.... 
+				// Tab 없이 처리되는 클래스들도 있음....
 				DockTab tab2 = SimpleTextView.this.tab;
 				if (tab2 != null) {
 					if (tab2.getText().charAt(0) == '*') {
@@ -159,10 +169,28 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 
 			}
 		});
+
+		codeArea.setOnKeyPressed(ev -> {
+
+			if (ev.getCode() == KeyCode.S && ev.isControlDown()) {
+				if (ev.isConsumed())
+					return;
+				miSaveOnAction();
+				ev.consume();
+			} else if (ev.getCode() == KeyCode.N && ev.isControlDown()) {
+				if (ev.isConsumed())
+					return;
+
+				miNewOnAction();
+				ev.consume();
+			}
+
+		});
 		initHelpers();
 		initGraphics();
 
-		miSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
+		// miSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.S,
+		// KeyCombination.CONTROL_DOWN));
 
 	}
 
@@ -238,8 +266,6 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 			hboxButtons.setMaxHeight(0d);
 			hboxButtons.setPrefHeight(0d);
 		}
-
-		codeArea.appendText(content);
 
 		codeArea.selectionProperty().addListener((oba, oldval, newval) -> {
 			int start = newval.getStart();
@@ -418,6 +444,26 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 		}
 	}
 
+	private ObjectProperty<File> saveTemp = new SimpleObjectProperty<>();
+
+	@FXML
+	public void miSaveOnAction() {
+		File file = saveTemp.get();
+		if (file == null || !file.exists()) {
+			miSaveAsOnAction();
+		} else {
+			try {
+				FileUtil.writeFile(file, this.codeArea.getText(), StandardCharsets.UTF_8);
+				if (tab != null) {
+					tab.setText(file.getName());
+				}
+
+			} catch (IOException e) {
+				DialogUtil.showExceptionDailog(e);
+			}
+		}
+	}
+
 	/**
 	 * menuItem 다른이름으로 저장.
 	 * 
@@ -426,7 +472,9 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 	 */
 	@FXML
 	public void miSaveAsOnAction() {
-		FxUtil.saveAsFx(getScene().getWindow(), new SaveAsModel() {
+
+		File saveAsFx = FxUtil.saveAsFx(getScene().getWindow(), new SaveAsModel() {
+
 			@Override
 			public String getContent() {
 				return codeArea.getText();
@@ -441,11 +489,14 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 
 			@Override
 			public void onSuccess(File f) {
-				if(tab!=null)
+				if (tab != null) {
 					tab.setText(f.getName());
+				}
+
 			}
 
 		});
+		saveTemp.set(saveAsFx);
 
 		// File saveAs =
 		// DialogUtil.showFileSaveCheckDialog(getScene().getWindow(),
@@ -494,7 +545,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 	public void miToHtmlCodeOnAction() {
 
 		try {
-			MimeToHtmlAdapter adapter = new MimeToHtmlAdapter(content);
+			MimeToHtmlAdapter adapter = new MimeToHtmlAdapter(this.codeArea.getText());
 			String content = adapter.getContent();
 			codeArea.getUndoManager().mark();
 			codeArea.replaceText(content);
@@ -629,6 +680,24 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 		}
 	}
 
+	@FXML
+	public void miOpenOnAction() {
+		File file = DialogUtil.showFileDialog(chooser -> {
+		});
+
+		if (file != null && file.exists()) {
+			this.codeArea.replaceText(FileUtil.readFile(file, LoadFileOptionHandler.getDefaultHandler()));
+
+			this.saveTemp.set(file);
+
+			if (this.tab != null) {
+				tab.setText(file.getName());
+			}
+
+		}
+
+	}
+
 	private DockTabPane tabpane;
 
 	@Override
@@ -642,6 +711,11 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 	@Override
 	public void setTab(DockTab tab) {
 		this.tab = tab;
+	}
+
+	@FXML
+	public void miNewOnAction() {
+		SharedMemory.getSystemLayoutViewController().miSimpleTextViewOnAction();
 	}
 
 }
