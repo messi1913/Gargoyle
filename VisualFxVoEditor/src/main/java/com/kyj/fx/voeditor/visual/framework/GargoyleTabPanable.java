@@ -17,7 +17,23 @@ import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
  */
 public interface GargoyleTabPanable {
 
+	/**
+	 * Gargoyle의 메인에서 현재 tabpane을 추가. <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 20.
+	 * @param tabpane
+	 */
 	public void setTabPane(DockTabPane tabpane);
 
+	/**
+	 * 
+	 * Gargoyle의 메인에서 현재 tab을 추가.(활성화된 탭) <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 20.
+	 * @param tab
+	 */
 	public void setTab(DockTab tab);
+
 }
