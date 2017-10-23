@@ -9,6 +9,9 @@ package com.kyj.fx.voeditor.visual.component.sql.table;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.fxml.FXML;
@@ -21,7 +24,9 @@ import javafx.scene.control.TextField;
  * @author KYJ
  *
  */
-public abstract class AbstractTableBaseInformationController extends AbstractTableInfomation{
+public abstract class AbstractTableBaseInformationController extends AbstractTableInfomation {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTableBaseInformationController.class);
 
 	public static final String KEY_TABLE_BASE_INFORMATION = TableInformationFrameView.KEY_TABLE_BASE_INFORMATION;
 
@@ -87,12 +92,13 @@ public abstract class AbstractTableBaseInformationController extends AbstractTab
 		this.txtTableName.setText(tableName);
 
 		String sql = getTableCommentSQL(catalog, databaseName, tableName);
-		if (sql != null) {
+		if (ValueUtil.isNotEmpty(sql)) {
 			List<Map<String, Object>> query = this.parent.query(sql);
 			String comment = getTableComment(query);
 			txtComments.setText(comment);
+		} else {
+			LOGGER.error("SQL IS EMPTY.");
 		}
-
 	}
 
 	@Override
