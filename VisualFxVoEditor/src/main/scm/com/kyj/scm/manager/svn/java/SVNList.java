@@ -131,7 +131,10 @@ class SVNList extends AbstractSVN implements IListCommand<String, List<String>> 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+//			_path = JavaSVNManager.relativePath(getSvnURL().toString(), _path, true);
 
+//			getSvnURL().
 			repository.getDir(_path, parseLong, true, list);
 
 			if (isRecursive) {

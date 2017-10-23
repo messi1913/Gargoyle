@@ -13,17 +13,17 @@ import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
+import org.tmatesoft.svn.core.internal.util.SVNURLUtil;
 import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.AbstractScm;
 import com.kyj.scm.manager.core.commons.DimKeywords;
 import com.kyj.scm.manager.core.commons.SCMCommonable;
-
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * SVN에 접속하기 위한 메타정보를 처리한다.
@@ -66,14 +66,14 @@ abstract class AbstractSVN extends AbstractScm implements SCMCommonable, DimKeyw
 		if (url == null || url.toString().trim().isEmpty())
 			throw new RuntimeException("does not exist url");
 
-		//		Object userId = this.properties.get(SCMCommonable.SVN_USER_ID);
-		//		if (userId == null || userId.toString().trim().isEmpty())
-		//			throw new RuntimeException("does not exist userId");
+		// Object userId = this.properties.get(SCMCommonable.SVN_USER_ID);
+		// if (userId == null || userId.toString().trim().isEmpty())
+		// throw new RuntimeException("does not exist userId");
 		//
-		//		Object userPass = this.properties.get(SCMCommonable.SVN_USER_PASS);
-		//		if (userPass == null || userPass.toString().trim().isEmpty()) {
-		//			throw new RuntimeException("does not exist userPassword");
-		//		}
+		// Object userPass = this.properties.get(SCMCommonable.SVN_USER_PASS);
+		// if (userPass == null || userPass.toString().trim().isEmpty()) {
+		// throw new RuntimeException("does not exist userPassword");
+		// }
 
 	}
 
@@ -102,11 +102,11 @@ abstract class AbstractSVN extends AbstractScm implements SCMCommonable, DimKeyw
 			DefaultSVNOptions options = new DefaultSVNOptions();
 			svnManager = SVNClientManager.newInstance(options, authManager);
 
-			//			svnManager.dispose();
-			//			repository.closeSession();
+			// svnManager.dispose();
+			// repository.closeSession();
 		} catch (SVNException e) {
 			LOGGER.error(ValueUtil.toString(e));
-			//			throw new RuntimeException(e);
+			// throw new RuntimeException(e);
 		}
 
 	}

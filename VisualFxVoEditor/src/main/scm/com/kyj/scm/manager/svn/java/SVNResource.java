@@ -13,7 +13,6 @@ import java.util.Properties;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNInfo;
 import org.tmatesoft.svn.core.wc.SVNRevision;
@@ -45,8 +44,8 @@ class SVNResource extends AbstractSVN {
 	 * @throws SVNException
 	 */
 	public boolean isExists(String relativePath) throws Exception {
-		//		ArrayList<Object> dirEntries = new ArrayList<>();
-		//		getRepository().getDir(relativePath, -1, null, dirEntries);
+		// ArrayList<Object> dirEntries = new ArrayList<>();
+		// getRepository().getDir(relativePath, -1, null, dirEntries);
 		SVNNodeKind checkPath = getRepository().checkPath(relativePath, -1);
 		if (checkPath == SVNNodeKind.FILE || checkPath == SVNNodeKind.DIR)
 			return true;
@@ -113,7 +112,7 @@ class SVNResource extends AbstractSVN {
 		String decodedString = location.toDecodedString();
 		String uriEncodedPath = location.getURIEncodedPath();
 		String rootUrl = decodedString.replaceAll(uriEncodedPath, "");
-		return rootUrl;
+		return decodedString;
 	}
 
 	/**
@@ -164,15 +163,16 @@ class SVNResource extends AbstractSVN {
 
 		if (getJavaSVNManager().isHttp() || getJavaSVNManager().isHttps()) {
 
-			//http or https 프로토콜은 아래 함수 인자에 false만줘도 리턴되는 값이 있으나 svn:// 프로토콜은 true로 줘야함.
+			// http or https 프로토콜은 아래 함수 인자에 false만줘도 리턴되는 값이 있으나 svn:// 프로토콜은
+			// true로 줘야함.
 			SVNURL repoRoot = getRepository().getRepositoryRoot(false);
 			if (repoRoot == null)
 				repoRoot = getRepository().getRepositoryRoot(true);
 
-			//실제 root의 경로만 리턴받음.
+			// 실제 root의 경로만 리턴받음.
 			String rootPath = repoRoot.toString();
 
-			//루트로부터 상대경로만 뽑아내고 리턴.
+			// 루트로부터 상대경로만 뽑아내고 리턴.
 			int indexOf = relativePath.indexOf(rootPath) + rootPath.length();
 			repositoryPath = relativePath.substring(indexOf);
 
@@ -183,6 +183,7 @@ class SVNResource extends AbstractSVN {
 
 	/**
 	 * JavaSVNManager를 이용하여 아래 값을 체크할것.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 12.
 	 * @return
@@ -194,6 +195,7 @@ class SVNResource extends AbstractSVN {
 
 	/**
 	 * JavaSVNManager를 이용하여 아래 값을 체크할것.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 13.
 	 * @return
@@ -202,4 +204,5 @@ class SVNResource extends AbstractSVN {
 		String protocol = getRepository().getLocation().getProtocol();
 		return "https".equals(protocol);
 	}
+
 }

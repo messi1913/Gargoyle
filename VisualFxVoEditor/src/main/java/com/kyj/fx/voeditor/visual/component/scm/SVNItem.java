@@ -130,6 +130,8 @@ public class SVNItem implements SCMItem<SVNItem> {
 		 * new SVNRepository("", url.toString(), manager);
 		 */
 
+		_path = JavaSVNManager.relativePath(svnUrl, _path, true);
+		
 		//		if(_path.startsWith("/"))
 		//			_path = _path.substring(1);
 

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.wc.SVNLogClient;
 import org.tmatesoft.svn.core.wc.SVNRevision;
@@ -91,6 +92,10 @@ class SVNLog extends AbstractSVN implements ILogCommand<String, List<SVNLogEntry
 				e.printStackTrace();
 			}
 
+//			SVNURL svnURL = getSvnURL();
+//			_path = JavaSVNManager.relativePath(svnURL.toString(), _path, true);
+			
+			
 			logClient.doLog(getSvnURL(), new String[] { _path }, SVNRevision.create(Long.parseLong(revision)),
 					SVNRevision.create(Long.parseLong(revision) == -1 ? 0 : Long.parseLong(revision)), SVNRevision.HEAD, true, false, 100L,
 					handler);

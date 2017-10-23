@@ -22,6 +22,7 @@ import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -211,9 +212,12 @@ public class SVNViewer extends BorderPane {
 			long revision = svnLogEntry.getRevision();
 			long revision2 = svnLogEntry2.getRevision();
 			SVNItem svnItem = lastSelectedSVNItem.get();
-
-			String cat = svnItem.getManager().cat(svnItem.getPath(), String.valueOf(revision));
-			String cat2 = svnItem.getManager().cat(svnItem.getPath(), String.valueOf(revision2));
+			
+			String rootUrl = svnItem.getManager().getRootUrl();
+			
+			
+			String cat = svnItem.getManager().cat(JavaSVNManager.relativePath(rootUrl, svnItem.getPath(), true), String.valueOf(revision));
+			String cat2 = svnItem.getManager().cat(JavaSVNManager.relativePath(rootUrl, svnItem.getPath(), true), String.valueOf(revision2));
 
 			try {
 
@@ -264,7 +268,12 @@ public class SVNViewer extends BorderPane {
 			//			lineHist.scaleYProperty().set(0.7);
 			lineHist.autosize();
 			lineHist.setLegendVisible(false);
-			List<SVNLogEntry> logs = item.getManager().log(item.getPath());
+			
+			
+			String relativePath = JavaSVNManager.relativePath(item.getManager().getRootUrl(), item.getPath(), true);
+			
+			List<SVNLogEntry> logs = item.getManager().log(relativePath);
+//			List<SVNLogEntry> logs = item.getManager().log(item.getPath());
 
 			tbRevision.getItems().addAll(logs.stream().sorted(sortUpper).collect(Collectors.toList()));
 
@@ -310,7 +319,7 @@ public class SVNViewer extends BorderPane {
 
 			borChart.setCenter(lineHist);
 
-			String cat = item.getManager().cat(item.getPath());
+			String cat = item.getManager().cat(relativePath);
 			//			String simpleName = item.getSimpleName();
 			javaTextAre.setContent(cat);
 
@@ -364,6 +373,7 @@ public class SVNViewer extends BorderPane {
 
 					long revision = selectedItem.getRevision();
 					String path = svnItem.getPath();
+					path = JavaSVNManager.relativePath(svnItem.getManager().getRootUrl(), path, true);
 					String cat = svnItem.getManager().cat(path, String.valueOf(revision));
 					javaTextAre.setContent(cat);
 					tabPaneSVN.getSelectionModel().select(tabHistChart);

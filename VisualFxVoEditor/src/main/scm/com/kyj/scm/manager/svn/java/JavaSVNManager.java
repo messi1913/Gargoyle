@@ -28,8 +28,10 @@ import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.internal.util.SVNURLUtil;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.AbstractScmManager;
 import com.kyj.scm.manager.core.commons.SCMKeywords;
 import com.kyj.scm.manager.core.commons.ScmDirHandler;
@@ -72,7 +74,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	 * @최초생성일 2016. 12. 13.
 	 */
 	private boolean isHttps;
-	/*[끝] SVN URL의 특이 프로토콜에 대한 체크를 위해 추가 변수 생성*/
+	/* [끝] SVN URL의 특이 프로토콜에 대한 체크를 위해 추가 변수 생성 */
 
 	public JavaSVNManager(Properties properties) {
 		super();
@@ -103,6 +105,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 
 	/**
 	 * create new instance
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 1.
 	 * @param url
@@ -145,15 +148,15 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	 */
 	public String getUrl() {
 		return this.svnResource.getUrl();
-		//		Object objURL = this.properties.get(SVN_URL);
-		//		if (objURL == null)
-		//			throw new GagoyleParamEmptyException("SVN URL IS EMPTY.");
-		//		return objURL.toString();
+		// Object objURL = this.properties.get(SVN_URL);
+		// if (objURL == null)
+		// throw new GagoyleParamEmptyException("SVN URL IS EMPTY.");
+		// return objURL.toString();
 	}
 
 	public String getUserId() {
 		return this.svnResource.getUserId();
-		//		return getProperties().get(SVN_USER_ID).toString();
+		// return getProperties().get(SVN_USER_ID).toString();
 	}
 
 	@Override
@@ -220,6 +223,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 
 	/**
 	 * 메타정보를 포함하는 SVN 엔트리 반환
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 3.
 	 * @param path
@@ -231,6 +235,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 
 	/**
 	 * 메타정보를 포함하는 SVN 엔트리 반환
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 3.
 	 * @param path
@@ -243,6 +248,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 
 	/**
 	 * 메타정보를 포함하는 SVN 엔트리 반환
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 3.
 	 * @param path
@@ -370,7 +376,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	 * @return
 	 ********************************/
 	public List<SVNLogEntry> logFileSystem(File path, Date endDate, Consumer<Exception> exceptionHandler) {
-		return logCommand.logFileSystem( /*only one target supported.*/new File[] { path }, 0, endDate, exceptionHandler);
+		return logCommand.logFileSystem( /* only one target supported. */new File[] { path }, 0, endDate, exceptionHandler);
 	}
 
 	/**
@@ -551,7 +557,8 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	 * @throws SVNException
 	 * @throws IOException
 	 *
-	 * @deprecated 서버간의 API연계에서 사용되면 안됨. 해당 API가 사용되는 때는 FileSystem으로 버젼관리가 되는 상황에서만 사용되야함. (( 로컬시스템으로 svn파일이 관리되는 경우에만 사용. ))
+	 * @deprecated 서버간의 API연계에서 사용되면 안됨. 해당 API가 사용되는 때는 FileSystem으로 버젼관리가 되는
+	 *             상황에서만 사용되야함. (( 로컬시스템으로 svn파일이 관리되는 경우에만 사용. ))
 	 */
 	@Deprecated
 	public SVNCommitInfo commitClient(File[] paths, String commitMessage) throws SVNException, IOException {
@@ -639,9 +646,10 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	}
 
 	/********************************
-	 * 작성일 :  2016. 7. 31. 작성자 : KYJ
+	 * 작성일 : 2016. 7. 31. 작성자 : KYJ
 	 *
 	 * SVN 서버 접속 여부를 확인
+	 * 
 	 * @throws SVNException
 	 ********************************/
 	public void ping() throws SVNException {
@@ -649,7 +657,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	}
 
 	/********************************
-	 * 작성일 :  2016. 7. 31. 작성자 : KYJ
+	 * 작성일 : 2016. 7. 31. 작성자 : KYJ
 	 *
 	 * SVN 서버 RepositoryUUID를 리턴.
 	 *
@@ -661,9 +669,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	}
 
 	/**
-	 * SVN 서버에 연결된 루트 디렉토리에 속하는
-	 * 로컬 파일시스템의 파일에 해당하는 SVN서버 경로를
-	 * 리턴한다.
+	 * SVN 서버에 연결된 루트 디렉토리에 속하는 로컬 파일시스템의 파일에 해당하는 SVN서버 경로를 리턴한다.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 1.
@@ -676,9 +682,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	}
 
 	/**
-	 * 현재 객체에 설정된 Properties를 리턴한다.
-	 * 원본 데이터가 변경되자않게하기위해
-	 * 객체를 새로 생성후 반환한다.
+	 * 현재 객체에 설정된 Properties를 리턴한다. 원본 데이터가 변경되자않게하기위해 객체를 새로 생성후 반환한다.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 9.
@@ -691,6 +695,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 
 	/**
 	 * 상대경로를 구함.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 13.
 	 * @param path
@@ -703,6 +708,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 
 	/**
 	 * svnurl이 http 프로토콜인지 확인
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 13.
 	 * @return
@@ -713,6 +719,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 
 	/**
 	 * svnurl이 https 프로토콜인지 확인
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 13.
 	 * @return
@@ -726,4 +733,29 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 		return new File(SystemUtils.getJavaIoTmpDir(), "svn");
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 23. 
+	 * @param parentURL
+	 * @param childURL
+	 * @param urlEncoding
+	 * @return
+	 */
+	public static String relativePath(String parentURL, String childURL, boolean urlEncoding) {
+		String relativePath = childURL;
+		// 상대경로로 수정
+		if (ValueUtil.isNotEmpty(childURL)) {
+			try {
+				SVNURL pa = SVNURL.parseURIEncoded(parentURL);
+				SVNURL s = SVNURL.parseURIEncoded(childURL);
+				String relativeURL = SVNURLUtil.getRelativeURL(pa, s, true);
+				// System.out.println(relativeURL);
+				relativePath = relativeURL;
+			} catch (SVNException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return relativePath;
+	}
 }
