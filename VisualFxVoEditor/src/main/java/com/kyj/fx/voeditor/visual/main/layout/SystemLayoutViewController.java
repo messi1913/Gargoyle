@@ -324,7 +324,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 							try {
 								Class<?> nodeClass = jar.getNodeClass();
 								Object newInstance = jar.loader.loadClass(nodeClass.getName()).newInstance();
-								//								Object newInstance = jar.getNodeClass().newInstance();
+								// Object newInstance =
+								// jar.getNodeClass().newInstance();
 
 								if (newInstance instanceof CloseableParent<?>) {
 									loadNewSystemTab(jar.getDisplayMenuName(), (CloseableParent<?>) newInstance);
@@ -367,7 +368,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 		});
 
-		//tab image 아이콘 처리
+		// tab image 아이콘 처리
 		try (InputStream is = getClass().getResourceAsStream("/META-INF/images/eclipse/eview16/packages.gif")) {
 			tabPackageExplorer.setGraphic(new ImageView(new Image(is)));
 		} catch (IOException e) {
@@ -537,14 +538,15 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	private void openPdf(File file) throws Exception {
 		try {
 
-			//			CloseableParent<PDFImageBasePane> pdfPane = new CloseableParent<PDFImageBasePane>(new PDFImageBasePane(file)) {
+			// CloseableParent<PDFImageBasePane> pdfPane = new
+			// CloseableParent<PDFImageBasePane>(new PDFImageBasePane(file)) {
 			//
-			//				@Override
-			//				public void close() throws IOException {
-			//					LOGGER.debug("Close doc . reuqest ");
-			//					getParent().close();
-			//				}
-			//			};
+			// @Override
+			// public void close() throws IOException {
+			// LOGGER.debug("Close doc . reuqest ");
+			// getParent().close();
+			// }
+			// };
 
 			PDFImageBasePaneWrapper pane = new PDFImageBasePaneWrapper(file);
 			loadNewSystemTab(file.getName(), pane);
@@ -599,8 +601,9 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	/**
 	 * 
 	 * ZIP 파일을 연다.
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 6. 15. 
+	 * @작성일 : 2017. 6. 15.
 	 * @param file
 	 */
 	private void openZip(File file) {
@@ -620,8 +623,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		try {
 			String content1 = FileUtils.readFileToString(file, "UTF-8");
 			JavaTextView javaTextView = new JavaTextView(content1, false);
-			//2016-10-03 editable 주석 해제.
-			//			javaTextView.setEditable(false);
+			// 2016-10-03 editable 주석 해제.
+			// javaTextView.setEditable(false);
 			loadNewSystemTab(file.getName(), javaTextView);
 		} catch (IOException e1) {
 			LOGGER.debug(ValueUtil.toString(e1));
@@ -692,7 +695,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		menuItemOpenWithSceneBuilder.setOnAction(this::menuItemOpenWithSceneBuilderOnAction);
 		menuOpenWidth.setOnShowing(event -> {
 
-			/*[시작]씬빌더 열기 기능 처리*/
+			/* [시작]씬빌더 열기 기능 처리 */
 			String sceneBuilderLocation = ResourceLoader.getInstance().get(ResourceLoader.SCENEBUILDER_LOCATION);
 			TreeItem<JavaProjectFileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
 			boolean isRemoveOpenWidthSceneBuilderMenuItem = true;
@@ -720,7 +723,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 			if (isRemoveOpenWidthSceneBuilderMenuItem)
 				menuOpenWidth.getItems().remove(menuItemOpenWithSceneBuilder);
-			/*[끝]씬빌더 열기 기능 처리*/
+			/* [끝]씬빌더 열기 기능 처리 */
 
 		});
 
@@ -730,7 +733,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		fileTreeContextMenu.setOnShowing(ev -> {
 			TreeItem<JavaProjectFileWrapper> selectedTreeItem = this.treeProjectFile.getSelectionModel().getSelectedItem();
 
-			/*[시작] SVN Graph 관련 Disable 여부 체크*/
+			/* [시작] SVN Graph 관련 Disable 여부 체크 */
 			boolean isDisableSCMGraphsMenuItem = true;
 			if (selectedTreeItem != null) {
 				menuRunAs.getItems().clear();
@@ -739,17 +742,17 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				File file = fileWrapper.getFile();
 				if (fileWrapper.isSVNConnected())
 					isDisableSCMGraphsMenuItem = false;
-				//				if(fileWrapper.is)
+				// if(fileWrapper.is)
 
 				if (fileWrapper.isJavaProjectFile()) {
 					LOGGER.debug("isJavaProjectFile true");
-					//TODO 자바 프로젝트 파일인경우 처리할 항목 기술.
+					// TODO 자바 프로젝트 파일인경우 처리할 항목 기술.
 					menuRunAs.getItems().add(new MenuItem("Java Application"));
 				}
 
 				if (selectedTreeItem instanceof JavaProjectMemberFileTreeItem) {
 					LOGGER.debug("projectFile Member true");
-					//TODO 메인함수인지 아닌지 여부를 결정해서 Java Application 기능 처리.
+					// TODO 메인함수인지 아닌지 여부를 결정해서 Java Application 기능 처리.
 
 					if (FileUtil.isJavaFile(file)) {
 						MenuItem runJavaApp = new MenuItem("Java Application");
@@ -772,13 +775,13 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 					menuPMD.getItems().add(menuRunAllPmd);
 				}
 
-				//항상출력
+				// 항상출력
 				menuRunAs.getItems().add(new SeparatorMenuItem());
 				menuRunAs.getItems().add(new MenuItem("Run Configurations"));
 
 			}
 			menuItemSCMGraphs.setDisable(isDisableSCMGraphsMenuItem);
-			/*[끝] SVN Graph 관련 Disable 여부 체크*/
+			/* [끝] SVN Graph 관련 Disable 여부 체크 */
 
 		});
 		/***********************************************************************************/
@@ -828,8 +831,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		menuProperties.setOnAction(this::menuPropertiesOnAction);
 		chodeAnalysisMenuItem.setOnAction(this::menuItemCodeAnalysisMenuItemOnAction);
 
-		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem,
-				deleteFileMenuItem, /* voEditorMenuItem, daoWizardMenuItem, */
+		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem, deleteFileMenuItem, /*
+																													 * voEditorMenuItem,
+																													 * daoWizardMenuItem,
+																													 */
 				voEditorMenuItem, /* setVoEditorMenuItem, */ setDaoWizardMenuItem, chodeAnalysisMenuItem, makeProgramSpecMenuItem,
 				menuItemSCMGraphs, new SeparatorMenuItem(), refleshMenuItem, new SeparatorMenuItem(), menuPMD, new SeparatorMenuItem(),
 				menuRunAs, new SeparatorMenuItem(), menuProperties);
@@ -882,24 +887,26 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			refleshWorkspaceTreeItem(selectedItem);
 		});
 
-		//함수위치로 이동
-		//		deleteFileMenuItem.setOnAction(event -> {
-		//			TreeItem<FileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
-		//			if (selectedItem != null) {
-		//				File file = selectedItem.getValue().getFile();
-		//				if (file != null && file.exists()) {
-		//					Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("파일삭제.",
-		//							file.getName() + " 정말 삭제하시겠습니까? \n[휴지통에 보관되지않음.]");
-		//					showYesOrNoDialog.ifPresent(pair -> {
-		//						if ("Y".equals(pair.getValue())) {
-		//							TreeItem<FileWrapper> root = treeProjectFile.getRoot();
-		//							root.getChildren().remove(selectedItem);
-		//							file.delete();
-		//						}
-		//					});
-		//				}
-		//			}
-		//		});
+		// 함수위치로 이동
+		// deleteFileMenuItem.setOnAction(event -> {
+		// TreeItem<FileWrapper> selectedItem =
+		// treeProjectFile.getSelectionModel().getSelectedItem();
+		// if (selectedItem != null) {
+		// File file = selectedItem.getValue().getFile();
+		// if (file != null && file.exists()) {
+		// Optional<Pair<String, String>> showYesOrNoDialog =
+		// DialogUtil.showYesOrNoDialog("파일삭제.",
+		// file.getName() + " 정말 삭제하시겠습니까? \n[휴지통에 보관되지않음.]");
+		// showYesOrNoDialog.ifPresent(pair -> {
+		// if ("Y".equals(pair.getValue())) {
+		// TreeItem<FileWrapper> root = treeProjectFile.getRoot();
+		// root.getChildren().remove(selectedItem);
+		// file.delete();
+		// }
+		// });
+		// }
+		// }
+		// });
 
 		makeProgramSpecMenuItem.setOnAction(event -> {
 
@@ -985,8 +992,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			// 2016-10-14 kyj Resource 리로팅
 			SharedMemory.init();
 
-			//TODO 열러있던 탭을 모두 close, 이 처리가 되기전에 열려있는 창에대한 문구 표시 필요
-			//			tabPanWorkspace.getTabs().clear();
+			// TODO 열러있던 탭을 모두 close, 이 처리가 되기전에 열려있는 창에대한 문구 표시 필요
+			// tabPanWorkspace.getTabs().clear();
 
 		}
 	}
@@ -1000,8 +1007,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 */
 	@FXML
 	public void miAboutOnAction(ActionEvent e) {
-//		String url = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
-//		DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub : %s\nVersion : %s", url, Main.getVersion()));
+		// String url =
+		// ConfigResourceLoader.getInstance().get(ConfigResourceLoader.ABOUT_PAGE_URL);
+		// DialogUtil.showMessageDialog(String.format("Gagoyle\nGithub :
+		// %s\nVersion : %s", url, Main.getVersion()));
 		FxUtil.createStageAndShow(new GargoyleHelpComposite());
 	}
 
@@ -1065,16 +1074,16 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			ObservableList<DockTab> tabs = null;
 			while (true) {
 
-				//삭제처리이기때문에 배열을 지속적으로 다시 가져와야함.
+				// 삭제처리이기때문에 배열을 지속적으로 다시 가져와야함.
 				tabs = tabPanWorkspace.getTabs();
-				//WelCome Page는 닫지않음
+				// WelCome Page는 닫지않음
 				if (tabs.size() == 1)
 					break;
 
-				//WelCome Page -> 0 index므로 1번부터 조회
+				// WelCome Page -> 0 index므로 1번부터 조회
 				DockTab dockTab = tabs.get(1);
 
-				//선택된 탭이면 종료
+				// 선택된 탭이면 종료
 				if (selectedItem == dockTab)
 					break;
 
@@ -1101,7 +1110,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	public void closeTab(DockTab tab) {
 		if (tab != null) {
 
-			//WelCome Page는 닫지않음.
+			// WelCome Page는 닫지않음.
 			if (tabPanWorkspace.getTabs().indexOf(tab) == 0)
 				return;
 
@@ -1185,7 +1194,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 						else
 							file.delete();
 
-						TreeItem<JavaProjectFileWrapper> root = selectedItem.getParent();//treeProjectFile.getRoot();
+						TreeItem<JavaProjectFileWrapper> root = selectedItem.getParent();// treeProjectFile.getRoot();
 						root.getChildren().remove(selectedItem);
 
 					}
@@ -1197,6 +1206,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	/**
 	 * PMD 실행처리
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param e
@@ -1348,7 +1358,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			}
 		} else if (event.getCode() == KeyCode.DELETE && !event.isControlDown() && !event.isShiftDown() && !event.isAltDown()) {
 
-			//이벤트 발생시킴.
+			// 이벤트 발생시킴.
 			ActionEvent.fireEvent(tail -> tail.append((event1, tail1) -> {
 				deleteFileMenuItemOnAction((ActionEvent) event1);
 				return event1;
@@ -1473,12 +1483,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		tab.setContextMenu(closeContextMenu());
 
 		/*
-		 * 17.9.17 kyj 
-		 * 기능이 처리되지않음.
-		 * DragDrop 기능 설치.
+		 * 17.9.17 kyj 기능이 처리되지않음. DragDrop 기능 설치.
 		 * 
 		 */
-//		new DefaultFileDragDropHelper(tab.getContent());
+		// new DefaultFileDragDropHelper(tab.getContent());
 
 	}
 
@@ -1507,24 +1515,24 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				}
 
+				/*
+				 * DockTab tab = new DockTab(tabName, parent);
+				 * tab.setTooltip(new
+				 * Tooltip(loader.getController().getClass().getName()));
+				 * 
+				 * addTabItem(tab);
+				 * tab.getTabPane().getSelectionModel().select(tab);
+				 * 
+				 * // 리스너 호출. onParentloaded.forEach(v -> { v.onLoad(parent);
+				 * });
+				 * 
+				 * if (parent instanceof GargoyleTabPanable) {
+				 * GargoyleTabPanable _tabPanable = (GargoyleTabPanable) parent;
+				 * _tabPanable.setTab(tab);
+				 * _tabPanable.setTabPane(tabPanWorkspace); }
+				 */
 				DockTab tab = new DockTab(tabName, parent);
-				// 툴팁 처리 (클래스위치)
-				tab.setTooltip(new Tooltip(loader.getController().getClass().getName()));
-
-				addTabItem(tab);
-				tab.getTabPane().getSelectionModel().select(tab);
-
-				// 리스너 호출.
-				onParentloaded.forEach(v -> {
-					v.onLoad(parent);
-				});
-				
-				if(parent instanceof GargoyleTabPanable)
-				{
-					GargoyleTabPanable _tabPanable = (GargoyleTabPanable) parent;
-					_tabPanable.setTab(tab);
-					_tabPanable.setTabPane(tabPanWorkspace);
-				}
+				loadNewSystemTab(tabName, tab, null);
 			} catch (IOException e1) {
 				DialogUtil.showExceptionDailog(e1);
 			}
@@ -1532,8 +1540,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	}
 
 	/**
-	 * 탭에 대해 로드함.
-	 *
+	 * 탭에 대해 로드함. <br/>
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 11. 4.
 	 * @param tableName
@@ -1551,30 +1559,59 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				}
 
 				DockTab tab = new DockTab(tableName, parent);
-				// 툴팁 처리 (클래스위치)
-				tab.setTooltip(new Tooltip(parent.getClass().getName()));
-				addTabItem(tab);
-				if (skin != null) {
-					parent.getStylesheets().clear();
-					//					parent.getStylesheets().add(skin);
-					//					tab.getstyle.add(skin);
-				}
-				tabPanWorkspace.getSelectionModel().select(tab);
-
-				// 리스너 호출.
-				onParentloaded.forEach(v -> v.onLoad(parent));
-				// _parent.getStylesheets().clear();
-				
-				if(parent instanceof GargoyleTabPanable)
-				{
-					GargoyleTabPanable _tabPanable = (GargoyleTabPanable) parent;
-					_tabPanable.setTab(tab);
-					_tabPanable.setTabPane(tabPanWorkspace);
-				}
+				loadNewSystemTab(tableName, tab, skin);
 			} catch (Exception e1) {
 				DialogUtil.showExceptionDailog(e1);
 			}
 		});
+	}
+
+	/**
+	 * 탭 로드 <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 20.
+	 * @param tableName
+	 * @param tab
+	 */
+	public void loadNewSystemTab(String tabName, DockTab tab) {
+		loadNewSystemTab(tabName, tab, null);
+	}
+
+	/**
+	 * 탭 로드 <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 20.
+	 * @param tableName
+	 * @param tab
+	 * @param skin
+	 */
+	public void loadNewSystemTab(String tableName, DockTab tab, String skin) {
+
+		Parent parent = (Parent) tab.getContent();
+		// 툴팁 처리 (클래스위치)
+		tab.setTooltip(new Tooltip(parent.getClass().getName()));
+		addTabItem(tab);
+		if (skin != null) {
+			parent.getStylesheets().clear();
+		}
+		tabPanWorkspace.getSelectionModel().select(tab);
+
+		// 리스너 호출.
+		onParentloaded.forEach(v -> v.onLoad(parent));
+		// _parent.getStylesheets().clear();
+
+		List<Node> findAllByNodes = FxUtil.findAllByNodes(parent, n -> n instanceof Button);
+		findAllByNodes.forEach(btn -> {
+			btn.getStyleClass().add("button-gargoyle");
+		});
+
+		if (parent instanceof GargoyleTabPanable) {
+			GargoyleTabPanable _tabPanable = (GargoyleTabPanable) parent;
+			_tabPanable.setTab(tab);
+			_tabPanable.setTabPane(tabPanWorkspace);
+		}
 	}
 
 	/**
@@ -1604,8 +1641,6 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				Parent _parent = parent.getParent();
 
-				
-				
 				if (beforeParentLoad != null && beforeParentLoad.filter(_parent)) {
 					beforeParentLoad.beforeLoad(_parent);
 
@@ -1615,38 +1650,34 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				}
 
 				DockTab tab = new DockTab(tableName, _parent);
-				// 툴팁 처리 (클래스위치)
-				tab.setTooltip(new Tooltip(parent.getClass().getName()));
+				loadNewSystemTab(tableName, tab);
+				/*
+				 * DockTab tab = new DockTab(tableName, _parent); // 툴팁 처리
+				 * (클래스위치) tab.setTooltip(new
+				 * Tooltip(parent.getClass().getName()));
+				 * 
+				 * addTabItem(tab);
+				 * tabPanWorkspace.getSelectionModel().select(tab);
+				 * 
+				 * tab.setOnCloseRequest(ev -> { try { LOGGER.
+				 * debug("closeable parent on close request , tabName : {} ",
+				 * tableName); parent.close(); } catch (Exception e) {
+				 * LOGGER.error(ValueUtil.toString(e)); } });
+				 * 
+				 * // 리스너 호출. onParentloaded.forEach(v ->
+				 * v.onLoad(parent.getParent()));
+				 * 
+				 * List<Node> findAllByNodes = FxUtil.findAllByNodes(_parent, n
+				 * -> n instanceof Button); findAllByNodes.forEach(btn -> {
+				 * btn.getStyleClass().add("button-gargoyle"); });
+				 * 
+				 * if (_parent instanceof GargoyleTabPanable) {
+				 * GargoyleTabPanable _tabPanable = (GargoyleTabPanable)
+				 * _parent; _tabPanable.setTab(tab);
+				 * _tabPanable.setTabPane(tabPanWorkspace); }
+				 * 
+				 */
 
-				addTabItem(tab);
-				tabPanWorkspace.getSelectionModel().select(tab);
-
-				tab.setOnCloseRequest(ev -> {
-					try {
-						LOGGER.debug("closeable parent on close request , tabName : {} ", tableName);
-						parent.close();
-					} catch (Exception e) {
-						LOGGER.error(ValueUtil.toString(e));
-					}
-				});
-
-				// 리스너 호출.
-				onParentloaded.forEach(v -> v.onLoad(parent.getParent()));
-				// tab.getTabPane().getSelectionModel().select(tab);
-				// _parent.getScene().getStylesheets().clear();
-
-				List<Node> findAllByNodes = FxUtil.findAllByNodes(_parent, n -> n instanceof Button);
-				findAllByNodes.forEach(btn -> {
-					btn.getStyleClass().add("button-gargoyle");
-				});
-				
-				if(_parent instanceof GargoyleTabPanable)
-				{
-					GargoyleTabPanable _tabPanable = (GargoyleTabPanable) _parent;
-					_tabPanable.setTab(tab);
-					_tabPanable.setTabPane(tabPanWorkspace);
-				}
-				
 			} catch (Exception e1) {
 				DialogUtil.showExceptionDailog(e1);
 			}
@@ -1737,14 +1768,14 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			CommonsSqllPan sqlPane = CommonsSqllPan.getSqlPane();
 
 			loadNewSystemTab(String.format("Database[%s]", sqlPane.getClass().getSimpleName()), sqlPane);
-			//			Stage stage = new Stage();
-			//			sqlPane.setStage(stage);
-			//			Scene scene = new Scene(new BorderPane(sqlPane), 1100, 900);
-			//			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-			//			stage.setScene(scene);
-			//			stage.setAlwaysOnTop(false);
-			//			stage.initOwner(SharedMemory.getPrimaryStage());
-			//			stage.show();
+			// Stage stage = new Stage();
+			// sqlPane.setStage(stage);
+			// Scene scene = new Scene(new BorderPane(sqlPane), 1100, 900);
+			// scene.getStylesheets().add(SkinManager.getInstance().getSkin());
+			// stage.setScene(scene);
+			// stage.setAlwaysOnTop(false);
+			// stage.initOwner(SharedMemory.getPrimaryStage());
+			// stage.show();
 		} catch (Exception ex) {
 			LOGGER.error(ValueUtil.toString(ex));
 			DialogUtil.showExceptionDailog(ex);
@@ -1805,7 +1836,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			});
 
 			stage.show();
-			//			dbConsoleProperty.set(null);
+			// dbConsoleProperty.set(null);
 		} catch (Exception ex) {
 			DialogUtil.showExceptionDailog(ex);
 			LOGGER.error(ValueUtil.toString(ex));
@@ -1986,6 +2017,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	/**
 	 * 구글 트랜드 OPEN
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 4.
 	 */
@@ -2067,6 +2099,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	/**
 	 * 프로그램이 설치된 디렉토리를 open.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 12. 10.
 	 */
@@ -2077,6 +2110,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	/**
 	 * LogView
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 1. 16.
 	 */
@@ -2110,57 +2144,62 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 	/**
 	 * text viewer
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 7. 19. 
+	 * @작성일 : 2017. 7. 19.
 	 */
 	@FXML
 	public void miSimpleTextViewOnAction() {
-		loadNewSystemTab("Text Viewer", new SimpleTextView(""));
+		SimpleTextView newInstance = new SimpleTextView("");		
+		loadNewSystemTab(SimpleTextView.APP_NAME, newInstance);
 	}
 
 	/**
 	 * xml viewer
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 7. 19. 
+	 * @작성일 : 2017. 7. 19.
 	 */
 	@FXML
 	public void miXmlViewOnAction() {
 		loadNewSystemTab("XML Viewer", new XMLEditor());
 	}
-	
+
 	/**
 	 * 
 	 */
 	@FXML
-	public void miXlstConvertViewOnAction(){
+	public void miXlstConvertViewOnAction() {
 		loadNewSystemTab("XLST-Convert", new XsltTransformComposite());
 	}
-	
+
 	@FXML
-	public void miBase64ImageOnAction(){
+	public void miBase64ImageOnAction() {
 		loadNewSystemTab("Base64 <-> Image", new Base64ImageConvertComposte());
 	}
-	
+
 	@FXML
-	public void miHttpRequestOnAction(){
+	public void miHttpRequestOnAction() {
 		loadNewSystemTab("HttpUtil", new HttpActionComposite());
 	}
-	
+
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 10. 10. 
+	 * @작성일 : 2017. 10. 10.
 	 */
 	@FXML
 	public void miFileAnalysisViewOnAction() {
 		loadNewSystemTab("File Analysis View", new FilesAnalysisComposite());
 	}
-	
+
 	@FXML
-	public void miMailOnAction(){
+	public void miMailOnAction() {
 		loadNewSystemTab(MailViewCompositeWrapper.getName(), new MailViewCompositeWrapper());
 	}
+
 	/**
 	 * Java Application 실행처리.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 3. 6.
 	 * @param e
@@ -2173,7 +2212,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		}
 		if (selectedItem != null) {
 			JavaProjectFileWrapper value = selectedItem.getValue();
-			//			new EclipseJavaCompiler(value);
+			// new EclipseJavaCompiler(value);
 		}
 	}
 
