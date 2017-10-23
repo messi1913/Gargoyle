@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
+import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.loder.DynamicClassLoader;
 import com.kyj.fx.voeditor.visual.loder.ProjectInfo;
 import com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController;
@@ -147,6 +148,8 @@ public class SharedMemory {
 	}
 
 	public static void initLoad() {
+		
+		
 		Service<Void> serviceClasses = new Service<Void>() {
 
 			@Override
@@ -167,10 +170,12 @@ public class SharedMemory {
 					}
 
 				};
-
+				
+				
 				return task;
 			}
 		};
+		serviceClasses.setExecutor(ExecutorDemons.getGargoyleSystemExecutorSerivce());
 		serviceClasses.start();
 
 		Service<Void> serviceSources = new Service<Void>() {
@@ -197,6 +202,7 @@ public class SharedMemory {
 				return task;
 			}
 		};
+		serviceSources.setExecutor(ExecutorDemons.getGargoyleSystemExecutorSerivce());
 		serviceSources.start();
 	}
 
