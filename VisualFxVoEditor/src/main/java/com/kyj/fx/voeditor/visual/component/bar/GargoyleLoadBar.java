@@ -33,7 +33,8 @@ import javafx.stage.Window;
  */
 public abstract class GargoyleLoadBar<V> extends Service<V> {
 
-	public static final ExecutorService newSingleThreadExecutor = ExecutorDemons.newSingleThreadExecutor();
+	//기본 Executors로 변경
+	public static final ExecutorService newSingleThreadExecutor = ExecutorDemons.getGargoyleSystemExecutorSerivce();
 
 	private Task<V> task;
 	private Stage stage;
