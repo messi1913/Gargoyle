@@ -20,6 +20,7 @@ import javafx.scene.layout.BorderPane;
  * @author KYJ
  *
  */
+@Deprecated
 public abstract class BorderPaneOnRootBaseSkin extends BorderPane implements Skin<Control> {
 
 	protected BorderPaneOnRootBaseSkin() {
