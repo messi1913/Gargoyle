@@ -952,7 +952,7 @@
 				<include name="wget-1.2.21.jar" />
 				<include name="threads-0.0.13.jar" />
 				<include name="mssql-jdbc-6.2.1.jre8.jar" />
-				
+
 
 			</fileset>
 		</copy>
@@ -1040,6 +1040,7 @@
 		<mkdir dir="dist/btrace" />
 		<mkdir dir="dist/rulesets" />
 		<mkdir dir="dist/template" />
+		<mkdir dir="dist/javascript" />
 
 		<copy todir="dist/libs">
 			<fileset dir="externalLibs">
@@ -1083,6 +1084,14 @@
 			</fileset>
 		</copy>
 
+		<copy todir="dist/javascript">
+			<fileset dir="../javascript">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+
+		
+
 		<copyfile src="../UserConf.properties" dest="dist/UserConf.properties" />
 
 
@@ -1096,7 +1105,7 @@
 			<fx:fileset dir="dist" includes="skins/**" />
 			<fx:fileset dir="dist" includes="rulesets/**" />
 			<fx:fileset dir="dist" includes="template/**" />
-
+			<fx:fileset dir="dist" includes="javascript/**" />
 		</fx:resources>
 
 		<fx:application id="Gargoyle" name="Gargoyle" mainClass="com.kyj.fx.voeditor.visual.main.Main" toolkit="fx" version="${product.version}">
@@ -1204,6 +1213,7 @@
 			<fx:fileset dir="dist" includes="skins/**" />
 			<fx:fileset dir="dist" includes="rulesets/**" />
 			<fx:fileset dir="dist" includes="template/**" />
+			<fx:fileset dir="dist" includes="javascript/**" />
 		</fx:resources>
 
 		<delete dir="package" />
