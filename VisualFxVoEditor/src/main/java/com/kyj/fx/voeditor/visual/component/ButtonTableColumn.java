@@ -64,7 +64,7 @@ public class ButtonTableColumn<S extends Map<String, Object>> extends TableColum
 		this.changeFunc = changeFunc;
 	}
 
-	public void clickHandle(int nRow) {
+	public void clickHandle(Button btn, int nRow) {
 	}
 
 	class ButtonCellFactory implements Callback<TableColumn<S, Boolean>, TableCell<S, Boolean>> {
@@ -100,7 +100,7 @@ public class ButtonTableColumn<S extends Map<String, Object>> extends TableColum
 				}
 			});
 
-			cellButton.setOnAction(e -> parent.clickHandle(buttonCell.getRowIndex()));
+			cellButton.setOnAction(e -> parent.clickHandle(cellButton, buttonCell.getRowIndex()));
 
 			return buttonCell;
 

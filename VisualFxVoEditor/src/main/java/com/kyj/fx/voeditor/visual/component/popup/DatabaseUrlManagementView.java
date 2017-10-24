@@ -40,6 +40,7 @@ import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.utils.EncrypUtil;
+import com.sun.jna.Platform;
 import com.sun.star.uno.RuntimeException;
 
 import javafx.beans.property.SimpleObjectProperty;
@@ -186,7 +187,7 @@ public class DatabaseUrlManagementView extends BorderPane {
 
 		colPopup = new ButtonTableColumn() {
 			@Override
-			public void clickHandle(int nRow) {
+			public void clickHandle(Button btn, int nRow) {
 				try {
 					showSqlPane(nRow);
 				} catch (Exception e) {
@@ -199,9 +200,10 @@ public class DatabaseUrlManagementView extends BorderPane {
 		colPing = new ButtonTableColumn("Ping") {
 
 			@Override
-			public void clickHandle(int nRow) {
+			public void clickHandle(Button btn, int nRow) {
 				try {
-					ping(nRow);
+
+					ping(btn, nRow);
 				} catch (Exception e) {
 					DialogUtil.showExceptionDailog(e);
 					LOGGER.error(ValueUtil.toString(e));
@@ -346,14 +348,14 @@ public class DatabaseUrlManagementView extends BorderPane {
 			Map<String, Object> map = new HashMap<>();
 			List<String> colList = new ArrayList<String>();
 
-			//2016-12-10 by kyj. 구 코드 버그 수정.
+			// 2016-12-10 by kyj. 구 코드 버그 수정.
 
 			for (int i = 0; i < tbDatabase.getItems().size(); i++) {
 				Map<String, Object> item = tbDatabase.getItems().get(i);
-				Object key = prefiixKey + i;//  item.get("seqNum");
+				Object key = prefiixKey + i;// item.get("seqNum");
 
 				JSONObject json = new JSONObject();
-				json.put("seqNum", /*item.get("seqNum")*/ key);
+				json.put("seqNum", /* item.get("seqNum") */ key);
 				json.put("dbms", item.get("dbms"));
 				json.put("alias", item.get("alias"));
 				json.put(ResourceLoader.BASE_KEY_JDBC_URL, item.get(ResourceLoader.BASE_KEY_JDBC_URL));
@@ -370,13 +372,13 @@ public class DatabaseUrlManagementView extends BorderPane {
 			});
 			map.put("database.column.order", colList.toString());
 
-			{/*하나의 트랜잭션*/
+			{/* 하나의 트랜잭션 */
 				removeKeys();
 				instance.putAll(map);
 				delItems.clear();
 			}
 
-			//			tbDatabase.getItems().clear();
+			// tbDatabase.getItems().clear();
 			tbDatabase.getItems().setAll(loadResource());
 
 			DialogUtil.showMessageDialog("Save Complete...");
@@ -394,8 +396,8 @@ public class DatabaseUrlManagementView extends BorderPane {
 
 	private void removeKeys() {
 
-		List<String> collect = delItems.stream().flatMap(m -> m.entrySet().stream())
-				.filter(ent -> "seqNum".equals(ent.getKey())).map(ent -> ent.getValue().toString()).collect(Collectors.toList());
+		List<String> collect = delItems.stream().flatMap(m -> m.entrySet().stream()).filter(ent -> "seqNum".equals(ent.getKey()))
+				.map(ent -> ent.getValue().toString()).collect(Collectors.toList());
 		ResourceLoader.getInstance().clearKeys(collect);
 
 	}
@@ -427,7 +429,7 @@ public class DatabaseUrlManagementView extends BorderPane {
 
 	}
 
-	public void ping(int nRow) throws Exception {
+	public void ping(Button btn, int nRow) throws Exception {
 		Map<String, Object> map = tbDatabase.getItems().get(nRow);
 
 		Object object = map.get("dbms");
@@ -439,8 +441,10 @@ public class DatabaseUrlManagementView extends BorderPane {
 			LOGGER.error(msg);
 			DialogUtil.showMessageDialog(msg);
 		}
-
-		DbUtil.ping(() -> {
+		
+		btn.setDisable(true);
+		
+		DbUtil.pingAsync(() -> {
 
 			String driver = ConfigResourceLoader.getInstance().get("dbms." + dbms);
 			String url = map.get(ResourceLoader.BASE_KEY_JDBC_URL).toString();
@@ -457,14 +461,24 @@ public class DatabaseUrlManagementView extends BorderPane {
 			poolProperties.setPassword(password);
 
 			return poolProperties;
-		} , (bool) -> {
+		}, (bool) -> {
+			javafx.application.Platform.runLater(()->{
+				btn.setDisable(false);
+			});
+			
+			
 			String msg = "fail!";
 			if (bool)
 				msg = "success!";
-			DialogUtil.showMessageDialog(msg);
-		} , ex -> {
+			DialogUtil.showMessageDialog(FxUtil.getWindow(DatabaseUrlManagementView.this), msg);
+		}, ex -> {
+			
+			javafx.application.Platform.runLater(()->{
+				btn.setDisable(false);
+			});
+			
 			LOGGER.info(ValueUtil.toString("ping test", ex));
-			DialogUtil.showExceptionDailog((Exception)ex, ex.getMessage());
+			DialogUtil.showExceptionDailog(FxUtil.getWindow(DatabaseUrlManagementView.this), (Exception) ex, ex.getMessage());
 		});
 
 		// LOGGER.debug(map.toString());
@@ -494,9 +508,9 @@ public class DatabaseUrlManagementView extends BorderPane {
 		String title = String.format("Database[%s]", sqlPane.getClass().getSimpleName());
 
 		DockNode dockNode = new DockNode(sqlPane, title);
-		//		Platform.runLater(() -> {
-		//			dockNode.setMaximized(true);
-		//		});
+		// Platform.runLater(() -> {
+		// dockNode.setMaximized(true);
+		// });
 
 		// dockNode.setFloating(true, new Point2D(0,0));
 		// dockNode.getStage().centerOnScreen();
