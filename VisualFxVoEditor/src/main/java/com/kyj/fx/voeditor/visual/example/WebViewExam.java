@@ -53,27 +53,9 @@ public class WebViewExam extends Application {
 	public void start(Stage primaryStage) throws Exception {
 
 		TinymceDeligator createInstance = TinymceDeligator.createInstance();
-//		createInstance.setReadOnly(true);
+		// createInstance.setReadOnly(true);
 		WebView view = createInstance.getWebView();
 		WebEngine engine = view.getEngine();
-
-		engine.setJavaScriptEnabled(true);
-		engine.setCreatePopupHandler(new Callback<PopupFeatures, WebEngine>() {
-
-			@Override
-			public WebEngine call(PopupFeatures p) {
-
-				Stage stage = new Stage(StageStyle.UTILITY);
-				WebView wv2 = new WebView();
-				VBox vBox = new VBox(5);
-				vBox.getChildren().add(wv2);
-				vBox.getChildren().add(new Button("업로딩"));
-				wv2.getEngine().setJavaScriptEnabled(true);
-				stage.setScene(new Scene(vBox));
-				stage.show();
-				return wv2.getEngine();
-			}
-		});
 
 		engine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
 			@Override
@@ -84,28 +66,14 @@ public class WebViewExam extends Application {
 			}
 		});
 
-		engine.setConfirmHandler(new Callback<String, Boolean>() {
-
-			@Override
-			public Boolean call(String param) {
-				System.out.println("confirm handler : " + param);
-				return true;
-			}
-		});
-
-		engine.setOnAlert((WebEvent<String> wEvent) -> {
-			System.out.println("Alert Event  -  Message:  " + wEvent.getData());
-		});
-//		engine.load(new File("javascript/tinymce/index.html").toURI().toURL().toExternalForm());
 		primaryStage.setScene(new Scene(new BorderPane(view), 1200, 700));
 		primaryStage.show();
 
-		
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				
+
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
@@ -113,37 +81,36 @@ public class WebViewExam extends Application {
 				}
 
 				Platform.runLater(() -> {
-					
-//					System.out.println("ACTION READONLY");
+
+					// System.out.println("ACTION READONLY");
 					createInstance.setText("<a href='http://www.naver.com'>LINK</a>");
-//					createInstance.setReadOnly(true);
-				
-					
+					// createInstance.setReadOnly(true);
+
 				});
 
 			}
 		}).start();
-		
-//		new Thread(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//				
-//				try {
-//					Thread.sleep(10000);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//
-//				Platform.runLater(() -> {
-//					
-//					System.out.println("ACTION Editable");
-//					createInstance.setReadOnly(false);
-//				
-//				});
-//
-//			}
-//		}).start();
+
+		// new Thread(new Runnable() {
+		//
+		// @Override
+		// public void run() {
+		//
+		// try {
+		// Thread.sleep(10000);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		//
+		// Platform.runLater(() -> {
+		//
+		// System.out.println("ACTION Editable");
+		// createInstance.setReadOnly(false);
+		//
+		// });
+		//
+		// }
+		// }).start();
 
 	}
 
