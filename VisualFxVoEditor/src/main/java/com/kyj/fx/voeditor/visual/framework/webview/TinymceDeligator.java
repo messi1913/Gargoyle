@@ -20,25 +20,32 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
 /**
+ * 
+ * TinyMCE HTML 지원하기 위한 Wrapping 클래스.
+ * 
  * @author KYJ
  *
  */
 public class TinymceDeligator {
+
+	private static final String TYNYMCE_LOCATION = "javascript/tinymce/index.html";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TinymceDeligator.class);
 
@@ -50,15 +57,20 @@ public class TinymceDeligator {
 	 * @최초생성일 2017. 10. 18.
 	 */
 	private BooleanProperty webViewLoaded = new SimpleBooleanProperty();
+	private BooleanProperty readOnlyProperty = new SimpleBooleanProperty(true);
+
 	private final String initCont;
 
-	public TinymceDeligator() {
+	/**
+	 */
+	protected TinymceDeligator() {
 		this("");
 	}
 
 	/**
+	 * @param initCont
 	 */
-	public TinymceDeligator(String initCont) {
+	protected TinymceDeligator(String initCont) {
 		webview = new WebView();
 		this.initCont = initCont;
 	}
@@ -86,128 +98,176 @@ public class TinymceDeligator {
 	}
 
 	/**
+	 * @최초생성일 2017. 10. 25.
+	 */
+	private EventHandler<WebErrorEvent> onErrorHandler = ev -> {
+		LOGGER.error(ValueUtil.toString(ev.getException()));
+	};
+
+	/**
+	 * @최초생성일 2017. 10. 25.
+	 */
+	private ChangeListener<State> stateChangeListener = new ChangeListener<State>() {
+
+		@Override
+		public void changed(ObservableValue<? extends State> observable, State oldValue, State newValue) {
+			if (newValue == State.SUCCEEDED) {
+				WebEngine engine = getWebView().getEngine();
+				if (ValueUtil.isNotEmpty(initCont)) {
+					engine.executeScript(" document.getElementById('gargoyle-textarea').innerHTML= '" + initCont + "'; ");
+				}
+
+				engine.getLoadWorker().stateProperty().removeListener(this);
+				webViewLoaded.set(true);
+			}
+		}
+	};
+
+	/**
+	 * @최초생성일 2017. 10. 25.
+	 */
+	private Callback<String, Boolean> confirmHandler = new Callback<String, Boolean>() {
+
+		@Override
+		public Boolean call(String param) {
+			LOGGER.debug("confirm handler : {} ", param);
+			return true;
+		}
+	};
+
+	/**
+	 * @최초생성일 2017. 10. 25.
+	 */
+	private Callback<PopupFeatures, WebEngine> createPopupHandler = new Callback<PopupFeatures, WebEngine>() {
+
+		@Override
+		public WebEngine call(PopupFeatures p) {
+
+			Stage stage = new Stage(StageStyle.UTILITY);
+			WebView wv2 = new WebView();
+			VBox vBox = new VBox(5);
+			vBox.getChildren().add(wv2);
+			vBox.getChildren().add(new Button("업로딩"));
+			wv2.getEngine().setJavaScriptEnabled(true);
+			stage.setScene(new Scene(vBox));
+			stage.show();
+			return wv2.getEngine();
+		}
+	};
+
+	/**
+	 * @최초생성일 2017. 10. 25.
+	 */
+	private EventHandler<? super ContextMenuEvent> contextMenuRequestHandler = ev -> {
+
+		MenuItem miReload = new MenuItem("Reload");
+		miReload.setDisable(true);
+		miReload.setOnAction(e -> {
+			webview.getEngine().reload();
+		});
+
+		MenuItem miSource = new MenuItem("Source");
+		miSource.setOnAction(e -> {
+			Object executeScript = webview.getEngine().executeScript("document.documentElement.innerHTML");
+			String htmlCoded = executeScript.toString();
+
+			XMLEditor fxmlTextArea = new XMLEditor();
+			fxmlTextArea.setContent(htmlCoded);
+			FxUtil.createStageAndShow(fxmlTextArea, stage -> {
+				stage.setWidth(1200d);
+				stage.setHeight(800d);
+				stage.initOwner(FxUtil.getWindow(webview));
+			});
+			// FxUtil.createStageAndShow("Source", new
+			// WebViewConsole(view));
+
+		});
+
+		ContextMenu contextMenu = new ContextMenu(miReload, miSource);
+		contextMenu.show(FxUtil.getWindow(webview), ev.getScreenX(), ev.getScreenY());
+
+	};
+
+	/**
+	 * @최초생성일 2017. 10. 25.
+	 */
+	private ChangeListener<Boolean> readOnyChangeListener = new ChangeListener<Boolean>() {
+
+		@Override
+		public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+
+			// 기능이 정상작동하면 리스너를 없앰. 최초 로딩시 TinyMCE 로딩 지연때문에 처리
+			if (!canWrite()) {
+				ChangeListener<Boolean> listener = new ChangeListener<Boolean>() {
+
+					@Override
+					public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+						if (newValue) {
+
+							if (newValue) {
+								webview.getEngine().executeScript("tinymce.activeEditor.setMode('readonly');");
+							} else {
+								webview.getEngine().executeScript("tinymce.activeEditor.setMode('design');");
+							}
+							webViewLoaded.removeListener(this);
+						}
+					}
+				};
+
+				webViewLoaded.addListener(listener);
+			} else {
+				if (newValue) {
+					webview.getEngine().executeScript("tinymce.activeEditor.setMode('readonly');");
+				} else {
+					webview.getEngine().executeScript("tinymce.activeEditor.setMode('design');");
+				}
+			}
+
+		}
+	};
+
+	/**
 	 * 생성자로 객체생성후 initialize 호출.
 	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 10. 25.
 	 */
-	public TinymceDeligator initialize() {
+	protected TinymceDeligator initialize() {
 		try {
-
-			webview.setContextMenuEnabled(false);
-			webview.setOnContextMenuRequested(ev -> {
-				
-				MenuItem miReload = new MenuItem("Reload");
-				miReload.setOnAction(e -> {
-					webview.getEngine().reload();
-				});
-
-				MenuItem miSource = new MenuItem("Source");
-				miSource.setOnAction(e -> {
-					Object executeScript = webview.getEngine().executeScript("document.documentElement.innerHTML");
-					String htmlCoded = executeScript.toString();
-
-					XMLEditor fxmlTextArea = new XMLEditor();
-					fxmlTextArea.setContent(htmlCoded);
-					FxUtil.createStageAndShow(fxmlTextArea, stage -> {
-						stage.setWidth(1200d);
-						stage.setHeight(800d);
-					});
-					// FxUtil.createStageAndShow("Source", new
-					// WebViewConsole(view));
-
-				});
-
-				ContextMenu contextMenu = new ContextMenu(miReload, miSource);
-				contextMenu.show(FxUtil.getWindow(webview), ev.getScreenX(), ev.getScreenY());
-
-			});
 
 			WebEngine engine = webview.getEngine();
 
-			engine.setOnError(ev -> {
-				LOGGER.error(ValueUtil.toString(ev.getException()));
-			});
+			// Define Context Menu.
+			webview.setContextMenuEnabled(false);
+			webview.setOnContextMenuRequested(contextMenuRequestHandler);
 
-			ChangeListener<State> listener = new ChangeListener<State>() {
+			// Define Events.
+			engine.setOnError(onErrorHandler);
+			engine.getLoadWorker().stateProperty().addListener(stateChangeListener);
+			engine.setConfirmHandler(confirmHandler);
+			engine.setCreatePopupHandler(createPopupHandler);
 
-				@Override
-				public void changed(ObservableValue<? extends State> observable, State oldValue, State newValue) {
-					if (newValue == State.SUCCEEDED) {
-
-						if (ValueUtil.isNotEmpty(initCont)) {
-							engine.executeScript(" document.getElementById('gargoyle-textarea').innerHTML= '" + initCont + "'; ");
-						}
-
-						engine.getLoadWorker().stateProperty().removeListener(this);
-						webViewLoaded.set(true);
-					}
-				}
-			};
-
-			engine.getLoadWorker().stateProperty().addListener(listener);
-
-			engine.setConfirmHandler(new Callback<String, Boolean>() {
-
-				@Override
-				public Boolean call(String param) {
-					System.out.println("confirm handler : " + param);
-					return true;
-				}
-			});
-
-			engine.setCreatePopupHandler(new Callback<PopupFeatures, WebEngine>() {
-
-				@Override
-				public WebEngine call(PopupFeatures p) {
-
-					Stage stage = new Stage(StageStyle.UTILITY);
-					WebView wv2 = new WebView();
-					VBox vBox = new VBox(5);
-					vBox.getChildren().add(wv2);
-					vBox.getChildren().add(new Button("업로딩"));
-					wv2.getEngine().setJavaScriptEnabled(true);
-					stage.setScene(new Scene(vBox));
-					stage.show();
-					return wv2.getEngine();
-				}
-			});
-
-			engine.load(new File("javascript/tinymce/index.html").toURI().toURL().toExternalForm());
-
+			// Load HTML
+			engine.load(new File(TYNYMCE_LOCATION).toURI().toURL().toExternalForm());
 		} catch (MalformedURLException e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}
 
+		// Read Property Chagne Listener.
+		readOnlyProperty.addListener(readOnyChangeListener);
 		return this;
 	}
 
+	/**
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 25.
+	 * @param flag
+	 *            true : readonly <br/>
+	 *            false : can write <br/>
+	 */
 	public void setReadOnly(boolean flag) {
-
-		if (!canWrite()) {
-			ChangeListener<Boolean> listener = new ChangeListener<Boolean>() {
-
-				@Override
-				public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-					if (newValue) {
-
-						if (flag) {
-							webview.getEngine().executeScript("tinymce.activeEditor.setMode('readonly');");
-						} else {
-							webview.getEngine().executeScript("tinymce.activeEditor.setMode('design');");
-						}
-						webViewLoaded.removeListener(this);
-					}
-				}
-			};
-			webViewLoaded.addListener(listener);
-		} else {
-			if (flag) {
-				webview.getEngine().executeScript("tinymce.activeEditor.setMode('readonly');");
-			} else {
-				webview.getEngine().executeScript("tinymce.activeEditor.setMode('design');");
-			}
-		}
+		this.readOnlyProperty.set(flag);
 	}
 
 	/**
@@ -225,7 +285,7 @@ public class TinymceDeligator {
 	 * @param content
 	 */
 	public void setText(String content) {
-
+		// 기능이 정상작동하면 리스너를 없앰. 최초 로딩시 TinyMCE 로딩 지연때문에 처리
 		if (!canWrite()) {
 			ChangeListener<Boolean> listener = new ChangeListener<Boolean>() {
 
