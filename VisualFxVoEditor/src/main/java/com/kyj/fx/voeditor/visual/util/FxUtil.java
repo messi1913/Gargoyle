@@ -18,6 +18,7 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1529,7 +1530,7 @@ public class FxUtil {
 	 * @param textField
 	 * @param suggestions
 	 */
-	public static void installAutoTextFieldBinding(TextField textField, Supplier<List<String>> suggestions) {
+	public static void installAutoTextFieldBinding(TextField textField, Supplier<Collection<String>> suggestions) {
 		if (suggestions == null || suggestions.get() == null)
 			return;
 

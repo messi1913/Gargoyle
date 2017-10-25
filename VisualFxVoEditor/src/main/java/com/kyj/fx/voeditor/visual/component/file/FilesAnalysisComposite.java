@@ -7,13 +7,13 @@
 package com.kyj.fx.voeditor.visual.component.file;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,7 +125,13 @@ public class FilesAnalysisComposite extends BorderPane {
 		tbFiles.setContextMenu(createTbFilesContextMenu());
 
 		FxUtil.installClipboardKeyEvent(tbFiles);
+
+		FxUtil.installAutoTextFieldBinding(txtNameFilter, () -> {
+			return filters.get();
+		});
 	}
+
+	static ObjectProperty<HashSet<String>> filters = new SimpleObjectProperty<>(new HashSet<String>(Arrays.asList("aaa")));
 
 	private ContextMenu createTbFilesContextMenu() {
 
@@ -314,9 +320,15 @@ public class FilesAnalysisComposite extends BorderPane {
 			protected Void call() throws Exception {
 
 				String text = txtNameFilter.getText();
-
+				filters.get().add(text);
+				
 				TreeItem<V> selectedItem = tvFiles.getSelectionModel().getSelectedItem();
+
+				if (selectedItem == null)
+					selectedItem = tvFiles.getRoot();
+
 				if (selectedItem != null) {
+					
 					V value = selectedItem.getValue();
 					if (value != null) {
 						FilteredList<File> items = new FilteredList<>(value.getItems());
