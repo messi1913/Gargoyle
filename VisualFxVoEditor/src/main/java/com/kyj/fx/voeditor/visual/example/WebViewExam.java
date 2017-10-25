@@ -6,7 +6,12 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
+import java.io.File;
+
+import com.kyj.fx.voeditor.visual.framework.webview.TinymceDeligator;
+
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
@@ -44,11 +49,12 @@ public class WebViewExam extends Application {
 
 	/***********************************************************************************/
 	/* 이벤트 구현 */
-
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
-		WebView view = new WebView();
+		TinymceDeligator createInstance = TinymceDeligator.createInstance();
+//		createInstance.setReadOnly(true);
+		WebView view = createInstance.getWebView();
 		WebEngine engine = view.getEngine();
 
 		engine.setJavaScriptEnabled(true);
@@ -90,19 +96,64 @@ public class WebViewExam extends Application {
 		engine.setOnAlert((WebEvent<String> wEvent) -> {
 			System.out.println("Alert Event  -  Message:  " + wEvent.getData());
 		});
-		engine.load("http://blog.daum.net/photoon/7920766");
+//		engine.load(new File("javascript/tinymce/index.html").toURI().toURL().toExternalForm());
 		primaryStage.setScene(new Scene(new BorderPane(view), 1200, 700));
 		primaryStage.show();
 
+		
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
+				Platform.runLater(() -> {
+					
+//					System.out.println("ACTION READONLY");
+					createInstance.setText("<a href='http://www.naver.com'>LINK</a>");
+//					createInstance.setReadOnly(true);
+				
+					
+				});
+
+			}
+		}).start();
+		
+//		new Thread(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				
+//				try {
+//					Thread.sleep(10000);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//
+//				Platform.runLater(() -> {
+//					
+//					System.out.println("ACTION Editable");
+//					createInstance.setReadOnly(false);
+//				
+//				});
+//
+//			}
+//		}).start();
+
 	}
 
-	// 
+	//
 
 	/***********************************************************************************/
 
 	/***********************************************************************************/
 	/* 일반API 구현 */
 
-	// 
+	//
 	/***********************************************************************************/
 }
