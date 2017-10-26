@@ -48,7 +48,30 @@
 				</configuration>
 			</plugin>
 
-
+			<!-- JAR파일로 말아질때 특정 리소스는 제외시키는 플러그인 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.1</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/maven/**</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<!-- package 실행할때 프로젝트 디펜던시들을 특정폴더로 복사해주게 설정 -->
 			<!-- <plugin> -->
 			<!-- <groupId>org.apache.maven.plugins</groupId> -->
@@ -138,7 +161,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
-<!-- 			<scope>compile</scope> -->
+			<!-- <scope>compile</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>

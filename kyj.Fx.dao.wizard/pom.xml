@@ -15,8 +15,8 @@
 		<logback.version>1.0.13</logback.version>
 		<slf4j.version>1.7.5</slf4j.version>
 		<java.version>1.8</java.version>
-<!-- 		<deploy.target.dir>${user.home}/.m2/repository/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/0.0.2-SNAPSHOT</deploy.target.dir> -->
-		<!-- 2015.12.10 mar버젼에서 인식이 불가능한 상황이 발생하면서, 추가함. 정확한 원인은 모르겟음. 실행하는데는 문제없으나
+		<!-- <deploy.target.dir>${user.home}/.m2/repository/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/0.0.2-SNAPSHOT</deploy.target.dir> -->
+		<!-- 2015.12.10 mar버젼에서 인식이 불가능한 상황이 발생하면서, 추가함. 정확한 원인은 모르겟음. 실행하는데는 문제없으나 
 			jar파일처리시 문제. -->
 		<vo.editor.jar.path.name>${user.home}/.m2/repository/kyj/FxVoEditor/kyj.FxVoEditor/0.0.1-SNAPSHOT/kyj.FxVoEditor-0.0.1-SNAPSHOT.jar</vo.editor.jar.path.name>
 		<lib.dir>lib</lib.dir>
@@ -50,26 +50,50 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			
+			<!-- JAR파일로 말아질때 특정 리소스는 제외시키는 플러그인 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.1</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/maven/**</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<!-- javadoc 파일생성 -->
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 				<artifactId>maven-javadoc-plugin</artifactId> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>attach-javadocs</id> -->
-<!-- 						<goals> -->
-<!-- 							<goal>jar</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-javadoc-plugin</artifactId> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <id>attach-javadocs</id> -->
+			<!-- <goals> -->
+			<!-- <goal>jar</goal> -->
+			<!-- </goals> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
 
-<!-- 				<configuration> -->
-<!-- 					<charset>UTF-8</charset> -->
-<!-- 					<docencoding>UTF-8</docencoding> -->
-<!-- 				</configuration> -->
+			<!-- <configuration> -->
+			<!-- <charset>UTF-8</charset> -->
+			<!-- <docencoding>UTF-8</docencoding> -->
+			<!-- </configuration> -->
 
-<!-- 			</plugin> -->
+			<!-- </plugin> -->
 
 
 			<!-- package 실행할때 프로젝트 디펜던시들을 특정폴더로 복사해주게 설정 -->
@@ -149,8 +173,8 @@
 			<groupId>kyj.FxVoEditor</groupId>
 			<artifactId>kyj.FxVoEditor</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-<!-- 			<scope>system</scope> -->
-<!-- 			<systemPath>${vo.editor.jar.path.name}</systemPath> -->
+			<!-- <scope>system</scope> -->
+			<!-- <systemPath>${vo.editor.jar.path.name}</systemPath> -->
 		</dependency>
 	</dependencies>
 
