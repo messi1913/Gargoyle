@@ -99,7 +99,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 	 *
 	 * @최초생성일 2016. 11. 22.
 	 */
-	private static ExecutorService gargoyleThreadExecutors = ExecutorDemons.newFixedThreadExecutor(REALTIME_SRCH_THREAD_POOL_NAME, 1);
+	private ExecutorService gargoyleThreadExecutors = ExecutorDemons.newFixedThreadExecutor(REALTIME_SRCH_THREAD_POOL_NAME, 1);
 
 	/**
 	 * 실시간 검색어 처리에 대한 코드 구현부
