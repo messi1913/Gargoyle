@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.fxmisc.richtext.CodeArea?>
 
-<BorderPane prefHeight="336.0" prefWidth="595.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.component.text.LogViewController">
+<BorderPane prefHeight="336.0" prefWidth="595.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.component.text.LogViewController">
 	<center>
       <VBox>
          <children>
@@ -24,6 +24,7 @@
                      <children>
                         <Label text="Status" />
                         <Label fx:id="lblStatus" text="Stop" />
+                        <Label fx:id="lblTimerStatus" text="inActive" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_RIGHT" spacing="5.0">

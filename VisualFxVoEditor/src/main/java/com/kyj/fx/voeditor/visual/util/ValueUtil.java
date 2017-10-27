@@ -89,10 +89,11 @@ public class ValueUtil {
 
 	/**
 	 * Email Check REG Expression.
+	 * 
 	 * @최초생성일 2017. 10. 16.
 	 */
 	public static final String EMAIL_VALIDATION_EXP = "[\\w\\~\\-\\.]+@[\\w\\~\\-]+(\\.[\\w\\~\\-]+)+";
-	
+
 	public enum IndexCaseTypes {
 		UPPERCASE, LOWERCASE
 	}
@@ -456,7 +457,8 @@ public class ValueUtil {
 	}
 
 	/**
-	 * 패턴에 일치하는 텍스트를 replace한후 반환
+	 * 패턴에 일치하는 텍스트를 replace한후 반환 <br/>
+	 * 매치되는 텍스트가 없을때까지 반복. <br/>
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 1. 22.
@@ -473,6 +475,33 @@ public class ValueUtil {
 		Matcher matcher = compile.matcher(value);
 		// 패턴에 일치하는 문자가 없을때까지 반복한다.
 		while (matcher.find()) {
+			int start = matcher.start();
+			int end = matcher.end();
+			sb.replace(start, end, replacedText);
+			matcher = compile.matcher(sb.toString());
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 패턴에 일치하는 텍스트를 replace한후 반환 <br/>
+	 * 매치되는 텍스트 한번만 처리. <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 27.
+	 * @param regex
+	 * @param value
+	 * @param replacedText
+	 * @return
+	 */
+	public static String regexReplaceMatch(String regex, String value, String replacedText) {
+
+		Pattern compile = Pattern.compile(regex);
+
+		StringBuffer sb = new StringBuffer(value);
+		Matcher matcher = compile.matcher(value);
+		// 패턴에 일치하는 문자가 없을때까지 반복한다.
+		if (matcher.find()) {
 			int start = matcher.start();
 			int end = matcher.end();
 			sb.replace(start, end, replacedText);
@@ -686,9 +715,8 @@ public class ValueUtil {
 		JSONObject fromJson = gson.fromJson(str, JSONObject.class);
 		return fromJson == null ? new JSONObject() : fromJson;
 	}
-	
-	public static Map<String,Object> toMap(String json)
-	{
+
+	public static Map<String, Object> toMap(String json) {
 		Gson gson = new Gson();
 		return gson.fromJson(json, HashMap.class);
 	}
@@ -1949,8 +1977,7 @@ public class ValueUtil {
 
 	/**
 	 * 
-	 * 두 번째 인수 문자열의 문자를 세 번째 인수 문자열에서 같은 위치에 있는 문자로 바꾼 첫 번째 인수 문자열을 반환합니다.
-	 * <br/>
+	 * 두 번째 인수 문자열의 문자를 세 번째 인수 문자열에서 같은 위치에 있는 문자로 바꾼 첫 번째 인수 문자열을 반환합니다. <br/>
 	 * 테스트 :: <br/>
 	 * translate("bar","abc","ABC") <br/>
 	 * 결과 :: <br/>

@@ -18,11 +18,13 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.voeditor.visual.framework.logview.helper.ui.EMRServiceLogTableViewHelper;
 import com.kyj.fx.voeditor.visual.framework.thread.DemonTimerFactory;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -42,7 +44,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
@@ -78,7 +82,7 @@ public class LogViewController implements Closeable {
 	@FXML
 	private Button btnStart;
 	@FXML
-	private Label lblStatus;
+	private Label lblStatus, lblTimerStatus;
 
 	private CodeAreaFindAndReplaceHelper<CodeArea> findAndReplaceHelper;
 
@@ -108,19 +112,46 @@ public class LogViewController implements Closeable {
 		findAndReplaceHelper = new CodeAreaFindAndReplaceHelper<>(txtLog);
 		txtLog.addEventHandler(KeyEvent.KEY_PRESSED, this::txtLogOnKeyPress);
 		this.isStared.addListener((oba, o, n) -> {
-			if (n) {
-				lblStatus.setText("Started");
-				btnStart.setDisable(true);
-			} else {
-				lblStatus.setText("Stopped");
-				btnStart.setDisable(false);
-			}
+
+			Platform.runLater(() -> {
+				if (n) {
+					lblStatus.setText("Started");
+					btnStart.setDisable(true);
+				} else {
+					lblStatus.setText("Stopped");
+					btnStart.setDisable(false);
+				}
+			});
 
 		});
 
 		btnStart.setOnAction(ev -> {
 			start();
 		});
+
+		txtLog.setParagraphGraphicFactory(LineNumberFactory.get(txtLog));
+
+		createContextMenu();
+	}
+
+	protected void createContextMenu() {
+		ContextMenu contextMenu = new ContextMenu();
+		txtLog.setContextMenu(contextMenu);
+
+		MenuItem e = new MenuItem("EMRService Log Viewer");
+		e.setOnAction(ev -> {
+			EMRServiceLogTableViewHelper helper = new EMRServiceLogTableViewHelper(this.txtLog.getText());
+
+			FxUtil.createStageAndShow(helper.getView(), stage -> {
+				stage.initOwner(FxUtil.getWindow(composite.getParent()));
+				stage.setTitle("EMRService Log Viewer");
+				stage.setWidth(1200d);
+				stage.setHeight(800d);
+			});
+
+			helper.start();
+		});
+		contextMenu.getItems().add(e);
 
 	}
 
@@ -184,6 +215,12 @@ public class LogViewController implements Closeable {
 	 */
 	public void createChannel() throws IOException {
 		File monitoringFile = composite.getMonitoringFile();
+
+		if (fileChannel != null) {
+			fileChannel.close();
+			fileChannel = null;
+		}
+
 		fileChannel = FileChannel.open(monitoringFile.toPath(), StandardOpenOption.READ);
 		buffer = ByteBuffer.allocate(seekSize);
 	}
@@ -267,6 +304,9 @@ public class LogViewController implements Closeable {
 
 	private void watchFile() {
 
+		if (fileWatcher != null)
+			fileWatcher.cancel();
+
 		if (null == fileWatcher) {
 
 			fileWatcher = DemonTimerFactory.newInsance("Gargoyle Log Monitor Timer");// new
@@ -290,24 +330,29 @@ public class LogViewController implements Closeable {
 
 					long space = -1L;
 					try {
+						boolean open = fileChannel.isOpen();
+						// LOGGER.debug("{}", open);
+						Platform.runLater(() -> {
+							lblTimerStatus.setText(open ? "Active" : "inActive");
+						});
 						space = fileChannel.size();
 					} catch (IOException e) {
 						failCount++;
 						LOGGER.error(ValueUtil.toString(e));
 						if (failCount > 10) {
-							
+
+							Platform.runLater(() -> {
+								lblTimerStatus.setText("inActive");
+								DialogUtil.showMessageDialog("Can't Connect Nerwork. ");
+							});
+
 							this.cancel();
-							
+
 							try {
 								close();
 							} catch (IOException e1) {
 								e1.printStackTrace();
 							}
-							
-							Platform.runLater(() -> {
-								
-								DialogUtil.showMessageDialog("Can't Connect Nerwork. ");
-							});
 
 						}
 
@@ -392,6 +437,7 @@ public class LogViewController implements Closeable {
 	 */
 	@Override
 	public void close() throws IOException {
+		LOGGER.debug("Close Reqeust.");
 		isStared.set(false);
 		isRunning.set(false);
 		// monitorFile.close();
