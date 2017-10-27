@@ -25,6 +25,7 @@ import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.thread.DemonTimerFactory;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.star.uno.RuntimeException;
@@ -178,7 +179,7 @@ public class LogViewController implements Closeable {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 9. 17. 
+	 * @작성일 : 2017. 9. 17.
 	 * @throws IOException
 	 */
 	public void createChannel() throws IOException {
@@ -188,7 +189,8 @@ public class LogViewController implements Closeable {
 	}
 
 	/**
-	 * 마지막에 읽어들인 byte 위치를 임시저장한다. 저장된 위치를 기준으로 파일이 변경되면 그 위치부터 새롭게 추가된 텍스트를 읽어온다.
+	 * 마지막에 읽어들인 byte 위치를 임시저장한다. 저장된 위치를 기준으로 파일이 변경되면 그 위치부터 새롭게 추가된 텍스트를
+	 * 읽어온다.
 	 * 
 	 * @최초생성일 2017. 1. 11.
 	 */
@@ -267,9 +269,13 @@ public class LogViewController implements Closeable {
 
 		if (null == fileWatcher) {
 
-			fileWatcher = DemonTimerFactory.newInsance("Gargoyle Log Monitor Timer");// new Timer();
+			fileWatcher = DemonTimerFactory.newInsance("Gargoyle Log Monitor Timer");// new
+																						// Timer();
 
-			fileWatcher.scheduleAtFixedRate(new TimerTask() {
+			TimerTask task = new TimerTask() {
+
+				private int failCount;
+
 				@Override
 				public void run() {
 
@@ -286,15 +292,35 @@ public class LogViewController implements Closeable {
 					try {
 						space = fileChannel.size();
 					} catch (IOException e) {
-						e.printStackTrace();
+						failCount++;
+						LOGGER.error(ValueUtil.toString(e));
+						if (failCount > 10) {
+							
+							this.cancel();
+							
+							try {
+								close();
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+							
+							Platform.runLater(() -> {
+								
+								DialogUtil.showMessageDialog("Can't Connect Nerwork. ");
+							});
+
+						}
+
 					}
 
 					// Debug.
-					// LOGGER.debug(" file space : " + space + " // cached space : " + lastLength.get());
+					// LOGGER.debug(" file space : " + space + " // cached space
+					// : " + lastLength.get());
 
 					/*
-					 * 처음에는 수정된 일짜 정보 기준으로 처리하였으나, OS영역에서 파일 내용이 변경되어도 반영이 잘 이루어지지않음. 그래서 파일 사이즈 기준으로 변경유무를 추가. lastReadTime == -1 의 조건은 최초에
-					 * 읽어들인경우 파일 내용을 읽어들이기 위한 조건처리이다.
+					 * 처음에는 수정된 일짜 정보 기준으로 처리하였으나, OS영역에서 파일 내용이 변경되어도 반영이 잘
+					 * 이루어지지않음. 그래서 파일 사이즈 기준으로 변경유무를 추가. lastReadTime == -1 의
+					 * 조건은 최초에 읽어들인경우 파일 내용을 읽어들이기 위한 조건처리이다.
 					 */
 					if (lastReadTime == -1 || (space != lastLength.get()) || (lastModified > lastReadTime)) {
 
@@ -310,7 +336,8 @@ public class LogViewController implements Closeable {
 					isRunning.lazySet(true);
 
 				}
-			}, 0, watchDelayTimeMills());
+			};
+			fileWatcher.scheduleAtFixedRate(task, 0, watchDelayTimeMills());
 
 		}
 	}
@@ -340,11 +367,11 @@ public class LogViewController implements Closeable {
 		});
 
 		/* Create Change Model */
-//		Chagne chg = new Chagne();
-//		chg.setContent(string);
-//		onChangeListener.forEach(v -> {
-//
-//		});
+		// Chagne chg = new Chagne();
+		// chg.setContent(string);
+		// onChangeListener.forEach(v -> {
+		//
+		// });
 	}
 
 	/**
