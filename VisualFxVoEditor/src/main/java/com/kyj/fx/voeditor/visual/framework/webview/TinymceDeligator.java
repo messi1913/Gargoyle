@@ -6,13 +6,23 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.framework.webview;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.util.Base64;
+import java.util.List;
+import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -21,12 +31,18 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
@@ -226,6 +242,75 @@ public class TinymceDeligator {
 		}
 	};
 
+	private EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
+		@Override
+		public void handle(KeyEvent ev) {
+
+			if (ev.isControlDown() && ev.getCode() == KeyCode.V) {
+				pasteHandler(ev);
+			}
+		}
+	};
+
+	/**
+	 * 붙여넣기 핸들링 <br/>
+	 * 
+	 * 10.26 이미지 붙여넣기
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 26.
+	 * @param ev
+	 */
+	protected void pasteHandler(KeyEvent ev) {
+		Clipboard systemClipboard = Clipboard.getSystemClipboard();
+		Set<DataFormat> contentTypes = systemClipboard.getContentTypes();
+		LOGGER.debug("{}", contentTypes);
+
+		List<File> files = systemClipboard.getFiles();
+
+		if (systemClipboard.getImage() != null) {
+			pasteImage(systemClipboard.getImage());
+		} else if (files != null) {
+
+			for (File f : files) {
+				try {
+					String contentType = Files.probeContentType(f.toPath());
+					LOGGER.debug(contentType);
+					if (contentType.startsWith("image/")) {
+						pasteImage(contentType, FileUtil.getBytes(f));
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private void pasteImage(Image img) {
+		try {
+			LOGGER.debug("image.");
+			BufferedImage in = SwingFXUtils.fromFXImage(img, null);
+			try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+				ImageIO.write(in, "png", out);
+				String imageData = Base64.getEncoder().encodeToString(out.toByteArray());
+				setText(String.format("<img src=data:image/jpeg;base64,%s></img>", imageData));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void pasteImage(String contentType, byte[] bytes) {
+		try {
+			try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+				String imageData = Base64.getEncoder().encodeToString(bytes);
+				setText(String.format("<img src=data:" + contentType + ";base64,%s></img>", imageData));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * 생성자로 객체생성후 initialize 호출.
 	 * 
@@ -240,6 +325,8 @@ public class TinymceDeligator {
 			// Define Context Menu.
 			webview.setContextMenuEnabled(false);
 			webview.setOnContextMenuRequested(contextMenuRequestHandler);
+
+			webview.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
 
 			// Define Events.
 			engine.setOnError(onErrorHandler);
@@ -300,14 +387,16 @@ public class TinymceDeligator {
 						sb.append(" \n");
 						sb.append("},100)\n");
 						// LOGGER.debug(sb.toString());
-
+						LOGGER.debug("setTimeout");
 						webview.getEngine().executeScript(sb.toString());
 						webViewLoaded.removeListener(this);
 					}
 				}
 			};
+			LOGGER.debug("Add Listener.");
 			webViewLoaded.addListener(listener);
 		} else {
+			LOGGER.debug("Apply Text {} ", content);
 			webview.getEngine().executeScript(String.format("tinymce.activeEditor.setContent(\"%s\");", content));
 		}
 
