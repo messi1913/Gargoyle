@@ -314,7 +314,9 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 		} catch (RejectedExecutionException e) {
 
 			if (gargoyleThreadExecutors.isShutdown() || gargoyleThreadExecutors.isTerminated()) {
-				gargoyleThreadExecutors = ExecutorDemons.newFixedThreadExecutor(REALTIME_SRCH_THREAD_POOL_NAME, 1);
+				// gargoyleThreadExecutors =
+				// ExecutorDemons.newFixedThreadExecutor(REALTIME_SRCH_THREAD_POOL_NAME,
+				// 1);
 				service.setExecutor(gargoyleThreadExecutors);
 			}
 
@@ -487,18 +489,12 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 	 */
 	protected void reload() {
 
-		if (gargoyleThreadExecutors.isShutdown() || gargoyleThreadExecutors.isTerminated()) {
-
-			if (service.isRunning()) {
-				service.cancel();
-				gargoyleThreadExecutors.shutdown();
-			}
-
-			service.setExecutor(gargoyleThreadExecutors = ExecutorDemons.newFixedThreadExecutor(REALTIME_SRCH_THREAD_POOL_NAME, 1));
-		}
-
 		if (service.isRunning()) {
 			return;
+		}
+
+		if (gargoyleThreadExecutors.isShutdown() || gargoyleThreadExecutors.isTerminated()) {
+			service.setExecutor(gargoyleThreadExecutors);
 		}
 
 		if (State.SUCCEEDED == service.getState()) {
@@ -564,7 +560,7 @@ public class NrchRealtimeSrchFlowComposite extends CloseableParent<BorderPane> {
 	@Override
 	public void close() throws IOException {
 		if (service != null) {
-			
+
 			isRecycle.set(false);
 			gargoyleThreadExecutors.shutdown();
 		}
