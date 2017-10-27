@@ -46,6 +46,12 @@ public class XMLFormatter implements Formatter {
 	public static XMLFormatter newInstnace() {
 		return new XMLFormatter();
 	}
+	
+	private boolean suppressDeclaration = true;
+	
+	public void setSuppressDeclaration(boolean suppressDeclaration) {
+		this.suppressDeclaration = suppressDeclaration;
+	}
 
 	// public static void main(String[] args) throws IOException,
 	// DocumentException {
@@ -123,7 +129,7 @@ public class XMLFormatter implements Formatter {
 			xmlEncoding = doc.getXMLEncoding();
 
 			OutputFormat format = OutputFormat.createPrettyPrint();
-			format.setSuppressDeclaration(true);
+			format.setSuppressDeclaration(suppressDeclaration);
 //			format.setTrimText(true);
 			xmlWriter = new XMLWriter(out, format);
 			xmlWriter.write(doc.getDocument());
