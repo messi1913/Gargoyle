@@ -1560,6 +1560,17 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				DockTab tab = new DockTab(tableName, parent);
 				loadNewSystemTab(tableName, tab, skin);
+
+				tab.setOnCloseRequest(ev -> {
+					try {
+						LOGGER.debug("closeable parent on close request , tabName : {} ", tableName);
+						if (parent instanceof Closeable) {
+							((Closeable) parent).close();
+						}
+					} catch (Exception e) {
+						LOGGER.error(ValueUtil.toString(e));
+					}
+				});
 			} catch (Exception e1) {
 				DialogUtil.showExceptionDailog(e1);
 			}
@@ -1612,6 +1623,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			_tabPanable.setTab(tab);
 			_tabPanable.setTabPane(tabPanWorkspace);
 		}
+
 	}
 
 	/**
@@ -1651,6 +1663,16 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 				DockTab tab = new DockTab(tableName, _parent);
 				loadNewSystemTab(tableName, tab);
+
+				tab.setOnCloseRequest(ev -> {
+					try {
+						LOGGER.debug("closeable parent on close request , tabName : {} ", tableName);
+						parent.close();
+					} catch (Exception e) {
+						LOGGER.error(ValueUtil.toString(e));
+					}
+				});
+
 				/*
 				 * DockTab tab = new DockTab(tableName, _parent); // 툴팁 처리
 				 * (클래스위치) tab.setTooltip(new
@@ -2150,7 +2172,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	 */
 	@FXML
 	public void miSimpleTextViewOnAction() {
-		SimpleTextView newInstance = new SimpleTextView("");		
+		SimpleTextView newInstance = new SimpleTextView("");
 		loadNewSystemTab(SimpleTextView.APP_NAME, newInstance);
 	}
 
