@@ -139,7 +139,11 @@ public class ResourcesConfigView extends BorderPane {
 		observableArrayList = loadResource();
 		tbDatabase.getItems().addAll(observableArrayList);
 		
+		tbDatabase.getSelectionModel().setCellSelectionEnabled(true);
+		
 		FxUtil.installClipboardKeyEvent(tbDatabase);
+		
+		
 	}
 
 	/**
