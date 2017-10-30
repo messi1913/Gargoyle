@@ -21,6 +21,36 @@ public class SenderMailInfo {
 	 */
 	private String sendUserPassword;
 
+	public String host;
+
+	public String port;
+
+	public MailType type = MailType.SMPT;
+
+	public enum MailType {
+		SMPT, POP3;
+	}
+
+	public String getPort() {
+		return port;
+	}
+
+	public void setPort(String port) {
+		this.port = port;
+	}
+
+	public MailType getType() {
+		return type;
+	}
+
+	public void setType(MailType type) {
+		this.type = type;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
 	/**
 	 * @return the sendUserId
 	 */
@@ -56,7 +86,6 @@ public class SenderMailInfo {
 	}
 
 	public Session getSession() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -66,8 +95,7 @@ public class SenderMailInfo {
 	}
 
 	public String getHost() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.host;
 	}
 
 }

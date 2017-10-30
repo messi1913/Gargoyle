@@ -106,9 +106,13 @@ public class MailUtil {
 		SenderMailInfo sender = null;
 
 		// 데이터베이스 관리 계정 존재하면 디비에 저장된 계정을 이용함.
-		if ("Y".equals(ResourceLoader.getInstance().get(ResourceLoader.SENDMAIL_CUSTOM_ACCOUNT_USE_YN))) {
+		if ("Y".equals(ResourceLoader.getInstance().get(ResourceLoader.SENDMAIL_CUSTOM_ACCOUNT_USE_YN, "Y"))) {
 			String userId = ResourceLoader.getInstance().get(ResourceLoader.SENDMAIL_CUSTOM_USER_ID);
 			String userPwd = ResourceLoader.getInstance().get(ResourceLoader.SENDMAIL_CUSTOM_USER_PASSWORD);
+
+			String host = ResourceLoader.getInstance().get(ResourceLoader.SENDMAIL_CUSTOM_USER_HOST);
+			String port = ResourceLoader.getInstance().get(ResourceLoader.SENDMAIL_CUSTOM_USER_PORT);
+			String protocol = ResourceLoader.getInstance().get(ResourceLoader.SENDMAIL_CUSTOM_USER_PROTOCOL_TYPE, "SMPT");
 
 			if (ValueUtil.isEmpty(userId, userPwd)) {
 				throw new InvalidArgumentException("sender email id or password is null");
@@ -117,6 +121,16 @@ public class MailUtil {
 			sender = new SenderMailInfo();
 			sender.setSendUserId(userId);
 			sender.setSendUserPassword(userPwd);
+
+			sender.setHost(host);
+			sender.setPort(port);
+
+			try {
+				SenderMailInfo.MailType type = SenderMailInfo.MailType.valueOf(protocol);
+				sender.setType(type);
+			} catch (Exception e) {
+				// Nothing.
+			}
 
 		} else {
 			sender = BeanUtil.getBean("mailSenderInfo", SenderMailInfo.class);

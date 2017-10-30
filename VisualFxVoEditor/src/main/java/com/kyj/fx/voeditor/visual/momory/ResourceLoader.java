@@ -193,6 +193,13 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static final String SENDMAIL_CUSTOM_ACCOUNT_USE_YN = "sendmail.custom.account.use.yn";
 	public static final String SENDMAIL_CUSTOM_USER_ID = "sendmail.custom.user.id";
 	public static final String SENDMAIL_CUSTOM_USER_PASSWORD = "sendmail.custom.user.password";
+	
+	public static final String SENDMAIL_CUSTOM_USER_HOST = "sendmail.custom.user.host";
+	public static final String SENDMAIL_CUSTOM_USER_PORT = "sendmail.custom.user.port";
+	//SMPT OR POP3 . default SMTP
+	public static final String SENDMAIL_CUSTOM_USER_PROTOCOL_TYPE = "sendmail.custom.user.protocol.type";
+	
+	
 
 	private String[] baseKeys = { BASE_KEY_JDBC_INFO, BASE_KEY_JDBC_DRIVER, BASE_KEY_JDBC_URL, BASE_KEY_JDBC_ID, BASE_KEY_JDBC_PASS,
 			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES };
