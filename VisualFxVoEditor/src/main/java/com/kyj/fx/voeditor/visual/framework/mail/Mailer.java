@@ -14,6 +14,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
@@ -25,6 +27,9 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
  *
  */
 public class Mailer {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Mailer.class);
+
 	private JavaMailSenderImpl mailSender;
 
 	@Deprecated
@@ -71,6 +76,10 @@ public class Mailer {
 		this.encoding = encoding;
 	}
 
+	public JavaMailSenderImpl getMailSender() {
+		return mailSender;
+	}
+
 	/**
 	 * @param mailUseYn
 	 *            the mailUseYn to set
@@ -107,12 +116,11 @@ public class Mailer {
 		helper.setTo(mail.getMailTo().stream().toArray(String[]::new));
 
 		helper.setCc(mail.getMailCc().stream().toArray(String[]::new));
-		
+
 		helper.setBcc(mail.getBcc().stream().toArray(String[]::new));
-		
+
 		helper.setSentDate(new Date());
-		
-		
+
 		if (mail.getMailSubject() != null) {
 			helper.setSubject(mail.getMailSubject());
 		} else {
@@ -123,6 +131,11 @@ public class Mailer {
 			_encoding = encoding;
 
 		if (mailSenderInfo != null) {
+
+			Properties javaMailProperties = mailSenderInfo.getJavaMailProperties();
+			if (javaMailProperties != null)
+				mailSender.setJavaMailProperties(javaMailProperties);
+
 			String sendUserId = mailSenderInfo.getSendUserId();
 			String sendUserPassword = mailSenderInfo.getSendUserPassword();
 			if (ValueUtil.isNotEmpty(sendUserId)) {
@@ -135,12 +148,33 @@ public class Mailer {
 			}
 
 			mailSender.setDefaultEncoding(mailSenderInfo.getDefaultEncoding());
+
 			String host = mailSenderInfo.getHost();
-			if (host != null)
+			if (ValueUtil.isNotEmpty(host))
 				mailSender.setHost(host);
-			Properties javaMailProperties = mailSenderInfo.getJavaMailProperties();
-			if (javaMailProperties != null)
-				mailSender.setJavaMailProperties(javaMailProperties);
+
+			String port = mailSenderInfo.getPort();
+			if (ValueUtil.isNotEmpty(port)) {
+				try {
+
+					mailSender.setPort(Integer.parseInt(port));
+				} catch (NumberFormatException e) {
+					LOGGER.error(ValueUtil.toString(e));
+					throw e;
+				}
+			}
+
+			switch (mailSenderInfo.getType()) {
+			case POP3:
+				mailSender.getJavaMailProperties().put("mail.pop3.starttls.enable", "true");
+				mailSender.getJavaMailProperties().put("mail.smtp.starttls.enable", "false");
+				break;
+			case SMPT:
+				mailSender.getJavaMailProperties().put("mail.pop3.starttls.enable", "false");
+				mailSender.getJavaMailProperties().put("mail.smtp.starttls.enable", "true");
+				break;
+			}
+
 		}
 
 		String mailContent = mail.getMailContent();
@@ -167,8 +201,7 @@ public class Mailer {
 		for (AttachmentItem item : attachmentItems) {
 			helper.addAttachment(item.getDisplayName(), item.getDataSource());
 		}
-		
-		
+
 		mailSender.send(message);
 
 	}

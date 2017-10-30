@@ -184,7 +184,6 @@ class MailViewComposite extends BorderPane implements Closeable {
 			};
 
 			engine.getLoadWorker().stateProperty().addListener(listener);
-
 			engine.load(new File("javascript/tinymce/index.html").toURI().toURL().toExternalForm());
 
 		} catch (MalformedURLException e) {
