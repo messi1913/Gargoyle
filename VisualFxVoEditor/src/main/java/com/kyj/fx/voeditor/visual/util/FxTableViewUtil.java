@@ -391,8 +391,13 @@ class FxTableViewUtil {
 						}
 					} catch (Exception e) {
 						// Nothing...
+						call = getValue(tc.getTableView(), tc, row);
+//						Object item = cell.getItem();
+//						call = item.toString();
 					}
 				}
+				
+			
 
 				if (converter != null) {
 					Object cellData = tc.getCellData(row);

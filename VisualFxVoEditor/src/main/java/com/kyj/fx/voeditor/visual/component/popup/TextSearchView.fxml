@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root prefHeight="308.0" prefWidth="556.0" stylesheets="@TextSearchView.css" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="308.0" prefWidth="556.0" stylesheets="@TextSearchView.css" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
 		<BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<center>
@@ -45,7 +45,7 @@
 												<VBox alignment="TOP_CENTER" prefHeight="233.0" prefWidth="27.0" spacing="5.0" GridPane.columnIndex="6" GridPane.rowIndex="1" GridPane.rowSpan="2">
 													<children>
 														<Button fx:id="btnFindNext" mnemonicParsing="false" onMouseClicked="#btnFindNextOnMouseClick" prefWidth="100.0" text="다음찾기" />
-														<Button mnemonicParsing="false" onMouseClicked="#btnMatchCountOnMouseClick" prefWidth="100.0" text="일치하는 수" />
+														<Button fx:id="btnMatchedCount" mnemonicParsing="false" onMouseClicked="#btnMatchCountOnMouseClick" prefWidth="100.0" text="일치하는 수" />
 														<Button mnemonicParsing="false" onMouseClicked="#btnCloseOnMouseClick" prefWidth="100.0" text="닫기" />
 													</children>
 													<padding>
