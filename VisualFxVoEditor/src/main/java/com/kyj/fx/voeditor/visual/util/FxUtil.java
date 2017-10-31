@@ -57,6 +57,7 @@ import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
+import com.kyj.fx.voeditor.visual.example.TableViewSearchExam.Value;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.InstanceTypes;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
@@ -2106,11 +2107,11 @@ public class FxUtil {
 	 * 다른이름으로 저장 처리에 대한 공통 API
 	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 1. 13.  <br/>
-	 * 				  2017. 10. 20  리턴값 추가. 
+	 * @작성일 : 2017. 1. 13. <br/>
+	 *      2017. 10. 20 리턴값 추가.
 	 * @param owner
 	 * @param model
-	 * @return 
+	 * @return
 	 *
 	 */
 	public static <T> File saveAsFx(Window owner, SaveAsModel model) {
@@ -2139,7 +2140,7 @@ public class FxUtil {
 			FileUtil.writeFile(saveAs, model.getContent(), model.getEncoding(), model.onError());
 			model.onSuccess(saveAs);
 		}
-		
+
 		return saveAs;
 
 	}
@@ -2332,5 +2333,9 @@ public class FxUtil {
 
 		return new MouseEvent(MouseEvent.MOUSE_CLICKED, 0, 0, 0, 0, MouseButton.PRIMARY, 1, false, false, false, false, false, false, false,
 				false, false, false, null);
+	}
+
+	public static <T> void installFindKeyEvent(Window owner, TableView<T> tb) {
+		FxTableViewUtil.installFindKeyEvent(owner, tb);
 	}
 }

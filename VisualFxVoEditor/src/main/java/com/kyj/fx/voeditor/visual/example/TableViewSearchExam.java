@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.example;
 
 import com.kyj.fx.voeditor.visual.component.popup.TableViewSearchComposite;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
@@ -48,8 +49,7 @@ public class TableViewSearchExam extends Application {
 		primaryStage.setScene(sc);
 		primaryStage.show();
 
-		TableViewSearchComposite<Value> composite = new TableViewSearchComposite<Value>(primaryStage, t);
-		composite.show();
+		FxUtil.installFindKeyEvent(primaryStage, t);
 	}
 
 	public static class Value {

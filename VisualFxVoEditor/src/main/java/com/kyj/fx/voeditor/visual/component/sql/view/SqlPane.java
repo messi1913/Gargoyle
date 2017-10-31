@@ -445,6 +445,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		tbResult.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		// 키 이벤트 기능 설치.
 		FxUtil.installClipboardKeyEvent(tbResult);
+		FxUtil.installFindKeyEvent(FxUtil.getWindow(SqlPane.this), tbResult);
 
 		BorderPane tbResultLayout = new BorderPane(tbResult);
 		lblStatus = new Label("Ready...");
@@ -1297,7 +1298,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		ObservableList<Map<String, Object>> items = this.tbResult.getItems();
 		ToExcelFileFunction toExcelFileFunction = new ToExcelFileFunction();
-		//Bug Fix 
+		// Bug Fix
 		List<String> columns = this.tbResult.getColumns().stream().skip(1).map(col -> col.getText()).collect(Collectors.toList());
 		toExcelFileFunction.generate0(saveFile, columns, items);
 

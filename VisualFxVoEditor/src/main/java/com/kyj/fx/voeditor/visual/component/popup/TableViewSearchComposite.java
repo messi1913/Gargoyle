@@ -6,8 +6,10 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.popup;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -39,6 +42,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /**
  * 텍스트기반 검색
@@ -77,7 +81,7 @@ public class TableViewSearchComposite<T> extends BorderPane {
 	 */
 	private ObjectProperty<SearchResultVO> searchResultVOProperty;
 
-	private Stage owner;
+	private Window owner;
 
 	/**
 	 * 범위선택 라이오 박스를 선택했는지 유무
@@ -119,13 +123,16 @@ public class TableViewSearchComposite<T> extends BorderPane {
 
 	private TableView<T> tbContent;
 
+	@FXML
+	private RadioButton rbDirUp, rbDirDown;
+
 	/**
 	 * 생성자
 	 *
 	 * @param parent
 	 * @param content
 	 */
-	public TableViewSearchComposite(Stage owner, TableView<T> tb) {
+	public TableViewSearchComposite(Window owner, TableView<T> tb) {
 
 		FxUtil.loadRoot(TableViewSearchComposite.class, this, err -> {
 			LOGGER.error(ValueUtil.toString(err));
@@ -174,7 +181,8 @@ public class TableViewSearchComposite<T> extends BorderPane {
 	/****************************************************************/
 
 	/**
-	 * 검색 처리를 진행하며 검색이 완료되면 searchResultVOProperty에 값을 set함과 동시에 부가정보 ( slidingStartIndexProperty, slidingEndIndexProperty )를 갱신함.
+	 * 검색 처리를 진행하며 검색이 완료되면 searchResultVOProperty에 값을 set함과 동시에 부가정보 (
+	 * slidingStartIndexProperty, slidingEndIndexProperty )를 갱신함.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 12. 14.
@@ -185,7 +193,8 @@ public class TableViewSearchComposite<T> extends BorderPane {
 	}
 
 	/**
-	 * 검색 처리를 진행하며 검색이 완료되면 searchResultVOProperty에 값을 set함과 동시에 부가정보 ( slidingStartIndexProperty, slidingEndIndexProperty )를 갱신함.
+	 * 검색 처리를 진행하며 검색이 완료되면 searchResultVOProperty에 값을 set함과 동시에 부가정보 (
+	 * slidingStartIndexProperty, slidingEndIndexProperty )를 갱신함.
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 10. 29.
@@ -212,43 +221,78 @@ public class TableViewSearchComposite<T> extends BorderPane {
 		ObservableList<T> items = this.tbContent.getItems();
 		ObservableList<TableColumn<T, ?>> columns = this.tbContent.getColumns();
 
-		b: for (int i = slidingStartRowIndexProperty.get(), max = items.size(); i < max; i++) {
-
-			for (TableColumn<T, ?> c : columns) {
-				String content = FxUtil.getDisplayText(c, i).toString();
-
-				int startIdx = content.indexOf(findWord);
-
-				if (startIdx >= 0) {
-					int endIdx = startIdx + findWord.length();
-
-					SearchResultVO value = new SearchResultVO();
-					value.setSearchText(findWord);
-					value.setStartIndex(startIdx);
-					value.setEndIndex(endIdx);
-
-					if (function != null)
-						value = function.apply(value);
-
-					searchResultVOProperty.set(value);
-
-					slidingStartRowIndexProperty.set(i + 1);
-					this.tbContent.scrollTo(i);
-					this.tbContent.getSelectionModel().select(i);
-
-					break b;
-				} else {
-					slidingStartRowIndexProperty.set(0);
-				}
+		int size = items.size();
+		if (rbDirDown.isSelected()) {
+			for (int i = slidingStartRowIndexProperty.get(), max = size; i < max; i++) {
+				boolean find = find(findWord, function, columns, size, i, t -> true);
+				if (find)
+					break;
 			}
 		}
 
+		if (rbDirUp.isSelected()) {
+			for (int i = slidingStartRowIndexProperty.get(); i >= 0; i--) {
+				boolean find = find(findWord, function, columns, size, i, t -> true);
+				if (find)
+					break;
+			}
+		}
 		return slidingStartRowIndexProperty.get();
+	}
+
+	private boolean find(String findWord, Function<SearchResultVO, SearchResultVO> function, ObservableList<TableColumn<T, ?>> columns,
+			int size, int index, Predicate<SearchResultVO> isBreak) {
+		for (TableColumn<T, ?> c : columns) {
+			String content = FxUtil.getDisplayText(c, index).toString();
+
+			int startIdx = content.indexOf(findWord);
+
+			if (startIdx >= 0) {
+				int endIdx = startIdx + findWord.length();
+
+				SearchResultVO value = new SearchResultVO();
+				value.setSearchText(findWord);
+				value.setStartIndex(startIdx);
+				value.setEndIndex(endIdx);
+
+				if (function != null)
+					value = function.apply(value);
+
+				searchResultVOProperty.set(value);
+
+				int nextIdx = index;
+				if (rbDirDown.isSelected()) {
+					if (size - 1 > nextIdx)
+						nextIdx++;
+				} else {
+					if (nextIdx > 0)
+						nextIdx--;
+				}
+
+				slidingStartRowIndexProperty.set(nextIdx);
+
+				this.tbContent.scrollTo(index);
+				TableViewSelectionModel<T> selectionModel = this.tbContent.getSelectionModel();
+				if (selectionModel.isCellSelectionEnabled()) {
+					selectionModel.select(index, c);
+				} else {
+					selectionModel.select(index);
+				}
+
+				if (isBreak.test(value)) {
+					return true;
+				}
+			}
+			// else {
+			// slidingStartRowIndexProperty.set(0);
+			// }
+		}
+		return false;
 	}
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 10. 29. 
+	 * @작성일 : 2017. 10. 29.
 	 */
 	public void findAll() {
 		findAll(txtFindTextContent.getText(), null);
@@ -256,7 +300,7 @@ public class TableViewSearchComposite<T> extends BorderPane {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 10. 29. 
+	 * @작성일 : 2017. 10. 29.
 	 * @param function
 	 */
 	public void findAll(Function<SearchResultVO, SearchResultVO> function) {
@@ -265,7 +309,7 @@ public class TableViewSearchComposite<T> extends BorderPane {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 10. 29. 
+	 * @작성일 : 2017. 10. 29.
 	 * @param findWord
 	 * @param function
 	 */
@@ -277,27 +321,7 @@ public class TableViewSearchComposite<T> extends BorderPane {
 		ObservableList<TableColumn<T, ?>> columns = this.tbContent.getColumns();
 
 		for (int i = 0, max = items.size(); i < max; i++) {
-
-			for (TableColumn<T, ?> c : columns) {
-				String content = FxUtil.getDisplayText(c, i).toString();
-
-				int startIdx = content.indexOf(findWord);
-
-				if (startIdx >= 0) {
-					int endIdx = startIdx + findWord.length();
-
-					SearchResultVO value = new SearchResultVO();
-					value.setSearchText(findWord);
-					value.setStartIndex(startIdx);
-					value.setEndIndex(endIdx);
-
-					if (function != null)
-						value = function.apply(value);
-
-					searchResultVOProperty.set(value);
-
-				}
-			}
+			find(findWord, function, columns, max, i, v -> false);
 		}
 
 	}
@@ -369,10 +393,9 @@ public class TableViewSearchComposite<T> extends BorderPane {
 		if (ValueUtil.isEmpty(findText))
 			return;
 
-		IntegerProperty count = new SimpleIntegerProperty();
-
+		AtomicInteger count = new AtomicInteger(0);
 		findAll(v -> {
-			count.add(1);
+			count.getAndAdd(1);
 			return v;
 		});
 		txtDesc.setText(String.format("Found Word \" %s \" : count : %d ", findText, count.get()));
@@ -395,7 +418,7 @@ public class TableViewSearchComposite<T> extends BorderPane {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 10. 29. 
+	 * @작성일 : 2017. 10. 29.
 	 */
 	public void show() {
 		Stage stage = new Stage();

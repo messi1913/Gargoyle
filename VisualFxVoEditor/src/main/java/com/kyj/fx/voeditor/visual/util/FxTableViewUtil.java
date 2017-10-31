@@ -17,6 +17,8 @@ import org.apache.commons.lang.SystemUtils;
 import com.kyj.fx.voeditor.visual.component.grid.AbstractDVO;
 import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
 import com.kyj.fx.voeditor.visual.component.grid.IOptions;
+import com.kyj.fx.voeditor.visual.component.popup.TableViewSearchComposite;
+import com.kyj.fx.voeditor.visual.example.TableViewSearchExam.Value;
 import com.kyj.fx.voeditor.visual.framework.excel.IExcelScreenHandler;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 
@@ -37,6 +39,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Window;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
@@ -133,8 +136,7 @@ class FxTableViewUtil {
 	 *
 	 * 테이블뷰 클립보드 기능.
 	 * 
-	 * @Deprecated COPY 기능과 PASTE 기능을 분리.
-	 *   installCopyHandler 사용할것
+	 * @Deprecated COPY 기능과 PASTE 기능을 분리. installCopyHandler 사용할것
 	 * @param table
 	 ********************************/
 	@SuppressWarnings("rawtypes")
@@ -218,14 +220,14 @@ class FxTableViewUtil {
 			SelectionMode selectionMode = selectionModel.getSelectionMode();
 			boolean cellSelectionEnabled = selectionModel.isCellSelectionEnabled();
 
-			//			switch (selectionMode) {
-			//			case SINGLE:
+			// switch (selectionMode) {
+			// case SINGLE:
 			//
-			//				break;
-			//			case MULTIPLE:
+			// break;
+			// case MULTIPLE:
 			//
-			//				break;
-			//			}
+			// break;
+			// }
 
 			if (!cellSelectionEnabled) {
 				Object selectedItem = table.getSelectionModel().getSelectedItem();
@@ -339,8 +341,9 @@ class FxTableViewUtil {
 
 	/**
 	 * 테이블컬럼에서 화면에 보여주는 텍스트를 리턴한다.
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 3. 31. 
+	 * @작성일 : 2017. 3. 31.
 	 * @param tc
 	 * @param row
 	 * @return
@@ -349,13 +352,14 @@ class FxTableViewUtil {
 	public static Object getDisplayText(TableColumn<?, ?> tc, int row) {
 
 		Callback cellFactory = tc.getCellFactory();
-		//		ObservableValue<?> cellObservableValue = tc.getCellObservableValue(row);
+		// ObservableValue<?> cellObservableValue =
+		// tc.getCellObservableValue(row);
 
-		if (cellFactory != null /*&& cellObservableValue != null*/) {
+		if (cellFactory != null /* && cellObservableValue != null */) {
 
-			//			Object value = cellObservableValue.getValue();
+			// Object value = cellObservableValue.getValue();
 
-			Object call = cellFactory.call(tc /*value*/);
+			Object call = cellFactory.call(tc /* value */);
 
 			if (call != null && call instanceof TableCell) {
 				TableCell cell = (TableCell) call;
@@ -365,19 +369,19 @@ class FxTableViewUtil {
 					converter = txtCell.getConverter();
 				}
 
-				//					else if (cell instanceof TextAreaTableCell) {
-				//						TextAreaTableCell txtCell = (TextAreaTableCell) cell;
-				//						converter = txtCell.getConverter();
-				//					} 
+				// else if (cell instanceof TextAreaTableCell) {
+				// TextAreaTableCell txtCell = (TextAreaTableCell) cell;
+				// converter = txtCell.getConverter();
+				// }
 				else if (cell instanceof ComboBoxTableCell) {
 					ComboBoxTableCell txtCell = (ComboBoxTableCell) cell;
 					converter = txtCell.getConverter();
 				}
 
-				//					else if (cell instanceof HyperlinkTableCell) {
-				//						HyperlinkTableCell txtCell = (HyperlinkTableCell) cell;
-				//						converter = txtCell.getConverter();
-				//					}
+				// else if (cell instanceof HyperlinkTableCell) {
+				// HyperlinkTableCell txtCell = (HyperlinkTableCell) cell;
+				// converter = txtCell.getConverter();
+				// }
 				/* else 기본값. */
 				else {
 					try {
@@ -392,12 +396,10 @@ class FxTableViewUtil {
 					} catch (Exception e) {
 						// Nothing...
 						call = getValue(tc.getTableView(), tc, row);
-//						Object item = cell.getItem();
-//						call = item.toString();
+						// Object item = cell.getItem();
+						// call = item.toString();
 					}
 				}
-				
-			
 
 				if (converter != null) {
 					Object cellData = tc.getCellData(row);
@@ -413,7 +415,7 @@ class FxTableViewUtil {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 7. 17. 
+	 * @작성일 : 2017. 7. 17.
 	 * @param baseModel
 	 * @param view
 	 * @param option
@@ -427,7 +429,7 @@ class FxTableViewUtil {
 	public static class EasyMenuItem {
 		/**
 		 * @작성자 : KYJ
-		 * @작성일 : 2017. 7. 18. 
+		 * @작성일 : 2017. 7. 18.
 		 * @param target
 		 * @return
 		 */
@@ -475,6 +477,30 @@ class FxTableViewUtil {
 			});
 			return miExportExcel;
 		}
+	}
+
+	/**
+	 * tableView 찾기 기능을 추가한다. <br/>
+	 * 
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 10. 31.
+	 * @param owner
+	 *            부모 팝업
+	 * @param tb
+	 *            대상 테이블뷰
+	 */
+	public static <T> void installFindKeyEvent(Window owner, TableView<T> tb) {
+		tb.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
+			if (!ev.isAltDown() && !ev.isShiftDown() && ev.isControlDown() && ev.getCode() == KeyCode.F) {
+				if (ev.isConsumed())
+					return;
+				TableViewSearchComposite<T> composite = new TableViewSearchComposite<>(owner, tb);
+				composite.show();
+				ev.consume();
+			}
+		});
+
 	}
 
 }

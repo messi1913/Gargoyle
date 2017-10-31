@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root prefHeight="308.0" prefWidth="556.0" stylesheets="@TextSearchView.css" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="308.0" prefWidth="556.0" stylesheets="@TextSearchView.css" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
 		<BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<center>
@@ -71,12 +71,12 @@
 															</rowConstraints>
 															<children>
 																<Label text="방향" />
-																<RadioButton mnemonicParsing="false" selected="true" text="위" GridPane.rowIndex="1">
+																<RadioButton fx:id="rbDirUp" mnemonicParsing="false" selected="true" text="위" GridPane.rowIndex="1">
 																	<toggleGroup>
 																		<ToggleGroup fx:id="Direction" />
 																	</toggleGroup>
 																</RadioButton>
-																<RadioButton mnemonicParsing="false" selected="true" text="아래" toggleGroup="$Direction" GridPane.rowIndex="2" />
+																<RadioButton fx:id="rbDirDown" mnemonicParsing="false" selected="true" text="아래" toggleGroup="$Direction" GridPane.rowIndex="2" />
 															</children>
 														</GridPane>
 													</children>
