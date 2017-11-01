@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
@@ -174,7 +176,16 @@ class MailViewComposite extends BorderPane implements Closeable {
 					if (newValue == State.SUCCEEDED) {
 
 						if (ValueUtil.isNotEmpty(initCont)) {
-							engine.executeScript(" document.getElementById('gargoyle-textarea').innerHTML= '" + initCont + "'; ");
+
+							String[] split = initCont.split("\n");
+							Optional<String> reduce = Stream.of(split).map(str -> "<p>".concat(str).concat("</p>")).reduce((str1, str2) -> {
+								return str1.concat(str2);
+							});
+
+							reduce.ifPresent(str -> {
+								setText(str);
+							});
+
 						}
 
 						engine.getLoadWorker().stateProperty().removeListener(this);
@@ -184,7 +195,14 @@ class MailViewComposite extends BorderPane implements Closeable {
 			};
 
 			engine.getLoadWorker().stateProperty().addListener(listener);
+
 			engine.load(new File("javascript/tinymce/index.html").toURI().toURL().toExternalForm());
+
+			// engine.executeScript("
+			// document.getElementById('gargoyle-textarea').innerHTML= '<p>" +
+			// initCont + "</p> ' ");
+
+			// setText(initCont);
 
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -225,8 +243,10 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 							try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 								ImageIO.write(in, "png", out);
-//								File output = new File(FileUtil.getTempGagoyle(), DateUtil.getCurrentDateString() + ".png");
-//								ImageIO.write(in, "png", output);
+								// File output = new
+								// File(FileUtil.getTempGagoyle(),
+								// DateUtil.getCurrentDateString() + ".png");
+								// ImageIO.write(in, "png", output);
 								String imageData = Base64.getEncoder().encodeToString(out.toByteArray());
 
 								setText(String.format("<img src=data:image/jpeg;base64,%s></img>", imageData));
@@ -238,7 +258,8 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 					}
 
-					// Object content = systemClipboard.getContent(DataFormat.RTF);
+					// Object content =
+					// systemClipboard.getContent(DataFormat.RTF);
 					// LOGGER.debug("{}", content.toString());
 					// LOGGER.debug("ctrl + v");
 				}
@@ -306,6 +327,7 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 				@Override
 				public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+					LOGGER.debug("Changed..... {} ", newValue);
 					if (newValue) {
 
 						StringBuffer sb = new StringBuffer();
@@ -319,6 +341,7 @@ class MailViewComposite extends BorderPane implements Closeable {
 						engine.executeScript(sb.toString());
 						webViewLoaded.removeListener(this);
 					}
+
 				}
 			};
 
@@ -327,7 +350,8 @@ class MailViewComposite extends BorderPane implements Closeable {
 
 			// StringBuffer sb = new StringBuffer();
 			// sb.append("setTimeout(function(){\n");
-			// sb.append(String.format("tinymce.activeEditor.setContent('%s');", content));
+			// sb.append(String.format("tinymce.activeEditor.setContent('%s');",
+			// content));
 			// sb.append("tinymce.activeEditor.focus();\n");
 			// sb.append(" \n");
 			// sb.append("},100)\n");
@@ -344,7 +368,8 @@ class MailViewComposite extends BorderPane implements Closeable {
 		// tinymce.activeEditor.getContent({format: 'raw'}); } outText(); ");
 		Object executeScript = engine.executeScript("  tinymce.activeEditor.getContent({format: 'raw'}); ");
 		// 본문 타입
-		mail.setContentType(choContentType.getSelectionModel().getSelectedItem().toString() /* "text/html" */);
+		mail.setContentType(choContentType.getSelectionModel().getSelectedItem()
+				.toString() /* "text/html" */);
 
 		// 본문
 		mail.setMailContent(executeScript.toString());
