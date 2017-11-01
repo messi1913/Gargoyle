@@ -510,14 +510,33 @@ public class FileUtil implements GargoyleExtensionFilters {
 		return false;
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 1.
+	 * @param is
+	 * @return
+	 */
 	public static String readToString(InputStream is) {
+		return readToString(is, "UTF-8");
+	}
+
+	/**
+	 * 인코딩 옵션 추가. </br>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 1.
+	 * @param is
+	 * @param encoding
+	 * @return
+	 */
+	public static String readToString(InputStream is, String encoding) {
 		String result = "";
 		if (is != null) {
 			BufferedReader br = null;
 			StringBuffer sb = new StringBuffer();
 			String temp = null;
 			try {
-				br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+				br = new BufferedReader(new InputStreamReader(is, encoding));
 				while ((temp = br.readLine()) != null) {
 					sb.append(temp).append(System.lineSeparator());
 				}
@@ -990,13 +1009,28 @@ public class FileUtil implements GargoyleExtensionFilters {
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 10. 16. 
+	 * @작성일 : 2017. 10. 16.
 	 * @param imageFile
 	 * @return
 	 * @throws IOException
 	 */
 	public static byte[] getBytes(File imageFile) throws IOException {
 		return toByteArray(imageFile);
+	}
+
+	/**
+	 * 파일내용에 인코딩 정보가 존재하면 그 인코딩을 리턴합니다. </br>
+	 * 만약에 인코딩정보가 없다면 UTF-8을 리턴합니다 </br>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 1.
+	 * @param f
+	 *            인코딩을 찾을 파일.
+	 * @return 인코딩
+	 * @throws IOException
+	 */
+	public static String findEncoding(File f) throws IOException {
+		return new FileEncodingFinder(f).getEncoding();
 	}
 
 }

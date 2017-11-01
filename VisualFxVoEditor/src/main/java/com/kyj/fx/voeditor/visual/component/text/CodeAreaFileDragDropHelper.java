@@ -8,6 +8,7 @@ package com.kyj.fx.voeditor.visual.component.text;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.fxmisc.richtext.CodeArea;
@@ -36,8 +37,11 @@ public class CodeAreaFileDragDropHelper extends AbstractFileDragDropHelper<CodeA
 	/*********************************************************/
 	// 파일 드래그 드롭 처리.
 
-	/* (non-Javadoc)
-	 * @see com.kyj.fx.voeditor.visual.component.text.AbstractDragDropHelper#onDagOver(javafx.scene.input.DragEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.kyj.fx.voeditor.visual.component.text.AbstractDragDropHelper#
+	 * onDagOver(javafx.scene.input.DragEvent)
 	 */
 	@Override
 	public void onDagOver(DragEvent ev) {
@@ -51,8 +55,11 @@ public class CodeAreaFileDragDropHelper extends AbstractFileDragDropHelper<CodeA
 
 	}
 
-	/* (non-Javadoc)
-	 * @see com.kyj.fx.voeditor.visual.component.text.AbstractDragDropHelper#onDragDropped(javafx.scene.input.DragEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.kyj.fx.voeditor.visual.component.text.AbstractDragDropHelper#
+	 * onDragDropped(javafx.scene.input.DragEvent)
 	 */
 	@Override
 	public void onDragDropped(DragEvent ev) {
@@ -73,8 +80,15 @@ public class CodeAreaFileDragDropHelper extends AbstractFileDragDropHelper<CodeA
 
 				}
 
+				String encoding = "UTF-8";
+				try {
+					encoding = FileUtil.findEncoding(f);
+				} catch (IOException e1) {
+					// Not Important.
+				}
+
 				try (FileInputStream is = new FileInputStream(f)) {
-					setContent(FileUtil.readToString(is));
+					setContent(FileUtil.readToString(is, encoding));
 				} catch (Exception e) {
 					LOGGER.error(ValueUtil.toString(e));
 				}
