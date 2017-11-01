@@ -7,12 +7,7 @@
 package com.kyj.scm.manager.svn.java;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URLDecoder;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -26,11 +21,9 @@ import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
 import com.kyj.scm.manager.core.commons.ICatCommand;
-import com.kyj.scm.manager.stream.StringOutputStream;
 import com.sun.star.uno.RuntimeException;
 
 import kyj.Fx.dao.wizard.core.util.ValueUtil;
-
 
 /**
  * SVN의 CAT명령어를 수행한다.
@@ -43,6 +36,13 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 	private static Logger LOGGER = LoggerFactory.getLogger(SVNCat.class);
 
 	private static final String DEFAULT_ENCODING = "UTF-8";
+
+	/**
+	 * 3MB설정
+	 * 
+	 * @최초생성일 2017. 11. 2.
+	 */
+	private static final int LIMIT_READABLE_MAX_SIZE = 1024 * 1024 * 3;
 
 	/**
 	 * @param properties
@@ -188,21 +188,23 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 			 * Displays the file contents in the console if the file is a text.
 			 */
 			if (isTextType) {
-//				try (StringOutputStream out = new StringOutputStream()) {
-//					baos.writeTo(out);
+				// try (StringOutputStream out = new StringOutputStream()) {
+				// baos.writeTo(out);
 
-					result = baos.toString(encoding); // out.getString();
-//				}
+				result = baos.toString(encoding); // out.getString();
+				// }
 			}
 			/*
-			 * 2017.2.28
-			 * binay type은 무거운 데이터를 읽어들일수있는 가능성때문에 여기서 제외시켜놓겠음.
+			 * 2017.2.28 binay type은 무거운 데이터를 읽어들일수있는 가능성때문에 여기서 제외시켜놓겠음.
 			 */
-			else if(SVNProperty.isBinaryMimeType(mimeType))
-			{
-				result = mimeType + " is not support.";   //baos.toString(encoding);
-			}
-			else {
+			else if (SVNProperty.isBinaryMimeType(mimeType)) {
+				int size = baos.size();
+
+				if (LIMIT_READABLE_MAX_SIZE >= size)
+					result = baos.toString(encoding);
+				else
+					result = mimeType + " is not support. 3MB Over."; // baos.toString(encoding);
+			} else {
 				LOGGER.debug(
 						"File contents can not be displayed in the console since the mime-type property says that it's not a kind of a text file.");
 
@@ -214,11 +216,5 @@ class SVNCat extends AbstractSVN implements ICatCommand<String, String> {
 		}
 		return result;
 	}
-
-
-
-
-
-
 
 }
