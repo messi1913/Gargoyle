@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,6 @@ import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.utils.EncrypUtil;
-import com.sun.jna.Platform;
 import com.sun.star.uno.RuntimeException;
 
 import javafx.beans.property.SimpleObjectProperty;
@@ -280,37 +278,20 @@ public class DatabaseUrlManagementView extends BorderPane {
 	/**
 	 * 화면에 리소스를 읽어들인다.
 	 *
-	 *
-	 * 변경이력 : 2015.11.30, kyj, static 으로 변경
-	 *
+	 * <br/>
+	 * 변경이력 : 
+	 * 2017.10.31 kyj  컨넥션 정보를 공통 API 함수로 변경.
+	 * 2015.11.30, kyj, static 으로 변경
+	 * 
 	 * @return
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 11. 4.
 	 */
-	@SuppressWarnings("unchecked")
 	public static ObservableList<Map<String, Object>> loadResource() {
-		ResourceLoader instance = ResourceLoader.getInstance();
-		ObservableList<Map<String, Object>> observableArrayList = FXCollections.observableArrayList();
-		Enumeration<Object> keySet = instance.keySet();
-		while (keySet.hasMoreElements()) {
-			Object _key = keySet.nextElement();
-			if (_key == null)
-				continue;
-			String key = (String) _key;
-			if (!key.startsWith("database.info."))
-				continue;
-
-			String value = instance.get(key);
-			if ("jdbc.pass".equals(key))
-				value = decryp(value);
-			JSONObject json = ValueUtil.toJSONObject(value);
-			Map<String, Object> map = new HashMap<String, Object>(json);
-			map.put("seqNum", key);
-			observableArrayList.add(0, map);
-		}
-
-		return observableArrayList;
+		List<Map<String, Object>> items = DbUtil.getAvailableConnections();
+		return FXCollections.observableArrayList(items);
+		
 	}
 
 	// private static String encryp(Object str) {
