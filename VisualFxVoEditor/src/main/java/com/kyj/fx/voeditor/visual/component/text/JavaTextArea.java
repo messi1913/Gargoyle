@@ -71,9 +71,9 @@ public class JavaTextArea extends BorderPane {
 	private Label lblLineInfo = new Label();
 
 	/**
-	 * 인스턴스의 수와 상관없이 무조건 1개의 서비스로 사용.
-	 * 처음에 생성자에 생성했는데, 스레드수가 너무 많이 늘어남. 사실 이 클래스는 어플리케이션당 하나만 사용하여
-	 * 관리해도 상관없다고 판단.
+	 * 인스턴스의 수와 상관없이 무조건 1개의 서비스로 사용. 처음에 생성자에 생성했는데, 스레드수가 너무 많이 늘어남. 사실 이 클래스는
+	 * 어플리케이션당 하나만 사용하여 관리해도 상관없다고 판단.
+	 * 
 	 * @최초생성일 2016. 10. 18.
 	 */
 	private static final ExecutorService executor = ExecutorDemons.newSingleThreadExecutor();
@@ -82,11 +82,7 @@ public class JavaTextArea extends BorderPane {
 
 	// 선택 범위 지정
 	private EventHandler<? super MouseEvent> defaultSelectionHandler = event -> {
-		if (event.getClickCount() == 1) {
-			// codeArea.setStyleSpans(0,
-			// groupBackgroundColor(codeArea.getText(),
-			// codeArea.getCaretPosition()));
-		} else if (event.getClickCount() == 2) {
+		if (event.getClickCount() == 2) {
 			String selectedText = codeArea.getSelectedText();
 			if (ValueUtil.isNotEmpty(selectedText)) {
 				IndexRange selection = codeArea.getSelection();
@@ -98,32 +94,16 @@ public class JavaTextArea extends BorderPane {
 			}
 		}
 	};
+
 	public JavaTextArea() {
 		this("");
 	}
+
 	public JavaTextArea(String content) {
-
-
-		//
-		//		RuntimeClassUtil.addShutdownHook(() -> {
-		//
-		//			if (!executor.isTerminated())
-		//				executor.shutdownNow();
-		//
-		//		});
 
 		codeArea = new CodeArea();
 		codeHelperDeligator = new JavaCodeAreaHelper(codeArea);
 		codeArea.setParagraphGraphicFactory(getLineFactory());
-
-		//		codeArea.richChanges().subscribe(change -> {
-		//			codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
-		//		});
-
-		//		codeArea.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
-		//				.subscribe(change -> {
-		//					codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
-		//				});
 
 		codeArea.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
 				.successionEnds(Duration.ofMillis(500)).supplyTask(this::computeHighlightingAsync).awaitLatest(codeArea.richChanges())
@@ -138,20 +118,7 @@ public class JavaTextArea extends BorderPane {
 
 		// 마우스 클릭이벤트 정의
 		codeArea.addEventHandler(KeyEvent.KEY_PRESSED, this::codeAreaKeyClick);
-		// codeArea.setOnKeyPressed(this::codeAreaKeyClick);
-		//
 		codeArea.setOnMouseClicked(defaultSelectionHandler);
-
-		//		codeArea.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
-		//				.successionEnds(Duration.millis(500)).supplyTask(this::computeHighlightingAsync).awaitLatest(codeArea.richChanges())
-		//				.filterMap(t -> {
-		//					if (t.isSuccess()) {
-		//						return Optional.of(t.get());
-		//					} else {
-		//						t.getFailure().printStackTrace();
-		//						return Optional.empty();
-		//					}
-		//				}).subscribe(this::applyHighlighting);
 
 		codeArea.selectionProperty().addListener((oba, oldval, newval) -> {
 			int start = newval.getStart();
@@ -168,19 +135,15 @@ public class JavaTextArea extends BorderPane {
 		lblLineInfo.setMinHeight(USE_COMPUTED_SIZE);
 		lblLineInfo.setMaxHeight(USE_COMPUTED_SIZE);
 
-
-
 		this.setCenter(codeArea);
 		this.setBottom(lblLineInfo);
 		// this.getChildren().add(codeArea);
 
-		//		this.getStylesheets().add(JavaKeywordsAsync.class.getResource("java-keywords.css").toExternalForm());
+		// this.getStylesheets().add(JavaKeywordsAsync.class.getResource("java-keywords.css").toExternalForm());
 		this.getStylesheets().add(JavaTextArea.class.getResource("java-keywords.css").toExternalForm());
-		
-		
+
 		this.codeArea.appendText(content);
 
-		
 		UndoManager undoManager = codeArea.getUndoManager();
 		undoManager.forgetHistory();
 		undoManager.mark();
@@ -196,34 +159,17 @@ public class JavaTextArea extends BorderPane {
 		codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
 	}
 
-	//	public void setContent(String content) {
-	//		codeArea.clear();
-	//		codeArea.replaceText(0, 0, content);
-	//	}
-
 	public String getContent() {
 		return codeHelperDeligator.getText();
 	}
-
-	//	public void appendContent(String content) {
-	//		codeArea.replaceText(0, 0, content);
-	//	}
 
 	protected void setContent(List<String> readLines) {
 		setContent(readLines.stream().collect(Collectors.joining("\n")));
 	}
 
-	private void setContent(int start, int end, String text) {
-		codeHelperDeligator.setContent(start, end, text);
-	}
-
 	public void setContent(String content) {
 		codeHelperDeligator.setContent(content);
 	}
-	
-	
-
-    
 
 	public void setEditable(boolean editable) {
 		this.codeArea.setEditable(editable);
@@ -257,26 +203,6 @@ public class JavaTextArea extends BorderPane {
 	public IndexRange getParagraphSelection(int paragraph) {
 		return codeArea.getParagraphSelection(paragraph);
 	}
-	//	private static StyleSpans<Collection<String>> computeHighlighting(String text) {
-	//		Matcher matcher = PATTERN.matcher(text);
-	//		int lastKwEnd = 0;
-	//		StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-	//		while (matcher.find()) {
-	//			String styleClass = matcher.group("KEYWORD") != null ? "keyword"
-	//					: matcher.group("PAREN") != null ? "paren"
-	//							: matcher.group("BRACE") != null ? "brace"
-	//									: matcher.group("BRACKET") != null ? "bracket"
-	//											: matcher.group("SEMICOLON") != null ? "semicolon"
-	//													: matcher.group("STRING") != null ? "string"
-	//															: matcher.group("COMMENT") != null ? "comment" : null;
-	//			/* never happens */ assert styleClass != null;
-	//			spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
-	//			spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
-	//			lastKwEnd = matcher.end();
-	//		}
-	//		spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
-	//		return spansBuilder.create();
-	//	}
 
 	private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
 		codeArea.setStyleSpans(0, highlighting);
@@ -317,10 +243,6 @@ public class JavaTextArea extends BorderPane {
 		return task;
 	}
 
-	//	private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
-	//		codeArea.setStyleSpans(0, highlighting);
-	//	}
-
 	/**
 	 * 키클릭 이벤트 처리
 	 *
@@ -330,140 +252,21 @@ public class JavaTextArea extends BorderPane {
 	 */
 	public void codeAreaKeyClick(KeyEvent e) {
 		codeHelperDeligator.codeAreaKeyClick(e);
-		//
-		//		if ((e.getCode() == KeyCode.F) && (e.isControlDown() && !e.isShiftDown())) {
-		//
-		//			ObservableValue<String> textProperty = codeArea.textProperty();
-		//			TextSearchAndReplaceView textSearchView = new TextSearchAndReplaceView(this, textProperty);
-		//
-		//			textSearchView.setOnSearchResultListener((vo) -> {
-		//
-		//				switch (vo.getSearchType()) {
-		//				case SEARCH_SIMPLE: {
-		//					int startIndex = vo.getStartIndex();
-		//					int endIndex = vo.getEndIndex();
-		//					codeArea.selectRange(startIndex, endIndex);
-		//					LOGGER.debug(String.format("find text : %s startIdx :%d endIdx :%d", vo.getSearchText(), startIndex, endIndex));
-		//					break;
-		//				}
-		//				case SEARCH_ALL: {
-		//					int startIndex = vo.getStartIndex();
-		//					String searchText = vo.getSearchText();
-		//					String replaceText = vo.getReplaceText();
-		//					// codeArea.replaceText(startIndex, startIndex +
-		//					// searchText.length(), replaceText);
-		//					setContent(startIndex, startIndex + searchText.length(), replaceText);
-		//					break;
-		//				}
-		//				}
-		//
-		//			});
-		//
-		//			textSearchView.setOnReplaceResultListener(vo -> {
-		//				switch (vo.getReaplceType()) {
-		//				case SIMPLE: {
-		//					String reaplceResult = vo.getReaplceResult();
-		//					setContent(reaplceResult);
-		//					break;
-		//				}
-		//				case ALL: {
-		//					String reaplceResult = vo.getReaplceResult();
-		//					setContent(reaplceResult);
-		//					break;
-		//				}
-		//				}
-		//			});
-		//
-		//			textSearchView.isSelectScopePropertyProperty().addListener((oba, oldval, newval) -> {
-		//				if (newval)
-		//					LOGGER.debug("User Select Locale Scope..");
-		//				else
-		//					LOGGER.debug("User Select Gloval Scope..");
-		//			});
-		//
-		//			codeArea.setOnMouseClicked(event -> {
-		//
-		//				IndexRange selection = codeArea.getSelection();
-		//				int start = selection.getStart();
-		//				textSearchView.setSlidingStartIndexProperty(start);
-		//
-		//			});
-		//
-		//			textSearchView.show();
-		//
-		//			codeArea.setOnMouseClicked(defaultSelectionHandler);
-		//
-		//			e.consume();
-		//		}
-		//		// CTRL + SHIFT + F 포멧팅
-		//		//		else if (e.getCode() == KeyCode.F && (e.isControlDown() && e.isShiftDown())) {
-		//		//
-		//		//			doSqlFormat();
-		//		//			e.consume();
-		//		//		}
-		//		// Ctr + ALT +  U 선택된 문자 또는 전체 문자를 대문자로 치환
-		//		else if (e.getCode() == KeyCode.U && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
-		//			String selectedText = codeArea.getSelectedText();
-		//			if (ValueUtil.isNotEmpty(selectedText)) {
-		//				// codeArea.replaceSelection(sqlFormatter.toUpperCase(selectedText));
-		//				replaceSelection(ValueUtil.toUpperCase(selectedText));
-		//			} else {
-		//				String text = codeArea.getText();
-		//				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-		//				// codeArea.clear();
-		//				// codeArea.appendText(sqlFormatter.toUpperCase(text));
-		//				setContent(ValueUtil.toUpperCase(text));
-		//			}
-		//			e.consume();
-		//		}
-		//		// Ctr + ALT + L 선택된 문자 또는 전체 문자를 소문자로 치환
-		//		else if (e.getCode() == KeyCode.L && (e.isControlDown() && e.isAltDown() && !e.isShiftDown())) {
-		//			String selectedText = codeArea.getSelectedText();
-		//			if (ValueUtil.isNotEmpty(selectedText)) {
-		//				// codeArea.replaceSelection(sqlFormatter.toLowerCase(selectedText));
-		//				replaceSelection(ValueUtil.toLowerCase(selectedText));
-		//			} else {
-		//				String text = codeArea.getText();
-		//				//// 2016.2.15 undo,redo처리를 위해 setContent로 변경
-		//				// codeArea.clear();
-		//				// codeArea.appendText(sqlFormatter.toLowerCase(text));
-		//				setContent(ValueUtil.toUpperCase(text));
-		//			}
-		//			e.consume();
-		//		}
-		//		// CTRL + L 특정 라인위치로 이동
-		//		else if (e.getCode() == KeyCode.L && (e.isControlDown() && !e.isAltDown() && !e.isShiftDown())) {
-		//			Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog("Go to Line", "Enter line number");
-		//			showInputDialog.ifPresent(v -> {
-		//
-		//				ValueUtil.ifNumberPresent(v.getValue(), num -> {
-		//
-		//					moveToLine(num.intValue());
-		//
-		//				});
-		//			});
-		//
-		//		}
 	}
 
 	public void replaceSelection(String selection) {
 		codeHelperDeligator.replaceSelection(selection);
-		//		codeArea.getUndoManager().mark();
-		//		codeArea.replaceSelection(selection);
-		//		codeArea.getUndoManager().mark();
 	}
 
 	public void appendContent(String content) {
 		codeHelperDeligator.appendContent(content);
-		//		codeArea.getUndoManager().mark();
-		//		codeArea.appendText(content);
-		//		codeArea.getUndoManager().mark();
 	}
 
 	/**
 	 * 특정라인으로 이동처리하는 메소드
 	 *
 	 * 특정라인블록 전체를 선택처리함.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 10. 4.
 	 * @param moveToLine
@@ -491,11 +294,11 @@ public class JavaTextArea extends BorderPane {
 		return codeHelperDeligator.getCurrentLine();
 	}
 
-	public void lineStart(SelectionPolicy pol){
+	public void lineStart(SelectionPolicy pol) {
 		codeArea.lineStart(pol);
 	}
 
-	public void clearSelection(){
+	public void clearSelection() {
 		codeArea.deselect();
 	}
 }
