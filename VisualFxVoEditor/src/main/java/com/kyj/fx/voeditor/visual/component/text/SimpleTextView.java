@@ -211,6 +211,21 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 
 			@Override
 			public void customMenus(CodeArea codeArea, ContextMenu contextMenu) {
+
+				{
+					Menu miMail = new Menu("Mail");
+					MenuItem miSmtpMail = new MenuItem("SMTP Mail");
+					miMail.getItems().add(miSmtpMail);
+
+					miSmtpMail.setOnAction(ev -> {
+						MailViewCompositeWrapper wrapper = new MailViewCompositeWrapper(codeArea.getSelectedText());
+						SharedMemory.getSystemLayoutViewController().loadNewSystemTab(MailViewCompositeWrapper.getName(), wrapper);
+
+					});
+					contextMenu.getItems().add(miMail);
+
+				}
+
 				{
 					MenuItem e = new MenuItem("Show Application Code");
 					e.setOnAction(ev -> {
@@ -237,20 +252,6 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 					contextMenu.getItems().add(e);
 				}
 
-				{
-
-					Menu miMail = new Menu("Mail");
-					MenuItem miSmtpMail = new MenuItem("SMTP Mail");
-					miMail.getItems().add(miSmtpMail);
-
-					miSmtpMail.setOnAction(ev -> {
-						MailViewCompositeWrapper wrapper = new MailViewCompositeWrapper(codeArea.getSelectedText());
-						SharedMemory.getSystemLayoutViewController().loadNewSystemTab(MailViewCompositeWrapper.getName(), wrapper);
-
-					});
-					contextMenu.getItems().add(miMail);
-
-				}
 			}
 		});
 	}
