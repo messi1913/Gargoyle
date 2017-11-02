@@ -939,7 +939,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		// KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN));
 		menuFormatter.setOnAction(this::menuFormatterOnAction);
 
-		MenuItem menuShowApplicationCode = new MenuItem("Show Application Code");
+		MenuItem menuShowApplicationCode = new MenuItem("Show Application Code [Java]");
 		menuShowApplicationCode.setOnAction(this::menuShowApplicationCodeOnAction);
 
 		menuFunc.getItems().addAll(menuQueryMacro, menuFormatter, menuShowApplicationCode);
