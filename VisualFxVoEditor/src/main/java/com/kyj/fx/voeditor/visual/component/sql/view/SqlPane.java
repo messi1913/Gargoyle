@@ -109,6 +109,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
@@ -445,7 +446,10 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		tbResult.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		// 키 이벤트 기능 설치.
 		FxUtil.installClipboardKeyEvent(tbResult);
-		FxUtil.installFindKeyEvent(FxUtil.getWindow(SqlPane.this), tbResult);
+		Window window = FxUtil.getWindow(SqlPane.this);
+		if(window == null)
+			window = SharedMemory.getPrimaryStage();
+		FxUtil.installFindKeyEvent(window, tbResult);
 
 		BorderPane tbResultLayout = new BorderPane(tbResult);
 		lblStatus = new Label("Ready...");
