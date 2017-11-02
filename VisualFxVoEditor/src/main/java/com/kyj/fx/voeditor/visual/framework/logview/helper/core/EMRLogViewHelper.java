@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.kyj.fx.voeditor.visual.component.grid.AbstractDVO;
 import com.kyj.fx.voeditor.visual.component.grid.ColumnName;
 import com.kyj.fx.voeditor.visual.framework.logview.helper.converter.AbstractConverter;
@@ -29,6 +32,8 @@ import javafx.beans.property.StringProperty;
  *
  */
 public class EMRLogViewHelper extends LogViewHelper<String> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(EMRLogViewHelper.class);
 
 	public static final DateConverter DATE_CONVERTER = new DateConverter("[0-9]{14}", DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSS,
 			DateUtil.SYSTEM_DATEFORMAT_YYYY_MM_DD_HH_MM_SS);
@@ -148,11 +153,13 @@ public class EMRLogViewHelper extends LogViewHelper<String> {
 					info.setXml(m.getMatched());
 					info.setTransactionType(m.getName());
 				} else if (converter instanceof RequestMessageTypeConverter) {
-					if (m.getMatched() != null)
+					if (m.getMatched() != null) {
 						info.setServiceType(m.getMatched());
+					}
 				} else if (converter instanceof ResponseMessageTypeConverter) {
-					if (m.getMatched() != null)
+					if (m.getMatched() != null) {
 						info.setServiceType(m.getMatched());
+					}
 				}
 			}
 			return info;

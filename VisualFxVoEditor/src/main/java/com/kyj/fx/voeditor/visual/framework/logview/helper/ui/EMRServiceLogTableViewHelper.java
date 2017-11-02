@@ -80,10 +80,12 @@ public class EMRServiceLogTableViewHelper extends Thread {
 			String tmp = null;
 			while ((tmp = r.readLine()) != null) {
 				h.setText(tmp);
-				h.read();
-				DefaultFxDataInfo fxValue = h.getFxValue();
-				if (fxValue != null)
-					items.add(fxValue);
+				if (h.read()) {
+					DefaultFxDataInfo fxValue = h.getFxValue();
+					if (fxValue != null)
+						items.add(fxValue);
+				}
+
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -94,8 +96,9 @@ public class EMRServiceLogTableViewHelper extends Thread {
 
 	private Consumer<List<DefaultFxDataInfo>> action = items -> {
 		Platform.runLater(() -> {
+
 			this.view.getItems().addAll(items);
-			
+
 			// Install Table Filter.
 			Builder<DefaultFxDataInfo> forTableView = TableFilter.forTableView(view);
 			forTableView.lazy(true);

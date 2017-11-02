@@ -14,7 +14,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.kyj.fx.voeditor.visual.component.grid.AbstractDVO;
 import com.kyj.fx.voeditor.visual.framework.logview.helper.converter.Converter;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -100,6 +99,7 @@ public class LogViewHelper<T> {
 	}
 
 	public boolean read() {
+		items.clear();
 		boolean exists = false;
 		String tmp = readLine;
 		if (ValueUtil.isEmpty(tmp))
