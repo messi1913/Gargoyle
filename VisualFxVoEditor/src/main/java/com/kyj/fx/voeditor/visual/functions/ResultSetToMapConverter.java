@@ -144,6 +144,7 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 
 					if (isBigDataColumnSkip) {
 						switch (columnType) {
+
 						case Types.BLOB:
 							// map.put(metaData.getColumnLabel(c), new
 							// BigDataDVO("BLOB", value));
@@ -158,6 +159,13 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 						default:
 							String columnTypeName = metaData.getColumnTypeName(c);
 							int cType = metaData.getColumnType(c);
+
+							// 17.11.2 if the length over 3000 character replace by kyj.
+							if (value.length() > 3000) {
+								map.put(columnLabel,
+										isEmptyValue ? new BigDataDVO("{data.text}", value) : new BigDataDVO("{DATA.TEXT}", value));
+								break;
+							}
 
 							// mysql big data type.
 							if ("text".equals(columnTypeName)) {
@@ -204,7 +212,7 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 			}
 		} catch (SQLException e) {
 			LOGGER.error(ValueUtil.toString(e));
-			if(exceptionHandler!=null)
+			if (exceptionHandler != null)
 				exceptionHandler.accept(e);
 		}
 		return arrayList;
