@@ -161,7 +161,7 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 							int cType = metaData.getColumnType(c);
 
 							// 17.11.2 if the length over 3000 character replace by kyj.
-							if (value.length() > 3000) {
+							if (value!=null && value.length() > 3000) {
 								map.put(columnLabel,
 										isEmptyValue ? new BigDataDVO("{data.text}", value) : new BigDataDVO("{DATA.TEXT}", value));
 								break;
