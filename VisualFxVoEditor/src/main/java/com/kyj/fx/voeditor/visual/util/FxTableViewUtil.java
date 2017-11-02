@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 import org.apache.commons.lang.SystemUtils;
 
@@ -18,7 +19,6 @@ import com.kyj.fx.voeditor.visual.component.grid.AbstractDVO;
 import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
 import com.kyj.fx.voeditor.visual.component.grid.IOptions;
 import com.kyj.fx.voeditor.visual.component.popup.TableViewSearchComposite;
-import com.kyj.fx.voeditor.visual.example.TableViewSearchExam.Value;
 import com.kyj.fx.voeditor.visual.framework.excel.IExcelScreenHandler;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 
@@ -346,10 +346,11 @@ class FxTableViewUtil {
 	 * @작성일 : 2017. 3. 31.
 	 * @param tc
 	 * @param row
+	 * @param stringconverter
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Object getDisplayText(TableColumn<?, ?> tc, int row) {
+	public static Object getDisplayText(TableColumn<?, ?> tc, int row, BiFunction<TableColumn<?, ?>, Object, Object> customDataConverter) {
 
 		Callback cellFactory = tc.getCellFactory();
 		// ObservableValue<?> cellObservableValue =
@@ -360,6 +361,9 @@ class FxTableViewUtil {
 			// Object value = cellObservableValue.getValue();
 
 			Object call = cellFactory.call(tc /* value */);
+
+			if (customDataConverter != null)
+				return customDataConverter.apply(tc, call);
 
 			if (call != null && call instanceof TableCell) {
 				TableCell cell = (TableCell) call;
@@ -482,20 +486,23 @@ class FxTableViewUtil {
 	/**
 	 * tableView 찾기 기능을 추가한다. <br/>
 	 * 
-	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 10. 31.
 	 * @param owner
-	 *            부모 팝업
+	 *            owner 부모 팝업
 	 * @param tb
 	 *            대상 테이블뷰
+	 * @param customConverter
+	 *            데이터 변환 컨버터
 	 */
-	public static <T> void installFindKeyEvent(Window owner, TableView<T> tb) {
+	public static <T> void installFindKeyEvent(Window owner, TableView<T> tb,
+			BiFunction<TableColumn<?, ?>, Object, Object> customConverter) {
 		tb.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
 			if (!ev.isAltDown() && !ev.isShiftDown() && ev.isControlDown() && ev.getCode() == KeyCode.F) {
 				if (ev.isConsumed())
 					return;
 				TableViewSearchComposite<T> composite = new TableViewSearchComposite<>(owner, tb);
+				composite.setCustomConverter(customConverter);
 				composite.show();
 				ev.consume();
 			}

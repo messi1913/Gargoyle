@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -57,7 +58,6 @@ import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
-import com.kyj.fx.voeditor.visual.example.TableViewSearchExam.Value;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.InstanceTypes;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
@@ -2178,8 +2178,13 @@ public class FxUtil {
 	 * @param row
 	 * @return
 	 */
+
 	public static String getDisplayText(TableColumn<?, ?> tc, int row) {
-		return FxTableViewUtil.getDisplayText(tc, row).toString();
+		return FxTableViewUtil.getDisplayText(tc, row, null).toString();
+	}
+
+	public static String getDisplayText(TableColumn<?, ?> tc, int row, BiFunction<TableColumn<?, ?>, Object, Object> stringconverter) {
+		return FxTableViewUtil.getDisplayText(tc, row, stringconverter).toString();
 	}
 
 	public static Object getValue(TableView<?> table, TableColumn<?, ?> column, int rowIndex) {
@@ -2313,29 +2318,16 @@ public class FxUtil {
 	 * @return
 	 */
 	public static MouseEvent mouseEventForDummy() {
-		// NamedArg("eventType") EventType<? extends MouseEvent> eventType,
-		// @NamedArg("x") double x, @NamedArg("y") double y,
-		// @NamedArg("screenX") double screenX, @NamedArg("screenY") double
-		// screenY,
-		// @NamedArg("button") MouseButton button,
-		// @NamedArg("clickCount") int clickCount,
-		// @NamedArg("shiftDown") boolean shiftDown,
-		// @NamedArg("controlDown") boolean controlDown,
-		// @NamedArg("altDown") boolean altDown,
-		// @NamedArg("metaDown") boolean metaDown,
-		// @NamedArg("primaryButtonDown") boolean primaryButtonDown,
-		// @NamedArg("middleButtonDown") boolean middleButtonDown,
-		// @NamedArg("secondaryButtonDown") boolean secondaryButtonDown,
-		// @NamedArg("synthesized") boolean synthesized,
-		// @NamedArg("popupTrigger") boolean popupTrigger,
-		// @NamedArg("stillSincePress") boolean stillSincePress,
-		// @NamedArg("pickResult") PickResult pickResult
-
 		return new MouseEvent(MouseEvent.MOUSE_CLICKED, 0, 0, 0, 0, MouseButton.PRIMARY, 1, false, false, false, false, false, false, false,
 				false, false, false, null);
 	}
 
 	public static <T> void installFindKeyEvent(Window owner, TableView<T> tb) {
-		FxTableViewUtil.installFindKeyEvent(owner, tb);
+		installFindKeyEvent(owner, tb, null);
+	}
+
+	public static <T> void installFindKeyEvent(Window owner, TableView<T> tb,
+			BiFunction<TableColumn<?, ?>, Object, Object> customConverter) {
+		FxTableViewUtil.installFindKeyEvent(owner, tb, customConverter);
 	}
 }
