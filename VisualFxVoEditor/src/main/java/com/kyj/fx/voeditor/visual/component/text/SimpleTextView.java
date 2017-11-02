@@ -227,9 +227,18 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 				}
 
 				{
-					MenuItem e = new MenuItem("Show Application Code");
+					MenuItem e = new MenuItem("Show Application Code [Java]");
 					e.setOnAction(ev -> {
-						FxUtil.EasyFxUtils.showApplicationCode(codeArea.getSelectedText());
+						FxUtil.EasyFxUtils.showJavaApplicationCode(codeArea.getSelectedText());
+					});
+
+					contextMenu.getItems().add(e);
+				}
+
+				{
+					MenuItem e = new MenuItem("Show Application Code [C#]");
+					e.setOnAction(ev -> {
+						FxUtil.EasyFxUtils.showDotNetApplicationCode(codeArea.getSelectedText());
 					});
 
 					contextMenu.getItems().add(e);
@@ -291,8 +300,7 @@ public class SimpleTextView extends BorderPane implements PrimaryStageCloseable,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable#closeRequest()
+	 * @see com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable#closeRequest()
 	 */
 	@Override
 	public void closeRequest() {

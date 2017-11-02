@@ -171,8 +171,7 @@ public class FxUtil {
 		try {
 
 			/*
-			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된
-			 * 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
+			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
 			 */
 			File parentFile = new File(FileUtil.getTempGagoyle(), "font");
 			if (!parentFile.exists())
@@ -1389,15 +1388,34 @@ public class FxUtil {
 	 */
 	public static class EasyFxUtils {
 
+		public enum CodeType {
+			JAVA, DOT_NET
+		}
+
 		public static void showApplicationCode(String sql, Function<String, String> convert) {
+			showApplicationCode(CodeType.JAVA, sql, convert);
+		}
+
+		public static void showApplicationCode(CodeType codeType, String sql, Function<String, String> convert) {
 
 			String[] split = sql.split("\n");
 			StringBuilder sb = new StringBuilder();
-			sb.append("StringBuffer sb = new StringBuffer();\n");
-			for (String str : split) {
-				sb.append("sb.append(\"").append(convert.apply(str)).append("\\n").append("\");\n");
+			switch (codeType) {
+			case JAVA:
+				sb.append("StringBuffer sb = new StringBuffer();\n");
+				for (String str : split) {
+					sb.append("sb.append(\"").append(convert.apply(str)).append("\\n").append("\");\n");
+				}
+				sb.append("sb.toString();");
+				break;
+			case DOT_NET:
+				sb.append("StringBuilder sb = new StringBuilder();\n");
+				for (String str : split) {
+					sb.append("sb.Append(\"").append(convert.apply(str)).append("\\n").append("\");\n");
+				}
+				sb.append("sb.ToString();");
+				break;
 			}
-			sb.append("sb.toString();");
 
 			LOGGER.debug(sb.toString());
 
@@ -1469,33 +1487,38 @@ public class FxUtil {
 		};
 
 		/**
-		 * 어플리케이션 코드를 만들어주는 팝업을 보여준다.
+		 * 어플리케이션 코드를 만들어주는 팝업을 보여준다. </br>
 		 *
 		 * @작성자 : KYJ
 		 * @작성일 : 2016. 9. 23.
 		 * @param sql
 		 * @throws IOException
 		 */
-		public static void showApplicationCode(String sql) {
-
-			showApplicationCode(sql, smartDoubleDotConvert);
-			// String[] split = sql.split("\n");
-			// StringBuilder sb = new StringBuilder();
-			// sb.append("StringBuffer sb = new StringBuffer();\n");
-			// for (String str : split) {
-			// sb.append("sb.append(\"").append(str).append("\\n").append("\");\n");
-			// }
-			// sb.append("sb.toString();");
-			//
-			// LOGGER.debug(sb.toString());
-			//
-			// try {
-			// new JavaTextView(sb.toString()).show(800, 500);
-			// } catch (IOException e) {
-			// LOGGER.error(ValueUtil.toString(e));
-			// }
+		public static void showJavaApplicationCode(String sql) {
+			showApplicationCode(CodeType.JAVA, sql, smartDoubleDotConvert);
 		}
 
+		/**
+		 * 어플리케이션 코드를 만들어주는 팝업을 보여준다. </br>
+		 * 
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 11. 2.
+		 * @param sql
+		 */
+		public static void showApplicationCode(String sql) {
+			showApplicationCode(CodeType.JAVA, sql, smartDoubleDotConvert);
+		}
+
+		/**
+		 * 어플리케이션 코드를 만들어주는 팝업을 보여준다. </br>
+		 * 
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 11. 2.
+		 * @param sql
+		 */
+		public static void showDotNetApplicationCode(String sql) {
+			showApplicationCode(CodeType.DOT_NET, sql, smartDoubleDotConvert);
+		}
 	}
 
 	/**

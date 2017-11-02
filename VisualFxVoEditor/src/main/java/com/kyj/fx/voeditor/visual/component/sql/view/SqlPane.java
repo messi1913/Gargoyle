@@ -447,7 +447,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		// 키 이벤트 기능 설치.
 		FxUtil.installClipboardKeyEvent(tbResult);
 		Window window = FxUtil.getWindow(SqlPane.this);
-		if(window == null)
+		if (window == null)
 			window = SharedMemory.getPrimaryStage();
 		FxUtil.installFindKeyEvent(window, tbResult);
 
@@ -704,8 +704,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * 컨텍스트 메뉴 생성 및 기능 적용
 	 *
 	 *
-	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
-	 * setAccelerator에 등록된 이벤트가 호출안됨
+	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
 	 * 
 	 *
 	 * @param schemaTree2
@@ -912,8 +911,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 *
 	 * 2016-12-09 CodeAssistHelper 기능 추가.
 	 *
-	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
-	 * setAccelerator에 등록된 이벤트가 호출안됨
+	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
 	 *
 	 * @return
 	 */
@@ -940,9 +938,12 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		menuFormatter.setOnAction(this::menuFormatterOnAction);
 
 		MenuItem menuShowApplicationCode = new MenuItem("Show Application Code [Java]");
-		menuShowApplicationCode.setOnAction(this::menuShowApplicationCodeOnAction);
+		menuShowApplicationCode.setOnAction(this::menuShowJavaApplicationCodeOnAction);
 
-		menuFunc.getItems().addAll(menuQueryMacro, menuFormatter, menuShowApplicationCode);
+		MenuItem menuShowDotNetApplicationCode = new MenuItem("Show Application Code [C#]");
+		menuShowDotNetApplicationCode.setOnAction(this::menuShowDotNetApplicationCodeOnAction);
+		
+		menuFunc.getItems().addAll(menuQueryMacro, menuFormatter, menuShowApplicationCode , menuShowDotNetApplicationCode);
 
 		contextMenu.getItems().add(menuFunc);
 		return sqlTab;
@@ -987,14 +988,25 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	}
 
 	/**
-	 * Application Code를 보여주는 팝업
+	 * Application Code를 보여주는 팝업 </br>
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 9. 23.
 	 * @param e
 	 */
-	public void menuShowApplicationCodeOnAction(ActionEvent e) {
-		FxUtil.EasyFxUtils.showApplicationCode(this.sqlTab.getSelectedSQLText());
+	public void menuShowJavaApplicationCodeOnAction(ActionEvent e) {
+		FxUtil.EasyFxUtils.showJavaApplicationCode(this.sqlTab.getSelectedSQLText());
+	}
+
+	/**
+	 * Application Code를 보여주는 팝업 </br>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 2.
+	 * @param e
+	 */
+	public void menuShowDotNetApplicationCodeOnAction(ActionEvent e) {
+		FxUtil.EasyFxUtils.showDotNetApplicationCode(this.sqlTab.getSelectedSQLText());
 	}
 
 	/**
@@ -1045,8 +1057,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				// String driverName =
 				// DbUtil.getDriverNameByConnection(connection);
 				// String dbmsName = ValueUtil.getDriverToDBMSName(driverName);
-				showProperties(connectionSupplier, /* catalog */null,
-						/* schemaName */null, selectedSQLText);
+				showProperties(connectionSupplier, /* catalog */null, /* schemaName */null, selectedSQLText);
 			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
 			}
@@ -1712,8 +1723,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						});
 
 						FxUtil.installAutoTextFieldBinding(txtTable, () -> {
-							return searchPattern(txtSchema.getText(), txtTable.getText()).stream().map(v -> stringConverter.apply(
-									v.getValue())/* v.getValue().getName() */).collect(Collectors.toList());
+							return searchPattern(txtSchema.getText(), txtTable.getText()).stream()
+									.map(v -> stringConverter.apply(v.getValue())/* v.getValue().getName() */).collect(Collectors.toList());
 						});
 						txtSchema.setText(_defaultSchema);
 
@@ -1722,8 +1733,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						if (null != selectedItem) {
 							K value = selectedItem.getValue();
 							if (value instanceof TableItemTree) {
-								txtTable.setText(stringConverter
-										.apply(value) /* value.getName() */);
+								txtTable.setText(stringConverter.apply(value) /* value.getName() */);
 							}
 						}
 
