@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.popup;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -126,6 +127,16 @@ public class TableViewSearchComposite<T> extends BorderPane {
 	@FXML
 	private RadioButton rbDirUp, rbDirDown;
 
+	private BiFunction<TableColumn<?, ?>, Object, Object> customConverter;
+
+	public BiFunction<TableColumn<?, ?>, Object, Object> getCustomConverter() {
+		return customConverter;
+	}
+
+	public void setCustomConverter(BiFunction<TableColumn<?, ?>, Object, Object> customConverter) {
+		this.customConverter = customConverter;
+	}
+
 	/**
 	 * 생성자
 	 *
@@ -243,7 +254,7 @@ public class TableViewSearchComposite<T> extends BorderPane {
 	private boolean find(String findWord, Function<SearchResultVO, SearchResultVO> function, ObservableList<TableColumn<T, ?>> columns,
 			int size, int index, Predicate<SearchResultVO> isBreak) {
 		for (TableColumn<T, ?> c : columns) {
-			String content = FxUtil.getDisplayText(c, index).toString();
+			String content = FxUtil.getDisplayText(c, index, this.customConverter).toString();
 
 			int startIdx = content.indexOf(findWord);
 
