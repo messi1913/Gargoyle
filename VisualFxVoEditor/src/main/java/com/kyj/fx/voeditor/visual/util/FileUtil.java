@@ -48,6 +48,8 @@ import com.kyj.fx.voeditor.visual.framework.FileCheckHandler;
 import com.kyj.fx.voeditor.visual.framework.collections.CachedMap;
 import com.kyj.fx.voeditor.visual.framework.model.proj.ProjectDescription;
 import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
+import com.kyj.fx.voeditor.visual.framework.thread.CloseableCallable;
+import com.kyj.fx.voeditor.visual.framework.thread.DemonThreadFactory;
 import com.kyj.fx.voeditor.visual.functions.LoadFileOptionHandler;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 
@@ -827,6 +829,31 @@ public class FileUtil implements GargoyleExtensionFilters {
 			return toJavaProjectFileTreeItem(treeItem.getParent());
 		}
 		return null;
+	}
+
+	/**
+	 * 비동기 텍스트 리더 </br>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 3.
+	 * @param location
+	 * @param conCompleted
+	 * @throws IOException
+	 */
+	public static <T> void asynchRead(File location, Consumer<String> conCompleted) {
+
+		DemonThreadFactory<String> newInstance = DemonThreadFactory.newInstance();
+		Thread newThread = newInstance.newThread(new CloseableCallable<String>() {
+
+			@Override
+			public String call() throws Exception {
+				return FileUtil.readFile(location, LoadFileOptionHandler.getDefaultHandler());
+			}
+		}, conCompleted, err -> {
+			throw new RuntimeException(err);
+		});
+		
+		newThread.start();
 	}
 
 	public static <T> void asynchRead(Path path, Function<byte[], T> handler) throws IOException {

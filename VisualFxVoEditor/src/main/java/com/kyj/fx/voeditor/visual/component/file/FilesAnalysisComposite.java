@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.component.bar.GargoyleSynchLoadBar;
 import com.kyj.fx.voeditor.visual.component.image.FileIconImageView;
 import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.voeditor.visual.framework.logview.helper.ui.EMRServiceLogTableViewHelper;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.functions.LoadFileOptionHandler;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
@@ -30,6 +31,7 @@ import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -46,6 +48,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -154,7 +157,32 @@ public class FilesAnalysisComposite extends BorderPane {
 				});
 			}
 		});
-		return new ContextMenu(miShowInSystemExplor, miProperties);
+
+		Menu miSyncade = new Menu("Syncade");
+		{
+			MenuItem miSyncadeLogView = new MenuItem("Syncade LogView");
+			miSyncadeLogView.setOnAction(ev -> {
+				File selectedItem = tbFiles.getSelectionModel().getSelectedItem();
+				if (selectedItem != null) {
+
+					FileUtil.asynchRead(selectedItem, str -> {
+						EMRServiceLogTableViewHelper helper = new EMRServiceLogTableViewHelper(str);
+						helper.start();
+						Platform.runLater(() -> {
+							FxUtil.createStageAndShow(helper.getView(), stage -> {
+								stage.initOwner(FxUtil.getWindow(FilesAnalysisComposite.this));
+								stage.setTitle(selectedItem.getName());
+							});
+						});
+					});
+
+				}
+			});
+
+			miSyncade.getItems().add(miSyncadeLogView);
+		}
+
+		return new ContextMenu(miShowInSystemExplor, miSyncade, miProperties);
 	}
 
 	private StringConverter<V> treeItemStringConverter = new StringConverter<V>() {
@@ -321,14 +349,14 @@ public class FilesAnalysisComposite extends BorderPane {
 
 				String text = txtNameFilter.getText();
 				filters.get().add(text);
-				
+
 				TreeItem<V> selectedItem = tvFiles.getSelectionModel().getSelectedItem();
 
 				if (selectedItem == null)
 					selectedItem = tvFiles.getRoot();
 
 				if (selectedItem != null) {
-					
+
 					V value = selectedItem.getValue();
 					if (value != null) {
 						FilteredList<File> items = new FilteredList<>(value.getItems());

@@ -27,6 +27,15 @@ public class DemonThreadFactory<R> {
 	}
 
 	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 3. 
+	 * @return
+	 */
+	public static <R> DemonThreadFactory<R> newInstance() {
+		return new DemonThreadFactory<R>();
+	}
+
+	/**
 	 * 새로운 데몬 스레드 생성
 	 * 
 	 * @작성자 : KYJ
@@ -41,5 +50,4 @@ public class DemonThreadFactory<R> {
 		return newThread;
 	}
 
-	
 }
