@@ -35,7 +35,6 @@ public class EncrypUtil {
 		return LocalEncrypter.encrypt(str, key);
 	}
 
-	
 	public static String decryp(String str) throws Exception {
 		return LocalEncrypter.decrypt(str, key);
 	}
