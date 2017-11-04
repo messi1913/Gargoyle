@@ -14,12 +14,12 @@ package com.kyj.utils;
 public class GargoyleEncrypConverter implements IEncrypConvert {
 
 	@Override
-	public String encryp(String message) throws Exception {
+	public byte[] encryp(byte[] message) throws Exception {
 		return EncrypUtil.encryp(message);
 	}
 
 	@Override
-	public String decryp(String message) throws Exception {
+	public byte[] decryp(byte[] message) throws Exception {
 		return EncrypUtil.decryp(message);
 	}
 

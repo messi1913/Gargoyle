@@ -20,7 +20,7 @@ public interface IEncrypConvert {
 	 * @param message
 	 * @return
 	 */
-	public String encryp(String message) throws Exception;
+	public byte[] encryp(byte[] message) throws Exception;
 
 	/**
 	 * 복호화
@@ -30,5 +30,5 @@ public interface IEncrypConvert {
 	 * @param message
 	 * @return
 	 */
-	public String decryp(String message) throws Exception;
+	public byte[] decryp(byte[] message) throws Exception;
 }

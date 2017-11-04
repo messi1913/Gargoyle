@@ -139,6 +139,7 @@ class LocalEncrypter {
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 4. 3.
 	 * @param encodeString
+	 *            base64 encoded String
 	 * @param key
 	 * @return
 	 * @throws Exception
@@ -150,6 +151,42 @@ class LocalEncrypter {
 
 	/**
 	 * 암호화
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 4.
+	 * @param inputBytes
+	 *            base64 encoded
+	 * @param key
+	 * @return
+	 * @throws Exception
+	 */
+	public static byte[] encrypt(byte[] inputBytes, Key key) throws Exception {
+		Cipher cipher = Cipher.getInstance(algorithm);
+		cipher.init(Cipher.ENCRYPT_MODE, key);
+		return cipher.doFinal(encoder.encode(inputBytes));
+	}
+
+	/**
+	 * 복호화
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 4.
+	 * @param inputBytes
+	 *            base64 encoded
+	 * @param key
+	 * @return
+	 * 
+	 * @throws Exception
+	 */
+	public static byte[] decrypt(byte[] inputBytes, Key key) throws Exception {
+		Cipher cipher = Cipher.getInstance(algorithm);
+		cipher.init(Cipher.DECRYPT_MODE, key);
+		byte[] recoveredBytes = cipher.doFinal(decoder.decode(inputBytes));
+		return recoveredBytes;
+	}
+
+	/**
+	 * 암호화
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 4. 3.
@@ -157,7 +194,9 @@ class LocalEncrypter {
 	 * @param key
 	 * @return
 	 * @throws Exception
+	 * @Deprecated 불필요하게 문자열로 리턴하므로 추후 사용하지않을 예정임
 	 */
+	@Deprecated
 	private static byte[] _encrypt(String input, Key key) throws Exception {
 		Cipher cipher = Cipher.getInstance(algorithm);
 		cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -174,7 +213,9 @@ class LocalEncrypter {
 	 * @param key
 	 * @return
 	 * @throws Exception
+	 * @Deprecated 불필요하게 문자열로 리턴하므로 추후 사용하지않을 예정임
 	 */
+	@Deprecated
 	private static String _decrypt(byte[] encryptionBytes, Key key) throws Exception {
 		Cipher cipher = Cipher.getInstance(algorithm);
 		cipher.init(Cipher.DECRYPT_MODE, key);

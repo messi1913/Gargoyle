@@ -39,4 +39,11 @@ public class EncrypUtil {
 		return LocalEncrypter.decrypt(str, key);
 	}
 
+	public static byte[] encryp(byte[] input) throws Exception {
+		return LocalEncrypter.encrypt(input, key);
+	}
+
+	public static byte[] decryp(byte[] input) throws Exception {
+		return LocalEncrypter.decrypt(input, key);
+	}
 }
