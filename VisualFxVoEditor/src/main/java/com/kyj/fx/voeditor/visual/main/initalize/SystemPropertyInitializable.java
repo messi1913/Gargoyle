@@ -6,10 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.main.initalize;
 
-import java.nio.charset.Charset;
-import java.util.Enumeration;
-import java.util.Properties;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,19 +22,21 @@ public class SystemPropertyInitializable implements Initializable {
 
 	@Override
 	public void initialize() throws Exception {
-
+		
+		LOGGER.debug("Start System Property Initialize!");
 		registAppName();
 		LOGGER.debug("Show System Properties");
 		setFileEncoingInit();
 
-		Properties properties = System.getProperties();
-		Enumeration<Object> keys = properties.keys();
-		LOGGER.debug("Default Charset : {} ", Charset.defaultCharset().displayName());
-		while (keys.hasMoreElements()) {
-			Object key = keys.nextElement();
-			Object value = properties.get(key);
-			LOGGER.debug(String.format("Key : %s Value : %s", key.toString(), value.toString()));
-		}
+//		ValueUtil.toString( System.getProperties());
+//		Properties properties = System.getProperties();
+//		Enumeration<Object> keys = properties.keys();
+//		LOGGER.debug("Default Charset : {} ", Charset.defaultCharset().displayName());
+//		while (keys.hasMoreElements()) {
+//			Object key = keys.nextElement();
+//			Object value = properties.get(key);
+//			LOGGER.debug(String.format("Key : %s Value : %s", key.toString(), value.toString()));
+//		}
 
 		networkSettings();
 

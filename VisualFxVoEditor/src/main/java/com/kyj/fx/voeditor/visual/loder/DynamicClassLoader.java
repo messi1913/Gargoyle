@@ -150,8 +150,9 @@ public class DynamicClassLoader {
 		 */
 		List<ProjectInfo> allClasses = new ArrayList<>();
 
-		if (listFiles != null && !listFiles.isEmpty())
-			LOGGER.debug(" im will working...");
+		//
+//		if (listFiles != null && !listFiles.isEmpty())
+//			LOGGER.debug(" im will working...");
 
 		long startTime = System.currentTimeMillis();
 
@@ -177,13 +178,11 @@ public class DynamicClassLoader {
 				).map(pram -> pram.getOutput()).distinct().parallel().flatMap(new Function<String, Stream<ProjectInfo>>() {
 					@Override
 					public Stream<ProjectInfo> apply(String entry) {
-						LOGGER.debug(String.format("entry : %s", entry));
+//						LOGGER.debug(String.format("entry : %s", entry));
 						File compiledFilePath = new File(projectFile, entry);
 						int length = compiledFilePath.getAbsolutePath().length() + 1;
 						List<String> findClases = findClases(projectFile.getAbsolutePath(), compiledFilePath, length);
-						LOGGER.debug(compiledFilePath.toString());
-						LOGGER.debug(findClases.toString());
-						LOGGER.debug(String.valueOf(findClases.size()));
+						LOGGER.debug("classes : [{}] {} {}", String.valueOf(findClases.size()),compiledFilePath.toString(),findClases.toString() );
 
 						ProjectInfo classInfo = new ProjectInfo();
 						classInfo.setProjectName(projectFile.getName());
@@ -270,14 +269,15 @@ public class DynamicClassLoader {
 				}).map(pram -> pram.getPath()).distinct().parallel().flatMap(new Function<String, Stream<ProjectInfo>>() {
 					@Override
 					public Stream<ProjectInfo> apply(String entry) {
-						LOGGER.debug("projroot : {}  entry : {} ", projectFile.getName(), entry);
+//						LOGGER.debug("projroot : {}  entry : {} ", projectFile.getName(), entry);
 						File compiledFilePath = new File(projectFile, entry);
 						int length = compiledFilePath.getAbsolutePath().length() + 1;
 						List<String> findJavaSources = findSource(projectFile.getAbsolutePath(), compiledFilePath, length);
-						LOGGER.debug(compiledFilePath.toString());
-						LOGGER.debug(findJavaSources.toString());
-						LOGGER.debug(String.valueOf(findJavaSources.size()));
-
+//						LOGGER.debug(compiledFilePath.toString());
+//						LOGGER.debug(findJavaSources.toString());
+//						LOGGER.debug(String.valueOf(findJavaSources.size()));
+						LOGGER.debug("sources : [{}] {} {}", String.valueOf(findJavaSources.size()),compiledFilePath.toString(),findJavaSources.toString() );
+						
 						ProjectInfo classInfo = new ProjectInfo();
 						classInfo.setProjectName(projectFile.getName());
 						classInfo.setProjectDir(compiledFilePath.getAbsolutePath());

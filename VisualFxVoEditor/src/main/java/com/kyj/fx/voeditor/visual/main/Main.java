@@ -271,19 +271,9 @@ public class Main extends Application {
 		@Override
 		public void uncaughtException(Thread t, Throwable e) {
 			// Print the details of the exception in SceneBuilder log file
-			LOGGER.error("####################");
-			LOGGER.error("uncaughtException");
-			LOGGER.error(ValueUtil.toString(e));
-			LOGGER.error("####################");
-
-			StackTraceElement[] sts = t.getStackTrace();
-			if (sts != null) {
-				for (StackTraceElement s : sts) {
-
-					LOGGER.error("className : {} method : {}  line : {} ", s.getClassName(), s.getMethodName(), s.getLineNumber());
-				}
-			}
-
+			
+			
+			LOGGER.error(ValueUtil.toString("uncaughtException",e));
 		}
 	}
 
