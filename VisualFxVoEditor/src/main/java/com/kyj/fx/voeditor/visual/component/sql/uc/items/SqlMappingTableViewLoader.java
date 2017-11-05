@@ -21,6 +21,8 @@ public class SqlMappingTableViewLoader extends MakeBusinessFrameComposite {
 		super();
 		try {
 			addItem(new RegistItem("A0001", "Database", new SqlMappingTableViewRegister()));
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
