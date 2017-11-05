@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
@@ -21,6 +22,7 @@ import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
+import com.kyj.fx.voeditor.visual.framework.collections.LimitSizeLinkedHashMap;
 import com.kyj.fx.voeditor.visual.util.PDFUtil;
 
 import javafx.scene.Node;
@@ -46,6 +48,7 @@ public class PDFImageBasePane extends BorderPane implements Closeable {
 	private PDPageTree allPages;
 	private int totalPageCount;
 
+	private Map<Integer,ImageViewPane> cache = new LimitSizeLinkedHashMap<>(15);
 	/**
 	 * PDF파일로부터 정보를 읽어서 UI에 표시해준다.
 	 *
@@ -73,6 +76,9 @@ public class PDFImageBasePane extends BorderPane implements Closeable {
 
 			@Override
 			public Node call(Integer param) {
+				if(cache.containsKey(param))
+					return cache.get(param);
+				
 				try {
 					PDPage pdPage = allPages.get(param);
 					PDRectangle mediaBox = pdPage.getMediaBox();
@@ -91,7 +97,7 @@ public class PDFImageBasePane extends BorderPane implements Closeable {
 //						COSInputStream createInputStream = next.createInputStream();
 //						return
 //					}
-					BufferedImage renderImage = pdfRenderer.renderImage(param);
+					BufferedImage renderImage = pdfRenderer.renderImage(param, 2);
 //					BufferedImage renderImage = pdfRenderer.renderImage(param, 500, ImageType.RGB);
 					//BufferedImage renderImageWithDPI = pdfRenderer.renderImageWithDPI(param, 300, ImageType.RGB);
 					//ImageIOUtil.writeImage(bim, pdfFilename + "-" + (pageCounter++) + ".png", 300);
@@ -101,8 +107,12 @@ public class PDFImageBasePane extends BorderPane implements Closeable {
 					// imageViewPane = new ImageViewPane(inputStream, width,
 					// height);
 					// }
+					
+					
 					InputStream inputStream = PDFUtil.toInputStream(renderImage);
-					return new ImageViewPane(inputStream, width, height);
+					ImageViewPane imageViewPane = new ImageViewPane(inputStream, width, height);
+					
+					return cache.put(param, imageViewPane);
 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -128,21 +138,7 @@ public class PDFImageBasePane extends BorderPane implements Closeable {
 		this.setBottom(new HBox(5, numberField, btnGo));
 	}
 
-	private TextField numberField = new TextField() {
-		@Override
-		public void replaceText(int start, int end, String text) {
-			if (text.matches("[0-9]*")) {
-				super.replaceText(start, end, text);
-			}
-		}
-
-		@Override
-		public void replaceSelection(String text) {
-			if (text.matches("[0-9]*")) {
-				super.replaceSelection(text);
-			}
-		}
-	};
+	private TextField numberField = new NumberTextField() ;
 
 	/**
 	 * pdf 파일

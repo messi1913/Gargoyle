@@ -161,13 +161,8 @@ public class PDFUtil {
 	 * @throws IOException
 	 */
 	public static InputStream toInputStream(BufferedImage bufferedImage) throws IOException {
-		final ByteArrayOutputStream output = new ByteArrayOutputStream() {
-			@Override
-			public byte[] toByteArray() {
-				return this.buf;
-			}
-		};
-
+		final ByteArrayOutputStream output = new ByteArrayOutputStream() ;
+		
 		ImageIOUtil.writeImage(bufferedImage, "png", output);
 		return new ByteArrayInputStream(output.toByteArray()/*, 0, output.size()*/);
 	}
