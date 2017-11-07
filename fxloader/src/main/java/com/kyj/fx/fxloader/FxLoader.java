@@ -95,6 +95,19 @@ public class FxLoader {
 		return newInstance;
 	}
 
+	public static <N, C> N load(Class<C> controllerClass, Consumer<N> option, Consumer<Exception> errHandler) {
+		N n = null;
+		try {
+			n = load(controllerClass, null, option, null);
+		} catch (Exception e) {
+			if (errHandler != null)
+				e.printStackTrace();
+			else
+				LOGGER.error(ValueUtil.toString(e));
+		}
+		return n;
+	}
+
 	private static <C> FXMLController getFxmlController(Class<C> controllerClass) throws Exception {
 		return controllerClass.getAnnotation(FXMLController.class);
 	}
@@ -132,6 +145,22 @@ public class FxLoader {
 			return null;
 		}
 		return controller.css();
+	}
+
+	/********************************
+	 * 작성일 : 2016. 5. 21. 작성자 : KYJ
+	 *
+	 * FXMLController에 정의된 내용을 기준으로 FXML을 로드한다.
+	 *
+	 *
+	 * @param controllerClass
+	 * @return
+	 * @throws GargoyleException
+	 * @throws NullPointerException
+	 * @throws IOException
+	 ********************************/
+	public static <T> T load(Class<?> controllerClass) throws Exception {
+		return load(controllerClass, null, null, null);
 	}
 
 	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, String css)
@@ -330,5 +359,79 @@ public class FxLoader {
 
 			return Stream.empty();
 		}).collect(Collectors.toList());
+	}
+
+	/********************************
+	 * 작성일 : 2016. 5. 21. 작성자 : KYJ
+	 *
+	 * FXMLController에 정의된 내용을 기준으로 FXML을 로드한다.
+	 *
+	 * @param controllerClass
+	 * @param instance
+	 * @return
+	 * @throws GargoyleException
+	 * @throws NullPointerException
+	 * @throws IOException
+	 ********************************/
+	public static <T, C> T loadRoot(Class<C> controllerClass, Object instance) throws Exception {
+		return load(controllerClass, instance, null, null);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 5. 21. 작성자 : KYJ
+	 *
+	 * FXMLController에 정의된 내용을 기준으로 FXML을 로드한다.
+	 *
+	 * @param controllerClass
+	 * @return
+	 * @throws GargoyleException
+	 * @throws NullPointerException
+	 * @throws IOException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 ********************************/
+	public static <T, C> T loadRoot(Class<C> controllerClass) throws Exception {
+		return load(controllerClass, controllerClass.newInstance(), null, null);
+	}
+
+	/********************************
+	 * 작성일 : 2016. 5. 28. 작성자 : KYJ
+	 *
+	 * ref loadRoot() method.
+	 *
+	 * 에러를 뱉지않고 핸들링할 수 있는 파라미터를 받음.
+	 *
+	 * @param controllerClass
+	 * @param errorCallback
+	 * @return
+	 ********************************/
+	private static <T, C> T loadRoot(Class<C> controllerClass, Consumer<Exception> errorCallback) {
+		try {
+			return load(controllerClass, controllerClass.newInstance(), null, null);
+		} catch (Exception e) {
+			errorCallback.accept(e);
+		}
+		return null;
+	}
+
+	/********************************
+	 * 작성일 : 2016. 5. 29. 작성자 : KYJ
+	 *
+	 * ref loadRoot() method.
+	 *
+	 * 에러를 뱉지않고 핸들링할 수 있는 파라미터를 받음.
+	 *
+	 * @param controllerClass
+	 * @param instance
+	 * @param errorCallback
+	 * @return
+	 ********************************/
+	public static <T, C> T loadRoot(Class<C> controllerClass, Object instance, Consumer<Exception> errorCallback) {
+		try {
+			return load(controllerClass, instance, null, null);
+		} catch (Exception e) {
+			errorCallback.accept(e);
+		}
+		return null;
 	}
 }
