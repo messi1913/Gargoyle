@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;

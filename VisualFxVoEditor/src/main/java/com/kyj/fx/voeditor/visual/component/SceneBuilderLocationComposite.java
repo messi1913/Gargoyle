@@ -8,7 +8,7 @@ package com.kyj.fx.voeditor.visual.component;
 
 import java.io.File;
 
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;

@@ -13,8 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -44,6 +42,7 @@ import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.fxloader.FxLoader;
 import com.kyj.fx.voeditor.visual.component.bar.GargoyleLoadBar;
 import com.kyj.fx.voeditor.visual.component.bar.GargoyleSynchLoadBar;
 import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
@@ -59,15 +58,11 @@ import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
-import com.kyj.fx.voeditor.visual.framework.InstanceTypes;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
-import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.builder.GargoyleBuilderFactory;
-import com.kyj.fx.voeditor.visual.framework.builder.GargoyleButtonBuilder;
 import com.kyj.fx.voeditor.visual.framework.contextmenu.FxContextManager;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
 import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
-import com.kyj.fx.voeditor.visual.momory.FxMemory;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
@@ -97,7 +92,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.SnapshotResult;
-import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -222,7 +216,7 @@ public class FxUtil {
 	 * @throws IOException
 	 ********************************/
 	public static <T> T load(Class<?> controllerClass) throws Exception {
-		return load(controllerClass, null, null, null);
+		return FxLoader.load(controllerClass);
 	}
 
 	/********************************
@@ -239,20 +233,11 @@ public class FxUtil {
 	 * @throws IOException
 	 ********************************/
 	public static <N, C> N load(Class<C> controllerClass, Consumer<N> option) throws Exception {
-		return load(controllerClass, null, option, null);
+		return FxLoader.load(controllerClass, null, option, null);
 	}
 
 	public static <N, C> N load(Class<C> controllerClass, Consumer<N> option, Consumer<Exception> errHandler) {
-		N n = null;
-		try {
-			n = load(controllerClass, null, option, null);
-		} catch (Exception e) {
-			if (errHandler != null)
-				e.printStackTrace();
-			else
-				LOGGER.error(ValueUtil.toString(e));
-		}
-		return n;
+		return FxLoader.load(controllerClass, option, errHandler);
 	}
 
 	/**
@@ -269,7 +254,7 @@ public class FxUtil {
 	 * @throws IOException
 	 */
 	public static <N, C> N loadAndControllerAction(Class<C> controllerClass, Consumer<C> controllerAction) throws Exception {
-		return load(controllerClass, null, null, controllerAction);
+		return FxLoader.load(controllerClass, null, null, controllerAction);
 	}
 
 	/********************************
@@ -285,7 +270,7 @@ public class FxUtil {
 	 * @throws IOException
 	 ********************************/
 	public static <T, C> T loadRoot(Class<C> controllerClass, Object instance) throws Exception {
-		return load(controllerClass, instance, null, null);
+		return FxLoader.load(controllerClass, instance, null, null);
 	}
 
 	/********************************
@@ -302,7 +287,7 @@ public class FxUtil {
 	 * @throws IllegalAccessException
 	 ********************************/
 	public static <T, C> T loadRoot(Class<C> controllerClass) throws Exception {
-		return load(controllerClass, controllerClass.newInstance(), null, null);
+		return FxLoader.load(controllerClass, controllerClass.newInstance(), null, null);
 	}
 
 	/********************************
@@ -318,7 +303,7 @@ public class FxUtil {
 	 ********************************/
 	private static <T, C> T loadRoot(Class<C> controllerClass, Consumer<Exception> errorCallback) {
 		try {
-			return load(controllerClass, controllerClass.newInstance(), null, null);
+			return FxLoader.load(controllerClass, controllerClass.newInstance(), null, null);
 		} catch (Exception e) {
 			errorCallback.accept(e);
 		}
@@ -339,51 +324,51 @@ public class FxUtil {
 	 ********************************/
 	public static <T, C> T loadRoot(Class<C> controllerClass, Object instance, Consumer<Exception> errorCallback) {
 		try {
-			return load(controllerClass, instance, null, null);
+			return FxLoader.load(controllerClass, instance, null, null);
 		} catch (Exception e) {
 			errorCallback.accept(e);
 		}
 		return null;
 	}
 
-	private static <C> FXMLController getFxmlController(Class<C> controllerClass) throws GargoyleException {
-		return controllerClass.getAnnotation(FXMLController.class);
-	}
+//	private static <C> FXMLController getFxmlController(Class<C> controllerClass) throws GargoyleException {
+//		return controllerClass.getAnnotation(FXMLController.class);
+//	}
 
-	private static String getFxml(FXMLController controller) {
-		if (controller == null) {
-			return null;
-		}
-		return controller.value();
-	}
+	// private static String getFxml(FXMLController controller) {
+	// if (controller == null) {
+	// return null;
+	// }
+	// return controller.value();
+	// }
 
-	private static String getCss(Class<?> res, FXMLController controller) {
-		if (res != null) {
-			try {
-				String css = getCss(controller);
+//	private static String getCss(Class<?> res, FXMLController controller) {
+//		if (res != null) {
+//			try {
+//				String css = getCss(controller);
+//
+//				if (ValueUtil.isEmpty(css))
+//					return null;
+//
+//				URL resource = res.getResource(css);
+//
+//				if (resource == null)
+//					return null;
+//
+//				return resource.toExternalForm();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		return null;
+//	}
 
-				if (ValueUtil.isEmpty(css))
-					return null;
-
-				URL resource = res.getResource(css);
-
-				if (resource == null)
-					return null;
-
-				return resource.toExternalForm();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return null;
-	}
-
-	private static String getCss(FXMLController controller) {
-		if (controller == null) {
-			return null;
-		}
-		return controller.css();
-	}
+//	private static String getCss(FXMLController controller) {
+//		if (controller == null) {
+//			return null;
+//		}
+//		return controller.css();
+//	}
 
 	/********************************
 	 * 작성일 : 2016. 5. 21. 작성자 : KYJ
@@ -402,151 +387,22 @@ public class FxUtil {
 	 ********************************/
 	public static <N, C> N load(Class<C> controllerClass, Object rootInstance, Consumer<N> option, Consumer<C> controllerAction)
 			throws Exception {
-		if (controllerClass == null)
-			throw new NullPointerException("controller is null.");
-
-		String fullClassName = controllerClass.getCanonicalName();
-		FXMLController controller = getFxmlController(controllerClass);
-		if (controller == null) {
-			throw new GargoyleException("this is not FXMLController. check @FXMLController");
-		}
-
-		String fxml = getFxml(controller);// controller.value();
-
-		String css = getCss(controllerClass, controller);// controller.value();
-
-		if (ValueUtil.isEmpty(fxml))
-			throw new IllegalArgumentException("value is empty..");
-
-		InstanceTypes type = controller.instanceType();
-		N newInstance = null;
-		switch (type) {
-
-		case Singleton:
-
-			Node node = FxMemory.get(fullClassName);
-			if (node == null) {
-				newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, css, option,
-						controllerAction);
-				FxMemory.put(fullClassName, (Node) newInstance);
-			} else {
-				newInstance = (N) node;
-			}
-
-			break;
-
-		case RequireNew:
-			newInstance = newInstance(controllerClass, rootInstance, controller.isSelfController(), fxml, css, option, controllerAction);
-			break;
-		}
-
-		return newInstance;
+		return FxLoader.load(controllerClass, rootInstance, option, controllerAction);
 	}
 
 	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, String css)
 			throws Exception {
-		return newInstance(controllerClass, rootInstance, isSelfController, fxml, css, null, null);
+		return FxLoader.load(controllerClass, rootInstance, isSelfController, fxml, css, null, null);
 	}
 
 	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, Consumer<T> option,
 			Consumer<C> controllerAction) throws Exception {
-		return newInstance(controllerClass, rootInstance, isSelfController, fxml, null, option, controllerAction);
+		return FxLoader.load(controllerClass, rootInstance, isSelfController, fxml, null, option, controllerAction);
 	}
 
 	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, String css,
 			Consumer<T> option, Consumer<C> controllerAction) throws Exception {
-		return newInstance(controllerClass, rootInstance, isSelfController, fxml, css, option, controllerAction);
-	}
-
-	private static <T, C> T newInstance(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String _fxml, String _css,
-			Consumer<T> option, Consumer<C> controllerAction) throws Exception {
-
-		String fxml = _fxml;
-		if (fxml == null) {
-			FXMLController controller = getFxmlController(controllerClass);
-			if (controller == null) {
-				throw new GargoyleException("this is not FXMLController. check @FXMLController");
-			}
-			fxml = getFxml(controller);// controller.value();
-		}
-
-		URL resource = controllerClass.getResource(fxml);
-
-		FXMLLoader loader = createNewFxmlLoader();
-		loader.setLocation(resource);
-
-		if (isSelfController && rootInstance != null) {
-			try {
-				loader.setRoot(rootInstance);
-				loader.setController(rootInstance);
-
-				if (rootInstance instanceof Parent && ValueUtil.isNotEmpty(_css)) {
-					((Parent) rootInstance).getStylesheets().add(_css);
-				}
-
-			} catch (Exception e) {
-				throw new GargoyleException(e);
-			}
-		}
-		// T _load = null;
-		// fix load error.
-		// if (resource != null) {
-		T load = loader.load();
-		// } else {
-		// _load = loader.load(controllerClass.getResourceAsStream(fxml));
-		// }
-		//
-		// T load = _load;
-		C instanceController = loader.getController();
-
-		// show warning...
-		if (load == null) {
-			LOGGER.warn("load result is empty.. controller class : {} ", controllerClass);
-		}
-		Method[] declaredMethods = controllerClass.getDeclaredMethods();
-
-		// 2017-02-07 findfirst에서 어노테이션으로 선언된 다건의 함수를 호출하게 다시 유도.
-		// findfirst로 수정. @FxPostInitialize가 여러건있는경우를 잘못된 로직 유도를 방지.
-		Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null).forEach(m -> {
-			// .ifPresent((m -> {
-			if (((m.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC)) {
-				try {
-					if (instanceController != null) {
-						// Lazy Run.
-						Platform.runLater(() -> {
-							try {
-
-								m.setAccessible(true);
-								m.invoke(instanceController);
-
-							} catch (Exception e) {
-								LOGGER.error(ValueUtil.toString(e));
-							}
-						});
-					}
-				} catch (Exception e) {
-					LOGGER.error(ValueUtil.toString(e));
-				}
-			}
-		});
-
-		if (option != null) {
-			option.accept(load);
-		}
-
-		if (controllerAction != null)
-			controllerAction.accept(instanceController);
-
-		Platform.runLater(() -> {
-			Parent parent = (Parent) load;
-			List<Node> findAllByNodes = FxUtil.findAllByNodes(parent, v -> v instanceof Button);
-			findAllByNodes.forEach(v -> {
-				GargoyleButtonBuilder.applyStyleClass((Button) v, SkinManager.BUTTON_STYLE_CLASS_NAME);
-				// LOGGER.debug("Button : {}", v);
-			});
-		});
-
-		return load;
+		return FxLoader.load(controllerClass, rootInstance, isSelfController, fxml, css, option, controllerAction);
 	}
 
 	/**

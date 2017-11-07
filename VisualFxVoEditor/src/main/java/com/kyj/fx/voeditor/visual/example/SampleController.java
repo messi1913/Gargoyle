@@ -6,8 +6,8 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
-import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.fxloader.FXMLController;
+import com.kyj.fx.fxloader.FxPostInitialize;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;

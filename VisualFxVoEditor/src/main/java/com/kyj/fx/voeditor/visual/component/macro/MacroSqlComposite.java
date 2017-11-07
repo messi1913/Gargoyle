@@ -7,14 +7,13 @@
 package com.kyj.fx.voeditor.visual.component.macro;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
-import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.fxloader.FXMLController;
+import com.kyj.fx.fxloader.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -25,7 +24,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCharacterCombination;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderPane;	
 
 /***************************
  * 

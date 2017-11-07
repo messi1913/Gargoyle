@@ -9,7 +9,7 @@ package com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.skin;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.ui.tabs.AbstractSpecTab;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.EtcDefineDVO;

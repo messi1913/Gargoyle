@@ -8,9 +8,9 @@ package com.kyj.fx.voeditor.visual.component.config.view;
 
 import java.net.URL;
 
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.component.config.item.node.IRunableItem;
 import com.kyj.fx.voeditor.visual.component.config.model.RunItemCatchModel;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 

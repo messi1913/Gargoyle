@@ -14,12 +14,11 @@ import java.util.stream.Collectors;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.component.TextBaseDiffAppController;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;

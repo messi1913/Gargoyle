@@ -23,8 +23,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.html.HTMLImageElement;
 
 import com.jfoenix.controls.JFXTextField;
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.component.console.WebViewConsole;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;

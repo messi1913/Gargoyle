@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.component.ButtonTableColumn;
 import com.kyj.fx.voeditor.visual.component.ColorPickerTableColumn;
 import com.kyj.fx.voeditor.visual.component.ComboBoxTableColumn;
@@ -30,7 +31,6 @@ import com.kyj.fx.voeditor.visual.component.PasswordTextFieldTableCell;
 import com.kyj.fx.voeditor.visual.component.dock.pane.DockNode;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
 import com.kyj.fx.voeditor.visual.exceptions.NotYetSupportException;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.main.model.vo.Code;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;

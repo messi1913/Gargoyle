@@ -9,7 +9,7 @@ package com.kyj.fx.voeditor.visual.component.chart;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 

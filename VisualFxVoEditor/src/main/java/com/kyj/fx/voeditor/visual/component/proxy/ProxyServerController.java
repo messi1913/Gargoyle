@@ -12,13 +12,11 @@ import java.io.IOException;
 import org.fxmisc.richtext.CodeArea;
 
 import com.jfoenix.controls.JFXListView;
+import com.kyj.fx.fxloader.FXMLController;
+import com.kyj.fx.fxloader.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.component.text.IntegerField;
-import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
-import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.proxy.SimpleProxyServer;
 import com.kyj.fx.voeditor.visual.framework.proxy.UTF8EncodingProxyListener;
-import com.kyj.fx.voeditor.visual.main.Main;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Platform;

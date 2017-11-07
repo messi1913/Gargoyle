@@ -13,9 +13,9 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.component.ConfigItemTreeItem;
 import com.kyj.fx.voeditor.visual.component.font.FontViewComposite;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
 import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationGraphicsNodeItem;
 import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationLeafNodeItem;
 import com.kyj.fx.voeditor.visual.main.model.vo.ConfigurationTreeItem;

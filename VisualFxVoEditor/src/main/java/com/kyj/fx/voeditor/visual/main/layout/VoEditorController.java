@@ -54,7 +54,7 @@ import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.popup.MeerketAbstractVoOpenClassResourceView;
 import com.kyj.fx.voeditor.visual.events.CommonContextMenuEvent;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleFileAlreadyExistException;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.momory.ClassTypeResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;

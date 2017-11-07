@@ -7,9 +7,6 @@
 package com.kyj.fx.voeditor.visual.component.config.view;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,10 +17,9 @@ import org.apache.tools.ant.BuildListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.fxloader.FXMLController;
+import com.kyj.fx.fxloader.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.component.config.model.AntRunConfigItem;
-import com.kyj.fx.voeditor.visual.component.console.SystemConsole;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
-import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.jdt.compiler.AntJavaCompiler;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;

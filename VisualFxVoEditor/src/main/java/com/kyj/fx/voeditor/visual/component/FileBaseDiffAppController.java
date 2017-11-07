@@ -18,7 +18,7 @@ import com.kyj.fx.voeditor.visual.diff.ChunkWrapper;
 import com.kyj.fx.voeditor.visual.diff.CompareResult;
 import com.kyj.fx.voeditor.visual.diff.DiffComparable;
 import com.kyj.fx.voeditor.visual.diff.FileBaseComparator;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.fxloader.FXMLController;
 
 import difflib.Chunk;
 import difflib.Delta;

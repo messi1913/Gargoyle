@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.scm;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,11 +15,9 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 
-import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.application.Platform;

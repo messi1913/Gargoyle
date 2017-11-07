@@ -22,8 +22,8 @@ import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
-import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.fxloader.FXMLController;
+import com.kyj.fx.fxloader.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.logview.helper.ui.EMRServiceLogTableViewHelper;
 import com.kyj.fx.voeditor.visual.framework.thread.DemonTimerFactory;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;

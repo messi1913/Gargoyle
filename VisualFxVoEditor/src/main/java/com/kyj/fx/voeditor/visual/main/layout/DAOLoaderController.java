@@ -21,7 +21,7 @@ import com.kyj.fx.voeditor.visual.component.TextBaseDiffAppController;
 import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.diff.TextBaseComparator;
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.main.model.vo.TbmSysDaoMethodsHDVO;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DbUtil;

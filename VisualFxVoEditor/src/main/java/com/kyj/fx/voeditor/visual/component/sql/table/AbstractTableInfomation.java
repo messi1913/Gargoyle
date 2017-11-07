@@ -6,7 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.table;
 
-import com.kyj.fx.voeditor.visual.framework.annotation.FxPostInitialize;
+import com.kyj.fx.fxloader.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.scene.layout.BorderPane;

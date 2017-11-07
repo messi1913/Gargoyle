@@ -6,7 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component;
 
-import com.kyj.fx.voeditor.visual.framework.annotation.FXMLController;
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 
 import javafx.fxml.FXML;
