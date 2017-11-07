@@ -8,7 +8,9 @@
 
 
 	<properties>
-
+		<!-- skip test -->
+		<maven.test.skip>true</maven.test.skip>
+		
 		<!-- HTTP -->
 		<apache-http-client.version>4.3.6</apache-http-client.version>
 
@@ -629,8 +631,15 @@
 		<dependency>
 			<groupId>kyj.encryp</groupId>
 			<artifactId>encryp</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.3</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.kyj.fx</groupId>
+			<artifactId>fxloader</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
 
 
 		<dependency>
@@ -717,7 +726,7 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/mime4j/apache-mime4j-storage-0.7.2.jar</systemPath>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.sourceforge.nekohtml</groupId>
 			<artifactId>nekohtml</artifactId>
@@ -790,6 +799,40 @@
 		<!-- <version>1.10</version> -->
 		<!-- </dependency> -->
 
+		<!-- jasper lib -->
+		<!-- <dependency> -->
+		<!-- <groupId>jasper</groupId> -->
+		<!-- <artifactId>jasperreport</artifactId> -->
+		<!-- <version>6.4.1</version> -->
+		<!-- <scope>system</scope> -->
+		<!-- <systemPath>${project.basedir}/lib/jasper/jasperreports-6.4.1.jar</systemPath> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>6.4.3</version>
+		</dependency>
+
+		<!-- <dependency> -->
+		<!-- <groupId>jasper</groupId> -->
+		<!-- <artifactId>fonts</artifactId> -->
+		<!-- <version>6.4.1</version> -->
+		<!-- <scope>system</scope> -->
+		<!-- <systemPath>${project.basedir}/lib/jasper/jasperreports-fonts-6.4.1.jar</systemPath> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-fonts</artifactId>
+			<version>6.0.0</version>
+		</dependency>
+
+		<!-- <dependency> -->
+		<!-- <groupId>jasper</groupId> -->
+		<!-- <artifactId>javaflow</artifactId> -->
+		<!-- <version>6.4.1</version> -->
+		<!-- <scope>system</scope> -->
+		<!-- <systemPath>${project.basedir}/lib/jasper/jasperreports-javaflow-6.4.1.jar</systemPath> -->
+		<!-- </dependency> -->
 
 	</dependencies>
 
