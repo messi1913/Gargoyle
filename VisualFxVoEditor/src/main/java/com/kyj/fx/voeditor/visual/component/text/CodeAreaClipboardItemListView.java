@@ -11,11 +11,14 @@ import java.util.function.Consumer;
 
 import org.controlsfx.control.PopOver;
 
+import com.sun.star.awt.MouseButton;
+
 import javafx.scene.control.ListView;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.util.StringConverter;
 
 /**
@@ -28,7 +31,7 @@ class CodeAreaClipboardItemListView extends ListView<ClipboardContent> {
 
 	public CodeAreaClipboardItemListView() {
 
-		//		List<ClipboardContent> clipBoardItems = parent.getClipBoardItems();
+		// List<ClipboardContent> clipBoardItems = parent.getClipBoardItems();
 		setCellFactory(TextFieldListCell.forListView(new StringConverter<ClipboardContent>() {
 
 			@Override
@@ -42,7 +45,25 @@ class CodeAreaClipboardItemListView extends ListView<ClipboardContent> {
 			}
 		}));
 		setOnKeyPressed(this::onKeyPress);
+		setOnMouseClicked(this::onMouseClick);
+	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 9.
+	 * @param e
+	 */
+	void onMouseClick(MouseEvent e) {
+		if (e.getClickCount() == 2 && e.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+			if (e.isConsumed())
+				return;
+
+			ClipboardContent selectedItem = getSelectionModel().getSelectedItem();
+			if (selectItemAction(selectedItem))
+				this.window.hide();
+
+			e.consume();
+		}
 	}
 
 	void onKeyPress(KeyEvent e) {
@@ -60,16 +81,27 @@ class CodeAreaClipboardItemListView extends ListView<ClipboardContent> {
 				return;
 
 			ClipboardContent selectedItem = getSelectionModel().getSelectedItem();
-			if (selectedItem == null)
-				return;
-
-			if (this.window != null) {
-				if (selectItemAction != null)
-					selectItemAction.accept(selectedItem.getString());
+			if (selectItemAction(selectedItem))
 				this.window.hide();
-			}
 			e.consume();
 		}
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 9.
+	 * @param selectedItem
+	 */
+	private boolean selectItemAction(ClipboardContent selectedItem) {
+		if (selectedItem == null)
+			return false;
+
+		if (this.window != null) {
+			if (selectItemAction != null) {
+				selectItemAction.accept(selectedItem.getString());
+			}
+		}
+		return true;
 	}
 
 	public void setPopOver(PopOver window) {
