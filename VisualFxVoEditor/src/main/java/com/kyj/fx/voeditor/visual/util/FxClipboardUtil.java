@@ -56,13 +56,18 @@ public class FxClipboardUtil {
 	}
 
 	/**
-	 * 문자열을 클립보드에 복사
-	 *
-	 * @param clipTarget
+	 * 문자열을 클립보드에 복사 <br>
+	 * 
+	 * 만약 클립보드에 이미지가 없다면 null  리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 9. 
+	 * @return
 	 */
 	public static Image pastImage() {
 		Clipboard systemClipboard = Clipboard.getSystemClipboard();
-		return systemClipboard.getImage();
+		if(systemClipboard.hasImage())
+			return systemClipboard.getImage();
+		return null;
 	}
 
 	public static final int EMPTY = 0x000;

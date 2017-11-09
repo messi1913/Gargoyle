@@ -6,13 +6,16 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.image;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Optional;
 
+import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,13 +23,18 @@ import com.jfoenix.controls.JFXTextArea;
 import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FileUtil;
+import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.PDFUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -64,6 +72,31 @@ public class Base64ImageConvertComposte extends BorderPane {
 			if (file.exists()) {
 				FileUtil.openFile(file);
 			}
+		});
+
+		// 붙여넣기시 클립보드 이미지 처리하는 함수.
+		this.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
+
+			if (ev.getCode() == KeyCode.V && ev.isControlDown()) {
+				if (ev.isConsumed())
+					return;
+				Image pastImage = null;
+				if ((pastImage = FxClipboardUtil.pastImage()) != null) {
+					this.IvImage.setImage(pastImage);
+
+					try {
+						BufferedImage bufferedImage = SwingFXUtils.fromFXImage(pastImage, null);
+						ByteArrayOutputStream output = new ByteArrayOutputStream();
+						ImageIOUtil.writeImage(bufferedImage, "png", output);
+						this.txtBase64.setText(Base64.getEncoder().encodeToString(output.toByteArray()));
+					} catch (Exception e) {
+						LOGGER.error(ValueUtil.toString(e));
+					}
+				}
+
+				ev.consume();
+			}
+
 		});
 	}
 
