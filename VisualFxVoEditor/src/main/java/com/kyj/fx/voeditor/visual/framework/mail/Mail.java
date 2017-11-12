@@ -5,6 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.velocity.Template;
+
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -29,6 +33,8 @@ public class Mail {
 	private StringProperty contentType;
 
 	private List<AttachmentItem> attachmentItems = new ArrayList<>();
+
+	private ObjectProperty<Template> emailTemplate = new SimpleObjectProperty<>();
 
 	public Mail() {
 		mailTo = FXCollections.observableArrayList();
@@ -179,6 +185,18 @@ public class Mail {
 		this.mailTo.clear();
 		this.mailCc.clear();
 		this.mailBcc.clear();
+	}
+
+	public final ObjectProperty<Template> emailTemplateProperty() {
+		return this.emailTemplate;
+	}
+
+	public final Template getEmailTemplate() {
+		return this.emailTemplateProperty().get();
+	}
+
+	public final void setEmailTemplate(final Template emailTemplate) {
+		this.emailTemplateProperty().set(emailTemplate);
 	}
 
 	// public void setMailTo(String ... email) {

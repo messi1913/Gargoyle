@@ -52,6 +52,7 @@ public class MailUtil {
 	 * @throws Exception
 	 * @User KYJ
 	 */
+	@Deprecated
 	public static void sendMail(List<Mail> mails, Map<String, Object> mailContent) throws Exception {
 		Mailer bean = BeanUtil.getBean("mailer", Mailer.class);
 		sendMail(bean, mails, mailContent);
@@ -72,7 +73,9 @@ public class MailUtil {
 	 * @param mailContent
 	 * @param errorHandler
 	 * @return
+	 * @Deprecated
 	 */
+	@Deprecated
 	public static void sendMail(Mailer mailer, List<Mail> mails, Map<String, Object> mailContent, Consumer<Exception> errorHandler) {
 		try {
 			VelocityContext merge = toVelocityContext(mailContent);
@@ -150,6 +153,7 @@ public class MailUtil {
 	 * @throws Exception
 	 * @User KYJ
 	 */
+	@Deprecated
 	public static void sendMail(SenderMailInfo sender, Mail mail, Map<String, Object> mailContent) throws Exception {
 		try {
 			Mailer bean = BeanUtil.getBean("mailer", Mailer.class);

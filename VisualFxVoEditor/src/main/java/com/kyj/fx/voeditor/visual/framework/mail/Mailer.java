@@ -1,7 +1,5 @@
 package com.kyj.fx.voeditor.visual.framework.mail;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.List;
@@ -9,8 +7,6 @@ import java.util.Properties;
 
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -19,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-import com.kyj.fx.voeditor.visual.util.MailUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 /**
@@ -127,9 +122,23 @@ public class Mailer {
 			helper.setSubject(this.mailTitle);
 		}
 
+		/*
+		 * Encoding fist. 
+		 * find Mailer property.  <br/>
+		 * second find by input parameter - SenderMailInfo. <br/>
+		 * 
+		 */
 		if (ValueUtil.isNotEmpty(encoding))
 			_encoding = encoding;
 
+		if (ValueUtil.isNotEmpty(mailSenderInfo.getDefaultEncoding())) {
+			_encoding = mailSenderInfo.getDefaultEncoding();
+		}
+
+		mailSender.setDefaultEncoding(_encoding);
+
+		
+		
 		if (mailSenderInfo != null) {
 
 			Properties javaMailProperties = mailSenderInfo.getJavaMailProperties();
@@ -146,8 +155,6 @@ public class Mailer {
 			if (ValueUtil.isNotEmpty(sendUserPassword)) {
 				mailSender.setPassword(sendUserPassword);
 			}
-
-			mailSender.setDefaultEncoding(mailSenderInfo.getDefaultEncoding());
 
 			String host = mailSenderInfo.getHost();
 			if (ValueUtil.isNotEmpty(host))
@@ -177,24 +184,41 @@ public class Mailer {
 
 		}
 
+		/*
+		 *  #Mail Cont.#
+		 *   first find emailtemplate.
+		 *   
+		 *   if is empty, mailCont will be send.
+		 *   if null , template will be send.
+		 */
 		String mailContent = mail.getMailContent();
-
-		if (ValueUtil.isEmpty(mailContent)) {
-			Template template = null;
-			if (ValueUtil.isNotEmpty(mailTemplate)) {
-				template = MailUtil.createTemplate(mailTemplate);
-			} else {
-				template = MailUtil.createTemplate(ClassLoader.getSystemResource("templates/emailtemplate.vm"));
-			}
+		
+		if(mail.getEmailTemplate() !=null)
+		{
+			Template template = mail.getEmailTemplate();
 			template.setEncoding(_encoding);
 			StringWriter stringWriter = new StringWriter();
 			template.merge(velocityContext, stringWriter);
 			helper.setText(stringWriter.toString());
 		}
-
-		else {
+		
+		else if (ValueUtil.isEmpty(mailContent)) {
 			helper.setText("", mailContent);
+//			Template template = null;
+//			if (ValueUtil.isNotEmpty(mailTemplate)) {
+//				template = MailUtil.createTemplate(mailTemplate);
+//			} else {
+//				template = MailUtil.createTemplate(ClassLoader.getSystemResource("templates/emailtemplate.vm"));
+//			}
+//			template.setEncoding(_encoding);
+//			StringWriter stringWriter = new StringWriter();
+//			template.merge(velocityContext, stringWriter);
+//			helper.setText(stringWriter.toString());
 		}
+
+//		else {
+//			helper.setText("", mailContent);
+//		}
 
 		// attachment
 		List<AttachmentItem> attachmentItems = mail.getAttachmentItems();
@@ -206,16 +230,16 @@ public class Mailer {
 
 	}
 
-	private File writeTemplate(String templateName) {
-		File file = new File(templateName);
-		ClassLoader classLoader = getClass().getClassLoader();
-		try {
-			String result = IOUtils.toString(classLoader.getResourceAsStream("templates/emailtemplate.vm"));
-
-			FileUtils.writeStringToFile(file, result);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return file;
-	}
+	// private File writeTemplate(String templateName) {
+	// File file = new File(templateName);
+	// ClassLoader classLoader = getClass().getClassLoader();
+	// try {
+	// String result = IOUtils.toString(classLoader.getResourceAsStream("templates/emailtemplate.vm"));
+	//
+	// FileUtils.writeStringToFile(file, result);
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// }
+	// return file;
+	// }
 }
