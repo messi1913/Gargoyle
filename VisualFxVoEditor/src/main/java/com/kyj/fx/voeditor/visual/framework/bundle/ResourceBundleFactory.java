@@ -9,12 +9,12 @@ package com.kyj.fx.voeditor.visual.framework.bundle;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
-
-import sun.util.ResourceBundleEnumeration;
 
 /**
  * 다국어 정보를 처리할 수 있는 번들을 리턴한다.
@@ -26,12 +26,12 @@ public class ResourceBundleFactory {
 
 	/**
 	 * 번들을 생성하는 코어 로직.
+	 * 
 	 * @최초생성일 2016. 8. 12.
 	 */
 	private static DefaultLanguageInitializer loader = new DefaultLanguageInitializer();
 
 	private static ResourceBundle bundle;
-
 
 	public static ResourceBundle getBundle() throws IOException, Exception {
 
@@ -53,15 +53,19 @@ public class ResourceBundleFactory {
 
 		/**
 		 * Creates a property resource bundle from an {@link java.io.InputStream
-		 * InputStream}.  The property file read with this constructor
-		 * must be encoded in ISO-8859-1.
+		 * InputStream}. The property file read with this constructor must be
+		 * encoded in ISO-8859-1.
 		 *
-		 * @param stream an InputStream that represents a property file
-		 *        to read from.
-		 * @throws IOException if an I/O error occurs
-		 * @throws NullPointerException if <code>stream</code> is null
-		 * @throws IllegalArgumentException if {@code stream} contains a
-		 *     malformed Unicode escape sequence.
+		 * @param stream
+		 *            an InputStream that represents a property file to read
+		 *            from.
+		 * @throws IOException
+		 *             if an I/O error occurs
+		 * @throws NullPointerException
+		 *             if <code>stream</code> is null
+		 * @throws IllegalArgumentException
+		 *             if {@code stream} contains a malformed Unicode escape
+		 *             sequence.
 		 */
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public DefaultPropertyResourceBundle(Properties properties) throws IOException {
@@ -106,12 +110,64 @@ public class ResourceBundleFactory {
 		 */
 		public Enumeration<String> getKeys() {
 			ResourceBundle parent = this.parent;
-			return new ResourceBundleEnumeration(lookup.keySet(), (parent != null) ? parent.getKeys() : null);
+			return new GargoyeResourceBundleEnumeration(lookup.keySet(), (parent != null) ? parent.getKeys() : null);
 		}
 
 		/**
-		 * Returns a <code>Set</code> of the keys contained
-		 * <em>only</em> in this <code>ResourceBundle</code>.
+		 *  기존 사용하던 API 내용 구현 ResourceBundleEnumeration
+		 *  
+		 * @author KYJ
+		 *
+		 */
+		static class GargoyeResourceBundleEnumeration implements Enumeration<String> {
+			Set<String> set;
+			Iterator<String> iterator;
+			Enumeration<String> enumeration; // may remain null
+
+			/**
+		     * Constructs a resource bundle enumeration.
+		     * @param set an set providing some elements of the enumeration
+		     * @param enumeration an enumeration providing more elements of the enumeration.
+		     *        enumeration may be null.
+		     */
+		    public GargoyeResourceBundleEnumeration(Set<String> set, Enumeration<String> enumeration) {
+		        this.set = set;
+		        this.iterator = set.iterator();
+		        this.enumeration = enumeration;
+		    }
+
+			String next = null;
+
+			public boolean hasMoreElements() {
+				if (next == null) {
+					if (iterator.hasNext()) {
+						next = iterator.next();
+					} else if (enumeration != null) {
+						while (next == null && enumeration.hasMoreElements()) {
+							next = enumeration.nextElement();
+							if (set.contains(next)) {
+								next = null;
+							}
+						}
+					}
+				}
+				return next != null;
+			}
+
+			public String nextElement() {
+				if (hasMoreElements()) {
+					String result = next;
+					next = null;
+					return result;
+				} else {
+					throw new NoSuchElementException();
+				}
+			}
+		}
+
+		/**
+		 * Returns a <code>Set</code> of the keys contained <em>only</em> in
+		 * this <code>ResourceBundle</code>.
 		 *
 		 * @return a <code>Set</code> of the keys contained only in this
 		 *         <code>ResourceBundle</code>
