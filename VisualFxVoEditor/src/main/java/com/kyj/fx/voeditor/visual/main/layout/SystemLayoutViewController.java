@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +66,8 @@ import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentOnLoaded;
 import com.kyj.fx.voeditor.visual.framework.GargoyleTabPanable;
+import com.kyj.fx.voeditor.visual.framework.thread.CloseableCallable;
+import com.kyj.fx.voeditor.visual.framework.thread.DemonThreadFactory;
 import com.kyj.fx.voeditor.visual.loder.JarWrapper;
 import com.kyj.fx.voeditor.visual.loder.PluginLoader;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
@@ -104,6 +107,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
@@ -831,10 +835,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		menuProperties.setOnAction(this::menuPropertiesOnAction);
 		chodeAnalysisMenuItem.setOnAction(this::menuItemCodeAnalysisMenuItemOnAction);
 
-		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem, deleteFileMenuItem, /*
-																													 * voEditorMenuItem,
-																													 * daoWizardMenuItem,
-																													 */
+		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem,
+				deleteFileMenuItem, /*
+									 * voEditorMenuItem, daoWizardMenuItem,
+									 */
 				voEditorMenuItem, /* setVoEditorMenuItem, */ setDaoWizardMenuItem, chodeAnalysisMenuItem, makeProgramSpecMenuItem,
 				menuItemSCMGraphs, new SeparatorMenuItem(), refleshMenuItem, new SeparatorMenuItem(), menuPMD, new SeparatorMenuItem(),
 				menuRunAs, new SeparatorMenuItem(), menuProperties);
@@ -1516,20 +1520,14 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				}
 
 				/*
-				 * DockTab tab = new DockTab(tabName, parent);
-				 * tab.setTooltip(new
-				 * Tooltip(loader.getController().getClass().getName()));
+				 * DockTab tab = new DockTab(tabName, parent); tab.setTooltip(new Tooltip(loader.getController().getClass().getName()));
 				 * 
-				 * addTabItem(tab);
-				 * tab.getTabPane().getSelectionModel().select(tab);
+				 * addTabItem(tab); tab.getTabPane().getSelectionModel().select(tab);
 				 * 
-				 * // 리스너 호출. onParentloaded.forEach(v -> { v.onLoad(parent);
-				 * });
+				 * // 리스너 호출. onParentloaded.forEach(v -> { v.onLoad(parent); });
 				 * 
-				 * if (parent instanceof GargoyleTabPanable) {
-				 * GargoyleTabPanable _tabPanable = (GargoyleTabPanable) parent;
-				 * _tabPanable.setTab(tab);
-				 * _tabPanable.setTabPane(tabPanWorkspace); }
+				 * if (parent instanceof GargoyleTabPanable) { GargoyleTabPanable _tabPanable = (GargoyleTabPanable) parent;
+				 * _tabPanable.setTab(tab); _tabPanable.setTabPane(tabPanWorkspace); }
 				 */
 				DockTab tab = new DockTab(tabName, parent);
 				loadNewSystemTab(tabName, tab, null);
@@ -1674,29 +1672,20 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				});
 
 				/*
-				 * DockTab tab = new DockTab(tableName, _parent); // 툴팁 처리
-				 * (클래스위치) tab.setTooltip(new
-				 * Tooltip(parent.getClass().getName()));
+				 * DockTab tab = new DockTab(tableName, _parent); // 툴팁 처리 (클래스위치) tab.setTooltip(new Tooltip(parent.getClass().getName()));
 				 * 
-				 * addTabItem(tab);
-				 * tabPanWorkspace.getSelectionModel().select(tab);
+				 * addTabItem(tab); tabPanWorkspace.getSelectionModel().select(tab);
 				 * 
-				 * tab.setOnCloseRequest(ev -> { try { LOGGER.
-				 * debug("closeable parent on close request , tabName : {} ",
-				 * tableName); parent.close(); } catch (Exception e) {
-				 * LOGGER.error(ValueUtil.toString(e)); } });
+				 * tab.setOnCloseRequest(ev -> { try { LOGGER. debug("closeable parent on close request , tabName : {} ", tableName);
+				 * parent.close(); } catch (Exception e) { LOGGER.error(ValueUtil.toString(e)); } });
 				 * 
-				 * // 리스너 호출. onParentloaded.forEach(v ->
-				 * v.onLoad(parent.getParent()));
+				 * // 리스너 호출. onParentloaded.forEach(v -> v.onLoad(parent.getParent()));
 				 * 
-				 * List<Node> findAllByNodes = FxUtil.findAllByNodes(_parent, n
-				 * -> n instanceof Button); findAllByNodes.forEach(btn -> {
+				 * List<Node> findAllByNodes = FxUtil.findAllByNodes(_parent, n -> n instanceof Button); findAllByNodes.forEach(btn -> {
 				 * btn.getStyleClass().add("button-gargoyle"); });
 				 * 
-				 * if (_parent instanceof GargoyleTabPanable) {
-				 * GargoyleTabPanable _tabPanable = (GargoyleTabPanable)
-				 * _parent; _tabPanable.setTab(tab);
-				 * _tabPanable.setTabPane(tabPanWorkspace); }
+				 * if (_parent instanceof GargoyleTabPanable) { GargoyleTabPanable _tabPanable = (GargoyleTabPanable) _parent;
+				 * _tabPanable.setTab(tab); _tabPanable.setTabPane(tabPanWorkspace); }
 				 * 
 				 */
 
@@ -1786,22 +1775,46 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	@FXML
 	public void lblDatabaseMouseClick(MouseEvent e) {
 
-		try {
-			CommonsSqllPan sqlPane = CommonsSqllPan.getSqlPane();
+		/*17.11.15 DB 비동기 접속 처리 로직 구현*/
+		Label source = (Label) e.getSource();
+		source.setDisable(true);
 
-			loadNewSystemTab(String.format("Database[%s]", sqlPane.getClass().getSimpleName()), sqlPane);
-			// Stage stage = new Stage();
-			// sqlPane.setStage(stage);
-			// Scene scene = new Scene(new BorderPane(sqlPane), 1100, 900);
-			// scene.getStylesheets().add(SkinManager.getInstance().getSkin());
-			// stage.setScene(scene);
-			// stage.setAlwaysOnTop(false);
-			// stage.initOwner(SharedMemory.getPrimaryStage());
-			// stage.show();
-		} catch (Exception ex) {
+		DemonThreadFactory<Boolean> newInstance = DemonThreadFactory.newInstance();
+		newInstance.newThread(new CloseableCallable<Boolean>() {
+
+			@Override
+			public Boolean call() throws Exception {
+				try (Connection connection = DbUtil.getConnection()) {
+					connection.getMetaData().getCatalogTerm();
+				}
+				return true;
+			}
+		}, flag -> {
+
+			if (flag) {
+				Platform.runLater(() -> {
+					source.setDisable(false);
+					try {
+						CommonsSqllPan sqlPane = CommonsSqllPan.getSqlPane();
+						loadNewSystemTab(String.format("Database[%s]", sqlPane.getClass().getSimpleName()), sqlPane);
+					} catch (Exception ex) {
+						LOGGER.error(ValueUtil.toString(ex));
+						DialogUtil.showExceptionDailog(SharedMemory.getPrimaryStage(), ex);
+					}
+				});
+			} else {
+				DialogUtil.showMessageDialog(SharedMemory.getPrimaryStage(), "Connection Fail.. ");
+			}
+
+		}, ex -> {
+
+			Platform.runLater(() -> {
+				source.setDisable(false);
+			});
+
 			LOGGER.error(ValueUtil.toString(ex));
-			DialogUtil.showExceptionDailog(ex);
-		}
+			DialogUtil.showExceptionDailog(SharedMemory.getPrimaryStage(), ex);
+		}).start();
 
 	}
 
