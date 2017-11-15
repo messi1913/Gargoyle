@@ -221,7 +221,7 @@ public class MakeBusinessFrameComposite extends BorderPane implements MakeBusine
 		int MAX = items.size();
 
 		boolean isLastPage = false;
-		boolean isFirstPage = false;
+		boolean isFirstPage = (indexOf == 0);
 
 		// invalide page
 		if (indexOf == -1) {
@@ -273,7 +273,7 @@ public class MakeBusinessFrameComposite extends BorderPane implements MakeBusine
 	private void addAction(List<? extends RegistItem> list) {
 		ObservableList<Node> children = vbList.getChildren();
 		List<Node> newItemList = new ArrayList<Node>();
-		list.forEach(item -> {
+		list.stream().filter(v -> v != null).forEach(item -> {
 			String id = item.getId();
 
 			if (ValueUtil.isEmpty(id))

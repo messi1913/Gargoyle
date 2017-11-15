@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.BorderPane?>
+
+
+<fx:root prefHeight="730.0" prefWidth="504.0" type="BorderPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.141">
+   <center>
+      <TreeTableView fx:id="ttvBizItem" BorderPane.alignment="CENTER">
+        <columns>
+          <TreeTableColumn prefWidth="162.0" text="C1" />
+          <TreeTableColumn prefWidth="314.0" text="C2" />
+        </columns>
+      </TreeTableView>
+   </center>
+</fx:root>

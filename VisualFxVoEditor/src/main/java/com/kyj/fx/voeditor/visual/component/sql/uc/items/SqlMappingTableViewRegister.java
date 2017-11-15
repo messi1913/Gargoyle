@@ -22,6 +22,7 @@ import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.fxloader.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.framework.loader.core.BusinessRegistable;
 import com.kyj.fx.voeditor.visual.framework.loader.core.RegistItem;
+import com.kyj.fx.voeditor.visual.framework.loader.events.MakeBusinessFrameOnFinishEvent;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -50,7 +51,7 @@ import javafx.util.StringConverter;
  *
  */
 @FXMLController(value = "SqlMappingTableViewRegister.fxml", isSelfController = true, css = "SqlMappingTableViewRegister.css")
-public class SqlMappingTableViewRegister extends BorderPane implements BusinessRegistable {
+public class SqlMappingTableViewRegister extends BorderPane implements BusinessRegistable, MakeBusinessFrameOnFinishEvent {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SqlMappingTableViewRegister.class);
 	private String id;
@@ -379,5 +380,14 @@ public class SqlMappingTableViewRegister extends BorderPane implements BusinessR
 	@Override
 	public List<RegistItem> registPages() {
 		return Collections.emptyList();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.kyj.fx.voeditor.visual.framework.loader.events.MakeBusinessFrameOnFinishEvent#onFinish(java.util.List)
+	 */
+	@Override
+	public boolean onFinish(List<Map<String, Object>> properties) {
+		LOGGER.debug("onFinish Event Called......");
+		return true;
 	}
 }
