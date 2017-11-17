@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.json.simple.JSONObject;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -1516,4 +1517,142 @@ public class DbUtil extends ConnectionManager {
 	// e.printStackTrace();
 	// }
 	// }
+
+	public static Connection getConnection(Map<String, Object> map) throws Exception {
+		String jdbcDriver = ConfigResourceLoader.getInstance().get("dbms." + map.get(ResourceLoader.DBMS.toString()));
+		String password = map.get(ResourceLoader.BASE_KEY_JDBC_PASS) == null ? "" : map.get(ResourceLoader.BASE_KEY_JDBC_PASS).toString();
+		password = EncrypUtil.decryp(password);
+
+		return getConnection(jdbcDriver, map.get(ResourceLoader.BASE_KEY_JDBC_URL).toString(),
+				map.get(ResourceLoader.BASE_KEY_JDBC_ID) == null ? "" : map.get(ResourceLoader.BASE_KEY_JDBC_ID).toString(), password);
+
+	}
+
+	/**
+	 * 프로시저 컬럼 정보를 찾는다.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 17.
+	 * @param con
+	 * @param catalog
+	 * @param schemaPattern
+	 * @param procedureNamePattern
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Map<String, Object>> getProcedureColumns(Connection con, String catalog, String schemaPattern,
+			String procedureNamePattern) throws SQLException {
+		return getProcedureColumns(con, catalog, schemaPattern, procedureNamePattern, null);
+	}
+
+	/**
+	 * 프로시저 컬럼 정보를 찾는다.
+
+ *  <OL>
+     *  <LI><B>PROCEDURE_CAT</B> String {@code =>} procedure catalog (may be <code>null</code>)
+     *  <LI><B>PROCEDURE_SCHEM</B> String {@code =>} procedure schema (may be <code>null</code>)
+     *  <LI><B>PROCEDURE_NAME</B> String {@code =>} procedure name
+     *  <LI><B>COLUMN_NAME</B> String {@code =>} column/parameter name
+     *  <LI><B>COLUMN_TYPE</B> Short {@code =>} kind of column/parameter:
+     *      <UL>
+     *      <LI> procedureColumnUnknown - nobody knows
+     *      <LI> procedureColumnIn - IN parameter
+     *      <LI> procedureColumnInOut - INOUT parameter
+     *      <LI> procedureColumnOut - OUT parameter
+     *      <LI> procedureColumnReturn - procedure return value
+     *      <LI> procedureColumnResult - result column in <code>ResultSet</code>
+     *      </UL>
+     *  <LI><B>DATA_TYPE</B> int {@code =>} SQL type from java.sql.Types
+     *  <LI><B>TYPE_NAME</B> String {@code =>} SQL type name, for a UDT type the
+     *  type name is fully qualified
+     *  <LI><B>PRECISION</B> int {@code =>} precision
+     *  <LI><B>LENGTH</B> int {@code =>} length in bytes of data
+     *  <LI><B>SCALE</B> short {@code =>} scale -  null is returned for data types where
+     * SCALE is not applicable.
+     *  <LI><B>RADIX</B> short {@code =>} radix
+     *  <LI><B>NULLABLE</B> short {@code =>} can it contain NULL.
+     *      <UL>
+     *      <LI> procedureNoNulls - does not allow NULL values
+     *      <LI> procedureNullable - allows NULL values
+     *      <LI> procedureNullableUnknown - nullability unknown
+     *      </UL>
+     *  <LI><B>REMARKS</B> String {@code =>} comment describing parameter/column
+     *  <LI><B>COLUMN_DEF</B> String {@code =>} default value for the column, which should be interpreted as a string when the value is enclosed in single quotes (may be <code>null</code>)
+     *      <UL>
+     *      <LI> The string NULL (not enclosed in quotes) - if NULL was specified as the default value
+     *      <LI> TRUNCATE (not enclosed in quotes)        - if the specified default value cannot be represented without truncation
+     *      <LI> NULL                                     - if a default value was not specified
+     *      </UL>
+     *  <LI><B>SQL_DATA_TYPE</B> int  {@code =>} reserved for future use
+     *  <LI><B>SQL_DATETIME_SUB</B> int  {@code =>} reserved for future use
+     *  <LI><B>CHAR_OCTET_LENGTH</B> int  {@code =>} the maximum length of binary and character based columns.  For any other datatype the returned value is a
+     * NULL
+     *  <LI><B>ORDINAL_POSITION</B> int  {@code =>} the ordinal position, starting from 1, for the input and output parameters for a procedure. A value of 0
+     *is returned if this row describes the procedure's return value.  For result set columns, it is the
+     *ordinal position of the column in the result set starting from 1.  If there are
+     *multiple result sets, the column ordinal positions are implementation
+     * defined.
+     *  <LI><B>IS_NULLABLE</B> String  {@code =>} ISO rules are used to determine the nullability for a column.
+     *       <UL>
+     *       <LI> YES           --- if the column can include NULLs
+     *       <LI> NO            --- if the column cannot include NULLs
+     *       <LI> empty string  --- if the nullability for the
+     * column is unknown
+     *       </UL>
+     *  <LI><B>SPECIFIC_NAME</B> String  {@code =>} the name which uniquely identifies this procedure within its schema.
+     *  </OL>
+     *  
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 17. 
+	 * @param con
+	 * @param catalog
+	 * @param schemaPattern
+	 * @param procedureNamePattern
+	 * @param columnNamePattern
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Map<String, Object>> getProcedureColumns(Connection con, String catalog, String schemaPattern,
+			String procedureNamePattern, String columnNamePattern) throws SQLException {
+
+		List<Map<String, Object>> r = Collections.emptyList();
+		try {
+			ResultSet resultSet = con.getMetaData().getProcedureColumns("SamsungDB", "dbo", procedureNamePattern, columnNamePattern);
+			ResultSetToMapConverter c = new ResultSetToMapConverter();
+
+			r = c.apply(resultSet.getMetaData(), resultSet);
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+			throw e;
+		}
+		return r;
+	}
+
+	/**
+	 * 프로시저에 대한 정보를 리턴
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 17.
+	 * @param con
+	 * @param catalog
+	 * @param schemaPattern
+	 * @param procedureNamePattern
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Map<String, Object>> getProcedures(Connection con, String catalog, String schemaPattern, String procedureNamePattern)
+			throws SQLException {
+
+		List<Map<String, Object>> r = Collections.emptyList();
+		try {
+			ResultSet resultSet = con.getMetaData().getProcedures(catalog, schemaPattern, procedureNamePattern);
+			ResultSetToMapConverter c = new ResultSetToMapConverter();
+
+			r = c.apply(resultSet.getMetaData(), resultSet);
+		} catch (Exception e) {
+			LOGGER.error(ValueUtil.toString(e));
+			throw e;
+		}
+		return r;
+	}
 }
