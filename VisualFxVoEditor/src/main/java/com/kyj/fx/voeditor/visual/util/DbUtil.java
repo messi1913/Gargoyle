@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
@@ -27,6 +28,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -51,6 +54,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.exceptions.NotSupportException;
+import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.functions.BiTransactionScope;
 import com.kyj.fx.voeditor.visual.functions.ResultSetToMapConverter;
@@ -1662,5 +1666,43 @@ public class DbUtil extends ConnectionManager {
 			throw e;
 		}
 		return r;
+	}
+
+	public static Optional<ResultSet> executeProcedure(Connection con, String _sql, TreeMap<String, Object> param,
+			ExceptionHandler handler) {
+
+		Optional<ResultSet> op = Optional.empty();
+		if (ValueUtil.isEmpty(_sql))
+			return null;
+
+		// if the _sql is dynamic sql , convert param by velocity context.
+		String sql = ValueUtil.getVelocityToText(_sql, param);
+		if (ValueUtil.isNotEmpty(param)) {
+			sql = ValueUtil.getVelocityToText(_sql, param);
+		}
+		try {
+
+			CallableStatement prepareCall = con.prepareCall(sql);
+
+			Set<String> keySet = param.keySet();
+
+			int seq = 1;
+			for (String key : keySet) {
+				Object val = param.get(key);
+				prepareCall.setObject(seq, val);
+				seq++;
+			}
+
+			ResultSet rs = prepareCall.executeQuery();
+
+			op = Optional.of(rs);
+		} catch (Exception e) {
+			if (handler != null)
+				handler.handle(e);
+			else
+				throw new RuntimeException(e);
+		}
+
+		return op;
 	}
 }

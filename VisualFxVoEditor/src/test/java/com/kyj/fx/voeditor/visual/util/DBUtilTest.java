@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,7 +181,7 @@ public class DBUtilTest {
 	}
 
 	@Test
-	public void executeProcedureTest() {
+	public void findProcedureTest() {
 
 		// String callSql = "call DMI_Manu32.MatRec_GetLocations('Receiving')";
 		Optional<Map<String, Object>> findFirst = DbUtil.getAvailableConnections().stream().filter(map -> {
@@ -191,7 +193,8 @@ public class DBUtilTest {
 
 			try (Connection connection = DbUtil.getConnection(map)) {
 
-				List<Map<String, Object>> apply = DbUtil.getProcedureColumns(connection, "SamsungDB", "dbo", "DMICustom_GetContainerDetailsWithParents_NT");
+				List<Map<String, Object>> apply = DbUtil.getProcedureColumns(connection, "SamsungDB", "dbo",
+						"DMICustom_GetContainerDetailsWithParents_NT");
 
 				apply.forEach(m -> LOGGER.debug(m.toString()));
 
@@ -202,6 +205,58 @@ public class DBUtilTest {
 
 		});
 
+	}
+
+	@Test
+	public void executeProcedureTest() {
+		Optional<Map<String, Object>> findFirst = DbUtil.getAvailableConnections().stream().filter(map -> {
+			LOGGER.debug(map.toString());
+
+			return "123".equals(map.get("alias"));
+		}).findFirst();
+
+		findFirst.ifPresent(map -> {
+
+			Connection con = null;
+			try {
+				con = DbUtil.getConnection(map);
+				CallableStatement prepareCall = con.prepareCall(" { call SamsungDB.dbo.MatRec_TransferOrderNumber( ? )  } ");
+				prepareCall.setString(1, "4401");
+
+				// Unexpected Paramter.
+				prepareCall.setString(2, "4401");
+				ResultSet rs = prepareCall.executeQuery();
+				while (rs.next()) {
+					System.out.println(rs.getString(1));
+				}
+				Assert.fail("un expected result.");
+			} catch (Exception e) {
+				e.printStackTrace();
+				// Expected Exception.
+				Assert.assertTrue(true);
+			}
+
+			try {
+				//Expect true
+				CallableStatement prepareCall = con.prepareCall(" { call SamsungDB.dbo.MatRec_TransferOrderNumber( ? )  } ");
+				prepareCall.setString(1, "4401");
+
+				ResultSet rs = prepareCall.executeQuery();
+				while (rs.next()) {
+					System.out.println(rs.getString(1));
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+				// Expected Exception.
+				Assert.fail("un expected result.");
+			}
+
+			// Finally close.
+			if (con != null)
+				DbUtil.close(con);
+
+		});
 	}
 
 }
