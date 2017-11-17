@@ -15,12 +15,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
-
-import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
-import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
 
 /**
  * 데이터베이스 스키마 정보 출력
@@ -78,18 +78,22 @@ public class MSSQLSchemaItemTree extends SchemaItemTree<String> {
 	}
 
 	@Override
-	protected DatabaseItemTree<String> createProcedureItemTree(String cat, String schem, String name, String type, String remark)
+	protected DatabaseItemTree<String> createProcedureItemTree(String cat, String schem, String _name, String type, String remark)
 			throws Exception {
+		String name = _name;
+		if (_name.endsWith(";1")) {
+			name = _name.substring(0, _name.length() - 2);
+		}
 
 		if (procedureFilter(cat, schem, name, type)) {
 			DatabaseItemTree<String> createProcedureItemTree = super.createProcedureItemTree(cat, schem, name, type, remark);
 			createProcedureItemTree.setName(toProcedureName(cat, schem, name, type));
 			return createProcedureItemTree;
 		}
-
 		return null;
-
 	}
+	
+	
 
 	protected boolean procedureFilter(String cat, String schem, String name, String type) {
 		return !"sys".equals(schem);

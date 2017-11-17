@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
@@ -31,7 +28,7 @@ import javafx.scene.control.TreeItem;
  */
 public abstract class SchemaItemTree<T> extends DatabaseItemTree<T> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SchemaItemTree.class);
+//	private static final Logger LOGGER = LoggerFactory.getLogger(SchemaItemTree.class);
 
 	private DatabaseItemTree<T> parent;
 
@@ -97,14 +94,14 @@ public abstract class SchemaItemTree<T> extends DatabaseItemTree<T> {
 				String remark = rs.getString(7);
 				String type = rs.getString(8);
 
-//				LOGGER.debug("cat {} schem {} name {} {}  ", cat, schem, name, type);
+				// LOGGER.debug("cat {} schem {} name {} {} ", cat, schem, name,
+				// type);
 
 				DatabaseItemTree<T> procd = createProcedureItemTree(cat, schem, name, type, remark);
 				if (procd != null)
 					childrens.add(new TreeItem<>(procd));
 
 			}
-			
 
 			// Functions
 			childrens.addAll(getFunctions());
@@ -135,7 +132,7 @@ public abstract class SchemaItemTree<T> extends DatabaseItemTree<T> {
 	 * @작성일 : 2017. 9. 12.
 	 * @param cat
 	 * @param schem
-	 * @param name
+	 * @param na
 	 * @param type
 	 * @param remark
 	 * @return

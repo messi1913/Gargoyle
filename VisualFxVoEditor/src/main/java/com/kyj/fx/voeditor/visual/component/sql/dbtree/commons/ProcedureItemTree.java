@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.kyj.fx.voeditor.visual.util.DbUtil;
+import com.kyj.fx.voeditor.visual.util.FxCollectors;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
+
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
@@ -29,13 +34,32 @@ public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 	private String cat;
 	private String schem;
 	private String remark;
-	public ProcedureItemTree(SchemaItemTree<T> parent, String cat, String schem, String name, String remark) throws Exception {
+	private String procedureName;
+
+	public ProcedureItemTree(SchemaItemTree<T> parent, String cat, String schem, String procedureName, String remark) throws Exception {
 		this.parent = parent;
 		this.conSupplier = parent.conSupplier;
-		setName(name);
+		this.procedureName = procedureName;
 		this.cat = cat;
 		this.schem = schem;
 		this.remark = remark;
+		setName(procedureName);
+	}
+
+	public String getCat() {
+		return cat;
+	}
+
+	public String getSchem() {
+		return schem;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public String getProcedureName() {
+		return procedureName;
 	}
 
 	@Deprecated
@@ -44,10 +68,27 @@ public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 		return null;
 	}
 
-	@Deprecated
 	@Override
 	public ObservableList<TreeItem<DatabaseItemTree<T>>> applyChildren(List<Map<String, Object>> items) throws Exception {
-		return null;
+		ObservableList<TreeItem<DatabaseItemTree<T>>> collect = FXCollections.emptyObservableList();
+
+		if (ValueUtil.isNotEmpty(items)) {
+			collect = items.stream().map(m -> {
+
+				try {
+					ProcedureColumnsTree<T> tree = new ProcedureColumnsTree<>(this, m);
+					TreeItem<DatabaseItemTree<T>> treeItem = new TreeItem<DatabaseItemTree<T>>();
+					treeItem.setValue(tree);
+					treeItem.setGraphic(tree.createGraphics());
+					return treeItem;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return null;
+			}).collect(FxCollectors.toObservableList());
+		}
+
+		return collect;
 	}
 
 	/*
@@ -59,7 +100,11 @@ public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 	 */
 	@Override
 	public void read() throws Exception {
-		return;
+
+		Connection con = getConnection();
+		List<Map<String, Object>> procedureColumns = DbUtil.getProcedureColumns(con, cat, schem, getProcedureName());
+		getChildrens().addAll(applyChildren(procedureColumns));
+
 	}
 
 	public Connection getConnection() {

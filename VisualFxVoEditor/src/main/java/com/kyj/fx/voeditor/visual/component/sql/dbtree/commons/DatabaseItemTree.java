@@ -16,6 +16,7 @@ import com.kyj.fx.voeditor.visual.util.DbUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 
 /**
@@ -49,8 +50,8 @@ public abstract class DatabaseItemTree<T> implements IConnectionByChildrens<T> {
 				childrens.addAll(applyChildren(select));
 			}
 
-			//			if (childrens == null)
-			//				childrens = FXCollections.observableArrayList();
+			// if (childrens == null)
+			// childrens = FXCollections.observableArrayList();
 
 			// SQL로 불가능한 처리는 Connection을 받아 처리하도록한다.
 			ObservableList<TreeItem<DatabaseItemTree<T>>> second = applyChildren(connection);
@@ -88,8 +89,8 @@ public abstract class DatabaseItemTree<T> implements IConnectionByChildrens<T> {
 	 * check is Valide Schema Name
 	 *
 	 * if is not, The Method(' show100RowAction() ') in CommonsSqllPan.java
-	 *  
-	 * not apply  schema Name SQL 
+	 * 
+	 * not apply schema Name SQL
 	 * 
 	 * @param schemaName
 	 * @return
@@ -103,6 +104,17 @@ public abstract class DatabaseItemTree<T> implements IConnectionByChildrens<T> {
 	// throws Exception;
 
 	public abstract ObservableList<TreeItem<DatabaseItemTree<T>>> applyChildren(List<Map<String, Object>> items) throws Exception;
+
+	/**
+	 * 트리 이미지
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 17.
+	 * @return
+	 */
+	public Node createGraphics() {
+		return null;
+	}
 
 	/*
 	 * (non-Javadoc)

@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
-
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
+
+import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
 
 /**
  * @author KYJ
