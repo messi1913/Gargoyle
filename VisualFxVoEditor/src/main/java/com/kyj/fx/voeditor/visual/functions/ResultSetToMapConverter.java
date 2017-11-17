@@ -29,6 +29,9 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 /**
  * ResultSet 결과 데이터를 Map형태로 반환함.
  *
+ *
+ * 17.11.17 findFirst 라는 속성 추가. 첫번째 행만 처리하고 리턴. by kyj.
+ *  
  * @author KYJ
  *
  */
@@ -45,6 +48,8 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 
 	public static final String START_ROW = "start.row";
 
+	public static final String FIND_FIRST_YN = "findFirst.yn";
+
 	/**
 	 * Mapping처리할때 필요한 속성이 정의된다.
 	 *
@@ -55,6 +60,13 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 	private boolean isBigDataColumnSkip;
 
 	private int startRow = -1;
+
+	/**
+	 * 첫번째 행만 리턴할지 유무
+	 * 
+	 * @최초생성일 2017. 11. 17.
+	 */
+	private boolean isFindFirst;
 
 	private Consumer<Exception> exceptionHandler;
 
@@ -103,6 +115,15 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 				} catch (NumberFormatException e) {
 					/* Nothing. */}
 
+			}
+		}
+
+		if (this.prop.containsKey(FIND_FIRST_YN)) {
+			Object findFirst = this.prop.get(FIND_FIRST_YN);
+			if ("Y".equals(findFirst)) {
+				this.isFindFirst = true;
+			} else {
+				this.isFindFirst = false;
 			}
 		}
 
@@ -160,8 +181,9 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 							String columnTypeName = metaData.getColumnTypeName(c);
 							int cType = metaData.getColumnType(c);
 
-							// 17.11.2 if the length over 3000 character replace by kyj.
-							if (value!=null && value.length() > 3000) {
+							// 17.11.2 if the length over 3000 character replace
+							// by kyj.
+							if (value != null && value.length() > 3000) {
 								map.put(columnLabel,
 										isEmptyValue ? new BigDataDVO("{data.text}", value) : new BigDataDVO("{DATA.TEXT}", value));
 								break;
@@ -209,6 +231,9 @@ public class ResultSetToMapConverter implements BiFunction<ResultSetMetaData, Re
 				}
 				arrayList.add(map);
 				firstRow = false;
+				
+				if(isFindFirst)
+					break;
 			}
 		} catch (SQLException e) {
 			LOGGER.error(ValueUtil.toString(e));
