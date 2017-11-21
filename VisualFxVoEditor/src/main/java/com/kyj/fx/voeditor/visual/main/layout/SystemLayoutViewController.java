@@ -121,11 +121,14 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -309,6 +312,26 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		treeProjectFile.setOnMouseClicked(this::treeProjectFileOnMouseClick);
 		// 트리 키 이벤트
 		treeProjectFile.addEventHandler(KeyEvent.KEY_PRESSED, this::treeProjectFileOnKeyPressed);
+
+		/*******************************/
+		// 17.11.21 KYJ
+		/* [시작] 파일경로 드래그 드롭 이벤트 처리 */
+
+		treeProjectFile.setOnDragDetected(ev -> {
+			TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+			if (selectedItem != null) {
+				Dragboard board = treeProjectFile.startDragAndDrop(TransferMode.LINK);
+				ClipboardContent content = new ClipboardContent();
+				content.putFiles(Arrays.asList(selectedItem.getValue().getFile()));
+				board.setContent(content);
+
+				// treeProjectFile.startDragAndDrop(TransferMode.LINK);
+				LOGGER.debug("Drag Detected...");
+				ev.consume();
+			}
+
+		});
+		/* [끝] 파일경로 드래그 드롭 이벤트 처리 */
 
 		/** 플러그인들을 로드함. **/
 		Platform.runLater(new Runnable() {
@@ -835,10 +858,10 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		menuProperties.setOnAction(this::menuPropertiesOnAction);
 		chodeAnalysisMenuItem.setOnAction(this::menuItemCodeAnalysisMenuItemOnAction);
 
-		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem,
-				deleteFileMenuItem, /*
-									 * voEditorMenuItem, daoWizardMenuItem,
-									 */
+		fileTreeContextMenu.getItems().addAll(openFileMenuItem, menuOpenWidth, newFileMenuItem, deleteFileMenuItem, /*
+																													 * voEditorMenuItem,
+																													 * daoWizardMenuItem,
+																													 */
 				voEditorMenuItem, /* setVoEditorMenuItem, */ setDaoWizardMenuItem, chodeAnalysisMenuItem, makeProgramSpecMenuItem,
 				menuItemSCMGraphs, new SeparatorMenuItem(), refleshMenuItem, new SeparatorMenuItem(), menuPMD, new SeparatorMenuItem(),
 				menuRunAs, new SeparatorMenuItem(), menuProperties);
@@ -1520,14 +1543,20 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				}
 
 				/*
-				 * DockTab tab = new DockTab(tabName, parent); tab.setTooltip(new Tooltip(loader.getController().getClass().getName()));
+				 * DockTab tab = new DockTab(tabName, parent);
+				 * tab.setTooltip(new
+				 * Tooltip(loader.getController().getClass().getName()));
 				 * 
-				 * addTabItem(tab); tab.getTabPane().getSelectionModel().select(tab);
+				 * addTabItem(tab);
+				 * tab.getTabPane().getSelectionModel().select(tab);
 				 * 
-				 * // 리스너 호출. onParentloaded.forEach(v -> { v.onLoad(parent); });
+				 * // 리스너 호출. onParentloaded.forEach(v -> { v.onLoad(parent);
+				 * });
 				 * 
-				 * if (parent instanceof GargoyleTabPanable) { GargoyleTabPanable _tabPanable = (GargoyleTabPanable) parent;
-				 * _tabPanable.setTab(tab); _tabPanable.setTabPane(tabPanWorkspace); }
+				 * if (parent instanceof GargoyleTabPanable) {
+				 * GargoyleTabPanable _tabPanable = (GargoyleTabPanable) parent;
+				 * _tabPanable.setTab(tab);
+				 * _tabPanable.setTabPane(tabPanWorkspace); }
 				 */
 				DockTab tab = new DockTab(tabName, parent);
 				loadNewSystemTab(tabName, tab, null);
@@ -1672,20 +1701,29 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 				});
 
 				/*
-				 * DockTab tab = new DockTab(tableName, _parent); // 툴팁 처리 (클래스위치) tab.setTooltip(new Tooltip(parent.getClass().getName()));
+				 * DockTab tab = new DockTab(tableName, _parent); // 툴팁 처리
+				 * (클래스위치) tab.setTooltip(new
+				 * Tooltip(parent.getClass().getName()));
 				 * 
-				 * addTabItem(tab); tabPanWorkspace.getSelectionModel().select(tab);
+				 * addTabItem(tab);
+				 * tabPanWorkspace.getSelectionModel().select(tab);
 				 * 
-				 * tab.setOnCloseRequest(ev -> { try { LOGGER. debug("closeable parent on close request , tabName : {} ", tableName);
-				 * parent.close(); } catch (Exception e) { LOGGER.error(ValueUtil.toString(e)); } });
+				 * tab.setOnCloseRequest(ev -> { try { LOGGER.
+				 * debug("closeable parent on close request , tabName : {} ",
+				 * tableName); parent.close(); } catch (Exception e) {
+				 * LOGGER.error(ValueUtil.toString(e)); } });
 				 * 
-				 * // 리스너 호출. onParentloaded.forEach(v -> v.onLoad(parent.getParent()));
+				 * // 리스너 호출. onParentloaded.forEach(v ->
+				 * v.onLoad(parent.getParent()));
 				 * 
-				 * List<Node> findAllByNodes = FxUtil.findAllByNodes(_parent, n -> n instanceof Button); findAllByNodes.forEach(btn -> {
+				 * List<Node> findAllByNodes = FxUtil.findAllByNodes(_parent, n
+				 * -> n instanceof Button); findAllByNodes.forEach(btn -> {
 				 * btn.getStyleClass().add("button-gargoyle"); });
 				 * 
-				 * if (_parent instanceof GargoyleTabPanable) { GargoyleTabPanable _tabPanable = (GargoyleTabPanable) _parent;
-				 * _tabPanable.setTab(tab); _tabPanable.setTabPane(tabPanWorkspace); }
+				 * if (_parent instanceof GargoyleTabPanable) {
+				 * GargoyleTabPanable _tabPanable = (GargoyleTabPanable)
+				 * _parent; _tabPanable.setTab(tab);
+				 * _tabPanable.setTabPane(tabPanWorkspace); }
 				 * 
 				 */
 
@@ -1775,7 +1813,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	@FXML
 	public void lblDatabaseMouseClick(MouseEvent e) {
 
-		/*17.11.15 DB 비동기 접속 처리 로직 구현*/
+		/* 17.11.15 DB 비동기 접속 처리 로직 구현 */
 		Label source = (Label) e.getSource();
 		source.setDisable(true);
 

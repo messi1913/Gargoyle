@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -61,8 +60,6 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -78,8 +75,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
@@ -200,6 +199,40 @@ public class DaoWizardViewController {
 
 	@FXML
 	public void initialize() {
+
+		/*******************************/
+		// 17.11.21 KYJ
+		/* [시작] 파일경로 드래그 드롭 이벤트 처리 */
+		txtDaoLocation.setOnDragOver(ev -> {
+			ev.acceptTransferModes(TransferMode.LINK);
+			LOGGER.debug("Drag Over..");
+			ev.consume();
+		});
+
+		txtDaoLocation.setOnDragDropped(ev -> {
+			Dragboard dragboard = ev.getDragboard();
+			if (dragboard.hasFiles()) {
+				List<File> files = dragboard.getFiles();
+				if (files.isEmpty() || files.size() >= 2) {
+					return;
+				}
+				File file = files.get(0);
+				if (file.isDirectory()) {
+					// 경로를 생대경로화 시킨다.
+					Path relativize = FileUtil.toRelativizeForGagoyle(file);
+
+					// 2016.03.31 파일경로를 상대경로화 시켜 저장.
+					this.txtDaoLocation.setText(relativize.toString());
+					LOGGER.debug("Drag Droped...");
+					ev.setDropCompleted(true);
+				}
+			} else if (dragboard.hasString()) {
+				this.txtDaoLocation.setText(dragboard.getString());
+				LOGGER.debug("Drag Droped...");
+				ev.setDropCompleted(true);
+			}
+		});
+		/* [끝] 파일경로 드래그 드롭 이벤트 처리 */
 
 		tbParams.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -606,7 +639,7 @@ public class DaoWizardViewController {
 			String tableName = tableMasterDVO.getTableName();
 			String catalog = tableMasterDVO.getCatalog();
 			String schemaName = tableMasterDVO.getSchemaName();
-			
+
 			if (ValueUtil.isNotEmpty(catalog)) {
 				tableName = tableMasterDVO.getCatalog();
 			}
