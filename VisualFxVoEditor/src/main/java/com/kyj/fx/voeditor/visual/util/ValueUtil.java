@@ -273,13 +273,15 @@ public class ValueUtil {
 		return replace(sql, paramMap, str -> String.format("'%s'", str));
 	}
 
+	
 	private static String replace(String sql, Map<String, Object> paramMap, Function<String, String> customFormat) {
 		if (sql == null || sql.trim().isEmpty())
 			return sql;
 
+//		String specialCharacter = getDynamicValueSpecialCharacter();
 		String _sql = sql.replaceAll(COMMENT_PATTERN, "");
 		String pattern = ":\\w+";
-		// String pattern = ":";
+
 		String result = regexReplaceMatchs(pattern, _sql, v -> {
 			String replace = v.replaceAll(":", "");
 			Object object = paramMap.get(replace);
@@ -301,13 +303,7 @@ public class ValueUtil {
 			// 2016-11-01 custom 포멧 제공
 			return customFormat.apply(string); // String.format("'%s'", string);
 		});
-		// Optional<String> reduce = regexMatchs.stream().reduce((a, b) ->
-		// a.concat(b));
-		// if (reduce.isPresent())
-		// return reduce.get();
-		// return _sql;
 		return result;
-		// return sql.replaceAll(pattern, "\\$");
 	}
 
 	/**
@@ -322,11 +318,8 @@ public class ValueUtil {
 
 		String _sql = sql;
 		// 주석에 대해당하는 문자들을 제거
-		// _sql = _sql.replaceAll(STRING_PATTERN, "");
 		_sql = _sql.replaceAll(COMMENT_PATTERN, "");
-		// String pattern = "\\$\\w+|:\\w+";
 		String pattern = "\\$\\w+";
-		// String pattern = "[( ]+\\$\\w+|=[ ]{0,}:\\w+";
 
 		Pattern compile = Pattern.compile(pattern);
 		Matcher matcher = compile.matcher(_sql);
@@ -347,18 +340,10 @@ public class ValueUtil {
 	public static List<String> getVelocityKeys(String _dynamicSql) {
 		String dynamicSql = _dynamicSql;
 		// 주석에 대해당하는 문자들을 제거
-		// dynamicSql = dynamicSql.replaceAll(STRING_PATTERN, "");
 		dynamicSql = dynamicSql.replaceAll(COMMENT_PATTERN, "");
 		String pattern = "\\$\\w+|:\\w+";
-		// String pattern = "[( ]+\\$\\w+|=[ ]{0,}:\\w+";
 		// 맨앞의 특수문자는 제거.
 		return regexMatchs(pattern, dynamicSql, param -> {
-			// String result = param.trim();
-			// if (result.startsWith("($")) {
-			// return result.substring(2);
-			// }
-			// else if(result.startsWith("="))
-			// return result.substring(1).trim().substring(1);
 			return param.substring(1);
 		});
 	}

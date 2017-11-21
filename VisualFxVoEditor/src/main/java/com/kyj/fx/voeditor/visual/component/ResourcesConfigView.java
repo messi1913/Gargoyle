@@ -25,6 +25,7 @@ import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil.POPUP_STYLE;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.property.SimpleObjectProperty;
@@ -142,7 +143,7 @@ public class ResourcesConfigView extends BorderPane {
 		tbDatabase.getSelectionModel().setCellSelectionEnabled(true);
 		
 		FxUtil.installClipboardKeyEvent(tbDatabase);
-		
+		FxUtil.installDoubleClickPopup(FxUtil.getWindow(this), POPUP_STYLE.POPUP, tbDatabase);
 		
 	}
 

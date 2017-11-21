@@ -13,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,7 +57,6 @@ import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
-import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.builder.GargoyleBuilderFactory;
 import com.kyj.fx.voeditor.visual.framework.contextmenu.FxContextManager;
 import com.kyj.fx.voeditor.visual.functions.ToExcelFileFunction;
@@ -165,7 +163,8 @@ public class FxUtil {
 		try {
 
 			/*
-			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
+			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된
+			 * 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
 			 */
 			File parentFile = new File(FileUtil.getTempGagoyle(), "font");
 			if (!parentFile.exists())
@@ -331,9 +330,10 @@ public class FxUtil {
 		return null;
 	}
 
-//	private static <C> FXMLController getFxmlController(Class<C> controllerClass) throws GargoyleException {
-//		return controllerClass.getAnnotation(FXMLController.class);
-//	}
+	// private static <C> FXMLController getFxmlController(Class<C>
+	// controllerClass) throws GargoyleException {
+	// return controllerClass.getAnnotation(FXMLController.class);
+	// }
 
 	// private static String getFxml(FXMLController controller) {
 	// if (controller == null) {
@@ -342,33 +342,33 @@ public class FxUtil {
 	// return controller.value();
 	// }
 
-//	private static String getCss(Class<?> res, FXMLController controller) {
-//		if (res != null) {
-//			try {
-//				String css = getCss(controller);
-//
-//				if (ValueUtil.isEmpty(css))
-//					return null;
-//
-//				URL resource = res.getResource(css);
-//
-//				if (resource == null)
-//					return null;
-//
-//				return resource.toExternalForm();
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		return null;
-//	}
+	// private static String getCss(Class<?> res, FXMLController controller) {
+	// if (res != null) {
+	// try {
+	// String css = getCss(controller);
+	//
+	// if (ValueUtil.isEmpty(css))
+	// return null;
+	//
+	// URL resource = res.getResource(css);
+	//
+	// if (resource == null)
+	// return null;
+	//
+	// return resource.toExternalForm();
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// return null;
+	// }
 
-//	private static String getCss(FXMLController controller) {
-//		if (controller == null) {
-//			return null;
-//		}
-//		return controller.css();
-//	}
+	// private static String getCss(FXMLController controller) {
+	// if (controller == null) {
+	// return null;
+	// }
+	// return controller.css();
+	// }
 
 	/********************************
 	 * 작성일 : 2016. 5. 21. 작성자 : KYJ
@@ -1193,7 +1193,7 @@ public class FxUtil {
 	 * @return
 	 ********************************/
 	public static Window getWindow(Node node) {
-		return getWindow(node, () -> null);
+		return getWindow(node, () -> SharedMemory.getPrimaryStage());
 	}
 
 	public static Window getWindow(Node node, Supplier<Window> emptyThan) {
@@ -1826,9 +1826,9 @@ public class FxUtil {
 		installDoubleClickPopup(null, style, tbMetadata);
 	}
 
-	public static <T> void installDoubleClickPopup(Window owner, POPUP_STYLE style, TableView<T> tbMetadata) {
+	public static <T> void installDoubleClickPopup(Window _owner, POPUP_STYLE style, TableView<T> tbMetadata) {
 		tbMetadata.addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
-
+			Window owner = _owner;
 			if (MouseButton.PRIMARY == ev.getButton() && ev.getClickCount() == 2) {
 				if (ev.isConsumed())
 					return;
@@ -1859,17 +1859,16 @@ public class FxUtil {
 				final double WIDTH = 500d;
 				final double HEIGHT = 400d;
 
-				JavaTextArea createJavaTextArea = createJavaTextArea(value);
-				createJavaTextArea.setPrefSize(WIDTH, HEIGHT);
-
 				switch (style) {
 				case POP_OVER:
+					JavaTextArea createJavaTextArea = createJavaTextArea(value);
+					createJavaTextArea.setPrefSize(WIDTH, HEIGHT);
 					FxUtil.showPopOver(tbMetadata, createJavaTextArea);
 					break;
 				case POPUP:
 
 					createSimpleTextAreaAndShow(value, stage -> {
-						stage.setTitle("Show Values");
+						stage.setTitle("Show Value");
 						stage.setWidth(WIDTH);
 						stage.setHeight(HEIGHT);
 						stage.initStyle(StageStyle.UTILITY);

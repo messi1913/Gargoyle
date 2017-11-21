@@ -496,7 +496,7 @@ public class DatabaseUrlManagementView extends BorderPane {
 		// dockNode.setFloating(true, new Point2D(0,0));
 		// dockNode.getStage().centerOnScreen();
 
-		FxUtil.createDockStageAndShow(null, dockNode);
+		FxUtil.createDockStageAndShow(FxUtil.getWindow(this), dockNode);
 
 		// FxUtil.createStageAndShow(title, dockNode, stage -> {
 		// stage.getScene().getStylesheets().add(SkinManager.getInstance().getSkin());
