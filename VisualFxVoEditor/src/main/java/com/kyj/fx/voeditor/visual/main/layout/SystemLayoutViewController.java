@@ -316,21 +316,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		/*******************************/
 		// 17.11.21 KYJ
 		/* [시작] 파일경로 드래그 드롭 이벤트 처리 */
-
-		treeProjectFile.setOnDragDetected(ev -> {
-			TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
-			if (selectedItem != null) {
-				Dragboard board = treeProjectFile.startDragAndDrop(TransferMode.LINK);
-				ClipboardContent content = new ClipboardContent();
-				content.putFiles(Arrays.asList(selectedItem.getValue().getFile()));
-				board.setContent(content);
-
-				// treeProjectFile.startDragAndDrop(TransferMode.LINK);
-				LOGGER.debug("Drag Detected...");
-				ev.consume();
-			}
-
-		});
+		treeProjectFile.setOnDragDetected(this::treeProjectFileOnDragDetected);
 		/* [끝] 파일경로 드래그 드롭 이벤트 처리 */
 
 		/** 플러그인들을 로드함. **/
@@ -1355,6 +1341,34 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			fileTreeContextMenu.hide();
 		}
 
+	}
+
+	/**
+	 * 트리 드래그 디텍트 이벤트 처리. <br/>
+	 * 트리내에 구성된 파일의 위치정보를 드래그 드롭 기능으로 <br/>
+	 * 전달해주는 역할을 수행한다.<br/>
+	 * <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 21.
+	 * @param ev
+	 */
+	public void treeProjectFileOnDragDetected(MouseEvent ev) {
+		TreeItem<JavaProjectFileWrapper> selectedItem = treeProjectFile.getSelectionModel().getSelectedItem();
+		if (selectedItem == null || selectedItem.getValue() == null) {
+			return;
+		}
+
+		File file = selectedItem.getValue().getFile();
+		if (file == null || !file.exists())
+			return;
+		
+		Dragboard board = treeProjectFile.startDragAndDrop(TransferMode.LINK);
+		ClipboardContent content = new ClipboardContent();
+		content.putFiles(Arrays.asList(file));
+		board.setContent(content);
+
+		ev.consume();
 	}
 
 	/********************************

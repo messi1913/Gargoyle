@@ -205,7 +205,6 @@ public class DaoWizardViewController {
 		/* [시작] 파일경로 드래그 드롭 이벤트 처리 */
 		txtDaoLocation.setOnDragOver(ev -> {
 			ev.acceptTransferModes(TransferMode.LINK);
-			LOGGER.debug("Drag Over..");
 			ev.consume();
 		});
 
@@ -223,12 +222,43 @@ public class DaoWizardViewController {
 
 					// 2016.03.31 파일경로를 상대경로화 시켜 저장.
 					this.txtDaoLocation.setText(relativize.toString());
-					LOGGER.debug("Drag Droped...");
 					ev.setDropCompleted(true);
 				}
 			} else if (dragboard.hasString()) {
 				this.txtDaoLocation.setText(dragboard.getString());
-				LOGGER.debug("Drag Droped...");
+				ev.setDropCompleted(true);
+			}
+		});
+		
+		txtClassName.setOnDragOver(ev -> {
+			ev.acceptTransferModes(TransferMode.LINK);
+			ev.consume();
+		});
+		txtClassName.setOnDragDropped(ev -> {
+			Dragboard dragboard = ev.getDragboard();
+			if (dragboard.hasFiles()) {
+				List<File> files = dragboard.getFiles();
+				if (files.isEmpty() || files.size() >= 2) {
+					return;
+				}
+				File file = files.get(0);
+				File parentFile = file;
+				if (file.isFile()) {
+					parentFile = file.getParentFile();
+				}
+
+				// 경로를 생대경로화 시킨다.
+				Path relativize = FileUtil.toRelativizeForGagoyle(parentFile);
+
+				// 2016.03.31 파일경로를 상대경로화 시켜 저장.
+				this.txtDaoLocation.setText(relativize.toString());
+				// 파일명 저장.
+				this.txtClassName.setText(file.getName());
+
+				ev.setDropCompleted(true);
+
+			} else if (dragboard.hasString()) {
+				this.txtClassName.setText(dragboard.getString());
 				ev.setDropCompleted(true);
 			}
 		});

@@ -17,89 +17,138 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.control.TextField?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.main.layout.DaoWizardViewController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="com.kyj.fx.voeditor.visual.main.layout.DaoWizardViewController">
 	<top>
 		<GridPane BorderPane.alignment="CENTER">
 			<columnConstraints>
-				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
-				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
-				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
-				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
-				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
-				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
-				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
-				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+					percentWidth="10.0" prefWidth="100.0" />
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+					percentWidth="10.0" prefWidth="100.0" />
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+					percentWidth="10.0" prefWidth="100.0" />
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+					percentWidth="10.0" prefWidth="100.0" />
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+					percentWidth="10.0" prefWidth="100.0" />
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+					percentWidth="10.0" prefWidth="100.0" />
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+					percentWidth="30.0" prefWidth="100.0" />
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+					percentWidth="10.0" prefWidth="100.0" />
 			</columnConstraints>
 			<rowConstraints>
-				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-				<RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0"
+					vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0"
+					vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0"
+					vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0"
+					vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0"
+					vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0"
+					vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="25.0"
+					vgrow="SOMETIMES" />
 			</rowConstraints>
 			<children>
-				<Label fx:id="lblClassName" text="Class Name" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-				<TextField fx:id="txtClassName" prefHeight="23.0" prefWidth="583.0" GridPane.columnIndex="1" GridPane.columnSpan="7" GridPane.rowIndex="1" />
+				<Label fx:id="lblClassName" text="Class Name"
+					GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS"
+					GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+				<TextField fx:id="txtClassName" prefHeight="23.0"
+					prefWidth="583.0" GridPane.columnIndex="1" GridPane.columnSpan="7"
+					GridPane.rowIndex="1" />
 				<Label text="Description" GridPane.rowIndex="3" />
-				<TextArea fx:id="txtAreaDaoDesc" onKeyPressed="#txtAreadDaoDescOnKeyPressd" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="7" GridPane.rowIndex="3" GridPane.rowSpan="2">
-               <GridPane.margin>
-                  <Insets bottom="2.0" top="2.0" />
-               </GridPane.margin></TextArea>
-				<Button fx:id="btnGenerate" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#btnGenerateOnMouseClick" text="Generate" GridPane.columnIndex="1" GridPane.rowIndex="6">
+				<TextArea fx:id="txtAreaDaoDesc" onKeyPressed="#txtAreadDaoDescOnKeyPressd"
+					prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1"
+					GridPane.columnSpan="7" GridPane.rowIndex="3" GridPane.rowSpan="2">
+					<GridPane.margin>
+						<Insets bottom="2.0" top="2.0" />
+					</GridPane.margin>
+				</TextArea>
+				<Button fx:id="btnGenerate" maxWidth="1.7976931348623157E308"
+					mnemonicParsing="false" onMouseClicked="#btnGenerateOnMouseClick"
+					text="Generate" GridPane.columnIndex="1" GridPane.rowIndex="6">
 					<GridPane.margin>
 						<Insets bottom="3.0" right="3.0" top="3.0" />
 					</GridPane.margin>
 				</Button>
-				<Button fx:id="btnDatabase" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#btnDaoDatabaseMouseClick" text="DataBase" GridPane.columnIndex="2" GridPane.rowIndex="6">
+				<Button fx:id="btnDatabase" maxWidth="1.7976931348623157E308"
+					mnemonicParsing="false" onMouseClicked="#btnDaoDatabaseMouseClick"
+					text="Table Model" GridPane.columnIndex="2" GridPane.rowIndex="6">
 					<GridPane.margin>
 						<Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
 					</GridPane.margin>
 
 				</Button>
 				<Label text="Location" GridPane.rowIndex="2" />
-				<TextField fx:id="txtDaoLocation" prefHeight="23.0" prefWidth="164.0" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="2" />
-				<Button fx:id="btnBrowse" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#btnBrowseMouseClick" text="Browse" GridPane.columnIndex="7" GridPane.rowIndex="2">
-               <GridPane.margin>
-                  <Insets left="3.0" right="3.0" />
-               </GridPane.margin>
+				<TextField fx:id="txtDaoLocation" prefHeight="23.0"
+					prefWidth="164.0" GridPane.columnIndex="1" GridPane.columnSpan="6"
+					GridPane.rowIndex="2" />
+				<Button fx:id="btnBrowse" maxWidth="1.7976931348623157E308"
+					mnemonicParsing="false" onMouseClicked="#btnBrowseMouseClick" text="Browse"
+					GridPane.columnIndex="7" GridPane.rowIndex="2">
+					<GridPane.margin>
+						<Insets left="3.0" right="3.0" />
+					</GridPane.margin>
 				</Button>
 				<Label text="Package Name" />
-				<TextField fx:id="txtPackageName" GridPane.columnIndex="1" GridPane.columnSpan="7" />
+				<TextField fx:id="txtPackageName" GridPane.columnIndex="1"
+					GridPane.columnSpan="7" />
 				<Label text="Table Name" GridPane.rowIndex="5" />
-				<TextField fx:id="txtTableName" editable="false" onMouseClicked="#txtTableNameOnMouseClick" prefHeight="23.0" prefWidth="232.0" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="5" />
-				<Button fx:id="btnMakeDef" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#btnMakeDefMouseClick" text="Add Model" GridPane.columnIndex="7" GridPane.rowIndex="5">
-               <GridPane.margin>
-                  <Insets left="3.0" right="3.0" />
-               </GridPane.margin>
+				<TextField fx:id="txtTableName" editable="false"
+					onMouseClicked="#txtTableNameOnMouseClick" prefHeight="23.0"
+					prefWidth="232.0" GridPane.columnIndex="1" GridPane.columnSpan="6"
+					GridPane.rowIndex="5" />
+				<Button fx:id="btnMakeDef" maxWidth="1.7976931348623157E308"
+					mnemonicParsing="false" onMouseClicked="#btnMakeDefMouseClick"
+					text="Add Model" GridPane.columnIndex="7" GridPane.rowIndex="5">
+					<GridPane.margin>
+						<Insets left="3.0" right="3.0" />
+					</GridPane.margin>
 				</Button>
 			</children>
-         <padding>
-            <Insets bottom="3.0" left="3.0" right="3.0" />
-         </padding>
+			<padding>
+				<Insets bottom="3.0" left="3.0" right="3.0" />
+			</padding>
 		</GridPane>
 	</top>
 	<center>
-		<SplitPane dividerPositions="0.5" prefHeight="600.0" BorderPane.alignment="CENTER">
+		<SplitPane dividerPositions="0.5" prefHeight="600.0"
+			BorderPane.alignment="CENTER">
 			<items>
 				<BorderPane prefHeight="200.0" prefWidth="200.0">
 					<center>
-						<SplitPane dividerPositions="0.4206081081081081, 0.7212837837837838" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+						<SplitPane dividerPositions="0.4206081081081081, 0.7212837837837838"
+							orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0"
+							BorderPane.alignment="CENTER">
 							<items>
-								<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="152.0" prefWidth="494.0">
+								<AnchorPane minHeight="0.0" minWidth="0.0"
+									prefHeight="152.0" prefWidth="494.0">
 									<children>
-										<TableView fx:id="tbMethods" cache="false" editable="true" layoutX="147.0" layoutY="53.0" onMouseClicked="#tbMethodsOnMouseClick" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+										<TableView fx:id="tbMethods" cache="false" editable="true"
+											layoutX="147.0" layoutY="53.0" onMouseClicked="#tbMethodsOnMouseClick"
+											prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
+											AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+											AnchorPane.topAnchor="0.0">
 											<columns>
-												<TableColumn fx:id="colMethodNo" editable="false" prefWidth="99.0" text="No." />
-												<TableColumn fx:id="methodName" editable="true" prefWidth="99.0" text="methodName">
+												<TableColumn fx:id="colMethodNo" editable="false"
+													prefWidth="99.0" text="No." />
+												<TableColumn fx:id="methodName" editable="true"
+													prefWidth="99.0" text="methodName">
 													<cellValueFactory>
 														<PropertyValueFactory property="methodName" />
 													</cellValueFactory>
 												</TableColumn>
-												<TableColumn fx:id="colResultVoClass" editable="false" prefWidth="118.0" text="Result Vo Class">
+												<TableColumn fx:id="colResultVoClass" editable="false"
+													prefWidth="118.0" text="Result Vo Class">
 												</TableColumn>
-												<TableColumn fx:id="methodDesc" prefWidth="227.0" text="Desc...">
+												<TableColumn fx:id="methodDesc" prefWidth="227.0"
+													text="Desc...">
 													<cellValueFactory>
 														<PropertyValueFactory property="methodDesc" />
 													</cellValueFactory>
@@ -108,19 +157,25 @@
 										</TableView>
 									</children>
 								</AnchorPane>
-								<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+								<AnchorPane minHeight="0.0" minWidth="0.0"
+									prefHeight="100.0" prefWidth="160.0">
 									<children>
-										<TableView fx:id="tbParams" editable="true" layoutX="147.0" layoutY="53.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-											
+										<TableView fx:id="tbParams" editable="true" layoutX="147.0"
+											layoutY="53.0" prefHeight="200.0" prefWidth="200.0"
+											AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+											AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
 											<columns>
-												<TableColumn fx:id="colParamNo" editable="false" prefWidth="56.0" text="No.">
+												<TableColumn fx:id="colParamNo" editable="false"
+													prefWidth="56.0" text="No.">
 												</TableColumn>
 												<TableColumn prefWidth="190.0" text="Name">
 													<cellValueFactory>
 														<PropertyValueFactory property="fieldName" />
 													</cellValueFactory>
 												</TableColumn>
-												<TableColumn fx:id="colParamTypes" prefWidth="99.0" text="Type">
+												<TableColumn fx:id="colParamTypes" prefWidth="99.0"
+													text="Type">
 													<cellValueFactory>
 														<PropertyValueFactory property="type" />
 													</cellValueFactory>
@@ -135,7 +190,8 @@
 													<!-- </ChoiceBoxTableCell> -->
 													<!-- </cellFactory> -->
 												</TableColumn>
-												<TableColumn fx:id="colParamTestValue" editable="true" prefWidth="109.0" text="Test Value">
+												<TableColumn fx:id="colParamTestValue" editable="true"
+													prefWidth="109.0" text="Test Value">
 													<cellValueFactory>
 														<PropertyValueFactory property="testValue" />
 													</cellValueFactory>
@@ -147,23 +203,31 @@
 								</AnchorPane>
 								<AnchorPane prefHeight="149.0" prefWidth="494.0">
 									<children>
-										<TableView fx:id="tbMappings" editable="true" layoutX="119.0" layoutY="47.0" onMouseClicked="#tbMappingsOnMouseClick" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+										<TableView fx:id="tbMappings" editable="true"
+											layoutX="119.0" layoutY="47.0" onMouseClicked="#tbMappingsOnMouseClick"
+											prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
+											AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+											AnchorPane.topAnchor="0.0">
 											<columns>
-												<TableColumn editable="false" prefWidth="172.0" text="Column Name">
+												<TableColumn editable="false" prefWidth="172.0"
+													text="Column Name">
 													<cellValueFactory>
 														<PropertyValueFactory property="columnName" />
 													</cellValueFactory>
 												</TableColumn>
-												<TableColumn editable="false" prefWidth="172.0" text="Column Type">
+												<TableColumn editable="false" prefWidth="172.0"
+													text="Column Type">
 													<cellValueFactory>
 														<PropertyValueFactory property="columnType" />
 													</cellValueFactory>
 												</TableColumn>
 
-												<TableColumn fx:id="colProgramType" prefWidth="200.0" text="Program Type">
+												<TableColumn fx:id="colProgramType" prefWidth="200.0"
+													text="Program Type">
 
 													<columns>
-														<TableColumn fx:id="colProgramType" editable="true" prefWidth="150.0" text="Program Type">
+														<TableColumn fx:id="colProgramType" editable="true"
+															prefWidth="150.0" text="Program Type">
 															<cellValueFactory>
 																<PropertyValueFactory property="programType" />
 															</cellValueFactory>
@@ -176,13 +240,15 @@
 														<!-- </cellValueFactory> -->
 														<!-- </TableColumn> -->
 
-														<LockImagedYnColumn fx:id="colProgramTypeLock" editable="true" prefWidth="50.0" style="-fx-alignment:center" text="Lock">
+														<LockImagedYnColumn fx:id="colProgramTypeLock"
+															editable="true" prefWidth="50.0" style="-fx-alignment:center"
+															text="Lock">
 															<columnName>
 																<String fx:value="lockYn" />
 															</columnName>
-<!-- 															<cellValueFactory> -->
-<!-- 																<PropertyValueFactory property="lockYn" /> -->
-<!-- 															</cellValueFactory> -->
+															<!-- <cellValueFactory> -->
+															<!-- <PropertyValueFactory property="lockYn" /> -->
+															<!-- </cellValueFactory> -->
 														</LockImagedYnColumn>
 
 													</columns>
@@ -200,7 +266,8 @@
 				</BorderPane>
 				<BorderPane prefHeight="200.0" prefWidth="200.0">
 					<center>
-						<SqlKeywords fx:id="txtSql" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+						<SqlKeywords fx:id="txtSql" prefHeight="200.0"
+							prefWidth="200.0" BorderPane.alignment="CENTER" />
 						<!-- <TextArea fx:id="txtSql" prefHeight="200.0" prefWidth="200.0" -->
 						<!-- BorderPane.alignment="CENTER" /> -->
 					</center>
@@ -208,12 +275,16 @@
 						<HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER_RIGHT">
 							<children>
 								<Label fx:id="lblMessage" />
-								<Button fx:id="btnShowAppCode" mnemonicParsing="false" onMouseClicked="#btnShowAppCodeOnMouseClick" prefHeight="23.0" prefWidth="97.0" text="Show Application Code">
+								<Button fx:id="btnShowAppCode" mnemonicParsing="false"
+									onMouseClicked="#btnShowAppCodeOnMouseClick" prefHeight="23.0"
+									prefWidth="97.0" text="Show Application Code">
 									<HBox.margin>
 										<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 									</HBox.margin>
 								</Button>
-								<Button fx:id="btnExec" mnemonicParsing="false" onMouseClicked="#btnExecOnMouseClick" prefHeight="23.0" prefWidth="97.0" text="Execute...">
+								<Button fx:id="btnExec" mnemonicParsing="false"
+									onMouseClicked="#btnExecOnMouseClick" prefHeight="23.0"
+									prefWidth="97.0" text="Execute...">
 									<HBox.margin>
 										<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 									</HBox.margin>
