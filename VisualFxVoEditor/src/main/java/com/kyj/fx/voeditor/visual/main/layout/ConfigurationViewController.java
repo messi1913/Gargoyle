@@ -18,6 +18,7 @@ import com.kyj.fx.voeditor.visual.component.SkinConfigView;
 import com.kyj.fx.voeditor.visual.component.config.skin.CustomSkinConfigView;
 import com.kyj.fx.voeditor.visual.component.config.skin.InstalledJresComposte;
 import com.kyj.fx.voeditor.visual.component.config.view.PostgrePgAdminConfigComposite;
+import com.kyj.fx.voeditor.visual.component.popup.DaoWizardCustomConfigView;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseConfigView;
 import com.kyj.fx.voeditor.visual.component.popup.DatabaseUrlManagementView;
 import com.kyj.fx.voeditor.visual.component.scm.SVNConfigView;
@@ -64,10 +65,10 @@ public class ConfigurationViewController {
 
 		// TODO 설정파일로 트리에 보여줄 내용이 동적으로 불러들일 수 있게 처리하도록 하면 좋을것같다.
 		ConfigurationTreeItem databases = new ConfigurationTreeItem();
-		databases.setItemName("Database");
+		databases.setItemName("Database Setting.");
 
 		ConfigurationTreeItem resources = new ConfigurationTreeItem();
-		resources.setItemName("Resources");
+		resources.setItemName("Environement Resources");
 
 		ConfigurationTreeItem java = new ConfigurationTreeItem();
 		java.setItemName("Java");
@@ -79,14 +80,19 @@ public class ConfigurationViewController {
 		root.setItemName("Configurations");
 		{
 			ConfigurationLeafNodeItem children1 = new ConfigurationLeafNodeItem();
-			children1.setItemName("Database Settings");
+			children1.setItemName("Master Database Settings");
 			children1.setContentNode(DatabaseConfigView.class);
 
 			ConfigurationLeafNodeItem children2 = new ConfigurationLeafNodeItem();
-			children2.setItemName("Database Url Management");
-			children2.setContentNode(DatabaseUrlManagementView.class);
-
-			databases.setChildrens(Arrays.asList(children1, children2));
+			children2.setItemName("DAO Wizard Custom Settings");
+			children2.setContentNode(DaoWizardCustomConfigView.class);
+			
+			ConfigurationLeafNodeItem children3 = new ConfigurationLeafNodeItem();
+			children3.setItemName("Database Url Management");
+			children3.setContentNode(DatabaseUrlManagementView.class);
+			
+			
+			databases.setChildrens(Arrays.asList(children1, children2, children3));
 		}
 
 		List<ConfigurationTreeItem> resourcesChildrens = new ArrayList<>();

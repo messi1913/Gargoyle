@@ -15,13 +15,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tomcat.jdbc.pool.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.framework.KeyValue;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -127,30 +130,27 @@ public class SimpleSQLResultView extends BorderPane {
 		});
 		/* [끝] 바인드변수 맵핑시키는 테이블 */
 
-		String wrapperedSQL = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_LIMIT_WRAPPER);
-		LOGGER.debug(String.format("wrapperedSql : %s", wrapperedSQL));
-		param.put(ConfigResourceLoader.USER_SQL, this.sql);
-		String velocityToText = ValueUtil.getVelocityToText(wrapperedSQL, param);
-		param.remove(ConfigResourceLoader.USER_SQL);
+		// String wrapperedSQL =
+		// ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_LIMIT_WRAPPER);
+		// LOGGER.debug(String.format("wrapperedSql : %s", wrapperedSQL));
+		// param.put(ConfigResourceLoader.USER_SQL, this.sql);
+		// String velocityToText = ValueUtil.getVelocityToText(wrapperedSQL,
+		// param);
+		// param.remove(ConfigResourceLoader.USER_SQL);
 
-		LOGGER.debug(String.format("before velocityText %s", velocityToText));
-		String sql = ValueUtil.getVelocityToText(velocityToText, param);
-		LOGGER.debug(String.format("after velocityText %s", sql));
+		// LOGGER.debug(String.format("before velocityText %s",
+		// velocityToText));
+		String sql = ValueUtil.getVelocityToText(this.sql, param);
+		LOGGER.debug(String.format("Convert SQL : \n%s", sql));
+
 		columns = new ArrayList<>();
 		try {
 
-			// Iterator<Entry<String, Object>> iterator =
-			// param.entrySet().iterator();
+			// Parameters.
 			MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource(param);
-			// while (iterator.hasNext()) {
-			// Entry<String, Object> next = iterator.next();
-			// Object value = null;
-			// if (next.getValue() != null)
-			// value = "'".concat(next.getValue().toString()).concat("'");
-			// mapSqlParameterSource.addValue(next.getKey(), value);
-			// }
 
-			List<Map<String, Object>> select = DbUtil.select(sql, mapSqlParameterSource, (rs, row) -> {
+			// RowMapper.
+			RowMapper<Map<String, Object>> rowMapper = (rs, row) -> {
 				Map<String, Object> hashMap = new HashMap<String, Object>();
 
 				final ResultSetMetaData metaData = rs.getMetaData();
@@ -182,7 +182,11 @@ public class SimpleSQLResultView extends BorderPane {
 					hashMap.put(columnLabel, rs.getString(c));
 				}
 				return hashMap;
-			});
+			};
+
+			// Execute.
+
+			List<Map<String, Object>> select = execute(sql, mapSqlParameterSource, rowMapper);
 
 			if (select != null && !select.isEmpty()) {
 				clear();
@@ -221,6 +225,28 @@ public class SimpleSQLResultView extends BorderPane {
 		this.mappingedSqlKeywords.setContent(ValueUtil.getVelocityToText(this.sql, param, true));
 		this.sqlKeywords.setContent(this.sql);
 
+	}
+
+	private List<Map<String, Object>> execute(String sql, MapSqlParameterSource mapSqlParameterSource,
+			RowMapper<Map<String, Object>> rowMapper) throws Exception {
+
+		/* Custom DataSource 정보가 존재한다면 Custom DataSource를 활용한다. */
+
+		ResourceLoader instance = ResourceLoader.getInstance();
+		String url = instance.get(ResourceLoader.CUSTOM_DAOWIZARD_KEY_JDBC_URL, null);
+		if (ValueUtil.isNotEmpty(url)) {
+			String driver = instance.get(ResourceLoader.CUSTOM_DAOWIZARD_KEY_JDBC_DRIVER, "");
+			String id = instance.get(ResourceLoader.CUSTOM_DAOWIZARD_KEY_JDBC_ID, "");
+			String pass = instance.get(ResourceLoader.CUSTOM_DAOWIZARD_KEY_JDBC_PASS, "");
+
+			if (ValueUtil.isNotEmpty(pass))
+				pass = DbUtil.decryp(pass);
+			DataSource dataSource = DbUtil.getDataSource(driver, url, id, pass);
+
+			return DbUtil.selectLimit(dataSource, sql, mapSqlParameterSource, rowMapper, 100);
+		}
+
+		return DbUtil.selectLimit(sql, mapSqlParameterSource, rowMapper, 100);
 	}
 
 	/**

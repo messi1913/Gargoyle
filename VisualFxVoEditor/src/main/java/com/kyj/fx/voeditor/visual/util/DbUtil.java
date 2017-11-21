@@ -44,12 +44,15 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.RowMapperResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedBeanPropertyRowMapper;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
@@ -330,34 +333,29 @@ public class DbUtil extends ConnectionManager {
 	 */
 
 	public static <T> List<T> select(final String sql, Map<String, Object> paramMap, RowMapper<T> rowMapper) throws Exception {
-		DataSource dataSource = null;
-		List<T> query = null;
-		try {
-			dataSource = getDataSource();
-			query = select(dataSource, sql, paramMap, rowMapper);
-		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(e));
-			query = Collections.emptyList();
-		} finally {
-			close(dataSource);
-		}
-		return query;
+		return select(getDataSource(), sql, paramMap, rowMapper);
+	}
+
+	/**
+	 * SQL을 실행하고 결과를 반환
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 21.
+	 * @param sql
+	 * @param mapSqlParameterSource
+	 * @param rowMapper
+	 * @param limit
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Map<String, Object>> selectLimit(String sql, MapSqlParameterSource mapSqlParameterSource,
+			RowMapper<Map<String, Object>> rowMapper, int limit) throws Exception {
+		return selectLimit(getDataSource(), sql, mapSqlParameterSource, rowMapper, limit);
 	}
 
 	public static <T> List<T> select(DataSource dataSource, final String sql, Map<String, Object> paramMap, RowMapper<T> rowMapper)
 			throws Exception {
-		List<T> query = null;
-		try {
-			noticeQuery(sql);
-			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-
-			// String _sql = ValueUtil.getVelocityToText(sql, paramMap);
-			// LOGGER.debug(_sql);
-			query = jdbcTemplate.query(sql, new MapSqlParameterSource(paramMap), rowMapper);
-		} catch (Exception e) {
-			throw e;
-		}
-		return query;
+		return select(dataSource, sql, new MapSqlParameterSource(paramMap), rowMapper);
 	}
 
 	/**
@@ -368,25 +366,71 @@ public class DbUtil extends ConnectionManager {
 	 * @throws Exception
 	 */
 	public static <T> List<T> select(final String sql, MapSqlParameterSource paramMap, RowMapper<T> rowMapper) throws Exception {
+		return select(getDataSource(), sql, paramMap, rowMapper);
+	}
 
-		DataSource dataSource = null;
+	/**
+	 * SQL을 실행하고 결과를 반환
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 21.
+	 * @param dataSource
+	 * @param sql
+	 * @param paramMap
+	 * @param rowMapper
+	 * @return
+	 * @throws Exception
+	 */
+	public static <T> List<T> select(DataSource dataSource, final String sql, MapSqlParameterSource paramMap, RowMapper<T> rowMapper)
+			throws Exception {
+		return selectLimit(dataSource, sql, paramMap, rowMapper, -1);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 21.
+	 * @param dataSource
+	 * @param sql
+	 * @param paramMap
+	 * @param rowMapper
+	 * @param limit
+	 * @return
+	 * @throws Exception
+	 */
+	public static <T> List<T> selectLimit(DataSource dataSource, final String sql, MapSqlParameterSource paramMap, RowMapper<T> rowMapper,
+			final int limit) throws Exception {
 		List<T> query = null;
 		try {
-
 			noticeQuery(sql);
-
-			dataSource = getDataSource();
-
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			// String _sql = ValueUtil.getVelocityToText(sql,
-			// paramMap.getValues());
 
-			query = jdbcTemplate.query(sql, paramMap, rowMapper);
+			// String _sql = ValueUtil.getVelocityToText(sql, paramMap);
+			// LOGGER.debug(_sql);
+
+			ResultSetExtractor<List<T>> extr = new ResultSetExtractor<List<T>>() {
+
+				@Override
+				public List<T> extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+					ArrayList<T> arrayList = new ArrayList<T>();
+					int rownum = 1;
+
+					while (rs.next()) {
+						T mapRow = rowMapper.mapRow(rs, rownum);
+						arrayList.add(mapRow);
+						rownum++;
+
+						if ((limit != -1) && (limit <= rownum)) {
+							break;
+						}
+
+					}
+					return arrayList;
+				}
+			};
+
+			query = jdbcTemplate.query(sql, paramMap, extr);
 		} catch (Exception e) {
-
-			// cleanDataSource();
-			// close(dataSource);
-			LOGGER.error(ValueUtil.toString(e));
 			throw e;
 		} finally {
 			cleanDataSource();
@@ -1705,4 +1749,5 @@ public class DbUtil extends ConnectionManager {
 
 		return op;
 	}
+
 }

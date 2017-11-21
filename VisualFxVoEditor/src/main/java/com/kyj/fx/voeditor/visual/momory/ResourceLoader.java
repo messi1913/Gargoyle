@@ -60,6 +60,18 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static final String BASE_KEY_JDBC_ID = "jdbc.id";
 	public static final String BASE_KEY_JDBC_PASS = "jdbc.pass";
 	public static final String BASE_KEY_JDBC_INFO = "database.info";
+
+	/**
+	 * DAO Wizard에서 사용하는 커스텀 db조회 세팅.
+	 * 
+	 * @최초생성일 2017. 11. 21.
+	 */
+	public static final String CUSTOM_DAOWIZARD_KEY_JDBC_DRIVER = "custom.daowizard.key.jdbc.driver";
+	public static final String CUSTOM_DAOWIZARD_KEY_JDBC_URL = "custom.daowizard.key.jdbc.url";
+	public static final String CUSTOM_DAOWIZARD_KEY_JDBC_PASS = "custom.daowizard.key.jdbc.pass";
+	public static final String CUSTOM_DAOWIZARD_KEY_JDBC_ID = "custom.daowizard.key.jdbc.id";
+	
+
 	/**
 	 * 프로그램 기본 시작 정보를 반환한다. KYJ
 	 */
@@ -182,24 +194,20 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	 * @최초생성일 2017. 9. 17.
 	 */
 	public static final String LANGUAGE_STORED_PROPERTIES_LOCATION = "language.store.properties.location";
-	
-	
-	
-	
+
 	/**
 	 * Send Mail 속성 키
+	 * 
 	 * @최초생성일 2017. 10. 18.
 	 */
 	public static final String SENDMAIL_CUSTOM_ACCOUNT_USE_YN = "sendmail.custom.account.use.yn";
 	public static final String SENDMAIL_CUSTOM_USER_ID = "sendmail.custom.user.id";
 	public static final String SENDMAIL_CUSTOM_USER_PASSWORD = "sendmail.custom.user.password";
-	
+
 	public static final String SENDMAIL_CUSTOM_USER_HOST = "sendmail.custom.user.host";
 	public static final String SENDMAIL_CUSTOM_USER_PORT = "sendmail.custom.user.port";
-	//SMPT OR POP3 . default SMTP
+	// SMPT OR POP3 . default SMTP
 	public static final String SENDMAIL_CUSTOM_USER_PROTOCOL_TYPE = "sendmail.custom.user.protocol.type";
-	
-	
 
 	private String[] baseKeys = { BASE_KEY_JDBC_INFO, BASE_KEY_JDBC_DRIVER, BASE_KEY_JDBC_URL, BASE_KEY_JDBC_ID, BASE_KEY_JDBC_PASS,
 			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES };

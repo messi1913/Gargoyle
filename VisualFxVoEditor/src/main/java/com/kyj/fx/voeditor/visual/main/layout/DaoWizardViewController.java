@@ -829,7 +829,6 @@ public class DaoWizardViewController {
 	@FXML
 	public void btnExecOnMouseClick(MouseEvent e) {
 
-		LOGGER.debug("event] btnExecOnMouseClick");
 		String velocitySQL = txtSql.getText().trim();
 		if (velocitySQL == null || velocitySQL.isEmpty())
 			return;

@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="437.0" prefWidth="550.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
 	<center>
 		<TableView fx:id="tbDatabase" editable="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<columns>
@@ -41,7 +41,7 @@
 						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 					</padding>
 					<children>
-						<Label text="URL Management Item">
+						<Label fx:id="lblTitle" text="URL Management Item">
 							<padding>
 								<Insets right="5.0" />
 							</padding>

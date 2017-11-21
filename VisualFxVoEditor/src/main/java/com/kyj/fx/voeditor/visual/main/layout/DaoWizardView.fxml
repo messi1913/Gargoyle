@@ -275,16 +275,17 @@
 						<HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER_RIGHT">
 							<children>
 								<Label fx:id="lblMessage" />
-								<Button fx:id="btnShowAppCode" mnemonicParsing="false"
-									onMouseClicked="#btnShowAppCodeOnMouseClick" prefHeight="23.0"
-									prefWidth="97.0" text="Show Application Code">
+								
+								
+								<Button mnemonicParsing="false" onMouseClicked="#btnShowAppCodeOnMouseClick"
+									prefHeight="23.0" prefWidth="97.0" text="Show Application Code">
 									<HBox.margin>
 										<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 									</HBox.margin>
 								</Button>
-								<Button fx:id="btnExec" mnemonicParsing="false"
-									onMouseClicked="#btnExecOnMouseClick" prefHeight="23.0"
-									prefWidth="97.0" text="Execute...">
+								
+								<Button mnemonicParsing="false" onMouseClicked="#btnExecOnMouseClick"
+									prefHeight="23.0" prefWidth="97.0" text="Execute...">
 									<HBox.margin>
 										<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 									</HBox.margin>
