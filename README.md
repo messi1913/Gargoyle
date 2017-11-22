@@ -6,4 +6,4 @@ https://callakrsos.github.io/Gargoyle/
 
 
 Download
-https://github.com/callakrsos/Gargoyle/releases/download/PreGargoyle-v1.7.10/Gargoyle-1.7.10.exe
+https://github.com/callakrsos/Gargoyle/releases/download/PreGargoyle-v1.8.0/Gargoyle-1.8.0.exe
