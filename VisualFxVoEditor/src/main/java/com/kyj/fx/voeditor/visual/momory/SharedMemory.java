@@ -19,6 +19,8 @@ import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.loder.DynamicClassLoader;
 import com.kyj.fx.voeditor.visual.loder.ProjectInfo;
 import com.kyj.fx.voeditor.visual.main.layout.SystemLayoutViewController;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.sun.star.uno.RuntimeException;
 
 import javafx.application.Application;
 import javafx.concurrent.Service;
@@ -65,6 +67,8 @@ public class SharedMemory {
 	private static List<ProjectInfo> listClases;
 
 	private static List<ProjectInfo> listSources;
+	
+	private static List<ProjectInfo> listSourceClass;
 
 	private static Object lock = new Object();
 
@@ -83,7 +87,10 @@ public class SharedMemory {
 	public static synchronized List<ProjectInfo> loadSources() {
 		return loadSources(false);
 	}
-
+	public static synchronized List<ProjectInfo> listSourcesConvertClassName() {
+		return loadSourcesConvertClassName(false);
+	}
+	
 	/**
 	 * 특정조건에 일치하는 클래스 파일들을 찾는다.
 	 *
@@ -131,6 +138,23 @@ public class SharedMemory {
 	}
 
 	@SuppressWarnings("unchecked")
+	public static synchronized List<ProjectInfo> loadSourcesConvertClassName(boolean reflesh) {
+
+		String classDirName = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
+		try {
+			if (listSourceClass == null || reflesh)
+				listSourceClass = DynamicClassLoader.loadSourcesConvertClassName(classDirName);
+		} catch (Exception e) {
+			LOGGER.error("exception %s", e.toString());
+		}
+
+		if (listSourceClass == null)
+			return Collections.EMPTY_LIST;
+		// copy해서 사용
+		return new ArrayList<>(listSourceClass);
+	}
+	
+	@SuppressWarnings("unchecked")
 	public static synchronized List<ProjectInfo> loadSources(boolean reflesh) {
 
 		String classDirName = ResourceLoader.getInstance().get(ResourceLoader.BASE_DIR);
@@ -148,8 +172,7 @@ public class SharedMemory {
 	}
 
 	public static void initLoad() {
-		
-		
+
 		Service<Void> serviceClasses = new Service<Void>() {
 
 			@Override
@@ -170,8 +193,7 @@ public class SharedMemory {
 					}
 
 				};
-				
-				
+
 				return task;
 			}
 		};
@@ -244,6 +266,7 @@ public class SharedMemory {
 	}
 
 	private static Application app;
+
 	public static void setApplication(Application application) {
 		app = application;
 	}
@@ -252,4 +275,20 @@ public class SharedMemory {
 		return app;
 	}
 
+	/**
+	 * 워크스페이스 경로 리턴
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 22. 
+	 * @return
+	 */
+	public static File getWorkspaceRoot() {
+		String rootLocation = ResourceLoader.getInstance().get("base.dir");
+		if (ValueUtil.isEmpty(rootLocation)) {
+			throw new RuntimeException("Invalide root location.");
+		}
+		File rootFile = new File(rootLocation);
+		if (!rootFile.exists())
+			throw new RuntimeException("Invalide root location.");
+		return rootFile;
+	}
 }

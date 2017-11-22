@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,6 +42,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.core.VoEditor;
 import com.kyj.fx.voeditor.core.model.meta.ClassMeta;
 import com.kyj.fx.voeditor.core.model.meta.FieldMeta;
@@ -54,13 +56,12 @@ import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.popup.MeerketAbstractVoOpenClassResourceView;
 import com.kyj.fx.voeditor.visual.events.CommonContextMenuEvent;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleFileAlreadyExistException;
-import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.momory.ClassTypeResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
-import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ExcelUtil;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.GargoyleExtensionFilters;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.util.VoEditorConverter;
@@ -76,8 +77,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Pair;
@@ -140,8 +143,76 @@ public class VoEditorController {
 	 */
 	@FXML
 	public void initialize() {
+
+		/*******************************/
+		// 17.11.21 KYJ
+		/* [시작] 파일경로 드래그 드롭 이벤트 처리 */
+
+		this.txtLocation.setOnDragOver(ev -> {
+			ev.acceptTransferModes(TransferMode.LINK);
+			ev.consume();
+		});
+
+		this.txtLocation.setOnDragDropped(ev -> {
+			Dragboard dragboard = ev.getDragboard();
+			if (dragboard.hasFiles()) {
+				List<File> files = dragboard.getFiles();
+				if (files.isEmpty() || files.size() >= 2) {
+					return;
+				}
+				File file = files.get(0);
+				if (file.isDirectory()) {
+					// 경로를 생대경로화 시킨다.
+					Path relativize = FileUtil.toRelativizeForGagoyle(file);
+
+					// 2016.03.31 파일경로를 상대경로화 시켜 저장.
+					this.txtLocation.setText(relativize.toString());
+					ev.setDropCompleted(true);
+				}
+			} else if (dragboard.hasString()) {
+				this.txtLocation.setText(dragboard.getString());
+				ev.setDropCompleted(true);
+			}
+		});
+
+		txtClassName.setOnDragOver(ev -> {
+			ev.acceptTransferModes(TransferMode.LINK);
+			ev.consume();
+		});
+
+		txtClassName.setOnDragDropped(ev -> {
+			Dragboard dragboard = ev.getDragboard();
+			if (dragboard.hasFiles()) {
+				List<File> files = dragboard.getFiles();
+				if (files.isEmpty() || files.size() >= 2) {
+					return;
+				}
+				File file = files.get(0);
+				File parentFile = file;
+				if (file.isFile()) {
+					parentFile = file.getParentFile();
+				}
+
+				// 경로를 생대경로화 시킨다.
+				Path relativize = FileUtil.toRelativizeForGagoyle(parentFile);
+
+				// 2016.03.31 파일경로를 상대경로화 시켜 저장.
+				this.txtLocation.setText(relativize.toString());
+				// 파일명 저장.
+				if (file.isFile())
+					this.txtClassName.setText(file.getName());
+
+				ev.setDropCompleted(true);
+
+			} else if (dragboard.hasString()) {
+				this.txtClassName.setText(dragboard.getString());
+				ev.setDropCompleted(true);
+			}
+		});
+		/* [끝] 파일경로 드래그 드롭 이벤트 처리 */
+
 		txtParentClassName.setText(ConfigResourceLoader.getInstance().get(ConfigResourceLoader.VOEDITOR_DEFAULT_EXTENDS_CLASS));
-		
+
 		colType.setCellFactory(new ClassTypeCheckBoxCellFactory());
 		colName.setCellFactory(TextFieldTableCell.forTableColumn());
 		colSize.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -249,7 +320,7 @@ public class VoEditorController {
 			String location = txtLocation.getText();
 			String packageName = txtPackageName.getText();
 			// ConfigResourceLoader에서 변경 17.8.26
-			String extendsBaseClass = this.txtParentClassName.getText();//ResourceLoader.getInstance().get(ConfigResourceLoader.VOEDITOR_DEFAULT_EXTENDS_CLASS);
+			String extendsBaseClass = this.txtParentClassName.getText();// ResourceLoader.getInstance().get(ConfigResourceLoader.VOEDITOR_DEFAULT_EXTENDS_CLASS);
 
 			ObservableList<TableModelDVO> items = tbVoEditor.getItems();
 			ClassMeta classMeta = EditorUtil.extractedClassMeta(className, packageName, extendsBaseClass);
@@ -265,7 +336,12 @@ public class VoEditorController {
 							// String fileName =
 							// ValueUtil.getIndexcase(className, 0,
 							// IndexCaseTypes.UPPERCASE);
-							voEditor.toFile(location);
+
+							voEditor.toFile(SharedMemory.getWorkspaceRoot(), location);
+
+							//
+							SharedMemory.loadSourcesConvertClassName(true);
+
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -682,14 +758,25 @@ public class VoEditorController {
 
 		try {
 			view = new MeerketAbstractVoOpenClassResourceView("");
-			
+
 			ResultDialog<String> show = view.show(true);
 			this.txtParentClassName.setText(show.getData());
-			
+
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}
 
+	}
+
+	/**
+	 * Vo클래스명 처리.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 22.
+	 * @param voClassName
+	 */
+	public void setVoClassName(String voClassName) {
+		txtClassName.setText(voClassName);
 	}
 
 }

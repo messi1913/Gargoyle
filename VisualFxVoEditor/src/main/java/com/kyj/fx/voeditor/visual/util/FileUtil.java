@@ -35,6 +35,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -852,7 +853,7 @@ public class FileUtil implements GargoyleExtensionFilters {
 		}, conCompleted, err -> {
 			throw new RuntimeException(err);
 		});
-		
+
 		newThread.start();
 	}
 
@@ -1058,6 +1059,16 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 */
 	public static String findEncoding(File f) throws IOException {
 		return new FileEncodingFinder(f).getEncoding();
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 22.
+	 * @param name
+	 * @return
+	 */
+	public static String getFileNameWithoutExtension(String name) {
+		return FilenameUtils.removeExtension(name);
 	}
 
 }

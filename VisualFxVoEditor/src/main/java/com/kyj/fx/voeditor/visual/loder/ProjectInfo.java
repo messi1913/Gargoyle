@@ -9,6 +9,12 @@ package com.kyj.fx.voeditor.visual.loder;
 import java.util.List;
 
 /**
+ * Project 관련 정보를 관리하기 위한 데이터셋 <br/>
+ * 
+ * <ol>
+ * <li>17.11.22 entry 항목 추가</li>
+ * </ol>
+ * 
  * @author KYJ
  *
  */
@@ -18,6 +24,17 @@ public class ProjectInfo {
 	private String projectDir;
 	private List<String> classes;
 	private List<String> javaSources;
+	/**
+	 * Entry 항목 추가.<br/>
+	 * example) <br/>
+	 * <ol>
+	 * <li>src/main/java</li>
+	 * <li>src/test/java</li>
+	 * </ol>
+	 * 
+	 * @최초생성일 2017. 11. 22.
+	 */
+	private String entry;
 
 	public List<String> getJavaSources() {
 		return javaSources;
@@ -70,6 +87,19 @@ public class ProjectInfo {
 	 */
 	public void setClasses(List<String> classes) {
 		this.classes = classes;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 22.
+	 * @param entry
+	 */
+	public void setEntry(String entry) {
+		this.entry = entry;
+	}
+
+	public String getEntry() {
+		return entry;
 	}
 
 }

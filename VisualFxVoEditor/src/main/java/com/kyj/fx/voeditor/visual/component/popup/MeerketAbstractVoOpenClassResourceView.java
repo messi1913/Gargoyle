@@ -13,7 +13,10 @@ import java.util.stream.Collectors;
 
 import com.kyj.fx.voeditor.visual.loder.ProjectInfo;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+
+import javafx.scene.input.MouseEvent;
 
 /**
  * 클래스 리소스정보를 로딩해온다.
@@ -31,7 +34,7 @@ public class MeerketAbstractVoOpenClassResourceView extends BaseOpenClassResourc
 	 * @최초생성일 2015. 10. 27.
 	 */
 	private static List<String> fileNameFilter;
-	
+
 	static {
 		String VO_RESOURCE_FILTERING_NAME = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.VO_RESOURCE_FILTERING_NAME);
 		fileNameFilter = Arrays
@@ -42,16 +45,23 @@ public class MeerketAbstractVoOpenClassResourceView extends BaseOpenClassResourc
 	 * @throws Exception
 	 */
 	public MeerketAbstractVoOpenClassResourceView() throws Exception {
-		super();
+		super(RESOURCE_TYPE.SOURCE_CLASS);
+
+	}
+
+	@Override
+	public void btnRefleshOnMouseClick(MouseEvent event) {
+		setResources(getClassesByLoader(SharedMemory.loadSourcesConvertClassName(true)));
+		lvResources.getItems().setAll(getResources());
 	}
 
 	/**
-	 * @param data 
-	 *    필드에 기본적으로 입력할 텍스트
+	 * @param data
+	 *            필드에 기본적으로 입력할 텍스트
 	 * @throws Exception
 	 */
 	public MeerketAbstractVoOpenClassResourceView(String data) throws Exception {
-		super(data);
+		super(RESOURCE_TYPE.SOURCE_CLASS, data);
 	}
 
 	/**
@@ -61,14 +71,26 @@ public class MeerketAbstractVoOpenClassResourceView extends BaseOpenClassResourc
 	public List<String> getClassesByLoader(List<ProjectInfo> list) {
 		List<String> arrayList = new ArrayList<String>();
 		list.forEach(proj -> {
-			List<String> classes = proj.getClasses();
-			List<String> collect = classes.parallelStream().filter(clazz -> {
-				for (String end : fileNameFilter) {
-					if (clazz.lastIndexOf(end) >= 0)
-						return true;
-				}
-				return false;
-			}).collect(Collectors.toList());
+			List<String> sources = proj.getJavaSources();
+//			List<String> sources = proj.getClasses();
+
+			// FileUtil.toRelativizeForGagoyle(userDir);
+			List<String> collect = sources.parallelStream()
+					// .map(name -> FileUtil.getFileNameWithoutExtension(name))
+					.filter(clazz -> {
+						for (String end : fileNameFilter) {
+							if (clazz.lastIndexOf(end) >= 0)
+								return true;
+						}
+						return false;
+					})
+					// .map(name ->{
+					//
+					// Path projPath = Paths.get(proj.getProjectDir());
+					//
+					// Path path = Paths.get(name);
+					// })
+					.collect(Collectors.toList());
 			arrayList.addAll(collect);
 		});
 		return arrayList;

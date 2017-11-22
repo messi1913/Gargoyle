@@ -70,7 +70,6 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	public static final String CUSTOM_DAOWIZARD_KEY_JDBC_URL = "custom.daowizard.key.jdbc.url";
 	public static final String CUSTOM_DAOWIZARD_KEY_JDBC_PASS = "custom.daowizard.key.jdbc.pass";
 	public static final String CUSTOM_DAOWIZARD_KEY_JDBC_ID = "custom.daowizard.key.jdbc.id";
-	
 
 	/**
 	 * 프로그램 기본 시작 정보를 반환한다. KYJ
@@ -209,8 +208,12 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	// SMPT OR POP3 . default SMTP
 	public static final String SENDMAIL_CUSTOM_USER_PROTOCOL_TYPE = "sendmail.custom.user.protocol.type";
 
+	public static final String VOEDITOR_SUFFIX_NAME = "voeditor.suffix.name";
+	public static final String VOEDITOR_PREFFIX_NAME = "voeditor.preffix.name";
 	private String[] baseKeys = { BASE_KEY_JDBC_INFO, BASE_KEY_JDBC_DRIVER, BASE_KEY_JDBC_URL, BASE_KEY_JDBC_ID, BASE_KEY_JDBC_PASS,
-			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES };
+			SKIP_BIG_DATA_COLUMN, APPLY_MAX_ROW_COUNT, SVN_REPOSITORIES,
+			/* 17.11.22 */
+			VOEDITOR_SUFFIX_NAME, VOEDITOR_PREFFIX_NAME };
 
 	public static synchronized ResourceLoader getInstance() {
 		if (loader == null) {
@@ -268,6 +271,8 @@ public class ResourceLoader implements IFileBaseConfiguration {
 				continue;
 			if (APPLY_MAX_ROW_COUNT.equals(key) || SKIP_BIG_DATA_COLUMN.equals(key)) {
 				properties.put(key, "true");
+			} else if (VOEDITOR_SUFFIX_NAME.equals(key)) {
+				properties.put(key, "DVO");
 			}
 			properties.put(key, "");
 		}

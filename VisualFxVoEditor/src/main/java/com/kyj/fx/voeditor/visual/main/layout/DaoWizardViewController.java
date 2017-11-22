@@ -229,7 +229,7 @@ public class DaoWizardViewController {
 				ev.setDropCompleted(true);
 			}
 		});
-		
+
 		txtClassName.setOnDragOver(ev -> {
 			ev.acceptTransferModes(TransferMode.LINK);
 			ev.consume();
@@ -344,6 +344,8 @@ public class DaoWizardViewController {
 							view = new MeerketAbstractVoOpenClassResourceView();
 						}
 
+						view.setTitle("VO Finder");
+						
 						view.setConsumer(str -> {
 							if (str == null || str.isEmpty())
 								return;
@@ -599,6 +601,19 @@ public class DaoWizardViewController {
 
 				return dvo;
 			}).collect(Collectors.toList());
+
+			TbpSysDaoMethodsDVO selectedItem = tbMethods.getSelectionModel().getSelectedItem();
+			if (selectedItem != null) {
+				String methodName = selectedItem.getMethodName();
+				if (ValueUtil.isNotEmpty(methodName)) {
+
+					String suffix = ResourceLoader.getInstance().get(ResourceLoader.VOEDITOR_SUFFIX_NAME, "DVO");
+					String name = ValueUtil.getPrefixUpperTextMyEdit(methodName);
+					String preffix = ResourceLoader.getInstance().get(ResourceLoader.VOEDITOR_PREFFIX_NAME, "");
+					String voClassName = String.format("%s%s%s", preffix, name, suffix);
+					controller.setVoClassName(voClassName);
+				}
+			}
 
 			controller.addItem(resultItems);
 			SharedMemory.getSystemLayoutViewController().loadNewSystemTab("New VO", root);
@@ -1009,7 +1024,8 @@ public class DaoWizardViewController {
 				showYesOrNoDialog.ifPresent(string -> {
 					if ("Y".equals(string.getValue())) {
 						try {
-							daowizard.toFile(ValueUtil.appendBaseDir(location));
+							daowizard.toFile(SharedMemory.getWorkspaceRoot(), ValueUtil.appendBaseDir(location));
+
 						} catch (Exception e) {
 							DialogUtil.showExceptionDailog(e);
 						}

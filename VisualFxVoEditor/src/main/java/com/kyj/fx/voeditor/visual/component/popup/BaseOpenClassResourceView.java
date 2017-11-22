@@ -34,6 +34,14 @@ public class BaseOpenClassResourceView extends AbstractOpenClassResourceView<Str
 		this("");
 	}
 
+	public BaseOpenClassResourceView(RESOURCE_TYPE resourceType) throws Exception {
+		super(resourceType);
+	}
+
+	public BaseOpenClassResourceView(RESOURCE_TYPE resourceType, String data) throws Exception {
+		super(resourceType, data);
+	}
+
 	/**
 	 * 리소스 다이얼로그를 오픈한다.
 	 *
@@ -64,7 +72,8 @@ public class BaseOpenClassResourceView extends AbstractOpenClassResourceView<Str
 
 	@Override
 	public boolean isMatch(String value, String check) {
-		return  value.toUpperCase().indexOf(check.toUpperCase()) >=0; //value.indexOf(check) >= 0;
+		return value.toUpperCase().indexOf(check.toUpperCase()) >= 0; // value.indexOf(check)
+																		// >= 0;
 	}
 
 	@Override

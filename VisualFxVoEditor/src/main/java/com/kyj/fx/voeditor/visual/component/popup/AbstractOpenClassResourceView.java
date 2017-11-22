@@ -24,39 +24,45 @@ public abstract class AbstractOpenClassResourceView<R> extends ResourceView<R> {
 	private RESOURCE_TYPE resourceType;
 
 	enum RESOURCE_TYPE {
-		CLASS, SOURCE
+		CLASS, SOURCE, SOURCE_CLASS
 	}
 
 	public AbstractOpenClassResourceView(String data) throws Exception {
-		this(RESOURCE_TYPE.CLASS);
-		this.data.set(data);
-		}
+		this(RESOURCE_TYPE.CLASS, data);
+	}
 
 	public AbstractOpenClassResourceView() throws Exception {
-		this(RESOURCE_TYPE.CLASS);
+		this(RESOURCE_TYPE.CLASS, "");
 	}
 
 	public AbstractOpenClassResourceView(RESOURCE_TYPE resourceType) throws Exception {
+		this(resourceType, "");
+	}
+
+	public AbstractOpenClassResourceView(RESOURCE_TYPE resourceType, String data) throws Exception {
 		this.resourceType = resourceType;
+		this.data.set(data);
 		findResource();
 	}
 
-	private void findResource() {
-		switch (resourceType) {
+	protected void findResource() {
+		switch (this.resourceType) {
 		case CLASS:
 			setResources(getClassesByLoader(SharedMemory.loadClasses()));
-
 			break;
 		case SOURCE:
 			setResources(getClassesByLoader(SharedMemory.loadSources()));
 			break;
+		case SOURCE_CLASS:
+			setResources(getClassesByLoader(SharedMemory.listSourcesConvertClassName()));
 		}
 
-		lvResources.getItems().addAll(getResources());
+//		lvResources.getItems().setAll(getResources());
+		 lvResources.getItems().addAll(getResources());
 	}
 
 	public void btnRefleshOnMouseClick(MouseEvent event) {
-		//setResources(getClassesByLoader(SharedMemory.loadClasses(true)));
+		// setResources(getClassesByLoader(SharedMemory.loadClasses(true)));
 		findResource();
 		lvResources.getItems().addAll(getResources());
 	}

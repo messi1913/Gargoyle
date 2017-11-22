@@ -123,7 +123,7 @@ public class DynamicClassLoader {
 
 	}
 
-	public static List<ProjectInfo> listClases(String classDirName) throws Exception {
+	public static List<ProjectInfo> listClases(String classDirName, String[] extentions) throws Exception {
 		File file = new File(classDirName);
 		// 기본적인 파일의 존재유무 및 디렉토리인지 체크.
 		if (!file.exists())
@@ -151,8 +151,8 @@ public class DynamicClassLoader {
 		List<ProjectInfo> allClasses = new ArrayList<>();
 
 		//
-//		if (listFiles != null && !listFiles.isEmpty())
-//			LOGGER.debug(" im will working...");
+		// if (listFiles != null && !listFiles.isEmpty())
+		// LOGGER.debug(" im will working...");
 
 		long startTime = System.currentTimeMillis();
 
@@ -178,17 +178,119 @@ public class DynamicClassLoader {
 				).map(pram -> pram.getOutput()).distinct().parallel().flatMap(new Function<String, Stream<ProjectInfo>>() {
 					@Override
 					public Stream<ProjectInfo> apply(String entry) {
-//						LOGGER.debug(String.format("entry : %s", entry));
+						// LOGGER.debug(String.format("entry : %s", entry));
 						File compiledFilePath = new File(projectFile, entry);
 						int length = compiledFilePath.getAbsolutePath().length() + 1;
-						List<String> findClases = findClases(projectFile.getAbsolutePath(), compiledFilePath, length);
-						LOGGER.debug("classes : [{}] {} {}", String.valueOf(findClases.size()),compiledFilePath.toString(),findClases.toString() );
+						List<String> findClases = findClases(projectFile.getAbsolutePath(), compiledFilePath, extentions, length);
+						LOGGER.debug("classes : [{}] {} {}", String.valueOf(findClases.size()), compiledFilePath.toString(),
+								findClases.toString());
 
 						ProjectInfo classInfo = new ProjectInfo();
 						classInfo.setProjectName(projectFile.getName());
 						classInfo.setProjectDir(compiledFilePath.getAbsolutePath());
 						classInfo.setClasses(findClases);
 
+						return Stream.of(classInfo);
+					}
+				}).collect(Collectors.toList());
+
+				allClasses.addAll(collect);
+				searchedDirCount++;
+				srchedDirNames.append(f.getAbsolutePath()).append(SystemUtils.LINE_SEPARATOR);
+			} catch (SAXParseException e) {
+				LOGGER.error(String.format("정상적인 XML 형태가 아님. 파일명 :  %s", f.getAbsolutePath()));
+				LOGGER.error(String.format("%d 행 :: %d 열", e.getLineNumber(), e.getColumnNumber()));
+			}
+
+		}
+		long endTime = System.currentTimeMillis();
+
+		long costMillisend = endTime - startTime;
+
+		LOGGER.debug(String.format("Total Cost time : %s (ms) searched Directory Count : %d ", costMillisend, searchedDirCount));
+		LOGGER.debug(String.format("Searched Dirs info \n%s", srchedDirNames.toString()));
+		return allClasses;
+	}
+
+	public static List<ProjectInfo> listClases(String classDirName) throws Exception {
+		return listClases(classDirName, new String[] { CLASS_FILE_EXTENSION });
+	}
+
+	public static List<ProjectInfo> loadSourcesConvertClassName(String classDirName) throws Exception {
+
+		File file = new File(classDirName);
+		// 기본적인 파일의 존재유무 및 디렉토리인지 체크.
+		if (!file.exists())
+			throw new FileNotFoundException(file + " Not found!");
+
+		//
+		if (!file.isDirectory())
+			throw new IllegalArgumentException("only directory.");
+
+		/*
+		 * 디렉토리안에 클래스패스 정보가 존재하는지 확인하고 존재한다면 classpath에 기술된 정보 기준으로 클래스 파일을
+		 * 로드한다. 프로그램내에서 workspace를 선택한 경우일수있고, 프로젝트를 선택한 두가지의 경우가 있기때문에 두가지의
+		 * 케이스를 고려한 로직이 들어간다.
+		 */
+
+		/*
+		 * 일단 워크스페이스를 선택한경우라고 가정하고 워크스페이스내에 폴더들을 순차적으로 돌아보면서 classpath의 존재유무를 찾고
+		 * 존재하는케이스는 따로 모아놓는다. 파일레벨은 워크스페이스(0레벨)-프로젝트(1레벨)로 가정하여 1레벨까지만 이동한다.
+		 */
+		List<File> listFiles = findClassPaths(file);
+
+		/*
+		 * classpath파일을 찾은경우 그 파일path를 기준으로 클래스들을 로딩한다.
+		 */
+		List<ProjectInfo> allClasses = new ArrayList<>();
+
+		if (listFiles != null && !listFiles.isEmpty())
+			LOGGER.debug(" im will working...");
+
+		long startTime = System.currentTimeMillis();
+
+		int searchedDirCount = 0;
+		StringBuffer srchedDirNames = new StringBuffer();
+		for (File f : listFiles) {
+			try {
+				ClassPath parsingClassPath = parsingClassPath(f.getAbsolutePath());
+
+				// 프로젝트파일.
+				File projectFile = f.getParentFile();
+
+				// output 속성값의 존재유무만 확인하여 컴파일되는 경로를 찾는다.
+				List<ProjectInfo> collect = parsingClassPath.toStream().filter(
+
+						entry -> {
+							// boolean notEmpty =
+							// ValueUtil.isNotEmpty(entry.getOutput());
+							boolean notEmpty = ValueUtil.isNotEmpty(entry.getPath());
+							LOGGER.debug(String.format("srch entry path : %s is Traget %b ", entry.getPath(), notEmpty));
+							//
+
+							return notEmpty;
+						}
+
+				).filter(entry -> {
+					return StringUtils.equals("src", entry.getKind());
+				}).map(pram -> pram.getPath()).distinct().parallel().flatMap(new Function<String, Stream<ProjectInfo>>() {
+					@Override
+					public Stream<ProjectInfo> apply(String entry) {
+						// LOGGER.debug("projroot : {} entry : {} ",
+						// projectFile.getName(), entry);
+						File compiledFilePath = new File(projectFile, entry);
+						int length = compiledFilePath.getAbsolutePath().length() + 1;
+						List<String> findJavaSources = findJavaConvertClassPattern(projectFile.getAbsolutePath(), compiledFilePath, length);
+						// LOGGER.debug(compiledFilePath.toString());
+						// LOGGER.debug(findJavaSources.toString());
+						// LOGGER.debug(String.valueOf(findJavaSources.size()));
+						LOGGER.debug("sources : [{}] {} ", String.valueOf(findJavaSources.size()), compiledFilePath.toString());
+
+						ProjectInfo classInfo = new ProjectInfo();
+						classInfo.setProjectName(projectFile.getName());
+						classInfo.setProjectDir(compiledFilePath.getAbsolutePath());
+						classInfo.setJavaSources(findJavaSources);
+						classInfo.setEntry(entry);
 						return Stream.of(classInfo);
 					}
 				}).collect(Collectors.toList());
@@ -256,7 +358,8 @@ public class DynamicClassLoader {
 				List<ProjectInfo> collect = parsingClassPath.toStream().filter(
 
 						entry -> {
-							//							boolean notEmpty = ValueUtil.isNotEmpty(entry.getOutput());
+							// boolean notEmpty =
+							// ValueUtil.isNotEmpty(entry.getOutput());
 							boolean notEmpty = ValueUtil.isNotEmpty(entry.getPath());
 							LOGGER.debug(String.format("srch entry path : %s is Traget %b ", entry.getPath(), notEmpty));
 							//
@@ -269,15 +372,16 @@ public class DynamicClassLoader {
 				}).map(pram -> pram.getPath()).distinct().parallel().flatMap(new Function<String, Stream<ProjectInfo>>() {
 					@Override
 					public Stream<ProjectInfo> apply(String entry) {
-//						LOGGER.debug("projroot : {}  entry : {} ", projectFile.getName(), entry);
+						// LOGGER.debug("projroot : {} entry : {} ",
+						// projectFile.getName(), entry);
 						File compiledFilePath = new File(projectFile, entry);
 						int length = compiledFilePath.getAbsolutePath().length() + 1;
 						List<String> findJavaSources = findSource(projectFile.getAbsolutePath(), compiledFilePath, length);
-//						LOGGER.debug(compiledFilePath.toString());
-//						LOGGER.debug(findJavaSources.toString());
-//						LOGGER.debug(String.valueOf(findJavaSources.size()));
-						LOGGER.debug("sources : [{}] {} {}", String.valueOf(findJavaSources.size()),compiledFilePath.toString(),findJavaSources.toString() );
-						
+						// LOGGER.debug(compiledFilePath.toString());
+						// LOGGER.debug(findJavaSources.toString());
+						// LOGGER.debug(String.valueOf(findJavaSources.size()));
+						LOGGER.debug("sources : [{}] {} ", String.valueOf(findJavaSources.size()), compiledFilePath.toString());
+
 						ProjectInfo classInfo = new ProjectInfo();
 						classInfo.setProjectName(projectFile.getName());
 						classInfo.setProjectDir(compiledFilePath.getAbsolutePath());
@@ -326,6 +430,50 @@ public class DynamicClassLoader {
 	 * @return
 	 */
 	public static List<String> findClases(final String projectName, final File filePathName, final int length) {
+		return findClases(projectName, filePathName, new String[] { CLASS_FILE_EXTENSION }, length);
+		// Function<File, String> toPackageName = file -> {
+		// String absolutePath = file.getAbsolutePath();
+		// String pathPattern = absolutePath.substring(length);
+		// String packagePath = pathPattern.replaceAll("\\\\", ".");
+		// int indexOf = packagePath.indexOf('$');
+		// if (indexOf >= 0) {
+		// return packagePath.substring(0, indexOf);
+		// } else {
+		// // 6의 의미는 ".class".length()
+		// return packagePath.substring(0, (packagePath.length() - 6));
+		// }
+		// };
+		//
+		// FileSearcher fileSearcher = new FileSearcher(filePathName, -1, new
+		// String[] { CLASS_FILE_EXTENSION }, new Predicate<File>() {
+		//
+		// // 탐색하지않을 파일명을 기입한다.
+		// List<String> exceptNames = ConfigResourceLoader.getInstance()
+		// .getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME_SOURCE_TYPE,
+		// ",");
+		//
+		// @Override
+		// public boolean test(File file) {
+		// return !exceptNames.contains(file.getName());
+		// }
+		// });
+		//
+		// List<String> find = fileSearcher.find(toPackageName);
+		// return find.stream().distinct().collect(Collectors.toList());
+	}
+
+	/**
+	 * 특정 디렉토리안에 .class 파일이 존재하는지 찾는다.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 22.
+	 * @param projectName
+	 * @param filePathName
+	 * @param fileExtensions
+	 * @param length
+	 * @return
+	 */
+	public static List<String> findClases(final String projectName, final File filePathName, String[] fileExtensions, final int length) {
 		Function<File, String> toPackageName = file -> {
 			String absolutePath = file.getAbsolutePath();
 			String pathPattern = absolutePath.substring(length);
@@ -339,7 +487,31 @@ public class DynamicClassLoader {
 			}
 		};
 
-		FileSearcher fileSearcher = new FileSearcher(filePathName, -1, new String[] { CLASS_FILE_EXTENSION }, new Predicate<File>() {
+		return findClases(projectName, filePathName, fileExtensions, toPackageName, length);
+	}
+
+	public static List<String> findJavaConvertClassPattern(final String projectName, final File filePathName, final int length) {
+		int javaFileExtLength = JAVA_FILE_EXTENSION.length();
+		Function<File, String> toPackageName = file -> {
+			String absolutePath = file.getAbsolutePath();
+			String pathPattern = absolutePath.substring(length);
+			String packagePath = pathPattern.replaceAll("\\\\", ".");
+			int indexOf = packagePath.indexOf('$');
+			if (indexOf >= 0) {
+				return packagePath.substring(0, indexOf);
+			} else {
+				// 6의 의미는 ".class".length()
+				return packagePath.substring(0, (packagePath.length() - javaFileExtLength));
+			}
+		};
+
+		return findClases(projectName, filePathName, new String[] { JAVA_FILE_EXTENSION }, toPackageName, length);
+	}
+
+	public static List<String> findClases(final String projectName, final File filePathName, String[] fileExtensions,
+			Function<File, String> toPackageName, final int length) {
+
+		FileSearcher fileSearcher = new FileSearcher(filePathName, -1, fileExtensions, new Predicate<File>() {
 
 			// 탐색하지않을 파일명을 기입한다.
 			List<String> exceptNames = ConfigResourceLoader.getInstance()
@@ -465,7 +637,8 @@ public class DynamicClassLoader {
 
 	public static Class<?> loadFromJarFile(File jarFile, String classForName, String jarInClasspath) throws Exception {
 
-		URLClassLoader loader = (URLClassLoader) createLoader(jarFile, jarInClasspath);//URLClassLoader.newInstance(urls, DynamicClassLoader.class.getClassLoader());
+		URLClassLoader loader = (URLClassLoader) createLoader(jarFile, jarInClasspath);// URLClassLoader.newInstance(urls,
+																						// DynamicClassLoader.class.getClassLoader());
 		Class<?> forName = null;
 
 		try {
@@ -491,9 +664,8 @@ public class DynamicClassLoader {
 
 		URL[] urls = null;
 		ClassLoader classLoader = null;
-		
-		
-		//jar 파일이 참고하는 다른 라이브러리를 동적으로 추가되는 경우라면 시스템 클래스 로더를 사용.
+
+		// jar 파일이 참고하는 다른 라이브러리를 동적으로 추가되는 경우라면 시스템 클래스 로더를 사용.
 		if (ValueUtil.isNotEmpty(jarInClasspath)) {
 
 			String name = jarFile.getName();
@@ -513,24 +685,27 @@ public class DynamicClassLoader {
 				int length = split.length + 1;
 				urls = new URL[length + 1];
 				urls[0] = url;
-				for (int i = 1; i < length; i++ /*String res : split*/) {
+				for (int i = 1; i < length; i++ /* String res : split */) {
 					String res = split[i - 1];
-				
 
 					File file = new File(dir, res);
 					urls[i] = file.toURI().toURL();
 					LOGGER.debug("{} append url : {} ", i, urls[i].toExternalForm());
 
-										final Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
-										method.setAccessible(true);
-										method.invoke(systemClassLoader, new Object[] { urls[i] });
+					final Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
+					method.setAccessible(true);
+					method.invoke(systemClassLoader, new Object[] { urls[i] });
 				}
-//				classLoader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
-//				if ("GargoyleMusic.jar".equals(jarFile.getName())) {
-//					Class<?> loadClass = classLoader.loadClass("org.apache.catalina.loader.WebappClassLoader");
-//					Constructor<?> constructor = loadClass.getConstructor(ClassLoader.class);
-//					classLoader = (ClassLoader) constructor.newInstance(classLoader);
-//				}
+				// classLoader = URLClassLoader.newInstance(urls,
+				// ClassLoader.getSystemClassLoader());
+				// if ("GargoyleMusic.jar".equals(jarFile.getName())) {
+				// Class<?> loadClass =
+				// classLoader.loadClass("org.apache.catalina.loader.WebappClassLoader");
+				// Constructor<?> constructor =
+				// loadClass.getConstructor(ClassLoader.class);
+				// classLoader = (ClassLoader)
+				// constructor.newInstance(classLoader);
+				// }
 			}
 		} else {
 			urls = new URL[] { url };
@@ -549,7 +724,8 @@ public class DynamicClassLoader {
 		 */
 		// if (loader == null)
 		classLoader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
-		//		URLClassLoader loader = URLClassLoader.newInstance(urls, ClassLoader.getSystemClassLoader());
+		// URLClassLoader loader = URLClassLoader.newInstance(urls,
+		// ClassLoader.getSystemClassLoader());
 
 		return classLoader;
 	}
@@ -641,15 +817,15 @@ class FileSearcher {
 	public static final Predicate<File> DEFAULT_FILTER = new Predicate<File>() {
 
 		/*
-		 *  탐색하지않을 파일명을 기입한다.
-		 *  디폴트로는 소스 디렉토리가 존재하는 위치에 있는 대상은 필터링된다.
+		 * 탐색하지않을 파일명을 기입한다. 디폴트로는 소스 디렉토리가 존재하는 위치에 있는 대상은 필터링된다.
 		 */
-		//		List<String> exceptNames = ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME_SOURCE_TYPE,
-		//				",");
+		// List<String> exceptNames =
+		// ConfigResourceLoader.getInstance().getValues(ConfigResourceLoader.FILTER_NOT_SRCH_DIR_NAME_SOURCE_TYPE,
+		// ",");
 
 		@Override
 		public boolean test(File file) {
-			return true; //!exceptNames.contains(file.getName());
+			return true; // !exceptNames.contains(file.getName());
 		}
 	};
 
@@ -661,11 +837,12 @@ class FileSearcher {
 	}
 
 	/**
-	 * @param filter the filter to set
+	 * @param filter
+	 *            the filter to set
 	 */
-	//	public final void setFilter(Predicate<File> filter) {
-	//		this.filter = filter;
-	//	}
+	// public final void setFilter(Predicate<File> filter) {
+	// this.filter = filter;
+	// }
 
 	public FileSearcher(File root) {
 
