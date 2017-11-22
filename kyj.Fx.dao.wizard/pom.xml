@@ -4,7 +4,7 @@
 
 	<groupId>kyj.Fx.dao.wizard</groupId>
 	<artifactId>kyj.Fx.dao.wizard</artifactId>
-	<version>0.0.6-SNAPSHOT</version>
+	<version>0.0.7-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>kyj.Fx.dao.wizard</name>
@@ -18,9 +18,11 @@
 		<!-- <deploy.target.dir>${user.home}/.m2/repository/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/0.0.2-SNAPSHOT</deploy.target.dir> -->
 		<!-- 2015.12.10 mar버젼에서 인식이 불가능한 상황이 발생하면서, 추가함. 정확한 원인은 모르겟음. 실행하는데는 문제없으나 
 			jar파일처리시 문제. -->
-		<vo.editor.jar.path.name>${user.home}/.m2/repository/kyj/FxVoEditor/kyj.FxVoEditor/0.0.1-SNAPSHOT/kyj.FxVoEditor-0.0.1-SNAPSHOT.jar</vo.editor.jar.path.name>
+		<vo.editor.jar.version>0.0.2-SNAPSHOT</vo.editor.jar.version>
+		<vo.editor.jar.path.name>${user.home}/.m2/repository/kyj/FxVoEditor/kyj.FxVoEditor/${vo.editor.jar.version}-SNAPSHOT/kyj.FxVoEditor-{$vo.editor.jar.version}-SNAPSHOT.jar</vo.editor.jar.path.name>
+
 		<lib.dir>lib</lib.dir>
-		<jar.name>kyj.fx.dao.wizard-0.0.1-SNAPSHOT</jar.name>
+<!-- 		<jar.name>kyj.fx.dao.wizard-0.0.2-SNAPSHOT</jar.name> -->
 	</properties>
 
 	<build>
