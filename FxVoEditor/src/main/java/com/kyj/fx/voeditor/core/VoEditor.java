@@ -172,28 +172,38 @@ public class VoEditor {
 
 	/**
 	 * 결과를 파일로 반환
-	 *
-	 * @Date 2015. 10. 12.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 22.
+	 * @param parent
 	 * @param filePathName
 	 * @return
 	 * @throws Exception
-	 * @User KYJ
 	 */
-	public File toFile(String filePathName) throws Exception {
+	public File toFile(File parent, String filePathName) throws Exception {
 
 		if (!this.fxVo.isBuild())
 			throw new IllegalStateException("first call Build func...");
 
 		String fileName = getClassName();
-		FileWriter writer = null;
-		try {
-			writer = new FileWriter(filePathName + File.separator + fileName + ".java");
-			writer.write(toText());
-		} finally {
-			if (writer != null)
-				writer.close();
+
+		String location = filePathName + File.separator + fileName + ".java";
+
+		File file = new File(parent, location);
+
+		if (parent != null && parent.exists()) {
+			file = new File(parent, location);
+		} else {
+			file = new File(location);
 		}
 
-		return new File(filePathName);
+		if (!file.exists())
+			file.createNewFile();
+
+		try (FileWriter writer = new FileWriter(file)) {
+			writer.write(toText());
+		}
+
+		return file;
 	}
 }
