@@ -198,25 +198,48 @@ public class DaoWizard<C extends ClassMeta, M extends TbpSysDaoMethodsDVO, F ext
 	 * @throws Exception
 	 * @User KYJ
 	 */
-	public File toFile(String filePathName) throws Exception {
+	public File toFile(File parent, String filePathName) throws Exception {
 
 		if (!this.fxDao.isBuild())
 			throw new IllegalStateException("first call Build func...");
 
+//		String fileName = getClassName();
+//		FileWriter writer = null;
+//		try {
+//			writer = new FileWriter(filePathName + File.separator + fileName + ".java");
+//			writer.write(toText());
+//		} finally {
+//			if (writer != null)
+//				writer.close();
+//		}
+//
+//		return new File(filePathName);
+//		
+		
+		if (!this.fxDao.isBuild())
+			throw new IllegalStateException("first call Build func...");
+
 		String fileName = getClassName();
-		FileWriter writer = null;
-		try {
-			writer = new FileWriter(filePathName + File.separator + fileName + ".java");
-			writer.write(toText());
-		} finally {
-			if (writer != null)
-				writer.close();
+
+		String location = filePathName + File.separator + fileName + ".java";
+
+		File file = new File(parent, location);
+
+		if (parent != null && parent.exists()) {
+			file = new File(parent, location);
+		} else {
+			file = new File(location);
 		}
 
-		return new File(filePathName);
+		if (!file.exists())
+			file.createNewFile();
+
+		try (FileWriter writer = new FileWriter(file)) {
+			writer.write(toText());
+		}
+
+		return file;
 	}
 
-	public void saveDatabase() {
 
-	}
 }
