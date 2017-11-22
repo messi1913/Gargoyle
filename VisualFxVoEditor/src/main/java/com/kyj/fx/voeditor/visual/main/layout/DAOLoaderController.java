@@ -11,17 +11,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.component.DiffAppController;
 import com.kyj.fx.voeditor.visual.component.TextBaseDiffAppController;
 import com.kyj.fx.voeditor.visual.component.grid.CommonsBaseGridView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.diff.TextBaseComparator;
-import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.main.model.vo.TbmSysDaoMethodsHDVO;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -187,34 +186,36 @@ public class DAOLoaderController {
 				if ("Y".equals(v.getValue())) {
 					try {
 
-						//Camel Case로 변경하는 작업이 필요함.
+						// Camel Case로 변경하는 작업이 필요함.
 						HashMap<String, Object> param = new HashMap<String, Object>();
 						Iterator<String> iterator = selectedItem.keySet().iterator();
-						while(iterator.hasNext())
-						{
+						while (iterator.hasNext()) {
 							String key = iterator.next();
 							param.put(ValueUtil.toCamelCase(key), selectedItem.get(key));
 						}
-//						Map<HashMap<String, Object>, HashMap<String, Object>> collect = selectedItem.entrySet().stream()
-//						.map(m -> {
-//							HashMap<String, Object> hashMap = new HashMap<String, Object>();
-//							hashMap.put(ValueUtil.toCamelCase(m.getKey()), m.getValue());
-//							return hashMap;
-//						})
-//						.collect(Collectors.toMap(k -> k, val -> val));
+						// Map<HashMap<String, Object>, HashMap<String, Object>>
+						// collect = selectedItem.entrySet().stream()
+						// .map(m -> {
+						// HashMap<String, Object> hashMap = new HashMap<String,
+						// Object>();
+						// hashMap.put(ValueUtil.toCamelCase(m.getKey()),
+						// m.getValue());
+						// return hashMap;
+						// })
+						// .collect(Collectors.toMap(k -> k, val -> val));
 
-
-						//삭제
+						// 삭제
 						int count = removDAO(param);
 
 						if (count != -1) {
-							//삭제성공.
-							//재조회
+							// 삭제성공.
+							// 재조회
 							List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
 							tbSrchDao.getItems().addAll(listDAO);
-							//DialogUtil.showMessageDialog(className + " 삭제 완료.");
+							// DialogUtil.showMessageDialog(className + " 삭제
+							// 완료.");
 						} else {
-							//삭제 실패.
+							// 삭제 실패.
 							DialogUtil.showMessageDialog(className + " 일치하는 조건이 없습니다. ");
 						}
 
@@ -266,6 +267,7 @@ public class DAOLoaderController {
 
 	/**
 	 * DAO iTEM 삭제.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 9. 23.
 	 * @param paramMap
@@ -330,9 +332,6 @@ public class DAOLoaderController {
 		});
 	}
 
-	public void setSystemLayoutViewController(SystemLayoutViewController systemLayoutViewController) {
-	}
-
 	@FXML
 	public void tbSrchDaoOnMouseClick(MouseEvent e) {
 
@@ -344,7 +343,8 @@ public class DAOLoaderController {
 						return;
 
 					TbmSysDaoDVO tbmSysDAO = new TbmSysDaoDVO();
-					tbmSysDAO.setClassName(selectedItem.get("CLASS_NAME").toString());
+					String className = selectedItem.get("CLASS_NAME").toString();
+					tbmSysDAO.setClassName(className);
 					tbmSysDAO.setPackageName(selectedItem.get("PACKAGE_NAME").toString());
 					tbmSysDAO.setLocation(selectedItem.get("LOCATION").toString());
 					tbmSysDAO.setClassDesc(selectedItem.get("CLASS_DESC").toString());
@@ -353,21 +353,21 @@ public class DAOLoaderController {
 						tbmSysDAO.setTableName(object.toString());
 
 					FxUtil.load(DAOLoaderController.class);
-					FXMLLoader loader = FxUtil.createNewFxmlLoader();//new FXMLLoader();
+					FXMLLoader loader = FxUtil.createNewFxmlLoader();// new
+																		// FXMLLoader();
 					loader.setLocation(getClass().getResource("DaoWizardView.fxml"));
 					BorderPane pane = loader.load();
 					DaoWizardViewController controller = loader.getController();
 					controller.setTbmSysDaoProperty(tbmSysDAO);
 
-					/*2016-10-26 by kyj change code  tab handling -> loadNewSystem api */
-					//					Tab tab = new Tab("DaoWizard", pane);
-					//					this.systemRoot.addTabItem(tab);
-					//					tab.getTabPane().getSelectionModel().select(tab);
-					SharedMemory.getSystemLayoutViewController().loadNewSystemTab("DaoWizard", pane);
+					/*
+					 * <ol>
+					 * <li>16.10.26 by kyj change code tab handling -> loadNewSystem api</li>
+					 * <li>17.11.22 Modify Tab Name. by kyj.</li>
+					 * </ol>
+					 */
+					SharedMemory.getSystemLayoutViewController().loadNewSystemTab(String.format("%s", className), pane);
 
-					//2016-09-23 굳히 재조회 할 필요없으므로 주석.
-					//					List<Map<String, Object>> listDAO = listDAO(txtSrchTable.getText().trim());
-					//					tbSrchDao.getItems().addAll(listDAO);
 				} catch (Exception e1) {
 					LOGGER.error(e1.toString());
 					DialogUtil.showExceptionDailog(e1);

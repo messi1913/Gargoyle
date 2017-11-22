@@ -241,8 +241,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			TitledPane titledPane = loader.load();
 			VBox.setVgrow(titledPane, Priority.ALWAYS);
 			accordionItems.getChildren().add(titledPane);
-			DAOLoaderController controller = loader.getController();
-			controller.setSystemLayoutViewController(this);
+//			DAOLoaderController controller = loader.getController();
+//			controller.setSystemLayoutViewController(this);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

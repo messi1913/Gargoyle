@@ -31,6 +31,7 @@ import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -65,7 +66,7 @@ public class SimpleSQLResultView extends BorderPane {
 
 	private Map<String, Object> param;
 	private Stage stage = new Stage();
-	private List<TableModelDVO> columns;
+	private List<TableModelDVO> columns = FXCollections.observableArrayList();
 	private SplitPane splitPane;
 
 	public SimpleSQLResultView() {
@@ -143,7 +144,7 @@ public class SimpleSQLResultView extends BorderPane {
 		String sql = ValueUtil.getVelocityToText(this.sql, param);
 		LOGGER.debug(String.format("Convert SQL : \n%s", sql));
 
-		columns = new ArrayList<>();
+		// columns = new ArrayList<>();
 		try {
 
 			// Parameters.
@@ -160,7 +161,7 @@ public class SimpleSQLResultView extends BorderPane {
 				for (int c = 1; c <= columnCount; c++) {
 					String columnLabel = metaData.getColumnLabel(c);
 
-					if (row == 0) {
+					if (row == 1) {
 						TableModelDVO tableModelDVO = new TableModelDVO();
 						tableModelDVO.setDatabaseColumnName(columnLabel);
 						String columnTypeName = metaData.getColumnTypeName(c);
@@ -185,11 +186,9 @@ public class SimpleSQLResultView extends BorderPane {
 			};
 
 			// Execute.
-
+			clear();
 			List<Map<String, Object>> select = execute(sql, mapSqlParameterSource, rowMapper);
-
 			if (select != null && !select.isEmpty()) {
-				clear();
 				createColumns(columns);
 				tbResult.getItems().addAll(select);
 			}

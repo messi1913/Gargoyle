@@ -29,7 +29,12 @@ public class SqlFormatter implements Formatter {
 	private static final Set<String> BEGIN_VELOCITY = new HashSet<String>();
 	private static final Set<String> END_VELOCITY = new HashSet<String>();
 
+	private static final Set<String> FUNC_KEYWORD = new HashSet<String>();
+
 	static {
+
+		FUNC_KEYWORD.add("substring");
+
 		BEGIN_CLAUSES.add("left");
 		BEGIN_CLAUSES.add("right");
 		BEGIN_CLAUSES.add("inner");
@@ -90,6 +95,8 @@ public class SqlFormatter implements Formatter {
 		boolean afterWhite = false;
 		int inFunction = 0;
 		int parensSinceSelect = 0;
+		// 17.11.22 DBMS Function
+		boolean isDbmsFunctionScope = false;
 		private LinkedList<Integer> parenCounts = new LinkedList<Integer>();
 		private LinkedList<Boolean> afterByOrFromOrSelects = new LinkedList<Boolean>();
 		int indent = 0;
@@ -119,13 +126,12 @@ public class SqlFormatter implements Formatter {
 				} else if ("\"".equals(token)) {
 					String t;
 					do {
-						
+
 						/*
-						 * by kyj.
-						 * if occured error  than
-						 * system can not be controed.
-						 * so the try ~ catch block will be prevent the crush.  
-						*/
+						 * by kyj. if occured error than system can not be
+						 * controed. so the try ~ catch block will be prevent
+						 * the crush.
+						 */
 						try {
 							t = tokens.nextToken();
 							token += t;
@@ -279,6 +285,11 @@ public class SqlFormatter implements Formatter {
 		private void commaAfterByOrFromOrSelect() {
 
 			out();
+
+			if (isDbmsFunctionScope) {
+				return;
+			}
+
 			newline();
 		}
 
@@ -343,6 +354,7 @@ public class SqlFormatter implements Formatter {
 		private void select() {
 
 			out();
+			// newline();
 			indent++;
 			newline();
 			parenCounts.addLast(Integer.valueOf(parensSinceSelect));
@@ -408,6 +420,10 @@ public class SqlFormatter implements Formatter {
 				afterByOrSetOrFromOrSelect = afterByOrFromOrSelects.removeLast().booleanValue();
 			}
 
+			if (isDbmsFunctionScope) {
+				isDbmsFunctionScope = false;
+			}
+
 			if (inFunction > 0) {
 				inFunction--;
 				out();
@@ -427,6 +443,11 @@ public class SqlFormatter implements Formatter {
 				inFunction++;
 			}
 
+			if (dbmsFunction(lastToken)) {
+				isDbmsFunctionScope = true;
+				inFunction++;
+			}
+
 			beginLine = false;
 			if (inFunction > 0) {
 				out();
@@ -439,6 +460,18 @@ public class SqlFormatter implements Formatter {
 				}
 			}
 			parensSinceSelect++;
+		}
+
+		/**
+		 * is DBMS Function
+		 * 
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 11. 22.
+		 * @param token
+		 * @return
+		 */
+		private boolean dbmsFunction(String token) {
+			return FUNC_KEYWORD.contains(token);
 		}
 
 		private void reset() {
