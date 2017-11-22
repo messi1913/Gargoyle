@@ -10,7 +10,7 @@
 	<properties>
 		<!-- skip test -->
 		<maven.test.skip>true</maven.test.skip>
-		
+
 		<!-- HTTP -->
 		<apache-http-client.version>4.3.6</apache-http-client.version>
 
@@ -40,9 +40,7 @@
 
 		<poi.word.version>3.14</poi.word.version>
 
-		<vo.editor.jar.path.name>${user.home}/.m2/repository/kyj/FxVoEditor/kyj.FxVoEditor/0.0.1-SNAPSHOT/kyj.FxVoEditor-0.0.1-SNAPSHOT.jar</vo.editor.jar.path.name>
-
-		<dao.wizard.jar.version>0.0.5-SNAPSHOT</dao.wizard.jar.version>
+		<dao.wizard.jar.version>0.0.7-SNAPSHOT</dao.wizard.jar.version>
 		<dao.wizard.jar.path.name>${user.home}/.m2/repository/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/${dao.wizard.jar.version}/kyj.fx.dao.wizard-${dao.wizard.jar.version}.jar</dao.wizard.jar.path.name>
 		<maven.plugin.url>http://repo.maven.apache.org/maven2</maven.plugin.url>
 
@@ -599,9 +597,9 @@
 		<!-- </dependency> -->
 
 		<dependency>
-			<groupId>kyj.FxVoEditor</groupId>
-			<artifactId>kyj.FxVoEditor</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>com.kyj.fx</groupId>
+			<artifactId>FxVoEditor</artifactId>
+			<version>0.0.2</version>
 			<!-- <scope>system</scope> -->
 			<!-- <systemPath>${vo.editor.jar.path.name}</systemPath> -->
 			<exclusions>
@@ -616,6 +614,12 @@
 			<groupId>kyj.Fx.dao.wizard</groupId>
 			<artifactId>kyj.Fx.dao.wizard</artifactId>
 			<version>${dao.wizard.jar.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.kyj.fx</groupId>
+					<artifactId>FxVoEditor</artifactId>
+				</exclusion>
+			</exclusions>
 			<!-- <scope>system</scope> -->
 			<!-- <systemPath>${dao.wizard.jar.path.name}</systemPath> -->
 		</dependency>
@@ -633,13 +637,13 @@
 			<artifactId>encryp</artifactId>
 			<version>0.0.3</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.kyj.fx</groupId>
 			<artifactId>fxloader</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-		
+
 
 
 		<dependency>

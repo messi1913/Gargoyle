@@ -18,11 +18,11 @@
 		<!-- <deploy.target.dir>${user.home}/.m2/repository/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/0.0.2-SNAPSHOT</deploy.target.dir> -->
 		<!-- 2015.12.10 mar버젼에서 인식이 불가능한 상황이 발생하면서, 추가함. 정확한 원인은 모르겟음. 실행하는데는 문제없으나 
 			jar파일처리시 문제. -->
-		<vo.editor.jar.version>0.0.2-SNAPSHOT</vo.editor.jar.version>
-		<vo.editor.jar.path.name>${user.home}/.m2/repository/kyj/FxVoEditor/kyj.FxVoEditor/${vo.editor.jar.version}-SNAPSHOT/kyj.FxVoEditor-{$vo.editor.jar.version}-SNAPSHOT.jar</vo.editor.jar.path.name>
+		<!-- <vo.editor.jar.version>0.0.2-SNAPSHOT</vo.editor.jar.version> -->
+		<!-- <vo.editor.jar.path.name>${user.home}/.m2/repository/kyj/FxVoEditor/kyj.FxVoEditor/${vo.editor.jar.version}-SNAPSHOT/kyj.FxVoEditor-{$vo.editor.jar.version}-SNAPSHOT.jar</vo.editor.jar.path.name> -->
 
 		<lib.dir>lib</lib.dir>
-<!-- 		<jar.name>kyj.fx.dao.wizard-0.0.2-SNAPSHOT</jar.name> -->
+		<!-- <jar.name>kyj.fx.dao.wizard-0.0.2-SNAPSHOT</jar.name> -->
 	</properties>
 
 	<build>
@@ -52,7 +52,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<!-- JAR파일로 말아질때 특정 리소스는 제외시키는 플러그인 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -172,11 +172,9 @@
 
 
 		<dependency>
-			<groupId>kyj.FxVoEditor</groupId>
-			<artifactId>kyj.FxVoEditor</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<!-- <scope>system</scope> -->
-			<!-- <systemPath>${vo.editor.jar.path.name}</systemPath> -->
+			<groupId>com.kyj.fx</groupId>
+			<artifactId>FxVoEditor</artifactId>
+			<version>0.0.2</version>
 		</dependency>
 	</dependencies>
 
