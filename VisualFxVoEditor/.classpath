@@ -6,7 +6,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" output="target/classes" path="src/main/resources">
+	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
@@ -42,11 +42,6 @@
 	<classpathentry kind="lib" path="lib/boilerpipe/nekohtml-1.9.13.jar"/>
 	<classpathentry kind="lib" path="lib/boilerpipe/nekohtml-relocated-1.9.13.jar"/>
 	<classpathentry kind="lib" path="lib/customjfoenix.jar"/>
-	<classpathentry kind="lib" path="lib/scm/dimmension/darius-1.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/scm/dimmension/dmclient-1.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/scm/dimmension/dmfile-1.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/scm/dimmension/dmnet-1.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/scm/dimmension/dmtpi-1.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/jgit/org.eclipse.jgit-4.6.0.201612231935-r.jar"/>
 	<classpathentry kind="lib" path="lib/richtext/richtextfx-fat-1.0.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
