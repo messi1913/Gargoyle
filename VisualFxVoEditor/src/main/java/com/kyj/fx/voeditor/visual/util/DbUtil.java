@@ -664,8 +664,7 @@ public class DbUtil extends ConnectionManager {
 			for (String sql : apply) {
 
 				/*
-				 * sqlite에서 공백이 포함된 sql은 add한경우 에러. 확인해보니 isEmpty함수에 이상이 있는듯하여
-				 * 수정.
+				 * sqlite에서 공백이 포함된 sql은 add한경우 에러. 확인해보니 isEmpty함수에 이상이 있는듯하여 수정.
 				 */
 				if (ValueUtil.isEmpty(sql))
 					continue;
@@ -895,18 +894,15 @@ public class DbUtil extends ConnectionManager {
 	 * 1.TABLE_CAT String => table catalog (may be null) </br>
 	 * 2.TABLE_SCHEM String => table schema (may be null) </br>
 	 * 3.TABLE_NAME String => table name </br>
-	 * 4.TABLE_TYPE String => table type. Typical types are "TABLE", "VIEW",
-	 * "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS",
+	 * 4.TABLE_TYPE String => table type. Typical types are "TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS",
 	 * "SYNONYM". </br>
 	 * 5.REMARKS String => explanatory comment on the table </br>
 	 * 6.TYPE_CAT String => the types catalog (may be null) </br>
 	 * 7.TYPE_SCHEM String => the types schema (may be null) </br>
 	 * 8.TYPE_NAME String => type name (may be null) </br>
-	 * 9.SELF_REFERENCING_COL_NAME String => name of the designated "identifier"
-	 * column of a typed table (may be null) </br>
-	 * 10.REF_GENERATION String => specifies how values in
-	 * SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER",
-	 * "DERIVED". (may be null) </br>
+	 * 9.SELF_REFERENCING_COL_NAME String => name of the designated "identifier" column of a typed table (may be null) </br>
+	 * 10.REF_GENERATION String => specifies how values in SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER", "DERIVED".
+	 * (may be null) </br>
 	 * 
 	 * @param converter
 	 * @return
@@ -921,24 +917,20 @@ public class DbUtil extends ConnectionManager {
 	/********************************
 	 * 작성일 : 2016. 8. 11. 작성자 : KYJ
 	 *
-	 * 2016-11-10 모든 테이블탐색후 대소문자무시 검색으로 수정 2017-07-12 Connection을 파라미터로 넣어 동적으로
-	 * 찾을 수 있게 수정 </br>
+	 * 2016-11-10 모든 테이블탐색후 대소문자무시 검색으로 수정 2017-07-12 Connection을 파라미터로 넣어 동적으로 찾을 수 있게 수정 </br>
 	 * </br>
 	 * 1.TABLE_CAT String => table catalog (may be null) </br>
 	 * 2.TABLE_SCHEM String => table schema (may be null) </br>
 	 * 3.TABLE_NAME String => table name </br>
-	 * 4.TABLE_TYPE String => table type. Typical types are "TABLE", "VIEW",
-	 * "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS",
+	 * 4.TABLE_TYPE String => table type. Typical types are "TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS",
 	 * "SYNONYM". </br>
 	 * 5.REMARKS String => explanatory comment on the table </br>
 	 * 6.TYPE_CAT String => the types catalog (may be null) </br>
 	 * 7.TYPE_SCHEM String => the types schema (may be null) </br>
 	 * 8.TYPE_NAME String => type name (may be null) </br>
-	 * 9.SELF_REFERENCING_COL_NAME String => name of the designated "identifier"
-	 * column of a typed table (may be null) </br>
-	 * 10.REF_GENERATION String => specifies how values in
-	 * SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER",
-	 * "DERIVED". (may be null) </br>
+	 * 9.SELF_REFERENCING_COL_NAME String => name of the designated "identifier" column of a typed table (may be null) </br>
+	 * 10.REF_GENERATION String => specifies how values in SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER", "DERIVED".
+	 * (may be null) </br>
 	 * 
 	 * @param connection
 	 * @param converter
@@ -956,10 +948,13 @@ public class DbUtil extends ConnectionManager {
 		/* 17.9.19 catalog를 추가하여 조회할 수 있게 코드 수정 */
 
 		ResultSet catalogs = metaData.getCatalogs();
+		boolean existsCatalog = false;
+		boolean existsSchema = false;
+
 		while (catalogs.next()) {
+			existsCatalog = true;
 			String catal = catalogs.getString(1);
-			ResultSet rs = metaData.getTables(catal, null,
-					"%"/* + tableNamePattern + "%" */, new String[] { "TABLE" });
+			ResultSet rs = metaData.getTables(catal, null, "%"/* + tableNamePattern + "%" */, new String[] { "TABLE" });
 			String tableNamePatternUpperCase = tableNamePattern.toUpperCase();
 			while (rs.next()) {
 
@@ -979,6 +974,49 @@ public class DbUtil extends ConnectionManager {
 			}
 		}
 
+		if (!existsCatalog) {
+			ResultSet schemas = metaData.getSchemas();
+			while (schemas.next()) {
+				existsSchema = true;
+				ResultSet rs = metaData.getTables(null, schemas.getString(0), "%"/* + tableNamePattern + "%" */, new String[] { "TABLE" });
+				String tableNamePatternUpperCase = tableNamePattern.toUpperCase();
+				while (rs.next()) {
+
+					// 2016-08-18 특정데이터베이스(sqlite)에서는 인덱스 트리거정보도 동시에 출력된다.
+					String tableType = rs.getString(4);
+					if ("TABLE".equals(tableType)) {
+
+						String tableName = rs.getString(3);
+						if (tableName.toUpperCase().indexOf(tableNamePatternUpperCase) != -1) {
+							T apply = converter.apply(rs);
+							if (apply != null)
+								tables.add(apply);
+						}
+
+					}
+				}
+			}
+		}
+
+		if (!existsCatalog && !existsSchema) {
+			ResultSet rs = metaData.getTables(null, null, "%"/* + tableNamePattern + "%" */, new String[] { "TABLE" });
+			String tableNamePatternUpperCase = tableNamePattern.toUpperCase();
+			while (rs.next()) {
+
+				// 2016-08-18 특정데이터베이스(sqlite)에서는 인덱스 트리거정보도 동시에 출력된다.
+				String tableType = rs.getString(4);
+				if ("TABLE".equals(tableType)) {
+
+					String tableName = rs.getString(3);
+					if (tableName.toUpperCase().indexOf(tableNamePatternUpperCase) != -1) {
+						T apply = converter.apply(rs);
+						if (apply != null)
+							tables.add(apply);
+					}
+
+				}
+			}
+		}
 		return tables;
 	}
 
@@ -1002,52 +1040,40 @@ public class DbUtil extends ConnectionManager {
 	 * 3.TABLE_NAME String => table name </br>
 	 * 4.COLUMN_NAME String => column name </br>
 	 * 5.DATA_TYPE int => SQL type from java.sql.Types </br>
-	 * 6.TYPE_NAME String => Data source dependent type name, for a UDT the type
-	 * name is fully qualified </br>
+	 * 6.TYPE_NAME String => Data source dependent type name, for a UDT the type name is fully qualified </br>
 	 * 7.COLUMN_SIZE int => column size. </br>
 	 * 8.BUFFER_LENGTH is not used. </br>
-	 * 9.DECIMAL_DIGITS int => the number of fractional digits. Null is returned
-	 * for data types where DECIMAL_DIGITS is not applicable. </br>
+	 * 9.DECIMAL_DIGITS int => the number of fractional digits. Null is returned for data types where DECIMAL_DIGITS is not applicable.
+	 * </br>
 	 * 10.NUM_PREC_RADIX int => Radix (typically either 10 or 2) </br>
-	 * 11.NULLABLE int => is NULL allowed. ◦ columnNoNulls - might not allow
-	 * NULL values </br>
+	 * 11.NULLABLE int => is NULL allowed. ◦ columnNoNulls - might not allow NULL values </br>
 	 * ◦ columnNullable - definitely allows NULL values </br>
 	 * ◦ columnNullableUnknown - nullability unknown </br>
 	 * </br>
 	 * 12.REMARKS String => comment describing column (may be null) </br>
-	 * 13.COLUMN_DEF String => default value for the column, which should be
-	 * interpreted as a string when the value is enclosed in single quotes (may
-	 * be null) </br>
+	 * 13.COLUMN_DEF String => default value for the column, which should be interpreted as a string when the value is enclosed in single
+	 * quotes (may be null) </br>
 	 * 14.SQL_DATA_TYPE int => unused </br>
 	 * 15.SQL_DATETIME_SUB int => unused </br>
-	 * 16.CHAR_OCTET_LENGTH int => for char types the maximum number of bytes in
-	 * the column </br>
+	 * 16.CHAR_OCTET_LENGTH int => for char types the maximum number of bytes in the column </br>
 	 * 17.ORDINAL_POSITION int => index of column in table (starting at 1) </br>
-	 * 18.IS_NULLABLE String => ISO rules are used to determine the nullability
-	 * for a column. ◦ YES --- if the column can include NULLs </br>
+	 * 18.IS_NULLABLE String => ISO rules are used to determine the nullability for a column. ◦ YES --- if the column can include NULLs
+	 * </br>
 	 * ◦ NO --- if the column cannot include NULLs </br>
 	 * ◦ empty string --- if the nullability for the column is unknown </br>
 	 * </br>
-	 * 19.SCOPE_CATALOG String => catalog of table that is the scope of a
-	 * reference attribute (null if DATA_TYPE isn't REF) </br>
-	 * 20.SCOPE_SCHEMA String => schema of table that is the scope of a
-	 * reference attribute (null if the DATA_TYPE isn't REF) </br>
-	 * 21.SCOPE_TABLE String => table name that this the scope of a reference
-	 * attribute (null if the DATA_TYPE isn't REF) </br>
-	 * 22.SOURCE_DATA_TYPE short => source type of a distinct type or
-	 * user-generated Ref type, SQL type from java.sql.Types (null if DATA_TYPE
-	 * isn't DISTINCT or user-generated REF) </br>
-	 * 23.IS_AUTOINCREMENT String => Indicates whether this column is auto
-	 * incremented ◦ YES --- if the column is auto incremented </br>
+	 * 19.SCOPE_CATALOG String => catalog of table that is the scope of a reference attribute (null if DATA_TYPE isn't REF) </br>
+	 * 20.SCOPE_SCHEMA String => schema of table that is the scope of a reference attribute (null if the DATA_TYPE isn't REF) </br>
+	 * 21.SCOPE_TABLE String => table name that this the scope of a reference attribute (null if the DATA_TYPE isn't REF) </br>
+	 * 22.SOURCE_DATA_TYPE short => source type of a distinct type or user-generated Ref type, SQL type from java.sql.Types (null if
+	 * DATA_TYPE isn't DISTINCT or user-generated REF) </br>
+	 * 23.IS_AUTOINCREMENT String => Indicates whether this column is auto incremented ◦ YES --- if the column is auto incremented </br>
 	 * ◦ NO --- if the column is not auto incremented </br>
-	 * ◦ empty string --- if it cannot be determined whether the column is auto
-	 * incremented </br>
+	 * ◦ empty string --- if it cannot be determined whether the column is auto incremented </br>
 	 * </br>
-	 * 24.IS_GENERATEDCOLUMN String => Indicates whether this is a generated
-	 * column ◦ YES --- if this a generated column </br>
+	 * 24.IS_GENERATEDCOLUMN String => Indicates whether this is a generated column ◦ YES --- if this a generated column </br>
 	 * ◦ NO --- if this not a generated column </br>
-	 * ◦ empty string --- if it cannot be determined whether this is a generated
-	 * column </br>
+	 * ◦ empty string --- if it cannot be determined whether this is a generated column </br>
 	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 10.
@@ -1069,52 +1095,40 @@ public class DbUtil extends ConnectionManager {
 	 * 3.TABLE_NAME String => table name </br>
 	 * 4.COLUMN_NAME String => column name </br>
 	 * 5.DATA_TYPE int => SQL type from java.sql.Types </br>
-	 * 6.TYPE_NAME String => Data source dependent type name, for a UDT the type
-	 * name is fully qualified </br>
+	 * 6.TYPE_NAME String => Data source dependent type name, for a UDT the type name is fully qualified </br>
 	 * 7.COLUMN_SIZE int => column size. </br>
 	 * 8.BUFFER_LENGTH is not used. </br>
-	 * 9.DECIMAL_DIGITS int => the number of fractional digits. Null is returned
-	 * for data types where DECIMAL_DIGITS is not applicable. </br>
+	 * 9.DECIMAL_DIGITS int => the number of fractional digits. Null is returned for data types where DECIMAL_DIGITS is not applicable.
+	 * </br>
 	 * 10.NUM_PREC_RADIX int => Radix (typically either 10 or 2) </br>
-	 * 11.NULLABLE int => is NULL allowed. ◦ columnNoNulls - might not allow
-	 * NULL values </br>
+	 * 11.NULLABLE int => is NULL allowed. ◦ columnNoNulls - might not allow NULL values </br>
 	 * ◦ columnNullable - definitely allows NULL values </br>
 	 * ◦ columnNullableUnknown - nullability unknown </br>
 	 * </br>
 	 * 12.REMARKS String => comment describing column (may be null) </br>
-	 * 13.COLUMN_DEF String => default value for the column, which should be
-	 * interpreted as a string when the value is enclosed in single quotes (may
-	 * be null) </br>
+	 * 13.COLUMN_DEF String => default value for the column, which should be interpreted as a string when the value is enclosed in single
+	 * quotes (may be null) </br>
 	 * 14.SQL_DATA_TYPE int => unused </br>
 	 * 15.SQL_DATETIME_SUB int => unused </br>
-	 * 16.CHAR_OCTET_LENGTH int => for char types the maximum number of bytes in
-	 * the column </br>
+	 * 16.CHAR_OCTET_LENGTH int => for char types the maximum number of bytes in the column </br>
 	 * 17.ORDINAL_POSITION int => index of column in table (starting at 1) </br>
-	 * 18.IS_NULLABLE String => ISO rules are used to determine the nullability
-	 * for a column. ◦ YES --- if the column can include NULLs </br>
+	 * 18.IS_NULLABLE String => ISO rules are used to determine the nullability for a column. ◦ YES --- if the column can include NULLs
+	 * </br>
 	 * ◦ NO --- if the column cannot include NULLs </br>
 	 * ◦ empty string --- if the nullability for the column is unknown </br>
 	 * </br>
-	 * 19.SCOPE_CATALOG String => catalog of table that is the scope of a
-	 * reference attribute (null if DATA_TYPE isn't REF) </br>
-	 * 20.SCOPE_SCHEMA String => schema of table that is the scope of a
-	 * reference attribute (null if the DATA_TYPE isn't REF) </br>
-	 * 21.SCOPE_TABLE String => table name that this the scope of a reference
-	 * attribute (null if the DATA_TYPE isn't REF) </br>
-	 * 22.SOURCE_DATA_TYPE short => source type of a distinct type or
-	 * user-generated Ref type, SQL type from java.sql.Types (null if DATA_TYPE
-	 * isn't DISTINCT or user-generated REF) </br>
-	 * 23.IS_AUTOINCREMENT String => Indicates whether this column is auto
-	 * incremented ◦ YES --- if the column is auto incremented </br>
+	 * 19.SCOPE_CATALOG String => catalog of table that is the scope of a reference attribute (null if DATA_TYPE isn't REF) </br>
+	 * 20.SCOPE_SCHEMA String => schema of table that is the scope of a reference attribute (null if the DATA_TYPE isn't REF) </br>
+	 * 21.SCOPE_TABLE String => table name that this the scope of a reference attribute (null if the DATA_TYPE isn't REF) </br>
+	 * 22.SOURCE_DATA_TYPE short => source type of a distinct type or user-generated Ref type, SQL type from java.sql.Types (null if
+	 * DATA_TYPE isn't DISTINCT or user-generated REF) </br>
+	 * 23.IS_AUTOINCREMENT String => Indicates whether this column is auto incremented ◦ YES --- if the column is auto incremented </br>
 	 * ◦ NO --- if the column is not auto incremented </br>
-	 * ◦ empty string --- if it cannot be determined whether the column is auto
-	 * incremented </br>
+	 * ◦ empty string --- if it cannot be determined whether the column is auto incremented </br>
 	 * </br>
-	 * 24.IS_GENERATEDCOLUMN String => Indicates whether this is a generated
-	 * column ◦ YES --- if this a generated column </br>
+	 * 24.IS_GENERATEDCOLUMN String => Indicates whether this is a generated column ◦ YES --- if this a generated column </br>
 	 * ◦ NO --- if this not a generated column </br>
-	 * ◦ empty string --- if it cannot be determined whether this is a generated
-	 * column </br>
+	 * ◦ empty string --- if it cannot be determined whether this is a generated column </br>
 	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 10.
@@ -1140,52 +1154,40 @@ public class DbUtil extends ConnectionManager {
 	 * 3.TABLE_NAME String => table name </br>
 	 * 4.COLUMN_NAME String => column name </br>
 	 * 5.DATA_TYPE int => SQL type from java.sql.Types </br>
-	 * 6.TYPE_NAME String => Data source dependent type name, for a UDT the type
-	 * name is fully qualified </br>
+	 * 6.TYPE_NAME String => Data source dependent type name, for a UDT the type name is fully qualified </br>
 	 * 7.COLUMN_SIZE int => column size. </br>
 	 * 8.BUFFER_LENGTH is not used. </br>
-	 * 9.DECIMAL_DIGITS int => the number of fractional digits. Null is returned
-	 * for data types where DECIMAL_DIGITS is not applicable. </br>
+	 * 9.DECIMAL_DIGITS int => the number of fractional digits. Null is returned for data types where DECIMAL_DIGITS is not applicable.
+	 * </br>
 	 * 10.NUM_PREC_RADIX int => Radix (typically either 10 or 2) </br>
-	 * 11.NULLABLE int => is NULL allowed. ◦ columnNoNulls - might not allow
-	 * NULL values </br>
+	 * 11.NULLABLE int => is NULL allowed. ◦ columnNoNulls - might not allow NULL values </br>
 	 * ◦ columnNullable - definitely allows NULL values </br>
 	 * ◦ columnNullableUnknown - nullability unknown </br>
 	 * </br>
 	 * 12.REMARKS String => comment describing column (may be null) </br>
-	 * 13.COLUMN_DEF String => default value for the column, which should be
-	 * interpreted as a string when the value is enclosed in single quotes (may
-	 * be null) </br>
+	 * 13.COLUMN_DEF String => default value for the column, which should be interpreted as a string when the value is enclosed in single
+	 * quotes (may be null) </br>
 	 * 14.SQL_DATA_TYPE int => unused </br>
 	 * 15.SQL_DATETIME_SUB int => unused </br>
-	 * 16.CHAR_OCTET_LENGTH int => for char types the maximum number of bytes in
-	 * the column </br>
+	 * 16.CHAR_OCTET_LENGTH int => for char types the maximum number of bytes in the column </br>
 	 * 17.ORDINAL_POSITION int => index of column in table (starting at 1) </br>
-	 * 18.IS_NULLABLE String => ISO rules are used to determine the nullability
-	 * for a column. ◦ YES --- if the column can include NULLs </br>
+	 * 18.IS_NULLABLE String => ISO rules are used to determine the nullability for a column. ◦ YES --- if the column can include NULLs
+	 * </br>
 	 * ◦ NO --- if the column cannot include NULLs </br>
 	 * ◦ empty string --- if the nullability for the column is unknown </br>
 	 * </br>
-	 * 19.SCOPE_CATALOG String => catalog of table that is the scope of a
-	 * reference attribute (null if DATA_TYPE isn't REF) </br>
-	 * 20.SCOPE_SCHEMA String => schema of table that is the scope of a
-	 * reference attribute (null if the DATA_TYPE isn't REF) </br>
-	 * 21.SCOPE_TABLE String => table name that this the scope of a reference
-	 * attribute (null if the DATA_TYPE isn't REF) </br>
-	 * 22.SOURCE_DATA_TYPE short => source type of a distinct type or
-	 * user-generated Ref type, SQL type from java.sql.Types (null if DATA_TYPE
-	 * isn't DISTINCT or user-generated REF) </br>
-	 * 23.IS_AUTOINCREMENT String => Indicates whether this column is auto
-	 * incremented ◦ YES --- if the column is auto incremented </br>
+	 * 19.SCOPE_CATALOG String => catalog of table that is the scope of a reference attribute (null if DATA_TYPE isn't REF) </br>
+	 * 20.SCOPE_SCHEMA String => schema of table that is the scope of a reference attribute (null if the DATA_TYPE isn't REF) </br>
+	 * 21.SCOPE_TABLE String => table name that this the scope of a reference attribute (null if the DATA_TYPE isn't REF) </br>
+	 * 22.SOURCE_DATA_TYPE short => source type of a distinct type or user-generated Ref type, SQL type from java.sql.Types (null if
+	 * DATA_TYPE isn't DISTINCT or user-generated REF) </br>
+	 * 23.IS_AUTOINCREMENT String => Indicates whether this column is auto incremented ◦ YES --- if the column is auto incremented </br>
 	 * ◦ NO --- if the column is not auto incremented </br>
-	 * ◦ empty string --- if it cannot be determined whether the column is auto
-	 * incremented </br>
+	 * ◦ empty string --- if it cannot be determined whether the column is auto incremented </br>
 	 * </br>
-	 * 24.IS_GENERATEDCOLUMN String => Indicates whether this is a generated
-	 * column ◦ YES --- if this a generated column </br>
+	 * 24.IS_GENERATEDCOLUMN String => Indicates whether this is a generated column ◦ YES --- if this a generated column </br>
 	 * ◦ NO --- if this not a generated column </br>
-	 * ◦ empty string --- if it cannot be determined whether this is a generated
-	 * column </br>
+	 * ◦ empty string --- if it cannot be determined whether this is a generated column </br>
 	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 10.
@@ -1596,10 +1598,8 @@ public class DbUtil extends ConnectionManager {
 	 * 프로시저 컬럼 정보를 찾는다.
 	 * 
 	 * <OL>
-	 * <LI><B>PROCEDURE_CAT</B> String {@code =>} procedure catalog (may be
-	 * <code>null</code>)
-	 * <LI><B>PROCEDURE_SCHEM</B> String {@code =>} procedure schema (may be
-	 * <code>null</code>)
+	 * <LI><B>PROCEDURE_CAT</B> String {@code =>} procedure catalog (may be <code>null</code>)
+	 * <LI><B>PROCEDURE_SCHEM</B> String {@code =>} procedure schema (may be <code>null</code>)
 	 * <LI><B>PROCEDURE_NAME</B> String {@code =>} procedure name
 	 * <LI><B>COLUMN_NAME</B> String {@code =>} column/parameter name
 	 * <LI><B>COLUMN_TYPE</B> Short {@code =>} kind of column/parameter:
@@ -1612,12 +1612,10 @@ public class DbUtil extends ConnectionManager {
 	 * <LI>procedureColumnResult - result column in <code>ResultSet</code>
 	 * </UL>
 	 * <LI><B>DATA_TYPE</B> int {@code =>} SQL type from java.sql.Types
-	 * <LI><B>TYPE_NAME</B> String {@code =>} SQL type name, for a UDT type the
-	 * type name is fully qualified
+	 * <LI><B>TYPE_NAME</B> String {@code =>} SQL type name, for a UDT type the type name is fully qualified
 	 * <LI><B>PRECISION</B> int {@code =>} precision
 	 * <LI><B>LENGTH</B> int {@code =>} length in bytes of data
-	 * <LI><B>SCALE</B> short {@code =>} scale - null is returned for data types
-	 * where SCALE is not applicable.
+	 * <LI><B>SCALE</B> short {@code =>} scale - null is returned for data types where SCALE is not applicable.
 	 * <LI><B>RADIX</B> short {@code =>} radix
 	 * <LI><B>NULLABLE</B> short {@code =>} can it contain NULL.
 	 * <UL>
@@ -1626,36 +1624,28 @@ public class DbUtil extends ConnectionManager {
 	 * <LI>procedureNullableUnknown - nullability unknown
 	 * </UL>
 	 * <LI><B>REMARKS</B> String {@code =>} comment describing parameter/column
-	 * <LI><B>COLUMN_DEF</B> String {@code =>} default value for the column,
-	 * which should be interpreted as a string when the value is enclosed in
-	 * single quotes (may be <code>null</code>)
+	 * <LI><B>COLUMN_DEF</B> String {@code =>} default value for the column, which should be interpreted as a string when the value is
+	 * enclosed in single quotes (may be <code>null</code>)
 	 * <UL>
-	 * <LI>The string NULL (not enclosed in quotes) - if NULL was specified as
-	 * the default value
-	 * <LI>TRUNCATE (not enclosed in quotes) - if the specified default value
-	 * cannot be represented without truncation
+	 * <LI>The string NULL (not enclosed in quotes) - if NULL was specified as the default value
+	 * <LI>TRUNCATE (not enclosed in quotes) - if the specified default value cannot be represented without truncation
 	 * <LI>NULL - if a default value was not specified
 	 * </UL>
 	 * <LI><B>SQL_DATA_TYPE</B> int {@code =>} reserved for future use
 	 * <LI><B>SQL_DATETIME_SUB</B> int {@code =>} reserved for future use
-	 * <LI><B>CHAR_OCTET_LENGTH</B> int {@code =>} the maximum length of binary
-	 * and character based columns. For any other datatype the returned value is
-	 * a NULL
-	 * <LI><B>ORDINAL_POSITION</B> int {@code =>} the ordinal position, starting
-	 * from 1, for the input and output parameters for a procedure. A value of 0
-	 * is returned if this row describes the procedure's return value. For
-	 * result set columns, it is the ordinal position of the column in the
-	 * result set starting from 1. If there are multiple result sets, the column
-	 * ordinal positions are implementation defined.
-	 * <LI><B>IS_NULLABLE</B> String {@code =>} ISO rules are used to determine
-	 * the nullability for a column.
+	 * <LI><B>CHAR_OCTET_LENGTH</B> int {@code =>} the maximum length of binary and character based columns. For any other datatype the
+	 * returned value is a NULL
+	 * <LI><B>ORDINAL_POSITION</B> int {@code =>} the ordinal position, starting from 1, for the input and output parameters for a
+	 * procedure. A value of 0 is returned if this row describes the procedure's return value. For result set columns, it is the ordinal
+	 * position of the column in the result set starting from 1. If there are multiple result sets, the column ordinal positions are
+	 * implementation defined.
+	 * <LI><B>IS_NULLABLE</B> String {@code =>} ISO rules are used to determine the nullability for a column.
 	 * <UL>
 	 * <LI>YES --- if the column can include NULLs
 	 * <LI>NO --- if the column cannot include NULLs
 	 * <LI>empty string --- if the nullability for the column is unknown
 	 * </UL>
-	 * <LI><B>SPECIFIC_NAME</B> String {@code =>} the name which uniquely
-	 * identifies this procedure within its schema.
+	 * <LI><B>SPECIFIC_NAME</B> String {@code =>} the name which uniquely identifies this procedure within its schema.
 	 * </OL>
 	 * 
 	 * @작성자 : KYJ

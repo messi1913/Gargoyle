@@ -123,7 +123,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 	public static final String FILE_NAME = "UserConf.properties";
 	public static final String DATABASE_COLUMN_ORDER = "database.column.order";
-	public static final Object DBMS = "dbms";
+	public static final String DBMS = "dbms";
 
 	/**
 	 * 컬럼 크기가 큰 경우 데이터 맵핑을 생략할건지 유무

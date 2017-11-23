@@ -43,6 +43,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -125,7 +126,10 @@ public class DaoWizardCustomConfigView extends BorderPane {
 							setText("");
 						} else {
 							/* 2016.4.20 패스워드에 속하는 영역인경우 패스워드 형태로 변경. */
-							int rowIndex = getTableRow().getIndex();
+							TableRow tableRow = getTableRow();
+							if(tableRow == null)
+								return;
+							int rowIndex = tableRow.getIndex();
 
 							if (Objects.equal(ResourceLoader.CUSTOM_DAOWIZARD_KEY_JDBC_PASS, colKey.getCellData(rowIndex)))
 								setText(PasswordTextFieldTableCell.getPasswordTextFieldStringConverter().toString(item.toString()));

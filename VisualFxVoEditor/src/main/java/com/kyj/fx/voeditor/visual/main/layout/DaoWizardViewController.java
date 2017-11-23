@@ -9,6 +9,7 @@ package com.kyj.fx.voeditor.visual.main.layout;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -33,7 +34,7 @@ import com.kyj.fx.voeditor.visual.component.Menus;
 import com.kyj.fx.voeditor.visual.component.NumberingCellValueFactory;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
 import com.kyj.fx.voeditor.visual.component.popup.BaseOpenClassResourceView;
-import com.kyj.fx.voeditor.visual.component.popup.DatabaseTableView;
+import com.kyj.fx.voeditor.visual.component.popup.DefaultDatabaseTableView;
 import com.kyj.fx.voeditor.visual.component.popup.JavaTextView;
 import com.kyj.fx.voeditor.visual.component.popup.MeerketAbstractVoOpenClassResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.SimpleSQLResultView;
@@ -280,10 +281,8 @@ public class DaoWizardViewController {
 		colMethodNo.setCellValueFactory(new NumberingCellValueFactory<>(tbMethods.getItems()));
 
 		/*
-		 * 2015-11-02 기존에 사용하던 NumberingCellValueFactory을 적용할 수 없음.
-		 * colParamNo컬럼같은경우는 method에 따라 데이터의 주소값이 바뀌는 타입이라 주소값이 바뀌는 상태에선 적절한 넘버링
-		 * 데이터가 화면에 보여주지않음. 하여 주소값을 계속 유지시킬 수 있도록 tbMethods에서 선택된 메소드정보에서 값을
-		 * 참조하여 넘버링을 시킴.
+		 * 2015-11-02 기존에 사용하던 NumberingCellValueFactory을 적용할 수 없음. colParamNo컬럼같은경우는 method에 따라 데이터의 주소값이 바뀌는 타입이라 주소값이 바뀌는 상태에선 적절한 넘버링
+		 * 데이터가 화면에 보여주지않음. 하여 주소값을 계속 유지시킬 수 있도록 tbMethods에서 선택된 메소드정보에서 값을 참조하여 넘버링을 시킴.
 		 *
 		 * 2016-04-19 파람의 아이템을 삭제하고 다시 호출했을때 인덱스 순서가 맞지않던 버그 fix
 		 */
@@ -345,7 +344,7 @@ public class DaoWizardViewController {
 						}
 
 						view.setTitle("VO Finder");
-						
+
 						view.setConsumer(str -> {
 							if (str == null || str.isEmpty())
 								return;
@@ -676,7 +675,7 @@ public class DaoWizardViewController {
 	 */
 	@FXML
 	public void btnDaoDatabaseMouseClick(MouseEvent e) {
-		DatabaseTableView view = new DatabaseTableView();
+		DefaultDatabaseTableView view = new DefaultDatabaseTableView();
 		TableDVO tableDVO = view.show();
 		if (tableDVO != null) {
 			TableMasterDVO tableMasterDVO = tableDVO.getTableMasterDVO();
@@ -688,16 +687,22 @@ public class DaoWizardViewController {
 			if (ValueUtil.isNotEmpty(catalog)) {
 				tableName = tableMasterDVO.getCatalog();
 			}
+
 			if (ValueUtil.isNotEmpty(schemaName)) {
 				tableName = tableName.concat(".").concat(schemaName);
 			}
-			if (ValueUtil.isNotEmpty(tableMasterDVO.getTableName())) {
+
+			if (ValueUtil.isEmpty(catalog) && ValueUtil.isEmpty(schemaName)) {
+				tableName = tableMasterDVO.getTableName();
+			} else if (ValueUtil.isNotEmpty(tableMasterDVO.getTableName())) {
 				tableName = tableName.concat(".").concat(tableMasterDVO.getTableName());
 			}
 
 			txtTableName.setText(tableName);
 			// TbmSysDaoDVO tbmSysDaoDVO = new TbmSysDaoDVO();
-			tbmSysDaoDVOProperty.get().setTableName(tableName);
+
+			// FIXME 버그 체크
+			// tbmSysDaoDVOProperty.get().setTableName(tableName);
 
 		}
 
@@ -814,25 +819,27 @@ public class DaoWizardViewController {
 		return e;
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<String> getTableColumns(String tableName) {
+
 		try {
-			return DbUtil.columns(tableName);
+
+			ResourceLoader instance = ResourceLoader.getInstance();
+			String url = instance.get(ResourceLoader.CUSTOM_DAOWIZARD_KEY_JDBC_URL);
+			String id = instance.get(ResourceLoader.CUSTOM_DAOWIZARD_KEY_JDBC_ID);
+			String pass = instance.get(ResourceLoader.CUSTOM_DAOWIZARD_KEY_JDBC_PASS);
+			String driver = instance.get(ResourceLoader.CUSTOM_DAOWIZARD_KEY_JDBC_DRIVER);
+
+			if (ValueUtil.isEmpty(driver, url)) {
+				return DbUtil.columns(tableName);
+			}
+
+			try (Connection connection = DbUtil.getConnection(driver, url, id, pass)) {
+				return DbUtil.columns(connection, tableName);
+			}
+			
 		} catch (Exception e1) {
 			return Collections.emptyList();
 		}
-		// String sqlColumns =
-		// ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_COLUMN);
-		// List<String> columns = Collections.EMPTY_LIST;
-		// Map<String, Object> hashMap = new HashMap<String, Object>();
-		// hashMap.put("tableName", tableName);
-		// try {
-		// columns = DbUtil.select(sqlColumns, hashMap, (rs, row) ->
-		// rs.getString("COLUMN_NAME"));
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
-		// return columns;
 	}
 
 	/**
