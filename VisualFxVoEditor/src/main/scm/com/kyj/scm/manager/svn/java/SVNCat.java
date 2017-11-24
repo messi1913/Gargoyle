@@ -20,10 +20,9 @@ import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.ICatCommand;
 import com.sun.star.uno.RuntimeException;
-
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * SVN의 CAT명령어를 수행한다.

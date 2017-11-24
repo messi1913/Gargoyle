@@ -17,10 +17,9 @@ import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.ICheckoutCommand;
 import com.sun.star.uno.RuntimeException;
-
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * SVN의 CHECKOUT 명령을 수행한다
