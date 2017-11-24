@@ -12,8 +12,9 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
+
 import javafx.util.Callback;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  *

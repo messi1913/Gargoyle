@@ -24,6 +24,7 @@ import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.SCMKeywords;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 
@@ -47,7 +48,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * SVN TreeView

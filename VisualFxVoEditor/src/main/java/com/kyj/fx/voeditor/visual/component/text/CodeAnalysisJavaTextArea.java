@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.fxloader.FxPostInitialize;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.biz.SourceCodeAnalysis;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.model.BizFile;
 import com.kyj.fx.voeditor.visual.words.spec.auto.msword.vo.SourceAnalysisDVO;
@@ -22,7 +23,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * @author KYJ

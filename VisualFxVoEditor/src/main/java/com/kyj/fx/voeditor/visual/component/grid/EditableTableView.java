@@ -17,8 +17,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -32,6 +30,7 @@ import com.google.common.base.Objects;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.btrace.BTraceUtils.Strings;
 
 import javafx.beans.property.ObjectProperty;
@@ -50,7 +49,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /***************************
  *

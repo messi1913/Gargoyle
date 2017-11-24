@@ -25,6 +25,7 @@ import com.kyj.fx.voeditor.visual.framework.model.GagoyleDate;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -41,7 +42,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  *

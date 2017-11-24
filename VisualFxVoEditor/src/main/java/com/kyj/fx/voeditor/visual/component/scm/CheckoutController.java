@@ -18,6 +18,7 @@ import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
@@ -33,7 +34,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /***************************
  *

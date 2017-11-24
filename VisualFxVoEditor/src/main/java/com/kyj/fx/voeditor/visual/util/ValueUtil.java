@@ -273,12 +273,11 @@ public class ValueUtil {
 		return replace(sql, paramMap, str -> String.format("'%s'", str));
 	}
 
-	
 	private static String replace(String sql, Map<String, Object> paramMap, Function<String, String> customFormat) {
 		if (sql == null || sql.trim().isEmpty())
 			return sql;
 
-//		String specialCharacter = getDynamicValueSpecialCharacter();
+		// String specialCharacter = getDynamicValueSpecialCharacter();
 		String _sql = sql.replaceAll(COMMENT_PATTERN, "");
 		String pattern = ":\\w+";
 
@@ -2017,5 +2016,24 @@ public class ValueUtil {
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * charsequence가 포함되는 마지막 인덱스를 리턴 <br/>
+	 * 존재하지않는 경우 -1 리턴 <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 24.
+	 * @param value
+	 * @param c
+	 * @return
+	 */
+	public static int lastIndexOf(String value, char c) {
+
+		for (int i = value.length() - 1; i >= 0; i--) {
+			if (value.charAt(i) == c)
+				return i;
+		}
+		return -1;
 	}
 }

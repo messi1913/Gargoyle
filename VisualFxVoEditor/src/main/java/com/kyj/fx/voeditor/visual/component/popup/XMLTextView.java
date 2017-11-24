@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
@@ -26,7 +26,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * 단순한 텍스트를 보여주는 용도로만 사용되됨.

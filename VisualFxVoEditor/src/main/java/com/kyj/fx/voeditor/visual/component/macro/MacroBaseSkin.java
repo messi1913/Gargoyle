@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.voeditor.visual.component.NumberTextField;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.sun.javafx.scene.control.behavior.BehaviorBase;
 import com.sun.javafx.scene.control.behavior.KeyBinding;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
@@ -53,7 +54,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * SQL 매크로 기능을 지우너하기 위한 베이스 스킨

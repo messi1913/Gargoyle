@@ -10,6 +10,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.kyj.fx.voeditor.visual.diff.ChunkWrapper;
+import com.kyj.fx.voeditor.visual.diff.CompareResult;
+import com.kyj.fx.voeditor.visual.diff.DiffComparable;
+import com.kyj.fx.voeditor.visual.diff.TextBaseComparator;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
+
+import difflib.Chunk;
+import difflib.Delta;
+import difflib.Delta.TYPE;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -36,19 +48,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.kyj.fx.voeditor.visual.diff.ChunkWrapper;
-import com.kyj.fx.voeditor.visual.diff.DiffComparable;
-import com.kyj.fx.voeditor.visual.diff.CompareResult;
-import com.kyj.fx.voeditor.visual.diff.TextBaseComparator;
-
-import difflib.Chunk;
-import difflib.Delta;
-import difflib.Delta.TYPE;
 
 /**
  * 

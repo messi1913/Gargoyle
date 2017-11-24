@@ -28,10 +28,10 @@ import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.util.VoWizardUtil;
+import com.kyj.utils.EncrypUtil;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -99,10 +99,11 @@ public class DefaultDatabaseTableView extends BorderPane {
 					return DbUtil.getConnection();
 				}
 
-				return DbUtil.getConnection(driver, url, id, pass);
+				return DbUtil.getConnection(driver, url, id,   ValueUtil.isNotEmpty(pass) ? EncrypUtil.decryp(pass)  : pass );
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error(ValueUtil.toString(e));
+//				e.printStackTrace();
 			}
 			return null;
 		}

@@ -127,9 +127,10 @@ public class VoWizardUtil {
 		DatabaseTypeMappingFunction databaseTypeMappingFunction = new DatabaseTypeMappingFunction();
 
 		String tableName = selectedItem.getTableName();
+		String schemaName = selectedItem.getSchemaName();
 		String catalog = selectedItem.getCatalog();
 
-		List<String> pks = DbUtil.pks(con, catalog, tableName, rs -> {
+		List<String> pks = DbUtil.pks(con, catalog, schemaName, tableName, rs -> {
 
 			try {
 				return rs.getString(4).toLowerCase();
@@ -139,7 +140,7 @@ public class VoWizardUtil {
 			return "";
 		});
 
-		return DbUtil.columns(con, catalog, tableName, rs -> {
+		return DbUtil.columns(con, catalog, schemaName, tableName, rs -> {
 
 			TableModelDVO dvo = new TableModelDVO();
 			try {

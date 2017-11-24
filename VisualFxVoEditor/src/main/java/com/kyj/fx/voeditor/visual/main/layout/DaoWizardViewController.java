@@ -57,10 +57,13 @@ import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.utils.EncrypUtil;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -201,6 +204,41 @@ public class DaoWizardViewController {
 	@FXML
 	public void initialize() {
 
+		/**/
+
+		baseModel.addListener(new ChangeListener<TableDVO>() {
+
+			@Override
+			public void changed(ObservableValue<? extends TableDVO> observable, TableDVO oldValue, TableDVO newValue) {
+				if (newValue != null) {
+
+					TableMasterDVO tableMasterDVO = newValue.getTableMasterDVO();
+					txtTableName.setText(tableMasterDVO.getTableName());
+					// String tableName = tableMasterDVO.getTableName();
+					// String catalog = tableMasterDVO.getCatalog();
+					// String schemaName = tableMasterDVO.getSchemaName();
+					//
+					// if (ValueUtil.isNotEmpty(catalog)) {
+					// tableName = tableMasterDVO.getCatalog();
+					// }
+					//
+					// if (ValueUtil.isNotEmpty(schemaName)) {
+					// tableName = tableName.concat(".").concat(schemaName);
+					// }
+					//
+					// if (ValueUtil.isEmpty(catalog) &&
+					// ValueUtil.isEmpty(schemaName)) {
+					// tableName = tableMasterDVO.getTableName();
+					// } else if
+					// (ValueUtil.isNotEmpty(tableMasterDVO.getTableName())) {
+					// tableName =
+					// tableName.concat(".").concat(tableMasterDVO.getTableName());
+					// }
+
+				}
+			}
+
+		});
 		/*******************************/
 		// 17.11.21 KYJ
 		/* [시작] 파일경로 드래그 드롭 이벤트 처리 */
@@ -281,8 +319,10 @@ public class DaoWizardViewController {
 		colMethodNo.setCellValueFactory(new NumberingCellValueFactory<>(tbMethods.getItems()));
 
 		/*
-		 * 2015-11-02 기존에 사용하던 NumberingCellValueFactory을 적용할 수 없음. colParamNo컬럼같은경우는 method에 따라 데이터의 주소값이 바뀌는 타입이라 주소값이 바뀌는 상태에선 적절한 넘버링
-		 * 데이터가 화면에 보여주지않음. 하여 주소값을 계속 유지시킬 수 있도록 tbMethods에서 선택된 메소드정보에서 값을 참조하여 넘버링을 시킴.
+		 * 2015-11-02 기존에 사용하던 NumberingCellValueFactory을 적용할 수 없음.
+		 * colParamNo컬럼같은경우는 method에 따라 데이터의 주소값이 바뀌는 타입이라 주소값이 바뀌는 상태에선 적절한 넘버링
+		 * 데이터가 화면에 보여주지않음. 하여 주소값을 계속 유지시킬 수 있도록 tbMethods에서 선택된 메소드정보에서 값을
+		 * 참조하여 넘버링을 시킴.
 		 *
 		 * 2016-04-19 파람의 아이템을 삭제하고 다시 호출했을때 인덱스 순서가 맞지않던 버그 fix
 		 */
@@ -666,6 +706,8 @@ public class DaoWizardViewController {
 		return null;
 	}
 
+	private ObjectProperty<TableDVO> baseModel = new SimpleObjectProperty<>();
+
 	/**
 	 * 데이터베이스 선택시....
 	 *
@@ -678,27 +720,31 @@ public class DaoWizardViewController {
 		DefaultDatabaseTableView view = new DefaultDatabaseTableView();
 		TableDVO tableDVO = view.show();
 		if (tableDVO != null) {
-			TableMasterDVO tableMasterDVO = tableDVO.getTableMasterDVO();
+			// TableMasterDVO tableMasterDVO = tableDVO.getTableMasterDVO();
+			//
+			// String tableName = tableMasterDVO.getTableName();
+			// String catalog = tableMasterDVO.getCatalog();
+			// String schemaName = tableMasterDVO.getSchemaName();
+			//
+			// if (ValueUtil.isNotEmpty(catalog)) {
+			// tableName = tableMasterDVO.getCatalog();
+			// }
+			//
+			// if (ValueUtil.isNotEmpty(schemaName)) {
+			// tableName = tableName.concat(".").concat(schemaName);
+			// }
+			//
+			// if (ValueUtil.isEmpty(catalog) && ValueUtil.isEmpty(schemaName))
+			// {
+			// tableName = tableMasterDVO.getTableName();
+			// } else if (ValueUtil.isNotEmpty(tableMasterDVO.getTableName())) {
+			// tableName =
+			// tableName.concat(".").concat(tableMasterDVO.getTableName());
+			// }
 
-			String tableName = tableMasterDVO.getTableName();
-			String catalog = tableMasterDVO.getCatalog();
-			String schemaName = tableMasterDVO.getSchemaName();
+			baseModel.set(tableDVO);
 
-			if (ValueUtil.isNotEmpty(catalog)) {
-				tableName = tableMasterDVO.getCatalog();
-			}
-
-			if (ValueUtil.isNotEmpty(schemaName)) {
-				tableName = tableName.concat(".").concat(schemaName);
-			}
-
-			if (ValueUtil.isEmpty(catalog) && ValueUtil.isEmpty(schemaName)) {
-				tableName = tableMasterDVO.getTableName();
-			} else if (ValueUtil.isNotEmpty(tableMasterDVO.getTableName())) {
-				tableName = tableName.concat(".").concat(tableMasterDVO.getTableName());
-			}
-
-			txtTableName.setText(tableName);
+			// txtTableName.setText(tableName);
 			// TbmSysDaoDVO tbmSysDaoDVO = new TbmSysDaoDVO();
 
 			// FIXME 버그 체크
@@ -730,8 +776,10 @@ public class DaoWizardViewController {
 	 */
 	@FXML
 	public void btnMakeDefMouseClick() {
+
+		TableDVO tableDVO = baseModel.get();
 		String tableName = txtTableName.getText();
-		if (tableName == null || tableName.isEmpty()) {
+		if (tableDVO == null || tableName.isEmpty()) {
 			DialogUtil.showMessageDialog("테이블이 비어있습니다.");
 			return;
 		}
@@ -740,7 +788,7 @@ public class DaoWizardViewController {
 		// int size = items.size();
 		// int size =
 		// tbmSysDaoDVOProperty.get().getTbpSysDaoMethodsDVOList().size();
-		defaultDaoMethodByTable(items);
+		defaultDaoMethodByTable(tableDVO, items);
 
 	}
 
@@ -776,18 +824,24 @@ public class DaoWizardViewController {
 
 	/**
 	 * 데이터베이스 처리에의한 디폴트값(TbpSysDaoMethodsDVO) 생성
+	 * 
+	 * @param tableDVO
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2015. 10. 21.
 	 * @param items
 	 * @param size
 	 */
-	private void defaultDaoMethodByTable(ObservableList<TbpSysDaoMethodsDVO> items) {
+	private void defaultDaoMethodByTable(TableDVO tableDVO, ObservableList<TbpSysDaoMethodsDVO> items) {
 		String appendName = DateUtil.getCurrentDateString(DateUtil.SYSTEM_DATEFORMAT_YYYYMMDDHHMMSSS);
 		TbpSysDaoMethodsDVO e = addDefDaoMethod("dList" + appendName, true);
-		String tableName = txtTableName.getText();
-		List<String> columns = getTableColumns(tableName);
-		String sqlBody = QuerygenUtil.queryjen(tableName, columns);
+		// String tableName = txtTableName.getText();
+
+		String catalog = tableDVO.getTableMasterDVO().getCatalog();
+		String schemaName = tableDVO.getTableMasterDVO().getSchemaName();
+		String tableName = tableDVO.getTableMasterDVO().getTableName();
+		List<String> columns = getTableColumns(catalog, schemaName, tableName);
+		String sqlBody = QuerygenUtil.queryjen(catalog, schemaName, tableName, columns);
 		e.setSqlBody(sqlBody);
 	}
 
@@ -819,7 +873,7 @@ public class DaoWizardViewController {
 		return e;
 	}
 
-	private List<String> getTableColumns(String tableName) {
+	private List<String> getTableColumns(String catalog, String schema, String _tableName) {
 
 		try {
 
@@ -830,13 +884,36 @@ public class DaoWizardViewController {
 			String driver = instance.get(ResourceLoader.CUSTOM_DAOWIZARD_KEY_JDBC_DRIVER);
 
 			if (ValueUtil.isEmpty(driver, url)) {
-				return DbUtil.columns(tableName);
+				return DbUtil.columns(_tableName);
 			}
 
-			try (Connection connection = DbUtil.getConnection(driver, url, id, pass)) {
-				return DbUtil.columns(connection, tableName);
+			try (Connection connection = DbUtil.getConnection(driver, url, id,
+					ValueUtil.isNotEmpty(pass) ? EncrypUtil.decryp(pass) : pass)) {
+
+//				String catalog = null;
+//				String schema = null;
+//				String tableName = _tableName;
+//				String tmp = _tableName;
+//
+//				int lastIndexOf = ValueUtil.lastIndexOf(tmp, '.');
+//				if (lastIndexOf == -1)
+//					return DbUtil.columns(connection, null, null, tableName);
+//				else {
+//
+//					tableName = tmp.substring(lastIndexOf + 1);
+//					tmp = tmp.substring(0, lastIndexOf);
+//
+//					lastIndexOf = ValueUtil.lastIndexOf(tmp, '.');
+//					if (lastIndexOf != -1) {
+//						schema = tmp.substring(lastIndexOf + 1);
+//						catalog = tmp.substring(0, lastIndexOf);
+//					}
+//
+//				}
+
+				return DbUtil.columns(connection, catalog, schema, _tableName);
 			}
-			
+
 		} catch (Exception e1) {
 			return Collections.emptyList();
 		}

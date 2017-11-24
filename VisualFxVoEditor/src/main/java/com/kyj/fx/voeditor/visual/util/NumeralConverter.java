@@ -187,6 +187,14 @@ public class NumeralConverter {
 	public static String to16(int value) {
 		return to(value, 16);
 	}
+	
+	public static String to16(boolean value) {
+		return value ? "1" : "0";
+	}
+	
+	public static String to16(String value) {
+		return to16(Integer.parseInt(value));
+	}
 
 	/**
 	 * 10진수를 21진수로 변환합니다.

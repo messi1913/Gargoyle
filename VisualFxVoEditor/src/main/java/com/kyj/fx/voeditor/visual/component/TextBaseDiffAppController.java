@@ -13,11 +13,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.diff.ChunkWrapper;
 import com.kyj.fx.voeditor.visual.diff.CompareResult;
 import com.kyj.fx.voeditor.visual.diff.DiffComparable;
 import com.kyj.fx.voeditor.visual.diff.TextBaseComparator;
-import com.kyj.fx.fxloader.FXMLController;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -53,7 +54,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * @author KYJ

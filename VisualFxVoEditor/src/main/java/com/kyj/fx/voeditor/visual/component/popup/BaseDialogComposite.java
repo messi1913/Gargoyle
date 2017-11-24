@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -30,7 +31,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  * 에러내용을 보여주기 위한 뷰.

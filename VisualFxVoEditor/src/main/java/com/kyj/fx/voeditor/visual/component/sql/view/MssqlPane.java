@@ -39,7 +39,7 @@ import com.kyj.fx.voeditor.visual.component.text.ASTSqlCodeAreaHelper;
 import com.kyj.fx.voeditor.visual.component.text.MssqlASTSqlCodeAreaHelper;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
-import com.kyj.fx.voeditor.visual.functions.ThFunction;
+import com.kyj.fx.voeditor.visual.functions.FourThFunction;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -320,7 +320,7 @@ public class MssqlPane extends CommonsSqllPan {
 	/**
 	 * @최초생성일 2017. 9. 15.
 	 */
-	public static final ThFunction<String, String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (catalog, tableNamePattern,
+	public static final FourThFunction<String, String, String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (catalog, schema, tableNamePattern,
 			metaData) -> {
 		int cateIdx = tableNamePattern.indexOf('.');
 		int schemIdx = tableNamePattern.indexOf('.', cateIdx + 1);
@@ -358,7 +358,7 @@ public class MssqlPane extends CommonsSqllPan {
 
 		try (Connection connection = connectionSupplier.get()) {
 
-			List<String> columns = DbUtil.columns(connection, null, tableName, COLUMN_CONVERTER, t -> {
+			List<String> columns = DbUtil.columns(connection, null, null, tableName, COLUMN_CONVERTER, t -> {
 				try {
 					return t.getString(4);
 				} catch (SQLException ex) {
@@ -421,7 +421,7 @@ public class MssqlPane extends CommonsSqllPan {
 						return "<<<<ERROR>>>>";
 					};
 
-					columnList = DbUtil.columns(connection, null, tableName, COLUMN_CONVERTER, converter);
+					columnList = DbUtil.columns(connection, null, null,  tableName, COLUMN_CONVERTER, converter);
 
 				} catch (Exception e) {
 					LOGGER.error(ValueUtil.toString(e));

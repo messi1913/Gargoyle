@@ -21,10 +21,9 @@ import com.kyj.fx.voeditor.visual.component.scm.SVNItem;
 import com.kyj.fx.voeditor.visual.component.scm.SVNRepository;
 import com.kyj.fx.voeditor.visual.component.scm.SVNTreeView;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
 import com.kyj.utils.EncrypUtil;
-
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  *

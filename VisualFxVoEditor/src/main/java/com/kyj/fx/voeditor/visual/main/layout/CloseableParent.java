@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.scene.Parent;
-import kyj.Fx.dao.wizard.core.util.ValueUtil;
 
 /**
  *
