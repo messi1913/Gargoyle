@@ -7,11 +7,14 @@
  *******************************/
 package kyj.Fx.dao.wizard.core.util;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
  * @author KYJ
  *
  */
-public class ValueUtil {
+class ValueUtil {
 
 	/**
 	 * 에러 메세지 상세화
@@ -27,6 +30,33 @@ public class ValueUtil {
 			sb.append(s.getClassName()).append(".").append(s.getMethodName()).append("[").append(s.getLineNumber()).append("]\n");
 		}
 		return sb.toString();
+	}
+
+	public static boolean isEmpty(Object obj) {
+		return !isNotEmpty(obj);
+	}
+	
+	public static boolean isNotEmpty(Object obj) {
+		boolean flag = true;
+		if (obj != null) {
+			if (obj instanceof String) {
+				String valueOf = obj.toString().trim();
+				flag = valueOf.length() > 0 && valueOf != "" && !valueOf.equals("null");
+			} else if (obj instanceof Collection) {
+				Collection<?> list = (Collection<?>) obj;
+				flag = !list.isEmpty();
+
+				// flag = list.size() > 0;
+			} else if (obj instanceof Map) {
+
+				Map<?, ?> map = (Map<?, ?>) obj;
+				flag = map.size() > 0;
+			}
+		} else {
+			flag = false;
+		}
+		return flag;
+
 	}
 
 }

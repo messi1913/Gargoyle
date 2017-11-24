@@ -18,6 +18,55 @@ import java.util.StringTokenizer;
 public class QuerygenUtil {
 
 	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 24.
+	 * @param catalog
+	 * @param schemaName
+	 * @param tableName
+	 * @param columns
+	 * @return
+	 */
+	public static String queryjen(String catalog, String schemaName, String tableName, List<String> columns) {
+		tableName = tableName.trim();
+		StringBuffer buf = new StringBuffer();
+		buf.append("SELECT \n");
+		int cnt = 0;
+		for (String str : columns) {
+			buf.append(str + " ");
+			if (cnt != columns.size() - 1) {
+				buf.append(" , \n");
+			}
+			cnt++;
+		}
+
+		boolean isCatalogEmpty = ValueUtil.isEmpty(catalog);
+		boolean isSchemaEmpty = ValueUtil.isEmpty(schemaName);
+
+		String name = "";
+
+		if (!isCatalogEmpty) {
+			name = catalog.concat(".");
+		}
+
+		if (!isSchemaEmpty) {
+			name = name.concat(schemaName).concat(".");
+		}
+
+		name = name.concat(tableName);
+
+		buf.append("\n FROM " + name + " \n WHERE 1=1 \n");
+
+		for (String str : columns) {
+
+			String textMyEdit = getPrefixLowerTextMyEdit(str);
+			buf.append(" #if($" + textMyEdit + ") \n");
+			buf.append("AND " + str + " = :" + textMyEdit + "\n");
+			buf.append(" #end \n");
+		}
+		return buf.toString();
+	}
+
+	/**
 	 * Velocity 기반 SQL문을 작성한다.
 	 * 
 	 * @작성자 : KYJ
