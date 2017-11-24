@@ -40,7 +40,7 @@
 
 		<poi.word.version>3.14</poi.word.version>
 
-		<dao.wizard.jar.version>0.0.7-SNAPSHOT</dao.wizard.jar.version>
+		<dao.wizard.jar.version>0.0.8-SNAPSHOT</dao.wizard.jar.version>
 		<dao.wizard.jar.path.name>${user.home}/.m2/repository/kyj/Fx/dao/wizard/kyj.Fx.dao.wizard/${dao.wizard.jar.version}/kyj.fx.dao.wizard-${dao.wizard.jar.version}.jar</dao.wizard.jar.path.name>
 		<maven.plugin.url>http://repo.maven.apache.org/maven2</maven.plugin.url>
 
