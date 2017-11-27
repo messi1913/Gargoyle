@@ -71,12 +71,12 @@ abstract class ConnectionManager {
 		if (con != null) {
 			close(con);
 		}
-//		if(ValueUtil.isNotEmpty(driver))
-			Class.forName(driver);
-		
+		// if(ValueUtil.isNotEmpty(driver))
+		Class.forName(driver);
+
 		DriverManager.setLoginTimeout(loginTimeoutSec);
-		//		Driver d = DriverManager.getDriver(url);
-		
+		// Driver d = DriverManager.getDriver(url);
+
 		Connection connection = null;
 		if (ValueUtil.isEmpty(id, password)) {
 			connection = DriverManager.getConnection(url);
@@ -138,11 +138,11 @@ abstract class ConnectionManager {
 	public static DataSource getDataSource(String driver, String url, String id, String pass) throws Exception {
 		if (dataSource == null) {
 			// 비밀번호는 입력안하는경우도 있기때문에 검증에서 제외
-			/*2016-08-10
-			 * id도 입력안하는 경우가 있음 sqlite. by kyj
-			 * */
+			/*
+			 * 2016-08-10 id도 입력안하는 경우가 있음 sqlite. by kyj
+			 */
 			if (ValueUtil.isEmpty(driver, url)) {
-				throw new GargoyleConnectionFailException("Check 'Datatabse Settings' on the 'Configuration tab' ");
+				throw new GargoyleConnectionFailException("Driver or url is empty.");
 			}
 
 			dataSource = new DataSource();

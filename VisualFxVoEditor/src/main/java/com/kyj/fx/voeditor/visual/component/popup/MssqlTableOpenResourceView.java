@@ -77,7 +77,7 @@ public class MssqlTableOpenResourceView extends TableOpenResourceView {
 		@Override
 		public void close() {
 			super.close();
-			
+
 			if (dutyCount > 0) {
 				dutyCount = 0;
 				return;
@@ -87,13 +87,28 @@ public class MssqlTableOpenResourceView extends TableOpenResourceView {
 		}
 
 		/*
-		 * 초기화 처리 함수.
+		 * 초기화 처리 함수. <br/>
 		 *
 		 * @inheritDoc
 		 */
 		@Override
 		protected void init() {
 			Platform.runLater(() -> loadTable(false));
+		}
+
+		/*
+		 * 데이터 리로딩 <br/>
+		 * 
+		 * (non-Javadoc)
+		 * 
+		 * @see com.kyj.fx.voeditor.visual.component.popup.ResourceView#
+		 * btnRefleshOnMouseClick(javafx.scene.input.MouseEvent)
+		 */
+		@Override
+		public void btnRefleshOnMouseClick(MouseEvent event) {
+
+			// 데이터베이스 테이블정보를 리로드.
+			Platform.runLater(() -> loadTable(true));
 		}
 
 		/********************************
@@ -120,12 +135,17 @@ public class MssqlTableOpenResourceView extends TableOpenResourceView {
 						lvResources.getItems().addAll(select);
 					} else {
 						ColumnMapRowMapper mapper = new ColumnMapRowMapper();
+
+						// [start] Find Tables
 						List<Map<String, Object>> tables = tables(connection, "", rs -> {
 
 							try {
 								Map<String, Object> mapRow = mapper.mapRow(rs, rs.getRow());
-								// if(rs.getString(2))
 								mapRow.put("TABLE_NAME", mapRow.get("TABLE_SCHEM") + "." + mapRow.get("TABLE_NAME"));
+								mapRow.put("TABLE_CAT", mapRow.get("TABLE_CAT"));
+								mapRow.put("TABLE_SCHEM", mapRow.get("TABLE_SCHEM"));
+								mapRow.put("SIMPLE_TABLE_NAME", mapRow.get("TABLE_NAME"));
+
 								return mapRow;
 							} catch (SQLException e) {
 								e.printStackTrace();
@@ -133,9 +153,50 @@ public class MssqlTableOpenResourceView extends TableOpenResourceView {
 
 							return Collections.emptyMap();
 						});
+						// [end] Find Tables
 
-						setResources(tables);
-						lvResources.getItems().addAll(tables);
+						// [start] Find Procedures
+						List<Map<String, Object>> procedures = procedures(connection, "", rs -> {
+
+							try {
+								Map<String, Object> mapRow = mapper.mapRow(rs, rs.getRow());
+
+								// 코드변경을 줄이기 위해 테이블명형태로 변환
+								// mapRow.put("PROCEDURE_CAT",
+								// mapRow.get("PROCEDURE_CAT"));
+								// mapRow.put("PROCEDURE_SCHEM",
+								// mapRow.get("TABLE_CAT"));
+								// mapRow.put("PROCEDURE_NAME",
+								// mapRow.get("TABLE_SCHEM"));
+
+								String procedureName = mapRow.get("PROCEDURE_NAME").toString();
+								// int indexOf = procedureName.indexOf(";");
+
+								int lastIndexOf = ValueUtil.lastIndexOf(procedureName, ';');
+								if (lastIndexOf >= 0) {
+									procedureName = procedureName.substring(0, lastIndexOf);
+								}
+
+								mapRow.put("TABLE_NAME", mapRow.get("PROCEDURE_SCHEM") + "." + procedureName);
+								mapRow.put("TABLE_CAT", mapRow.get("PROCEDURE_CAT"));
+								mapRow.put("TABLE_SCHEM", mapRow.get("PROCEDURE_SCHEM"));
+								mapRow.put("SIMPLE_TABLE_NAME", procedureName);
+
+								return mapRow;
+							} catch (SQLException e) {
+								e.printStackTrace();
+							}
+
+							return Collections.emptyMap();
+						});
+						// [end] Find Procedures
+
+						List<Map<String, Object>> data = new ArrayList<>();
+						data.addAll(tables);
+						data.addAll(procedures);
+						// Collections.addAll(c, elements)
+						setResources(data);
+						lvResources.getItems().addAll(data);
 
 					}
 
@@ -175,19 +236,14 @@ public class MssqlTableOpenResourceView extends TableOpenResourceView {
 			};
 		}
 
-		@Override
-		public void btnRefleshOnMouseClick(MouseEvent event) {
-
-			// 데이터베이스 테이블정보를 리로드.
-			Platform.runLater(() -> loadTable(true));
-		}
-
 		/*
 		 * @inheritDoc
 		 */
 		@Override
 		public boolean isMatch(Map<String, Object> value, String text) {
+
 			boolean equals = getTableName(value).toUpperCase().indexOf(text.toUpperCase()) >= 0;
+
 			return equals;
 		}
 	}
@@ -256,6 +312,84 @@ public class MssqlTableOpenResourceView extends TableOpenResourceView {
 			}
 
 		}
+
+		return tables;
+	}
+
+	/**
+	 * 
+	 * *
+	 * <OL>
+	 * <LI><B>PROCEDURE_CAT</B> String {@code =>} procedure catalog (may be
+	 * <code>null</code>)
+	 * <LI><B>PROCEDURE_SCHEM</B> String {@code =>} procedure schema (may be
+	 * <code>null</code>)
+	 * <LI><B>PROCEDURE_NAME</B> String {@code =>} procedure name
+	 * <LI>reserved for future use
+	 * <LI>reserved for future use
+	 * <LI>reserved for future use
+	 * <LI><B>REMARKS</B> String {@code =>} explanatory comment on the procedure
+	 * <LI><B>PROCEDURE_TYPE</B> short {@code =>} kind of procedure:
+	 * <UL>
+	 * <LI>procedureResultUnknown - Cannot determine if a return value will be
+	 * returned
+	 * <LI>procedureNoResult - Does not return a return value
+	 * <LI>procedureReturnsResult - Returns a return value
+	 * </UL>
+	 * <LI><B>SPECIFIC_NAME</B> String {@code =>} The name which uniquely
+	 * identifies this procedure within its schema.
+	 * </OL>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 27.
+	 * @param connection
+	 * @param procedureNamePattern
+	 * @param converter
+	 * @return
+	 * @throws Exception
+	 */
+	public static <T> List<T> procedures(Connection connection, String procedureNamePattern, Function<ResultSet, T> converter)
+			throws Exception {
+		if (converter == null)
+			throw new GargoyleException(GargoyleException.ERROR_CODE.PARAMETER_EMPTY, "converter is null ");
+
+		List<T> tables = new ArrayList<>();
+
+		DatabaseMetaData metaData = connection.getMetaData();
+
+		ResultSet schemas = metaData.getCatalogs();
+		while (schemas.next()) {
+
+			// String schemaName = schemas.getString(1);
+			String catalog = schemas.getString(1);
+			// if(schemaName.startsWith("##"))
+			// continue;
+
+			ResultSet rs = metaData.getProcedures(catalog, null, "%" + procedureNamePattern + "%");
+
+			// String tableNamePatternUpperCase =
+			// tableNamePattern.toUpperCase();
+			while (rs.next()) {
+
+				// 2016-08-18 특정데이터베이스(sqlite)에서는 인덱스 트리거정보도 동시에 출력된다.
+				// String tableType = rs.getString("PROCEDURE_NAME");
+				// if ("TABLE".equals(tableType)) {
+
+				// converter.apply(rs);
+				// String procedureName = rs.getString("PROCEDURE_NAME");
+				// if
+				// (tableName.toUpperCase().indexOf(tableNamePatternUpperCase)
+				// != -1) {
+				T apply = converter.apply(rs);
+				if (apply != null)
+					tables.add(apply);
+				// }
+
+				// }
+
+			}
+
+		} // end while
 
 		return tables;
 	}

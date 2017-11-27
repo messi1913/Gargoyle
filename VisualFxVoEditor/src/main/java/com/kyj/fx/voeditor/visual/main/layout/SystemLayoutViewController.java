@@ -127,6 +127,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -241,8 +242,8 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			TitledPane titledPane = loader.load();
 			VBox.setVgrow(titledPane, Priority.ALWAYS);
 			accordionItems.getChildren().add(titledPane);
-//			DAOLoaderController controller = loader.getController();
-//			controller.setSystemLayoutViewController(this);
+			// DAOLoaderController controller = loader.getController();
+			// controller.setSystemLayoutViewController(this);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -1362,7 +1363,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		File file = selectedItem.getValue().getFile();
 		if (file == null || !file.exists())
 			return;
-		
+
 		Dragboard board = treeProjectFile.startDragAndDrop(TransferMode.LINK);
 		ClipboardContent content = new ClipboardContent();
 		content.putFiles(Arrays.asList(file));
@@ -1468,16 +1469,22 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 			JavaProjectFileWrapper value = selectedItem.getValue();
 			if (value != null) {
-				File file = value.getFile();
-				LOGGER.debug(String.format(" file : %s ", file.toPath()));
-				if (file.exists() && file.isFile()) {
-					try {
-						boolean javaFile = FileUtil.isJavaFile(file);
-						LOGGER.debug("is javafile ? " + javaFile);
-						openFile(file);
-					} catch (Exception e) {
-						LOGGER.error(ValueUtil.toString(e));
+				//마우스 좌클릭인경우에만 이벤트 처리될수있도록 수정
+				if (event.getButton() == MouseButton.PRIMARY) {
+					if (event.isConsumed())
+						return;
+					File file = value.getFile();
+					LOGGER.debug(String.format(" file : %s ", file.toPath()));
+					if (file.exists() && file.isFile()) {
+						try {
+							boolean javaFile = FileUtil.isJavaFile(file);
+							LOGGER.debug("is javafile ? " + javaFile);
+							openFile(file);
+						} catch (Exception e) {
+							LOGGER.error(ValueUtil.toString(e));
+						}
 					}
+					event.consume();
 				}
 
 			}

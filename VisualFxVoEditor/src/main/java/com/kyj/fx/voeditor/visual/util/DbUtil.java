@@ -39,8 +39,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.management.DescriptorKey;
-
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.json.simple.JSONObject;
@@ -63,7 +61,6 @@ import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.functions.BiTransactionScope;
 import com.kyj.fx.voeditor.visual.functions.FourThFunction;
 import com.kyj.fx.voeditor.visual.functions.ResultSetToMapConverter;
-import com.kyj.fx.voeditor.visual.functions.ThFunction;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.utils.EncrypUtil;
@@ -386,6 +383,48 @@ public class DbUtil extends ConnectionManager {
 	public static <T> List<T> select(DataSource dataSource, final String sql, MapSqlParameterSource paramMap, RowMapper<T> rowMapper)
 			throws Exception {
 		return selectLimit(dataSource, sql, paramMap, rowMapper, -1);
+	}
+
+	
+	public static String selectScala(DataSource dataSource, final String sql, Map<String,Object> paramMap) {
+		return selectScala(dataSource, sql, new MapSqlParameterSource(paramMap));
+	}
+	
+	/**
+	 * 첫번쨰로우의 첫번쨰 컬럼값 리턴. <br/>
+	 * 값이 없는경우 NULL <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 27.
+	 * @param dataSource
+	 * @param sql
+	 * @param paramMap
+	 * @return
+	 */
+	public static String selectScala(DataSource dataSource, final String sql, MapSqlParameterSource paramMap) {
+		String r = null;
+		try {
+			noticeQuery(sql);
+			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+
+			ResultSetExtractor<String> extr = new ResultSetExtractor<String>() {
+
+				@Override
+				public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+					if (rs.next()) {
+						return rs.getString(1);
+					}
+					return null;
+				}
+			};
+			r = jdbcTemplate.query(sql, paramMap, extr);
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			cleanDataSource();
+		}
+		return r;
 	}
 
 	/**

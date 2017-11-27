@@ -10,8 +10,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
@@ -28,11 +28,12 @@ import javafx.scene.control.TreeItem;
  */
 public abstract class SchemaItemTree<T> extends DatabaseItemTree<T> {
 
-//	private static final Logger LOGGER = LoggerFactory.getLogger(SchemaItemTree.class);
+	// private static final Logger LOGGER =
+	// LoggerFactory.getLogger(SchemaItemTree.class);
 
 	private DatabaseItemTree<T> parent;
 
-	public Supplier<Connection> conSupplier;
+	public ConnectionSupplier conSupplier;
 
 	public SchemaItemTree() throws Exception {
 		super();
@@ -74,37 +75,32 @@ public abstract class SchemaItemTree<T> extends DatabaseItemTree<T> {
 				childrens.addAll(applyChildren(select));
 			}
 
-			// if (childrens == null)
-			// childrens = FXCollections.observableArrayList();
-
 			// SQL로 불가능한 처리는 Connection을 받아 처리하도록한다.
 			ObservableList<TreeItem<DatabaseItemTree<T>>> second = applyChildren(connection, getName());
 			if (second != null)
 				childrens.addAll(second);
 
 			String catalog = this.getName();
-			// try (Connection con = getConnection()) {
-			ResultSet rs = connection.getMetaData().getProcedures(catalog, null, "%");
 
-			while (rs.next()) {
-				String cat = rs.getString(1);
-				String schem = rs.getString(2);
-				String name = rs.getString(3);
+			try (ResultSet rs = connection.getMetaData().getProcedures(catalog, null, "%")) {
+				while (rs.next()) {
+					String cat = rs.getString(1);
+					String schem = rs.getString(2);
+					String name = rs.getString(3);
 
-				String remark = rs.getString(7);
-				String type = rs.getString(8);
+					String remark = rs.getString(7);
+					String type = rs.getString(8);
 
-				// LOGGER.debug("cat {} schem {} name {} {} ", cat, schem, name,
-				// type);
+					DatabaseItemTree<T> procd = createProcedureItemTree(cat, schem, name, type, remark);
+					if (procd != null) {
+						childrens.add(new TreeItem<>(procd));
+					}
 
-				DatabaseItemTree<T> procd = createProcedureItemTree(cat, schem, name, type, remark);
-				if (procd != null)
-					childrens.add(new TreeItem<>(procd));
+				}
 
+				// Functions
+				childrens.addAll(getFunctions());
 			}
-
-			// Functions
-			childrens.addAll(getFunctions());
 
 		} finally {
 			if (connection != null)

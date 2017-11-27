@@ -86,14 +86,14 @@ public class MSSQLSchemaItemTree extends SchemaItemTree<String> {
 		}
 
 		if (procedureFilter(cat, schem, name, type)) {
-			DatabaseItemTree<String> createProcedureItemTree = super.createProcedureItemTree(cat, schem, name, type, remark);
+			
+			DatabaseItemTree<String> createProcedureItemTree = new MSSQLProcedureItemTree(this, cat, schem, name, remark);
 			createProcedureItemTree.setName(toProcedureName(cat, schem, name, type));
+
 			return createProcedureItemTree;
 		}
 		return null;
 	}
-	
-	
 
 	protected boolean procedureFilter(String cat, String schem, String name, String type) {
 		return !"sys".equals(schem);
@@ -102,5 +102,7 @@ public class MSSQLSchemaItemTree extends SchemaItemTree<String> {
 	protected String toProcedureName(String cat, String schem, String name, String type) {
 		return String.format("%s.%s", schem, name);
 	}
+	
+	
 
 }

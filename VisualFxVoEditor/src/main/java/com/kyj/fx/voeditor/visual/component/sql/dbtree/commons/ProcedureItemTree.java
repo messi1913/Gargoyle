@@ -4,8 +4,8 @@ package com.kyj.fx.voeditor.visual.component.sql.dbtree.commons;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -25,7 +25,7 @@ public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 
 	private SchemaItemTree<T> parent;
 
-	public Supplier<Connection> conSupplier;
+	private ConnectionSupplier conSupplier;
 
 	public ProcedureItemTree() throws Exception {
 		super();
@@ -44,6 +44,10 @@ public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 		this.schem = schem;
 		this.remark = remark;
 		setName(procedureName);
+	}
+
+	public ConnectionSupplier getConSupplier() {
+		return conSupplier;
 	}
 
 	public String getCat() {
@@ -127,6 +131,17 @@ public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 	@Override
 	public String toString() {
 		return getName();
+	}
+
+	/**
+	 * 프로시저 내용을 리턴한다. <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 27.
+	 * @return
+	 */
+	public String readProcedureContent() {
+		return "";
 	}
 
 }

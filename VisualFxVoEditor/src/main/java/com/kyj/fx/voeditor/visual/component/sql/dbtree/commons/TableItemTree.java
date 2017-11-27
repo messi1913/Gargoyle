@@ -9,8 +9,8 @@ package com.kyj.fx.voeditor.visual.component.sql.dbtree.commons;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
+import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
@@ -25,7 +25,7 @@ public abstract class TableItemTree<T> extends SchemaItemTree<T> {
 
 	private SchemaItemTree<T> parent;
 
-	public Supplier<Connection> conSupplier;
+	public ConnectionSupplier conSupplier;
 
 	public TableItemTree() throws Exception {
 		super();

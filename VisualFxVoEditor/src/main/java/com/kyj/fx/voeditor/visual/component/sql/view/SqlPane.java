@@ -36,9 +36,10 @@ import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ColumnExpress
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableView.ValueExpression;
 import com.kyj.fx.voeditor.visual.component.grid.EditableTableViewComposite;
 import com.kyj.fx.voeditor.visual.component.macro.MacroControl;
-import com.kyj.fx.voeditor.visual.component.popup.ResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.popup.VariableMappingView;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ProcedureColumnsTree;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ProcedureItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
@@ -60,8 +61,8 @@ import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil.CustomInputDialogAction;
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxCollectors;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -428,7 +429,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		defaultSelectedItems();
 
-		sqlTab = createTabItem();
+		sqlTab = createTabItem(null);
 		sqlTabPane = new SqlTabPane(sqlTab);
 		sqlEditLayout.setCenter(sqlTabPane);
 
@@ -704,7 +705,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * 컨텍스트 메뉴 생성 및 기능 적용
 	 *
 	 *
-	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
+	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
+	 * setAccelerator에 등록된 이벤트가 호출안됨
 	 * 
 	 *
 	 * @param schemaTree2
@@ -746,12 +748,13 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		menuReflesh.setAccelerator(new KeyCodeCombination(KeyCode.F5));
 
 		MenuItem menuFindProcedure = new MenuItem("Find Procedure");
-		// menuFindProcedure.setAccelerator(new KeyCodeCombination(KeyCode.P,
-		// KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
 		menuFindProcedure.setOnAction(this::menuFindProcedureOnAction);
 
-		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuEditShowData, menuFindTable, menuFindProcedure, menuProperties,
-				new SeparatorMenuItem(), menuReflesh);
+		MenuItem menuReadProcedure = new MenuItem("Read Procedure");
+		menuReadProcedure.setOnAction(this::menuReadProcedureOnAction);
+
+		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuEditShowData, menuFindTable, menuFindProcedure, menuReadProcedure,
+				menuProperties, new SeparatorMenuItem(), menuReflesh);
 		schemaTree.setContextMenu(contextMenu);
 
 	}
@@ -911,13 +914,15 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 *
 	 * 2016-12-09 CodeAssistHelper 기능 추가.
 	 *
-	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
+	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
+	 * setAccelerator에 등록된 이벤트가 호출안됨
 	 *
 	 * @return
 	 */
-	SqlTab createTabItem() {
+	SqlTab createTabItem(String text) {
 		SqlTab sqlTab = new SqlTab(this::txtSqlOnKeyEvent);
-
+		if (text != null)
+			sqlTab.setText(text);
 		SqlKeywords sqlNode = sqlTab.getSqlNode();
 
 		// TODO
@@ -942,8 +947,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		MenuItem menuShowDotNetApplicationCode = new MenuItem("Show Application Code [C#]");
 		menuShowDotNetApplicationCode.setOnAction(this::menuShowDotNetApplicationCodeOnAction);
-		
-		menuFunc.getItems().addAll(menuQueryMacro, menuFormatter, menuShowApplicationCode , menuShowDotNetApplicationCode);
+
+		menuFunc.getItems().addAll(menuQueryMacro, menuFormatter, menuShowApplicationCode, menuShowDotNetApplicationCode);
 
 		contextMenu.getItems().add(menuFunc);
 		return sqlTab;
@@ -1028,8 +1033,27 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * @param e
 	 */
 	public void btnAddTabOnClick(MouseEvent e) {
-		sqlTabPane.getTabs().add(createTabItem());
-		sqlTabPane.getSelectionModel().selectLast();
+		newTab(true);
+	}
+
+	private SqlTab newTab(boolean select) {
+		return newTab(select, null);
+	}
+
+	/**
+	 * 새로운 탭 생성
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 27.
+	 * @param select
+	 * @return
+	 */
+	protected SqlTab newTab(boolean select, String text) {
+		SqlTab createTabItem = createTabItem(text);
+		sqlTabPane.getTabs().add(createTabItem);
+		if (select)
+			sqlTabPane.getSelectionModel().selectLast();
+		return createTabItem;
 	}
 
 	/********************************
@@ -1057,7 +1081,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				// String driverName =
 				// DbUtil.getDriverNameByConnection(connection);
 				// String dbmsName = ValueUtil.getDriverToDBMSName(driverName);
-				showProperties(connectionSupplier, /* catalog */null, /* schemaName */null, selectedSQLText);
+				showProperties(connectionSupplier, /* catalog */null,
+						/* schemaName */null, selectedSQLText);
 			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
 			}
@@ -1544,6 +1569,35 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	}
 
 	/**
+	 * 프로시저 내용을 읽어들인다. <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 27.
+	 * @param e
+	 */
+	public void menuReadProcedureOnAction(ActionEvent e) {
+		if (e.isConsumed()) {
+			return;
+		}
+
+		TreeItem<K> selectedItem = this.schemaTree.getSelectionModel().getSelectedItem();
+		if (selectedItem == null || selectedItem.getValue() == null)
+			return;
+
+		K value = selectedItem.getValue();
+
+		Class<? extends Object> cls = value.getClass();
+		boolean check = ProcedureItemTree.class.isAssignableFrom(cls) && !ProcedureColumnsTree.class.isAssignableFrom(cls);
+		if (check) {
+			ProcedureItemTree<T> tmp = (ProcedureItemTree<T>) value;
+			String readProcedureContent = tmp.readProcedureContent();
+			SqlTab newTab = newTab(true, tmp.getProcedureName());
+			newTab.appendTextSql(readProcedureContent);
+		}
+
+	}
+
+	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 9. 12.
 	 */
@@ -1723,8 +1777,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						});
 
 						FxUtil.installAutoTextFieldBinding(txtTable, () -> {
-							return searchPattern(txtSchema.getText(), txtTable.getText()).stream()
-									.map(v -> stringConverter.apply(v.getValue())/* v.getValue().getName() */).collect(Collectors.toList());
+							return searchPattern(txtSchema.getText(), txtTable.getText()).stream().map(v -> stringConverter.apply(
+									v.getValue())/* v.getValue().getName() */).collect(Collectors.toList());
 						});
 						txtSchema.setText(_defaultSchema);
 
@@ -1733,7 +1787,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						if (null != selectedItem) {
 							K value = selectedItem.getValue();
 							if (value instanceof TableItemTree) {
-								txtTable.setText(stringConverter.apply(value) /* value.getName() */);
+								txtTable.setText(stringConverter
+										.apply(value) /* value.getName() */);
 							}
 						}
 
