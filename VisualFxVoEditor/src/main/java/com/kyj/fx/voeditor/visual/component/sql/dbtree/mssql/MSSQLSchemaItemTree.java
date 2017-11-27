@@ -15,12 +15,15 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TreeItem;
+import javafx.scene.layout.StackPane;
 
 /**
  * 데이터베이스 스키마 정보 출력
@@ -64,7 +67,7 @@ public class MSSQLSchemaItemTree extends SchemaItemTree<String> {
 				LOGGER.debug("TABLE_CAT: {} TABLE_SCHEM:  {}  TABLE_NAME : {} TABLE_TYPE : {} ", tables.getString(1), tables.getString(2),
 						tables.getString(3), tableType);
 				MSSQLTableItemTree mssqlTableItemTree = new MSSQLTableItemTree(this, tables.getString(2) + "." + tables.getString(3));
-				TreeItem<DatabaseItemTree<String>> treeItem = new TreeItem<>(mssqlTableItemTree);
+				TreeItem<DatabaseItemTree<String>> treeItem = new TreeItem<>(mssqlTableItemTree, mssqlTableItemTree.createGraphics());
 				observableArrayList.add(treeItem);
 			}
 
@@ -86,7 +89,7 @@ public class MSSQLSchemaItemTree extends SchemaItemTree<String> {
 		}
 
 		if (procedureFilter(cat, schem, name, type)) {
-			
+
 			DatabaseItemTree<String> createProcedureItemTree = new MSSQLProcedureItemTree(this, cat, schem, name, remark);
 			createProcedureItemTree.setName(toProcedureName(cat, schem, name, type));
 
@@ -102,7 +105,5 @@ public class MSSQLSchemaItemTree extends SchemaItemTree<String> {
 	protected String toProcedureName(String cat, String schem, String name, String type) {
 		return String.format("%s.%s", schem, name);
 	}
-	
-	
 
 }

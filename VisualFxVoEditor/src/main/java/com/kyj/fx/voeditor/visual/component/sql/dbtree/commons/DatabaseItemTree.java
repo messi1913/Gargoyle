@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -18,6 +19,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * @author KYJ
@@ -113,7 +116,8 @@ public abstract class DatabaseItemTree<T> implements IConnectionByChildrens<T> {
 	 * @return
 	 */
 	public Node createGraphics() {
-		return null;
+		Image fxImage = new Image(getClass().getResourceAsStream("../database.png"), 15d, 15d, false, false);
+		return new ImageView(fxImage);
 	}
 
 	/*

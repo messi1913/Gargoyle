@@ -15,7 +15,10 @@ import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * @author KYJ
@@ -76,8 +79,8 @@ public abstract class TableItemTree<T> extends SchemaItemTree<T> {
 				childrens.addAll(applyChildren(select));
 			}
 
-//			if (childrens == null)
-//				childrens = FXCollections.observableArrayList();
+			// if (childrens == null)
+			// childrens = FXCollections.observableArrayList();
 
 			// SQL로 불가능한 처리는 Connection을 받아 처리하도록한다.
 			ObservableList<TreeItem<DatabaseItemTree<T>>> second = applyChildren(connection, parent.getName(), getName());
@@ -89,6 +92,12 @@ public abstract class TableItemTree<T> extends SchemaItemTree<T> {
 				connection.close();
 		}
 
+	}
+
+	@Override
+	public Node createGraphics() {
+		Image fxImage = new Image(getClass().getResourceAsStream("../table.png"), 15d, 15d, false, false);
+		return new ImageView(fxImage);
 	}
 
 	public Connection getConnection() {

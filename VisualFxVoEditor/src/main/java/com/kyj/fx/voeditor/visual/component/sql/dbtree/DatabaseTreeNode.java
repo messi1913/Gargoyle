@@ -11,9 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ColumnItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
-import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ProcedureItemTree;
-import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.SchemaItemTree;
-import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -40,17 +37,33 @@ public class DatabaseTreeNode {
 	 * @param file
 	 * @return
 	 * @User KYJ
+	 * @deprecated 각 클래스별 createGraphics함수로 별도 구현할 수 있도록 수정.
 	 */
+	@Deprecated
 	public static ImageView getDatabaseImage() {
 		Image fxImage = new Image(DatabaseTreeNode.class.getResourceAsStream("database.png"), 15d, 15d, false, false);
 		return new ImageView(fxImage);
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 27.
+	 * @return
+	 * @deprecated 각 클래스별 createGraphics함수로 별도 구현할 수 있도록 수정.
+	 */
+	@Deprecated
 	public static Node getTableImage() {
 		Image fxImage = new Image(DatabaseTreeNode.class.getResourceAsStream("table.png"), 15d, 15d, false, false);
 		return new ImageView(fxImage);
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 27.
+	 * @return
+	 * @deprecated 각 클래스별 createGraphics함수로 별도 구현할 수 있도록 수정.
+	 */
+	@Deprecated
 	public static Node getColumnImage() {
 		Image fxImage = new Image(DatabaseTreeNode.class.getResourceAsStream("column.png"), 15d, 15d, false, false);
 		return new ImageView(fxImage);
@@ -92,7 +105,7 @@ public class DatabaseTreeNode {
 			private ObservableList<TreeItem<DatabaseItemTree<String>>> buildChildren(TreeItem<DatabaseItemTree<String>> treeItem) {
 
 				DatabaseItemTree<String> f = treeItem.getValue();
-				// if (treeItem.getChildren().isEmpty()) {
+
 				if (f == null) {
 					return FXCollections.emptyObservableList();
 				} else {
@@ -107,11 +120,6 @@ public class DatabaseTreeNode {
 					}
 				}
 
-				// }
-
-				if (f == null) {
-					return FXCollections.emptyObservableList();
-				}
 				if (f instanceof ColumnItemTree) {
 					return FXCollections.emptyObservableList();
 				}
@@ -139,18 +147,24 @@ public class DatabaseTreeNode {
 
 	public static Node getGraphics(final DatabaseItemTree<String> f) {
 		if (f != null) {
-			if (f instanceof ColumnItemTree) {
-				return getColumnImage();
-			} else if (f instanceof TableItemTree) {
-				return getTableImage();
-			} else if (f instanceof ProcedureItemTree) {
-				//Not yet.
-			} else if (f instanceof SchemaItemTree) {
-				return getDatabaseImage();
-			}
+			return f.createGraphics();
+			
+			//각 클래스별 별도 구현. 더상의 캐스팅은 없다.
+			
+			// if (f instanceof ProcedureItemTree) {
+			// ProcedureItemTree<String> tmp = (ProcedureItemTree<String>) f;
+			// return tmp.createGraphics();
+			// } else if (f instanceof ColumnItemTree) {
+			// return getColumnImage();
+			// } else if (f instanceof TableItemTree) {
+			// return getTableImage();
+			// } else if (f instanceof SchemaItemTree) {
+			// return getDatabaseImage();
+			// }
+			
 		}
 
-		return new ImageView();
+		return null; // .new ImageView();
 	}
 
 }

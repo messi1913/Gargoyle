@@ -11,9 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
 import javafx.collections.FXCollections;
+import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * @author KYJ
@@ -77,6 +81,12 @@ public abstract class ColumnItemTree<T> extends TableItemTree<T> {
 	 */
 	public void setPrimaryKey(boolean isPrimaryKey) {
 		this.isPrimaryKey = isPrimaryKey;
+	}
+
+	@Override
+	public Node createGraphics() {
+		Image fxImage = new Image(getClass().getResourceAsStream("../column.png"), 15d, 15d, false, false);
+		return new ImageView(fxImage);
 	}
 
 	/*

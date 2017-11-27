@@ -13,7 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * @author KYJ
@@ -60,6 +63,12 @@ public class ProcedureColumnsTree<T> extends ProcedureItemTree<T> {
 	@Override
 	public void read() throws Exception {
 
+	}
+
+	@Override
+	public Node createGraphics() {
+		Image fxImage = new Image(getClass().getResourceAsStream("../column.png"), 15d, 15d, false, false);
+		return new ImageView(fxImage);
 	}
 
 	@Override

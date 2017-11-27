@@ -12,7 +12,10 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * 
@@ -121,6 +124,11 @@ public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 
 	public void setParent(SchemaItemTree<T> parent) {
 		this.parent = parent;
+	}
+
+	@Override
+	public Node createGraphics() {
+		return new ImageView(new Image(getClass().getResourceAsStream("../Procedure.png")));
 	}
 
 	/*
