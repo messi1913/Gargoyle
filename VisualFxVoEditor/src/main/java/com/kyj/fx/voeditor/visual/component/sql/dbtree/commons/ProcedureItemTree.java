@@ -2,8 +2,12 @@
 package com.kyj.fx.voeditor.visual.component.sql.dbtree.commons;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -26,6 +30,8 @@ import javafx.scene.image.ImageView;
  */
 public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProcedureItemTree.class);
+
 	private SchemaItemTree<T> parent;
 
 	private ConnectionSupplier conSupplier;
@@ -47,6 +53,7 @@ public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 		this.schem = schem;
 		this.remark = remark;
 		setName(procedureName);
+
 	}
 
 	public ConnectionSupplier getConSupplier() {
@@ -108,10 +115,10 @@ public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 	@Override
 	public void read() throws Exception {
 
-		Connection con = getConnection();
-		List<Map<String, Object>> procedureColumns = DbUtil.getProcedureColumns(con, cat, schem, getProcedureName());
-		getChildrens().addAll(applyChildren(procedureColumns));
-
+		try (Connection con = getConnection()) {
+			List<Map<String, Object>> procedureColumns = DbUtil.getProcedureColumns(con, cat, schem, getProcedureName());
+			getChildrens().addAll(applyChildren(procedureColumns));
+		}
 	}
 
 	public Connection getConnection() {
@@ -150,6 +157,35 @@ public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 	 */
 	public String readProcedureContent() {
 		return "";
+	}
+
+	/**
+	 * 프로시저 실행 템플릿 코드 리턴
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 27.
+	 * @return
+	 */
+	public String getExecuteProcedureTemplate() {
+		return null;
+	}
+
+	/**
+	 * 프로시저 파라미터 리턴
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 27.
+	 * @return
+	 */
+	public List<Map<String, Object>> getProcedureParams() {
+
+		try (Connection con = getConnection()) {
+			return DbUtil.getProcedureColumns(con, getCat(), getSchem(), procedureName);
+		} catch (SQLException e) {
+			LOGGER.error(ValueUtil.toString(e));
+		}
+
+		return null;
 	}
 
 }

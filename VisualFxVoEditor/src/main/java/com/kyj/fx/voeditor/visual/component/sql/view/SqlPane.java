@@ -753,8 +753,11 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		MenuItem menuReadProcedure = new MenuItem("Read Procedure");
 		menuReadProcedure.setOnAction(this::menuReadProcedureOnAction);
 
+		MenuItem menuExecuteProcedure = new MenuItem("Execute Procedure");
+		menuExecuteProcedure.setOnAction(this::menuExecuteProcedure);
+
 		ContextMenu contextMenu = new ContextMenu(menu, menuShowData, menuEditShowData, menuFindTable, menuFindProcedure, menuReadProcedure,
-				menuProperties, new SeparatorMenuItem(), menuReflesh);
+				menuExecuteProcedure, menuProperties, new SeparatorMenuItem(), menuReflesh);
 		schemaTree.setContextMenu(contextMenu);
 
 	}
@@ -1569,6 +1572,33 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	}
 
 	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 11. 27.
+	 * @param e
+	 */
+	public void menuExecuteProcedure(ActionEvent e) {
+		if (e.isConsumed()) {
+			return;
+		}
+
+		TreeItem<K> selectedItem = this.schemaTree.getSelectionModel().getSelectedItem();
+		if (selectedItem == null || selectedItem.getValue() == null)
+			return;
+
+		K value = selectedItem.getValue();
+
+		Class<? extends Object> cls = value.getClass();
+		boolean check = ProcedureItemTree.class.isAssignableFrom(cls) && !ProcedureColumnsTree.class.isAssignableFrom(cls);
+		if (check) {
+			ProcedureItemTree<T> tmp = (ProcedureItemTree<T>) value;
+			String readProcedureContent = tmp.readProcedureContent();
+			SqlTab newTab = newTab(true, tmp.getProcedureName());
+			newTab.appendTextSql(readProcedureContent);
+		}
+
+	}
+
+	/**
 	 * 프로시저 내용을 읽어들인다. <br/>
 	 * 
 	 * @작성자 : KYJ
@@ -1590,9 +1620,16 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		boolean check = ProcedureItemTree.class.isAssignableFrom(cls) && !ProcedureColumnsTree.class.isAssignableFrom(cls);
 		if (check) {
 			ProcedureItemTree<T> tmp = (ProcedureItemTree<T>) value;
-			String readProcedureContent = tmp.readProcedureContent();
-			SqlTab newTab = newTab(true, tmp.getProcedureName());
-			newTab.appendTextSql(readProcedureContent);
+			String procedureTemplate = tmp.getExecuteProcedureTemplate();
+			List<Map<String, Object>> params = tmp.getProcedureParams();
+			
+			
+			// TODO
+
+			// Show Execute Procedure Popup.
+
+			// SqlTab newTab = newTab(true, tmp.getProcedureName());
+			// newTab.appendTextSql(readProcedureContent);
 		}
 
 	}
