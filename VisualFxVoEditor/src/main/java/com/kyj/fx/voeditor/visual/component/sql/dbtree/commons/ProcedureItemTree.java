@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.DbTreePackageInfo;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.FxCollectors;
@@ -135,7 +136,7 @@ public class ProcedureItemTree<T> extends SchemaItemTree<T> {
 
 	@Override
 	public Node createGraphics() {
-		return new ImageView(new Image(getClass().getResourceAsStream("../Procedure.png")));
+		return new ImageView(new Image(DbTreePackageInfo.class.getResourceAsStream("Procedure.png")));
 	}
 
 	/*

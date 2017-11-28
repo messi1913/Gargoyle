@@ -12,6 +12,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.DbTreePackageInfo;
+
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
@@ -67,7 +69,7 @@ public class ProcedureColumnsTree<T> extends ProcedureItemTree<T> {
 
 	@Override
 	public Node createGraphics() {
-		Image fxImage = new Image(getClass().getResourceAsStream("../column.png"), 15d, 15d, false, false);
+		Image fxImage = new Image(DbTreePackageInfo.class.getResourceAsStream("column.png"), 15d, 15d, false, false);
 		return new ImageView(fxImage);
 	}
 

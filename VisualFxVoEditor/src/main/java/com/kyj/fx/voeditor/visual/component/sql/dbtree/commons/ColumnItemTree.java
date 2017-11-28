@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.DbTreePackageInfo;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 
 import javafx.collections.FXCollections;
@@ -85,7 +86,7 @@ public abstract class ColumnItemTree<T> extends TableItemTree<T> {
 
 	@Override
 	public Node createGraphics() {
-		Image fxImage = new Image(getClass().getResourceAsStream("../column.png"), 15d, 15d, false, false);
+		Image fxImage = new Image(DbTreePackageInfo.class.getResourceAsStream("column.png"), 15d, 15d, false, false);
 		return new ImageView(fxImage);
 	}
 

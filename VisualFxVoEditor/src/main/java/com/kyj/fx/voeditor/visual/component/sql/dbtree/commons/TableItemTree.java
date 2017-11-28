@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.DbTreePackageInfo;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleConnectionFailException;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
@@ -96,7 +97,7 @@ public abstract class TableItemTree<T> extends SchemaItemTree<T> {
 
 	@Override
 	public Node createGraphics() {
-		Image fxImage = new Image(getClass().getResourceAsStream("../table.png"), 15d, 15d, false, false);
+		Image fxImage = new Image(DbTreePackageInfo.class.getResourceAsStream("table.png"), 15d, 15d, false, false);
 		return new ImageView(fxImage);
 	}
 
