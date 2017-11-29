@@ -257,7 +257,11 @@ public class TableOpenResourceView {
 		public void close() {
 
 			if (dutyCloseCount > 0) {
-//				dutyCloseCount = 0;
+				/*
+				 * 17.11.29
+				 * 이거 0으로 초기화 안해주면 sqlite 테이블 조회할때 팝업이 안닫힌다.
+				 */
+				dutyCloseCount = 0;
 //				TableOpenResourceView.this.close();
 				return;
 			}
