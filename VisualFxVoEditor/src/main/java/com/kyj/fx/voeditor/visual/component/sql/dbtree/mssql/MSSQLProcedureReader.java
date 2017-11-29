@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ProcedureReader;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
@@ -19,7 +20,7 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
  * @author KYJ
  *
  */
-public class MSSQLProcedureReader {
+public class MSSQLProcedureReader implements ProcedureReader {
 
 	private DataSource dataSource;
 
@@ -47,6 +48,7 @@ public class MSSQLProcedureReader {
 	 * @return
 	 * @throws Exception
 	 */
+	@Override
 	public String readProcedure(Map<String, Object> paramMap) throws Exception {
 
 		StringBuffer sb = new StringBuffer();

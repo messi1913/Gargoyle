@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<fx:root prefHeight="736.0" prefWidth="1031.0" style="-fx-padding: 5;"
+	type="BorderPane" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<SplitPane orientation="VERTICAL" BorderPane.alignment="CENTER">
+			<items>
+				<SplitPane dividerPositions="0.5" prefHeight="160.0"
+					prefWidth="200.0">
+					<items>
+						<ScrollPane fitToHeight="true" fitToWidth="true"
+							minWidth="300.0">
+							<content>
+								<TextArea editable="false" fx:id="txtProcedureCont"
+									maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+									style="-fx-padding: 5;" />
+							</content>
+						</ScrollPane>
+						<VBox minWidth="300.0" style="-fx-padding: 5;">
+							<children>
+								<HBox alignment="CENTER" style="-fx-padding: 5;">
+									<children>
+										<Label alignment="CENTER" text="Valuable Mapping"
+											HBox.hgrow="ALWAYS">
+											<font>
+												<Font size="17.0" />
+											</font>
+										</Label>
+									</children>
+								</HBox>
+								<TableView fx:id="tbProcedureCols" prefHeight="200.0"
+									prefWidth="200.0" VBox.vgrow="ALWAYS" editable="true">
+									<columns>
+										<TableColumn fx:id="colName" prefWidth="157.0"
+											text="Name" />
+										<TableColumn prefWidth="327.0" text="Value">
+											<columns>
+												<TableColumn fx:id="colType" prefWidth="94.0"
+													text="Type" />
+												<TableColumn fx:id="colValue" editable="true"
+													prefWidth="121.0" text="Value" />
+												<TableColumn fx:id="colNullable" prefWidth="67.0"
+													text="Nullable" />
+											</columns>
+										</TableColumn>
+									</columns>
+								</TableView>
+							</children>
+						</VBox>
+					</items>
+				</SplitPane>
+			</items>
+		</SplitPane>
+	</center>
+	<bottom>
+		<HBox alignment="CENTER" style="-fx-padding: 5 5 0 5;"
+			BorderPane.alignment="CENTER">
+			<children>
+				<Button fx:id="btnExecute" mnemonicParsing="false" text="Execute"
+					onAction="#btnExecuteOnAction" />
+			</children>
+		</HBox>
+	</bottom>
+</fx:root>
