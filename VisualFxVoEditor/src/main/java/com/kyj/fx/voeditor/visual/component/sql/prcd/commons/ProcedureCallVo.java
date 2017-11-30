@@ -4,7 +4,7 @@
  *	작성일   : 2017. 11. 29.
  *	작성자   : KYJ
  *******************************/
-package com.kyj.fx.voeditor.visual.component.sql.prcd;
+package com.kyj.fx.voeditor.visual.component.sql.prcd.commons;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -23,6 +23,7 @@ public class ProcedureCallVo {
 	private StringProperty type;
 	private ObjectProperty<Object> value;
 	private BooleanProperty nullable;
+	
 
 	public ProcedureCallVo() {
 		name = new SimpleStringProperty();
