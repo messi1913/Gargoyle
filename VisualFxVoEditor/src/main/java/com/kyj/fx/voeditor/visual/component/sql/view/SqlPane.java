@@ -1620,16 +1620,9 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		boolean check = ProcedureItemTree.class.isAssignableFrom(cls) && !ProcedureColumnsTree.class.isAssignableFrom(cls);
 		if (check) {
 			ProcedureItemTree<T> tmp = (ProcedureItemTree<T>) value;
-			String procedureTemplate = tmp.getExecuteProcedureTemplate();
-			List<Map<String, Object>> params = tmp.getProcedureParams();
-			
-			
-			// TODO
-
-			// Show Execute Procedure Popup.
-
-			// SqlTab newTab = newTab(true, tmp.getProcedureName());
-			// newTab.appendTextSql(readProcedureContent);
+			String readProcedureContent = tmp.readProcedureContent();
+			SqlTab newTab = newTab(true, tmp.getProcedureName());
+			newTab.appendTextSql(readProcedureContent);
 		}
 
 	}
