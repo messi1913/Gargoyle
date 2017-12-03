@@ -15,6 +15,7 @@ import java.util.Map;
 import com.kyj.fx.voeditor.visual.excels.base.ExcelColDVO;
 import com.kyj.fx.voeditor.visual.excels.base.ExcelDataDVO;
 import com.kyj.fx.voeditor.visual.excels.base.ExcelSVO;
+import com.kyj.fx.voeditor.visual.framework.BigDataDVO;
 import com.kyj.fx.voeditor.visual.util.ExcelUtil;
 
 import javafx.scene.control.TableColumn;
@@ -70,7 +71,12 @@ public class ToExcelFileFunction {
 			while (iterator.hasNext()) {
 				String key = iterator.next();
 				Object value = map.get(key);
-				dataList.add(new ExcelDataDVO(i, col, value));
+				if (value instanceof BigDataDVO) {
+					dataList.add(new ExcelDataDVO(i, col, ((BigDataDVO) value).getValue()));
+				} else {
+					dataList.add(new ExcelDataDVO(i, col, value));
+				}
+
 				col++;
 			}
 		}
