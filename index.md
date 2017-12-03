@@ -44,10 +44,11 @@ Database Table Search
 ![alt tag](https://cloud.githubusercontent.com/assets/5085283/20559991/85dbb940-b1ba-11e6-9536-64a6d80bbead.png)
 
 Gargoyle-Music
-![alt tag](https://github.com/callakrsos/Gargoyle/blob/gh-pages/Music.png)
+![alt tag](https://user-images.githubusercontent.com/5085283/33525809-2e797fd8-d87a-11e7-88a4-14a75491930d.png)
 
 Gargiyle-Mail
-![alt tag](https://github.com/callakrsos/Gargoyle/blob/gh-pages/Mail.png)
+![alt tag](https://user-images.githubusercontent.com/5085283/33525808-2e50bf4e-d87a-11e7-9192-c6ce2c6774cb.png)
 
 Gargiyle-File Search
-![alt tag](https://github.com/callakrsos/Gargoyle/blob/gh-pages/File%20Search.png)
+![alt tag](https://user-images.githubusercontent.com/5085283/33525810-2ea1544a-d87a-11e7-8f65-0e784f77542d.png)
+
