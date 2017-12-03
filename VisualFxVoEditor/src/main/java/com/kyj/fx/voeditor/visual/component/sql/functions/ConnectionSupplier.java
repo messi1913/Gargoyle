@@ -14,9 +14,8 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.utils.EncrypUtil;
 
 /**
- * 데이터베이스 커넥션정보를 리턴해주는 객체
- *  더불어 접속 관련 메타정보를 기록.
- *  
+ * 데이터베이스 커넥션정보를 리턴해주는 객체 더불어 접속 관련 메타정보를 기록.
+ * 
  * @author KYJ
  *
  */
@@ -28,6 +27,11 @@ public class ConnectionSupplier implements Supplier<Connection> {
 	private String username;
 	private String password;
 	private String driver;
+
+	// 17.11.03 추가하되는 필드긴한데 적용되는지는 확인해볼 사항.
+	private String catalog;
+	private String schema;
+
 	private ExceptionHandler exHandler;
 
 	public ConnectionSupplier() {
@@ -53,8 +57,18 @@ public class ConnectionSupplier implements Supplier<Connection> {
 			} else {
 				con = DbUtil.getConnection(getDriver(), getUrl(), getUsername(), getPassword());
 			}
-			// Class.forName(driver);
-			// con = DriverManager.getConnection(url, username, password);
+
+			// 17.11.03 추가하되는 필드긴한데 적용되는지는 확인해볼 사항.
+			if (ValueUtil.isNotEmpty(this.catalog)) {
+				con.setCatalog(this.catalog);
+			}
+			
+			// 17.11.03 추가하되는 필드긴한데 적용되는지는 확인해볼 사항.
+			if (ValueUtil.isNotEmpty(this.schema)) {
+				con.setSchema(this.schema);
+			}
+
+
 		} catch (Exception e) {
 			if (exHandler != null)
 				exHandler.handle(e);
@@ -62,6 +76,24 @@ public class ConnectionSupplier implements Supplier<Connection> {
 				LOGGER.error(ValueUtil.toString(e));
 		}
 		return con;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 3. 
+	 * @param catalog
+	 */
+	public void setCatalog(String catalog) {
+		this.catalog = catalog;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 3. 
+	 * @param schema
+	 */
+	public void setSchema(String schema) {
+		this.schema = schema;
 	}
 
 	public ExceptionHandler getExHandler() {
