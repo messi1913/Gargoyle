@@ -6,11 +6,10 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.prcd.mssql;
 
-import java.util.Optional;
-
 import com.kyj.fx.voeditor.visual.component.sql.prcd.commons.ProcedureCallComposite;
 import com.kyj.fx.voeditor.visual.framework.keyboard.FxKey;
 
+import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
@@ -30,17 +29,14 @@ public class MssqlProcedureCallCompositePopup<T> {
 	public MssqlProcedureCallCompositePopup(Stage parent, ProcedureCallComposite<T> node) {
 		this.parent = parent;
 		this.node = node;
+
 	}
 
 	private Stage stage;
 
-	public Optional<T> getResult() {
-		T result = this.node.getResult();
-		return result == null ? Optional.empty() : Optional.of(result);
-	}
-
 	public void show() {
 		stage = new Stage();
+		stage.setScene(new Scene(this.node));
 		stage.setTitle(" MSSQL Procedure Call ");
 		stage.initOwner(this.parent);
 		stage.initModality(Modality.APPLICATION_MODAL);

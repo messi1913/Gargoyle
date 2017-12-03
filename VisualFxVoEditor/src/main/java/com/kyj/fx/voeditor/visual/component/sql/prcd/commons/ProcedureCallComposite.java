@@ -278,6 +278,7 @@ public abstract class ProcedureCallComposite<T> extends BorderPane {
 		String schema = this.schema.get();
 		String procedureName = this.procedureName.get();
 		ConnectionSupplier connectionSupplier = connectionSupplier();
+
 		if (connectionSupplier == null) {
 			throw new GagoyleRuntimeException("Connection Supplier is empty.");
 		}
@@ -371,30 +372,35 @@ public abstract class ProcedureCallComposite<T> extends BorderPane {
 		thread.start();
 	}
 
-	private <R> void doAsynch(Callable<R> action, Consumer<R> consume, Consumer<Exception> onError) {
-		Thread thread = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-
-				try {
-					R call = action.call();
-					consume.accept(call);
-				} catch (Exception e) {
-					onError.accept(e);
-				}
-			}
-		}, "doAsynch-Thread");
-		thread.setDaemon(true);
-		thread.start();
-	}
+//	private <R> void doAsynch(Callable<R> action, Consumer<R> consume, Consumer<Exception> onError) {
+//		Thread thread = new Thread(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//
+//				try {
+//					R call = action.call();
+//					consume.accept(call);
+//				} catch (Exception e) {
+//					onError.accept(e);
+//				}
+//			}
+//		}, "doAsynch-Thread");
+//		thread.setDaemon(true);
+//		thread.start();
+//	}
 
 	@FXML
 	public void btnExecuteOnAction() {
 		execute();
 	}
 
-	private ObjectProperty<Callback<ResultSet, T>> callback = new SimpleObjectProperty<>();
+	/**
+	 * 데이터 결과 변환
+	 * 
+	 * @최초생성일 2017. 12. 3.
+	 */
+	private ObjectProperty<Callback<ResultSet, T>> converter = new SimpleObjectProperty<>();
 
 	private ObjectProperty<T> result = new SimpleObjectProperty<>();
 
@@ -429,11 +435,9 @@ public abstract class ProcedureCallComposite<T> extends BorderPane {
 		if (!items.isEmpty()) {
 			StringBuffer paramSb = new StringBuffer();
 
-			for (ProcedureParamVo v : items) {
-				Object value = v.getValue();
-				if (ValueUtil.isNotEmpty(value)) {
-					paramSb.append(",").append("?");
-				}
+			// 변수의 수는 무조건 바인드 처리해야함.
+			for (int i = 0; i < items.size(); i++) {
+				paramSb.append(",").append("?");
 			}
 
 			paramStatement = "(".concat(paramSb.substring(1)).concat(")");
@@ -441,25 +445,42 @@ public abstract class ProcedureCallComposite<T> extends BorderPane {
 
 		try (Connection con = connectionSupplier.get()) {
 
-			String statement = String.format("use %s { call %s %s }", this.catalog.get(), procedureCont, paramStatement);
+			// 첫번째 필드는 프로시저명, 두번째 필드는 파라미터 정의
+			String statement = String.format(" { call %s %s } ",
+					/* this.catalog.get(), */ procedureCont, paramStatement);
+
+			// 현재 카탈로그 set
+//			con.setCatalog(this.catalog.get());
+
 			CallableStatement prepareCall = con.prepareCall(statement);
 
+			// TODO 디폴트값 처리하는것 구현할것.
 			for (ProcedureParamVo v : items) {
-				String name = v.getName();
 				Object value = v.getValue();
-				if (ValueUtil.isNotEmpty(value))
+				Integer index = v.getIndex();
+				if (v.isNullable() && ValueUtil.isEmpty(value)) {
+					prepareCall.setNull(index, java.sql.Types.NULL);
+				} else {
 
-					// if (name.startsWith("@"))
-					// name = name.substring(1);
-					prepareCall.setObject(name, value);
+					// Nullable이 아닌 경우 null값이 들어온경우 공백을 넣어줌.
+					if (value == null)
+						value = "";
+
+					prepareCall.setObject(index, value);
+				}
 			}
 
 			ResultSet rs = prepareCall.executeQuery();
 
-			Callback<ResultSet, T> callback2 = callback.get();
-			if (callback2 != null) {
-				T call = callback2.call(rs);
+			Callback<ResultSet, T> converter = this.converter.get();
+			if (converter != null) {
+
+				// 컨버터로 값을 변환
+				T call = converter.call(rs);
+				// 결과 처리
 				setResult(call);
+			} else {
+				LOGGER.info("Convert does not defined...");
 			}
 
 		} catch (SQLException e) {
@@ -472,12 +493,24 @@ public abstract class ProcedureCallComposite<T> extends BorderPane {
 		return this.result;
 	}
 
-	public final T getResult() {
+	final T getResult() {
 		return this.resultProperty().get();
 	}
 
-	private final void setResult(final T result) {
+	final void setResult(final T result) {
 		this.resultProperty().set(result);
+	}
+
+	public final ObjectProperty<Callback<ResultSet, T>> converterProperty() {
+		return this.converter;
+	}
+
+	public final Callback<ResultSet, T> getConverter() {
+		return this.converterProperty().get();
+	}
+
+	public final void setConverter(final Callback<ResultSet, T> converter) {
+		this.converterProperty().set(converter);
 	}
 
 }

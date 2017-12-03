@@ -44,6 +44,8 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SQLPaneMotionable;
+import com.kyj.fx.voeditor.visual.component.sql.prcd.commons.ProcedureCallComposite;
+import com.kyj.fx.voeditor.visual.component.sql.prcd.mssql.MssqlProcedureCallComposite;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTabPane;
 import com.kyj.fx.voeditor.visual.component.text.ASTSqlCodeAreaHelper;
@@ -1228,9 +1230,10 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		if (ValueUtil.isEditScript(sql)) {
 			execiteEdit(sql);
 		} else {
+
 			tbResult.getColumns().clear();
 			tbResult.getItems().clear();
-
+			
 			List<Map<String, Object>> query = query(sql, param, success -> {
 				lblStatus.setText(success.size() + " row");
 			}, (exception, showDialog) -> {
@@ -1238,13 +1241,23 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				if (showDialog)
 					DialogUtil.showExceptionDailog(this, exception);
 			});
-			if (query.isEmpty()) {
-				return;
-			}
-			binding(query);
-			tbResult.getItems().addAll(query);
-			tabPaneResult.getSelectionModel().select(this.tabResult);
+			
+			updateResultUi(query);
 		}
+	}
+
+	
+	public void updateResultUi(List<Map<String, Object>> data) {
+
+		if (data.isEmpty()) {
+			return;
+		}
+
+		
+
+		binding(data);
+		tbResult.getItems().addAll(data);
+		tabPaneResult.getSelectionModel().select(this.tabResult);
 	}
 
 	protected void execiteEdit(String sql) {
@@ -1577,25 +1590,6 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * @param e
 	 */
 	public void menuExecuteProcedure(ActionEvent e) {
-		if (e.isConsumed()) {
-			return;
-		}
-
-		TreeItem<K> selectedItem = this.schemaTree.getSelectionModel().getSelectedItem();
-		if (selectedItem == null || selectedItem.getValue() == null)
-			return;
-
-		K value = selectedItem.getValue();
-
-		Class<? extends Object> cls = value.getClass();
-		boolean check = ProcedureItemTree.class.isAssignableFrom(cls) && !ProcedureColumnsTree.class.isAssignableFrom(cls);
-		if (check) {
-			ProcedureItemTree<T> tmp = (ProcedureItemTree<T>) value;
-			String readProcedureContent = tmp.readProcedureContent();
-			SqlTab newTab = newTab(true, tmp.getProcedureName());
-			newTab.appendTextSql(readProcedureContent);
-		}
-
 	}
 
 	/**

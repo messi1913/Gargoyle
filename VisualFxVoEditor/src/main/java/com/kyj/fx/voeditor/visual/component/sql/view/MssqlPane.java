@@ -31,9 +31,14 @@ import com.kyj.fx.voeditor.visual.component.popup.TableOpenResourceView;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.DatabaseTreeNode;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ColumnItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.DatabaseItemTree;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ProcedureColumnsTree;
+import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.ProcedureItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.dbtree.mssql.MSSQLDatabaseItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
+import com.kyj.fx.voeditor.visual.component.sql.prcd.commons.ProcedureCallComposite;
+import com.kyj.fx.voeditor.visual.component.sql.prcd.mssql.DefaultMssqlProcedureCallComposite;
+import com.kyj.fx.voeditor.visual.component.sql.prcd.mssql.MssqlProcedureCallCompositePopup;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
 import com.kyj.fx.voeditor.visual.component.text.ASTSqlCodeAreaHelper;
 import com.kyj.fx.voeditor.visual.component.text.MssqlASTSqlCodeAreaHelper;
@@ -42,11 +47,14 @@ import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.functions.FourThFunction;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
+import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DbUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.TreeItem;
@@ -320,8 +328,8 @@ public class MssqlPane extends CommonsSqllPan {
 	/**
 	 * @최초생성일 2017. 9. 15.
 	 */
-	public static final FourThFunction<String, String, String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (catalog, schema, tableNamePattern,
-			metaData) -> {
+	public static final FourThFunction<String, String, String, DatabaseMetaData, ResultSet> COLUMN_CONVERTER = (catalog, schema,
+			tableNamePattern, metaData) -> {
 		int cateIdx = tableNamePattern.indexOf('.');
 		int schemIdx = tableNamePattern.indexOf('.', cateIdx + 1);
 
@@ -421,7 +429,7 @@ public class MssqlPane extends CommonsSqllPan {
 						return "<<<<ERROR>>>>";
 					};
 
-					columnList = DbUtil.columns(connection, null, null,  tableName, COLUMN_CONVERTER, converter);
+					columnList = DbUtil.columns(connection, null, null, tableName, COLUMN_CONVERTER, converter);
 
 				} catch (Exception e) {
 					LOGGER.error(ValueUtil.toString(e));
@@ -430,6 +438,52 @@ public class MssqlPane extends CommonsSqllPan {
 		}
 
 		return columnList;
+	}
+
+	@Override
+	public void menuExecuteProcedure(ActionEvent e) {
+		if (e.isConsumed()) {
+			return;
+		}
+
+		TreeItem<DatabaseItemTree<String>> selectedItem = this.schemaTree.getSelectionModel().getSelectedItem();
+		if (selectedItem == null || selectedItem.getValue() == null)
+			return;
+
+		DatabaseItemTree<String> value = selectedItem.getValue();
+
+		Class<? extends Object> cls = value.getClass();
+		boolean check = ProcedureItemTree.class.isAssignableFrom(cls) && !ProcedureColumnsTree.class.isAssignableFrom(cls);
+		if (check) {
+
+			ProcedureItemTree<String> tmp = (ProcedureItemTree<String>) value;
+			String procedureName = tmp.getProcedureName();
+			String schem = tmp.getSchem();
+			String cat = tmp.getCat();
+
+			ProcedureCallComposite<List<Map<String, Object>>> view = new DefaultMssqlProcedureCallComposite(connectionSupplier);
+			view.prepare(cat, schem, procedureName);
+			view.resultProperty().addListener(new ChangeListener<List<Map<String, Object>>>() {
+
+				@Override
+				public void changed(ObservableValue<? extends List<Map<String, Object>>> observable, List<Map<String, Object>> oldValue,
+						List<Map<String, Object>> newValue) {
+
+					getTbResult().getColumns().clear();
+					getTbResult().getItems().clear();
+
+					updateResultUi(newValue);
+
+				}
+			});
+
+			//
+			MssqlProcedureCallCompositePopup<List<Map<String, Object>>> popup = new MssqlProcedureCallCompositePopup<>(
+					SharedMemory.getPrimaryStage(), view);
+
+			popup.show();
+
+		}
 	}
 
 }

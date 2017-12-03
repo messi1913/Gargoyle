@@ -59,7 +59,7 @@
                         </GridPane>
 								<TableView fx:id="tbProcedureCols" editable="true" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
 									<columns>
-                              <TableColumn fx:id="colIndex" prefWidth="75.0" text="Index" />
+                              <TableColumn fx:id="colIndex" prefWidth="75.0" text="Index" editable="false" />
 										<TableColumn fx:id="colName" editable="false" prefWidth="157.0" text="Name" />
 										<TableColumn prefWidth="327.0" text="Value">
 											<columns>
