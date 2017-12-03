@@ -50,4 +50,4 @@ Gargiyle-Mail
 ![alt tag](https://github.com/callakrsos/Gargoyle/blob/gh-pages/Mail.png)
 
 Gargiyle-File Search
-![alt tag](https://github.com/callakrsos/Gargoyle/blob/gh-pages/File Search.png)
+![alt tag](https://github.com/callakrsos/Gargoyle/blob/gh-pages/File%20Search.png)
