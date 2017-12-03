@@ -10,6 +10,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -40,6 +43,7 @@ import com.kyj.fx.voeditor.visual.component.text.CodeAreaHelper;
 import com.kyj.fx.voeditor.visual.framework.contextmenu.FxContextManager;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.sun.codemodel.internal.util.UnicodeEscapeWriter;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -170,7 +174,22 @@ public class HttpActionComposite extends BorderPane {
 	@FXML
 	void btnSendOnAction(ActionEvent event) {
 
-		String url = txtReqUrl.getText();
+		/* 17.12.04 URL Encoding 수정 */
+		String _url;
+		try {
+			URL url = new URL(txtReqUrl.getText());
+			String query = url.getQuery();
+			String host = url.getHost();
+			String protocol = url.getProtocol();
+			query = URLEncoder.encode(query, "UTF-8");
+			_url = protocol + "://" + host + "?" + query;
+		} catch (MalformedURLException e) {
+			_url = txtReqUrl.getText();
+		} catch (UnsupportedEncodingException e) {
+			_url = txtReqUrl.getText();
+		}
+		String url = _url;
+		LOGGER.debug(url);
 		String reqType = cboReqType.getValue();
 		String receivedType = cboReceivedType.getValue();
 
@@ -181,7 +200,11 @@ public class HttpActionComposite extends BorderPane {
 			switch (receivedType) {
 			case "XML":
 				run = () -> {
-					txtResponse.replaceText(new com.kyj.fx.voeditor.visual.util.XMLFormatter().format(new String(b)));
+					try {
+						txtResponse.replaceText(new com.kyj.fx.voeditor.visual.util.XMLFormatter().format(new String(b)));
+					} catch (Exception e) {
+						txtResponse.replaceText(new String(b));
+					}
 				};
 
 				break;
