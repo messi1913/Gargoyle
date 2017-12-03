@@ -1,0 +1,13 @@
+
+/*
+@font-face
+{
+    src: url("/fonts/NANUMBARUNGOTHIC.ttf");
+}
+ */
+
+
+.root{
+	-fx-font-family : '나눔바른고딕';
+}
+

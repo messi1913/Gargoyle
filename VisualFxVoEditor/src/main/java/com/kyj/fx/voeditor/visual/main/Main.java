@@ -27,6 +27,7 @@ import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.application.Application;
@@ -202,10 +203,12 @@ public class Main extends Application {
 
 			Scene scene = new Scene(mainParent, 1280, 900);
 
+			FxUtil.hello();
 //			SkinManager.getInstance().resetSkin();
 			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 			scene.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
-
+			scene.getStylesheets().add(Main.class.getResource("global.css").toExternalForm());
+			
 			primaryStage.setScene(scene);
 
 			primaryStage.show();

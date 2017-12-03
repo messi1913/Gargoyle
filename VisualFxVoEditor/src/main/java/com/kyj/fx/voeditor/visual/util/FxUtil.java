@@ -9,10 +9,12 @@ package com.kyj.fx.voeditor.visual.util;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,6 +66,9 @@ import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
+import com.sun.javafx.font.PrismFontFactory;
+import com.sun.javafx.font.PrismFontLoader;
+import com.sun.javafx.tk.Toolkit;
 
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.animation.Transition;
@@ -152,6 +157,8 @@ public class FxUtil {
 	/**
 	 * @최초생성일 2016. 10. 6.
 	 */
+
+	// public static final String DEFAULT_FONT_SIMPLE = "(한)볼펜체C";
 	public static final String DEFAULT_FONT_SIMPLE = "NANUMBARUNGOTHIC";
 	public static final String DEFAULT_FONT = DEFAULT_FONT_SIMPLE + ".TTF";
 	public static final String FONTS_NANUMBARUNGOTHIC_TTF = "fonts/" + DEFAULT_FONT;
@@ -163,8 +170,7 @@ public class FxUtil {
 		try {
 
 			/*
-			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된
-			 * 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
+			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
 			 */
 			File parentFile = new File(FileUtil.getTempGagoyle(), "font");
 			if (!parentFile.exists())
@@ -183,6 +189,14 @@ public class FxUtil {
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * FxUtil 클래스의 static 스코프를 로드하기 위한 코드.
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 3. 
+	 */
+	public static void hello() {
 	}
 
 	public static Font getBoldFont() {
@@ -1917,6 +1931,33 @@ public class FxUtil {
 			return Font.getFontNames();
 		}
 
+		public static Font loadFont(URL location, double size) throws IOException {
+			return Font.loadFont(location.openStream(), size);
+		}
+
+		public static List<Font> loadFonts(File location, double size) {
+
+			return Stream.of(location.listFiles()).parallel().filter(f -> f.getName().endsWith(".ttf") || f.getName().endsWith(".TTF"))
+					.map(f -> {
+
+						try (FileInputStream in = new FileInputStream(f)) {
+
+							Font loadFont = Font.loadFont(in, size);
+
+							if (loadFont == null)
+								LOGGER.debug("can't load font {} ", f.getName());
+
+							return loadFont;
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						return null;
+					}).filter(f -> f != null).peek(System.out::println).collect(Collectors.toList());
+
+		}
+
 		public static List<String> getAvaliableFontFamilis() {
 			return Font.getFamilies();
 		}
@@ -2208,4 +2249,5 @@ public class FxUtil {
 			BiFunction<TableColumn<?, ?>, Object, Object> customConverter) {
 		FxTableViewUtil.installFindKeyEvent(owner, tb, customConverter);
 	}
+
 }

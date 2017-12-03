@@ -1742,8 +1742,62 @@ public class DbUtil extends ConnectionManager {
 	}
 
 	/**
+     *  <OL>
+     *  <LI><B>PROCEDURE_CAT</B> String {@code =>} procedure catalog (may be <code>null</code>)
+     *  <LI><B>PROCEDURE_SCHEM</B> String {@code =>} procedure schema (may be <code>null</code>)
+     *  <LI><B>PROCEDURE_NAME</B> String {@code =>} procedure name
+     *  <LI><B>COLUMN_NAME</B> String {@code =>} column/parameter name
+     *  <LI><B>COLUMN_TYPE</B> Short {@code =>} kind of column/parameter:
+     *      <UL>
+     *      <LI> procedureColumnUnknown - nobody knows
+     *      <LI> procedureColumnIn - IN parameter
+     *      <LI> procedureColumnInOut - INOUT parameter
+     *      <LI> procedureColumnOut - OUT parameter
+     *      <LI> procedureColumnReturn - procedure return value
+     *      <LI> procedureColumnResult - result column in <code>ResultSet</code>
+     *      </UL>
+     *  <LI><B>DATA_TYPE</B> int {@code =>} SQL type from java.sql.Types
+     *  <LI><B>TYPE_NAME</B> String {@code =>} SQL type name, for a UDT type the
+     *  type name is fully qualified
+     *  <LI><B>PRECISION</B> int {@code =>} precision
+     *  <LI><B>LENGTH</B> int {@code =>} length in bytes of data
+     *  <LI><B>SCALE</B> short {@code =>} scale -  null is returned for data types where
+     * SCALE is not applicable.
+     *  <LI><B>RADIX</B> short {@code =>} radix
+     *  <LI><B>NULLABLE</B> short {@code =>} can it contain NULL.
+     *      <UL>
+     *      <LI> procedureNoNulls - does not allow NULL values
+     *      <LI> procedureNullable - allows NULL values
+     *      <LI> procedureNullableUnknown - nullability unknown
+     *      </UL>
+     *  <LI><B>REMARKS</B> String {@code =>} comment describing parameter/column
+     *  <LI><B>COLUMN_DEF</B> String {@code =>} default value for the column, which should be interpreted as a string when the value is enclosed in single quotes (may be <code>null</code>)
+     *      <UL>
+     *      <LI> The string NULL (not enclosed in quotes) - if NULL was specified as the default value
+     *      <LI> TRUNCATE (not enclosed in quotes)        - if the specified default value cannot be represented without truncation
+     *      <LI> NULL                                     - if a default value was not specified
+     *      </UL>
+     *  <LI><B>SQL_DATA_TYPE</B> int  {@code =>} reserved for future use
+     *  <LI><B>SQL_DATETIME_SUB</B> int  {@code =>} reserved for future use
+     *  <LI><B>CHAR_OCTET_LENGTH</B> int  {@code =>} the maximum length of binary and character based columns.  For any other datatype the returned value is a
+     * NULL
+     *  <LI><B>ORDINAL_POSITION</B> int  {@code =>} the ordinal position, starting from 1, for the input and output parameters for a procedure. A value of 0
+     *is returned if this row describes the procedure's return value.  For result set columns, it is the
+     *ordinal position of the column in the result set starting from 1.  If there are
+     *multiple result sets, the column ordinal positions are implementation
+     * defined.
+     *  <LI><B>IS_NULLABLE</B> String  {@code =>} ISO rules are used to determine the nullability for a column.
+     *       <UL>
+     *       <LI> YES           --- if the column can include NULLs
+     *       <LI> NO            --- if the column cannot include NULLs
+     *       <LI> empty string  --- if the nullability for the
+     * column is unknown
+     *       </UL>
+     *  <LI><B>SPECIFIC_NAME</B> String  {@code =>} the name which uniquely identifies this procedure within its schema.
+     *  </OL>
+     *  
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 11. 29. 
+	 * @작성일 : 2017. 11. 29.
 	 * @param con
 	 * @param catalog
 	 * @param schemaPattern
@@ -1759,7 +1813,7 @@ public class DbUtil extends ConnectionManager {
 		List<Map<String, Object>> r = Collections.emptyList();
 		try {
 			ResultSet resultSet = con.getMetaData().getProcedureColumns(catalog, schemaPattern, procedureNamePattern, columnNamePattern);
-//			ResultSetToMapConverter c = new ResultSetToMapConverter();
+			// ResultSetToMapConverter c = new ResultSetToMapConverter();
 
 			return callback.call(resultSet);
 		} catch (Exception e) {
@@ -1769,7 +1823,13 @@ public class DbUtil extends ConnectionManager {
 	}
 
 	/**
-	 * 프로시저에 대한 정보를 리턴
+	 * 프로시저에 대한 정보를 리턴 <br/>
+	 *
+	 * <ol>
+	 * <li>PROCEDURE_CAT String => procedure catalog (may be null)</li>
+	 * <li>PROCEDURE_SCHEM String => procedure schema (may be null)</li>
+	 * <li>PROCEDURE_NAME String => procedure name</li>
+	 * </ol>
 	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 11. 17.
