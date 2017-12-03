@@ -34,20 +34,20 @@ public class MssqlProcedureCallCompositePopup<T> {
 
 	private Stage stage;
 
-	public Optional<T> show() {
+	public Optional<T> getResult() {
+		T result = this.node.getResult();
+		return result == null ? Optional.empty() : Optional.of(result);
+	}
 
+	public void show() {
 		stage = new Stage();
 		stage.setTitle(" MSSQL Procedure Call ");
 		stage.initOwner(this.parent);
 		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.setAlwaysOnTop(true);
 		stage.addEventHandler(KeyEvent.KEY_RELEASED, this::stageOnKeyReleaseEvent);
-		stage.showAndWait();
+		stage.show();
 
-		T result = node.getResult();
-		if(result == null)
-			return Optional.empty();
-		return Optional.of(result);
 	}
 
 	/**
