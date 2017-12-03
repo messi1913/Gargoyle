@@ -42,3 +42,12 @@ Java Code Search.
 ![alt tag](https://cloud.githubusercontent.com/assets/5085283/20559990/85d569e6-b1ba-11e6-8a2f-603400a9a367.png)
 Database Table Search
 ![alt tag](https://cloud.githubusercontent.com/assets/5085283/20559991/85dbb940-b1ba-11e6-9536-64a6d80bbead.png)
+
+Gargoyle-Music
+![alt tag](https://github.com/callakrsos/Gargoyle/blob/gh-pages/Music.png)
+
+Gargiyle-Mail
+![alt tag](https://github.com/callakrsos/Gargoyle/blob/gh-pages/Mail.png)
+
+Gargiyle-File Search
+![alt tag](https://github.com/callakrsos/Gargoyle/blob/gh-pages/File Search.png)
