@@ -4,9 +4,9 @@ import javafx.scene.layout.BorderPane;
 
 public class ServiceVelocityBinderComposite extends BorderPane {
 
-	private VelocityBinderComposite composite;
+	private AbstractVelocityBinderComposite composite;
 
-	public ServiceVelocityBinderComposite(VelocityBinderComposite composite) {
+	public ServiceVelocityBinderComposite(AbstractVelocityBinderComposite composite) {
 		super();
 		this.composite = composite;
 		this.setCenter(this.composite);

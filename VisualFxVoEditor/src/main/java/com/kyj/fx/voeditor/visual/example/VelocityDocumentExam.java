@@ -6,16 +6,10 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
-import java.util.HashMap;
-
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.fx.voeditor.visual.component.velocity.DefaultVelocityBinderComposite;
 
 import javafx.application.Application;
-import javafx.geometry.Orientation;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -25,29 +19,16 @@ import javafx.stage.Stage;
  */
 public class VelocityDocumentExam extends Application {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see javafx.application.Application#start(javafx.stage.Stage)
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
-		BorderPane pane = new BorderPane();
+		BorderPane pane = new DefaultVelocityBinderComposite();
 
-		TextArea root = new TextArea();
-		TextArea btm = new TextArea();
-
-		SplitPane splitPane = new SplitPane( root, btm);
-		splitPane.setDividerPosition(0, 0.6d);
-		splitPane.setOrientation(Orientation.VERTICAL);
-		pane.setCenter(splitPane);
-		Button value = new Button("Excute");
-		pane.setBottom(value);
-
-		value.setOnAction(ev -> {
-
-			String velocityToText = ValueUtil.getVelocityToText(root.getText(), new HashMap<String, Object>(), false);
-			btm.setText(velocityToText);
-		});
 		primaryStage.setScene(new Scene(pane));
 		primaryStage.show();
 	}

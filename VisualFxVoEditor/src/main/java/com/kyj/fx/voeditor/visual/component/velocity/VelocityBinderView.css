@@ -1,0 +1,9 @@
+.borderpane-root
+{
+	-fx-padding : 5.0px;
+}
+.hobx-button{
+	-fx-alignment: center ;
+	-fx-padding: 5.0px 5.0px 0.0px, 5.0px;
+	-fx-background-color: transparent  ;
+}
