@@ -692,8 +692,11 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		MenuItem menuExportJson = new MenuItem("Export Json");
 		menuExportJson.setOnAction(this::menuExportJsonOnAction);
 
+		MenuItem menuExportHtml = new MenuItem("Export HTML");
+		menuExportHtml.setOnAction(this::menuExportHtmlOnAction);
+		
 		Menu menuExportExcelFile = new Menu("Export", null, menuExportExcel, menuExportSpreadSheet, menuExportInsertScript,
-				menuExportMergeScript, menuExportJson);
+				menuExportMergeScript, menuExportJson, menuExportHtml);
 		/**/
 
 		MenuItem rowCopy = new MenuItem("row copy");
@@ -1442,6 +1445,20 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		}
 
 	}
+	
+	/**
+	 * Export HTML <br/>
+	 * 
+	 * TODO
+	 * 템플릿 파일과 데이터를 결합하여 HTML을 보여주는 기능 구현 <br/>
+	 *  
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 4. 
+	 * @param e
+	 */
+	public void menuExportHtmlOnAction(ActionEvent e) {
+		//TODO 
+	}
 
 	public abstract void menuExportInsertScriptOnAction(ActionEvent e);
 
@@ -1585,11 +1602,17 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	}
 
 	/**
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 11. 27.
 	 * @param e
 	 */
 	public void menuExecuteProcedure(ActionEvent e) {
+		
+		/*
+		 * 필요시 오버라이딩하여 구현할것.
+		 * 17.12.24 현재 MssqlPane에서만 구현됨. 
+		 */
 	}
 
 	/**

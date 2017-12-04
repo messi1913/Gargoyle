@@ -1,0 +1,17 @@
+/********************************
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : com.kyj.fx.voeditor.visual.component.velocity
+ *	작성일   : 2017. 12. 4.
+ *	작성자   : KYJ
+ *******************************/
+package com.kyj.fx.voeditor.visual.component.velocity;
+
+import javafx.scene.layout.BorderPane;
+
+/**
+ * @author KYJ
+ *
+ */
+public class VelocityBinderComposite extends BorderPane {
+
+}
