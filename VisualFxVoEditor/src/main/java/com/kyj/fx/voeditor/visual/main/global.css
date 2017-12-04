@@ -6,8 +6,9 @@
 }
  */
 
-
-.root{
-	-fx-font-family : '나눔바른고딕';
+.root {
+	/*-fx-font-family : '나눔바른고딕';*/
+	-fx-font-family : 'Verdana';
+	-fx-font-size: 13px ;
 }
 

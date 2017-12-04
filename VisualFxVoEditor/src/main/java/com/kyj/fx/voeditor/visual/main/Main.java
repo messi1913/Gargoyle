@@ -204,10 +204,11 @@ public class Main extends Application {
 			Scene scene = new Scene(mainParent, 1280, 900);
 
 			FxUtil.hello();
-//			SkinManager.getInstance().resetSkin();
+
+			scene.getStylesheets().add(Main.class.getResource("global.css").toExternalForm());
 			scene.getStylesheets().add(SkinManager.getInstance().getSkin());
 			scene.getStylesheets().add(SkinManager.getInstance().getButtonSkin());
-			scene.getStylesheets().add(Main.class.getResource("global.css").toExternalForm());
+			
 			
 			primaryStage.setScene(scene);
 
