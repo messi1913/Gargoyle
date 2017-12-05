@@ -19,11 +19,12 @@ import com.kyj.fx.voeditor.visual.util.XMLFormatter;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 
-public class XMLEditor extends BorderPane {
+public class XMLXPathEditor extends BorderPane {
 
 	/**
 	 * @최초생성일 2016. 10. 12.
@@ -49,7 +50,7 @@ public class XMLEditor extends BorderPane {
 	// private XMLTreeView xmlTreeView;
 	private CodeAreaHelper<CodeArea> codeHelperDeligator;
 
-	public XMLEditor() {
+	public XMLXPathEditor() {
 		codeArea = new CodeArea();
 		codeHelperDeligator = new CodeAreaHelper(codeArea);
 		codeHelperDeligator.customMenuHandler(new CodeAreaCustomMenusHandler<CodeArea>() {
@@ -74,12 +75,9 @@ public class XMLEditor extends BorderPane {
 						XMLTreeView xmlTreeView = new XMLTreeView();
 						xmlTreeView.setXml(getText());
 						xmlTreeView.setPrefSize(1200d, 800d);
-						
-						xmlTreeView.setContextMenu(XMLTreeView.createContextMenu(xmlTreeView));
-						
 						FxUtil.createStageAndShow(xmlTreeView, stage -> {
 							stage.setTitle("XML Structure");
-							stage.initOwner(FxUtil.getWindow(XMLEditor.this));
+							stage.initOwner(FxUtil.getWindow(XMLXPathEditor.this));
 						});
 					});
 					contextMenu.getItems().add(e);
@@ -132,7 +130,7 @@ public class XMLEditor extends BorderPane {
 		}
 	}
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(XMLEditor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(XMLXPathEditor.class);
 
 	/**
 	 * 
