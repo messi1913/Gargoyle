@@ -7,20 +7,14 @@
 package com.kyj.fx.voeditor.visual.component.tree;
 
 import java.io.ByteArrayInputStream;
-import java.util.Optional;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
-import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.SAXPasrerUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.kyj.fx.voeditor.visual.util.XMLUtils;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -28,7 +22,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -38,7 +31,6 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.util.Pair;
 import javafx.util.StringConverter;
 
 /**
@@ -230,40 +222,14 @@ public class XMLTreeView extends TreeView<XMLMeta> {
 		this.xmlProperty().set(xml);
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 5. 
+	 * @param parent
+	 * @return
+	 */
 	public static ContextMenu createContextMenu(XMLTreeView parent) {
-
-		ContextMenu cm = new ContextMenu();
-		{
-			MenuItem miXpath = new MenuItem("Xpath");
-			cm.getItems().add(miXpath);
-
-			miXpath.setOnAction(ev -> {
-
-				Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog(parent, "Xpath", "Input XPath");
-				showInputDialog.ifPresent(p -> {
-
-					String value = p.getValue();
-					if (ValueUtil.isNotEmpty(value)) {
-						Optional<NodeList> xpathNodes = XMLUtils.toXpathNodes(parent.getXml(), value);
-						// Optional<String> xpathText = XMLUtils.toXpathText();
-						xpathNodes.ifPresent(r -> {
-							int length = r.getLength();
-
-							StringBuffer sb = new StringBuffer();
-							for (int i = 0; i < length; i++) {
-								Node item = r.item(i);
-								sb.append(item.toString()).append("\n");
-							}
-							FxUtil.createCodeAreaAndShow(String.format("Input XPath : %s\n\n\n%s", value, sb.toString()));
-
-						});
-
-					}
-				});
-
-			});
-		}
-		return cm;
+		return FxUtil.ContextUtil.createXmlContextMenu(parent);
 
 	}
 }

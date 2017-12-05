@@ -42,6 +42,7 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.NodeList;
 
 import com.kyj.fx.fxloader.FxLoader;
 import com.kyj.fx.voeditor.visual.component.bar.GargoyleLoadBar;
@@ -58,6 +59,7 @@ import com.kyj.fx.voeditor.visual.component.scm.SvnChagnedCodeComposite;
 import com.kyj.fx.voeditor.visual.component.text.JavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
+import com.kyj.fx.voeditor.visual.component.tree.XMLTreeView;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.builder.GargoyleBuilderFactory;
 import com.kyj.fx.voeditor.visual.framework.contextmenu.FxContextManager;
@@ -66,9 +68,6 @@ import com.kyj.fx.voeditor.visual.main.layout.CloseableParent;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
 import com.kyj.scm.manager.svn.java.JavaSVNManager;
-import com.sun.javafx.font.PrismFontFactory;
-import com.sun.javafx.font.PrismFontLoader;
-import com.sun.javafx.tk.Toolkit;
 
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.animation.Transition;
@@ -193,8 +192,9 @@ public class FxUtil {
 
 	/**
 	 * FxUtil 클래스의 static 스코프를 로드하기 위한 코드.
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 12. 3. 
+	 * @작성일 : 2017. 12. 3.
 	 */
 	public static void hello() {
 	}
@@ -736,6 +736,7 @@ public class FxUtil {
 	 ********************************/
 	public static Stage craeteStage(Scene scene, Consumer<Stage> option) {
 		Stage stage = new Stage();
+		stage.initOwner(SharedMemory.getPrimaryStage());
 		stage.setScene(scene);
 
 		scene.getStylesheets().add(SkinManager.getInstance().getSkin());
@@ -1984,6 +1985,59 @@ public class FxUtil {
 			return Stream.of(FontWeight.values()).map(s -> s.name()).collect(Collectors.toList());
 		}
 
+	}
+
+	/**
+	 * @author KYJ
+	 *
+	 */
+	public static class ContextUtil {
+		
+		/**
+		 * XML 관련 컨텍스트 유틸
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 12. 5. 
+		 * @param parent
+		 * @return
+		 */
+		public static ContextMenu createXmlContextMenu(XMLTreeView parent) {
+
+			ContextMenu cm = new ContextMenu();
+			{
+				MenuItem miXpath = new MenuItem("Xpath");
+				cm.getItems().add(miXpath);
+
+				miXpath.setOnAction(ev -> {
+
+					Optional<Pair<String, String>> showInputDialog = DialogUtil.showInputDialog(parent, "Xpath", "Input XPath");
+					showInputDialog.ifPresent(p -> {
+
+						String value = p.getValue();
+						if (ValueUtil.isNotEmpty(value)) {
+							Optional<NodeList> xpathNodes = XMLUtils.toXpathNodes(parent.getXml(), value, err -> {
+								FxUtil.createCodeAreaAndShow(String.format("Input XPath : %s\n\n\n%s", value, ValueUtil.toString(err)));
+							});
+							// Optional<String> xpathText = XMLUtils.toXpathText();
+							xpathNodes.ifPresent(r -> {
+								int length = r.getLength();
+
+								StringBuffer sb = new StringBuffer();
+								for (int i = 0; i < length; i++) {
+									org.w3c.dom.Node item = r.item(i);
+									sb.append(item.toString()).append("\n");
+								}
+								FxUtil.createCodeAreaAndShow(String.format("Input XPath : %s\n\n\n%s", value, sb.toString()));
+
+							});
+
+						}
+					});
+
+				});
+			}
+			return cm;
+
+		}
 	}
 
 	/**
