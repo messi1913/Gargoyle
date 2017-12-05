@@ -9,7 +9,11 @@ package com.kyj.fx.voeditor.visual.component;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.apache.log4j.spi.LoggerFactory;
+import org.slf4j.Logger;
+
 import com.kyj.fx.voeditor.visual.momory.SkinManager;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -30,8 +34,9 @@ import javafx.util.Callback;
 public class ButtonTableColumn<S extends Map<String, Object>> extends TableColumn<S, Boolean> {
 
 	private Function<Integer, Boolean> changeFunc;
-
+	private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ButtonTableColumn.class);
 	public ButtonTableColumn() {
+		
 		initialize("", i -> true);
 	}
 
@@ -100,7 +105,27 @@ public class ButtonTableColumn<S extends Map<String, Object>> extends TableColum
 				}
 			});
 
-			cellButton.setOnAction(e -> parent.clickHandle(cellButton, buttonCell.getRowIndex()));
+			cellButton.setOnMouseClicked(ev -> {
+				if (ev.getClickCount() == 1) {
+
+					if (ev.isConsumed())
+						return;
+
+					cellButton.setDisable(true);
+					try {
+						parent.clickHandle(cellButton, buttonCell.getRowIndex());
+					} catch (Exception e) {
+						LOGGER.error(ValueUtil.toString(e));
+					}
+
+					cellButton.setDisable(false);
+
+					ev.consume();
+				}
+			});
+
+			// cellButton.setOnAction(e -> parent.clickHandle(cellButton,
+			// buttonCell.getRowIndex()));
 
 			return buttonCell;
 
