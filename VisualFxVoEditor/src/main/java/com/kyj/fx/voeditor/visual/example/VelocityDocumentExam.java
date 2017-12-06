@@ -6,11 +6,14 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import com.kyj.fx.voeditor.visual.component.velocity.DefaultVelocityBinderComposite;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 /**
@@ -27,7 +30,19 @@ public class VelocityDocumentExam extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
-		BorderPane pane = new DefaultVelocityBinderComposite();
+		DefaultVelocityBinderComposite pane = new DefaultVelocityBinderComposite();
+		ArrayList<Map<String, Object>> data = new ArrayList<>();
+
+		for (int i = 0; i < 10; i++) {
+			Map<String, Object> e = new LinkedHashMap<String, Object>();
+			e.put("v3", i);
+			e.put("v4", i);
+			e.put("v1", i);
+			e.put("v2", i);
+			data.add(e);
+		}
+
+		pane.setData(data);
 
 		primaryStage.setScene(new Scene(pane));
 		primaryStage.show();
