@@ -7,6 +7,8 @@
 package com.kyj.fx.voeditor.visual.component.file;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -50,12 +52,14 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -86,6 +90,14 @@ public class FilesAnalysisComposite extends BorderPane {
 
 	@FXML
 	private TableColumn<File, String> colFileName;
+	
+	/**
+	 * 17 . 12 . 06 부모 상대경로가 표시될 수 있도록 컬럼 추가.
+	 * 
+	 * @최초생성일 2017. 12. 6.
+	 */
+	@FXML
+	private TableColumn<File, Path> colParentPath;
 	@FXML
 	private ComboBox<String> cbFilterType;
 
@@ -122,11 +134,41 @@ public class FilesAnalysisComposite extends BorderPane {
 		tvFiles.setShowRoot(true);
 		tvFiles.setCache(false);
 		txtFileLocation.setEditable(false);
+
+		// 17 . 12 . 16 기본 Multiple로 선택되게 수정
+		tvFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		tbFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		tbFiles.getSelectionModel().setCellSelectionEnabled(true);
+		
 		colFileName.setCellValueFactory(v -> {
 			return new SimpleStringProperty(v.getValue().getName());
 		});
+
+		// 17 . 12 . 06 부모 상대경로가 표시될 수 있도록 컬럼 추가.
+		colParentPath.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Path>() {
+
+			@Override
+			public String toString(Path object) {
+				return object.toString();
+			}
+
+			@Override
+			public Path fromString(String string) {
+				return Paths.get(string);
+			}
+		}));
+		colParentPath.setCellValueFactory(v -> {
+
+			File rootFile = root.get();
+			Path rootPath = rootFile.toPath();
+			Path path = v.getValue().toPath();
+			return new SimpleObjectProperty<Path>(rootPath.relativize(path));
+			// FileUtil.toRelativizeForGagoyle(userDir);
+		});
+
 		tbFiles.setContextMenu(createTbFilesContextMenu());
 
+		FxUtil.installClipboardKeyEvent(tvFiles);
 		FxUtil.installClipboardKeyEvent(tbFiles);
 
 		FxUtil.installAutoTextFieldBinding(txtNameFilter, () -> {

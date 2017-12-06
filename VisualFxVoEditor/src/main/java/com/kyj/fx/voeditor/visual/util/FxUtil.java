@@ -108,6 +108,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -1237,6 +1238,16 @@ public class FxUtil {
 		FxTableViewUtil.installCopyHandler(tb);
 		// 2017.05.26 사용안함.
 		// ClipboardKeyEventInstaller.install(tb);
+	}
+	
+	/**
+	 * TreeView 키 이벤트 등록
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 6. 
+	 * @param tv
+	 */
+	public static void installClipboardKeyEvent(TreeView<?> tv) {
+		FxTreeViewClipboardUtil.installCopyPasteHandler(tv);
 	}
 
 	/**

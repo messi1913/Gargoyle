@@ -107,7 +107,10 @@ public class ExcelUtil {
 		}
 
 		if (str instanceof String) {
-			createCell.setCellValue((String) str);
+			if(((String) str).length() >= 32767)
+				createCell.setCellValue(new XSSFRichTextString(str.toString()));
+			else
+				createCell.setCellValue((String) str);
 		} else if (str instanceof Integer) {
 			createCell.setCellValue((Integer) str);
 		} else if (str instanceof Double) {

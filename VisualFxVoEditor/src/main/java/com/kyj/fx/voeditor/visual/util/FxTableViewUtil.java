@@ -230,16 +230,56 @@ class FxTableViewUtil {
 			// }
 
 			if (!cellSelectionEnabled) {
-				Object selectedItem = table.getSelectionModel().getSelectedItem();
 
-				ObservableList<?> columns = table.getColumns();
-				Optional<String> reduce = columns.stream().filter(ob -> ob instanceof TableColumn).map(obj -> (TableColumn) obj)
-						.map(tc -> tc.getCellData(selectedItem)).filter(v -> v != null).map(v -> v.toString())
-						.reduce((o1, o2) -> o1.toString().concat("\t").concat(o2.toString()));
-				reduce.ifPresent(str -> {
-					FxClipboardUtil.putString(str);
-					e.consume();
-				});
+				switch (selectionMode) {
+				case SINGLE: {
+					TableViewSelectionModel<?> selectionModel2 = table.getSelectionModel();
+					Object selectedItem = selectionModel2.getSelectedItem();
+
+					ObservableList<?> columns = table.getColumns();
+					Optional<String> reduce = columns.stream().filter(ob -> ob instanceof TableColumn).map(obj -> (TableColumn) obj).map(
+
+							tc -> {
+								return tc.getCellData(selectedItem);
+							}
+
+					).filter(v -> v != null).map(v -> v.toString()).reduce((o1, o2) -> o1.toString().concat("\t").concat(o2.toString()));
+					reduce.ifPresent(str -> {
+						FxClipboardUtil.putString(str);
+						e.consume();
+					});
+				}
+					break;
+				// 17.12.06 Multiple copy 적용.
+				case MULTIPLE: {
+					
+					ObservableList<Integer> selectedIndices = table.getSelectionModel().getSelectedIndices();
+//					ObservableList<?> selectedItems = table.getSelectionModel().getSelectedItems();
+
+					ObservableList<?> columns = table.getColumns();
+					StringBuffer sb = new StringBuffer();
+					for (int i = 0; i < selectedIndices.size(); i++) {
+						final int row = selectedIndices.get(i);
+						// Object data = selectedItmes.get(row);
+						Optional<String> reduce = columns.stream().filter(ob -> ob instanceof TableColumn).map(obj -> (TableColumn) obj)
+
+								.map(tc -> {
+									return getDisplayText(tc, row, null).toString();
+								}
+
+								).filter(v -> v != null).map(v -> v.toString())
+								.reduce((o1, o2) -> o1.toString().concat("\t").concat(o2.toString()));
+
+						reduce.ifPresent(str -> {
+							sb.append(str).append("\n");
+							e.consume();
+						});
+					}
+
+					FxClipboardUtil.putString(sb.toString());
+				}
+					break;
+				}
 
 			} else if (cellSelectionEnabled) {
 				ObservableList<TablePosition> selectedCells = selectionModel.getSelectedCells();
