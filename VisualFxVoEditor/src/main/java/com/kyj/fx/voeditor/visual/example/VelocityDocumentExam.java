@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.kyj.fx.voeditor.visual.component.velocity.DefaultVelocityBinderComposite;
+import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -42,6 +43,7 @@ public class VelocityDocumentExam extends Application {
 			data.add(e);
 		}
 
+		pane.setContext(ConfigResourceLoader.getInstance().get("default.database.view.template"));
 		pane.setData(data);
 
 		primaryStage.setScene(new Scene(pane));

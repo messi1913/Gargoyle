@@ -62,6 +62,7 @@ import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
 import com.kyj.fx.voeditor.visual.component.text.XMLEditor;
 import com.kyj.fx.voeditor.visual.component.text.XsltTransformComposite;
 import com.kyj.fx.voeditor.visual.component.utube.UtubeDownloaderComposite;
+import com.kyj.fx.voeditor.visual.component.velocity.DefaultVelocityBinderComposite;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleException;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentBeforeLoad;
 import com.kyj.fx.voeditor.visual.framework.GagoyleParentOnLoaded;
@@ -2266,7 +2267,12 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	public void miXlstConvertViewOnAction() {
 		loadNewSystemTab("XLST-Convert", new XsltTransformComposite());
 	}
-
+	
+	@FXML
+	public void miVelocityConvertOnAction(){
+		loadNewSystemTab("Velocity-Convert", new DefaultVelocityBinderComposite());
+	}
+	
 	@FXML
 	public void miBase64ImageOnAction() {
 		loadNewSystemTab("Base64 <-> Image", new Base64ImageConvertComposte());

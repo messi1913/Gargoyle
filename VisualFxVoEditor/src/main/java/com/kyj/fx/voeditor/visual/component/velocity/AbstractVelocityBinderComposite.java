@@ -128,6 +128,12 @@ public abstract class AbstractVelocityBinderComposite extends BorderPane {
 		this.txtContext.replaceText(velocity);
 	}
 
+	private ObjectProperty<List<Map<String, Object>>> data = new SimpleObjectProperty<>();
+
+	public void setData(List<Map<String, Object>> data) {
+		this.data.set(data);
+	}
+
 	/**
 	 * btn 클릭 함수 내용 정의 <br/>
 	 * 
@@ -139,12 +145,24 @@ public abstract class AbstractVelocityBinderComposite extends BorderPane {
 		Map<String, Object> map = param.get();
 
 		try {
+			map.put("data", data.get());
 			String velocityToText = ValueUtil.getVelocityToText(txtContext.getText(), map, false);
 			content.set(velocityToText);
 		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}
 
+	}
+
+	/**
+	 * 더미 데이터 매핑 팝업 열기
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 6.
+	 */
+	@FXML
+	public void showItemOnAction() {
+		//TODO
 	}
 
 }

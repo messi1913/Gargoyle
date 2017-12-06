@@ -44,8 +44,6 @@ import com.kyj.fx.voeditor.visual.component.sql.dbtree.commons.TableItemTree;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.sql.functions.ISchemaTreeItem;
 import com.kyj.fx.voeditor.visual.component.sql.functions.SQLPaneMotionable;
-import com.kyj.fx.voeditor.visual.component.sql.prcd.commons.ProcedureCallComposite;
-import com.kyj.fx.voeditor.visual.component.sql.prcd.mssql.MssqlProcedureCallComposite;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTabPane;
 import com.kyj.fx.voeditor.visual.component.text.ASTSqlCodeAreaHelper;
@@ -109,6 +107,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -694,7 +693,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 		MenuItem menuExportHtml = new MenuItem("Export HTML");
 		menuExportHtml.setOnAction(this::menuExportHtmlOnAction);
-		
+
 		Menu menuExportExcelFile = new Menu("Export", null, menuExportExcel, menuExportSpreadSheet, menuExportInsertScript,
 				menuExportMergeScript, menuExportJson, menuExportHtml);
 		/**/
@@ -710,8 +709,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * 컨텍스트 메뉴 생성 및 기능 적용
 	 *
 	 *
-	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
-	 * setAccelerator에 등록된 이벤트가 호출안됨
+	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
 	 * 
 	 *
 	 * @param schemaTree2
@@ -922,8 +920,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 *
 	 * 2016-12-09 CodeAssistHelper 기능 추가.
 	 *
-	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면
-	 * setAccelerator에 등록된 이벤트가 호출안됨
+	 * 2016-10-27 키 이벤트를 setAccelerator를 사용하지않고 이벤트 방식으로 변경 이유 : 도킹기능을 적용하하면 setAccelerator에 등록된 이벤트가 호출안됨
 	 *
 	 * @return
 	 */
@@ -1089,8 +1086,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				// String driverName =
 				// DbUtil.getDriverNameByConnection(connection);
 				// String dbmsName = ValueUtil.getDriverToDBMSName(driverName);
-				showProperties(connectionSupplier, /* catalog */null,
-						/* schemaName */null, selectedSQLText);
+				showProperties(connectionSupplier, /* catalog */null, /* schemaName */null, selectedSQLText);
 			} catch (Exception e1) {
 				LOGGER.error(ValueUtil.toString(e1));
 			}
@@ -1236,7 +1232,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 
 			tbResult.getColumns().clear();
 			tbResult.getItems().clear();
-			
+
 			List<Map<String, Object>> query = query(sql, param, success -> {
 				lblStatus.setText(success.size() + " row");
 			}, (exception, showDialog) -> {
@@ -1244,19 +1240,16 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 				if (showDialog)
 					DialogUtil.showExceptionDailog(this, exception);
 			});
-			
+
 			updateResultUi(query);
 		}
 	}
 
-	
 	public void updateResultUi(List<Map<String, Object>> data) {
 
 		if (data.isEmpty()) {
 			return;
 		}
-
-		
 
 		binding(data);
 		tbResult.getItems().addAll(data);
@@ -1445,19 +1438,37 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 		}
 
 	}
-	
+
 	/**
 	 * Export HTML <br/>
 	 * 
-	 * TODO
-	 * 템플릿 파일과 데이터를 결합하여 HTML을 보여주는 기능 구현 <br/>
-	 *  
+	 * TODO 템플릿 파일과 데이터를 결합하여 HTML을 보여주는 기능 구현 <br/>
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 12. 4. 
+	 * @작성일 : 2017. 12. 4.
 	 * @param e
 	 */
 	public void menuExportHtmlOnAction(ActionEvent e) {
-		//TODO 
+		// TODO
+
+		ObservableList<Map<String, Object>> items = this.tbResult.getItems();
+
+		String template = ConfigResourceLoader.getInstance().get("default.database.view.template");
+
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("data", items);
+
+		String velocityToText = ValueUtil.getVelocityToText(template, map, false);
+
+		System.out.println(velocityToText);
+
+		WebView v = new WebView();
+		v.getEngine().loadContent(velocityToText);
+		FxUtil.createStageAndShow(v, stage->{
+			stage.setWidth(1200d);
+			stage.setHeight(800d);
+		});
+
 	}
 
 	public abstract void menuExportInsertScriptOnAction(ActionEvent e);
@@ -1608,10 +1619,9 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 	 * @param e
 	 */
 	public void menuExecuteProcedure(ActionEvent e) {
-		
+
 		/*
-		 * 필요시 오버라이딩하여 구현할것.
-		 * 17.12.24 현재 MssqlPane에서만 구현됨. 
+		 * 필요시 오버라이딩하여 구현할것. 17.12.24 현재 MssqlPane에서만 구현됨.
 		 */
 	}
 
@@ -1824,8 +1834,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						});
 
 						FxUtil.installAutoTextFieldBinding(txtTable, () -> {
-							return searchPattern(txtSchema.getText(), txtTable.getText()).stream().map(v -> stringConverter.apply(
-									v.getValue())/* v.getValue().getName() */).collect(Collectors.toList());
+							return searchPattern(txtSchema.getText(), txtTable.getText()).stream()
+									.map(v -> stringConverter.apply(v.getValue())/* v.getValue().getName() */).collect(Collectors.toList());
 						});
 						txtSchema.setText(_defaultSchema);
 
@@ -1834,8 +1844,7 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 						if (null != selectedItem) {
 							K value = selectedItem.getValue();
 							if (value instanceof TableItemTree) {
-								txtTable.setText(stringConverter
-										.apply(value) /* value.getName() */);
+								txtTable.setText(stringConverter.apply(value) /* value.getName() */);
 							}
 						}
 
