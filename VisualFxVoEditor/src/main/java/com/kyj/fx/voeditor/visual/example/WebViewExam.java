@@ -6,8 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.example;
 
-import java.io.File;
-
 import com.kyj.fx.voeditor.visual.framework.webview.TinymceDeligator;
 
 import javafx.application.Application;
@@ -17,16 +15,10 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.util.Callback;
 
 /**
  * TODO 클래스 역할
@@ -69,6 +61,9 @@ public class WebViewExam extends Application {
 		primaryStage.setScene(new Scene(new BorderPane(view), 1200, 700));
 		primaryStage.show();
 
+		Platform.runLater(() -> {
+			createInstance.setText("hi");
+		});
 		new Thread(new Runnable() {
 
 			@Override
@@ -81,46 +76,12 @@ public class WebViewExam extends Application {
 				}
 
 				Platform.runLater(() -> {
-
-					// System.out.println("ACTION READONLY");
 					createInstance.setText("<a href='http://www.naver.com'>LINK</a>");
-					// createInstance.setReadOnly(true);
-
 				});
 
 			}
 		}).start();
 
-		// new Thread(new Runnable() {
-		//
-		// @Override
-		// public void run() {
-		//
-		// try {
-		// Thread.sleep(10000);
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		//
-		// Platform.runLater(() -> {
-		//
-		// System.out.println("ACTION Editable");
-		// createInstance.setReadOnly(false);
-		//
-		// });
-		//
-		// }
-		// }).start();
-
 	}
 
-	//
-
-	/***********************************************************************************/
-
-	/***********************************************************************************/
-	/* 일반API 구현 */
-
-	//
-	/***********************************************************************************/
 }

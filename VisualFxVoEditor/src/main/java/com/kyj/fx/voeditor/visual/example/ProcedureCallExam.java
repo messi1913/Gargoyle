@@ -8,10 +8,10 @@ package com.kyj.fx.voeditor.visual.example;
 
 import com.kyj.fx.voeditor.visual.component.sql.functions.ConnectionSupplier;
 import com.kyj.fx.voeditor.visual.component.sql.prcd.mssql.MssqlProcedureCallComposite;
-import com.kyj.fx.voeditor.visual.util.DbUtil;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 /**
@@ -37,7 +37,7 @@ public class ProcedureCallExam extends Application {
 
 			@Override
 			public String getUrl() {
-				return "";
+				return "jdbc:sqlserver://localhost:1433";
 			}
 
 			@Override
@@ -54,13 +54,19 @@ public class ProcedureCallExam extends Application {
 			public String getDriver() {
 				return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 			}
-			
+
 		};
 
+//		Platform.runLater(() -> {
+//			MssqlProcedureCallComposite<Void> root = new MssqlProcedureCallComposite<Void>(connectionSupplier);
+//			MssqlProcedureCallCompositePopup<Void> popup = new MssqlProcedureCallCompositePopup<Void>(primaryStage, root);
+//			popup.show();
+//		});
+
 		MssqlProcedureCallComposite<Void> root = new MssqlProcedureCallComposite<Void>(connectionSupplier);
-		root.setProcedure("master", "sys", "sp_add_data_file_recover_suspect_db");
-		root.prepare();
-		primaryStage.setScene(new Scene(root));
+
+		primaryStage.setScene(new Scene(new BorderPane(root)));
+		root.prepare("Catalog", "Schema", "ProcedureName");
 		primaryStage.show();
 
 	}
