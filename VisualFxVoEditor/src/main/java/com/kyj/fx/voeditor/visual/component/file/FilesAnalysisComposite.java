@@ -90,7 +90,7 @@ public class FilesAnalysisComposite extends BorderPane {
 
 	@FXML
 	private TableColumn<File, String> colFileName;
-	
+
 	/**
 	 * 17 . 12 . 06 부모 상대경로가 표시될 수 있도록 컬럼 추가.
 	 * 
@@ -139,7 +139,7 @@ public class FilesAnalysisComposite extends BorderPane {
 		tvFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		tbFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		tbFiles.getSelectionModel().setCellSelectionEnabled(true);
-		
+
 		colFileName.setCellValueFactory(v -> {
 			return new SimpleStringProperty(v.getValue().getName());
 		});
@@ -466,7 +466,7 @@ public class FilesAnalysisComposite extends BorderPane {
 	 * @author KYJ
 	 *
 	 */
-	static class V {
+	public static class V {
 		private String fileExtension;
 		private ObservableList<File> items = FXCollections.observableArrayList();
 		private IntegerProperty size = new SimpleIntegerProperty(-1);
@@ -542,8 +542,11 @@ public class FilesAnalysisComposite extends BorderPane {
 
 				protected Map<String, ObservableList<File>> call() throws Exception {
 
+					LOGGER.debug("Start Search");
+					long start = System.currentTimeMillis();
 					recursive(root);
-
+					long end = System.currentTimeMillis();
+					LOGGER.debug("End Search , Cost Time {} ", (end - start));
 					return items;
 				}
 			};

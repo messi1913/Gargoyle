@@ -1686,6 +1686,8 @@ public class FxUtil {
 
 		WebView view = new WebView();
 		view.setContextMenuEnabled(false);
+		view.setCache(true);
+
 		WebEngine engine = view.getEngine();
 
 		engine.setOnError(err -> {
@@ -1822,6 +1824,8 @@ public class FxUtil {
 				// }
 			}
 		});
+		
+		
 
 		FxUtil.createStageAndShow(new Scene(root, BROWSER_WIDTH, BROWSER_HEIGHT), stage -> {
 

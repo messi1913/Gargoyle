@@ -45,6 +45,10 @@ public class FileIconImageView extends ImageView {
 
 		Icon icon = getIcon(file);
 
+		if (icon == null) {
+			setImage((BufferedImage) null);
+			return;
+		}
 		java.awt.Image image = ((ImageIcon) icon).getImage();
 		java.awt.Image scaledInstance = image.getScaledInstance(width, width, 4);
 
