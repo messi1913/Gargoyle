@@ -271,8 +271,10 @@
 											onAction="#miXmlViewOnAction" text="XML Viwer" />
 										<MenuItem fx:id="miXlstConvert" mnemonicParsing="false"
 											onAction="#miXlstConvertViewOnAction" text="XLST-Convert" />
-											<MenuItem fx:id="miVelocityConvert" mnemonicParsing="false"
+										<MenuItem fx:id="miVelocityConvert" mnemonicParsing="false"
 											onAction="#miVelocityConvertOnAction" text="Velocity-Convert" />
+											<MenuItem fx:id="miBehaviorConvert" mnemonicParsing="false"
+											onAction="#miBehaviorConvertOnAction" text="Behavior Reader" />
 									</items>
 								</Menu>
 
@@ -297,14 +299,14 @@
 											onAction="#miFileAnalysisViewOnAction" text="File-Analysis-View" />
 									</items>
 								</Menu>
-								
+
 								<Menu text="Mail" mnemonicParsing="false">
 									<items>
-										<MenuItem mnemonicParsing="false"
-											onAction="#miMailOnAction" text="Mail" />
+										<MenuItem mnemonicParsing="false" onAction="#miMailOnAction"
+											text="Mail" />
 									</items>
 								</Menu>
-								
+
 							</items>
 						</Menu>
 

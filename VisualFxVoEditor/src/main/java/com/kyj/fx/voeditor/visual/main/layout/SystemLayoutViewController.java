@@ -55,6 +55,9 @@ import com.kyj.fx.voeditor.visual.component.popup.ZipFileViewerComposite;
 import com.kyj.fx.voeditor.visual.component.proxy.ProxyServerComposite;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
+import com.kyj.fx.voeditor.visual.component.text.BehaviorTextComposite;
+import com.kyj.fx.voeditor.visual.component.text.BehaviorTextComposite;
+import com.kyj.fx.voeditor.visual.component.text.BehaviorTextComposite;
 import com.kyj.fx.voeditor.visual.component.text.BigTextView;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
 import com.kyj.fx.voeditor.visual.component.text.LogViewComposite;
@@ -1470,7 +1473,7 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 
 			JavaProjectFileWrapper value = selectedItem.getValue();
 			if (value != null) {
-				//마우스 좌클릭인경우에만 이벤트 처리될수있도록 수정
+				// 마우스 좌클릭인경우에만 이벤트 처리될수있도록 수정
 				if (event.getButton() == MouseButton.PRIMARY) {
 					if (event.isConsumed())
 						return;
@@ -2267,12 +2270,12 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 	public void miXlstConvertViewOnAction() {
 		loadNewSystemTab("XLST-Convert", new XsltTransformComposite());
 	}
-	
+
 	@FXML
-	public void miVelocityConvertOnAction(){
+	public void miVelocityConvertOnAction() {
 		loadNewSystemTab("Velocity-Convert", new DefaultVelocityBinderComposite());
 	}
-	
+
 	@FXML
 	public void miBase64ImageOnAction() {
 		loadNewSystemTab("Base64 <-> Image", new Base64ImageConvertComposte());
@@ -2314,6 +2317,11 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 			JavaProjectFileWrapper value = selectedItem.getValue();
 			// new EclipseJavaCompiler(value);
 		}
+	}
+
+	@FXML
+	public void miBehaviorConvertOnAction() {
+		loadNewSystemTab(BehaviorTextComposite.getName(), new BehaviorTextComposite());
 	}
 
 }

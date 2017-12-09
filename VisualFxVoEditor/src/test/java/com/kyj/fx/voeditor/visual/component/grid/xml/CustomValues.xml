@@ -1,0 +1,194 @@
+<?xml version="1.0" standalone="yes"?>
+<CustomVariables>
+	<Variable Name="CSWSAppServer" Category="CS_CONFIG"
+		Description="Compliance Suite Server Name" Value="BIOMESDEV" />
+	<Variable Name="CSDBUser" Category="CS_CONFIG"
+		Description="Compliance Suite Database User" Value="sa" />
+	<Variable Name="CSDBPassword" Category="CS_CONFIG"
+		Description="Compliance Suite Database Password" Value="Samsung!" />
+	<Variable Name="CSGatewayDirectory" Category="CS_CONFIG"
+		Description="Location of label templates" Value="\\BIOMESDRA\SyncadeShare\Gateway" />
+	<Variable Name="DVHWSHost" Category="DV_CONFIG"
+		Description="DeltaV Historian WS Node Name" Value="" />
+	<Variable Name="DVHistorianDB" Category="DV_CONFIG"
+		Description="DeltaV Historian Database Name" Value="" />
+	<Variable Name="DVUser" Category="DV_CONFIG" Description="DeltaV User"
+		Value="" />
+	<Variable Name="DVPassword" Category="DV_CONFIG" Description="DeltaV Password"
+		Value="" />
+	<Variable Name="DVBatchEx" Category="DV_CONFIG" Description="DeltaV BeX nodename"
+		Value="" />
+	<Variable Name="DVCMWSHost" Category="DV_CONFIG"
+		Description="DeltaV Campaign Manager Web Service Host" Value="" />
+	<Variable Name="DVOPCWSHost" Category="DV_CONFIG"
+		Description="DeltaV OPC Web Service Host" Value="" />
+	<Variable Name="DMICS_ET_WSPATH" Category="ET" Description="ET WSDL Path"
+		Value="/et/webservice/" />
+	<Variable Name="CSDebugPath " Category="Debug" Description="Debug Path"
+		Value="C:\MES-Files" />
+	<Variable Name="GatewayDirectory" Category="Gateway"
+		Description="Gateway Directory" Value="\\BIOMESDRA\SyncadeShare\Gateway" />
+	<Variable Name="PrinterAvailable" Category="Printer"
+		Description="Printer Available" Value="" />
+	<Variable Name="DefaultPrinterID" Category="Printer"
+		Description="Printer ID" Value="" />
+	<Variable Name="DefaultPrinterPortId" Category="Printer"
+		Description="Printer Port Id" Value="" />
+	<Variable Name="DefaultPrinter" Category="Printer"
+		Description="Default Printer" Value="" />
+	<Variable Name="DefaultPrinterPort" Category="Printer"
+		Description="Default Printer Port" Value="" />
+	<Variable Name="CSDataBaseServer" Category="CS_CONFIG"
+		Description="Compliance Suite Database User" Value="BIOMESDEV" />
+	<Variable Name="DVHistorian" Category="DV_CONFIG" Description="DeltaV Historian"
+		Value="" />
+	<Variable Name="DVOPCServer" Category="DV_CONFIG" Description="DeltaV OPC Server"
+		Value="" />
+	<Variable Name="DVPhaseServer" Category="DV_CONFIG"
+		Description="DeltaV Phase Server" Value="" />
+	<Variable Name="ScalePortID1" Category="Scale" Description="Scale Port ID1"
+		Value="" />
+	<Variable Name="ScaleDebug" Category="Scale" Description="Scale Debug"
+		Value="" />
+	<Variable Name="TestScaleID" Category="Scale" Description="Test Scale ID"
+		Value="" />
+	<Variable Name="DVBeX" Category="DV_CONFIG" Description="DeltaV Bex"
+		Value="" />
+	<Variable Name="CSConfigPath" Category="CS_CONFIG"
+		Description="Config Path" Value="\\BIOMESDRA\SyncadeShare\MESConfig" />
+	<Variable Name="BEHAVIOR_USERNAME" Category="Behavior"
+		Description="Behavior Username" Value="system" />
+	<Variable Name="BEHAVIOR_PWD" Category="Behavior" Description="Behavior Password"
+		Value="009028003004000001" />
+	<Variable Name="BEHAVIOR_DOMAIN" Category="Behavior"
+		Description="Behavior Domain" Value="Syncade" />
+	<Variable Name="CSSystemID" Category="CS_CONFIG"
+		Description="Compliance Suite System ID" Value="" />
+	<Variable Name="CSTemporaryFilesPath" Category="CS_CONFIG"
+		Description="Temporary File storage path" Value="" />
+	<Variable Name="CSPermanentFilesPath" Category="CS_CONFIG"
+		Description="Permanant File storage path" Value="\\BIOMESDRA\SyncadeShare\MESPermanent" />
+	<Variable Name="MSMQServer" Category="CS_CONFIG" Description="Message Queue Server"
+		Value="." />
+	<Variable Name="CSETDatabase" Category="CS_CONFIG"
+		Description="ET Database name" Value="DMI_ET" />
+	<Variable Name="boolDvSimulation" Category="" Description=""
+		Value="True" />
+	<Variable Name="strDvSimulationXMLPath" Category=""
+		Description="" Value="\\C:\Inetpub\testOPCxi.xml" />
+	<Variable Name="SBL_ScaleValue" Category="" Description=""
+		Value="35" />
+	<Variable Name="DCA_USERNAME" Category="" Description="sa"
+		Value="sa" />
+	<Variable Name="DCA_PWD" Category="" Description="sa" Value="sa" />
+	<Variable Name="SynDCAIsSSL" Category="" Description="Is DCA SSL Server"
+		Value="0" />
+	<Variable Name="LinkedOrder_ReceiVeTimeout" Category=""
+		Description="PLM Server" Value="45000" />
+	<Variable Name="LinkedOrder_SendTimeout" Category=""
+		Description="PLM Server" Value="45000" />
+	<Variable Name="LinkedOrder_ConnectTimeout" Category=""
+		Description="PLM Server" Value="45000" />
+	<Variable Name="LinkedOrder_ResolveTimeout" Category=""
+		Description="PLM Server" Value="45000" />
+	<Variable Name="DVSOAXiGatewayWS" Category="" Description="Deltav SOA Xi URl"
+		Value="http://INPUN-DVPP010:58080/XiServices/ServerDiscovery" />
+	<Variable Name="DVWFOPCXiWS" Category="" Description="WF OPC Xi WS URl"
+		Value="http://BIOMESDEV/WFDeltaV/WebService/XiService.asmx" />
+	<Variable Name="OPCXMLGateway_RetryCount" Category=""
+		Description="Retry Count" Value="2" />
+	<Variable Name="OPCXMLGateway_RetryWait" Category=""
+		Description="Retry Wait in seconds" Value="1" />
+	<Variable Name="MESInterfaceDB" Category="MES"
+		Description="MES Interface DB Name" Value="SamsungDB" />
+	<Variable Name="SyncadeXMLFilesPath" Category="CS_CONFIG"
+		Description="XML file Storage path" Value="D:\Program Files (x86)\Emerson\Syncade4\XML" />
+	<Variable Name="LanguageDefault" Category="CS_CONFIG"
+		Description="Default Language" Value="English" />
+	<Variable Name="LanguageFileLocation" Category="CS_CONFIG"
+		Description="Language file full path" Value="D:\inetpub\wwwroot\Languages\Applications" />
+	<Variable Name="EMR_WF_TEXT_DATABASE" Category="CS_CONFIG"
+		Description="Syncade WF_TEXT database" Value="AC_Resource_Editor_Dev" />
+	<Variable Name="SynIsSSL" Category="" Description="" Value="FALSE" />
+	<Variable Name="EMR_DEBUGXMLMODE" Category="XPath Multi"
+		Description="Turns on XML debug output from all XML provider calls"
+		Value="TRUE" />
+	<Variable Name="EMR_GLOBAL_STORAGE_PATH" Category="CS_CONFIG"
+		Description="Global variable storage path" Value="C:\Globals" />
+	<Variable Name="EMR_LANGUAGE_DEBUG" Category="" Description=""
+		Value="0" />
+	<Variable Name="Template_File_Path" Category="" Description=""
+		Value="\\BIOMESDRA\SyncadeShare\InterfaceTemplate" />
+	<Variable Name="SBL_MAXIMO_EquipList_Property" Category=""
+		Description="" Value="Child Equipment List" />
+	<Variable Name="SBL_MAXIMO_CalibrationDueDate_Property"
+		Category="" Description="" Value="Calibration Due Date" />
+	<Variable Name="SBL_MAXIMO_CalibrationExpiredEvent_Property"
+		Category="" Description="" Value="Calibration Expired" />
+	<Variable Name="EMR_MM_RELEVANT_FLAG" Category="SAP-Integ"
+		Description="Flag indicating if SAP Material Master is relevant"
+		Value="True" />
+	<Variable Name="EMR_MM_RELEVANT_KEY" Category="SAP-Integ"
+		Description="SAP MM element name for SAP Relevant Flag" Value="SAP Material" />
+	<Variable Name="EMR_SAP_MM_RELEVANT_KEY" Category="SAP-Integ"
+		Description="Syncade Relevant Element in SAP Material Master" Value="Log Handling Group" />
+	<Variable Name="EMR_SAP_MM_RELEVANT_FLAG" Category="SAP-Integ"
+		Description="Value of Syncade Relevent Element in SAP Material Master"
+		Value="3001" />
+	<Variable Name="EMR_CONFIGFILEPATH" Category="File"
+		Description="Path for Config Files" Value="C:\CSConfig" />
+	<Variable Name="EMR_WD_MONITOR_SCRIPT_PERFORMANCE" Category="Debug"
+		Description="Enable WD script performance monitoring (true or false)"
+		Value="true" />
+	<Variable Name="EMR_DEFAULT_ORDER_STATUS" Category="SAP-Integ"
+		Description="Order Status for Order Creation" Value="Planned" />
+	<Variable Name="EMR_DEFAULT_ORDER_PRIORITY" Category="SAP-Integ"
+		Description="Order Priority for Order Creation" Value="Normal" />
+	<Variable Name="CSPDFLabelFileDirectory" Category=""
+		Description="PDF file path" Value="\\BIOMESDRA\SyncadeShare\PDFLabel" />
+	<Variable Name="CSSavePdf" Category="" Description="Boolean Parameter"
+		Value="True" />
+	<Variable Name="CSReasonCode" Description="Reason code 1"
+		Value="RC1" />
+	<Variable Name="CSPDFLabelFileDirectory12" Category=""
+		Description="" Value="" />
+	<Variable Name="MES_ETDatabase" Category="" Description=""
+		Value="DMI_ET" />
+	<Variable Name="SBL_EquipmentClassName" Category=""
+		Description="" Value="Dummy" />
+	<Variable Name="SBL_Active" Category="" Description="" Value="0" />
+	<Variable Name="SBL_InActive" Category="" Description=""
+		Value="1" />
+	<Variable Name="SBL_MAXIMO_CalibrationEventName" Category=""
+		Description="" Value="E_CALIBRATION" />
+	<Variable Name="SBL_MAXIMO_CalibrationExpireEventName"
+		Category="" Description="" Value="E_CALIBRATION_EXPIRED" />
+	<Variable Name="SBL_AssetId" Category="" Description=""
+		Value="Asset Id" />
+	<Variable Name="CSRetryCount" Category="" Description="Retry Count"
+		Value="3" />
+	<Variable Name="WriteLogTF" Category="CS_CONFIG"
+		Description="Check to write log. IF True then only write log" Value="True" />
+	<Variable Name="LogFolderPath" Category="CS_CONFIG"
+		Description="Log Folder path" Value="C:\Log" />
+	<Variable Name="SourceLocationInstructionOrder" Category="CS_CONFIG"
+		Description="Source Location Instruction Order While Dispensing"
+		Value="2" />
+	<Variable Name="TargerLocationInstructionOrder" Category="CS_CONFIG"
+		Description="Traget Location Instruction Order While Dispensing"
+		Value="3" />
+	<Variable Name="ERPCreatedOrderDefaultState" Category="CS_CONFIG"
+		Description="When order is created by ERP its state will be this parameter "
+		Value="Approve" />
+	<Variable Name="SendEmail" Category="SendEmail" Description="SendEmail"
+		Value="\\BIOMESDRA\SyncadeShare\Emails\Email-Response-EquipCreate.xml" />
+	<Variable Name="EMR_TEMP_DATA_PATH" Category="CS_CONFIG"
+		Description="WD Log" Value="D:\WDLog" />
+
+	<Variable Name="MES_DMI_ManuDatabase" Category="" Description=""
+		Value="DMI_Manu32" />
+	<Variable Name="OverrideERPCheckStatus" Category=""
+		Description="Override ERP Check Status for skip Material availability transaction"
+		Value="Conditional Release" />
+
+</CustomVariables>

@@ -14,7 +14,6 @@ import org.controlsfx.control.PopOver;
 import org.fxmisc.richtext.CodeArea;
 
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
-import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.SqlFormatter;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
