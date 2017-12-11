@@ -48,8 +48,10 @@ public class PreferencesUtilTest {
 	 *
 	 * @return
 	 * @throws Exception
+	 * @deprecated API Changed.
 	 */
 	@Test
+	@Deprecated
 	public void getMsWordDirByRegedit() throws Exception {
 
 		List<String> command = new ArrayList<String>();
@@ -60,7 +62,7 @@ public class PreferencesUtilTest {
 		command.add("/v");
 		command.add("PROGRAMDIR");
 
-		BiConsumer<Integer, StringBuffer> convert = (code, buf) -> {
+		BiConsumer<Integer, String> convert = (code, buf) -> {
 			if (code == 0) {
 				System.out.println("exit Code : " + code);
 				String str = buf.toString();
