@@ -121,7 +121,7 @@ public class CodeAreaFileDragDropHelper extends AbstractFileDragDropHelper<CodeA
 	 * @return
 	 */
 	protected long dragDropLimitSize() {
-		return 5 * 1024 * 1024;
+		return 60 * 1024 * 1024;
 	}
 
 	/*********************************************************/
