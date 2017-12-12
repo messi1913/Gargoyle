@@ -49,6 +49,8 @@ public class JSHintReportExecutor {
 
 		// messageReceiver = null;
 
+		String userHome = System.getProperty("user.home");
+		System.out.println(userHome);
 		File file = new File("C:\\ph4net0m\\ph4net0m");
 
 		ArrayList<Callable<Integer>> list = new ArrayList<>();
@@ -75,7 +77,7 @@ public class JSHintReportExecutor {
 							return 0;
 						RuntimeClassUtil.exeSynch(Arrays.asList(
 								/* command location */
-								"C:\\Users\\KYJ\\node_modules\\.bin\\jshint.cmd"
+								userHome + "\\node_modules\\.bin\\jshint.cmd"
 
 						/**/
 						, f.getAbsolutePath()
@@ -89,7 +91,7 @@ public class JSHintReportExecutor {
 //						,"--config" , "C:\\SVN_WORKSPACE\\jshintconfig.json",
 
 						/* report template. */
-						, "--reporter", "C:\\Users\\KYJ\\node_modules\\jshint-html-reporter\\reporter.js"
+						, "--reporter", userHome + "\\node_modules\\jshint-html-reporter\\reporter.js"
 
 //								, "-verbose"
 
