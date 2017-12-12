@@ -15,11 +15,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
+import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
 /**
  * @author KYJ
@@ -47,59 +49,63 @@ public class JSHintReportExecutor {
 
 		// messageReceiver = null;
 
-		File file = new File("C:\\SVN_WORKSPACE\\wwwroot");
+		File file = new File("C:\\ph4net0m\\ph4net0m");
 
 		ArrayList<Callable<Integer>> list = new ArrayList<>();
 		File[] listFiles = file.listFiles();
 		for (File f : listFiles) {
 			if (f.isDirectory()) {
-				
-				if(!"MaterialMovement".equals(f.getName()))
-					continue;
-				
+
+//				if (!"MaterialMovement".equals(f.getName()))
+//					continue;
+
 				Callable<Integer> task = new Callable<Integer>() {
-					
+
 					@Override
 					public Integer call() throws Exception {
 						System.out.println(f.getName() + " job Start.");
-						
+
 						String simpleOutputName = f.getName() + "-report.html";
 						File file2 = new File(file.getParentFile(), simpleOutputName);
-						
+
 						System.out.println(file2.getAbsolutePath());
-//						String outputFileName =  f.getName() + "-report.html";
-						
+						// String outputFileName = f.getName() + "-report.html";
+
 						if (file2.exists())
 							return 0;
 						RuntimeClassUtil.exeSynch(Arrays.asList(
 								/* command location */
-								"C:\\SVN_WORKSPACE\\node_modules\\.bin\\jshint.cmd"
-								
-								/**/
-								,f.getAbsolutePath()
+								"C:\\Users\\KYJ\\node_modules\\.bin\\jshint.cmd"
 
-								/* exclude */
-//								"--exclude-path", "C:\\SVN_WORKSPACE\\.jshintignore",
-								
-//								"--exclude" ,  "**/*min.js,**/jquery*.js",
-								
-								/* config */
-//								"--config" ,  "C:\\SVN_WORKSPACE\\jshintconfig.json",
-								
-								/* report template. */
-								,"--reporter", "C:\\SVN_WORKSPACE\\node_modules\\jshint-html-reporter\\reporter.js"
-								
-								,"-verbose"
-								
-//								/* redirect */
-								, ">", file2.getAbsolutePath()
-								
+						/**/
+						, f.getAbsolutePath()
+
+						/* exclude */
+//						,"--exclude-path", ".jshintignore"
+
+						 ,"--exclude" , "**/bootstrap*.js,**/*.min.js"
+
+						/* config */
+//						,"--config" , "C:\\SVN_WORKSPACE\\jshintconfig.json",
+
+						/* report template. */
+						, "--reporter", "C:\\Users\\KYJ\\node_modules\\jshint-html-reporter\\reporter.js"
+
+//								, "-verbose"
+
+						// /* redirect */
+						, ">", file2.getAbsolutePath()
+
 						), "EUC-KR",
 
-								pb -> {
+								new Consumer<ProcessBuilder>() {
+									@Override
+									public void accept(ProcessBuilder pb) {
+										
+										pb.directory(new File("C:\\ph4net0m\\ph4net0m"));
 
-									pb.directory(new File("C:\\SVN_WORKSPACE"));
-
+										System.out.println(ValueUtil.toString(pb.environment()));
+									}
 								}, messageReceiver, err -> {
 									System.err.println(err);
 									System.exit(-1);
