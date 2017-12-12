@@ -15,6 +15,7 @@ import org.w3c.dom.NodeList;
 
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.util.XMLUtils;
 
@@ -22,6 +23,9 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -29,6 +33,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
@@ -65,17 +70,34 @@ public class BehaviorTextComposite extends BorderPane {
 		HBox.getHgrow(txtLoacation);
 		hBox.setStyle("-fx-padding : 5px; -fx-spacing : 5px;");
 
-		setTop(hBox);
+		Menu menuWindow = new Menu("Window");
+		MenuItem cmiShowFullText = new MenuItem("Show Full Text");
+		cmiShowFullText.setOnAction(ev -> {
+			if (this.wib != null)
+				FxUtil.createStageAndShow(xmlEditor, stage -> {
+					stage.setTitle("XML - " + this.wib.getName());
+					stage.setWidth(800d);
+					stage.setHeight(600d);
+				});
+		});
+
+		menuWindow.getItems().add(cmiShowFullText);
+		MenuBar mbMaster = new MenuBar(menuWindow);
+		VBox top = new VBox(mbMaster, hBox);
+
+		setTop(top);
 
 		// Center
 		xmlEditor = new XMLEditor();
 		txtScript = new BehaviorTextArea();
-		
-//		SplitPane sub = new SplitPane(xmlEditor, customValuesXml);
-		
-		splitPane = new SplitPane(txtScript, xmlEditor);
-		
-		splitPane.setDividerPositions(0.7, 0.3);
+
+		// cmiShowFullText.selectedProperty().bind(xmlEditor.visibleProperty());
+		// xmlEditor.setVisible(false);
+		// SplitPane sub = new SplitPane(xmlEditor, customValuesXml);
+
+		splitPane = new SplitPane(txtScript /* , xmlEditor */);
+
+		// splitPane.setDividerPositions(1.0, 0.0);
 		splitPane.setOrientation(Orientation.HORIZONTAL);
 
 		tabPane = new TabPane();
@@ -129,7 +151,7 @@ public class BehaviorTextComposite extends BorderPane {
 		this.wib = DialogUtil.showFileDialog(chooser -> {
 			chooser.getExtensionFilters().add(new ExtensionFilter("WIB files (*.wib)", "*.wib"));
 		});
-		
+
 		if (this.wib != null)
 			this.txtLoacation.setText(this.wib.getAbsolutePath());
 

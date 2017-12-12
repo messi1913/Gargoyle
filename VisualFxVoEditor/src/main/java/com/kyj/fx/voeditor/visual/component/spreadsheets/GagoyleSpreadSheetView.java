@@ -19,6 +19,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.voeditor.visual.util.FileUtil;
 import com.kyj.fx.voeditor.visual.util.FxClipboardUtil;
 
 import javafx.collections.FXCollections;
@@ -60,7 +61,7 @@ public class GagoyleSpreadSheetView extends StackPane {
 		columns.forEach(col -> {
 			col.setPrefWidth(100d);
 		});
-//		ssv.setGrid(grid);
+		// ssv.setGrid(grid);
 		init();
 	}
 
@@ -76,16 +77,20 @@ public class GagoyleSpreadSheetView extends StackPane {
 		});
 
 		this.addEventHandler(KeyEvent.KEY_PRESSED, this::spreadSheetKeyPress);
-		//		{
-		//			Node node = new ImageView(new Image(GagoyleSpreadSheetView.class.getResourceAsStream("testImage.jpg"), 500, 500, false, false));
-		//			new DragDropWrapping(this, node);
-		//			getChildren().add(node);
-		//		}
-		//		{
-		//			Node node = new ImageView(new Image(GagoyleSpreadSheetView.class.getResourceAsStream("testImage.jpg"), 500, 500, false, false));
-		//			new DragDropWrapping(this, node);
-		//			getChildren().add(node);
-		//		}
+		// {
+		// Node node = new ImageView(new
+		// Image(GagoyleSpreadSheetView.class.getResourceAsStream("testImage.jpg"),
+		// 500, 500, false, false));
+		// new DragDropWrapping(this, node);
+		// getChildren().add(node);
+		// }
+		// {
+		// Node node = new ImageView(new
+		// Image(GagoyleSpreadSheetView.class.getResourceAsStream("testImage.jpg"),
+		// 500, 500, false, false));
+		// new DragDropWrapping(this, node);
+		// getChildren().add(node);
+		// }
 
 	}
 
@@ -147,22 +152,44 @@ public class GagoyleSpreadSheetView extends StackPane {
 
 			case FxClipboardUtil.FILE:
 				List<File> pastFiles = FxClipboardUtil.pasteFiles();
-				File file = pastFiles.get(0);
-				if (file != null && file.exists()) {
-					try {
-						Image pastImage = new Image(file.toURI().toURL().openStream());
+				if (pastFiles.size() == 1) {
+					File file = pastFiles.get(0);
+					if (file != null && file.exists()) {
+						try {
+							if (FileUtil.isImageFile(file)) {
+								Image pastImage = new Image(file.toURI().toURL().openStream());
 
-						ObservableList<TablePosition> selectedCells = ssv.getSelectionModel().getSelectedCells();
-						TablePosition tablePosition = selectedCells.get(0);
+								ObservableList<TablePosition> selectedCells = ssv.getSelectionModel().getSelectedCells();
+								TablePosition tablePosition = selectedCells.get(0);
 
-						int row = tablePosition.getRow();
-						int column = tablePosition.getColumn();
-						SpreadsheetCell cell = new ImageCellType().createCell(row, column, 1, 1, pastImage);
+								int row = tablePosition.getRow();
+								int column = tablePosition.getColumn();
+								SpreadsheetCell cell = new ImageCellType().createCell(row, column, 1, 1, pastImage);
 
-						ssv.getGrid().getRows().get(tablePosition.getRow()).set(tablePosition.getColumn(), cell);
+								ssv.getGrid().getRows().get(tablePosition.getRow()).set(tablePosition.getColumn(), cell);
 
-					} catch (Exception e1) {
-						e1.printStackTrace();
+							}
+
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				} else {
+					ObservableList<TablePosition> selectedCells = ssv.getSelectionModel().getSelectedCells();
+					TablePosition tablePosition = selectedCells.get(0);
+					int row = tablePosition.getRow();
+					int column = tablePosition.getColumn();
+					for (File f : pastFiles) {
+						String name = f.getName();
+						// SpreadsheetCell cell = new
+						// ImageCellType().createCell(row, column, 1, 1,
+						// pastImage);
+//						SpreadsheetCell cell = new SpreadsheetCellBase(row, column, 1, 1, SpreadsheetCellType.STRING);
+//						cell.setItem(name);
+						
+						ssv.getGrid().getRows().get(row++).get(column).setItem(name);
+						
+//						ssv.getGrid().getRows().get(row).set(column, cell);
 					}
 				}
 				break;
@@ -216,6 +243,7 @@ public class GagoyleSpreadSheetView extends StackPane {
 
 	/**
 	 * 특수문자에대한 문자열 paste에 대한 버그를 수정하기 위한 함수.
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 11. 23.
 	 * @param items
@@ -227,13 +255,13 @@ public class GagoyleSpreadSheetView extends StackPane {
 		int column = startColumnIndex;
 
 		int _column = column;
-		//		String[] split = pastString.split("\n");
+		// String[] split = pastString.split("\n");
 
 		Grid grid = ssv.getGrid();
 		ObservableList<ObservableList<SpreadsheetCell>> rows = grid.getRows();
 
 		for (Map<String, Object> str : items) {
-			//			String[] split2 = str.split("\t");
+			// String[] split2 = str.split("\t");
 			_column = column;
 			Iterator<String> iterator = str.keySet().iterator();
 			while (iterator.hasNext()) {
@@ -241,14 +269,12 @@ public class GagoyleSpreadSheetView extends StackPane {
 				Object value = str.get(strCol);
 				SpreadsheetCell spreadsheetCell = null;
 
-				if (rows.size() > row)
-				{
+				if (rows.size() > row) {
 					ObservableList<SpreadsheetCell> observableList = rows.get(row);
 
-					try{
+					try {
 						spreadsheetCell = observableList.get(_column);
-					}catch(IndexOutOfBoundsException e)
-					{
+					} catch (IndexOutOfBoundsException e) {
 						e.printStackTrace();
 					}
 
@@ -261,7 +287,7 @@ public class GagoyleSpreadSheetView extends StackPane {
 					spreadsheetCell = newCells.get(_column);
 				}
 
-				if(value !=null)
+				if (value != null)
 					value = value.toString();
 
 				spreadsheetCell.setItem(value);
@@ -508,31 +534,31 @@ public class GagoyleSpreadSheetView extends StackPane {
 
 	}
 
-	public ObservableList<String> getColumnHeaders(){
+	public ObservableList<String> getColumnHeaders() {
 		return ssv.getGrid().getColumnHeaders();
 	}
 
-	public ObservableList<ObservableList<SpreadsheetCell>> getRows(){
+	public ObservableList<ObservableList<SpreadsheetCell>> getRows() {
 		return ssv.getGrid().getRows();
 	}
-	
-	
+
 	/**
 	 * 시트의 컬럼 리턴
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 5. 12. 
+	 * @작성일 : 2017. 5. 12.
 	 * @return
 	 */
-	public ObservableList<SpreadsheetColumn> getColumns(){
+	public ObservableList<SpreadsheetColumn> getColumns() {
 		return this.ssv.getColumns();
 	}
-	
-	public void setColumnWidth(int index, int width){
+
+	public void setColumnWidth(int index, int width) {
 		SpreadsheetColumn spreadsheetColumn = getColumns().get(index);
 		spreadsheetColumn.setPrefWidth(width);
 	}
-	
-	public SpreadsheetColumn getColumn(SpreadsheetCell cell){
+
+	public SpreadsheetColumn getColumn(SpreadsheetCell cell) {
 		int column = cell.getColumn();
 		return getColumns().get(column);
 	}
@@ -540,5 +566,5 @@ public class GagoyleSpreadSheetView extends StackPane {
 	public SpreadsheetColumn getColumn(int index) {
 		return getColumns().get(index);
 	}
-	
+
 }

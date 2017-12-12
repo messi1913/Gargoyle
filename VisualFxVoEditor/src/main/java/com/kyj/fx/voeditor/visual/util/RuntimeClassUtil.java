@@ -386,12 +386,17 @@ public class RuntimeClassUtil {
 		try {
 			p = pb.start();
 
-			br = new BufferedReader(new InputStreamReader(p.getInputStream(), encoding));
+			if (encoding != null)
+				br = new BufferedReader(new InputStreamReader(p.getInputStream(), encoding));
+			else
+				br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
 			p.waitFor(10, TimeUnit.SECONDS);
 			String temp = null;
 
 			while ((temp = br.readLine()) != null) {
-				messageReceiver.accept(temp);
+				if (messageReceiver != null)
+					messageReceiver.accept(temp);
 			}
 			p.destroy();
 			result = p.exitValue();
@@ -462,11 +467,11 @@ public class RuntimeClassUtil {
 	 */
 	/* @Deprecated 테스트를 더 해봐야함. */
 
-	public static void exeAsynchLazy(List<String> args, BiConsumer<Integer, StringBuffer> convert) {
+	public static void exeAsynchLazy(List<String> args, BiConsumer<Integer, String> convert) {
 		exeAsynchLazy(args, "UTF-8", convert, null);
 	}
 
-	public static void exeAsynchLazy(List<String> args, String encoding, BiConsumer<Integer, StringBuffer> convert) {
+	public static void exeAsynchLazy(List<String> args, String encoding, BiConsumer<Integer, String> convert) {
 		exeAsynchLazy(args, encoding, convert, null);
 	}
 
@@ -484,12 +489,25 @@ public class RuntimeClassUtil {
 		thread.start();
 	}
 
-	public static void exeAsynchLazy(List<String> args, String encoding, BiConsumer<Integer, StringBuffer> convert,
+	public static void exeAsynchLazy(List<String> args, String encoding, BiConsumer<Integer, String> convert,
 			Consumer<Exception> errorHandler) {
 		Thread thread = new Asynch(args, encoding, convert, errorHandler);
 		thread.setDaemon(true);
 		thread.setName("exeAsynchLazy");
 		thread.start();
+	}
+
+	public static void exeSynch(List<String> args, String encoding, BiConsumer<Integer, String> convert, Consumer<Exception> errorHandler) {
+		exeSynch(args, encoding, null, convert, errorHandler);
+	}
+
+	public static void exeSynch(List<String> args, String encoding, Consumer<ProcessBuilder> pbPrerequire,
+			BiConsumer<Integer, String> convert, Consumer<Exception> errorHandler) {
+		Asynch thread = new Asynch(args, encoding, convert, errorHandler);
+
+		thread.setDaemon(true);
+		thread.setName("exeAsynchLazy");
+		thread.run();
 	}
 
 	private static class SimpleAsynch extends Thread {
@@ -530,13 +548,14 @@ public class RuntimeClassUtil {
 	private static class Asynch extends Thread {
 		List<String> args;
 		String encoding;
-		BiConsumer<Integer, StringBuffer> convert;
+		BiConsumer<Integer, String> consumer;
 		Consumer<Exception> errorHandler;
+		Consumer<ProcessBuilder> pbPrerequire;
 
-		public Asynch(List<String> args, String encoding, BiConsumer<Integer, StringBuffer> convert, Consumer<Exception> errorHandler) {
+		public Asynch(List<String> args, String encoding, BiConsumer<Integer, String> consumer, Consumer<Exception> errorHandler) {
 			this.args = args;
 			this.encoding = encoding;
-			this.convert = convert;
+			this.consumer = consumer;
 			this.errorHandler = errorHandler;
 			setName("RuntimeClassUtil-AsynchThread");
 		}
@@ -554,9 +573,17 @@ public class RuntimeClassUtil {
 			int result = -1;
 			Process p = null;
 			BufferedReader br = null;
-			StringBuffer sb = new StringBuffer();
+			// StringBuffer sb = new StringBuffer();
 
 			try {
+				// pb.directory(new File("C:\\SVN_WORKSPACE"));
+				// Map<String, String> environment = pb.environment();
+
+				if (pbPrerequire != null)
+					pbPrerequire.accept(pb);
+				
+				// LOGGER.debug("Print Env : \n{} ",
+				// ValueUtil.toString(environment));
 				p = pb.start();
 
 				br = new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.forName(encoding)));
@@ -564,13 +591,16 @@ public class RuntimeClassUtil {
 
 				String temp = null;
 				while ((temp = br.readLine()) != null) {
-					sb.append(temp);
+					consumer.accept(result, temp);
 				}
 
 				p.destroy();
 				result = p.exitValue();
 			} catch (Exception e) {
-				LOGGER.error(ValueUtil.toString(e));
+				if (errorHandler != null)
+					LOGGER.error(ValueUtil.toString(e));
+				else
+					errorHandler.accept(e);
 			} finally {
 				if (br != null) {
 					try {
@@ -585,7 +615,6 @@ public class RuntimeClassUtil {
 				}
 			}
 
-			convert.accept(result, sb);
 		}
 
 	}

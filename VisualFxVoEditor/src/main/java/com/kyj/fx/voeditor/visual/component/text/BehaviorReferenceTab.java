@@ -22,6 +22,7 @@ import javafx.scene.control.Tab;
  */
 public class BehaviorReferenceTab extends Tab {
 
+	private SplitPane content;
 	private BehaviorReferenceVO behaviorReferenceVO;
 	XMLEditor xmlEditor = new XMLEditor();
 	BehaviorTextArea txtScript = new BehaviorTextArea();
@@ -64,10 +65,14 @@ public class BehaviorReferenceTab extends Tab {
 	}
 
 	protected void addNewContent() {
-		SplitPane splitPane = new SplitPane(txtScript, xmlEditor);
-		splitPane.setOrientation(Orientation.HORIZONTAL);
-		splitPane.setDividerPositions(0.7d, 0.3d);
-		setContent(splitPane);
+		content = new SplitPane(txtScript, xmlEditor);
+		content.setOrientation(Orientation.HORIZONTAL);
+		content.setDividerPositions(0.7d, 0.3d);
+		setContent(content);
 	}
+
+//	public SplitPane getContent() {
+//		return content;
+//	}
 
 }

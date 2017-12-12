@@ -28,9 +28,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
@@ -2035,5 +2037,24 @@ public class ValueUtil {
 				return i;
 		}
 		return -1;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 11.
+	 * @param environment
+	 * @return
+	 */
+	public static <K, V> String toString(Map<K, V> environment) {
+		if (environment == null || environment.isEmpty())
+			return "";
+		Set<Entry<K, V>> entrySet = environment.entrySet();
+		Iterator<Entry<K, V>> iterator = entrySet.iterator();
+		StringBuffer sb = new StringBuffer();
+		while (iterator.hasNext()) {
+			Entry<K, V> entry = iterator.next();
+			sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append("\n");
+		}
+		return sb.toString();
 	}
 }

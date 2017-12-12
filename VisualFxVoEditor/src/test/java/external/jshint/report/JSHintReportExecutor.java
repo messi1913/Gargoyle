@@ -1,0 +1,134 @@
+/********************************
+ *	프로젝트 : VisualFxVoEditor
+ *	패키지   : external.jshint.report
+ *	작성일   : 2017. 12. 11.
+ *	작성자   : KYJ
+ *******************************/
+package external.jshint.report;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.kyj.fx.voeditor.visual.util.RuntimeClassUtil;
+
+/**
+ * @author KYJ
+ *
+ */
+public class JSHintReportExecutor {
+	ExecutorService newFixedThreadPool;
+
+	@Before
+	public void before() throws InterruptedException {
+		newFixedThreadPool = Executors.newFixedThreadPool(8);
+
+	}
+
+	@Test
+	public void test() throws Exception {
+		// jshint --reporter
+		// C:\Users\KYJ\node_modules\jshint-html-reporter/reporter.js . >
+		// reportt.html
+		// RuntimeClassUtil.exe
+
+		BiConsumer<Integer, String> messageReceiver = (idx, str) -> {
+			System.out.println(str);
+		};
+
+		// messageReceiver = null;
+
+		File file = new File("C:\\SVN_WORKSPACE\\wwwroot");
+
+		ArrayList<Callable<Integer>> list = new ArrayList<>();
+		File[] listFiles = file.listFiles();
+		for (File f : listFiles) {
+			if (f.isDirectory()) {
+				
+				if(!"MaterialMovement".equals(f.getName()))
+					continue;
+				
+				Callable<Integer> task = new Callable<Integer>() {
+					
+					@Override
+					public Integer call() throws Exception {
+						System.out.println(f.getName() + " job Start.");
+						
+						String simpleOutputName = f.getName() + "-report.html";
+						File file2 = new File(file.getParentFile(), simpleOutputName);
+						
+						System.out.println(file2.getAbsolutePath());
+//						String outputFileName =  f.getName() + "-report.html";
+						
+						if (file2.exists())
+							return 0;
+						RuntimeClassUtil.exeSynch(Arrays.asList(
+								/* command location */
+								"C:\\SVN_WORKSPACE\\node_modules\\.bin\\jshint.cmd"
+								
+								/**/
+								,f.getAbsolutePath()
+
+								/* exclude */
+//								"--exclude-path", "C:\\SVN_WORKSPACE\\.jshintignore",
+								
+//								"--exclude" ,  "**/*min.js,**/jquery*.js",
+								
+								/* config */
+//								"--config" ,  "C:\\SVN_WORKSPACE\\jshintconfig.json",
+								
+								/* report template. */
+								,"--reporter", "C:\\SVN_WORKSPACE\\node_modules\\jshint-html-reporter\\reporter.js"
+								
+								,"-verbose"
+								
+//								/* redirect */
+								, ">", file2.getAbsolutePath()
+								
+						), "EUC-KR",
+
+								pb -> {
+
+									pb.directory(new File("C:\\SVN_WORKSPACE"));
+
+								}, messageReceiver, err -> {
+									System.err.println(err);
+									System.exit(-1);
+								});
+
+						if (file2.exists() && file2.length() == 12288) {
+							System.out.println(file2 + " " + file2.length());
+							file2.delete();
+							// System.out.println(file.length());
+						}
+						System.out.println(f.getName() + " job Complete.");
+						return 1;
+					}
+
+				};
+
+				list.add(task);
+
+			} else {
+				System.out.println("skip : " + f + " is not dir. ");
+			}
+
+		}
+		System.out.println("start invoke");
+		List<Future<Integer>> invokeAll = newFixedThreadPool.invokeAll(list);
+		System.out.println("end invoke");
+		invokeAll.forEach(System.out::println);
+
+		// newFixedThreadPool.awaitTermination(120, TimeUnit.SECONDS);
+		// Thread.sleep(30000);
+	}
+}
