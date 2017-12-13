@@ -38,11 +38,8 @@ public class JSHintReportExecutor {
 
 	@Test
 	public void test() throws Exception {
-		// jshint --reporter
-		// C:\Users\KYJ\node_modules\jshint-html-reporter/reporter.js . >
-		// reportt.html
-		// RuntimeClassUtil.exe
 
+		String target = "C:\\SVN_WORKSPACE\\wwwroot";
 		BiConsumer<Integer, String> messageReceiver = (idx, str) -> {
 			System.out.println(str);
 		};
@@ -51,7 +48,7 @@ public class JSHintReportExecutor {
 
 		String userHome = System.getProperty("user.home");
 		System.out.println(userHome);
-		File file = new File("C:\\ph4net0m\\ph4net0m");
+		File file = new File(target);
 
 		ArrayList<Callable<Integer>> list = new ArrayList<>();
 		File[] listFiles = file.listFiles();
@@ -76,8 +73,8 @@ public class JSHintReportExecutor {
 						if (file2.exists())
 							return 0;
 						RuntimeClassUtil.exeSynch(Arrays.asList(
-								/* command location */
-								userHome + "\\node_modules\\.bin\\jshint.cmd"
+						/* command location */
+						userHome + "\\node_modules\\.bin\\jshint.cmd"
 
 						/**/
 						, f.getAbsolutePath()
@@ -85,7 +82,7 @@ public class JSHintReportExecutor {
 						/* exclude */
 //						,"--exclude-path", ".jshintignore"
 
-						 ,"--exclude" , "**/bootstrap*.js,**/*.min.js"
+						 ,"--exclude" , "**/bootstrap*.js,**/*.min.js, **/jquery.min.js, jquery*.js , **/knockout*.js, "
 
 						/* config */
 //						,"--config" , "C:\\SVN_WORKSPACE\\jshintconfig.json",
@@ -104,7 +101,7 @@ public class JSHintReportExecutor {
 									@Override
 									public void accept(ProcessBuilder pb) {
 										
-										pb.directory(new File("C:\\ph4net0m\\ph4net0m"));
+										pb.directory(new File(target));
 
 										System.out.println(ValueUtil.toString(pb.environment()));
 									}

@@ -504,7 +504,9 @@ public class RuntimeClassUtil {
 	public static void exeSynch(List<String> args, String encoding, Consumer<ProcessBuilder> pbPrerequire,
 			BiConsumer<Integer, String> convert, Consumer<Exception> errorHandler) {
 		Asynch thread = new Asynch(args, encoding, convert, errorHandler);
-
+		
+		thread.setPbPrerequire(pbPrerequire);
+		
 		thread.setDaemon(true);
 		thread.setName("exeAsynchLazy");
 		thread.run();
@@ -545,6 +547,10 @@ public class RuntimeClassUtil {
 
 	}
 
+	/**
+	 * @author KYJ
+	 *
+	 */
 	private static class Asynch extends Thread {
 		List<String> args;
 		String encoding;
@@ -558,6 +564,24 @@ public class RuntimeClassUtil {
 			this.consumer = consumer;
 			this.errorHandler = errorHandler;
 			setName("RuntimeClassUtil-AsynchThread");
+		}
+
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 12. 13. 
+		 * @return
+		 */
+		public Consumer<ProcessBuilder> getPbPrerequire() {
+			return pbPrerequire;
+		}
+
+		/**
+		 * @작성자 : KYJ
+		 * @작성일 : 2017. 12. 13. 
+		 * @param pbPrerequire
+		 */
+		public void setPbPrerequire(Consumer<ProcessBuilder> pbPrerequire) {
+			this.pbPrerequire = pbPrerequire;
 		}
 
 		/*
