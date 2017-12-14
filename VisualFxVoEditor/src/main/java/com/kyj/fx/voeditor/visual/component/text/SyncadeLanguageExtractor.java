@@ -29,6 +29,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -36,6 +38,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 
@@ -51,7 +55,7 @@ public class SyncadeLanguageExtractor extends BorderPane {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SyncadeLanguageExtractor.class);
 
 	@FXML
-	private RadioMenuItem miKorean, miEnglish;
+	private RadioMenuItem miKorean, miEnglish, miEncodingEuckr, miEncodingUtf8;
 	@FXML
 	private MenuItem miEtc;
 	@FXML
@@ -59,6 +63,10 @@ public class SyncadeLanguageExtractor extends BorderPane {
 
 	@FXML
 	private TableColumn<LangLabel, String> tvLang;
+	@FXML
+	private ToggleGroup lang;
+
+	private ToggleGroup tgEncoding;
 
 	/**
 	 * 생성자
@@ -71,6 +79,8 @@ public class SyncadeLanguageExtractor extends BorderPane {
 
 	}
 
+	private ObjectProperty<File> file = new SimpleObjectProperty<File>();
+
 	@FXML
 	public void initialize() {
 		tvLang.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -78,6 +88,20 @@ public class SyncadeLanguageExtractor extends BorderPane {
 			LangLabel value = call.getValue();
 			LangVersion defaultLangVersion = value.getDefaultLangVersion();
 			return defaultLangVersion.value;
+		});
+		tgEncoding = miEncodingUtf8.getToggleGroup();
+
+		file.addListener(fileChanageListener);
+		lang.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				RadioMenuItem r = (RadioMenuItem) newValue;
+				String lang = r.getText();
+				File f = file.get();
+				if (f != null)
+					readAynch(f);
+			}
 		});
 	}
 
@@ -87,81 +111,7 @@ public class SyncadeLanguageExtractor extends BorderPane {
 			stage.getExtensionFilters().add(GargoyleExtensionFilters.XML_FILTER);
 		});
 		if (f != null) {
-			FileUtil.asynchRead(f, xml -> {
-
-				String defaultLang = "English";
-				Optional<NodeList> applicationNode = XMLUtils.toXpathNodes(xml, "/Application");
-				if (applicationNode.isPresent()) {
-					NodeList nodeList = applicationNode.get();
-					Node item = nodeList.item(0);
-					NamedNodeMap attributes = item.getAttributes();
-					if (attributes != null) {
-
-						Node namedItem = attributes.getNamedItem("Default");
-						if (namedItem != null) {
-							defaultLang = namedItem.getTextContent();
-						}
-					}
-				}
-
-				Optional<NodeList> xpathNodes = XMLUtils.toXpathNodes(xml, "/Application/Label");
-				if (xpathNodes.isPresent()) {
-					NodeList nodeList = xpathNodes.get();
-
-					ObservableList<Object> items = FXCollections.observableArrayList();
-					for (int i = 0, size = nodeList.getLength(); i < size; i++) {
-
-						LangLabel langLabel = new LangLabel();
-
-						Node item = nodeList.item(i);
-						NamedNodeMap attributes = item.getAttributes();
-						if (attributes == null) {
-							// Invalide..
-							LOGGER.info("Invalide Label. ");
-							continue;
-						}
-
-						Node namedItem = attributes.getNamedItem("id");
-						String labelId = namedItem.getNodeValue();
-
-						// set Label ID
-						langLabel.setId(labelId);
-
-						// version.
-						NodeList versionNodes = item.getChildNodes();
-						for (int j = 0, max = versionNodes.getLength(); j < max; j++) {
-
-							LangVersion version = new LangVersion();
-
-							Node versionNode = versionNodes.item(j);
-							NamedNodeMap versionAttr = versionNode.getAttributes();
-							if (versionAttr != null) {
-								Node langNode = versionAttr.getNamedItem("language");
-								String langName = langNode.getNodeValue();
-								// set lang name
-								version.setLanguage(langName);
-
-								if (defaultLang.equals(langName)) {
-
-									langLabel.setDefaultLangVersion(version);
-								}
-							}
-							String content = versionNode.getTextContent();
-							version.setValue(content);
-
-							langLabel.getVersions().add(version);
-						}
-
-						items.add(langLabel);
-
-					} // end for
-
-					Platform.runLater(() -> {
-						tvItems.getItems().addAll(items);
-					});
-				}
-
-			});
+			file.set(f);
 		}
 	}
 
@@ -251,5 +201,97 @@ public class SyncadeLanguageExtractor extends BorderPane {
 			return value.get();
 		}
 
+	}
+
+	private ChangeListener<File> fileChanageListener = new ChangeListener<File>() {
+
+		@Override
+		public void changed(ObservableValue<? extends File> observable, File oldValue, File newValue) {
+			if (newValue != null && newValue.exists()) {
+				readAynch(newValue);
+			}
+
+		}
+	};
+
+	private void readAynch(File newValue) {
+		FileUtil.asynchRead(newValue, xml -> {
+
+			String defaultLang = "English";
+			RadioMenuItem selection = (RadioMenuItem) tgEncoding.getSelectedToggle();
+			String encoding = selection.getText();
+
+			Optional<NodeList> applicationNode = XMLUtils.toXpathNodes(xml, encoding, "//Application");
+			if (applicationNode.isPresent()) {
+				NodeList nodeList = applicationNode.get();
+				Node item = nodeList.item(0);
+				NamedNodeMap attributes = item.getAttributes();
+				if (attributes != null) {
+
+					Node namedItem = attributes.getNamedItem("Default");
+					if (namedItem != null) {
+						defaultLang = namedItem.getTextContent();
+					}
+				}
+			}
+
+			Optional<NodeList> xpathNodes = XMLUtils.toXpathNodes(xml, encoding, "/Application/Label");
+			if (xpathNodes.isPresent()) {
+				NodeList nodeList = xpathNodes.get();
+
+				ObservableList<LangLabel> items = FXCollections.observableArrayList();
+				for (int i = 0, size = nodeList.getLength(); i < size; i++) {
+
+					LangLabel langLabel = new LangLabel();
+
+					Node item = nodeList.item(i);
+					NamedNodeMap attributes = item.getAttributes();
+					if (attributes == null) {
+						// Invalide..
+						LOGGER.info("Invalide Label. ");
+						continue;
+					}
+
+					Node namedItem = attributes.getNamedItem("id");
+					String labelId = namedItem.getNodeValue();
+
+					// set Label ID
+					langLabel.setId(labelId);
+
+					// version.
+					NodeList versionNodes = item.getChildNodes();
+					for (int j = 0, max = versionNodes.getLength(); j < max; j++) {
+
+						LangVersion version = new LangVersion();
+
+						Node versionNode = versionNodes.item(j);
+						NamedNodeMap versionAttr = versionNode.getAttributes();
+						if (versionAttr != null) {
+							Node langNode = versionAttr.getNamedItem("language");
+							String langName = langNode.getNodeValue();
+							// set lang name
+							version.setLanguage(langName);
+
+							if (defaultLang.equals(langName)) {
+
+								langLabel.setDefaultLangVersion(version);
+							}
+						}
+						String content = versionNode.getTextContent();
+						version.setValue(content);
+
+						langLabel.getVersions().add(version);
+					}
+
+					items.add(langLabel);
+
+				} // end for
+
+				Platform.runLater(() -> {
+					tvItems.getItems().addAll(items);
+				});
+			}
+
+		});
 	}
 }
