@@ -72,5 +72,11 @@ public interface GargoyleExtensionFilters {
 	public static final String MP3_NAME = "mp3 files (*.mp3)";
 	public static final String MP3_EXTENSION = "mp3";
 	public static final String MP3 = EXTENSION_COMMONS + MP3_EXTENSION;
+	
+	
+	public static final String XML_NAME = "mp3 files (*.mp3)";
+	public static final String XML_EXTENSION = "mp3";
+	public static final String XML = EXTENSION_COMMONS + XML_EXTENSION;
+	public static final ExtensionFilter XML_FILTER=  new ExtensionFilter(XML_NAME, XML);
 
 }
