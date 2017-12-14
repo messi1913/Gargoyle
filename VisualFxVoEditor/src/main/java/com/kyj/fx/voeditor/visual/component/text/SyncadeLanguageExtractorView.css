@@ -1,0 +1,13 @@
+.bor-root {
+	-fx-padding: 5.0px;
+}
+
+.vbox {
+	-fx-padding: 5.0px 5.0px 5.0px 0.0px ;
+	-fx-spacing: 5.0px;
+}
+
+.bor-properties{
+	-fx-padding : 5.0px;
+	-fx-border-radius: 3.0px;
+}

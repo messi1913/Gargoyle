@@ -170,7 +170,8 @@ public class FxUtil {
 		try {
 
 			/*
-			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
+			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된
+			 * 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
 			 */
 			File parentFile = new File(FileUtil.getTempGagoyle(), "font");
 			if (!parentFile.exists())
@@ -691,14 +692,13 @@ public class FxUtil {
 				stage.setTitle(title);
 				stage.setAlwaysOnTop(true);
 				stage.initModality(Modality.APPLICATION_MODAL);
-				stage.initOwner(stage);
+				stage.initOwner(SharedMemory.getPrimaryStage());
+
 			};
 		} else {
 			option = stage -> {
 				stage.setTitle(title);
-				// stage.setAlwaysOnTop(true);
-				// stage.initModality(Modality.APPLICATION_MODAL);
-				// stage.initOwner(stage);
+				stage.initOwner(SharedMemory.getPrimaryStage());
 			};
 		}
 
@@ -1239,11 +1239,12 @@ public class FxUtil {
 		// 2017.05.26 사용안함.
 		// ClipboardKeyEventInstaller.install(tb);
 	}
-	
+
 	/**
 	 * TreeView 키 이벤트 등록
+	 * 
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 12. 6. 
+	 * @작성일 : 2017. 12. 6.
 	 * @param tv
 	 */
 	public static void installClipboardKeyEvent(TreeView<?> tv) {
@@ -1824,8 +1825,6 @@ public class FxUtil {
 				// }
 			}
 		});
-		
-		
 
 		FxUtil.createStageAndShow(new Scene(root, BROWSER_WIDTH, BROWSER_HEIGHT), stage -> {
 
@@ -2007,11 +2006,12 @@ public class FxUtil {
 	 *
 	 */
 	public static class ContextUtil {
-		
+
 		/**
 		 * XML 관련 컨텍스트 유틸
+		 * 
 		 * @작성자 : KYJ
-		 * @작성일 : 2017. 12. 5. 
+		 * @작성일 : 2017. 12. 5.
 		 * @param parent
 		 * @return
 		 */
@@ -2032,7 +2032,8 @@ public class FxUtil {
 							Optional<NodeList> xpathNodes = XMLUtils.toXpathNodes(parent.getXml(), value, err -> {
 								FxUtil.createCodeAreaAndShow(String.format("Input XPath : %s\n\n\n%s", value, ValueUtil.toString(err)));
 							});
-							// Optional<String> xpathText = XMLUtils.toXpathText();
+							// Optional<String> xpathText =
+							// XMLUtils.toXpathText();
 							xpathNodes.ifPresent(r -> {
 								int length = r.getLength();
 
