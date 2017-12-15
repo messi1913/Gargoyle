@@ -7,7 +7,6 @@
 package com.kyj.scm.manager.core.commons;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 /**
  * TODO 클래스 역할
@@ -24,8 +23,8 @@ public interface ICheckoutCommand<T, R> extends SCMCommonable {
 	 * @param param
 	 * @return
 	 ********************************/
-	public R checkout(T param) throws FileNotFoundException;
+	public R checkout(T param) throws Exception;
 
-	public R checkout(T param, File outDir) throws FileNotFoundException;
+	public R checkout(T param, File outDir) throws Exception;
 
 }

@@ -7,16 +7,18 @@
 package com.kyj.fx.voeditor.visual.component.scm;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tmatesoft.svn.core.SVNLogEntry;
 
 import com.kyj.fx.voeditor.visual.main.layout.GagoyleTabProxy;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
+import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.NullExpresion;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 
@@ -32,6 +34,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -42,7 +45,8 @@ import javafx.stage.Window;
  * @author KYJ
  *
  ***************************/
-public class CheckoutController {
+
+public class CheckoutController extends BorderPane {
 	private static Logger LOGGER = LoggerFactory.getLogger(CheckoutController.class);
 
 	@FXML
@@ -99,6 +103,12 @@ public class CheckoutController {
 	 */
 	private BooleanBinding btnFinishDisableBinding;
 
+	/**
+	 */
+	public CheckoutController() {
+
+	}
+
 	@FXML
 	public void initialize() {
 
@@ -115,8 +125,7 @@ public class CheckoutController {
 		txtProjectName.textProperty().bind(fileName);
 
 		/*
-		 * checkout이 정상적으로 처리완료되거나 cancel버튼을 클릭한경우
-		 * 행위를 기술한다.
+		 * checkout이 정상적으로 처리완료되거나 cancel버튼을 클릭한경우 행위를 기술한다.
 		 *
 		 * 디폴트값은 stage를 닫는다.
 		 */
@@ -173,13 +182,22 @@ public class CheckoutController {
 			LOGGER.debug(path);
 			LOGGER.debug(outDir.toString());
 
-			long checkoutCount = svnItem.getManager().checkout(path, outDir);
+			String revision = null;
+			SVNAdvanceOption svnAdvanceOption = advanceOption.get();
+			if (svnAdvanceOption != null)
+				revision = String.valueOf(svnAdvanceOption.getRevision());
+
+			long checkoutCount = -1;
+			if (ValueUtil.isNotEmpty(revision)) {
+				checkoutCount = svnItem.getManager().checkout(path, revision, outDir);
+			} else {
+				checkoutCount = svnItem.getManager().checkout(path, outDir);
+			}
 			LOGGER.debug("Checkout Result ::: " + checkoutCount);
-			
 			GagoyleTabProxy.getInstance().refleshWorkspaceTree();
-			
+
 			closeStage();
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			LOGGER.error(ValueUtil.toString(e));
 		}
 	}
@@ -287,4 +305,37 @@ public class CheckoutController {
 		});
 	}
 
+	private ObjectProperty<SVNAdvanceOption> advanceOption = new SimpleObjectProperty<>();
+
+	@FXML
+	public void btnAdvanceOnAction() {
+
+		SVNAdvanceComposite svnAdvanceComposite = new SVNAdvanceComposite(svnItem) {
+
+			@Override
+			public String getAuthor(int revision, List<SVNLogEntry> entries) {
+				return entries.get(0).getAuthor();
+			}
+
+			@Override
+			public String getMessage(int revision, List<SVNLogEntry> entries) {
+				return entries.get(0).getMessage();
+			}
+
+			@Override
+			protected void onSave() {
+				Stage window = (Stage) FxUtil.getWindow(this);
+				window.close();
+			}
+		};
+
+		FxUtil.createStageAndShowAndWait(svnAdvanceComposite, stage -> {
+			stage.initOwner(SharedMemory.getPrimaryStage());
+			stage.setResizable(false);
+			stage.initModality(Modality.APPLICATION_MODAL);
+		});
+
+		SVNAdvanceOption value = svnAdvanceComposite.getValue();
+		advanceOption.set(value);
+	}
 }

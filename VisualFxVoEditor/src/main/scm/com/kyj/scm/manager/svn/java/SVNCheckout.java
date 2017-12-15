@@ -9,7 +9,6 @@ package com.kyj.scm.manager.svn.java;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Properties;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,7 @@ import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
-import com.kyj.fx.voeditor.visual.util.ValueUtil;
+import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.scm.manager.core.commons.ICheckoutCommand;
 import com.sun.star.uno.RuntimeException;
 
@@ -54,9 +53,9 @@ class SVNCheckout extends AbstractSVN implements ICheckoutCommand<String, Long> 
 	 * @param path
 	 * @param outDir
 	 * @return
-	 * @throws FileNotFoundException
+	 * @throws Exception
 	 ********************************/
-	public Long checkout(String path, String outDir) throws FileNotFoundException {
+	public Long checkout(String path, String outDir) throws Exception {
 		return checkout(path, new File(outDir));
 	}
 
@@ -64,7 +63,7 @@ class SVNCheckout extends AbstractSVN implements ICheckoutCommand<String, Long> 
 	 * @inheritDoc
 	 */
 	@Override
-	public Long checkout(String path, File outDir) throws FileNotFoundException {
+	public Long checkout(String path, File outDir) throws Exception {
 		return checkout(path, "-1", outDir, null);
 	}
 
@@ -77,9 +76,10 @@ class SVNCheckout extends AbstractSVN implements ICheckoutCommand<String, Long> 
 	 * @param outDir
 	 * @param exceptionHandler
 	 * @return
+	 * @throws Exception
 	 * @throws FileNotFoundException
 	 ********************************/
-	public Long checkout(String path, String revision, File outDir, Consumer<Exception> exceptionHandler) throws FileNotFoundException {
+	public Long checkout(String path, String revision, File outDir, ExceptionHandler exceptionHandler) throws Exception {
 		long checkoutResult = -1;
 		try {
 			if (outDir == null || !outDir.exists())
@@ -87,13 +87,14 @@ class SVNCheckout extends AbstractSVN implements ICheckoutCommand<String, Long> 
 
 			SVNURL parseURIEncoded = SVNURL.parseURIEncoded(getUrl() + path);
 			LOGGER.debug(parseURIEncoded.toString());
-			checkoutResult = getSvnManager().getUpdateClient().doCheckout(parseURIEncoded, outDir, SVNRevision.HEAD, SVNRevision.HEAD,
+			checkoutResult = getSvnManager().getUpdateClient().doCheckout(parseURIEncoded, outDir, SVNRevision.HEAD, SVNRevision.create(Long.parseLong(revision)),
 					SVNDepth.INFINITY, false);
 
 		} catch (Exception e) {
-			LOGGER.error(ValueUtil.toString(e));
 			if (exceptionHandler != null)
-				exceptionHandler.accept(e);
+				exceptionHandler.handle(e);
+			else
+				throw e;
 		}
 
 		return checkoutResult;

@@ -9,7 +9,6 @@ package com.kyj.scm.manager.svn.java;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -31,6 +30,7 @@ import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.internal.util.SVNURLUtil;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
+import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.scm.manager.core.commons.AbstractScmManager;
 import com.kyj.scm.manager.core.commons.SCMKeywords;
@@ -322,6 +322,24 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	}
 
 	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 15.
+	 * @param path
+	 * @param revision
+	 * @param exceptionHandler
+	 * @return
+	 */
+	public List<SVNLogEntry> log(String path, int revision, Consumer<Exception> exceptionHandler) {
+		return logCommand.log(path, String.valueOf(revision), exceptionHandler);
+	}
+
+	public List<SVNLogEntry> log(String path, int revision) throws RuntimeException {
+		return logCommand.log(path, String.valueOf(revision), err -> {
+			throw new RuntimeException(err);
+		});
+	}
+
+	/**
 	 * svn 리비젼 정보 조회
 	 *
 	 * @작성자 : KYJ
@@ -380,16 +398,48 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	}
 
 	/**
-	 * 코드 체크아웃
+	 * 코드 체크아웃 <br/>
 	 *
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 3. 24.
 	 * @param param
 	 * @return
-	 * @throws FileNotFoundException
+	 * @throws Exception
 	 */
-	public Long checkout(String param, File outDir) throws FileNotFoundException {
+	public Long checkout(String param, File outDir) throws Exception {
 		return checkoutCommand.checkout(param, outDir);
+	}
+
+	/**
+	 * 코드 체크아웃 <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 15.
+	 * @param param
+	 * @param revision
+	 * @param outDir
+	 * @param exceptionHandler
+	 * @return
+	 * @throws Exception
+	 */
+	public Long checkout(String param, String revision, File outDir) throws Exception {
+		return checkoutCommand.checkout(param, revision, outDir, null);
+	}
+
+	/**
+	 * 코드 체크아웃 <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 15.
+	 * @param param
+	 * @param revision
+	 * @param outDir
+	 * @param exceptionHandler
+	 * @return
+	 * @throws Exception
+	 */
+	public Long checkout(String param, String revision, File outDir, ExceptionHandler exceptionHandler) throws Exception {
+		return checkoutCommand.checkout(param, revision, outDir, exceptionHandler);
 	}
 
 	/********************************
@@ -557,8 +607,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	 * @throws SVNException
 	 * @throws IOException
 	 *
-	 * @deprecated 서버간의 API연계에서 사용되면 안됨. 해당 API가 사용되는 때는 FileSystem으로 버젼관리가 되는
-	 *             상황에서만 사용되야함. (( 로컬시스템으로 svn파일이 관리되는 경우에만 사용. ))
+	 * @deprecated 서버간의 API연계에서 사용되면 안됨. 해당 API가 사용되는 때는 FileSystem으로 버젼관리가 되는 상황에서만 사용되야함. (( 로컬시스템으로 svn파일이 관리되는 경우에만 사용. ))
 	 */
 	@Deprecated
 	public SVNCommitInfo commitClient(File[] paths, String commitMessage) throws SVNException, IOException {
@@ -735,7 +784,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 10. 23. 
+	 * @작성일 : 2017. 10. 23.
 	 * @param parentURL
 	 * @param childURL
 	 * @param urlEncoding
@@ -758,4 +807,5 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 
 		return relativePath;
 	}
+
 }

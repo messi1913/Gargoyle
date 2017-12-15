@@ -170,8 +170,7 @@ public class FxUtil {
 		try {
 
 			/*
-			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된
-			 * 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
+			 * 2017-04-24 Font가 jar파일안에 압축되어있는경우 Temp 폴더에 임시 파일이 계속 쌓임. 관련된 버그수정을 위해 Font를 임시디렉토리로 복사한후 읽어옴.
 			 */
 			File parentFile = new File(FileUtil.getTempGagoyle(), "font");
 			if (!parentFile.exists())
@@ -714,6 +713,30 @@ public class FxUtil {
 	public static Stage createStageAndShow(Scene scene, Consumer<Stage> option) {
 		Stage stage = craeteStage(scene, option);
 		stage.show();
+		return stage;
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 15.
+	 * @param parent
+	 * @param option
+	 * @return
+	 */
+	public static Stage createStageAndShowAndWait(Parent parent, Consumer<Stage> option) {
+		return createStageAndShowAndWait(new Scene(parent), option);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 15.
+	 * @param scene
+	 * @param option
+	 * @return
+	 */
+	public static Stage createStageAndShowAndWait(Scene scene, Consumer<Stage> option) {
+		Stage stage = craeteStage(scene, option);
+		stage.showAndWait();
 		return stage;
 	}
 

@@ -89,11 +89,10 @@ public class CommandTest2 {
 	 * 작성일 : 2016. 5. 5. 작성자 : KYJ
 	 *
 	 * checkout 테스트
-	 *
-	 * @throws FileNotFoundException
+	 * @throws Exception 
 	 ********************************/
 	@Test
-	public void checkout() throws FileNotFoundException {
+	public void checkout() throws Exception {
 
 
 		String property = System.getProperty("user.home");
