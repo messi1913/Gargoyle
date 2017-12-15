@@ -648,12 +648,12 @@ public class FxUtil {
 	 * @param parent
 	 * @param option
 	 */
-	public static <P extends Parent> void createStageAndShow(P parent, Consumer<Stage> option) {
+	public static <P extends Parent> Stage createStageAndShow(P parent, Consumer<Stage> option) {
 		Scene scene = new Scene(parent);
-		createStageAndShow(scene, option);
+		return createStageAndShow(scene, option);
 	}
 
-	public static void createStageAndShow(CloseableParent<? extends Parent> cloableParent, Consumer<Stage> option) {
+	public static Stage createStageAndShow(CloseableParent<? extends Parent> cloableParent, Consumer<Stage> option) {
 
 		Stage stage = craeteStage(cloableParent.getParent(), option);
 		stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, ev -> {
@@ -669,6 +669,7 @@ public class FxUtil {
 		//
 		// });
 		stage.show();
+		return stage;
 	}
 
 	/**
@@ -677,15 +678,16 @@ public class FxUtil {
 	 * @param scene
 	 * @param isModal
 	 */
-	public static void createStageAndShow(String title, Scene scene, Consumer<Stage> option) {
+	public static Stage createStageAndShow(String title, Scene scene, Consumer<Stage> option) {
 		Stage stage = new Stage();
 		stage.setScene(scene);
 		stage.setTitle(title);
 		option.accept(stage);
 		stage.show();
+		return stage;
 	}
 
-	public static void createStageAndShow(String title, Scene scene, boolean isModal) {
+	public static Stage createStageAndShow(String title, Scene scene, boolean isModal) {
 		Consumer<Stage> option = null;
 		if (isModal) {
 			option = stage -> {
@@ -702,16 +704,17 @@ public class FxUtil {
 			};
 		}
 
-		createStageAndShow(scene, option);
+		return createStageAndShow(scene, option);
 	}
 
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2016. 6. 23.
 	 */
-	public static void createStageAndShow(Scene scene, Consumer<Stage> option) {
+	public static Stage createStageAndShow(Scene scene, Consumer<Stage> option) {
 		Stage stage = craeteStage(scene, option);
 		stage.show();
+		return stage;
 	}
 
 	/********************************

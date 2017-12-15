@@ -6,7 +6,8 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
-import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,6 +17,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.tools.ant.filters.StringInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
@@ -51,6 +53,22 @@ public class XMLUtils {
 		});
 	}
 
+	public static Optional<NodeList> toXpathNodes(String data, String xpath, Charset encoding) {
+		return toXpathValue(data, xpath, encoding, (doc, exp) -> {
+			NodeList result = (NodeList) exp.evaluate(doc, XPathConstants.NODESET);
+			return result;
+		}, err -> {
+			LOGGER.error(ValueUtil.toString(err));
+		});
+	}
+	
+	public static Optional<NodeList> toXpathNodes(String data, String xpath, ExceptionHandler errorHandler) {
+		return toXpathValue(data, xpath, null, (doc, exp) -> {
+			NodeList result = (NodeList) exp.evaluate(doc, XPathConstants.NODESET);
+			return result;
+		}, errorHandler);
+	}
+	
 	/**
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 12. 5.
@@ -59,8 +77,8 @@ public class XMLUtils {
 	 * @param errorHandler
 	 * @return
 	 */
-	public static Optional<NodeList> toXpathNodes(String data, String xpath, ExceptionHandler errorHandler) {
-		return toXpathValue(data, xpath, (doc, exp) -> {
+	public static Optional<NodeList> toXpathNodes(String data, String xpath, Charset encoding, ExceptionHandler errorHandler) {
+		return toXpathValue(data, xpath, encoding, (doc, exp) -> {
 			NodeList result = (NodeList) exp.evaluate(doc, XPathConstants.NODESET);
 			return result;
 		}, errorHandler);
@@ -99,7 +117,7 @@ public class XMLUtils {
 	 * @return
 	 */
 	private static <T> Optional<T> toXpathValue(String data, String xpath, XPathExpressionFunction<XPathExpression, T> converter) {
-		return toXpathValue(data, xpath, converter, ex -> {
+		return toXpathValue(data, xpath, null, converter, ex -> {
 			LOGGER.error(ValueUtil.toString(ex));
 		});
 	}
@@ -113,28 +131,32 @@ public class XMLUtils {
 	 * @param exHandler
 	 * @return
 	 */
-	private static <T> Optional<T> toXpathValue(String data, String xpath, XPathExpressionFunction<XPathExpression, T> converter,
-			ExceptionHandler exHandler) {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		org.w3c.dom.Document doc = null;
+	private static <T> Optional<T> toXpathValue(String data, String xpath, Charset encoding,
+			XPathExpressionFunction<XPathExpression, T> converter, ExceptionHandler exHandler) {
 		try {
+			org.w3c.dom.Document doc = null;
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setValidating(false);
 
 			factory.setIgnoringComments(true);
 			factory.setNamespaceAware(false);
 			factory.setXIncludeAware(false);
 
-			// StringInputStream in = new StringInputStream(data, "UTF-8");
-			InputSource source = new InputSource(new StringReader(data));
+			if(encoding == null)
+				encoding = StandardCharsets.UTF_8;
+			
+			try (StringInputStream in = new StringInputStream(data, encoding.name())) {
+				InputSource source = new InputSource(in);
 
-			DocumentBuilder newDocumentBuilder = factory.newDocumentBuilder();
-			doc = newDocumentBuilder.parse(source);
+				DocumentBuilder newDocumentBuilder = factory.newDocumentBuilder();
+				doc = newDocumentBuilder.parse(source);
 
-			XPathFactory xFactory = XPathFactory.newInstance();
-			XPath xPath = xFactory.newXPath();
-			XPathExpression compile = xPath.compile(xpath);
-			return Optional.of(converter.apply(doc, compile));
-			// return result.toString();
+				XPathFactory xFactory = XPathFactory.newInstance();
+				XPath xPath = xFactory.newXPath();
+				XPathExpression compile = xPath.compile(xpath);
+				return Optional.of(converter.apply(doc, compile));
+			}
+
 		} catch (Exception exp) {
 			if (exHandler != null)
 				exHandler.handle(exp);

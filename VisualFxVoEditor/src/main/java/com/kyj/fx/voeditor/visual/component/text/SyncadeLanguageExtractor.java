@@ -7,6 +7,7 @@
 package com.kyj.fx.voeditor.visual.component.text;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -66,6 +67,11 @@ public class SyncadeLanguageExtractor extends BorderPane {
 	@FXML
 	private ToggleGroup lang;
 
+	@FXML
+	private TableView<LangVersion> tbLang;
+	@FXML
+	private TableColumn<LangVersion, String> colLang, colLangCont;
+
 	private ToggleGroup tgEncoding;
 
 	/**
@@ -96,6 +102,8 @@ public class SyncadeLanguageExtractor extends BorderPane {
 
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				if (newValue == null)
+					return;
 				RadioMenuItem r = (RadioMenuItem) newValue;
 				String lang = r.getText();
 				File f = file.get();
@@ -103,6 +111,32 @@ public class SyncadeLanguageExtractor extends BorderPane {
 					readAynch(f);
 			}
 		});
+
+		tvItems.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<LangLabel>() {
+
+			@Override
+			public void changed(ObservableValue<? extends LangLabel> observable, LangLabel oldValue, LangLabel newValue) {
+				if (newValue == null)
+					return;
+
+				tbLang.getItems().clear();
+				// vboxLangProp.getChildren().clear();
+
+				ObservableList<LangVersion> versions = newValue.getVersions();
+				for (LangVersion version : versions) {
+					tbLang.getItems().add(version);
+				}
+			}
+		});
+
+		colLang.setEditable(true);
+		colLangCont.setEditable(true);
+
+		colLang.setCellFactory(TextFieldTableCell.forTableColumn());
+		colLangCont.setCellFactory(TextFieldTableCell.forTableColumn());
+
+		colLang.setCellValueFactory(param -> param.getValue().languageProperty());
+		colLangCont.setCellValueFactory(param -> param.getValue().valueProperty());
 	}
 
 	@FXML
@@ -118,6 +152,14 @@ public class SyncadeLanguageExtractor extends BorderPane {
 	@FXML
 	public void miExportOnAction() {
 
+	}
+
+	@FXML
+	public void btnAddOnAction() {
+
+		LangVersion e = new LangVersion();
+
+		tbLang.getItems().add(e);
 	}
 
 	public static class LangLabel {
@@ -166,6 +208,8 @@ public class SyncadeLanguageExtractor extends BorderPane {
 	public static class LangVersion {
 		private StringProperty language;
 		private StringProperty value;
+		private Node versionNode;
+		private LangLabel langLabel;
 
 		public LangVersion() {
 			language = new SimpleStringProperty();
@@ -201,6 +245,22 @@ public class SyncadeLanguageExtractor extends BorderPane {
 			return value.get();
 		}
 
+		public void setVersionNode(Node versionNode) {
+			this.versionNode = versionNode;
+		}
+
+		public Node getVersionNode() {
+			return versionNode;
+		}
+
+		public void setParent(LangLabel langLabel) {
+			this.langLabel = langLabel;
+		}
+
+		public LangLabel getParent() {
+			return langLabel;
+		}
+
 	}
 
 	private ChangeListener<File> fileChanageListener = new ChangeListener<File>() {
@@ -214,14 +274,24 @@ public class SyncadeLanguageExtractor extends BorderPane {
 		}
 	};
 
+	private StringProperty defaultLang = new SimpleStringProperty("English");
+
+	private synchronized String getDefaultLang() {
+		return defaultLang.get();
+	}
+
+	private synchronized void setDefaultLang(String lang) {
+		defaultLang.set(lang);
+	}
+
 	private void readAynch(File newValue) {
 		FileUtil.asynchRead(newValue, xml -> {
 
-			String defaultLang = "English";
+			// String defaultLang = getDefaultLang();
 			RadioMenuItem selection = (RadioMenuItem) tgEncoding.getSelectedToggle();
-			String encoding = selection.getText();
+			Charset encoding = Charset.forName(selection.getText());
 
-			Optional<NodeList> applicationNode = XMLUtils.toXpathNodes(xml, encoding, "//Application");
+			Optional<NodeList> applicationNode = XMLUtils.toXpathNodes(xml, "//Application", encoding);
 			if (applicationNode.isPresent()) {
 				NodeList nodeList = applicationNode.get();
 				Node item = nodeList.item(0);
@@ -230,12 +300,12 @@ public class SyncadeLanguageExtractor extends BorderPane {
 
 					Node namedItem = attributes.getNamedItem("Default");
 					if (namedItem != null) {
-						defaultLang = namedItem.getTextContent();
+						setDefaultLang(namedItem.getTextContent());
 					}
 				}
 			}
 
-			Optional<NodeList> xpathNodes = XMLUtils.toXpathNodes(xml, encoding, "/Application/Label");
+			Optional<NodeList> xpathNodes = XMLUtils.toXpathNodes(xml, "/Application/Label", encoding);
 			if (xpathNodes.isPresent()) {
 				NodeList nodeList = xpathNodes.get();
 
@@ -264,7 +334,13 @@ public class SyncadeLanguageExtractor extends BorderPane {
 
 						LangVersion version = new LangVersion();
 
+						version.setParent(langLabel);
 						Node versionNode = versionNodes.item(j);
+						short nodeType = versionNode.getNodeType();
+
+						if (Node.ELEMENT_NODE != nodeType)
+							continue;
+
 						NamedNodeMap versionAttr = versionNode.getAttributes();
 						if (versionAttr != null) {
 							Node langNode = versionAttr.getNamedItem("language");
@@ -280,6 +356,7 @@ public class SyncadeLanguageExtractor extends BorderPane {
 						String content = versionNode.getTextContent();
 						version.setValue(content);
 
+						version.setVersionNode(versionNode);
 						langLabel.getVersions().add(version);
 					}
 
@@ -288,6 +365,7 @@ public class SyncadeLanguageExtractor extends BorderPane {
 				} // end for
 
 				Platform.runLater(() -> {
+					tvItems.getItems().clear();
 					tvItems.getItems().addAll(items);
 				});
 			}

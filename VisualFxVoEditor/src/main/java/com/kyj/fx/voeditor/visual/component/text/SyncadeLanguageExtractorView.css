@@ -2,7 +2,7 @@
 	-fx-padding: 5.0px;
 }
 
-.vbox {
+.vbox , .hbox{
 	-fx-padding: 5.0px 5.0px 5.0px 0.0px ;
 	-fx-spacing: 5.0px;
 }
@@ -10,4 +10,8 @@
 .bor-properties{
 	-fx-padding : 5.0px;
 	-fx-border-radius: 3.0px;
+}
+
+#btn-add {
+	-fx-pref-width: 80.0px;	
 }

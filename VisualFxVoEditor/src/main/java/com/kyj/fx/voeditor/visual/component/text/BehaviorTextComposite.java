@@ -35,6 +35,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 
 /**
  * @author KYJ
@@ -51,6 +52,7 @@ public class BehaviorTextComposite extends BorderPane {
 	private SplitMenuButton smbReferences;
 	private TabPane tabPane;
 	private Tab mainTab;
+	private Stage xmlStage;
 
 	public BehaviorTextComposite() {
 
@@ -74,11 +76,16 @@ public class BehaviorTextComposite extends BorderPane {
 		MenuItem cmiShowFullText = new MenuItem("Show Full Text");
 		cmiShowFullText.setOnAction(ev -> {
 			if (this.wib != null)
-				FxUtil.createStageAndShow(xmlEditor, stage -> {
-					stage.setTitle("XML - " + this.wib.getName());
-					stage.setWidth(800d);
-					stage.setHeight(600d);
-				});
+				if (xmlStage != null) {
+					xmlStage.show();
+					return;
+				}
+
+			xmlStage = FxUtil.createStageAndShow(xmlEditor, stage -> {
+				stage.setTitle("XML - " + this.wib.getName());
+				stage.setWidth(800d);
+				stage.setHeight(600d);
+			});
 		});
 
 		menuWindow.getItems().add(cmiShowFullText);
