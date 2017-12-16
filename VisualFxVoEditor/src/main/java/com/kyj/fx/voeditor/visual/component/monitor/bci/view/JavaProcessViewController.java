@@ -83,7 +83,6 @@ public class JavaProcessViewController implements MonitorListener, PrimaryStageC
 			tbJavaApplication.getItems().setAll(activedApplicationModel);
 
 		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

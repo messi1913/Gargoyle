@@ -14,8 +14,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kyj.bci.monitor.ApplicationModel;
-import com.kyj.bci.monitor.MonitorListener;
 import com.kyj.bci.monitor.Monitors;
 import com.kyj.fx.fxloader.FXMLController;
 import com.kyj.fx.voeditor.visual.framework.PrimaryStageCloseable;
@@ -39,7 +37,7 @@ import javafx.scene.shape.Rectangle;
  *
  */
 @FXMLController(value = "ScheduleTimeLineView.fxml", isSelfController = true)
-public class ScheduleTimeLineComposite extends BorderPane implements MonitorListener, PrimaryStageCloseable {
+public class ScheduleTimeLineComposite extends BorderPane implements PrimaryStageCloseable {
 
 	private static final int CHART_SHOWING_ITEM_COUNT = MonitorProperties.getInstance()
 			.getInteger(MonitorProperties.CHART_SHOWING_ITEM_COUNT);
@@ -66,7 +64,7 @@ public class ScheduleTimeLineComposite extends BorderPane implements MonitorList
 	@FXML
 	public void initialize() {
 
-		Monitors.addListener(this);
+		// Monitors.addListener(this);
 		Main.addPrimaryStageCloseListener(this);
 
 		chartTimeLine.setVerticalGridLinesVisible(false);
@@ -135,36 +133,18 @@ public class ScheduleTimeLineComposite extends BorderPane implements MonitorList
 	}
 
 	@Override
-	public void onApplicationLoaded(ApplicationModel model) {
-		//		if (filter.test(model)) {
-		//batchProcessCounting.addAndGet(1);
-
-		//			batchProcessCounting.set(Monitors.getActivedCount());
-		//		}
-		// allProcessCounting.addAndGet(1);
-	}
-
-	@Override
-	public void onApplicationTerminated(ApplicationModel model) {
-		//		if (filter.test(model))
-		//			batchProcessCounting.set(Monitors.getActivedCount());
-		// allProcessCounting.addAndGet(-1);
-	}
-
-	@Override
 	public void closeRequest() {
 		LOGGER.debug("close request...");
-
+		// Monitors.removeListener(ScheduleTimeLineComposite.this);
 		Platform.runLater(() -> {
 
 			running.set(false);
 			if (monitorService.isRunning()) {
 				monitorService.cancel();
 			}
-			
-			Monitors.removeListener(ScheduleTimeLineComposite.this);	
+
 		});
-		
+
 	}
 
 }
