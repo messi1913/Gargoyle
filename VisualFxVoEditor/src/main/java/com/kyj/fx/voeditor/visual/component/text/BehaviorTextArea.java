@@ -101,7 +101,7 @@ public class BehaviorTextArea extends BorderPane {
 	public BehaviorTextArea(String content) {
 
 		codeArea = new CodeArea();
-		codeHelperDeligator = new CodeAreaHelper<CodeArea>(codeArea);
+		codeHelperDeligator = new BehaviorCodeAreaHelper(codeArea);
 		codeArea.setParagraphGraphicFactory(getLineFactory());
 
 		codeArea.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX

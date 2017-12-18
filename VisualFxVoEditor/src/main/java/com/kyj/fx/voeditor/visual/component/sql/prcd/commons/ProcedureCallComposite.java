@@ -372,23 +372,24 @@ public abstract class ProcedureCallComposite<T> extends BorderPane {
 		thread.start();
 	}
 
-//	private <R> void doAsynch(Callable<R> action, Consumer<R> consume, Consumer<Exception> onError) {
-//		Thread thread = new Thread(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//
-//				try {
-//					R call = action.call();
-//					consume.accept(call);
-//				} catch (Exception e) {
-//					onError.accept(e);
-//				}
-//			}
-//		}, "doAsynch-Thread");
-//		thread.setDaemon(true);
-//		thread.start();
-//	}
+	// private <R> void doAsynch(Callable<R> action, Consumer<R> consume,
+	// Consumer<Exception> onError) {
+	// Thread thread = new Thread(new Runnable() {
+	//
+	// @Override
+	// public void run() {
+	//
+	// try {
+	// R call = action.call();
+	// consume.accept(call);
+	// } catch (Exception e) {
+	// onError.accept(e);
+	// }
+	// }
+	// }, "doAsynch-Thread");
+	// thread.setDaemon(true);
+	// thread.start();
+	// }
 
 	@FXML
 	public void btnExecuteOnAction() {
@@ -450,7 +451,7 @@ public abstract class ProcedureCallComposite<T> extends BorderPane {
 					/* this.catalog.get(), */ procedureCont, paramStatement);
 
 			// 현재 카탈로그 set
-//			con.setCatalog(this.catalog.get());
+			// con.setCatalog(this.catalog.get());
 
 			CallableStatement prepareCall = con.prepareCall(statement);
 
@@ -465,8 +466,13 @@ public abstract class ProcedureCallComposite<T> extends BorderPane {
 					// Nullable이 아닌 경우 null값이 들어온경우 공백을 넣어줌.
 					if (value == null)
 						value = "";
+					
+//					if ("uniqueidentifier".equals(v.getType())) {
+//						prepareCall.setNCharacterStream(index, new StringReader(value.toString()));
+//					} else {
+						prepareCall.setObject(index, value);
+//					}
 
-					prepareCall.setObject(index, value);
 				}
 			}
 

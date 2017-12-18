@@ -7,12 +7,16 @@
 package com.kyj.fx.voeditor.visual.component.text;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.kyj.fx.voeditor.visual.component.dock.tab.DockTab;
+import com.kyj.fx.voeditor.visual.component.dock.tab.DockTabPane;
+import com.kyj.fx.voeditor.visual.framework.GargoyleTabPanable;
 import com.kyj.fx.voeditor.visual.framework.thread.ExecutorDemons;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
@@ -20,9 +24,12 @@ import com.kyj.fx.voeditor.visual.util.ValueUtil;
 import com.kyj.fx.voeditor.visual.util.XMLUtils;
 
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -31,6 +38,8 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -41,9 +50,9 @@ import javafx.stage.Stage;
  * @author KYJ
  *
  */
-public class BehaviorTextComposite extends BorderPane {
+public class BehaviorTextComposite extends BorderPane implements GargoyleTabPanable {
 
-	private File wib;
+	private ObjectProperty<File> wib = new SimpleObjectProperty<>();
 	private XMLEditor xmlEditor;
 	private BehaviorTextArea txtScript;
 	private SplitPane splitPane;
@@ -58,12 +67,15 @@ public class BehaviorTextComposite extends BorderPane {
 
 		// Top
 		smbReferences = new SplitMenuButton();
+		this.smbReferences.setText("Reference");
+
 		btnSearch = new Button("Search");
 		btnLoad = new Button("Load");
-		txtLoacation = new TextField(this.wib == null ? "" : this.wib.getAbsolutePath());
+		txtLoacation = new TextField();
 		// txtLoacation.setPrefWidth(Double.MAX_VALUE);
 		txtLoacation.setMaxWidth(Double.MAX_VALUE);
 		txtLoacation.setMinWidth(200d);
+		txtLoacation.setPrefWidth(400d);
 		smbReferences.setPrefWidth(200d);
 
 		HBox hBox = new HBox(smbReferences, txtLoacation, btnSearch, btnLoad);
@@ -75,17 +87,18 @@ public class BehaviorTextComposite extends BorderPane {
 		Menu menuWindow = new Menu("Window");
 		MenuItem cmiShowFullText = new MenuItem("Show Full Text");
 		cmiShowFullText.setOnAction(ev -> {
-			if (this.wib != null)
+			if (this.wib != null) {
 				if (xmlStage != null) {
 					xmlStage.show();
 					return;
 				}
 
-			xmlStage = FxUtil.createStageAndShow(xmlEditor, stage -> {
-				stage.setTitle("XML - " + this.wib.getName());
-				stage.setWidth(800d);
-				stage.setHeight(600d);
-			});
+				xmlStage = FxUtil.createStageAndShow(xmlEditor, stage -> {
+					stage.setTitle("XML - " + this.wib.getName());
+					stage.setWidth(800d);
+					stage.setHeight(600d);
+				});
+			}
 		});
 
 		menuWindow.getItems().add(cmiShowFullText);
@@ -96,15 +109,11 @@ public class BehaviorTextComposite extends BorderPane {
 
 		// Center
 		xmlEditor = new XMLEditor();
+
 		txtScript = new BehaviorTextArea();
 
-		// cmiShowFullText.selectedProperty().bind(xmlEditor.visibleProperty());
-		// xmlEditor.setVisible(false);
-		// SplitPane sub = new SplitPane(xmlEditor, customValuesXml);
+		splitPane = new SplitPane(txtScript);
 
-		splitPane = new SplitPane(txtScript /* , xmlEditor */);
-
-		// splitPane.setDividerPositions(1.0, 0.0);
 		splitPane.setOrientation(Orientation.HORIZONTAL);
 
 		tabPane = new TabPane();
@@ -113,23 +122,68 @@ public class BehaviorTextComposite extends BorderPane {
 		tabPane.getTabs().add(mainTab);
 		setCenter(tabPane);
 
+		// Events
+		this.btnSearch.setOnAction(this::btnSearchOnAction);
+		this.btnLoad.setOnAction(this::btnLoadOnAction);
+
+		// DragDrop
+		txtScript.setOnDragOver(this::txtScriptOnDagOver);
+		txtScript.setOnDragDropped(this::txtScriptOnDragDropped);
+
+		this.wib.addListener((oba, old, newval) -> {
+			if (newval != null && newval.exists()) {
+				tab.setText(newval.getName());
+			}
+		});
 		init();
 	}
 
 	public BehaviorTextComposite(File wib) {
 		this();
+		this.wib.set(wib);
+		txtLoacation.setText(this.wib == null ? "" : this.wib.get().getAbsolutePath());
 	}
 
 	protected void init() {
-		this.btnSearch.setOnAction(this::btnSearchOnAction);
-		this.btnLoad.setOnAction(this::btnLoadOnAction);
-		smbReferences.setText("Reference");
+
 		readAsync();
 	}
 
 	public void smbReferencesOnAction(BehaviorReferenceMenuItem e) {
 		BehaviorReferenceVO v = e.getValue();
 		addNewTab(v);
+	}
+
+	public void txtScriptOnDagOver(DragEvent ev) {
+		if (ev.isConsumed())
+			return;
+
+		if (ev.getDragboard().hasFiles()) {
+			ev.acceptTransferModes(TransferMode.LINK);
+			ev.consume();
+		}
+	}
+
+	public void txtScriptOnDragDropped(DragEvent ev) {
+
+		if (ev.isConsumed())
+			return;
+
+		if (ev.getDragboard().hasFiles()) {
+
+			List<File> files = ev.getDragboard().getFiles();
+
+			// tbDatabase.getItems().add(e)
+			files.stream().filter(f -> f.getName().endsWith(".wib")).findFirst().ifPresent(f -> {
+
+				this.wib.set(f);
+				this.readAsync();
+			});
+
+			ev.setDropCompleted(true);
+			ev.consume();
+		}
+
 	}
 
 	/**
@@ -155,12 +209,14 @@ public class BehaviorTextComposite extends BorderPane {
 	}
 
 	public void btnSearchOnAction(ActionEvent e) {
-		this.wib = DialogUtil.showFileDialog(chooser -> {
+		File wib = DialogUtil.showFileDialog(chooser -> {
 			chooser.getExtensionFilters().add(new ExtensionFilter("WIB files (*.wib)", "*.wib"));
 		});
 
-		if (this.wib != null)
-			this.txtLoacation.setText(this.wib.getAbsolutePath());
+		if (wib != null) {
+			this.wib.set(wib);
+			this.txtLoacation.setText(wib.getAbsolutePath());
+		}
 
 		readAsync();
 	}
@@ -168,7 +224,7 @@ public class BehaviorTextComposite extends BorderPane {
 	public void btnLoadOnAction(ActionEvent e) {
 		String text = this.txtLoacation.getText();
 		if (ValueUtil.isNotEmpty(text)) {
-			this.wib = new File(text);
+			this.wib.set(new File(text));
 			// Ref 초기화
 			smbReferences.getItems().clear();
 			readAsync();
@@ -176,7 +232,7 @@ public class BehaviorTextComposite extends BorderPane {
 	}
 
 	private void readAsync() {
-		if (this.wib != null && this.wib.exists()) {
+		if (this.wib.get() != null && this.wib.get().exists()) {
 			ExecutorDemons.getGargoyleSystemExecutorSerivce().execute(() -> {
 				String readBehavior = readBehavior();
 
@@ -210,13 +266,12 @@ public class BehaviorTextComposite extends BorderPane {
 
 						if (ValueUtil.isNotEmpty(txtFileName)) {
 
-							File refFile = new File(this.wib.getParentFile(), txtFileName);
+							File refFile = new File(this.wib.get().getParentFile(), txtFileName);
 							if (refFile.exists()) {
 								BehaviorReferenceMenuItem e = new BehaviorReferenceMenuItem(new BehaviorReferenceVO(refFile, txtFileName));
 								e.setOnAction(new BehaviorReferenceMenuItemActionEvent(BehaviorTextComposite.this, e));
 								smbReferences.getItems().add(e);
 							}
-
 						}
 					}
 				});
@@ -226,7 +281,7 @@ public class BehaviorTextComposite extends BorderPane {
 	}
 
 	private String readBehavior() {
-		BehaviorReader reader = new BehaviorReader(this.wib);
+		BehaviorReader reader = new BehaviorReader(this.wib.get());
 		return reader.readBehavior();
 	}
 
@@ -239,6 +294,19 @@ public class BehaviorTextComposite extends BorderPane {
 	 */
 	public static String getName() {
 		return "Behavior-Viewer";
+	}
+
+	private DockTabPane tabpane;
+	private DockTab tab;
+
+	@Override
+	public void setTabPane(DockTabPane tabpane) {
+		this.tabpane = tabpane;
+	}
+
+	@Override
+	public void setTab(DockTab tab) {
+		this.tab = tab;
 	}
 
 }

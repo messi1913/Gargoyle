@@ -26,11 +26,11 @@ import javafx.scene.input.TransferMode;
  * @author KYJ
  *
  */
-public class CodeAreaFileDragDropHelper extends AbstractFileDragDropHelper<CodeArea> {
+public class CodeAreaFileDragDropHelper<T extends CodeArea> extends AbstractFileDragDropHelper<T> {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(CodeAreaFileDragDropHelper.class);
 
-	public CodeAreaFileDragDropHelper(CodeArea codeArea) {
+	public CodeAreaFileDragDropHelper(T codeArea) {
 		super(codeArea);
 	}
 
