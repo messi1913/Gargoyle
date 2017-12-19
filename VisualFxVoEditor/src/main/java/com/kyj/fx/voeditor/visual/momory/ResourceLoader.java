@@ -118,7 +118,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	 */
 	public static final String USER_SELECT_LOCATION_PATH = "user.select.location.path";
 
-	private static ResourceLoaderDbProperties properties = ResourceLoaderDbProperties.getInstance();
+	private static ResourceLoaderDbProperties dbProperties = ResourceLoaderDbProperties.getInstance();
 	private static ResourceLoader loader;
 
 	public static final String FILE_NAME = "UserConf.properties";
@@ -226,36 +226,22 @@ public class ResourceLoader implements IFileBaseConfiguration {
 		initialize();
 	}
 
+	public static synchronized void reload() {
+
+		try {
+			dbProperties.load((InputStream) null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void initialize() {
 
 		try {
-			properties.load((InputStream) null);
+			dbProperties.load((InputStream) null);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// new
-		// Properties();
-		//
-		// FileInputStream inStream = null;
-		// try {
-		// File file = new File(FILE_NAME);
-		// if (!file.exists()) {
-		// file.createNewFile();
-		// }
-		// inStream = new FileInputStream(FILE_NAME);
-		// properties.load(inStream);
-		// baseKeyLoad(properties);
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// } finally {
-		// try {
-		// if (inStream != null)
-		// inStream.close();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-		// }
 	}
 
 	/**
@@ -285,28 +271,28 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	}
 
 	public void initDataBaseInfo() {
-		for (String key : properties.keySet().toArray(new String[0])) {
+		for (String key : dbProperties.keySet().toArray(new String[0])) {
 			if (key.startsWith("database.info.")) {
-				properties.remove(key);
+				dbProperties.remove(key);
 			}
 		}
 	}
 
 	public synchronized void putAll(Map<String, Object> bufMap) {
-		properties.putAll(bufMap);
+		dbProperties.putAll(bufMap);
 		store();
 	}
 
 	public synchronized void putAll(Properties prop) {
 		prop.entrySet().stream().forEach(e -> {
-			properties.put(e.getKey(), e.getValue());
+			dbProperties.put(e.getKey(), e.getValue());
 		});
 
 		store();
 	}
 
 	public synchronized void put(String key, String value) {
-		properties.put(key, value);
+		dbProperties.put(key, value);
 		store();
 	}
 
@@ -332,7 +318,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 		// }
 		// }
 		try {
-			properties.store((Writer) null, "User Conf...");
+			dbProperties.store((Writer) null, "User Conf...");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -347,7 +333,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	}
 
 	public String get(String key) {
-		String property = properties.getProperty(key);
+		String property = dbProperties.getProperty(key);
 		if (property == null || property.isEmpty())
 			return ConfigResourceLoader.getInstance().get(key);
 		return property;
@@ -355,7 +341,7 @@ public class ResourceLoader implements IFileBaseConfiguration {
 
 	String get(String key, int roopCount) {
 		roopCount++;
-		String property = properties.getProperty(key);
+		String property = dbProperties.getProperty(key);
 		if (property == null || property.isEmpty())
 			return ConfigResourceLoader.getInstance().get(key, roopCount);
 		return property;
@@ -369,18 +355,18 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	 * @return
 	 */
 	public List<String> getValues(String key, String deliminater) {
-		Object object = properties.get(key);
+		Object object = dbProperties.get(key);
 		if (object != null)
 			return Stream.of(object.toString().split(deliminater)).map(str -> str.trim()).collect(Collectors.toList());
 		return Collections.emptyList();
 	}
 
 	public Enumeration<Object> keySet() {
-		return properties.keys();
+		return dbProperties.keys();
 	}
 
 	public Set<Entry<Object, Object>> getEntry() {
-		return properties.entrySet();
+		return dbProperties.entrySet();
 	}
 
 	// public Map<String, Object> toMap() {
@@ -494,10 +480,10 @@ public class ResourceLoader implements IFileBaseConfiguration {
 	}
 
 	public Set<Entry<Object, Object>> entrySet() {
-		return properties.entrySet();
+		return dbProperties.entrySet();
 	}
 
 	public void clearKeys(List<String> keys) {
-		properties.clearKeys(keys);
+		dbProperties.clearKeys(keys);
 	}
 }
