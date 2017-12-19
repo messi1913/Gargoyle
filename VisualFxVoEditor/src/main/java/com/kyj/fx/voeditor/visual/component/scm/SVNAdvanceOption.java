@@ -12,7 +12,7 @@ package com.kyj.fx.voeditor.visual.component.scm;
  */
 public class SVNAdvanceOption {
 
-	private int revision;
+	private int revision = -1;
 
 	private String message;
 
