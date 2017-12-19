@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="borRoot" prefHeight="272.0" prefWidth="614.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.component.scm.CheckoutController">
+<BorderPane fx:id="borRoot" prefHeight="272.0" prefWidth="614.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kyj.fx.voeditor.visual.component.scm.CheckoutController">
 	<center>
 		<GridPane BorderPane.alignment="CENTER">
 			<columnConstraints>
@@ -22,7 +22,8 @@
 			<rowConstraints>
 				<RowConstraints maxHeight="57.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
 				<RowConstraints maxHeight="74.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-				<RowConstraints maxHeight="110.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="110.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="110.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
 			</rowConstraints>
 			<children>
 				<Label text="Project Name" />
@@ -43,6 +44,8 @@
 						</HBox>
 					</children>
 				</VBox>
+            <Label fx:id="lblLocation1" text="Revision" GridPane.rowIndex="2" />
+            <Label fx:id="txtRevision" text="-1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 			</children>
 			<padding>
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

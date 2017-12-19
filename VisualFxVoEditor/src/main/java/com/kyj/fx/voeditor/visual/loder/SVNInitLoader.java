@@ -39,47 +39,48 @@ public class SVNInitLoader implements SCMInitLoader {
 	public <T extends SVNItem> List<T> load() {
 
 		String jsonArray = ResourceLoader.getInstance().get(ResourceLoader.SVN_REPOSITORIES);
-		if (jsonArray == null || jsonArray.length() ==0)
+		if (jsonArray == null || jsonArray.length() == 0)
 			return null;
-
+		
+		List<SVNRepository> repositorys = new ArrayList<>();
 		JSONArray parse = null;
 		try {
 			parse = (JSONArray) new JSONParser().parse(jsonArray);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
 
-		List<SVNRepository> repositorys = new ArrayList<>();
-		int size = parse.size();
-		for (int i = 0; i < size; i++) {
-			Object obj = parse.get(i);
-			JSONObject jsonObject = (JSONObject) obj;
-			Object url = jsonObject.get(SVNTreeView.SVN_URL);
-			Object id = jsonObject.get(SVNTreeView.SVN_USER_ID);
-			Object pass = jsonObject.get(SVNTreeView.SVN_USER_PASS);
+			
+			int size = parse.size();
+			for (int i = 0; i < size; i++) {
+				Object obj = parse.get(i);
+				JSONObject jsonObject = (JSONObject) obj;
+				Object url = jsonObject.get(SVNTreeView.SVN_URL);
+				Object id = jsonObject.get(SVNTreeView.SVN_USER_ID);
+				Object pass = jsonObject.get(SVNTreeView.SVN_USER_PASS);
 
-			if (url == null)
-				continue;
+				if (url == null)
+					continue;
 
-			Properties properties = new Properties();
-			properties.put(SVNTreeView.SVN_URL, url.toString());
-			if (id != null && !id.toString().isEmpty())
-				properties.put(SVNTreeView.SVN_USER_ID, id.toString());
+				Properties properties = new Properties();
+				properties.put(SVNTreeView.SVN_URL, url.toString());
+				if (id != null && !id.toString().isEmpty())
+					properties.put(SVNTreeView.SVN_USER_ID, id.toString());
 
-			if (pass != null && !pass.toString().isEmpty()) {
-				try {
-					properties.put(SVNTreeView.SVN_USER_PASS, EncrypUtil.decryp(pass.toString()));
-				} catch (Exception e) {
-					properties.put(SVNTreeView.SVN_USER_PASS, pass.toString());
-					ValueUtil.toString(e);
+				if (pass != null && !pass.toString().isEmpty()) {
+					try {
+						properties.put(SVNTreeView.SVN_USER_PASS, EncrypUtil.decryp(pass.toString()));
+					} catch (Exception e) {
+						properties.put(SVNTreeView.SVN_USER_PASS, pass.toString());
+						ValueUtil.toString(e);
+					}
 				}
+
+				JavaSVNManager manager = new JavaSVNManager(properties);
+
+				SVNRepository svnRepository = new SVNRepository("", url.toString(), manager);
+
+				repositorys.add(svnRepository);
 			}
+		} catch (ParseException e) {
 
-			JavaSVNManager manager = new JavaSVNManager(properties);
-
-			SVNRepository svnRepository = new SVNRepository("", url.toString(), manager);
-
-			repositorys.add(svnRepository);
 		}
 
 		return (List<T>) repositorys;

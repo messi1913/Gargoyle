@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.scm;
 
+import java.util.Optional;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 /**
  * SVN 로케이션 추가 설정.
@@ -107,22 +109,28 @@ public class AddNewSVNRepositoryController implements SCMKeywords {
 		}
 
 		if (saveFunction.get().isValide(properties)) {
-			doSave(properties);
+			doSave(properties, SaveTypes.DEFAULT);
 		} else {
 
-			// Optional<Pair<String, String>> showYesOrNoDialog =
-			// DialogUtil.showYesOrNoDialog("Duplicated URL.",
-			// "Overrite ?? ");
-			// showYesOrNoDialog.ifPresent(v -> {
-			// if ("Y".equals(v.getValue())) {
-			// doSave(properties);
-			// }
-			//
-			// });
-			DialogUtil.showMessageDialog(this.stage, "Duplicated URL.");
+			Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Duplicated URL.", "Overrite ?? ");
+			if (showYesOrNoDialog.isPresent()) {
+				Pair<String, String> v = showYesOrNoDialog.get();
+				if ("Y".equals(v.getValue())) {
+					doSave(properties, SaveTypes.OVERWRITE);
+				} else {
+					DialogUtil.showMessageDialog(this.stage, "Duplicated URL.");
+				}
+			} else {
+				DialogUtil.showMessageDialog(this.stage, "Duplicated URL.");
+			}
+
 			return;
 		}
 
+	}
+
+	enum SaveTypes {
+		DEFAULT, OVERWRITE
 	}
 
 	/**
@@ -133,8 +141,21 @@ public class AddNewSVNRepositoryController implements SCMKeywords {
 	 * @param properties
 	 * @return
 	 */
-	private void doSave(Properties properties) {
-		boolean isSaveComplete = saveFunction.get().apply(properties);
+	private void doSave(Properties properties, SaveTypes type) {
+
+		boolean isSaveComplete = false;
+		SVNCreateFunction svnCreateFunction = saveFunction.get();
+		switch (type) {
+		case DEFAULT:
+			svnCreateFunction.setOverwrite(false);
+			isSaveComplete = svnCreateFunction.apply(properties);
+			break;
+		case OVERWRITE:
+			svnCreateFunction.setOverwrite(true);
+			isSaveComplete = svnCreateFunction.apply(properties);
+			break;
+		}
+
 		if (isSaveComplete) {
 			result.set(properties);
 			DialogUtil.showMessageDialog(this.stage, "save Complete!");

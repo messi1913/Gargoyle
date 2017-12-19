@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.fxloader.FXMLController;
+import com.kyj.fx.voeditor.visual.framework.contextmenu.FxContextManager;
 import com.kyj.fx.voeditor.visual.main.model.vo.Code;
 import com.kyj.fx.voeditor.visual.momory.ClassTypeResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
@@ -34,6 +35,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -78,19 +80,7 @@ public class ResourcesConfigView extends BorderPane {
 	 */
 	public ResourcesConfigView() {
 
-		FxUtil.loadRoot(ResourcesConfigView.class, this, err-> LOGGER.error(ValueUtil.toString(err)));
-//		FXMLLoader loader = new FXMLLoader();
-//		loader.setLocation(getClass().getResource("ResourcesConfigView.fxml"));
-//		loader.setController(this);
-//		loader.setRoot(this);
-//		
-//		
-//		this.getStylesheets().add(SkinManager.getInstance().getSkin());
-//		try {
-//			loader.load();
-//		} catch (Exception e) {
-//			LOGGER.error(e.getMessage());
-//		}
+		FxUtil.loadRoot(ResourcesConfigView.class, this, err -> LOGGER.error(ValueUtil.toString(err)));
 	}
 
 	@FXML
@@ -139,12 +129,24 @@ public class ResourcesConfigView extends BorderPane {
 
 		observableArrayList = loadResource();
 		tbDatabase.getItems().addAll(observableArrayList);
-		
+
 		tbDatabase.getSelectionModel().setCellSelectionEnabled(true);
-		
+
 		FxUtil.installClipboardKeyEvent(tbDatabase);
 		FxUtil.installDoubleClickPopup(FxUtil.getWindow(this), POPUP_STYLE.POPUP, tbDatabase);
+
+		/*
+		 * 17.12.19
+		 * ContextMenu 추가. 리로딩 기능을 지원.
+		 */
+		FxContextManager contextManager = new FxContextManager(this);
+		MenuItem item = new MenuItem("Reload");
+		item.setOnAction(ev ->{
+			ResourceLoader.getInstance().reload();
+		});
+		contextManager.addNewMenu(item);
 		
+		FxUtil.installContextMenu(contextManager);
 	}
 
 	/**

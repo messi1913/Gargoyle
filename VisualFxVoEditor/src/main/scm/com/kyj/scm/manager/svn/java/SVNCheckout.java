@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.internal.util.SVNURLUtil;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
 import com.kyj.fx.voeditor.visual.framework.handler.ExceptionHandler;
@@ -85,10 +86,13 @@ class SVNCheckout extends AbstractSVN implements ICheckoutCommand<String, Long> 
 			if (outDir == null || !outDir.exists())
 				throw new FileNotFoundException("not support...");
 
-			SVNURL parseURIEncoded = SVNURL.parseURIEncoded(getUrl() + path);
-			LOGGER.debug(parseURIEncoded.toString());
-			checkoutResult = getSvnManager().getUpdateClient().doCheckout(parseURIEncoded, outDir, SVNRevision.HEAD, SVNRevision.create(Long.parseLong(revision)),
-					SVNDepth.INFINITY, false);
+			SVNURL root = getSvnURL();
+			String relativeURL = SVNURLUtil.getRelativeURL(root, SVNURL.parseURIEncoded(path), false);
+
+			SVNURL appendPath = root.appendPath(relativeURL, true);
+			LOGGER.debug(appendPath.toString());
+			checkoutResult = getSvnManager().getUpdateClient().doCheckout(appendPath, outDir, SVNRevision.HEAD,
+					SVNRevision.create(Long.parseLong(revision)), SVNDepth.INFINITY, false);
 
 		} catch (Exception e) {
 			if (exceptionHandler != null)

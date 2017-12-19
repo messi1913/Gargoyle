@@ -37,12 +37,9 @@ public class SVNCreateFunction implements Function<Properties, Boolean>, SCMKeyw
 		JSONArray parse = null;
 		try {
 			String string = ResourceLoader.getInstance().get(SVN_REPOSITORIES);
-			if(string == null || string.length() == 0)
-			{
+			if (string == null || string.length() == 0) {
 				parse = new JSONArray();
-			}
-			else
-			{
+			} else {
 				parse = (JSONArray) new JSONParser().parse(string);
 			}
 		} catch (ParseException e) {
@@ -68,20 +65,24 @@ public class SVNCreateFunction implements Function<Properties, Boolean>, SCMKeyw
 
 	}
 
+	private boolean overwrite;
+
+	public void setOverwrite(boolean overwrite) {
+		this.overwrite = overwrite;
+	}
+
 	/**
 	 * @inheritDoc
 	 */
 	@Override
 	public Boolean apply(Properties t) {
 		JSONArray parse = null;
+
 		try {
 			String string = ResourceLoader.getInstance().get(SVN_REPOSITORIES);
-			if(string == null || string.length() == 0)
-			{
+			if (string == null || string.length() == 0) {
 				parse = new JSONArray();
-			}
-			else
-			{
+			} else {
 				parse = (JSONArray) new JSONParser().parse(string);
 			}
 		} catch (ParseException e) {

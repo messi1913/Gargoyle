@@ -27,6 +27,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -59,7 +61,7 @@ public class CheckoutController extends BorderPane {
 	private TextField txtProjectName;
 
 	@FXML
-	private Label lblLocation;
+	private Label lblLocation, txtRevision;
 
 	@FXML
 	private CheckBox chkIsDefaultLocation;
@@ -132,6 +134,16 @@ public class CheckoutController extends BorderPane {
 
 		onCloseAction.set(defaultCloseAction);
 
+		advanceOption.addListener(new ChangeListener<SVNAdvanceOption>() {
+
+			@Override
+			public void changed(ObservableValue<? extends SVNAdvanceOption> observable, SVNAdvanceOption oldValue,
+					SVNAdvanceOption newValue) {
+				if (newValue != null) {
+					txtRevision.setText(String.valueOf(newValue.getRevision()));
+				}
+			}
+		});
 	}
 
 	/********************************

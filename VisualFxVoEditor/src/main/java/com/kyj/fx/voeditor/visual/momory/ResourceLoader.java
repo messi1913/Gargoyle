@@ -226,13 +226,14 @@ public class ResourceLoader implements IFileBaseConfiguration {
 		initialize();
 	}
 
-	public static synchronized void reload() {
-
+	public boolean reload() {
 		try {
 			dbProperties.load((InputStream) null);
+			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	private void initialize() {
