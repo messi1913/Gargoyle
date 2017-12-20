@@ -40,6 +40,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTreeCell;
@@ -47,6 +48,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Callback;
 import javafx.util.Pair;
 
 /**
@@ -65,7 +67,8 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 	private SVNInitLoader loader;
 
 	/* Context Menu 정의. */
-	private ContextMenu contextMenu;
+	private ContextMenu contextMenuDir;
+
 	private Menu menuNew;
 	private MenuItem menuAddNewLocation;
 	private MenuItem menuSvnGraph;
@@ -93,19 +96,18 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 		loader = new SVNInitLoader();
 		discardFunction = new SVNDiscardLocationFunction();
 
-
 		addContextMenus();
 		this.setOnMouseClicked(this::svnTreeOnMouseClick);
 	}
 
-
 	/**
 	 * revision 번호를 필터링하면서 초기 데이터 로드
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 2. 13.
 	 * @param revisionHandler
 	 */
-	public void load(Predicate<Long> revisionHandler){
+	public void load(Predicate<Long> revisionHandler) {
 		SVNRootItem svnRootItem = new SVNRootItem();
 		List<TreeItem<SVNItem>> loadRepository = loadRepository(revisionHandler);
 		TreeItem<SVNItem> value = new TreeItem<>(svnRootItem);
@@ -117,23 +119,24 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 
 	/**
 	 * 기본 데이터 로드
+	 * 
 	 * @작성자 : KYJ
 	 * @작성일 : 2017. 2. 13.
 	 */
-	public void load(){
+	public void load() {
 		this.load(null);
 	}
 
-	public long getLatestRevision() throws SVNException{
+	public long getLatestRevision() throws SVNException {
 		ObservableList<TreeItem<SVNItem>> children = getRoot().getChildren();
-		if(children!=null && !children.isEmpty())
-		{
+		if (children != null && !children.isEmpty()) {
 			TreeItem<SVNItem> treeItem = children.get(0);
-			if(treeItem!=null && treeItem.getValue() !=null)
+			if (treeItem != null && treeItem.getValue() != null)
 				return treeItem.getValue().getLatestRevision();
 		}
 		return -1;
 	}
+
 	/***********************************************************************************/
 	/* 이벤트 구현 */
 
@@ -188,8 +191,8 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 
 				NullExpresion.ifNotNullDo(url, svnUrl -> {
 
-					Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog(
-							"Discard Repository", String.format("Do you want Discard Repository %s ???", url));
+					Optional<Pair<String, String>> showYesOrNoDialog = DialogUtil.showYesOrNoDialog("Discard Repository",
+							String.format("Do you want Discard Repository %s ???", url));
 
 					showYesOrNoDialog.ifPresent(v -> {
 
@@ -317,8 +320,7 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 				BorderPane n = fxmlLoader.load();
 
 				Stage window = (Stage) getParent().getScene().getWindow();
-				Stage parent = (Stage) com.kyj.fx.voeditor.visual.util.ValueUtil.decode(window, window,
-						SharedMemory.getPrimaryStage());
+				Stage parent = (Stage) com.kyj.fx.voeditor.visual.util.ValueUtil.decode(window, window, SharedMemory.getPrimaryStage());
 
 				Stage stage = new Stage();
 				AddNewSVNRepositoryController controller = fxmlLoader.getController();
@@ -362,8 +364,7 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 			BorderPane n = fxmlLoader.load();
 
 			Stage window = (Stage) getParent().getScene().getWindow();
-			Stage parent = (Stage) com.kyj.fx.voeditor.visual.util.ValueUtil.decode(window, window,
-					SharedMemory.getPrimaryStage());
+			Stage parent = (Stage) com.kyj.fx.voeditor.visual.util.ValueUtil.decode(window, window, SharedMemory.getPrimaryStage());
 
 			Stage stage = new Stage();
 			AddNewSVNRepositoryController controller = fxmlLoader.getController();
@@ -434,19 +435,23 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 		menuSvnGraph.setOnAction(this::menuSVNGraphOnAction);
 		menuProperties.setOnAction(this::menuPropertiesOnAction);
 
-		contextMenu = new ContextMenu(menuNew, new SeparatorMenuItem(), menuCheckout, new SeparatorMenuItem(),
-				menuSvnGraph, new SeparatorMenuItem(), menuDiscardLocation, menuReflesh, new SeparatorMenuItem(),
-				menuProperties);
+		contextMenuDir = new ContextMenu(menuNew, new SeparatorMenuItem(), menuCheckout, new SeparatorMenuItem(), menuSvnGraph,
+				new SeparatorMenuItem(), menuDiscardLocation, menuReflesh, new SeparatorMenuItem(), menuProperties);
+
+		// contextMenuFile = new ContextMenu(menuProperties);
 		// setContextMenu(contextMenu);
 
-		setCellFactory(treeItem -> {
-			TextFieldTreeCell<SVNItem> textFieldTreeCell = new TextFieldTreeCell<>();
-			textFieldTreeCell.setContextMenu(contextMenu);
-			return textFieldTreeCell;
+		setCellFactory(new Callback<TreeView<SVNItem>, TreeCell<SVNItem>>() {
+			@Override
+			public TreeCell<SVNItem> call(TreeView<SVNItem> tv) {
+				TextFieldTreeCell<SVNItem> textFieldTreeCell = new TextFieldTreeCell<SVNItem>();
+				textFieldTreeCell.setContextMenu(contextMenuDir);
+				return textFieldTreeCell;
+			}
 		});
 
 		// 특정 조건에 따른 메뉴 VISIBLE 처리를 정의함.
-		contextMenu.setOnShown(contextMenuVisibleEvent);
+		contextMenuDir.setOnShown(contextMenuVisibleEvent);
 	}
 
 	/**
@@ -459,9 +464,10 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 	public List<TreeItem<SVNItem>> loadRepository() {
 		return this.loadRepository(null);
 	}
+
 	public List<TreeItem<SVNItem>> loadRepository(Predicate<Long> revisionHandler) {
 		List<SVNItem> load = loader.load();
-		if(load == null)
+		if (load == null)
 			return Collections.emptyList();
 		return load.stream().map(v -> scmTreeMaker.createNode(v, revisionHandler)).collect(Collectors.toList());
 	}

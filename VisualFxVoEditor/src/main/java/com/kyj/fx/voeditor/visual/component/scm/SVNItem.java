@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.internal.util.SVNURLUtil;
 
 import com.kyj.fx.voeditor.visual.util.DateUtil;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
@@ -115,10 +117,12 @@ public class SVNItem implements SCMItem<SVNItem> {
 	 */
 	@Override
 	public List<SVNItem> getChildrens() {
-		String svnUrl = manager.getUrl();
+//		String svnUrl = manager.getUrl();
 		String _path = path;
 
 		/*
+		 * 17.12.20 상대주소기준으로 처리될 수 있도록 코드 수정
+		 * 
 		 * fix bug -> SVNInitLoader.java
 		 *
 		 * 버그 수정 SVN주소를 입력해도 루트디렉토리 밑의 요소들이 트리 요소로 화면에 출력되는 버그 수정
@@ -129,18 +133,31 @@ public class SVNItem implements SCMItem<SVNItem> {
 		 * to-be]
 		 * new SVNRepository("", url.toString(), manager);
 		 */
-
-		_path = JavaSVNManager.relativePath(svnUrl, _path, true);
+//		_path = SVNURL.parseURIEncoded(svnUrl).appendPath(path, true);
+//		_path = JavaSVNManager.relativePath(svnUrl, _path, true);
 		
 		//		if(_path.startsWith("/"))
 		//			_path = _path.substring(1);
 
 		List<SVNDirEntry> list = manager.listEntry(_path, "-1", false, BASIC_COMPAREABLE,
 				ex -> DialogUtil.showExceptionDailog(ex, "SVN Connection Fail"));
+		
+		// For Loop
 		List<SVNItem> collect = list.stream().map(p -> {
+			String rootUrl = manager.getRootUrl();
+			
 			String svnPath = p.getURL().getPath();
-			String url = p.getURL().toString();
-			svnPath = url.replaceFirst(svnUrl, "");
+//			String url = p.getURL().toString();
+			
+			
+			try {
+				svnPath = SVNURLUtil.getRelativeURL(SVNURL.parseURIEncoded(rootUrl) , p.getURL() , true);
+			} catch (SVNException e) {
+				e.printStackTrace();
+			}
+//			svnPath = JavaSVNManager.relativePath( rootUrl, svnPath, true);
+//			svnPath = url.replaceFirst(svnUrl, "");
+			
 			long revision = p.getRevision();
 			String name = p.getName();
 			String author = p.getAuthor();

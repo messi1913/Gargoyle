@@ -9,8 +9,10 @@ package com.kyj.scm.manager.svn.java;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -22,10 +24,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNCommitInfo;
+import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.internal.util.SVNURLUtil;
 import org.tmatesoft.svn.core.wc.SVNRevision;
@@ -44,6 +50,9 @@ import com.kyj.scm.manager.core.commons.ScmDirHandler;
  */
 
 public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, SVNFormatter {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(JavaSVNManager.class);
+
 	private SVNCat catCommand;
 
 	private SVNList listCommand;
@@ -442,6 +451,70 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 		return checkoutCommand.checkout(param, revision, outDir, exceptionHandler);
 	}
 
+	/**
+	 * 코드 체크아웃 <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 20.
+	 * @param param
+	 * @param pegrevision
+	 * @param revision
+	 * @param outDir
+	 * @return
+	 * @throws Exception
+	 */
+	public Long checkout(String param, String pegrevision, String revision, File outDir) throws Exception {
+		return checkoutCommand.checkout(param, pegrevision, revision, outDir, null);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 20.
+	 * @param absolutePath
+	 * @param pegrevision
+	 * @param revision
+	 * @param outDir
+	 * @return
+	 * @throws Exception
+	 */
+	public Long checkout(SVNURL absolutePath, String pegrevision, String revision, File outDir) throws Exception {
+		return checkoutCommand.checkout(absolutePath, SVNRevision.parse(pegrevision), SVNRevision.parse(revision), SVNDepth.INFINITY,
+				outDir, null);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 20.
+	 * @param absolutePath
+	 * @param pegrevision
+	 * @param revision
+	 * @param depth
+	 * @param outDir
+	 * @return
+	 * @throws Exception
+	 */
+	public Long checkout(SVNURL absolutePath, String pegrevision, String revision, SVNDepth depth, File outDir) throws Exception {
+		return checkoutCommand.checkout(absolutePath, SVNRevision.parse(pegrevision), SVNRevision.parse(revision), depth, outDir, null);
+	}
+
+	/**
+	 * 코드 체크아웃 <br/>
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 20.
+	 * @param param
+	 * @param pegrevision
+	 * @param revision
+	 * @param outDir
+	 * @param exceptionHandler
+	 * @return
+	 * @throws Exception
+	 */
+	public Long checkout(String param, String pegrevision, String revision, File outDir, ExceptionHandler exceptionHandler)
+			throws Exception {
+		return checkoutCommand.checkout(param, pegrevision, revision, outDir, exceptionHandler);
+	}
+
 	/********************************
 	 * 작성일 : 2016. 5. 5. 작성자 : KYJ
 	 *
@@ -607,7 +680,8 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 	 * @throws SVNException
 	 * @throws IOException
 	 *
-	 * @deprecated 서버간의 API연계에서 사용되면 안됨. 해당 API가 사용되는 때는 FileSystem으로 버젼관리가 되는 상황에서만 사용되야함. (( 로컬시스템으로 svn파일이 관리되는 경우에만 사용. ))
+	 * @deprecated 서버간의 API연계에서 사용되면 안됨. 해당 API가 사용되는 때는 FileSystem으로 버젼관리가 되는
+	 *             상황에서만 사용되야함. (( 로컬시스템으로 svn파일이 관리되는 경우에만 사용. ))
 	 */
 	@Deprecated
 	public SVNCommitInfo commitClient(File[] paths, String commitMessage) throws SVNException, IOException {
@@ -797,7 +871,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 			try {
 				SVNURL pa = SVNURL.parseURIEncoded(parentURL);
 				SVNURL s = SVNURL.parseURIEncoded(childURL);
-				String relativeURL = SVNURLUtil.getRelativeURL(pa, s, true);
+				String relativeURL = SVNURLUtil.getRelativeURL(pa, s, urlEncoding);
 				// System.out.println(relativeURL);
 				relativePath = relativeURL;
 			} catch (SVNException e) {
@@ -808,4 +882,48 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 		return relativePath;
 	}
 
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 20.
+	 * @param relativePath
+	 * @param relativePath
+	 * @param properties
+	 * @param contents
+	 * @return
+	 * @throws SVNException
+	 */
+	public long getCopy(String relativePath, long revision, SVNProperties properties, OutputStream contents) throws SVNException {
+		return checkoutCommand.getCopy(relativePath, revision, properties, contents);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 20.
+	 * @param absolutePath
+	 * @param revision
+	 * @param properties
+	 * @param contents
+	 * @return
+	 * @throws SVNException
+	 */
+	public long getCopy(SVNURL absolutePath, long revision, SVNProperties properties, OutputStream contents) throws SVNException {
+		return checkoutCommand.getCopy(absolutePath, revision, properties, contents);
+	}
+
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 20. 
+	 * @param absolutePath
+	 * @param revision
+	 * @param properties
+	 * @param outFile
+	 * @return
+	 * @throws SVNException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public File getCopy(SVNURL absolutePath, long revision, SVNProperties properties, File outFile)
+			throws SVNException, FileNotFoundException, IOException {
+		return checkoutCommand.getCopy(absolutePath, revision, properties, outFile);
+	}
 }
