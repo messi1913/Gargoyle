@@ -869,11 +869,16 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 		// 상대경로로 수정
 		if (ValueUtil.isNotEmpty(childURL)) {
 			try {
-				SVNURL pa = SVNURL.parseURIEncoded(parentURL);
-				SVNURL s = SVNURL.parseURIEncoded(childURL);
-				String relativeURL = SVNURLUtil.getRelativeURL(pa, s, urlEncoding);
-				// System.out.println(relativeURL);
-				relativePath = relativeURL;
+
+				if (childURL.startsWith(parentURL)) {
+					SVNURL pa = SVNURL.parseURIEncoded(parentURL);
+					SVNURL s = SVNURL.parseURIEncoded(childURL);
+					String relativeURL = SVNURLUtil.getRelativeURL(pa, s, urlEncoding);
+					relativePath = relativeURL;
+				} else {
+					return childURL;
+				}
+
 			} catch (SVNException e) {
 				e.printStackTrace();
 			}
@@ -912,7 +917,7 @@ public class JavaSVNManager extends AbstractScmManager implements SCMKeywords, S
 
 	/**
 	 * @작성자 : KYJ
-	 * @작성일 : 2017. 12. 20. 
+	 * @작성일 : 2017. 12. 20.
 	 * @param absolutePath
 	 * @param revision
 	 * @param properties
