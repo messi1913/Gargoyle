@@ -75,6 +75,7 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 	private MenuItem menuDiscardLocation;
 	private MenuItem menuReflesh;
 	private MenuItem menuCheckout;
+	private MenuItem menuCopy;
 	private MenuItem menuProperties;
 	/**
 	 * SVN분석 Graph객체를 보관함.
@@ -397,12 +398,24 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 	 */
 	private EventHandler<WindowEvent> contextMenuVisibleEvent = event -> {
 		TreeItem<SVNItem> selectedItem = getSelectionModel().getSelectedItem();
-		if (selectedItem != null && selectedItem.getValue() instanceof SVNRepository) {
-			menuDiscardLocation.setVisible(true);
-			menuSvnGraph.setVisible(true);
-		} else {
+		if (selectedItem != null) {
+
+			menuCopy.setVisible(false);
+			menuCheckout.setVisible(false);
 			menuDiscardLocation.setVisible(false);
 			menuSvnGraph.setVisible(false);
+
+			SVNItem value = selectedItem.getValue();
+			if (value instanceof SVNRepository) {
+				menuDiscardLocation.setVisible(true);
+				menuSvnGraph.setVisible(true);
+				menuCheckout.setVisible(true);
+			} else if (value instanceof SVNDirItem) {
+
+			} else if (value instanceof SVNFileItem) {
+				menuCopy.setVisible(true);
+			}
+
 		}
 	};
 
@@ -423,6 +436,7 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 		menuDiscardLocation = new MenuItem("Discard Location");
 		menuReflesh = new MenuItem("Reflesh");
 		menuCheckout = new MenuItem("Checkout");
+		menuCopy = new MenuItem("Copy");
 
 		menuSvnGraph = new MenuItem("SVN Graph");
 		menuProperties = new MenuItem("Properties");
@@ -435,12 +449,20 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 		menuSvnGraph.setOnAction(this::menuSVNGraphOnAction);
 		menuProperties.setOnAction(this::menuPropertiesOnAction);
 
-		contextMenuDir = new ContextMenu(menuNew, new SeparatorMenuItem(), menuCheckout, new SeparatorMenuItem(), menuSvnGraph,
+		contextMenuDir = new ContextMenu(menuNew, new SeparatorMenuItem(), menuCheckout, menuCopy, new SeparatorMenuItem(), menuSvnGraph,
 				new SeparatorMenuItem(), menuDiscardLocation, menuReflesh, new SeparatorMenuItem(), menuProperties);
 
 		// contextMenuFile = new ContextMenu(menuProperties);
 		// setContextMenu(contextMenu);
 
+		// setOnContextMenuRequested(ev -> {
+		//
+		// Node intersectedNode = ev.getPickResult().getIntersectedNode();
+		// if (intersectedNode instanceof TreeCell) {
+		// contextMenuDir.show(FxUtil.getWindow(this));
+		// }
+		//
+		// });
 		setCellFactory(new Callback<TreeView<SVNItem>, TreeCell<SVNItem>>() {
 			@Override
 			public TreeCell<SVNItem> call(TreeView<SVNItem> tv) {
