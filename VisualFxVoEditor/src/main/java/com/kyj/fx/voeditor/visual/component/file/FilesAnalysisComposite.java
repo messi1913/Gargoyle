@@ -267,7 +267,7 @@ public class FilesAnalysisComposite extends BorderPane {
 		}
 	};
 
-	private V vRoot = new V();
+	private static final V vRoot = new V();
 	{
 		vRoot.setFileExtension("ALL");
 	}
@@ -401,7 +401,8 @@ public class FilesAnalysisComposite extends BorderPane {
 
 					V value = selectedItem.getValue();
 					if (value != null) {
-						FilteredList<File> items = new FilteredList<>(value.getItems());
+
+						FilteredList<File> items = null;
 
 						if (value == vRoot) {
 							ObservableList<File> collect = tvFiles.getRoot().getChildren().stream()
