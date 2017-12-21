@@ -169,11 +169,11 @@ public class SVNItem implements SCMItem<SVNItem> {
 			if (kind == SVNNodeKind.DIR) {
 				svnItem = new SVNDirItem(svnPath, name, manager);
 				svnItem.setDir(true);
-				LOGGER.debug("{} .... Dir {}", name, true);
+//				LOGGER.debug("{} .... Dir {}", name, true);
 			} else {
 				svnItem = new SVNFileItem(svnPath, name, manager);
 				svnItem.setDir(false);
-				LOGGER.debug("{} .... File {}", name, true);
+//				LOGGER.debug("{} .... File {}", name, true);
 			}
 			svnItem.setAuthor(author);
 			svnItem.setRevision(revision);
