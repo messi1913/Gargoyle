@@ -20,6 +20,6 @@ public abstract class SVNCopyFunction<T extends SVNItem, R> implements Function<
 	 * File Copy 기능 구현 <br/>
 	 *
 	 */
-	public abstract R apply(SVNItem t);
+	public abstract R apply(T t);
 
 }
