@@ -1,6 +1,6 @@
 /********************************
  *	프로젝트 : idu-commons
- *	패키지   : com.samsung.idu.commons.core.util
+ *	패키지   : com.kyj.fx.voeditor.visual.util
  *	작성일   : 2017. 4. 11.
  *	프로젝트 : OPERA 
  *	작성자   : KYJ
