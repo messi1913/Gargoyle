@@ -90,15 +90,15 @@ public class FxPreferencesUtil {
 						continue;
 
 					Preferences versionNode = officeNode.node(n);
-					Preferences word = versionNode.node("Word");
-					Preferences installRoot = word.node("InstallRoot");
+//					Preferences word = versionNode.node("Word");
+//					Preferences installRoot = word.node("InstallRoot");
 
-					String string3 = installRoot.get("Path", "");
-					Preferences node2 = word.node("Options");
-					String string = node2.get("PROGRAMDIR", "");
-					boolean userNode = node2.isUserNode();
+//					String string3 = installRoot.get("Path", "");
+//					Preferences node2 = word.node("Options");
+//					String string = node2.get("PROGRAMDIR", "");
+//					boolean userNode = node2.isUserNode();
 
-					String string2 = installRoot.get("Path", "");
+//					String string2 = installRoot.get("Path", "");
 
 					if (!versionNode.nodeExists("Word")) {
 						continue;
