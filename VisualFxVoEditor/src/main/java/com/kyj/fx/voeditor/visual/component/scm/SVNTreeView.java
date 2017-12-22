@@ -306,6 +306,15 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 
 	/**
 	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 21.
+	 * @param e
+	 */
+	public void menuCopyOnAction(ActionEvent e) {
+
+	}
+
+	/**
+	 * @작성자 : KYJ
 	 * @작성일 : 2016. 8. 8.
 	 * @param e
 	 * @throws IOException
@@ -448,7 +457,7 @@ public class SVNTreeView extends TreeView<SVNItem> implements SCMKeywords {
 		menuCheckout.setOnAction(this::menuCheckoutOnAction);
 		menuSvnGraph.setOnAction(this::menuSVNGraphOnAction);
 		menuProperties.setOnAction(this::menuPropertiesOnAction);
-
+		menuCopy.setOnAction(this::menuCopyOnAction);
 		contextMenuDir = new ContextMenu(menuNew, new SeparatorMenuItem(), menuCheckout, menuCopy, new SeparatorMenuItem(), menuSvnGraph,
 				new SeparatorMenuItem(), menuDiscardLocation, menuReflesh, new SeparatorMenuItem(), menuProperties);
 

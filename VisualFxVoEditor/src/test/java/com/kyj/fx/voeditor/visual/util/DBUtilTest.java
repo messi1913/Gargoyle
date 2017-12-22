@@ -6,7 +6,6 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.util;
 
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -14,13 +13,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
 
@@ -30,11 +25,8 @@ import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
  */
 public class DBUtilTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DBUtilTest.class);
-
 	/**
-	 * Test method for
-	 * {@link com.kyj.fx.voeditor.visual.util.DbUtil#select(java.lang.String)}.
+	 * Test method for {@link com.kyj.fx.voeditor.visual.util.DbUtil#select(java.lang.String)}.
 	 *
 	 * @throws Exception
 	 */
@@ -128,7 +120,7 @@ public class DBUtilTest {
 		for (int page = 0; page < 3; page++) {
 
 			startRow = page * length;
-			// limitRow = (page * length) * 2;
+			//			limitRow = (page * length) * 2;
 			Connection connection = DbUtil.getConnection();
 			List<Map<String, Object>> selectCursor = DbUtil.selectCursor(connection, sql, startRow, limitRow);
 			for (int i = 0; i < selectCursor.size(); i++) {
@@ -164,7 +156,7 @@ public class DBUtilTest {
 			System.out.println(rs.getObject(4));
 		}
 		System.out.println("#case2");
-		// rs = metaData.getPrimaryKeys("study", null, "deparment");
+		//		rs = metaData.getPrimaryKeys("study", null, "deparment");
 		while (rs.next()) {
 			System.out.println(rs.getObject(4));
 		}
@@ -175,88 +167,7 @@ public class DBUtilTest {
 		}
 
 		connection.close();
-		// DbUtil.getConnection().getMetaData().getPrimaryKeys(catalog, schema,
-		// table)
+		//		DbUtil.getConnection().getMetaData().getPrimaryKeys(catalog, schema, table)
 
 	}
-
-	@Test
-	public void findProcedureTest() {
-
-		// String callSql = "call DMI_Manu32.MatRec_GetLocations('Receiving')";
-		Optional<Map<String, Object>> findFirst = DbUtil.getAvailableConnections().stream().filter(map -> {
-			LOGGER.debug(map.toString());
-			return "123".equals(map.get("alias"));
-		}).findFirst();
-
-		findFirst.ifPresent(map -> {
-
-			try (Connection connection = DbUtil.getConnection(map)) {
-
-				List<Map<String, Object>> apply = DbUtil.getProcedureColumns(connection, "SamsungDB", "dbo",
-						"DMICustom_GetContainerDetailsWithParents_NT");
-
-				apply.forEach(m -> LOGGER.debug(m.toString()));
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		});
-
-	}
-
-	@Test
-	public void executeProcedureTest() {
-		Optional<Map<String, Object>> findFirst = DbUtil.getAvailableConnections().stream().filter(map -> {
-			LOGGER.debug(map.toString());
-
-			return "123".equals(map.get("alias"));
-		}).findFirst();
-
-		findFirst.ifPresent(map -> {
-
-			Connection con = null;
-			try {
-				con = DbUtil.getConnection(map);
-				CallableStatement prepareCall = con.prepareCall(" { call SamsungDB.dbo.MatRec_TransferOrderNumber( ? )  } ");
-				prepareCall.setString(1, "4401");
-
-				// Unexpected Paramter.
-				prepareCall.setString(2, "4401");
-				ResultSet rs = prepareCall.executeQuery();
-				while (rs.next()) {
-					System.out.println(rs.getString(1));
-				}
-				Assert.fail("un expected result.");
-			} catch (Exception e) {
-				e.printStackTrace();
-				// Expected Exception.
-				Assert.assertTrue(true);
-			}
-
-			try {
-				//Expect true
-				CallableStatement prepareCall = con.prepareCall(" { call SamsungDB.dbo.MatRec_TransferOrderNumber( ? )  } ");
-				prepareCall.setString(1, "4401");
-
-				ResultSet rs = prepareCall.executeQuery();
-				while (rs.next()) {
-					System.out.println(rs.getString(1));
-				}
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-				// Expected Exception.
-				Assert.fail("un expected result.");
-			}
-
-			// Finally close.
-			if (con != null)
-				DbUtil.close(con);
-
-		});
-	}
-
 }
