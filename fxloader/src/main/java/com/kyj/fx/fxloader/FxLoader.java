@@ -257,14 +257,16 @@ public class FxLoader {
 		if (controllerAction != null)
 			controllerAction.accept(instanceController);
 
-		Platform.runLater(() -> {
-			Parent parent = (Parent) load;
-			List<Node> findAllByNodes = findAllByNodes(parent, v -> v instanceof Button);
-			findAllByNodes.forEach(v -> {
-				GargoyleButtonBuilder.applyStyleClass((Button) v, FxSkinManager.BUTTON_STYLE_CLASS_NAME);
-				// LOGGER.debug("Button : {}", v);
-			});
-		});
+		// Platform.runLater(() -> {
+		// Parent parent = (Parent) load;
+		// List<Node> findAllByNodes = findAllByNodes(parent, v -> v instanceof
+		// Button);
+		// findAllByNodes.forEach(v -> {
+		// GargoyleButtonBuilder.applyStyleClass((Button) v,
+		// FxSkinManager.BUTTON_STYLE_CLASS_NAME);
+		// // LOGGER.debug("Button : {}", v);
+		// });
+		// });
 
 		return load;
 	}
@@ -277,7 +279,8 @@ public class FxLoader {
 	public static FXMLLoader createNewFxmlLoader() {
 
 		FXMLLoader loader = new FXMLLoader();
-		loader.setBuilderFactory(GargoyleBuilderFactory.getInstance());
+		// remove this.
+		// loader.setBuilderFactory(GargoyleBuilderFactory.getInstance());
 		return loader;
 	}
 
