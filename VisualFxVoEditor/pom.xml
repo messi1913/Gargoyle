@@ -641,7 +641,7 @@
 		<dependency>
 			<groupId>com.kyj.fx</groupId>
 			<artifactId>fxloader</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2</version>
 		</dependency>
 
 
