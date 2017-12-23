@@ -23,9 +23,7 @@ public class GargoyleButtonBuilder extends Button implements Builder<Button> {
 
 	@Override
 	public Button build() {
-
 		applyStyleClass(this, "button-gargoyle");
-
 		return this;
 	}
 

@@ -7,6 +7,7 @@
 package com.kyj.fx.fxloader;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
 import javafx.util.Builder;
 import javafx.util.BuilderFactory;
 
@@ -24,9 +25,7 @@ public class GargoyleBuilderFactory implements BuilderFactory {
 	public static BuilderFactory getInstance() {
 
 		if (factory == null) {
-
 			factory = new GargoyleBuilderFactory();
-
 		}
 		return factory;
 	}
@@ -42,6 +41,8 @@ public class GargoyleBuilderFactory implements BuilderFactory {
 
 		if (type == Button.class) {
 			builder = new GargoyleButtonBuilder();
+		} else if (type == TableView.class) {
+			builder = new GargoyleTableViewBuilder();
 		}
 
 		return builder;

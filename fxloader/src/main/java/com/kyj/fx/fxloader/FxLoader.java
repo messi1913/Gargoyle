@@ -28,6 +28,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
+import javafx.util.BuilderFactory;
 
 /**
  * @author KYJ
@@ -158,9 +159,15 @@ public class FxLoader {
 	 * @throws GargoyleException
 	 * @throws NullPointerException
 	 * @throws IOException
+	 * @Deprecated use load(Object controller)
 	 ********************************/
+	@Deprecated
 	public static <T> T load(Class<?> controllerClass) throws Exception {
 		return load(controllerClass, null, null, null);
+	}
+
+	public static <T> T load(Object controller) throws Exception {
+		return load(controller.getClass(), controller, null, null);
 	}
 
 	public static <T, C> T load(Class<?> controllerClass, Object rootInstance, boolean isSelfController, String fxml, String css)
@@ -208,47 +215,64 @@ public class FxLoader {
 				throw e;
 			}
 		}
-		// T _load = null;
-		// fix load error.
-		// if (resource != null) {
+
 		T load = loader.load();
-		// } else {
-		// _load = loader.load(controllerClass.getResourceAsStream(fxml));
-		// }
-		//
-		// T load = _load;
 		C instanceController = loader.getController();
 
 		// show warning...
 		if (load == null) {
 			LOGGER.warn("load result is empty.. controller class : {} ", controllerClass);
 		}
-		Method[] declaredMethods = controllerClass.getDeclaredMethods();
 
 		// 2017-02-07 findfirst에서 어노테이션으로 선언된 다건의 함수를 호출하게 다시 유도.
 		// findfirst로 수정. @FxPostInitialize가 여러건있는경우를 잘못된 로직 유도를 방지.
-		Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null).forEach(m -> {
-			// .ifPresent((m -> {
-			if (((m.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC)) {
-				try {
-					if (instanceController != null) {
-						// Lazy Run.
-						Platform.runLater(() -> {
-							try {
+		if (instanceController != null) {
+			Method[] declaredMethods = controllerClass.getDeclaredMethods();
+			Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null)
+					.filter(m -> {
+						return ((m.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC);
+					}).forEach(m -> {
 
-								m.setAccessible(true);
-								m.invoke(instanceController);
+						try {
+							// Lazy Run.
+							Platform.runLater(() -> {
+								try {
+									m.setAccessible(true);
+									m.invoke(instanceController);
 
-							} catch (Exception e) {
-								LOGGER.error(ValueUtil.toString(e));
-							}
-						});
-					}
-				} catch (Exception e) {
-					LOGGER.error(ValueUtil.toString(e));
-				}
-			}
-		});
+								} catch (Exception e) {
+									LOGGER.error(ValueUtil.toString(e));
+								}
+							});
+						} catch (Exception e) {
+							LOGGER.error(ValueUtil.toString(e));
+						}
+					});
+		}
+
+		else if (rootInstance != null) {
+			Method[] declaredMethods = rootInstance.getClass().getDeclaredMethods();
+			Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null)
+					.filter(m -> {
+						return ((m.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC);
+					}).forEach(m -> {
+
+						try {
+							// Lazy Run.
+							Platform.runLater(() -> {
+								try {
+									m.setAccessible(true);
+									m.invoke(rootInstance);
+
+								} catch (Exception e) {
+									LOGGER.error(ValueUtil.toString(e));
+								}
+							});
+						} catch (Exception e) {
+							LOGGER.error(ValueUtil.toString(e));
+						}
+					});
+		}
 
 		if (option != null) {
 			option.accept(load);
@@ -277,7 +301,7 @@ public class FxLoader {
 	public static FXMLLoader createNewFxmlLoader() {
 
 		FXMLLoader loader = new FXMLLoader();
-		loader.setBuilderFactory(GargoyleBuilderFactory.getInstance());
+		loader.setBuilderFactory(builderFactory);
 		return loader;
 	}
 
@@ -433,5 +457,18 @@ public class FxLoader {
 			errorCallback.accept(e);
 		}
 		return null;
+	}
+
+	private static BuilderFactory builderFactory = GargoyleBuilderFactory.getInstance();
+
+	/**
+	 * 프로그램당 하나의 builder만
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 23.
+	 * @param _builderFactory
+	 */
+	public static void setBuilderFactory(BuilderFactory _builderFactory) {
+		builderFactory = _builderFactory;
 	}
 }
