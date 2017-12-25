@@ -202,6 +202,9 @@ public class VoEditorController {
 				if (file.isFile())
 					this.txtClassName.setText(file.getName());
 
+				this.txtPackageName.setText(DaoWizardViewController.getPackageNmae(file));
+				
+				
 				ev.setDropCompleted(true);
 
 			} else if (dragboard.hasString()) {

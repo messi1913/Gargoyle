@@ -25,6 +25,10 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ParseException;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.PackageDeclaration;
+import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.kyj.fx.voeditor.core.model.meta.ClassMeta;
 import com.kyj.fx.voeditor.core.model.meta.FieldMeta;
 import com.kyj.fx.voeditor.util.EditorUtil;
@@ -41,6 +45,7 @@ import com.kyj.fx.voeditor.visual.component.popup.SimpleSQLResultView;
 import com.kyj.fx.voeditor.visual.component.text.SqlKeywords;
 import com.kyj.fx.voeditor.visual.events.CommonContextMenuEvent;
 import com.kyj.fx.voeditor.visual.framework.daowizard.GargoyleDaoWizardFactory.Wizardtype;
+import com.kyj.fx.voeditor.visual.framework.parser.GargoyleJavaParser;
 import com.kyj.fx.voeditor.visual.functions.DatabaseTypeMappingFunction;
 import com.kyj.fx.voeditor.visual.functions.FxDAOReadFunction;
 import com.kyj.fx.voeditor.visual.functions.FxDAOSaveFunction;
@@ -294,6 +299,10 @@ public class DaoWizardViewController {
 				// 파일명 저장.
 				this.txtClassName.setText(file.getName());
 
+				this.txtPackageName.setText(getPackageNmae(file));
+
+				// 패키지 처리
+
 				ev.setDropCompleted(true);
 
 			} else if (dragboard.hasString()) {
@@ -319,10 +328,8 @@ public class DaoWizardViewController {
 		colMethodNo.setCellValueFactory(new NumberingCellValueFactory<>(tbMethods.getItems()));
 
 		/*
-		 * 2015-11-02 기존에 사용하던 NumberingCellValueFactory을 적용할 수 없음.
-		 * colParamNo컬럼같은경우는 method에 따라 데이터의 주소값이 바뀌는 타입이라 주소값이 바뀌는 상태에선 적절한 넘버링
-		 * 데이터가 화면에 보여주지않음. 하여 주소값을 계속 유지시킬 수 있도록 tbMethods에서 선택된 메소드정보에서 값을
-		 * 참조하여 넘버링을 시킴.
+		 * 2015-11-02 기존에 사용하던 NumberingCellValueFactory을 적용할 수 없음. colParamNo컬럼같은경우는 method에 따라 데이터의 주소값이 바뀌는 타입이라 주소값이 바뀌는 상태에선 적절한 넘버링
+		 * 데이터가 화면에 보여주지않음. 하여 주소값을 계속 유지시킬 수 있도록 tbMethods에서 선택된 메소드정보에서 값을 참조하여 넘버링을 시킴.
 		 *
 		 * 2016-04-19 파람의 아이템을 삭제하고 다시 호출했을때 인덱스 순서가 맞지않던 버그 fix
 		 */
@@ -890,26 +897,26 @@ public class DaoWizardViewController {
 			try (Connection connection = DbUtil.getConnection(driver, url, id,
 					ValueUtil.isNotEmpty(pass) ? EncrypUtil.decryp(pass) : pass)) {
 
-//				String catalog = null;
-//				String schema = null;
-//				String tableName = _tableName;
-//				String tmp = _tableName;
-//
-//				int lastIndexOf = ValueUtil.lastIndexOf(tmp, '.');
-//				if (lastIndexOf == -1)
-//					return DbUtil.columns(connection, null, null, tableName);
-//				else {
-//
-//					tableName = tmp.substring(lastIndexOf + 1);
-//					tmp = tmp.substring(0, lastIndexOf);
-//
-//					lastIndexOf = ValueUtil.lastIndexOf(tmp, '.');
-//					if (lastIndexOf != -1) {
-//						schema = tmp.substring(lastIndexOf + 1);
-//						catalog = tmp.substring(0, lastIndexOf);
-//					}
-//
-//				}
+				// String catalog = null;
+				// String schema = null;
+				// String tableName = _tableName;
+				// String tmp = _tableName;
+				//
+				// int lastIndexOf = ValueUtil.lastIndexOf(tmp, '.');
+				// if (lastIndexOf == -1)
+				// return DbUtil.columns(connection, null, null, tableName);
+				// else {
+				//
+				// tableName = tmp.substring(lastIndexOf + 1);
+				// tmp = tmp.substring(0, lastIndexOf);
+				//
+				// lastIndexOf = ValueUtil.lastIndexOf(tmp, '.');
+				// if (lastIndexOf != -1) {
+				// schema = tmp.substring(lastIndexOf + 1);
+				// catalog = tmp.substring(0, lastIndexOf);
+				// }
+				//
+				// }
 
 				return DbUtil.columns(connection, catalog, schema, _tableName);
 			}
@@ -1269,5 +1276,22 @@ public class DaoWizardViewController {
 			return true;
 		}
 		return false;
+	}
+
+	public static String getPackageNmae(File f) {
+		if (f == null || !f.exists())
+			return "";
+
+		if (f.getName().endsWith(".java")) {
+			CompilationUnit parse;
+			try {
+				parse = com.github.javaparser.JavaParser.parse(f, "utf-8");
+				return GargoyleJavaParser.getPackageName(parse);
+			} catch (ParseException | IOException e) {
+				LOGGER.error(ValueUtil.toString(e));
+			}
+		}
+
+		return "";
 	}
 }
