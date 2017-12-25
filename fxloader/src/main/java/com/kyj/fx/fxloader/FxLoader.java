@@ -214,6 +214,9 @@ public class FxLoader {
 			} catch (Exception e) {
 				throw e;
 			}
+		} else {
+			if (rootInstance != null)
+				loader.setController(rootInstance);
 		}
 
 		T load = loader.load();
@@ -250,29 +253,29 @@ public class FxLoader {
 					});
 		}
 
-		else if (rootInstance != null) {
-			Method[] declaredMethods = rootInstance.getClass().getDeclaredMethods();
-			Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null)
-					.filter(m -> {
-						return ((m.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC);
-					}).forEach(m -> {
-
-						try {
-							// Lazy Run.
-							Platform.runLater(() -> {
-								try {
-									m.setAccessible(true);
-									m.invoke(rootInstance);
-
-								} catch (Exception e) {
-									LOGGER.error(ValueUtil.toString(e));
-								}
-							});
-						} catch (Exception e) {
-							LOGGER.error(ValueUtil.toString(e));
-						}
-					});
-		}
+		// else if (rootInstance != null) {
+		// Method[] declaredMethods = rootInstance.getClass().getDeclaredMethods();
+		// Stream.of(declaredMethods).filter(m -> m.getParameterCount() == 0 && m.getAnnotation(FxPostInitialize.class) != null)
+		// .filter(m -> {
+		// return ((m.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC);
+		// }).forEach(m -> {
+		//
+		// try {
+		// // Lazy Run.
+		// Platform.runLater(() -> {
+		// try {
+		// m.setAccessible(true);
+		// m.invoke(rootInstance);
+		//
+		// } catch (Exception e) {
+		// LOGGER.error(ValueUtil.toString(e));
+		// }
+		// });
+		// } catch (Exception e) {
+		// LOGGER.error(ValueUtil.toString(e));
+		// }
+		// });
+		// }
 
 		if (option != null) {
 			option.accept(load);
