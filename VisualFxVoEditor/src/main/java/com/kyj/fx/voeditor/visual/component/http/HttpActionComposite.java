@@ -43,7 +43,6 @@ import com.kyj.fx.voeditor.visual.component.text.CodeAreaHelper;
 import com.kyj.fx.voeditor.visual.framework.contextmenu.FxContextManager;
 import com.kyj.fx.voeditor.visual.util.FxUtil;
 import com.kyj.fx.voeditor.visual.util.ValueUtil;
-import com.sun.codemodel.internal.util.UnicodeEscapeWriter;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -181,8 +180,13 @@ public class HttpActionComposite extends BorderPane {
 			String query = url.getQuery();
 			String host = url.getHost();
 			String protocol = url.getProtocol();
-			query = URLEncoder.encode(query, "UTF-8");
-			_url = protocol + "://" + host + "?" + query;
+			if (query != null) {
+				query = URLEncoder.encode(query, "UTF-8");
+				_url = protocol + "://" + host + "?" + query;
+			} else {
+				_url = url.toExternalForm();
+			}
+
 		} catch (MalformedURLException e) {
 			_url = txtReqUrl.getText();
 		} catch (UnsupportedEncodingException e) {
