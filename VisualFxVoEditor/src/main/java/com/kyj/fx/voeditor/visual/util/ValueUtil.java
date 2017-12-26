@@ -2057,4 +2057,18 @@ public class ValueUtil {
 		}
 		return sb.toString();
 	}
+
+	/**
+	 * 확장자 부분을 제거한 값을 리턴한다. <br/>
+	 * 확장자는 이름끝 .을 기준으로한다.
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 26.
+	 * @param name
+	 * @return
+	 */
+	public static String removeExtension(String name) {
+		String extension = getExtension(name);
+		return name.replace(extension, "");
+	}
 }

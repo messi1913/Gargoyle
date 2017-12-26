@@ -279,6 +279,8 @@ public class DaoWizardViewController {
 			ev.consume();
 		});
 		txtClassName.setOnDragDropped(ev -> {
+			if(ev.isConsumed())
+				return;
 			Dragboard dragboard = ev.getDragboard();
 			if (dragboard.hasFiles()) {
 				List<File> files = dragboard.getFiles();
@@ -297,17 +299,18 @@ public class DaoWizardViewController {
 				// 2016.03.31 파일경로를 상대경로화 시켜 저장.
 				this.txtDaoLocation.setText(relativize.toString());
 				// 파일명 저장.
-				this.txtClassName.setText(file.getName());
+				this.txtClassName.setText(ValueUtil.removeExtension(file.getName()));
 
 				this.txtPackageName.setText(getPackageNmae(file));
 
 				// 패키지 처리
 
 				ev.setDropCompleted(true);
-
+				ev.consume();
 			} else if (dragboard.hasString()) {
 				this.txtClassName.setText(dragboard.getString());
 				ev.setDropCompleted(true);
+				ev.consume();
 			}
 		});
 		/* [끝] 파일경로 드래그 드롭 이벤트 처리 */

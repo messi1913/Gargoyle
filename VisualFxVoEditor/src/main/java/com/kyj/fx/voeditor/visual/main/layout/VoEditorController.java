@@ -200,7 +200,7 @@ public class VoEditorController {
 				this.txtLocation.setText(relativize.toString());
 				// 파일명 저장.
 				if (file.isFile())
-					this.txtClassName.setText(file.getName());
+					this.txtClassName.setText(ValueUtil.removeExtension(file.getName()));
 
 				this.txtPackageName.setText(DaoWizardViewController.getPackageNmae(file));
 				
