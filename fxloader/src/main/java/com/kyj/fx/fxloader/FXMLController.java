@@ -9,6 +9,7 @@ package com.kyj.fx.fxloader;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Retention;
+import java.util.ResourceBundle;
 
 @Retention(RUNTIME)
 /***************************
@@ -62,5 +63,14 @@ public @interface FXMLController {
 	 * @return
 	 ********************************/
 	InstanceTypes instanceType() default InstanceTypes.RequireNew;
+
+	/**
+	 * Resources Bundle
+	 * 
+	 * @작성자 : KYJ
+	 * @작성일 : 2017. 12. 27.
+	 * @return
+	 */
+	String basebundle() default "bundles.GargoyleBundle";
 
 }

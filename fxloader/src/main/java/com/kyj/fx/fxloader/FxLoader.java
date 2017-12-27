@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -148,6 +149,13 @@ public class FxLoader {
 		return controller.css();
 	}
 
+	private static String getBundle(FXMLController controller) {
+		if (controller == null) {
+			return null;
+		}
+		return controller.basebundle();
+	}
+
 	/********************************
 	 * 작성일 : 2016. 5. 21. 작성자 : KYJ
 	 *
@@ -189,12 +197,19 @@ public class FxLoader {
 			Consumer<T> option, Consumer<C> controllerAction) throws Exception {
 
 		String fxml = _fxml;
+		String baseBundleName = null;
+		
+		FXMLController controller = getFxmlController(controllerClass);
 		if (fxml == null) {
-			FXMLController controller = getFxmlController(controllerClass);
 			if (controller == null) {
 				throw new NullPointerException("this is not FXMLController. check @FXMLController");
 			}
 			fxml = getFxml(controller);// controller.value();
+		}
+
+		String _basebundle = getBundle(controller);
+		if (ValueUtil.isNotEmpty(_basebundle)) {
+			baseBundleName = _basebundle;
 		}
 
 		URL resource = controllerClass.getResource(fxml);
@@ -206,7 +221,6 @@ public class FxLoader {
 			try {
 				loader.setRoot(rootInstance);
 				loader.setController(rootInstance);
-
 				if (rootInstance instanceof Parent && ValueUtil.isNotEmpty(_css)) {
 					((Parent) rootInstance).getStylesheets().add(_css);
 				}
@@ -218,6 +232,8 @@ public class FxLoader {
 			if (rootInstance != null)
 				loader.setController(rootInstance);
 		}
+
+		loader.setResources(ValueUtil.isEmpty(baseBundleName) ? null : ResourceBundle.getBundle(baseBundleName));
 
 		T load = loader.load();
 		C instanceController = loader.getController();
