@@ -42,16 +42,18 @@ public interface GargoyleExtensionFilters {
 	public static final String XLS_NAME = "Excel files (*.xls)";
 	public static final String XLS_EXTENSION = "xls";
 	public static final String XLS = EXTENSION_COMMONS + XLS_EXTENSION;
-
+	public static final ExtensionFilter XLS_FILTER=  new ExtensionFilter(XLS_NAME, XLS);
 
 	public static final String XLSX_NAME = "Excel files (*.xlsx)";
 	public static final String XLSX_EXTENSION = "xlsx";
 	public static final String XLSX = EXTENSION_COMMONS + XLSX_EXTENSION;
+	public static final ExtensionFilter XLSX_FILTER=  new ExtensionFilter(XLSX_NAME, XLSX);
 
 	public static final String DOCX_NAME = "Doc files (*.docx)";
 	public static final String DOCX_EXTENSION = "docx";
 	public static final String DOCX = EXTENSION_COMMONS + DOCX_EXTENSION;
-
+	public static final ExtensionFilter DOCX_FILTER=  new ExtensionFilter(DOCX_NAME, DOCX);
+	
 	public static final String DOC_NAME = "Doc files (*.doc)";
 	public static final String DOC_EXTENSION = "doc";
 	public static final String DOC = EXTENSION_COMMONS + DOC_EXTENSION;
