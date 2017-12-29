@@ -936,7 +936,15 @@ public class FileUtil implements GargoyleExtensionFilters {
 	 * @return
 	 */
 	public static String getFileExtension(String fileName) {
-		int dotIndex = fileName.lastIndexOf('.');
+		int dotIndex = -1;
+		int length = fileName.length();
+
+		for (int i = length-1; i >= 0; i--) {
+			if (fileName.charAt(i) == '.') {
+				dotIndex = i;
+				break;
+			}
+		}
 		return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
 	}
 
