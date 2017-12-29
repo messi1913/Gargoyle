@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.PackageDeclaration;
-import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.kyj.fx.voeditor.core.model.meta.ClassMeta;
 import com.kyj.fx.voeditor.core.model.meta.FieldMeta;
 import com.kyj.fx.voeditor.util.EditorUtil;
@@ -1099,8 +1097,11 @@ public class DaoWizardViewController {
 			String packageName = txtPackageName.getText();
 			String desc = txtAreaDaoDesc.getText();
 
-			// 저장처리전 검증 및 위자드로 한번 확인
-			String extendsBaseClass = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.DAO_WIZARD_DEFAULT_EXTENDS_CLASS);
+			/*
+			 * 17.12.29 ResourceLoader에서 값을 가져올 수 있도록 수정
+			 *  저장처리전 검증 및 위자드로 한번 확인
+			 */
+			String extendsBaseClass = ResourceLoader.getInstance().get( ConfigResourceLoader.DAO_WIZARD_DEFAULT_EXTENDS_CLASS);
 			ClassMeta classMeta = EditorUtil.extractedClassMeta(className, packageName, extendsBaseClass);
 			classMeta.setDesc(desc);
 			// TbmSysDaoDVO tbmSysDaoDVO = tbmSysDaoDVOProperty.get();

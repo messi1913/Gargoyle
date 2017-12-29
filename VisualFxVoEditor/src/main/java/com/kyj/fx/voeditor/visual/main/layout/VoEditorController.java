@@ -58,6 +58,7 @@ import com.kyj.fx.voeditor.visual.events.CommonContextMenuEvent;
 import com.kyj.fx.voeditor.visual.exceptions.GargoyleFileAlreadyExistException;
 import com.kyj.fx.voeditor.visual.momory.ClassTypeResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.ConfigResourceLoader;
+import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
 import com.kyj.fx.voeditor.visual.momory.SharedMemory;
 import com.kyj.fx.voeditor.visual.util.DialogUtil;
 import com.kyj.fx.voeditor.visual.util.ExcelUtil;
@@ -214,7 +215,10 @@ public class VoEditorController {
 		});
 		/* [끝] 파일경로 드래그 드롭 이벤트 처리 */
 
-		txtParentClassName.setText(ConfigResourceLoader.getInstance().get(ConfigResourceLoader.VOEDITOR_DEFAULT_EXTENDS_CLASS));
+		/*
+		 * 17.12.29 ResourceLoader로 수정
+		 */
+		txtParentClassName.setText(ResourceLoader.getInstance().get(ConfigResourceLoader.VOEDITOR_DEFAULT_EXTENDS_CLASS));
 
 		colType.setCellFactory(new ClassTypeCheckBoxCellFactory());
 		colName.setCellFactory(TextFieldTableCell.forTableColumn());
