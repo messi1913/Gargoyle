@@ -584,15 +584,15 @@
 		</copy>
 
 		<copy todir="externalLibs">
-			<fileset dir="${m2.dir}\kyj\Fx\dao\wizard\kyj.Fx.dao.wizard\0.0.8-SNAPSHOT">
-				<filename name="kyj.Fx.dao.wizard-0.0.8-SNAPSHOT.jar" />
+			<fileset dir="${m2.dir}\kyj\Fx\dao\wizard\kyj.Fx.dao.wizard\0.0.9-SNAPSHOT">
+				<filename name="kyj.Fx.dao.wizard-0.0.9-SNAPSHOT.jar" />
 			</fileset>
 		</copy>
 
 
 		<copy todir="externalLibs">
-			<fileset dir="${m2.dir}\kyj\FxVoEditor\kyj.FxVoEditor\0.0.2">
-				<filename name="kyj.FxVoEditor-0.0.2.jar" />
+			<fileset dir="${m2.dir}\com\kyj\fx\FxVoEditor\0.0.2">
+				<filename name="FxVoEditor-0.0.2.jar" />
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
@@ -601,8 +601,8 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="${m2.dir}\com\kyj\fx\fxloader\0.0.2">
-				<filename name="fxloader-0.0.2.jar" />
+			<fileset dir="${m2.dir}\com\kyj\fx\fxloader\0.0.3">
+				<filename name="fxloader-0.0.3.jar" />
 			</fileset>
 		</copy>
 		
@@ -926,9 +926,9 @@
 				<include name="sqlite-jdbc-3.19.3.jar" />
 				<include name="javaparser-core-2.4.0.jar" />
 				<include name="encryp-0.0.1.jar" />
-				<include name="kyj.Fx.dao.wizard-0.0.8-SNAPSHOT.jar" />
+				<include name="kyj.Fx.dao.wizard-0.0.9-SNAPSHOT.jar" />
 				<include name="kyj.FxVoEditor-0.0.2.jar" />
-				<include name="fxloader-0.0.2.jar" />
+				<include name="fxloader-0.0.3.jar" />
 				<include name="pmd.core-0.0.1-SNAPSHOT.jar" />
 
 
