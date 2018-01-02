@@ -70,7 +70,7 @@ public class FxLoader {
 		String css = getCss(controllerClass, controller);// controller.value();
 
 		if (ValueUtil.isEmpty(fxml))
-			throw new IllegalArgumentException("value is empty..");
+			throw new IllegalArgumentException("fxml value is empty..");
 
 		InstanceTypes type = controller.instanceType();
 		N newInstance = null;
