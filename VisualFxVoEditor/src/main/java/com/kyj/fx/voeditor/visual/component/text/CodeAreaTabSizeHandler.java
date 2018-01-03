@@ -22,8 +22,9 @@ import javafx.scene.input.KeyEvent;
  *  https://github.com/TomasMikula/RichTextFX/issues/86
  *  
  * @author KYJ
- *
+ * @Deprecated CodeAreaHelper의 탭기능 유지할것.
  */
+@Deprecated
 public class CodeAreaTabSizeHandler implements EventHandler<KeyEvent> {
 
 	private CodeArea codeArea;
@@ -53,7 +54,10 @@ public class CodeAreaTabSizeHandler implements EventHandler<KeyEvent> {
 
 			if (event.isConsumed())
 				return;
-			codeArea.replaceSelection("   ");
+			
+			//원본 텍스트가 유지될 수 있게 수정
+			String beforeText = codeArea.getSelectedText();
+			codeArea.replaceSelection("   ".concat(beforeText));
 			event.consume();
 		}
 

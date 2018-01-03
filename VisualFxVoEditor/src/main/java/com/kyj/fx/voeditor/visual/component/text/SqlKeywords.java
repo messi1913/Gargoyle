@@ -104,7 +104,8 @@ public class SqlKeywords extends BorderPane {
 				}).subscribe(this::applyHighlighting);
 
 		/**CodeArea 'Tab' Size handler *************************************************************/
-		codeArea.addEventHandler(KeyEvent.KEY_PRESSED, new CodeAreaTabSizeHandler(codeArea));
+		//17.01.14 Deprecated
+		//codeArea.addEventHandler(KeyEvent.KEY_PRESSED, new CodeAreaTabSizeHandler(codeArea));
 		
 		// 마우스 클릭이벤트 정의
 		codeArea.addEventHandler(KeyEvent.KEY_PRESSED, this::codeAreaKeyClick);
