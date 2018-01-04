@@ -37,13 +37,15 @@ import javafx.util.Pair;
  *
  * CodeArea클래스와 연관된 모든 공통처리내용이 구현된다.
  *
- *  2017.01.13 FindAndReplace를 별도의 Helper 클래스로 변경처리. by kyj.
+ * 2017.01.13 FindAndReplace를 별도의 Helper 클래스로 변경처리. by kyj.
+ * 
  * @author KYJ
  *
  */
 public class CodeAreaHelper<T extends CodeArea> {
 
-	//	private static Logger LOGGER = LoggerFactory.getLogger(CodeAreaHelper.class);
+	// private static Logger LOGGER =
+	// LoggerFactory.getLogger(CodeAreaHelper.class);
 
 	public static final String CHARACTERS_MATCH = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
 
@@ -130,13 +132,13 @@ public class CodeAreaHelper<T extends CodeArea> {
 		codeArea.getUndoManager().mark();
 		codeArea.clear();
 		codeArea.replaceText(0, 0, content);
-//		codeArea.getUndoManager().mark();
+		// codeArea.getUndoManager().mark();
 	}
 
 	public void setContent(int start, int end, String text) {
 		codeArea.getUndoManager().mark();
 		codeArea.replaceText(start, end, text);
-//		codeArea.getUndoManager().mark();
+		// codeArea.getUndoManager().mark();
 	}
 
 	public String getSqlFormat(String sql) {
@@ -146,13 +148,13 @@ public class CodeAreaHelper<T extends CodeArea> {
 	public void replaceSelection(String selection) {
 		codeArea.getUndoManager().mark();
 		codeArea.replaceSelection(selection);
-//		codeArea.getUndoManager().mark();
+		// codeArea.getUndoManager().mark();
 	}
 
 	public void appendContent(String content) {
 		codeArea.getUndoManager().mark();
 		codeArea.appendText(content);
-//		codeArea.getUndoManager().mark();
+		// codeArea.getUndoManager().mark();
 	}
 
 	public String getSelectedText() {
@@ -249,7 +251,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 	 */
 	public void codeAreaKeyClick(KeyEvent e) {
 
-		//CTRL + F
+		// CTRL + F
 		if (KeyCode.F == e.getCode() && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
 			if (!e.isConsumed()) {
 				findAndReplaceHelper.findReplaceEvent(new ActionEvent());
@@ -257,7 +259,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 			}
 
 		}
-		//CTRL + L
+		// CTRL + L
 		else if (KeyCode.L == e.getCode() && e.isControlDown() && !e.isShiftDown() && !e.isAltDown()) {
 			if (!e.isConsumed()) {
 				moveToLineEvent(new ActionEvent());
@@ -271,14 +273,14 @@ public class CodeAreaHelper<T extends CodeArea> {
 				e.consume();
 			}
 		}
-		//CTRL + L
+		// CTRL + L
 		else if (KeyCode.L == e.getCode() && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
 			if (!e.isConsumed()) {
 				toLowercaseEvent(new ActionEvent());
 				e.consume();
 			}
 		}
-		//CTRL + SHIFT + V
+		// CTRL + SHIFT + V
 		else if (KeyCode.V == e.getCode() && e.isControlDown() && e.isShiftDown() && !e.isAltDown()) {
 			if (e.isConsumed())
 				return;
@@ -301,8 +303,8 @@ public class CodeAreaHelper<T extends CodeArea> {
 
 		}
 		//////////////////////////////////////////////////////////////////////////////////////
-		/*선택된 행의 selection을 이동시키기 위한 처리  tab, shift + tab*/
-		//Tab
+		/* 선택된 행의 selection을 이동시키기 위한 처리 tab, shift + tab */
+		// Tab
 		else if (e.getCode() == KeyCode.TAB && (!e.isControlDown() && !e.isShiftDown())) {
 
 			if (e.isConsumed())
@@ -322,7 +324,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 
 			e.consume();
 		}
-		//Shift + Tab
+		// Shift + Tab
 		else if (e.getCode() == KeyCode.TAB && (!e.isControlDown() && e.isShiftDown())) {
 			if (e.isConsumed())
 				return;
@@ -330,6 +332,7 @@ public class CodeAreaHelper<T extends CodeArea> {
 			String selectedText = codeArea.getSelectedText();
 			IndexRange selection = codeArea.getSelection();
 
+			// 행만 선택하고 탭키를 누른경우
 			if (selection.getStart() == selection.getEnd()) {
 				codeArea.selectLine();
 				selectedText = codeArea.getSelectedText();
@@ -342,31 +345,56 @@ public class CodeAreaHelper<T extends CodeArea> {
 				/*
 				 * 2017-07-02
 				 * 
-				 * 더이상 탭이 진행될수 없는 상태의 텍스트인경우
-				 * 불필요한 부분까지 selection되는 부분을 해결한다.
-				 * 라인갯수를 추가적으로 알아야하기때문에 
-				 * ValueUtil.tabpping 함수를 사용하지않는다.
-				 * */
+				 * 더이상 탭이 진행될수 없는 상태의 텍스트인경우 불필요한 부분까지 selection되는 부분을 해결한다.
+				 * 라인갯수를 추가적으로 알아야하기때문에 ValueUtil.tabpping 함수를 사용하지않는다.
+				 */
 				String tabbing = selectedText;
 				/**/
 
 				String[] split = tabbing.split("\n");
+				Integer removedLength = 0;
+				StringBuffer sb = new StringBuffer();
 				if (split != null) {
-					Optional<String> reduce = Stream.of(split).map(str -> {
 
-						return str.replaceAll("^(\t|[ ]{1,3})", "");
+					/*
+					 * 17.01.04 로직수정
+					 * 
+					 * 언탭이후 선택된 라인행을 정확하게 선택하기 위한 로직구성.
+					 * 정규식을 버리려하였으나 버릴순없음. - 케이스1 공백이 없어진 행라인을 찾은뒤 변화없는 코드 작성
+					 */
+//					Optional<String> reduce = Stream.of(split).map(str -> {
+//						// 탭이거나 공백이 포함되는 문자 치환
+//
+//						return str.replaceAll("^(\t|[ ]{1,3})", "");
+//
+//						// return str;
+//					}).reduce((str1, str2) -> str1.concat("\n").concat(str2));
+//					if (reduce.isPresent()) {
+//						tabbing = reduce.get();
+//					}
 
-						// return str;
-					}).reduce((str1, str2) -> str1.concat("\n").concat(str2));
-					if (reduce.isPresent()) {
-						tabbing = reduce.get();
+					for (int i = 0, max = split.length; i < max; i++) {
+						String str = split[i];
+						if (str.startsWith("\t")) {
+							removedLength++;
+						} else if (str.startsWith("   ")) {
+							removedLength += 3;
+						} else if (str.startsWith("  ")) {
+							removedLength += 2;
+						} else if (str.startsWith(" ")) {
+							removedLength += 1;
+						}
+						sb.append(str.replaceAll("^(\t|[ ]{1,3})", ""));
+						if (i != max - 1)
+							sb.append("\n");
 					}
+					tabbing = sb.toString();
 				}
 
-				//원본텍스트와 다른경우에만 변화를 준다.
+				// 원본텍스트와 다른경우에만 변화를 준다.
 				if (!selectedText.equals(tabbing)) {
 					replaceSelection(tabbing);
-					codeArea.selectRange(selection.getStart(), selection.getEnd() - split.length);
+					codeArea.selectRange(selection.getStart(), selection.getEnd() - removedLength);
 				}
 
 			}
