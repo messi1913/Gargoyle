@@ -54,7 +54,23 @@ public class BaseFxExtractField extends FxVoCommons implements IExtractField<Fie
 				}
 
 			}
-
+			
+			//18.01.04 주석 추가.
+			String desc = t.getDesc();
+			if(desc!=null && !desc.isEmpty())
+			{
+				fieldPart.append("\t");
+				fieldPart.append("/**");
+				fieldPart.append("\t");
+				fieldPart.append("\n");
+				fieldPart.append("\t");
+				fieldPart.append(desc);
+				fieldPart.append("\n");
+				fieldPart.append("\t");
+				fieldPart.append("*/");
+				fieldPart.append("\n");
+			}
+			
 			fieldPart.append("\t");
 			if (Modifier.isPrivate(modifier)) {
 				fieldPart.append("private ");

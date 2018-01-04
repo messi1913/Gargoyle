@@ -44,6 +44,13 @@ public class FieldMeta {
 	 */
 	private Class<?> instanceType;
 
+	/**
+	 * 필드설명
+	 * 
+	 * @최초생성일 2018. 1. 4.
+	 */
+	private String desc;
+
 	public FieldMeta(Class<?> fieldType) {
 		super();
 		this.fieldType = fieldType;
@@ -156,6 +163,14 @@ public class FieldMeta {
 	 */
 	public void setPrimarykey(boolean primarykey) {
 		this.primarykey = primarykey;
+	}
+
+	public String getDesc() {
+		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
 	}
 
 	/*
