@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.fx.voeditor.visual.component.sql.view;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -40,6 +41,8 @@ import com.kyj.fx.voeditor.visual.component.sql.prcd.commons.ProcedureCallCompos
 import com.kyj.fx.voeditor.visual.component.sql.prcd.mssql.DefaultMssqlProcedureCallComposite;
 import com.kyj.fx.voeditor.visual.component.sql.prcd.mssql.MssqlProcedureCallCompositePopup;
 import com.kyj.fx.voeditor.visual.component.sql.tab.SqlTab;
+import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationFrameView;
+import com.kyj.fx.voeditor.visual.component.sql.table.TableInformationUserMetadataVO;
 import com.kyj.fx.voeditor.visual.component.text.ASTSqlCodeAreaHelper;
 import com.kyj.fx.voeditor.visual.component.text.MssqlASTSqlCodeAreaHelper;
 import com.kyj.fx.voeditor.visual.component.text.SimpleTextView;
@@ -57,6 +60,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.Scene;
 import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -95,8 +99,7 @@ public class MssqlPane extends CommonsSqllPan {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#
-	 * menuExportMergeScriptOnAction(javafx.event.ActionEvent)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane# menuExportMergeScriptOnAction(javafx.event.ActionEvent)
 	 */
 	@Override
 	public void menuExportMergeScriptOnAction(ActionEvent e) {
@@ -107,9 +110,7 @@ public class MssqlPane extends CommonsSqllPan {
 	/*
 	 * 100개의 데이터 보여주기 위해 처리하는 메소드
 	 *
-	 * @see
-	 * com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#show100RowAction(
-	 * javafx.event.ActionEvent)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#show100RowAction( javafx.event.ActionEvent)
 	 */
 	@Override
 	public List<Map<String, Object>> show100RowAction() {
@@ -147,8 +148,7 @@ public class MssqlPane extends CommonsSqllPan {
 
 				String tableName = "";
 				/*
-				 * 2016-07-12 SQLite에서는 스키마라는 개념이 존재하지않는다. Schema Name을 100개의로우를
-				 * 보여주는 SQL에 적용할지 여부를 결정한다.
+				 * 2016-07-12 SQLite에서는 스키마라는 개념이 존재하지않는다. Schema Name을 100개의로우를 보여주는 SQL에 적용할지 여부를 결정한다.
 				 */
 				if (value.isApplySchemaName(schemaName)) {
 					tableName = String.format("%s.%s", schemaName, value.getName()); // schemaName.concat(".").concat(value.getName());
@@ -268,8 +268,7 @@ public class MssqlPane extends CommonsSqllPan {
 	 * 
 	 * (non-Javadoc)
 	 * 
-	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#
-	 * createTableResourceView()
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane# createTableResourceView()
 	 */
 	@Override
 	protected TableOpenResourceView createTableResourceView() {
@@ -351,9 +350,7 @@ public class MssqlPane extends CommonsSqllPan {
 	/*
 	 * 테이블의 SELECT문을 리턴. (non-Javadoc)
 	 * 
-	 * @see
-	 * com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#applySelectScript(
-	 * javafx.event.ActionEvent)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.SqlPane#applySelectScript( javafx.event.ActionEvent)
 	 */
 	@Override
 	public void applySelectScript(ActionEvent e) {
@@ -399,8 +396,7 @@ public class MssqlPane extends CommonsSqllPan {
 	/*
 	 * 컬럼 트리 구성 함수 (non-Javadoc)
 	 * 
-	 * @see com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan#
-	 * getSelectedTreeByTableColumns(javafx.scene.control.TreeItem)
+	 * @see com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan# getSelectedTreeByTableColumns(javafx.scene.control.TreeItem)
 	 */
 	@Override
 	public List<String> getSelectedTreeByTableColumns(TreeItem<DatabaseItemTree<String>> selectItem) {
@@ -483,6 +479,37 @@ public class MssqlPane extends CommonsSqllPan {
 
 			popup.show();
 
+		}
+	}
+
+	@Override
+	public void showProperties(ConnectionSupplier connectionSupplier, String catalog, String databaseName, String tableName) {
+		try {
+
+			String[] split = tableName.split("\\.");
+			// 팝업씬 생성.
+			TableInformationFrameView tableInformationFrameView = new TableInformationFrameView(connectionSupplier, () -> {
+				TableInformationUserMetadataVO meta = new TableInformationUserMetadataVO();
+				meta.setCatalog(split[0]);
+				meta.setDatabaseName(databaseName);
+				meta.setTableName(split[1]);
+				return meta;
+			});
+
+			final Stage dialog = new Stage();
+			dialog.setTitle(POPUP_TITLE_DATABASE_INFOMATION.concat("(" + tableName + ")"));
+			// dialog.initModality(Modality.NONE);
+			dialog.setAlwaysOnTop(false);
+			dialog.centerOnScreen();
+			dialog.setMaxWidth(tableInformationFrameView.getPrefWidth());
+			dialog.setMaxHeight(tableInformationFrameView.getPrefHeight());
+
+			dialog.initOwner(this.getScene().getWindow());
+			Scene dialogScene = new Scene(tableInformationFrameView);
+			dialog.setScene(dialogScene);
+			dialog.show();
+		} catch (IOException e) {
+			LOGGER.error(ValueUtil.toString(e));
 		}
 	}
 

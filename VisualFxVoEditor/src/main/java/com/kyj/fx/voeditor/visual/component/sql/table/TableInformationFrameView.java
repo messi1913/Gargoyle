@@ -30,6 +30,8 @@ import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableColumnInformatio
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableCreateCodeInformationController;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonTableIndexInformationController;
 import com.kyj.fx.voeditor.visual.component.sql.view.DerbyTableCreateCodeInformationController;
+import com.kyj.fx.voeditor.visual.component.sql.view.MssqlTableColumnInformationController;
+import com.kyj.fx.voeditor.visual.component.sql.view.MssqlTableCreateCodeInformationController;
 import com.kyj.fx.voeditor.visual.component.sql.view.PostgreTableCreateCodeInformationController;
 import com.kyj.fx.voeditor.visual.exceptions.NotSupportException;
 import com.kyj.fx.voeditor.visual.momory.ResourceLoader;
@@ -75,6 +77,7 @@ public class TableInformationFrameView extends BorderPane {
 
 	/**
 	 * 데이터베이스에 대한 메타데이터를 조회하기 위한 뷰
+	 * 
 	 * @최초생성일 2016. 11. 28.
 	 */
 	public static final String KEY_DATABASE_MEATADATA = "DatabaseMetatadataView.fxml";
@@ -168,7 +171,14 @@ public class TableInformationFrameView extends BorderPane {
 
 		// 테이블에 대한 컬럼정보
 		{
-			AbstractTableInfomation columnPane = new CommonTableColumnInformationController();
+			AbstractTableInfomation columnPane = null;
+
+			if (ResourceLoader.ORG_MSSQL_JDBC_DRIVER.equals(getDbmsDriver())) {
+				columnPane = new MssqlTableColumnInformationController();
+			} else {
+				columnPane = new CommonTableColumnInformationController();
+			}
+
 			columnPane.setParentFrame(this);
 
 			try {
@@ -200,12 +210,14 @@ public class TableInformationFrameView extends BorderPane {
 
 		// 테이블에 대한 CREATE문에 대한 정보
 		{
-			AbstractTableInfomation createCodePane = new CommonTableCreateCodeInformationController();
+			AbstractTableInfomation createCodePane = null;
 
 			if (ResourceLoader.ORG_POSTGRESQL_DRIVER.equals(getDbmsDriver())) {
 				createCodePane = new PostgreTableCreateCodeInformationController();
 			} else if (ResourceLoader.ORG_APACHE_DERBY_JDBC.equals(getDbmsDriver())) {
 				createCodePane = new DerbyTableCreateCodeInformationController();
+			} else if (ResourceLoader.ORG_MSSQL_JDBC_DRIVER.equals(getDbmsDriver())) {
+				createCodePane = new MssqlTableCreateCodeInformationController();
 			} else {
 				createCodePane = new CommonTableCreateCodeInformationController();
 			}

@@ -1587,8 +1587,8 @@ public abstract class SqlPane<T, K> extends BorderPane implements ISchemaTreeIte
 			K value = selectedItem.getValue();
 			showProperties(connectionSupplier, value);
 		}
-
 	}
+	
 
 	/**
 	 * @작성자 : KYJ

@@ -197,6 +197,7 @@ public abstract class AbstractTableColumnInformationController extends AbstractT
 	@Override
 	public void init() throws Exception {
 		TableInformationUserMetadataVO metadata = this.parent.getMetadata();
+		String catalog = metadata.getCatalog();
 		String databaseName = metadata.getDatabaseName();
 		String tableName = metadata.getTableName();
 
@@ -209,12 +210,12 @@ public abstract class AbstractTableColumnInformationController extends AbstractT
 		//2016-11-26 by kyj 일단 모든 데이터베이스에서 다 조회가능한 인덱스 조회법으로 수정
 		String sql = "";/* getTableColumnsSQL(databaseName, tableName); */
 		if (ValueUtil.isEmpty(sql)) {
-			result = this.parent.queryForMeta(new ConverterFunction(databaseName, tableName));
+			result = this.parent.queryForMeta(new ConverterFunction(catalog, databaseName, tableName));
 		} else {
 			try {
 				result = this.parent.query(sql, rowMapper());
 			} catch (Exception e) {
-				result = this.parent.queryForMeta(new ConverterFunction(databaseName, tableName));
+				result = this.parent.queryForMeta(new ConverterFunction(catalog, databaseName, tableName));
 			}
 		}
 
@@ -229,7 +230,7 @@ public abstract class AbstractTableColumnInformationController extends AbstractT
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract String getTableColumnsSQL(String databaseName, String tableName) throws Exception;
+	public abstract String getTableColumnsSQL(String catalog, String databaseName, String tableName) throws Exception;
 
 	/**
 	 * 쿼리 결과에 따란 데이터매퍼를 설정한후 반환한다.
@@ -273,9 +274,10 @@ public abstract class AbstractTableColumnInformationController extends AbstractT
 	 *
 	 */
 	private class ConverterFunction implements Function<DatabaseMetaData, List<TableColumnMetaVO>> {
-		private String databaseName, tableName;
+		private String catalog, databaseName, tableName;
 
-		public ConverterFunction(String databaseName, String tableName) {
+		public ConverterFunction(String catalog, String databaseName, String tableName) {
+			this.catalog = catalog;
 			this.databaseName = databaseName;
 			this.tableName = tableName;
 		}

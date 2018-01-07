@@ -34,7 +34,7 @@ public class CommonTableColumnInformationController extends AbstractTableColumnI
 	public void postInit() {
 
 	}
-	
+
 	private ConstraintKeyTypeFactory fac = new ConstraintKeyTypeFactory((str) -> {
 		// TODO 다른 DBMS에서도 적용가능하게 수정해야할부분임.
 
@@ -45,21 +45,6 @@ public class CommonTableColumnInformationController extends AbstractTableColumnI
 			return KEY_TYPE.MULTI;
 		return KEY_TYPE.NOMAL;
 	});
-
-	@Override
-	public String getTableColumnsSQL(String databaseName, String tableName) throws Exception {
-
-		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COLUMNS_WRAPPER, getDbmsDriver());
-
-		//		if (ValueUtil.isNotEmpty(databaseName))
-		//			sql = sql.replaceAll(":databaseName", databaseName);
-		//		sql = sql.replaceAll(":tableName", tableName);
-
-		HashMap<String, Object> map = new HashMap<>();
-		map.put("databaseName", databaseName);
-		map.put("tableName", tableName);
-		return ValueUtil.getVelocityToText(sql, map, true);
-	}
 
 	@Override
 	public RowMapper<TableColumnMetaVO> rowMapper() {
@@ -75,6 +60,20 @@ public class CommonTableColumnInformationController extends AbstractTableColumnI
 			tableColumnMetaVO.setDataType(rs.getString("DATA_TYPE"));
 			return tableColumnMetaVO;
 		};
+	}
+
+	@Override
+	public String getTableColumnsSQL(String catalog, String databaseName, String tableName) throws Exception {
+		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_COLUMNS_WRAPPER, getDbmsDriver());
+
+		// if (ValueUtil.isNotEmpty(databaseName))
+		// sql = sql.replaceAll(":databaseName", databaseName);
+		// sql = sql.replaceAll(":tableName", tableName);
+
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("databaseName", databaseName);
+		map.put("tableName", tableName);
+		return ValueUtil.getVelocityToText(sql, map, true);
 	}
 
 }

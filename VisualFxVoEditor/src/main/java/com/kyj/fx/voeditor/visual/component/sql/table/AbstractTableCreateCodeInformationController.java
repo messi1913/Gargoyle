@@ -56,6 +56,7 @@ public abstract class AbstractTableCreateCodeInformationController<T> extends Ab
 	public void init() throws Exception {
 
 		TableInformationUserMetadataVO metadata = this.frame.getMetadata();
+		String catalog = metadata.getCatalog();
 		databaseName = metadata.getDatabaseName();
 		tableName = metadata.getTableName();
 
@@ -67,7 +68,7 @@ public abstract class AbstractTableCreateCodeInformationController<T> extends Ab
 			T embeddedScript = getEmbeddedScript();
 			txtSql.setContent(convertString(embeddedScript));
 		} else {
-			String sql = getCreateTableSQL(databaseName, tableName);
+			String sql = getCreateTableSQL(catalog, databaseName, tableName);
 			if (sql.trim().isEmpty())
 				return;
 
@@ -128,7 +129,7 @@ public abstract class AbstractTableCreateCodeInformationController<T> extends Ab
 	 * @param tableName
 	 * @return
 	 */
-	public abstract String getCreateTableSQL(String databaseName, String tableName);
+	public abstract String getCreateTableSQL(String catalog, String databaseName, String tableName);
 
 	/**
 	 * SQL에 해당하는결과를 바인딩하는 맵퍼 처리

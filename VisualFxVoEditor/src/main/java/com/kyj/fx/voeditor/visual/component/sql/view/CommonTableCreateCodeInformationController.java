@@ -29,7 +29,7 @@ public class CommonTableCreateCodeInformationController extends AbstractTableCre
 	}
 
 	@Override
-	public String getCreateTableSQL(String databaseName, String tableName) {
+	public String getCreateTableSQL(String catalog, String databaseName, String tableName) {
 		String sql = ConfigResourceLoader.getInstance().get(ConfigResourceLoader.SQL_TABLE_CREATE_WRAPPER, getDbmsDriver());
 //		if(ValueUtil.isNotEmpty(databaseName))
 //			sql = sql.replaceAll(":databaseName", databaseName);

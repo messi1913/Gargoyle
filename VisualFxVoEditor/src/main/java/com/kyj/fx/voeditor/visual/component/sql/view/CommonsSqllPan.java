@@ -21,7 +21,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -73,7 +72,7 @@ public abstract class CommonsSqllPan extends SqlPane<String, DatabaseItemTree<St
 	/**
 	 * 테이블 정보보기 팝업의 타이틀
 	 */
-	private static final String POPUP_TITLE_DATABASE_INFOMATION = "Properties";
+	public static final String POPUP_TITLE_DATABASE_INFOMATION = "Properties";
 
 	private static Logger LOGGER = LoggerFactory.getLogger(CommonsSqllPan.class);
 
