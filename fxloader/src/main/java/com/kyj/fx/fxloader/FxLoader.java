@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -215,6 +215,7 @@ public class FxLoader {
 		URL resource = controllerClass.getResource(fxml);
 
 		FXMLLoader loader = createNewFxmlLoader();
+		loader.setCharset(StandardCharsets.UTF_8);
 		loader.setLocation(resource);
 
 		if (isSelfController && rootInstance != null) {
@@ -232,9 +233,15 @@ public class FxLoader {
 			if (rootInstance != null)
 				loader.setController(rootInstance);
 		}
-
-		loader.setResources(ValueUtil.isEmpty(baseBundleName) ? null : ResourceBundle.getBundle(baseBundleName));
-
+		
+//		ClassLoader.getSystemResource("bundles/")
+//		new GagoyleResourceBundle(new InputStreamReader(in, cs));
+//		loader.setCharset(StandardCharsets.UTF_8);
+		
+		
+		loader.setResources(ValueUtil.isEmpty(baseBundleName) ? null : GagoyleResourceBundle.newBundle(baseBundleName));
+		
+		
 		T load = loader.load();
 		C instanceController = loader.getController();
 

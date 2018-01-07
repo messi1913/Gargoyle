@@ -30,6 +30,12 @@ public class GargoyleBuilderFactory implements BuilderFactory {
 		return factory;
 	}
 
+	private BuilderFactory deligator;
+
+	public void setBuilderFactory(BuilderFactory factory) {
+		this.deligator = factory;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -38,6 +44,13 @@ public class GargoyleBuilderFactory implements BuilderFactory {
 	@Override
 	public Builder<?> getBuilder(Class<?> type) {
 		Builder<?> builder = null;
+
+		if (deligator != null) {
+			Builder<?> userBuilder = deligator.getBuilder(type);
+			if (userBuilder != null) {
+				return userBuilder;
+			}
+		}
 
 		if (type == Button.class) {
 			builder = new GargoyleButtonBuilder();
