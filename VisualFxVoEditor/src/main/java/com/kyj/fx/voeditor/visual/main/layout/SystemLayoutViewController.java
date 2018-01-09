@@ -22,6 +22,7 @@ import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.kyj.fx.fxloader.FxLoader;
 import com.kyj.fx.voeditor.visual.component.ImageViewPane;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileTreeItem;
 import com.kyj.fx.voeditor.visual.component.JavaProjectFileWrapper;
@@ -29,6 +30,7 @@ import com.kyj.fx.voeditor.visual.component.JavaProjectMemberFileTreeItem;
 import com.kyj.fx.voeditor.visual.component.PDFImageBasePaneWrapper;
 import com.kyj.fx.voeditor.visual.component.ProjectFileTreeItemCreator;
 import com.kyj.fx.voeditor.visual.component.ResultDialog;
+import com.kyj.fx.voeditor.visual.component.XmlDiffAppController;
 import com.kyj.fx.voeditor.visual.component.capture.ErdScreenAdapter;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlyConsole;
 import com.kyj.fx.voeditor.visual.component.console.ReadOnlySingletonConsole;
@@ -55,8 +57,6 @@ import com.kyj.fx.voeditor.visual.component.popup.ZipFileViewerComposite;
 import com.kyj.fx.voeditor.visual.component.proxy.ProxyServerComposite;
 import com.kyj.fx.voeditor.visual.component.scm.SVNViewer;
 import com.kyj.fx.voeditor.visual.component.sql.view.CommonsSqllPan;
-import com.kyj.fx.voeditor.visual.component.text.BehaviorTextComposite;
-import com.kyj.fx.voeditor.visual.component.text.BehaviorTextComposite;
 import com.kyj.fx.voeditor.visual.component.text.BehaviorTextComposite;
 import com.kyj.fx.voeditor.visual.component.text.BigTextView;
 import com.kyj.fx.voeditor.visual.component.text.CodeAnalysisJavaTextArea;
@@ -2324,4 +2324,12 @@ public class SystemLayoutViewController implements DbExecListener, GagoyleTabLoa
 		loadNewSystemTab(BehaviorTextComposite.getName(), new BehaviorTextComposite());
 	}
 
+	@FXML
+	public void miXmlCompareOnAction() {
+		try {
+			loadNewSystemTab(XmlDiffAppController.getName(), (Parent) FxLoader.load(new XmlDiffAppController()));
+		} catch (Exception e) {
+			DialogUtil.showExceptionDailog(e);
+		}
+	}
 }

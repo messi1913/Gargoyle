@@ -6,6 +6,7 @@
  *******************************/
 package com.kyj.scm.manager.svn.java;
 
+import java.io.File;
 import java.util.Properties;
 import java.util.stream.Stream;
 
@@ -51,7 +52,31 @@ public class SVNCopy extends AbstractSVN implements ISCMCommit {
 			Copies each source in sources to dst.
 		*/
 		SVNCopyClient copyClient = getSvnManager().getCopyClient();
-		copyClient.doCopy(convert, targetURL, false, false, false, "copy by O-PERA", new SVNProperties());
+		copyClient.doCopy(convert, targetURL, false, false, false, "copy by IDU", new SVNProperties());
+	}
+	
+	/**
+	 * @작성자 : KYJ
+	 * @작성일 : 2018. 1. 5. 
+	 * @param paths
+	 * @param dir
+	 * @throws SVNException
+	 */
+	public void copy(SVNURL[] paths, File dir) throws SVNException {
+		SVNCopySource[] convert = convert(paths);
+
+
+		SVNCopyClient copyClient = getSvnManager().getCopyClient();
+		/*
+		 * SVNCopySource[] sources,
+		 *  File dst, 
+		 * boolean isMove, 
+		 * boolean makeParents, 
+		 * boolean failWhenDstExists, 
+		 * boolean allowMixedRevisions, 
+		 * boolean metadataOnly
+		 */
+		copyClient.doCopy(convert, dir, false, true, true, false , false);
 	}
 
 	private SVNCopySource[] convert(SVNURL[] urls) {

@@ -306,7 +306,14 @@
 											text="Mail" />
 									</items>
 								</Menu>
-
+								
+								<Menu text="Compare" mnemonicParsing="false">
+									<items>
+										<MenuItem mnemonicParsing="false" onAction="#miXmlCompareOnAction"
+											text="XML Compare" />
+									</items>
+								</Menu>
+								
 							</items>
 						</Menu>
 

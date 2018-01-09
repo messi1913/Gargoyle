@@ -33,6 +33,7 @@ public class FieldMetaFunction implements Function<List<TableModelDVO>, List<Fie
 				FieldMeta fieldMeta = ClassTypeResourceLoader.getInstance().get(type);
 				fieldMeta.setName(fieldName);
 				fieldMeta.setModifier(Modifier.PRIVATE);
+				fieldMeta.setDesc(tableModel.getDesc());
 				if ("Y".equals(tableModel.getPk())) {
 					fieldMeta.setPrimarykey(true);
 				}
