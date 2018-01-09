@@ -94,7 +94,7 @@ public class XmlDiffAppController {
 	private DiffComparable<URL> compare;
 
 	@FXML
-	private TextField txtUrlRevice, txtUrlOrigin;
+	private TextField txtUrlRevice, txtUrlOrigin, txtChunk;
 
 	enum DeltaType {
 		ORIGINAL, REVICED
@@ -488,8 +488,17 @@ public class XmlDiffAppController {
 					if (delta != null) {
 						Chunk original = delta.getOriginal();
 						Chunk revised = delta.getRevised();
-						setTooltip(new Tooltip(String.format("position[%d] \n%s -> %s", revised.getPosition() + 1,
-								revised.getLines().toString(), original.getLines().toString())));
+						String format = String.format("position[%d] \n%s -> %s", revised.getPosition() + 1, revised.getLines().toString(),
+								original.getLines().toString());
+						setTooltip(new Tooltip(format));
+
+						graphics.setOnMouseClicked(ev -> {
+							txtChunk.setText(format);
+						});
+					} else {
+						graphics.setOnMouseClicked(ev -> {
+							txtChunk.setText("");
+						});
 					}
 					// [end] Tooltip
 
@@ -524,8 +533,16 @@ public class XmlDiffAppController {
 					if (delta != null) {
 						Chunk original = delta.getOriginal();
 						Chunk revised = delta.getRevised();
-						setTooltip(new Tooltip(String.format("position[%d] \n%s -> %s", revised.getPosition() + 1,
-								original.getLines().toString(), revised.getLines().toString())));
+						String format = String.format("position[%d] \n%s -> %s", revised.getPosition() + 1, original.getLines().toString(),
+								revised.getLines().toString());
+						setTooltip(new Tooltip(format));
+						graphics.setOnMouseClicked(ev -> {
+							txtChunk.setText(format);
+						});
+					} else {
+						graphics.setOnMouseClicked(ev -> {
+							txtChunk.setText("");
+						});
 					}
 					// [end] Tooltip
 				}
