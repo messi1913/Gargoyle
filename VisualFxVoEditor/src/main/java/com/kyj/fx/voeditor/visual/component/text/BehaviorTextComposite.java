@@ -211,6 +211,7 @@ public class BehaviorTextComposite extends BorderPane implements GargoyleTabPana
 	public void btnSearchOnAction(ActionEvent e) {
 		File wib = DialogUtil.showFileDialog(chooser -> {
 			chooser.getExtensionFilters().add(new ExtensionFilter("WIB files (*.wib)", "*.wib"));
+			chooser.getExtensionFilters().add(new ExtensionFilter("ALL (*.*)", "*.*"));
 		});
 
 		if (wib != null) {
